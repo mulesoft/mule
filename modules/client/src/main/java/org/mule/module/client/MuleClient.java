@@ -326,7 +326,7 @@ public class MuleClient implements Disposable
 
         if (!muleContext.getConfiguration().isDefaultSynchronousEndpoints())
         {
-            logger.warn("The mule muleContext is running synchronously, a null message payload will be returned");
+            logger.warn("The mule muleContext is not running synchronously, a null message payload will be returned");
         }
         MuleSession session = new DefaultMuleSession(service, muleContext);
         ImmutableEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload());

@@ -10,7 +10,9 @@
 
 package org.mule.transport.http.transformers;
 
+import org.mule.RequestContext;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.OutputHandler;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
@@ -61,9 +63,9 @@ public class HttpResponseToString extends AbstractTransformer
             writer.println();
             writer.flush();
 
-            InputStream content = response.getBody();
-            if (content != null)
+            if (response.hasBody())
             {
+                OutputHandler handler = response.getBody();
                 Header transferenc = response.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
                 if (transferenc != null)
                 {
@@ -74,7 +76,7 @@ public class HttpResponseToString extends AbstractTransformer
                     }
                 }
 
-                IOUtils.copy(content, outstream);
+                handler.write(RequestContext.getEvent(), outstream);
 
                 if (outstream instanceof ChunkedOutputStream)
                 {

@@ -95,9 +95,9 @@
        we don't use extension or substitution here -->
 
     <xsl:template match="xsd:element[@ref]" mode="documentation">
-        <xsl:if test="xsd:annotation/xsd:documentation/text()">
+        <xsl:if test="xsd:annotation/xsd:documentation/text()|xsd:annotation/xsd:documentation/*">
             <p>
-                <xsl:value-of select="xsd:annotation/xsd:documentation/text()"/>
+                <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()" mode="copy"/>
                 <xsl:call-template name="attribution">
                     <xsl:with-param name="text">
                         From reference for element <xsl:value-of select="@ref"/>.
@@ -111,9 +111,9 @@
     </xsl:template>
 
     <xsl:template match="xsd:element[@name]" mode="documentation">
-        <xsl:if test="xsd:annotation/xsd:documentation/text()">
+        <xsl:if test="xsd:annotation/xsd:documentation/text()|xsd:annotation/xsd:documentation/*">
             <p>
-                <xsl:value-of select="xsd:annotation/xsd:documentation/text()"/>
+                <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()" mode="copy"/>
                 <xsl:call-template name="attribution">
                     <xsl:with-param name="text">
                         From declaration of element <xsl:value-of select="@name"/>.
@@ -124,14 +124,20 @@
         <xsl:if test="@type">
             <xsl:variable name="type" select="@type"/>
             <xsl:apply-templates
-                    select="xsd:complexType[@name=$type]" mode="documentation"/>
+                    select="/xsd:schema/xsd:complexType[@name=$type]" mode="documentation"/>
         </xsl:if>
     </xsl:template>
 
+    <xsl:template match="@*|node()" mode="copy">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()" mode="copy"/>
+        </xsl:copy>
+    </xsl:template>
+
     <xsl:template match="xsd:complexType" mode="documentation">
-        <xsl:if test="xsd:annotation/xsd:documentation/text()">
+        <xsl:if test="xsd:annotation/xsd:documentation/text()|xsd:annotation/xsd:documentation/*">
             <p>
-                <xsl:value-of select="xsd:annotation/xsd:documentation/text()"/>
+                <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()" mode="copy"/>
                 <xsl:call-template name="attribution">
                     <xsl:with-param name="text">
                         <xsl:choose>
@@ -183,9 +189,9 @@
                 <xsl:if test="@default"><xsl:value-of select="@default"/></xsl:if>
             </td>
             <td>
-                <xsl:if test="xsd:annotation/xsd:documentation/text()">
+                <xsl:if test="xsd:annotation/xsd:documentation/text()|xsd:annotation/xsd:documentation/*">
                     <p>
-                        <xsl:value-of select="xsd:annotation/xsd:documentation/text()"/>
+                        <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()" mode="copy"/>
                     </p>
                 </xsl:if>
             </td>
@@ -325,9 +331,9 @@
 
     <xsl:template match="xsd:element" mode="elements-doc">
         <!--element (doc) <xsl:value-of select="@name"/>-->
-        <xsl:if test="xsd:annotation/xsd:documentation/text()">
+        <xsl:if test="xsd:annotation/xsd:documentation/text()|xsd:annotation/xsd:documentation/*">
             <p>
-                <xsl:value-of select="xsd:annotation/xsd:documentation/text()"/>
+                <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()" mode="copy"/>
             </p>
         </xsl:if>
         <!--element (doc) done-->

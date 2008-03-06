@@ -34,11 +34,6 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
 
     private File tmpDir;
 
-    public AbstractFileFunctionalTestCase()
-    {
-        setDisposeManagerPerSuite(false);
-    }
-
     protected String getConfigResources()
     {
         return "file-functional-test.xml";

@@ -26,12 +26,6 @@ import org.dom4j.Element;
 public class AxisServiceUsingXFireEndpointTestCase extends FunctionalTestCase
 {
 
-    public AxisServiceUsingXFireEndpointTestCase()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
-
     public void testAxis() throws Exception
     {
         MuleClient client = new MuleClient();

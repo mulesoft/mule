@@ -15,7 +15,7 @@ import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
-import org.mule.api.context.notification.ManagerNotificationListener;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.MessageNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.RegistryNotificationListener;
@@ -31,7 +31,7 @@ import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.ManagementNotification;
-import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.MessageNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.RegistryNotification;
@@ -64,7 +64,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
     static
     {
         EVENT_MAP = new HashMap();
-        EVENT_MAP.put("MANAGER", ManagerNotification.class.getName());
+        EVENT_MAP.put("MANAGER", MuleContextNotification.class.getName());
         EVENT_MAP.put("MODEL", ModelNotification.class.getName());
         EVENT_MAP.put("SERVICE", ServiceNotification.class.getName());
         EVENT_MAP.put("SECURITY", SecurityNotification.class.getName());
@@ -77,7 +77,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         EVENT_MAP.put("TRANSACTION", TransactionNotification.class.getName());
 
         INTERFACE_MAP = new HashMap();
-        INTERFACE_MAP.put("MANAGER", ManagerNotificationListener.class.getName());
+        INTERFACE_MAP.put("MANAGER", MuleContextNotificationListener.class.getName());
         INTERFACE_MAP.put("MODEL", ModelNotificationListener.class.getName());
         INTERFACE_MAP.put("SERVICE", ServiceNotificationListener.class.getName());
         INTERFACE_MAP.put("SECURITY", SecurityNotificationListener.class.getName());

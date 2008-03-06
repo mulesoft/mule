@@ -26,11 +26,6 @@ public class HttpMethodTestCase extends FunctionalTestCase
 
     private HttpMethodBase method;
 
-    public HttpMethodTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "http-method-test.xml";

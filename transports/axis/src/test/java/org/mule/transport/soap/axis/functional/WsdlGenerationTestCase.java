@@ -30,11 +30,6 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
      */
     private static final String PROXY_REGEX = "^\\$Proxy(\\d+\\d*\\d*)$";
 
-    public WsdlGenerationTestCase()
-    {
-        super.setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "axis-wsdl-test.xml";

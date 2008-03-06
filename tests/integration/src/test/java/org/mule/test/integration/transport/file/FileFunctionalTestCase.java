@@ -29,12 +29,6 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
 {
     private Object receivedData = null;
 
-
-    public FileFunctionalTestCase()
-    {
-        super.setDisposeManagerPerSuite(true);
-    }
-
     //@Override
     protected void doSetUp() throws Exception
     {

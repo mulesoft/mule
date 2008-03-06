@@ -11,6 +11,23 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
     <xsd:complexType name="filenameParserType">
+        <xsd:annotation>
+            <xsd:documentation>
+                This controls the mapping from filename patterns to filenames.
+                Is requires an implementation of the FilenameParser interface,
+                which is used to control how filename patterns are used to generate file names.
+                The file provider has a default implementation called
+                SimpleFilenameParser that understands the following patterns:
+                <ul>
+                    <li>${DATE} - the current date in the format dd-MM-yy_HH-mm-ss.SS;</li>
+                    <li>${DATE:yy-MM-dd} - the current date using the specified format;</li>
+                    <li>${SYSTIME} - The current system time milliseconds;</li>
+                    <li>${UUID} - A generated Universally unique id;</li>
+                    <li>${ORIGINALNAME} - The original file name if the file being written was read from another location;</li>
+                    <li>${COUNT} - An incremental counter.</li>
+                </ul>
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:attribute name="class" type="xsd:NMTOKEN" use="required">
             <xsd:annotation>
                 <xsd:documentation>
@@ -25,25 +42,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence minOccurs="0" maxOccurs="1">
-                    <xsd:element name="filename-parser" type="filenameParserType" minOccurs="0" maxOccurs="1">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                This controls the mapping from filename patterns to filenames.
-                                Is requires an implementation of the FilenameParser interface,
-                                which is used to control how filename patterns are used to generate file names.
-                                The file provider has a default implementation called
-                                SimpleFilenameParser that understands the following patterns:
-                                <ul>
-                                    <li>${DATE} - the current date in the format dd-MM-yy_HH-mm-ss.SS;</li>
-                                    <li>${DATE:yy-MM-dd} - the current date using the specified format;</li>
-                                    <li>${SYSTIME} - The current system time milliseconds;</li>
-                                    <li>${UUID} - A generated Universally unique id;</li>
-                                    <li>${ORIGINALNAME} - The original file name if the file being written was read from another location;</li>
-                                    <li>${COUNT} - An incremental counter.</li>
-                                </ul>
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:element name="filename-parser" type="filenameParserType" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="inboundAttributes"/>
                 <xsd:attributeGroup ref="outboundAttributes"/>
@@ -204,7 +203,13 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="addressAttributes">
-        <xsd:attribute name="path" type="xsd:string"/>
+        <xsd:attribute name="path" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A file location.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
 </xsd:schema>

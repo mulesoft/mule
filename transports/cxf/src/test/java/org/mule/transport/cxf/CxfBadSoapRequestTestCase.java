@@ -24,12 +24,6 @@ import org.dom4j.Element;
 public class CxfBadSoapRequestTestCase extends FunctionalTestCase
 {
 
-    public CxfBadSoapRequestTestCase()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "soap-request-conf.xml";

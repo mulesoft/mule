@@ -23,12 +23,6 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 public class XfireMultipleConnectorsWSSecurityTestCase extends FunctionalTestCase
 {
     
-    public XfireMultipleConnectorsWSSecurityTestCase()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
-    
     public void testSecured() throws Exception
     {
         MuleClient client = new MuleClient();

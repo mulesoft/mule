@@ -16,7 +16,7 @@ import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
-import org.mule.api.context.notification.ManagerNotificationListener;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.MessageNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
@@ -186,7 +186,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         doInitialise();
         if (!ignoreManagerNotifications)
         {
-            ServerNotificationListener l = new ManagerNotificationListener()
+            ServerNotificationListener l = new MuleContextNotificationListener()
             {
                 public void onNotification(ServerNotification notification)
                 {

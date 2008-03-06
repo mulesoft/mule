@@ -13,7 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Constructor;
@@ -59,8 +59,8 @@ public class NotificationLifecycleObject extends LifecycleObject
     public NotificationLifecycleObject(Class type, Class notificationClass, int preNotification, int postNotification)
     {
         this(type, notificationClass);
-        setPreNotificationName(ManagerNotification.getActionName(preNotification));
-        setPostNotificationName(ManagerNotification.getActionName(postNotification));
+        setPreNotificationName(MuleContextNotification.getActionName(preNotification));
+        setPostNotificationName(MuleContextNotification.getActionName(postNotification));
     }
 
     public String getPostNotificationName()

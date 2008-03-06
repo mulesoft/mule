@@ -12,7 +12,7 @@ package org.mule.management.agents;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.context.notification.ManagerNotificationListener;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
@@ -21,7 +21,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.management.i18n.ManagementMessages;
 import org.mule.management.mbeans.ConnectorService;
@@ -204,11 +204,11 @@ public class JmxAgent extends AbstractAgent
         }
 
         // We need to register all the services once the server has initialised
-        ManagerNotificationListener l = new ManagerNotificationListener()
+        MuleContextNotificationListener l = new MuleContextNotificationListener()
         {
             public void onNotification(ServerNotification notification)
             {
-                if (notification.getAction() == ManagerNotification.MANAGER_STARTED_MODELS)
+                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED_MODELS)
                 {
                     try
                     {

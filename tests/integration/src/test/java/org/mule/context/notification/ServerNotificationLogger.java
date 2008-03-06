@@ -10,13 +10,13 @@
 
 package org.mule.context.notification;
 
-import org.mule.api.context.notification.ManagerNotificationListener;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.ServiceNotificationListener;
 
 public class ServerNotificationLogger
         extends AbstractNotificationLogger
-        implements ServiceNotificationListener, ManagerNotificationListener, ModelNotificationListener
+        implements ServiceNotificationListener, MuleContextNotificationListener, ModelNotificationListener
 {
     // nothing to do here
 }

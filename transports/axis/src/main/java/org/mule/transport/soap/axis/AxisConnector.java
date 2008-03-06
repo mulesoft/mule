@@ -11,7 +11,7 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleException;
-import org.mule.api.context.notification.ManagerNotificationListener;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
@@ -22,7 +22,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.transformer.TransformerUtils;
@@ -65,7 +65,7 @@ import org.apache.axis.wsdl.fromJava.Types;
  * Some of the Axis specific service initialisation code was adapted from the Ivory
  * project (http://ivory.codehaus.org). Thanks guys :)
  */
-public class AxisConnector extends AbstractConnector implements ManagerNotificationListener
+public class AxisConnector extends AbstractConnector implements MuleContextNotificationListener
 {
     /* Register the AxisFault Exception reader if this class gets loaded */
     static
@@ -621,7 +621,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     public void onNotification(ServerNotification notification)
     {
-        if (notification.getAction() == ManagerNotification.MANAGER_STARTED)
+        if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
         {
             // We need to register the Axis service component once the muleContext
             // starts because when the model starts listeners on components are started, thus

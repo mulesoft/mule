@@ -18,12 +18,6 @@ import org.mule.tck.FunctionalTestCase;
 public class MultipleConnectorsTestCase extends FunctionalTestCase
 {
 
-    public MultipleConnectorsTestCase()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "multiple-connectors.xml";

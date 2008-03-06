@@ -18,12 +18,6 @@ import org.mule.tck.FunctionalTestCase;
 public class XFireMultipleConnectorsTestCase extends FunctionalTestCase
 {
 
-    public XFireMultipleConnectorsTestCase()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
-    
     protected String getConfigResources()
     {
         return "xfire-multiple-connectors.xml";

@@ -20,15 +20,17 @@ import org.mule.transport.soap.xfire.XFireConnector;
 public class XFireNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
+    public static final String CLASS = "class";
+
     public void init()
     {
         registerMetaTransportEndpoints(XFireConnector.XFIRE);
         registerConnectorDefinitionParser(new XfireElementDefinitionParser());
-        registerBeanDefinitionParser("client-in-handler", new ChildListEntryDefinitionParser("clientInHandlers"));
-        registerBeanDefinitionParser("client-out-handler", new ChildListEntryDefinitionParser("clientOutHandlers"));
-        registerBeanDefinitionParser("client-service", new ChildListEntryDefinitionParser("clientServices"));
-        registerBeanDefinitionParser("server-in-handler", new ChildListEntryDefinitionParser("serverInHandlers"));
-        registerBeanDefinitionParser("server-out-handler", new ChildListEntryDefinitionParser("serverOutHandlers"));
+        registerBeanDefinitionParser("client-in-handler", new ChildListEntryDefinitionParser("clientInHandlers", CLASS));
+        registerBeanDefinitionParser("client-out-handler", new ChildListEntryDefinitionParser("clientOutHandlers", CLASS));
+        registerBeanDefinitionParser("client-service", new ChildListEntryDefinitionParser("clientServices", CLASS));
+        registerBeanDefinitionParser("server-in-handler", new ChildListEntryDefinitionParser("serverInHandlers", CLASS));
+        registerBeanDefinitionParser("server-out-handler", new ChildListEntryDefinitionParser("serverOutHandlers", CLASS));
         registerMuleBeanDefinitionParser("soap-11-transport", new NestedListDefinitionParser("properties", "soap11Transports", MapEntryCombiner.VALUE));
         registerMuleBeanDefinitionParser("complex-type", new NestedMapDefinitionParser("properties", "complexTypes"));
     }

@@ -25,12 +25,6 @@ public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
     private static final String NAME_PAYLOAD = "test-xml-payload.xml";
     private static final String NAME_STYLESHEET = "stylesheet.xsl";
 
-    public HttpContentLengthPropagationTestCase()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "http-content-length-propagation-conf.xml";

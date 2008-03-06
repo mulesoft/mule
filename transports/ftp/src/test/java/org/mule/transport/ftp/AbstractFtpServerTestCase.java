@@ -28,7 +28,6 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
     {
         this.port = port;
         this.timeout = timeout;
-        setDisposeManagerPerSuite(true);
     }
 
     public AbstractFtpServerTestCase(int port)

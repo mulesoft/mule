@@ -17,8 +17,23 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="udp:udpConnectorType">
-                    <xsd:attribute name="timeToLive" type="mule:substitutableLong"/>
-                    <xsd:attribute name="loopback" type="mule:substitutableBoolean"/>
+                    <xsd:attribute name="timeToLive" type="mule:substitutableLong">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Set the time-to-live value for multicast packets to control their scope.
+                                It must be in the range 0 to 255 (inclusive).
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="loopback" type="mule:substitutableBoolean">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Enable local loopback of multicast datagrams.
+                                The option is used by the platform's networking code as a hint for setting
+                                whether multicast data will be looped back to the local socket.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

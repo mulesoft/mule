@@ -22,8 +22,8 @@
     </spring:bean>
 
     <xfire:connector name="xfireConnector">
-        <xfire:client-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:client-out-handler>
-        <xfire:client-out-handler>org.codehaus.xfire.security.wss4j.WSS4JOutHandler</xfire:client-out-handler>
+        <xfire:client-out-handler class="org.codehaus.xfire.util.dom.DOMOutHandler"/>
+        <xfire:client-out-handler class="org.codehaus.xfire.security.wss4j.WSS4JOutHandler"/>
     </xfire:connector>
     
     <endpoint address="xfire:http://localhost:64567" name="endpoint" connector-ref="xfireConnector">

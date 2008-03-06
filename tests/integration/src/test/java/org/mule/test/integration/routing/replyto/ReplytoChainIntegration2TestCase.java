@@ -20,10 +20,6 @@ import java.util.Map;
 
 public class ReplytoChainIntegration2TestCase extends FunctionalTestCase
 {
-    public ReplytoChainIntegration2TestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
 
     protected String getConfigResources()
     {

@@ -20,11 +20,6 @@ import org.mule.transport.NullPayload;
 
 public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
 {
-    public AbstractLoanBrokerTestCase()
-    {
-        super();
-        setDisposeManagerPerSuite(true);
-    }
 
     protected int getNumberOfRequests()
     {

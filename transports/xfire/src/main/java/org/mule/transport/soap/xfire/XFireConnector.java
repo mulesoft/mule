@@ -13,7 +13,7 @@ package org.mule.transport.soap.xfire;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManager;
-import org.mule.api.context.notification.ManagerNotificationListener;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
@@ -23,7 +23,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
@@ -66,7 +66,7 @@ import org.codehaus.xfire.wsdl11.builder.WSDLBuilderFactory;
  * Configures Xfire to provide STaX-based Web Servies support to Mule.
  */
 public class XFireConnector extends AbstractConnector
-    implements ManagerNotificationListener
+    implements MuleContextNotificationListener
 {
 
     public static final String XFIRE = "xfire";
@@ -566,7 +566,7 @@ public class XFireConnector extends AbstractConnector
         // new service and a
         // different http port the model needs to be restarted before the
         // listener is available
-        if (event.getAction() == ManagerNotification.MANAGER_STARTED)
+        if (event.getAction() == MuleContextNotification.CONTEXT_STARTED)
         {
         	for (Iterator itr = components.iterator(); itr.hasNext();)
         	{

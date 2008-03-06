@@ -20,9 +20,15 @@ import org.mule.api.MuleSession;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.context.notification.ConnectionNotification;
+import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.ModelNotification;
 import org.mule.transport.NullPayload;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,11 +41,22 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
     private String endpointAddress;
     private OutboundEndpoint logEndpoint = null;
     private MuleSession session;
+    private List ignoredNotifications = new ArrayList();
 
 
     public EndpointNotificationLoggerAgent()
     {
         super("Endpoint Logger Agent");
+        // List of notifications to ignore, because when these notifications are
+        // received the notification endpoint is no longer available
+        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSING_CONNECTORS));
+        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSED_CONNECTORS));
+        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_STOPPED));
+        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSING));   
+        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSED));
+        ignoredNotifications.add(new Integer(ModelNotification.MODEL_STOPPED));
+        ignoredNotifications.add(new Integer(ModelNotification.MODEL_DISPOSING));
+        ignoredNotifications.add(new Integer(ModelNotification.MODEL_DISPOSED));
     }
 
     protected void doInitialise() throws InitialisationException
@@ -67,10 +84,20 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
 
     protected void logEvent(ServerNotification e)
     {
-        if (logEndpoint != null)
+        if (logEndpoint != null && !ignoredNotifications.contains(new Integer(e.getAction())))
         {
+            if ((e.getAction() == ConnectionNotification.CONNECTION_FAILED || e.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED)
+                && ((Connector) e.getSource()).equals(logEndpoint.getConnector()))
+            {
+                // If this is a CONNECTION_FAILED or
+                // CONNECTION_DISCONNECTED notification for the same connector that
+                // is being used for notifications then ignore.
+                return;
+            }
             try
             {
+                System.out.println("************************************************");
+                System.out.println(e.getActionName(e.getAction()));
                 MuleMessage msg = new DefaultMuleMessage(e.toString(), (Map) null);
                 MuleEvent event = new DefaultMuleEvent(msg, logEndpoint, session, false);
                 logEndpoint.dispatch(event);

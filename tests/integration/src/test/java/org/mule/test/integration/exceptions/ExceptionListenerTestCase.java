@@ -11,17 +11,12 @@
 package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.message.ExceptionMessage;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 public class ExceptionListenerTestCase extends FunctionalTestCase
 {
-
-    public ExceptionListenerTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
 
     protected String getConfigResources()
     {

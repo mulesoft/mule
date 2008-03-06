@@ -34,7 +34,7 @@ public abstract class ServerNotification extends EventObject
     public static final String TYPE_ERROR = "error";
     public static final String TYPE_FATAL = "fatal";
 
-    public static final int MANAGER_EVENT_ACTION_START_RANGE = 100;
+    public static final int CONTEXT_EVENT_ACTION_START_RANGE = 100;
     public static final int MODEL_EVENT_ACTION_START_RANGE = 200;
     public static final int SERVICE_EVENT_ACTION_START_RANGE = 300;
     public static final int SECURITY_EVENT_ACTION_START_RANGE = 400;

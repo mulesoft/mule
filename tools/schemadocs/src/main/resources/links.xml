@@ -12,10 +12,6 @@
     <link><item>mule:echo-component</item><page>Configuring+Models</page></link>
     <link><item>mule:log-component</item><page>Configuring+Models</page></link>
     <link><item>mule:null-component</item><page>Configuring+Models</page></link>
-    <link><item>http:rest-service-component</item><page>Configuring+Models</page></link>
-    <link><item>http:payloadParameterName</item><page>Configuring+Models</page></link>
-    <link><item>http:requiredParameter</item><page>Configuring+Models</page></link>
-    <link><item>http:optionalParameter</item><page>Configuring+Models</page></link>
     <link><item>mule:default-service-exception-strategy</item><page>Configuring+Models</page></link>
     <link><item>mule:default-connector-exception-strategy</item><page>Configuring+Models</page></link>
     <link><item>mule:custom-exception-strategy</item><page>Configuring+Models</page></link>
@@ -72,10 +68,6 @@
     <link><item>mule:jndi-provider-property</item><page>Additional+Configuration</page></link>
     <link><item>mule:jndi-provider-properties</item><page>Additional+Configuration</page></link>
     <link><item>mule:custom-transaction</item><page>Additional+Configuration</page></link>
-    <link><item>jms:transaction</item><page>Additional+Configuration</page></link>
-    <link><item>jms:client-ack-transaction</item><page>Additional+Configuration</page></link>
-    <link><item>jms:xa-transaction</item><page>Additional+Configuration</page></link>
-    <link><item>jdbc:transaction</item><page>Additional+Configuration</page></link>
     <link><item>mule:filter</item><page>Additional+Configuration</page></link>
     <link><item>mule:not-filter</item><page>Additional+Configuration</page></link>
     <link><item>mule:and-filter</item><page>Additional+Configuration</page></link>
@@ -88,7 +80,6 @@
     <link><item>mule:custom-filter</item><page>Additional+Configuration</page></link>
     <link><item>xml:is-xml-filter</item><page>Additional+Configuration</page></link>
     <link><item>xml:jxpath-filter</item><page>Additional+Configuration</page></link>
-    <link><item>jms:property-filter</item><page>Additional+Configuration</page></link>
     <link><item>ognl:filter</item><page>Additional+Configuration</page></link>
     <link><item>mule:custom-property-extractor</item><page>Additional+Configuration</page></link>
     <link><item>mule:map-property-extractor</item><page>Additional+Configuration</page></link>
@@ -129,12 +120,6 @@
     <link><item>xml:xslt-transformer</item><page>Additional+Configuration</page></link>
     <link><item>xml:xml-prettyprinter-transformer</item><page>Additional+Configuration</page></link>
     <link><item>soap:http-to-soap-request-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>http:http-client-response-to-object-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>http:http-response-to-string-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>http:object-to-http-client-request-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>http:message-to-http-response-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>jms:jmsmessage-to-object-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>jms:object-to-jmsmessage-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:encryption-security-filter</item><page>Additional+Configuration</page></link>
     <link><item>jaas:jaas-security-filter</item><page>Additional+Configuration</page></link>
     <link><item>acegi:http-security-filter</item><page>Additional+Configuration</page></link>
@@ -196,10 +181,102 @@
     <link><item>file:file-to-byte-array-transformer</item><page>File+Transport</page></link>
     <link><item>file:file-to-string-transformer</item><page>File+Transport</page></link>
 
-    <link><item>ftp:connector</item><page>Ftp+Transport</page></link>
-    <link><item>ftp:filename-parser</item><page>Ftp+Transport</page></link>
-    <link><item>ftp:inbound-endpoint</item><page>Ftp+Transport</page></link>
-    <link><item>ftp:outbound-endpoint</item><page>Ftp+Transport</page></link>
-    <link><item>ftp:endpoint</item><page>Ftp+Transport</page></link>
+    <link><item>ftp:connector</item><page>FTP+Transport</page></link>
+    <link><item>ftp:filename-parser</item><page>FTP+Transport</page></link>
+    <link><item>ftp:inbound-endpoint</item><page>FTP+Transport</page></link>
+    <link><item>ftp:outbound-endpoint</item><page>FTP+Transport</page></link>
+    <link><item>ftp:endpoint</item><page>FTP+Transport</page></link>
+
+    <link><item>http:connector</item><page>HTTP+Transport</page></link>
+    <link><item>http:rest-service-component</item><page>HTTP+Transport</page></link>
+    <link><item>http:payloadParameterName</item><page>HTTP+Transport</page></link>
+    <link><item>http:requiredParameter</item><page>HTTP+Transport</page></link>
+    <link><item>http:optionalParameter</item><page>HTTP+Transport</page></link>
+    <link><item>http:http-client-response-to-object-transformer</item><page>HTTP+Transport</page></link>
+    <link><item>http:http-response-to-string-transformer</item><page>HTTP+Transport</page></link>
+    <link><item>http:object-to-http-client-request-transformer</item><page>HTTP+Transport</page></link>
+    <link><item>http:message-to-http-response-transformer</item><page>HTTP+Transport</page></link>
+    <link><item>http:inbound-endpoint</item><page>HTTP+Transport</page></link>
+    <link><item>http:outbound-endpoint</item><page>HTTP+Transport</page></link>
+    <link><item>http:endpoint</item><page>HTTP+Transport</page></link>
+
+    <link><item>https:connector</item><page>HTTPS+Transport</page></link>
+    <link><item>https:tls-client</item><page>HTTPS+Transport</page></link>
+    <link><item>https:tls-key-store</item><page>HTTPS+Transport</page></link>
+    <link><item>https:tls-server</item><page>HTTPS+Transport</page></link>
+    <link><item>https:tls-protocol-handler</item><page>HTTPS+Transport</page></link>
+    <link><item>https:inbound-endpoint</item><page>HTTPS+Transport</page></link>
+    <link><item>https:outbound-endpoint</item><page>HTTPS+Transport</page></link>
+    <link><item>https:endpoint</item><page>HTTPS+Transport</page></link>
+
+    <link><item>imap:connector</item><page>IMAP+Transport</page></link>
+    <link><item>imap:inbound-endpoint</item><page>IMAP+Transport</page></link>
+    <link><item>imap:endpoint</item><page>IMAP+Transport</page></link>
+
+    <link><item>imaps:connector</item><page>IMAPS+Transport</page></link>
+    <link><item>imaps:tls-client</item><page>IMAPS+Transport</page></link>
+    <link><item>imaps:tls-trust-store</item><page>IMAPS+Transport</page></link>
+    <link><item>imaps:inbound-endpoint</item><page>IMAPS+Transport</page></link>
+    <link><item>imaps:endpoint</item><page>IMAPS+Transport</page></link>
+
+    <link><item>jdbc:connector</item><page>JDBC+Transport</page></link>
+    <link><item>jdbc:inbound-endpoint</item><page>JDBC+Transport</page></link>
+    <link><item>jdbc:outbound-endpoint</item><page>JDBC+Transport</page></link>
+    <link><item>jdbc:endpoint</item><page>JDBC+Transport</page></link>
+    <link><item>jdbc:transaction</item><page>JDBC+Transport</page></link>
+    <link><item>jdbc:query</item><page>JDBC+Transport</page></link>
+
+    <link><item>jetty:connector</item><page>Jetty+Transport</page></link>
+    <link><item>jetty:inbound-endpoint</item><page>Jetty+Transport</page></link>
+    <link><item>jetty:outbound-endpoint</item><page>Jetty+Transport</page></link>
+    <link><item>jetty:endpoint</item><page>Jetty+Transport</page></link>
+
+    <link><item>jms:connector</item><page>JMS+Transport</page></link>
+    <link><item>jms:custom-connector</item><page>JMS+Transport</page></link>
+    <link><item>jms:activemq-connector</item><page>JMS+Transport</page></link>
+    <link><item>jms:activemq-xa-connector</item><page>JMS+Transport</page></link>
+    <link><item>jms:weblogic-connector</item><page>JMS+Transport</page></link>
+    <link><item>jms:websphere-connector</item><page>JMS+Transport</page></link>
+    <link><item>jms:transaction</item><page>JMS+Transport</page></link>
+    <link><item>jms:client-ack-transaction</item><page>JMS+Transport</page></link>
+    <link><item>jms:xa-transaction</item><page>JMS+Transport</page></link>
+    <link><item>jms:jmsmessage-to-object-transformer</item><page>JMS+Transport</page></link>
+    <link><item>jms:object-to-jmsmessage-transformer</item><page>JMS+Transport</page></link>
+    <link><item>jms:inbound-endpoint</item><page>JMS+Transport</page></link>
+    <link><item>jms:outbound-endpoint</item><page>JMS+Transport</page></link>
+    <link><item>jms:endpoint</item><page>JMS+Transport</page></link>
+    <link><item>jms:selector</item><page>JMS+Transport</page></link>
+    <link><item>jms:property-filter</item><page>JMS+Transport</page></link>
+
+    <link><item>jnp:connector</item><page>JNP+Transport</page></link>
+    <link><item>jnp:inbound-endpoint</item><page>JNP+Transport</page></link>
+    <link><item>jnp:outbound-endpoint</item><page>JNP+Transport</page></link>
+    <link><item>jnp:endpoint</item><page>JNP+Transport</page></link>
+
+    <link><item>multicast:connector</item><page>Multicast+Transport</page></link>
+    <link><item>multicast:inbound-endpoint</item><page>Multicast+Transport</page></link>
+    <link><item>multicast:outbound-endpoint</item><page>Multicast+Transport</page></link>
+    <link><item>multicast:endpoint</item><page>Multicast+Transport</page></link>
+
+    <link><item>pop3:connector</item><page>POP3+Transport</page></link>
+    <link><item>pop3:inbound-endpoint</item><page>POP3+Transport</page></link>
+    <link><item>pop3:endpoint</item><page>POP3+Transport</page></link>
+
+    <link><item>pop3s:connector</item><page>POP3S+Transport</page></link>
+    <link><item>pop3s:tls-client</item><page>POP3S+Transport</page></link>
+    <link><item>pop3s:tls-trust-store</item><page>POP3S+Transport</page></link>
+    <link><item>pop3s:inbound-endpoint</item><page>POP3S+Transport</page></link>
+    <link><item>pop3s:endpoint</item><page>POP3S+Transport</page></link>
+
+    <link><item>quartz:connector</item><page>Quartz+Transport</page></link>
+    <link><item>quartz:factory-property</item><page>Quartz+Transport</page></link>
+    <link><item>quartz:factory-properties</item><page>Quartz+Transport</page></link>
+    <link><item>quartz:outbound-endpoint</item><page>Quartz+Transport</page></link>
+    <link><item>quartz:endpoint</item><page>Quartz+Transport</page></link>
+
+    <link><item>rmi:connector</item><page>RMI+Transport</page></link>
+    <link><item>rmi:inbound-endpoint</item><page>RMI+Transport</page></link>
+    <link><item>rmi:outbound-endpoint</item><page>RMI+Transport</page></link>
+    <link><item>rmi:endpoint</item><page>RMI+Transport</page></link>
 
 </links>

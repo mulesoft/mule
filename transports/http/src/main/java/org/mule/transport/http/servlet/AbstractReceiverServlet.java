@@ -10,12 +10,13 @@
 
 package org.mule.transport.http.servlet;
 
+import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.OutputHandler;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
@@ -126,7 +127,6 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             else
             {
                 httpResponse = new HttpResponse();
-                httpResponse.setBody(new ByteArrayInputStream(message.getPayloadAsBytes()));
                 String ct = message.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
                 if(ct!=null)
                 {
@@ -134,6 +134,8 @@ public abstract class AbstractReceiverServlet extends HttpServlet
                 }
                 httpResponse.setStatusLine(httpResponse.getHttpVersion(), 
                     message.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpServletResponse.SC_OK));
+                httpResponse.setBody(message);
+                
             }
 
             Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
@@ -154,14 +156,15 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             if (!contentType.startsWith("text"))
             {
                 servletResponse.setContentType(contentType);
-                servletResponse.getOutputStream().write(httpResponse.getBodyBytes());
+                OutputHandler outputHandler = httpResponse.getBody();
+                
+                outputHandler.write(RequestContext.getEvent(), servletResponse.getOutputStream());
             }
             else
             {
-
                 servletResponse.setContentType(contentType);
                 // Encoding: this method will check the charset on the content type
-                servletResponse.getWriter().write(httpResponse.getBodyString());
+                servletResponse.getWriter().write(httpResponse.getBodyAsString());
             }
         }
         servletResponse.flushBuffer();

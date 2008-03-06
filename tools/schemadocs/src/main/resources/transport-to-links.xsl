@@ -9,7 +9,11 @@
 
     <!-- generate text to cut+paste into the wiki and links document
 
-         this should be run on a transport's schema
+         this should be run on a transport's schema.
+
+         for example,
+         saxon ./transports/http/src/main/resources/META-INF/mule-http.xsd \
+               ./tools/schemadocs/src/main/resources/transport-to-links.xsl transport=http
     -->
 
     <!-- the transport we are generating docs for -->

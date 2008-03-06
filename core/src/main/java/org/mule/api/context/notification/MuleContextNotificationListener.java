@@ -12,11 +12,11 @@ package org.mule.api.context.notification;
 
 
 /**
- * <code>ManagerNotificationListener</code> is an observer interface that objects
+ * <code>MuleContextNotificationListener</code> is an observer interface that objects
  * can implement and then register themselves with the Mule manager to be notified
  * when a Manager event occurs.
  */
-public interface ManagerNotificationListener extends ServerNotificationListener
+public interface MuleContextNotificationListener extends ServerNotificationListener
 {
     // no methods
 }

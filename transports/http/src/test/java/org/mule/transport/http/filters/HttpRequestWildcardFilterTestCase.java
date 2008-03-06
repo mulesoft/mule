@@ -22,11 +22,6 @@ import java.util.Map;
 public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
 {
 
-    public HttpRequestWildcardFilterTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "http-wildcard-filter-test.xml";

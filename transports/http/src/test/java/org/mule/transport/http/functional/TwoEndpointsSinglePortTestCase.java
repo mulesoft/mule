@@ -20,10 +20,6 @@ import java.util.List;
 
 public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
 {
-    public TwoEndpointsSinglePortTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
 
     protected String getConfigResources()
     {

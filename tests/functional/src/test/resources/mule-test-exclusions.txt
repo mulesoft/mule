@@ -7,8 +7,5 @@
 
 org.mule.test.firewall.FirewallTestCase
 
-# TC: I broke this one but do not understand the test enough to know why
-org.mule.config.spring.parsers.MapMule2478TestCase
-
 # MULE-3005
 org.mule.test.spring.SpringIdsMule3005TestCase

@@ -18,11 +18,6 @@ public class AsynchronousSslMule1854TestCase extends FunctionalTestCase {
 
     protected static String TEST_MESSAGE = "Test Request";
 
-    public AsynchronousSslMule1854TestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "ssl-functional-test.xml";

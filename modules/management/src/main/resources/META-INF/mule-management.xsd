@@ -176,6 +176,8 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="yourkit-profiler" substitutionGroup="mule:abstract-extension"/>
+
     <xsd:element name="custom-agent" type="customAgentType" substitutionGroup="mule:abstract-extension"/>
     <xsd:complexType name="customAgentType">
         <xsd:complexContent>

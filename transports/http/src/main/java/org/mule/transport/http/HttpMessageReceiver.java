@@ -273,7 +273,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_METHOD_NOT_ALLOWED);
-            response.setBodyString(HttpMessages.methodNotAllowed(method).toString() + HttpConstants.CRLF);
+            response.setBody(HttpMessages.methodNotAllowed(method).toString() + HttpConstants.CRLF);
             return transformResponse(response);
         }
 
@@ -284,7 +284,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);
-            response.setBodyString(HttpMessages.malformedSyntax().toString() + HttpConstants.CRLF);
+            response.setBody(HttpMessages.malformedSyntax().toString() + HttpConstants.CRLF);
             return transformResponse(response);
         }
 
@@ -342,7 +342,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
-            response.setBodyString(HttpMessages.cannotBindToAddress(failedPath).toString());
+            response.setBody(HttpMessages.cannotBindToAddress(failedPath).toString());
             RequestContext.setEvent(new DefaultMuleEvent(new DefaultMuleMessage(response), endpoint,
                     new DefaultMuleSession(service, connector.getMuleContext()), true));
             // The DefaultResponseTransformer will set the necessary headers

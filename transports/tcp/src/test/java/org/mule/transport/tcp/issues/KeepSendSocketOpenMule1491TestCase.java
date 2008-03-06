@@ -31,11 +31,6 @@ public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase
 
     protected static String TEST_MESSAGE = "Test TCP Request";
 
-    public KeepSendSocketOpenMule1491TestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "tcp-keep-send-socket-open.xml";

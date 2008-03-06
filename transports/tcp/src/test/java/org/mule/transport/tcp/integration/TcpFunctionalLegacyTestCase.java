@@ -22,11 +22,6 @@ public class TcpFunctionalLegacyTestCase extends FunctionalTestCase
 
     protected static String TEST_MESSAGE = "Test TCP Request";
 
-    public TcpFunctionalLegacyTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "tcp-functional-legacy-test.xml";

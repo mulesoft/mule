@@ -10,6 +10,10 @@
 
 package org.mule.transport.http;
 
+import org.mule.RequestContext;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.OutputHandler;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -217,7 +221,7 @@ public class HttpServerConnection
         outstream.flush();
     }
 
-    public void writeResponse(final HttpResponse response) throws IOException
+    public void writeResponse(final HttpResponse response) throws IOException, TransformerException
     {
         if (response == null)
         {
@@ -239,7 +243,7 @@ public class HttpServerConnection
         writer.println();
         writer.flush();
 
-        InputStream content = response.getBody();
+        OutputHandler content = response.getBody();
         if (content != null)
         {
             Header transferenc = response.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
@@ -252,13 +256,12 @@ public class HttpServerConnection
                 }
             }
 
-            IOUtils.copy(content, outstream);
+            content.write(RequestContext.getEvent(), outstream);
 
             if (outstream instanceof ChunkedOutputStream)
             {
                 ((ChunkedOutputStream) outstream).finish();
             }
-            content.close();
         }
 
         outstream.flush();

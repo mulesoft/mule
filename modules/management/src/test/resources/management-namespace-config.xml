@@ -31,4 +31,7 @@
 
     <management:publish-notifications endpointAddress="test://test"/>
 
+    <!-- needs profiler installed -->
+    <!-- management:yourkit-profiler/ -->
+
  </mule>

@@ -31,12 +31,6 @@ public class AxisEchoTestCase extends FunctionalTestCase
     private String expectedGetResponse;
     private String expectedPostResponse;
 
-    public AxisEchoTestCase()
-    {
-        this.setDisposeManagerPerSuite(true);
-    }
-
-
     protected void doSetUp() throws Exception
     {
         try

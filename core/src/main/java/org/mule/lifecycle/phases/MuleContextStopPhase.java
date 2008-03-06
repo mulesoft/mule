@@ -18,7 +18,7 @@ import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.DefaultLifecyclePhase;
 import org.mule.lifecycle.NotificationLifecycleObject;
 
@@ -50,8 +50,8 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
         stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         try
         {
-            stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, ManagerNotification.class,
-                ManagerNotification.MANAGER_STOPPING_MODELS,ManagerNotification.MANAGER_STOPPED_MODELS));
+            stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class,
+                    MuleContextNotification.CONTEXT_STOPPING_MODELS,MuleContextNotification.CONTEXT_STOPPED_MODELS));
         }
         catch (IllegalStateException e)
         {

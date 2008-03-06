@@ -18,6 +18,7 @@ import org.mule.management.agents.JmxAgent;
 import org.mule.management.agents.JmxServerNotificationAgent;
 import org.mule.management.agents.Log4jAgent;
 import org.mule.management.agents.Mx4jAgent;
+import org.mule.management.agents.YourKitProfilerAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
@@ -83,6 +84,11 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(agent);
         assertEquals(TestAgent.class, agent.getClass());
         assertEquals("woggle", ((TestAgent) agent).getFrobbit());
+
+        // needs profiler installed
+//        agent = muleContext.getRegistry().lookupAgent("yourkit-profiler");
+//        assertNotNull(agent);
+//        assertEquals(YourKitProfilerAgent.class, agent.getClass());
     }
 
     public void testAgentsOrder() throws Exception

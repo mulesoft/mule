@@ -19,10 +19,6 @@ import org.mule.transformers.xml.wire.XStreamWireFormat;
 
 public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
 {
-    public MuleClientRemotingAxisTestCase()
-    {
-        setDisposeManagerPerSuite(false);
-    }
 
     protected String getConfigResources()
     {

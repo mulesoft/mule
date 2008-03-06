@@ -16,6 +16,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +37,7 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
         registerSourceType(byte[].class);
         registerSourceType(String.class);
         registerSourceType(InputStream.class);
+        registerSourceType(Serializable.class);
         setReturnClass(OutputHandler.class);
     }
 
@@ -58,6 +60,24 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
                 public void write(MuleEvent event, OutputStream out) throws IOException
                 {
                     out.write((byte[]) src);
+                }
+            };
+        }
+        else if (src instanceof InputStream)
+        {
+            return new OutputHandler()
+            {
+                public void write(MuleEvent event, OutputStream out) throws IOException
+                {
+                    InputStream is = (InputStream) src;
+                    try 
+                    {
+                        IOUtils.copyLarge(is, out);
+                    }
+                    finally
+                    {
+                        is.close();
+                    }
                 }
             };
         }

@@ -22,11 +22,6 @@ public class MuleMessageLengthTestCase extends FunctionalTestCase
 
     protected static String TEST_MESSAGE = "Test TCP Request";
 
-    public MuleMessageLengthTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "tcp-mplength-test.xml";

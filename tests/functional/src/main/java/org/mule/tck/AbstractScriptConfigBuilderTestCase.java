@@ -55,7 +55,6 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     protected AbstractScriptConfigBuilderTestCase(boolean legacy)
     {
         this.legacy = legacy;
-        setDisposeManagerPerSuite(true);
     }
 
     public void testManagerConfig() throws Exception

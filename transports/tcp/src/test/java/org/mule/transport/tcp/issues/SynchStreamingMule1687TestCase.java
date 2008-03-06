@@ -24,11 +24,6 @@ public class SynchStreamingMule1687TestCase extends FunctionalTestCase
 
     public static final String TEST_MESSAGE = "Test TCP Request";
 
-    public SynchStreamingMule1687TestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "tcp-synch-streaming-test.xml";

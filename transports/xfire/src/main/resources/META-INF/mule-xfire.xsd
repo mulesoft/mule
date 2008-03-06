@@ -22,11 +22,11 @@
         <xsd:complexContent>        
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
-                    <xsd:element name="client-in-handler" type="xsd:NMTOKEN" minOccurs="0" maxOccurs="unbounded" />
-                    <xsd:element name="client-out-handler" type="xsd:NMTOKEN" minOccurs="0" maxOccurs="unbounded" />
-                    <xsd:element name="client-service" type="xsd:NMTOKEN" minOccurs="0" maxOccurs="unbounded" />
-                    <xsd:element name="server-in-handler" type="xsd:NMTOKEN" minOccurs="0" maxOccurs="unbounded" />
-                    <xsd:element name="server-out-handler" type="xsd:NMTOKEN" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element name="client-in-handler" type="withClass" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element name="client-out-handler" type="withClass" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element name="client-service" type="withClass" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element name="server-in-handler" type="withClass" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element name="server-out-handler" type="withClass" minOccurs="0" maxOccurs="unbounded" />
                 </xsd:sequence>
                 <xsd:attribute name="bindingProviderClass" type="xsd:NMTOKEN">
                     <xsd:annotation>
@@ -80,6 +80,16 @@
                 </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="withClass">
+        <xsd:attribute name="class" type="mule:substitutableClass">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The class to use.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>

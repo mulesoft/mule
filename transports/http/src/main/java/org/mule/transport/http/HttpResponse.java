@@ -10,9 +10,19 @@
 
 package org.mule.transport.http;
 
+import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.OutputHandler;
+import org.mule.transport.NullPayload;
+
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 
@@ -25,8 +35,6 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.StatusLine;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 
 /**
  * A generic HTTP response wrapper.
@@ -45,6 +53,9 @@ public class HttpResponse
     private boolean keepAlive = false;
     private boolean disableKeepAlive = false;
     private String fallbackCharset = DEFAULT_CONTENT_CHARSET;
+    private MuleMessage message;
+    private MuleEventContext event;
+    private OutputHandler outputHandler;
 
     public HttpResponse()
     {
@@ -252,70 +263,94 @@ public class HttpResponse
         }
     }
 
-    public void setBodyString(final String string)
+    public boolean hasBody()
     {
-        if (string != null)
+        return outputHandler != null;
+    }
+
+    public OutputHandler getBody() throws TransformerException 
+    {
+        return outputHandler; 
+    }
+    
+    public void setBody(MuleMessage msg) throws TransformerException 
+    {
+        if (msg == null) return;
+        
+        Object payload = msg.getPayload();
+        if (payload instanceof String)
         {
-            byte[] raw;
-            try
+            setBody(payload.toString());
+        }
+        else if (payload instanceof NullPayload) 
+        {
+            return;
+        }
+        else if (payload instanceof byte[]) 
+        {
+            setBody((byte[]) payload);
+        }
+        else 
+        {
+            setBody((OutputHandler) msg.getPayload(OutputHandler.class));
+        }
+    }
+    
+    public void setBody(OutputHandler outputHandler) 
+    {
+        this.outputHandler = outputHandler;
+    }
+    
+    public void setBody(final String string)
+    {
+        byte[] raw;
+        try
+        {
+            raw = string.getBytes(getCharset());
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            raw = string.getBytes();
+        }
+        setBody(raw);
+    }
+
+    private void setBody(final byte[] raw)
+    {
+        if (!containsHeader(HttpConstants.HEADER_CONTENT_TYPE))
+        {
+            setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE));
+        }
+        setHeader(new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(raw.length)));
+        
+        this.outputHandler = new OutputHandler() {
+
+            public void write(MuleEvent event, OutputStream out) throws IOException
             {
-                raw = string.getBytes(getCharset());
+                out.write(raw);
             }
-            catch (UnsupportedEncodingException e)
-            {
-                raw = string.getBytes();
-            }
-            this.entity = new ByteArrayInputStream(raw);
-            if (!containsHeader(HttpConstants.HEADER_CONTENT_TYPE))
-            {
-                setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE));
-            }
-            setHeader(new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(raw.length)));
-        }
-        else
-        {
-            this.entity = null;
-        }
+            
+        };
     }
-
-    public void setBody(final InputStream instream)
+    
+    public String getBodyAsString() throws IOException 
     {
-        this.entity = instream;
-    }
-
-    public InputStream getBody()
-    {
-        return this.entity;
-    }
-
-    public byte[] getBodyBytes() throws IOException
-    {
-        InputStream in = getBody();
-        if (in != null)
+        if (!hasBody()) return "";
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        
+        outputHandler.write(RequestContext.getEvent(), out);
+        
+        try
         {
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
-            IOUtils.copy(in, buffer);
-            return buffer.toByteArray();
+            return new String(out.toByteArray(), getCharset());
         }
-        else
+        catch (UnsupportedEncodingException e)
         {
-            return null;
+            return new String(out.toByteArray());
         }
     }
-
-    public String getBodyString() throws IOException
-    {
-        byte[] raw = getBodyBytes();
-        if (raw != null)
-        {
-            return new String(raw, getCharset());
-        }
-        else
-        {
-            return null;
-        }
-    }
-
+    
     public boolean isKeepAlive()
     {
         return !disableKeepAlive && keepAlive;

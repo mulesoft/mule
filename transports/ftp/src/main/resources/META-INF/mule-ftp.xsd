@@ -18,40 +18,22 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence minOccurs="1" maxOccurs="1">
-                    <xsd:element name="filename-parser" type="file:filenameParserType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="filename-parser" type="file:filenameParserType" minOccurs="0"/>
                 </xsd:sequence>
-                <xsd:attribute name="outputPattern" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Pattern to generate output file name.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Time (ms) between polling reads.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="binary" type="mule:substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Select/disable binary file transfer type.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="passive" type="mule:substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Select/disable passive protocol (more likely to work through firewalls).
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
+                <xsd:attributeGroup ref="inboundAttributes"/>
+                <xsd:attributeGroup ref="outboundAttributes"/>
+                <xsd:attributeGroup ref="commonAttributes"/>
                 <xsd:attribute name="validateConnections" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Validate connection (via NOOP) before use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="connectionFactoryClass" type="mule:substitutableClass">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A class that extends FtpConnectionFactory.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -64,7 +46,8 @@
         <xsd:complexContent>
             <xsd:extension base="mule:inboundEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
-                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong"/>
+                <xsd:attributeGroup ref="commonAttributes"/>
+                <xsd:attributeGroup ref="inboundAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -74,7 +57,8 @@
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
-                <xsd:attribute name="outputPattern" type="xsd:string"/>
+                <xsd:attributeGroup ref="commonAttributes"/>
+                <xsd:attributeGroup ref="outboundAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -84,20 +68,87 @@
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
-                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong"/>
-                <xsd:attribute name="outputPattern" type="xsd:string"/>
+                <xsd:attributeGroup ref="commonAttributes"/>
+                <xsd:attributeGroup ref="inboundAttributes"/>
+                <xsd:attributeGroup ref="outboundAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:attributeGroup name="inboundAttributes">
+        <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The frequency in milliseconds that the read directory should be checked.
+                    Note that the read directory is specified by the endpoint of the listening component.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="outboundAttributes">
+        <xsd:attribute name="outputPattern" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The pattern to use when writing a file to disk.
+                    This can use the patterns supported by the filename-parser configured for this connector                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="commonAttributes">
+        <xsd:attribute name="binary" type="mule:substitutableBoolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Select/disable binary file transfer type.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="passive" type="mule:substitutableBoolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Select/disable passive protocol (more likely to work through firewalls).
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
     <xsd:attributeGroup name="addressAttributes">
-        <xsd:attribute name="user" type="xsd:string"/>
-        <xsd:attribute name="password" type="xsd:string"/>
-        <xsd:attribute name="host" type="xsd:string"/>
-        <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
-        <xsd:attribute name="path" type="xsd:string"/>
-        <xsd:attribute name="passive" type="mule:substitutableBoolean"/>
-        <xsd:attribute name="binary" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="path" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A file location.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="user" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A username.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="password" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A password.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="host" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    An IP address (eg www.mulesource.com, localhost, 127.0.0.1).
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="port" type="mule:substitutablePortNumber">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A port number.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
 </xsd:schema>

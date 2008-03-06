@@ -13,7 +13,8 @@
             outputPattern="abc"
             passive="false"
             pollingFrequency="1234"
-            validateConnections="false">
+            validateConnections="false"
+            connectionFactoryClass="org.mule.transport.ftp.FTPConnectorTestCase$TestFtpConnectionFactory">
         <ftp:filename-parser class="org.mule.transport.file.DummyFilenameParser"/>
     </ftp:connector>
 

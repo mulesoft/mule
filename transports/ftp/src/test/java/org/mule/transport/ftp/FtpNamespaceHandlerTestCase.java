@@ -31,6 +31,7 @@ public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(false, c.isBinary());
         assertEquals(false, c.isPassive());
         assertEquals(false, c.isValidateConnections());
+        assertEquals(FTPConnectorTestCase.TestFtpConnectionFactory.class.getName(), c.getConnectionFactoryClass());
 
         FilenameParser parser = c.getFilenameParser();
         assertTrue(parser.getClass().getName(), c.getFilenameParser() instanceof DummyFilenameParser);

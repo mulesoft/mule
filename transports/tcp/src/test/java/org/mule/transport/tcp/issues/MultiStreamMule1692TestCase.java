@@ -35,11 +35,6 @@ public class MultiStreamMule1692TestCase extends FunctionalTestCase
     public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
     public static final String RESULT_2 = "Received stream; length: 23; 'Seco...uest'";
 
-    public MultiStreamMule1692TestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "tcp-streaming-test.xml";

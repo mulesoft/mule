@@ -15,6 +15,7 @@ import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextFactory;
@@ -612,6 +613,10 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
                 }
             }
             catch (IOException ioex)
+            {
+                // ignore
+            }
+            catch (MuleRuntimeException ioex)
             {
                 // ignore
             }

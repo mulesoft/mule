@@ -20,10 +20,6 @@ import org.mule.util.StringUtils;
 
 public abstract class AbstractWebappTestCase extends AbstractMuleTestCase
 {
-    public AbstractWebappTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
     
     public void testSanity() throws Exception
     {

@@ -14,6 +14,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
@@ -36,6 +38,7 @@ public class XmlToObject extends AbstractXStreamTransformer
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);
+        registerSourceType(InputStream.class);
         registerSourceType(org.w3c.dom.Document.class);
         registerSourceType(org.dom4j.Document.class);
         setReturnClass(Object.class);
@@ -54,6 +57,28 @@ public class XmlToObject extends AbstractXStreamTransformer
             catch (UnsupportedEncodingException uee)
             {
                 throw new TransformerException(this, uee);
+            }
+        }
+        else if(src instanceof InputStream){
+            try
+            {
+                Reader xml = new InputStreamReader((InputStream) src, outputEncoding);
+                return getXStream().fromXML(xml);
+            }
+            catch (UnsupportedEncodingException uee)
+            {
+                throw new TransformerException(this, uee);
+            }
+            finally
+            {
+                try
+                {
+                    ((InputStream) src).close();
+                }
+                catch (IOException e)
+                {
+                    logger.warn("Exception closing stream: ", e);
+                }
             }
         }
         else if (src instanceof String)

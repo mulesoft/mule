@@ -18,10 +18,6 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 
 public class CustomConfigTestCase extends FunctionalTestCase
 {
-    public CustomConfigTestCase()
-    {
-        this.setDisposeManagerPerSuite(true);
-    }
 
     protected String getConfigResources()
     {

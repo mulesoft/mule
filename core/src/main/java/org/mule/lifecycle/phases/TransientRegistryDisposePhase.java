@@ -17,7 +17,7 @@ import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
 import org.mule.api.transport.Connector;
-import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.DefaultLifecyclePhase;
 import org.mule.lifecycle.NotificationLifecycleObject;
 
@@ -46,14 +46,14 @@ public class TransientRegistryDisposePhase extends DefaultLifecyclePhase
         super(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME);
 
         Set disposeOrderedObjects = new LinkedHashSet();
-//        disposeOrderedObjects.add(new NotificationLifecycleObject(MuleContext.class, ManagerNotification.class,
-//                ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSING),
-//                ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSED)));
+//        disposeOrderedObjects.add(new NotificationLifecycleObject(MuleContext.class, MuleContextNotification.class,
+//                MuleContextNotification.getActionName(MuleContextNotification.CONTEXT_DISPOSING),
+//                MuleContextNotification.getActionName(MuleContextNotification.CONTEXT_DISPOSED)));
         disposeOrderedObjects.add(new NotificationLifecycleObject(MuleContext.class));
         try
         {
-            disposeOrderedObjects.add(new NotificationLifecycleObject(Connector.class, ManagerNotification.class,
-                    ManagerNotification.MANAGER_DISPOSING_CONNECTORS,ManagerNotification.MANAGER_DISPOSED_CONNECTORS));
+            disposeOrderedObjects.add(new NotificationLifecycleObject(Connector.class, MuleContextNotification.class,
+                    MuleContextNotification.CONTEXT_DISPOSING_CONNECTORS,MuleContextNotification.CONTEXT_DISPOSED_CONNECTORS));
         }
         catch (IllegalStateException e)
         {

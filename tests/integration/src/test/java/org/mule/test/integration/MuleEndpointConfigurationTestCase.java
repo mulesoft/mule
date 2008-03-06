@@ -32,11 +32,6 @@ import org.mule.transport.vm.VMConnector;
 public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
 {
 
-    public MuleEndpointConfigurationTestCase()
-    {
-        super.setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "org/mule/test/integration/test-endpoints-config.xml";

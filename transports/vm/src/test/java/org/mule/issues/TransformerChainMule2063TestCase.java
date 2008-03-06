@@ -50,10 +50,9 @@ public class TransformerChainMule2063TestCase extends FunctionalTestCase
         doTest("test2", TEST2_OUT);
     }
 
-    // MULE-2131
-//    public void testOutputTransformers() throws Exception
-//    {
-//        doTest("test3", TEST3_OUT);
-//    }
+    public void testOutputTransformers() throws Exception
+    {
+        doTest("test3", TEST3_OUT);
+    }
 
 }

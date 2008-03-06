@@ -12,12 +12,12 @@ package org.mule.management;
 
 import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
-import org.mule.api.context.notification.ManagerNotificationListener;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.ServiceNotification;
 import org.mule.context.notification.CustomNotification;
-import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -28,7 +28,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerNotificationsTestCase extends AbstractMuleTestCase
-        implements ModelNotificationListener, ManagerNotificationListener
+        implements ModelNotificationListener, MuleContextNotificationListener
 {
 
     private final AtomicBoolean managerStopped = new AtomicBoolean(false);
@@ -203,7 +203,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         }
         else
         {
-            if (notification.getAction() == ManagerNotification.MANAGER_STOPPED)
+            if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED)
             {
                 managerStopped.set(true);
                 managerStoppedEvents.incrementAndGet();

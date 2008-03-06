@@ -46,7 +46,6 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
     {
         this.size = size;
         this.endpoint = endpoint;
-        setDisposeManagerPerSuite(true);
     }
 
     public void testSend() throws Exception

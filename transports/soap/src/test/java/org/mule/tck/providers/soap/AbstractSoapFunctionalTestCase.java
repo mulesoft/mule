@@ -28,11 +28,6 @@ import java.util.Map;
 public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 {
 
-    protected AbstractSoapFunctionalTestCase()
-    {
-        super.setDisposeManagerPerSuite(true);
-    }
-
     protected abstract String getRequestResponseEndpoint();
 
     protected abstract String getReceiveEndpoint();

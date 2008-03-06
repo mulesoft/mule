@@ -21,12 +21,6 @@ import org.mule.tck.testmodels.services.TestComponentException;
 public class AxisExceptionTestCase extends FunctionalTestCase
 {
 
-    public AxisExceptionTestCase()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "axis-using-xfire-config.xml";

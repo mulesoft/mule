@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
  * Allow definition of more complex components.  This combines functionality similar
  * to {@link org.mule.config.spring.parsers.delegate.SingleParentFamilyDefinitionParser}
  * with {@link org.mule.config.spring.parsers.delegate.MapDefinitionParserMutator}, allowing
- * a single element to be used to configure both the factory (if any confiuration is needed)
+ * a single element to be used to configure both the factory (if any configuration is needed)
  * and set properties for the service.  Nested service contents will also be handled
  * correctly.
  *

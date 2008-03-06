@@ -23,9 +23,7 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 import org.mule.util.StringUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -115,8 +113,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             if (!response.containsHeader(HttpConstants.HEADER_CONTENT_LENGTH)
                 && !response.containsHeader(HttpConstants.HEADER_TRANSFER_ENCODING))
             {
-                InputStream content = response.getBody();
-                if (content != null)
+                if (response.hasBody())
                 {
                     long len = response.getContentLength();
                     if (len < 0)
@@ -177,7 +174,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             if ("HEAD".equalsIgnoreCase(msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, null)))
             {
                 // this is a head request, we don't want to send the actual content
-                response.setBody(null);
+                response.setBody((MuleMessage) null);
             }
             return response;
         }
@@ -269,25 +266,9 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_REPLY_TO_PROPERTY,
                 msg.getReplyTo().toString()));
         }
-        if (src instanceof InputStream)
-        {
-            response.setBody((InputStream)src);
-        }
-        else if (src instanceof String)
-        {
-            response.setBodyString(src.toString());
-        }
-        else
-        {
-            try
-            {
-                response.setBody(new ByteArrayInputStream(msg.getPayloadAsBytes()));
-            }
-            catch (Exception e)
-            {
-                throw new TransformerException(this, e);
-            }
-        }
+        
+        response.setBody(msg);
+        
         return response;
     }
 

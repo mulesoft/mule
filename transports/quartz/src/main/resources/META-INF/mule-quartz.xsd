@@ -19,10 +19,32 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
-                    <xsd:element name="factory-property" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="factory-properties" type="spring:mapType" minOccurs="0"/>
+                    <xsd:element name="factory-property" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Set a property on the factory (see scheduler-ref).
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="factory-properties" type="spring:mapType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Set a collection of properties on the factory (see scheduler-ref).
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="scheduler-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="scheduler-ref" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Provide an implementation of the Quartz Scheduler interface.
+                            If no value is given here a scheduler is retrieved from the StdSchedulerFactory:
+                            if no properties are given the getDefaultScheduler method is called,
+                            otherwise a new factory instance is created using the given properties and
+                            a scheduler retrieved using the getScheduler method.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -46,25 +68,108 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="addressAttributes">
-        <xsd:attribute name="path" type="xsd:string"/>
-        <xsd:attribute name="cronExpression" type="xsd:string"/>
-        <xsd:attribute name="repeatInterval" type="mule:substitutableLong"/>
-        <xsd:attribute name="repeatCount" type="mule:substitutableInt"/>
-        <xsd:attribute name="startDelay" type="mule:substitutableLong"/>
-        <xsd:attribute name="payload" type="xsd:string"/>
-        <xsd:attribute name="jobDispatchEndpoint" type="xsd:string"/>
-        <xsd:attribute name="jobReceiveEndpoint" type="xsd:string"/>
-        <xsd:attribute name="jobReceiveTimeout" type="mule:substitutableLong"/>
+        <xsd:attribute name="path" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="cronExpression" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The cron expression to schedule events at specified dates / times.
+                    This or repeatInterval is required.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="repeatInterval" type="mule:substitutableLong">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The number of milliseconds between two events.
+                    This or cronExpression is required.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="repeatCount" type="mule:substitutableInt">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The number of events to be scheduled. 
+                    This value defaults to -1 which means that the events will be scheduled indefinitely.                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="startDelay" type="mule:substitutableLong">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The number of milliseconds that will elapse before the first event is fired.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="payload" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="jobDispatchEndpoint" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="jobReceiveEndpoint" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="jobReceiveTimeout" type="mule:substitutableLong">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <!-- deprecated, don't expose here -->
         <!-- xsd:attribute name="payloadClassName" type="xsd:string"/ -->
         <!-- this is a runtime lookup - probably shouldn't be "-ref", at least until we have decent tests etc -->
-        <xsd:attribute name="payloadRef" type="xsd:string"/>
-        <xsd:attribute name="groupName" type="xsd:string"/>
-        <xsd:attribute name="jobGroupName" type="xsd:string"/>
+        <xsd:attribute name="payloadRef" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="groupName" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The group name of the scheduled job
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="jobGroupName" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The job group name of the scheduled job.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <!-- this is a runtime lookup - probably shouldn't be "-ref", at least until we have decent tests etc -->
-        <xsd:attribute name="jobRef" type="xsd:string"/>
-        <xsd:attribute name="jobClass" type="xsd:string"/>
-        <xsd:attribute name="jobObject" type="xsd:string"/>
+        <xsd:attribute name="jobRef" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="jobClass" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="jobObject" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
 </xsd:schema>

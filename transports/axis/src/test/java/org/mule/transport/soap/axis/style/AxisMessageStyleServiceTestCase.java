@@ -31,11 +31,6 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
 {
     private static String expectedResult = "TEST RESPONSE";
 
-    public AxisMessageStyleServiceTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     public String getConfigResources()
     {
         return "style/axis-mule-message-config.xml";

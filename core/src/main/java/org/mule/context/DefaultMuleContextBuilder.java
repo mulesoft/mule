@@ -19,7 +19,7 @@ import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
-import org.mule.api.context.notification.ManagerNotificationListener;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.RegistryNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
@@ -31,7 +31,7 @@ import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.context.notification.ManagementNotification;
-import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.RegistryNotification;
 import org.mule.context.notification.SecurityNotification;
@@ -135,8 +135,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         else
         {
             ServerNotificationManager notificationManager = new ServerNotificationManager();
-            notificationManager.addInterfaceToType(ManagerNotificationListener.class,
-                ManagerNotification.class);
+            notificationManager.addInterfaceToType(MuleContextNotificationListener.class,
+                MuleContextNotification.class);
             notificationManager.addInterfaceToType(ModelNotificationListener.class, ModelNotification.class);
             notificationManager.addInterfaceToType(ServiceNotificationListener.class,
                 ServiceNotification.class);

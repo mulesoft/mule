@@ -32,7 +32,7 @@ import org.mule.api.security.SecurityManager;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
@@ -123,12 +123,12 @@ public class DefaultMuleContext implements MuleContext
             workManager.start();
             getNotificationManager().start(workManager);
 
-            fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_INITIALISING));
+            fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISING));
 
             directories.createDirectories();
             lifecycleManager.firePhase(this, Initialisable.PHASE_NAME);
 
-            fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_INITIALISED));
+            fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
         }
         catch (Exception e)
         {
@@ -152,7 +152,7 @@ public class DefaultMuleContext implements MuleContext
                 throw new NullPointerException(CoreMessages.objectIsNull("queueManager").getMessage());
             }
 
-            fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_STARTING));
+            fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
 
             directories.deleteMarkedDirectories();
 
@@ -162,7 +162,7 @@ public class DefaultMuleContext implements MuleContext
             {
                 logger.info(getConfiguration().getStartSplash());
             }
-            fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_STARTED));
+            fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
         }
         return LifecycleTransitionResult.OK;
     }
@@ -177,9 +177,9 @@ public class DefaultMuleContext implements MuleContext
     public synchronized LifecycleTransitionResult stop() throws MuleException
     {
         lifecycleManager.checkPhase(Stoppable.PHASE_NAME);
-        fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_STOPPING));
+        fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPING));
         lifecycleManager.firePhase(this, Stoppable.PHASE_NAME);
-        fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_STOPPED));
+        fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPED));
         return LifecycleTransitionResult.OK;
     }
 
@@ -192,7 +192,7 @@ public class DefaultMuleContext implements MuleContext
              
         ServerNotificationManager notificationManager = getNotificationManager();
         lifecycleManager.checkPhase(Disposable.PHASE_NAME);
-        fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_DISPOSING));
+        fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_DISPOSING));
 
         try
         {
@@ -217,7 +217,7 @@ public class DefaultMuleContext implements MuleContext
             logger.debug("Failed to cleanly dispose Mule: " + e.getMessage(), e);
         }
 
-        notificationManager.fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_DISPOSED));
+        notificationManager.fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_DISPOSED));
 
         if ((getConfiguration().getStartDate() > 0) && logger.isInfoEnabled())
         {

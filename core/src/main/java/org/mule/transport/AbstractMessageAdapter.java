@@ -16,6 +16,7 @@ import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.PropertyScope;
+import org.mule.api.transport.UniqueIdNotSupportedException;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.DebugOptions;
@@ -120,7 +121,15 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
             }
             encoding = template.getEncoding();
             exceptionPayload = template.getExceptionPayload();
-            id = template.getUniqueId();
+            
+            try 
+            {
+                id = template.getUniqueId();
+            }
+            catch (UniqueIdNotSupportedException e)
+            {
+                // Don't copy the id if it's not supported.
+            }
         }
     }
 

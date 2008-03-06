@@ -12,7 +12,7 @@ package org.mule.api.context.notification;
 
 
 /**
- * <code>ManagerNotificationListener</code> is an observer interface that objects
+ * <code>MuleContextNotificationListener</code> is an observer interface that objects
  * can implement to receive notifications about secure access requests.
  */
 public interface SecurityNotificationListener extends ServerNotificationListener

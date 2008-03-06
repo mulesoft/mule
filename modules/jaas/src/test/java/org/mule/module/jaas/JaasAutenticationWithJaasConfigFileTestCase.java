@@ -24,12 +24,6 @@ import java.util.Map;
 public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestCase
 {
 
-    public JaasAutenticationWithJaasConfigFileTestCase()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
-
     public void testCaseGoodAuthentication() throws Exception
     {
         MuleClient client = new MuleClient();

@@ -17,18 +17,13 @@
         enableJSR181Annotations="false"
         serviceTransport="org.mule.transport.soap.xfire.testmodels.MockService"
         typeMappingRegistryClass="org.mule.transport.soap.xfire.testmodels.MockTypeMappingRegistry">
-        
-        <xfire:client-in-handler>org.codehaus.xfire.util.dom.DOMInHandler</xfire:client-in-handler>
-        <xfire:client-in-handler>org.codehaus.xfire.util.LoggingHandler</xfire:client-in-handler>
-        
-        <xfire:client-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:client-out-handler>
-
-        <xfire:client-service>org.mule.transport.soap.xfire.testmodels.MockService</xfire:client-service>
-
-        <xfire:server-in-handler>org.codehaus.xfire.util.dom.DOMInHandler</xfire:server-in-handler>
-        <xfire:server-in-handler>org.codehaus.xfire.util.LoggingHandler</xfire:server-in-handler>
-
-        <xfire:server-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:server-out-handler>
+        <xfire:client-in-handler class="org.codehaus.xfire.util.dom.DOMInHandler"/>
+        <xfire:client-in-handler class="org.codehaus.xfire.util.LoggingHandler"/>
+        <xfire:client-out-handler class="org.codehaus.xfire.util.dom.DOMOutHandler"/>
+        <xfire:client-service class="org.mule.transport.soap.xfire.testmodels.MockService"/>
+        <xfire:server-in-handler class="org.codehaus.xfire.util.dom.DOMInHandler"/>
+        <xfire:server-in-handler class="org.codehaus.xfire.util.LoggingHandler"/>
+        <xfire:server-out-handler class="org.codehaus.xfire.util.dom.DOMOutHandler"/>
     </xfire:connector>
     
     <xfire:connector name="xfireConnector2"

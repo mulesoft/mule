@@ -21,7 +21,7 @@ import org.mule.api.MuleException;
  * pattern and it allows for pre and processing of invocations on the object being
  * intercepted.
  *
- * <p>In 2.x this is depreacted, but we provide an adapter, in the Spring Extras package, to
+ * <p>In 2.x this is deprecated, but we provide an adapter, in the Spring Extras package, to
  * help use old implementations.  There is one significant change, however - because the
  * interception is now "lower" in the call chain, {@link org.mule.api.interceptor.Invocation#execute()}
  * returns an Object rather than a {@link org.mule.api.MuleMessage}.  To simplify handling this,

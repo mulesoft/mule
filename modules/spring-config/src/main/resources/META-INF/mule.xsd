@@ -417,7 +417,7 @@
         <xsd:attribute name="defaultRemoteSync" type="substitutableBoolean" default="false">
             <xsd:annotation>
                 <xsd:documentation>
-                    Currently unused - JIRA issue MULE-3004.
+                    If true then connections to endpoints will wait for a response from the remote service.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -438,7 +438,6 @@
         <xsd:attribute name="defaultEncoding" type="xsd:string" default="UTF-8">
             <xsd:annotation>
                 <xsd:documentation>
-                    Currently unused - see JIRA issue MULE-3005.
                     This is the encoding assumed when dealing with Strings
                     if no more specific configuration is given.
                 </xsd:documentation>
@@ -1242,7 +1241,7 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Specify a component class.
-                            This is a shortcut that is equivalent to providing a singleton-object element.
+                            This is a shortcut that is equivalent to providing a prototype-object element.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1356,7 +1355,7 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
-        <xsd:attribute name="timeout" type="xsd:NMTOKEN">
+        <xsd:attribute name="timeout" type="substitutableInt">
             <xsd:annotation>
                 <xsd:documentation>
                     Timeout for transaction (ms).
@@ -3031,64 +3030,6 @@
 
 
     <!--==============================================================-->
-    <!--  Container Contexts                                             -->
-    <!--==============================================================-->
-
-    <xsd:element name="custom-container" type="customContainerContextType"/>
-    <xsd:element name="rmi-container" type="rmiContainerContextType"/>
-    <xsd:element name="ejb-container" type="rmiContainerContextType"/>
-    <xsd:element name="properties-container" type="propertiesContainerContextType"/>
-    <xsd:element name="plexus-container" type="iocContainerContextType"/>
-    <xsd:element name="pico-container" type="iocContainerContextType"/>
-    <xsd:element name="hivemind-container" type="iocContainerContextType"/>
-    <xsd:element name="jndi-container" type="baseContainerContextType"/>
-
-    <xsd:complexType name="baseContainerContextType">
-        <xsd:sequence>
-            <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-    </xsd:complexType>
-
-    <xsd:complexType name="rmiContainerContextType">
-        <xsd:complexContent>
-            <xsd:extension base="baseContainerContextType">
-                <xsd:attribute name="securityPolicy" type="xsd:string"/>
-                <xsd:attribute name="securityManager" type="xsd:string"/>
-                <xsd:attribute name="name" type="substitutableName" default="rmi"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="propertiesContainerContextType">
-        <xsd:complexContent>
-            <xsd:extension base="baseContainerContextType">
-                <xsd:attribute name="name" type="substitutableName" default="properties"/>
-                <xsd:attribute name="includeSystemProperties" type="substitutableBoolean"/>
-                <xsd:attribute name="enableTemplates" type="substitutableBoolean"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="iocContainerContextType">
-        <xsd:complexContent>
-            <xsd:extension base="baseContainerContextType">
-                <xsd:attribute name="configLocation" type="xsd:string"/>
-                <xsd:attribute name="configurationText" type="xsd:string"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="customContainerContextType">
-        <xsd:complexContent>
-            <xsd:extension base="baseContainerContextType">
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
-                <xsd:attribute name="name" type="substitutableName" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-
-    <!--==============================================================-->
     <!--  Object Factories                                            -->
     <!--==============================================================-->
 
@@ -3212,6 +3153,7 @@
     <!--==============================================================-->
     <!--  Utils / Standard Types                                      -->
     <!--==============================================================-->
+
 
     <xsd:complexType name="abstractAgentType">
         <xsd:annotation>
@@ -3678,5 +3620,53 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+
+
+    <!-- these cannot be references (unless we use qualified attribute names, which are ugly),
+         but serve as templates to cut+paste in individual transports
+
+    <xsd:attribute name="path" type="xsd:string">
+        <xsd:annotation>
+            <xsd:documentation>
+                A file location.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:attribute>
+
+    <xsd:attribute name="user" type="xsd:string">
+        <xsd:annotation>
+            <xsd:documentation>
+                A username.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:attribute>
+
+    <xsd:attribute name="password" type="xsd:string">
+        <xsd:annotation>
+            <xsd:documentation>
+                A password.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:attribute>
+
+    <xsd:attribute name="host" type="xsd:string">
+        <xsd:annotation>
+            <xsd:documentation>
+                An IP address (eg www.mulesource.com, localhost, 127.0.0.1).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:attribute>
+
+    <xsd:attribute name="port" type="substitutablePortNumber">
+        <xsd:annotation>
+            <xsd:documentation>
+                A port number.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:attribute>
+    
+    -->
+
 
 </xsd:schema>

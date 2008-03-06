@@ -53,7 +53,6 @@ public class MuleSessionHandler implements SessionHandler
 
         if (sessionId != null)
         {
-            // TODO Mule 2.0 grab session from the context
             throw new IllegalStateException(
                 "This session handler does not know how to look up session information for session id: "
                                 + sessionId);

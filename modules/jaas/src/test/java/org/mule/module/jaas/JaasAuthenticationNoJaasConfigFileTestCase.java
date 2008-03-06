@@ -23,12 +23,6 @@ import java.util.Map;
 
 public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCase
 {
-
-    public JaasAuthenticationNoJaasConfigFileTestCase()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
     
     public void assertExceptionPayload(MuleMessage umoMessage, String exceptionMessage)
     {

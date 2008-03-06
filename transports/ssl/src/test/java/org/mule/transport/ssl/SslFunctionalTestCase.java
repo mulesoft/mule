@@ -28,11 +28,6 @@ public class SslFunctionalTestCase extends FunctionalTestCase
     protected static String TEST_MESSAGE = "Test Request";
     private static int NUM_MESSAGES = 100;
 
-    public SslFunctionalTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "ssl-functional-test.xml";

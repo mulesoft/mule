@@ -33,12 +33,6 @@ public class StreamingTestCase extends FunctionalTestCase
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
 
-
-    public StreamingTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "tcp-streaming-test.xml";

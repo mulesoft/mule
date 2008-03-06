@@ -10,12 +10,12 @@
 
 package org.mule.transport.http.transformers;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 import org.mule.transport.http.ResponseWriter;
-import org.mule.transport.http.transformers.HttpResponseToString;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
@@ -45,7 +45,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleTestCase
         _resp = new HttpResponse();
         _resp.setStatusLine(new HttpVersion(1, 1), 200);
         _resp.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE));
-        _resp.setBodyString(_body);
+        _resp.setBody(new DefaultMuleMessage(_body));
     }
 
     /**

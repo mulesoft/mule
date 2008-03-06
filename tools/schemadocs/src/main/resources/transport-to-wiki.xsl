@@ -9,6 +9,11 @@
     <!-- generate text to cut+paste into the wiki and links document
 
          this should be run on a transport's schema
+
+         for example,
+         saxon ./transports/http/src/main/resources/META-INF/mule-https.xsd \
+               ./tools/schemadocs/src/main/resources/transport-to-wiki.xsl transport=https
+
     -->
 
     <!-- the transport we are generating docs for -->
@@ -24,7 +29,11 @@ h2. Detailed Configuration Information
         <xsl:apply-templates select="//xsd:element[@name='endpoint']" mode="wiki-menu-global"/>
         <xsl:apply-templates select="//xsd:element[@name!='connector'and@name!='endpoint'and@name!='inbound-endpoint'and@name!='outbound-endpoint']" mode="wiki-menu"/>
 
-        <xsl:apply-templates select="//xsd:element" mode="wiki-content"/>
+        <xsl:apply-templates select="//xsd:element[@name='connector']" mode="wiki-content"/>
+        <xsl:apply-templates select="//xsd:element[@name='inbound-endpoint']" mode="wiki-content"/>
+        <xsl:apply-templates select="//xsd:element[@name='outbound-endpoint']" mode="wiki-content"/>
+        <xsl:apply-templates select="//xsd:element[@name='endpoint']" mode="wiki-content"/>
+        <xsl:apply-templates select="//xsd:element[@name!='connector'and@name!='endpoint'and@name!='inbound-endpoint'and@name!='outbound-endpoint']" mode="wiki-content"/>
         <xsl:text>
 
 </xsl:text>

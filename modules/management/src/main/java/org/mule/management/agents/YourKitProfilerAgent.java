@@ -44,7 +44,7 @@ public class YourKitProfilerAgent implements Agent
      */
     public static final String PROFILER_OBJECT_NAME = "name=Profiler";
 
-    private String name = "Profiler Agent";
+    private String name = "yourkit-profiler";
     private MBeanServer mBeanServer;
     private ObjectName profilerName;
 

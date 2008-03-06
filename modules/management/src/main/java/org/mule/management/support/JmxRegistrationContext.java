@@ -10,9 +10,9 @@
 package org.mule.management.support;
 
 import org.mule.api.MuleContext;
-import org.mule.api.context.notification.ManagerNotificationListener;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 
 import org.apache.commons.logging.Log;
@@ -52,12 +52,12 @@ public class JmxRegistrationContext
         {
             // register the cleanup hook, otherwise server stop/start cycles may produce
             // Mule JMX domains with ever increasing suffix.
-            context.registerListener(new ManagerNotificationListener()
+            context.registerListener(new MuleContextNotificationListener()
             {
                 public void onNotification(ServerNotification notification)
                 {
-                    ManagerNotification mn = (ManagerNotification) notification;
-                    if (ManagerNotification.MANAGER_DISPOSED == mn.getAction())
+                    MuleContextNotification mn = (MuleContextNotification) notification;
+                    if (MuleContextNotification.CONTEXT_DISPOSED == mn.getAction())
                     {
                         // just in case someone is holding a ref to the context instance
                         resolvedDomain = null;

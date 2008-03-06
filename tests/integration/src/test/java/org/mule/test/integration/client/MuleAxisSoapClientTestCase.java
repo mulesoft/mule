@@ -18,11 +18,6 @@ import org.mule.tck.testmodels.services.Person;
 public class MuleAxisSoapClientTestCase extends FunctionalTestCase
 {
 
-    public MuleAxisSoapClientTestCase()
-    {
-        setDisposeManagerPerSuite(false);
-    }
-
     public String getSoapProvider()
     {
         return "axis";

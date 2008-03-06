@@ -22,11 +22,6 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
 {
     public static final int INTERATIONS = 1;
 
-    public MuleClientJmsTestCase()
-    {
-        setDisposeManagerPerSuite(false);
-    }
-
     protected String getConfigResources()
     {
         return "org/mule/test/integration/client/test-client-jms-mule-config.xml";

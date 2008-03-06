@@ -16,10 +16,6 @@ import org.mule.tck.FunctionalTestCase;
 
 public class ReplytoChainIntegration4TestCase extends FunctionalTestCase
 {
-    public ReplytoChainIntegration4TestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
 
     protected String getConfigResources()
     {

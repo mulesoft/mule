@@ -15,7 +15,7 @@ import org.mule.management.AbstractMuleJmxTestCase;
 import mx4j.tools.adaptor.http.HttpAdaptor;
 
 /**
- * Test that the HttpAdaptor lifecycle is properly managed.
+ * Test that the lifecycle is properly managed.
  */
 public class Mx4jAgentTestCase extends AbstractMuleJmxTestCase
 {

@@ -22,11 +22,6 @@ public class AsynchMule1869TestCase extends FunctionalTestCase
 
     protected static String TEST_MESSAGE = "Test TCP Request";
 
-    public AsynchMule1869TestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "tcp-functional-test.xml";

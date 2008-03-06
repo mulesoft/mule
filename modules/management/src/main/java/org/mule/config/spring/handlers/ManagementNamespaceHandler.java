@@ -22,6 +22,7 @@ import org.mule.management.agents.JmxServerNotificationAgent;
 import org.mule.management.agents.Log4jAgent;
 import org.mule.management.agents.Mx4jAgent;
 import org.mule.management.agents.RmiRegistryAgent;
+import org.mule.management.agents.YourKitProfilerAgent;
 
 /**
  * Handles all configuration elements in the Mule Management module.
@@ -46,6 +47,7 @@ public class ManagementNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("publish-notifications", new AgentDefinitionParser(EndpointNotificationLoggerAgent.class));
         registerBeanDefinitionParser("rmi-server", new AgentDefinitionParser(RmiRegistryAgent.class));
+        registerBeanDefinitionParser("yourkit-profiler", new AgentDefinitionParser(YourKitProfilerAgent.class));
         registerBeanDefinitionParser("custom-agent", new AgentDefinitionParser());
 
         //This gets processed by the jmx-server parser

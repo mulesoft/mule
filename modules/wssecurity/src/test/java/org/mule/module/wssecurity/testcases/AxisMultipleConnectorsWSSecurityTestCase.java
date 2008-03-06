@@ -21,12 +21,6 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 public class AxisMultipleConnectorsWSSecurityTestCase extends FunctionalTestCase
 {
     
-    public AxisMultipleConnectorsWSSecurityTestCase()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
-    
     public void testAxisAuthentication() throws Exception
     {
         // Action to perform : Signature

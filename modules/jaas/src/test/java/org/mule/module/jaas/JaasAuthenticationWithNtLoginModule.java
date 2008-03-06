@@ -23,12 +23,6 @@ import java.util.Map;
 public class JaasAuthenticationWithNtLoginModule extends FunctionalTestCase
 {
 
-    public JaasAuthenticationWithNtLoginModule()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
-
     public void testCaseAuthentication() throws Exception
     {
         MuleClient client = new MuleClient();
