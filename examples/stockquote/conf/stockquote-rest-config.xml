@@ -2,11 +2,13 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xmlns:xm="http://www.mulesource.org/schema/mule/xml/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
@@ -20,13 +22,7 @@
         using the XmlToObject transformer.
     </description>
 
-    <!-- TODO MULE-2731 -->
-    <spring:bean id="propertyPlaceholderConfigurer"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <spring:property name="location">
-            <spring:value>proxy.properties</spring:value>
-        </spring:property>
-    </spring:bean>
+    <context:property-placeholder location="proxy.properties"/>
 
     <http:connector name="HttpConnector"
                     proxyHostname="${proxyHostname}"

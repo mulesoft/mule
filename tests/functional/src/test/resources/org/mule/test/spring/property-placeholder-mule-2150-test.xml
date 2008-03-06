@@ -2,21 +2,16 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <environment-property name="prop1" value="value1"/>
 
-    <spring:bean id="propertyPlaceholderConfigurer"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <spring:property name="locations">
-            <spring:list>
-                <!-- defines prop2 as value2 -->
-                <spring:value>org/mule/test/spring/test.properties</spring:value>
-            </spring:list>
-        </spring:property>
-    </spring:bean>
+
+    <context:property-placeholder location="org/mule/test/spring/test.properties"/>
 
     <spring:bean name="props" class="org.mule.test.spring.MapHolder">
         <spring:property name="map">

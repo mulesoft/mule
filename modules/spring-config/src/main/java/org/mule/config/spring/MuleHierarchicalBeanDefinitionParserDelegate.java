@@ -177,11 +177,13 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             {
                 throw new RuntimeException(e);
             }
+            return parent;
         }
 
         else if (SpringXMLUtils.isLocalName(element, PROPERTY_ELEMENT))
         {
             parsePropertyElement(element, parent);
+            return parent;
         }
 
         // i am trying to keep these to a minimum - using anything but "bean" is a recipe
@@ -205,14 +207,14 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
         else if (SpringXMLUtils.isLocalName(element, BEAN_ELEMENT))
         {
-            registerBeanDefinitionHolder(parseBeanDefinitionElement(element, parent));
+            BeanDefinitionHolder holder = parseBeanDefinitionElement(element, parent);
+            registerBeanDefinitionHolder(holder);
+            return holder.getBeanDefinition();
         }
         else
         {
             throw new IllegalStateException("Unexpected Spring element: " + SpringXMLUtils.elementToString(element));
         }
-
-        return parent;
     }
 
     protected void registerBean(Element ele, BeanDefinition bd)

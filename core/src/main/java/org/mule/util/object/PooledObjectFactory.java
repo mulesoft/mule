@@ -14,6 +14,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.PoolingProfile;
+import org.mule.config.i18n.MessageFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -148,6 +149,8 @@ public class PooledObjectFactory extends AbstractObjectFactory implements Poolab
                 pool = null;
             }
         }
+
+        super.dispose();
     }
 
     /**
@@ -156,7 +159,15 @@ public class PooledObjectFactory extends AbstractObjectFactory implements Poolab
     // @Override
     public Object getInstance() throws Exception
     {
-        return pool.borrowObject();
+        if (pool != null)
+        {
+            return pool.borrowObject();
+        }
+        else
+        {
+            throw new InitialisationException(
+                MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
+        }
     }
 
     /**
@@ -165,13 +176,17 @@ public class PooledObjectFactory extends AbstractObjectFactory implements Poolab
     // @Override
     public void release(Object object)
     {
-        try
+        if (pool != null)
         {
-            pool.returnObject(object);
-        }
-        catch (Exception ex)
-        {
-            // declared Exception is never thrown from pool; this is a bug in the method signature
+            try
+            {
+                pool.returnObject(object);
+            }
+            catch (Exception ex)
+            {
+                // declared Exception is never thrown from pool; this is a known bug in
+                // the pool API
+            }
         }
     }
 

@@ -14,7 +14,7 @@
         <xsd:attribute name="class" type="xsd:NMTOKEN" use="required">
             <xsd:annotation>
                 <xsd:documentation>
-                    Controls the mapping from filename patterns to filenames.
+                    An implementation of the FilenameParser interface.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -25,61 +25,58 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence minOccurs="0" maxOccurs="1">
-                    <xsd:element name="filename-parser" type="filenameParserType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="filename-parser" type="filenameParserType" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                This controls the mapping from filename patterns to filenames.
+                                Is requires an implementation of the FilenameParser interface,
+                                which is used to control how filename patterns are used to generate file names.
+                                The file provider has a default implementation called
+                                SimpleFilenameParser that understands the following patterns:
+                                <ul>
+                                    <li>${DATE} - the current date in the format dd-MM-yy_HH-mm-ss.SS;</li>
+                                    <li>${DATE:yy-MM-dd} - the current date using the specified format;</li>
+                                    <li>${SYSTIME} - The current system time milliseconds;</li>
+                                    <li>${UUID} - A generated Universally unique id;</li>
+                                    <li>${ORIGINALNAME} - The original file name if the file being written was read from another location;</li>
+                                    <li>${COUNT} - An incremental counter.</li>
+                                </ul>
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="fileAge" type="mule:substitutableLong">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Miniumum age (ms) for a file to be processed.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="moveToDirectory" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Target directory for file backup when read.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="moveToPattern" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            File pattern for name of file when moved to backup directory.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="outputPattern" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            File pattern for name of file when writing to destination.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Period (ms) between poll connections to the server.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
+                <xsd:attributeGroup ref="inboundAttributes"/>
+                <xsd:attributeGroup ref="outboundAttributes"/>
                 <xsd:attribute name="writeToDirectory" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Destination directory for file.
+                            The directory path where the file should be written on dispatch.
+                            This path is usually set as the endpoint of the dispatch event,
+                            however this allows you to explicitly force a single directory for the connector.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="readFromDirectory" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Source directory for file.
+                            The directory path where the file should be read from.
+                            This path is usually set as the inbound endpoint,
+                            however this allows you to explicitly force a single directory for the connector.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="autoDelete" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Should file be deleted once read?
+                            By default, when a file is received it is read into a String or byte[].
+                            The file is moved if the moveToDirectory is set, otherwise it is deleted.
+                            To access the File object set this property to false and specify a
+                            NoActionTransformer transformer for the connector.
+                            Mule will not delete the file, so it's up to the component to delete it
+                            when it's done.
+                            If the moveToDirectory is set, the file is first moved, then the
+                            File object of the moved file is passed to the component.
+                            It is recommended that a moveToDirectory is specified when turning autoDelete off.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -93,28 +90,15 @@
                 <xsd:attribute name="serialiseObjects" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Forces use of transformers between serializable objects and byte arrays.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="comparator" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Comparator class name to use to sort files for processing.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="reverseOrder" type="mule:substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Should comparator order be reversed?
+                            Determines whether objects should be serialized to the file or not.
+                            If not the raw bytes or text is written.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="streaming" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Should a File InputStream be sent as the message payload or a File?
+                            Should a FileInputStream be sent as the message payload or a File?
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -159,17 +143,64 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="inboundAttributes">
-        <xsd:attribute name="pollingFrequency" type="mule:substitutableLong"/>
-        <xsd:attribute name="fileAge" type="mule:substitutableLong"/>
-        <xsd:attribute name="moveToPattern" type="xsd:string"/>
-        <xsd:attribute name="moveToDirectory" type="xsd:string"/>
-        <xsd:attribute name="readFromDirectoryName" type="xsd:string"/>
-        <xsd:attribute name="comparator" type="xsd:string"/>
-        <xsd:attribute name="reverseOrder" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The frequency in milliseconds that the read directory should be checked.
+                    Note that the read directory is specified by the endpoint of the listening component.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="fileAge" type="mule:substitutableLong">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Miniumum age (ms) for a file to be processed.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="moveToPattern" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The pattern to use when moving a read file to an new location determined by the
+                    moveToDirectory property.
+                    This can use the patterns supported by the filename-parser configured for this connector
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="moveToDirectory" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The directory path where the file should be written once it has been read.
+                    If this is not set the file read is deleted.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="comparator" type="mule:substitutableClass">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Sort incoming files using this comparator.
+                    The class must implement java.util.Comparator interface.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="reverseOrder" type="mule:substitutableBoolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Should comparator order be reversed?
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="outboundAttributes">
-        <xsd:attribute name="outputPattern" type="xsd:string"/>
+        <xsd:attribute name="outputPattern" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The pattern to use when writing a file to disk.
+                    This can use the patterns supported by the filename-parser configured for this connector
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="addressAttributes">

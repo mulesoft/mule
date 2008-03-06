@@ -48,7 +48,6 @@ public class RmiRegistryAgent extends AbstractAgent
     private String port;
     private boolean createRegistry = true;
 
-
     public RmiRegistryAgent()
     {
         super("rmi-server");

@@ -13,7 +13,6 @@ package org.mule.security;
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
-import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.security.SecurityException;
@@ -61,7 +60,7 @@ public class MuleSecurityManager implements SecurityManager
         List all = new LinkedList(providers.values());
         // ordering: appends
         all.addAll(cryptoStrategies.values());
-        return LifecycleLogic.initialiseAll(all.iterator());
+        return LifecycleTransitionResult.initialiseAll(all.iterator());
     }
 
     public Authentication authenticate(Authentication authentication)

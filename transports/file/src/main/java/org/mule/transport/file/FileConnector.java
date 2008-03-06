@@ -426,7 +426,7 @@ public class FileConnector extends AbstractConnector
         this.writeToDirectoryName = dir;
         if (writeToDirectoryName != null)
         {
-            File writeToDirectory = FileUtils.openDirectory((writeToDirectoryName));
+            File writeToDirectory = FileUtils.openDirectory(writeToDirectoryName);
             if (!(writeToDirectory.canRead()) || !writeToDirectory.canWrite())
             {
                 throw new IOException(

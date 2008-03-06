@@ -89,6 +89,7 @@ public class ParsersTestNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("no-name", new OrphanDefinitionParser(OrphanBean.class, true));
         registerBeanDefinitionParser("no-name-2", new IndependentDefinitionParser());
+        registerBeanDefinitionParser("container", new ThirdPartyContainerDefinitionParser());
     }
 
 }

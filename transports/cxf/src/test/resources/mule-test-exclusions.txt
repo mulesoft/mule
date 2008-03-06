@@ -34,3 +34,7 @@ org.mule.transport.cxf.CxfBasicTestCase
 
 # MULE-3051
 org.mule.transport.cxf.CxfComponentExceptionStrategyTestCase
+
+# MULE-3054
+org.mule.transport.cxf.jaxws.ClientTestCase
+

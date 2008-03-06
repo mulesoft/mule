@@ -15,6 +15,8 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.StringUtils;
 
+import java.util.Locale;
+
 public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTestCase
 {
 
@@ -34,7 +36,11 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
                 String text = response.getPayloadAsString();
                 assertNotNull("Null response", text);
                 assertTrue("Stock quote should contain \"BLOCK\": " + text, StringUtils.contains(text, "BLOCK"));
-                assertTrue("Stock quote should start with \"StockQuote[\":" + text, text.startsWith("StockQuote["));
+                if (Locale.getDefault().getISO3Language().equalsIgnoreCase("eng"))
+                {
+                    // the stockquote message is localized ...
+                    assertTrue("Stock quote should start with \"StockQuote[\":" + text, text.startsWith("StockQuote["));
+                }
                 logger.debug("**********");
                 logger.debug(response.getPayload());
                 logger.debug(response.getPayloadAsString());

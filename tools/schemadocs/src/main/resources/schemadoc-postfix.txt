@@ -1,5 +1,5 @@
 
-  <xsd:element name="spring:properties">
+  <xsd:element name="spring:property">
     <xsd:annotation>
       <xsd:documentation>
         A Spring property definition.

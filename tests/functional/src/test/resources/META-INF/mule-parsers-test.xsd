@@ -19,6 +19,7 @@
     <xsd:element name="missing" type="abstractBeanType"/>
     <xsd:element name="named" type="dynamicNamedType"/>
     <xsd:element name="inherit" type="inheritType"/>
+    <xsd:element name="container" type="containerType"/>
 
     <xsd:complexType name="orphanType">
         <xsd:complexContent>
@@ -230,6 +231,13 @@
         <xsd:complexContent>
             <xsd:extension base="spring:mapType"/>
         </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="containerType">
+        <xsd:sequence>
+            <xsd:any minOccurs="1"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string"/>
     </xsd:complexType>
 
 </xsd:schema>

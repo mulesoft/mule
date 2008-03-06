@@ -21,7 +21,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -90,7 +89,7 @@ public class OptimisedMuleProxy implements MuleProxy
         {
             try
             {
-                return LifecycleLogic.startAll((Startable) pojoService, ((Startable) pojoService).start(), new LifecycleLogic.Closure()
+                return LifecycleTransitionResult.startOrStopAll(((Startable) pojoService).start(), new LifecycleTransitionResult.Closure()
                 {
                     public LifecycleTransitionResult doContinue()
                     {

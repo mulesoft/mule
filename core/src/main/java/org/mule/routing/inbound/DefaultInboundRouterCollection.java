@@ -19,7 +19,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.InboundRouterCollection;
@@ -54,7 +53,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
 
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        return LifecycleLogic.initialiseAll(this, super.initialise(), endpoints.iterator());
+        return LifecycleTransitionResult.initialiseAll(super.initialise(), endpoints.iterator());
     }
 
     public MuleMessage route(MuleEvent event) throws MessagingException

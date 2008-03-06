@@ -46,6 +46,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
+import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -251,7 +252,7 @@ public class JmxAgent extends AbstractAgent
      * @see org.mule.api.lifecycle.Startable#start()
      */
     public LifecycleTransitionResult start() throws MuleException
-    {
+    {        
         if (connectorServer != null)
         {
             try
@@ -263,14 +264,18 @@ public class JmxAgent extends AbstractAgent
                 logger.info("Starting JMX agent connector Server");
                 connectorServer.start();
             }
+            catch (ExportException e)
+            {
+                throw new JmxManagementException(CoreMessages.failedToStart("Jmx Agent"), e);
+            }
             catch (IOException e)
             {
                 // this probably means that the RMI server isn't started so we request a retry
-                return LifecycleTransitionResult.retry(e);
+                return LifecycleTransitionResult.retry(e, this);
             }
             catch (Exception e)
             {
-                throw new JmxManagementException(CoreMessages.failedToStart("Jmx Connector"), e);
+                throw new JmxManagementException(CoreMessages.failedToStart("Jmx Agent"), e);
             }
         }
         return LifecycleTransitionResult.OK;

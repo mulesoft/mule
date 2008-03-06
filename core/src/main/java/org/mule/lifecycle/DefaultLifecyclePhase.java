@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
  * Usually, Lifecycle phases have a fixed configuration in which case a specialisation of this class should be
  * created that initialises its configuration internally.
  *
- * <p>Note that this class and {@link org.mule.api.lifecycle.LifecycleLogic} both make assumptions about
+ * <p>Note that this class and {@link org.mule.api.lifecycle.LifecycleTransitionResult} both make assumptions about
  * the interfaces used - the return values and exceptions.  These are, currently, that the return value is either
  * void or {@link org.mule.api.lifecycle.LifecycleTransitionResult} and either 0 or 1 exceptions can be
  * thrown which are either {@link InstantiationException} or {@link org.mule.api.lifecycle.LifecycleException}.
@@ -116,23 +116,24 @@ public class DefaultLifecyclePhase implements LifecyclePhase
                             {
                                 logger.debug("lifecycle phase: " + getName() + " for object: " + o);
                             }
-                            if (applyLifecycle(o).isOk())
+                            LifecycleTransitionResult result = applyLifecycle(o);
+                            if (result.isOk())
                             {
                                 target.remove();
                                 duplicates.add(o);
                             }
-                            else if (logger.isDebugEnabled())
+                            else if (retryCount + 1 == RETRY_MAX)
                             {
-                                logger.debug("retry requested for lifecycle phase: " + getName() + " for object: " + o);
+                                throw (LifecycleException)
+                                        new LifecycleException(CoreMessages.exceededRetry(getName(), o), o)
+                                                .initCause(result.getThrowable());
+                            }
+                            else
+                            {
+                                logger.debug("Retry requested for " + o);
                             }
                         }
                     }
-                }
-
-                if (targets.size() > 0)
-                {
-                    Object component = targets.iterator().next();
-                    throw new LifecycleException(CoreMessages.exceededRetry(getName(), component), component);
                 }
 
                 lo.firePostNotification(muleContext);

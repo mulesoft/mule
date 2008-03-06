@@ -14,7 +14,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
-import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.util.MuleLogger;
 
 import javax.script.Bindings;
@@ -29,7 +28,7 @@ public class ScriptComponent extends Scriptable implements Callable
 
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        return LifecycleLogic.initialiseAll(this, super.initialise(), new LifecycleLogic.Closure()
+        return LifecycleTransitionResult.initialiseAll(super.initialise(), new LifecycleTransitionResult.Closure()
         {
             public LifecycleTransitionResult doContinue()
             {

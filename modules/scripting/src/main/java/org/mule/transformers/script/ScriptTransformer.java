@@ -13,7 +13,6 @@ package org.mule.transformers.script;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
-import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.transformer.TransformerException;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -66,7 +65,7 @@ public class ScriptTransformer extends AbstractMessageAwareTransformer
      */
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        return LifecycleLogic.initialiseAll(this, super.initialise(), new LifecycleLogic.Closure()
+        return LifecycleTransitionResult.initialiseAll(super.initialise(), new LifecycleTransitionResult.Closure()
         {
             public LifecycleTransitionResult doContinue() throws InitialisationException
             {

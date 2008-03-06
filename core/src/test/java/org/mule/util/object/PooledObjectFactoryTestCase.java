@@ -14,13 +14,12 @@ import org.mule.api.service.Service;
 import org.mule.config.PoolingProfile;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.services.UniqueComponent;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.util.ExceptionUtils;
 
-public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
+public class PooledObjectFactoryTestCase extends AbstractObjectFactoryTestCase
 {
     public static final byte MAX_ACTIVE = 3;
     public static final long MAX_WAIT = 1500;
@@ -32,6 +31,34 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         pp.setMaxWait(MAX_WAIT);
         pp.setInitialisationPolicy(PoolingProfile.INITIALISE_NONE);
         return pp;
+    }
+
+    // @Override
+    public ObjectFactory getObjectFactory()
+    {
+        return new PooledObjectFactory();
+    }
+
+    // @Override
+    public void testGetObjectClass() throws Exception
+    {
+        PoolingProfile pp = getDefaultPoolingProfile();
+        pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_FAIL);
+        PooledObjectFactory factory = (PooledObjectFactory) getObjectFactory();
+        factory.setObjectClass(Orange.class);
+        factory.initialise();
+        assertEquals(Orange.class, factory.getObjectClass());
+    }
+
+    // @Override
+    public void testGet() throws Exception
+    {
+        PoolingProfile pp = getDefaultPoolingProfile();
+        pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_FAIL);
+        PooledObjectFactory factory = (PooledObjectFactory) getObjectFactory();
+        factory.setObjectClass(Orange.class);
+        factory.initialise();
+        assertNotSame(factory.getInstance(), factory.getInstance());
     }
 
     public void testCreatePool() throws Exception
@@ -194,10 +221,6 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
 
         of.dispose();
         assertEquals(0, of.getPoolSize());
-
-        of.initialise();
-        borrowed = of.getInstance();
-        assertEquals(1, of.getPoolSize());
     }
 
     public void testObjectUniqueness() throws Exception

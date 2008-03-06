@@ -23,7 +23,6 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
@@ -210,7 +209,7 @@ public abstract class AbstractService implements Service
             ((Initialisable) exceptionListener).initialise();
         }
 
-        return LifecycleLogic.initialiseAll(this, componentFactory.initialise(), new LifecycleLogic.Closure()
+        return LifecycleTransitionResult.initialiseAll(componentFactory.initialise(), new LifecycleTransitionResult.Closure()
         {
             public LifecycleTransitionResult doContinue() throws InitialisationException
             {

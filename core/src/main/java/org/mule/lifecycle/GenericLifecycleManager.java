@@ -13,6 +13,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.util.StringMessageUtils;
 
@@ -26,9 +27,7 @@ import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * TODO
- */
+
 public class GenericLifecycleManager implements LifecycleManager
 {
     /**
@@ -130,7 +129,6 @@ public class GenericLifecycleManager implements LifecycleManager
     public void applyLifecycle(MuleContext muleContext, Object object) throws MuleException
     {
         logger.debug("applying lifecycle to " + object);
-        //String startingPhase = DefaultLifecyclePhase.PHASE_NAME;
         LifecyclePhase lcp;
         String phase;
         Integer phaseIndex;
@@ -140,8 +138,11 @@ public class GenericLifecycleManager implements LifecycleManager
             phaseIndex = (Integer) index.get(phase);
             lcp = (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
             logger.debug("phase: " + lcp);
-            lcp.applyLifecycle(object);
-            //startingPhase = phase;
+            LifecycleTransitionResult result = lcp.applyLifecycle(object);
+            if (! LifecycleTransitionResult.isOk(result))
+            {
+                throw result.nestedRetryLifecycleException();
+            }
         }
         //If we're currently in a phase, fire that too
         if (getExecutingPhase() != null)
@@ -149,7 +150,11 @@ public class GenericLifecycleManager implements LifecycleManager
             phaseIndex = (Integer) index.get(getExecutingPhase());
             lcp = (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
             logger.debug("and executing: " + lcp);
-            lcp.applyLifecycle(object);
+            LifecycleTransitionResult result = lcp.applyLifecycle(object);
+            if (! LifecycleTransitionResult.isOk(result))
+            {
+                throw result.nestedRetryLifecycleException();
+            }
         }
     }
 

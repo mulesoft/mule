@@ -13,7 +13,6 @@ package org.mule.container;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
-import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.util.ClassUtils;
 
 import javax.naming.NamingException;
@@ -39,7 +38,7 @@ public class RmiContainerContext extends JndiContainerContext
 
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        return LifecycleLogic.initialiseAll(this, super.initialise(), new LifecycleLogic.Closure()
+        return LifecycleTransitionResult.initialiseAll(super.initialise(), new LifecycleTransitionResult.Closure()
         {
             public LifecycleTransitionResult doContinue() throws InitialisationException
             {
@@ -73,7 +72,7 @@ public class RmiContainerContext extends JndiContainerContext
 
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
-        Object object = null;
+        Object object;
         if (key == null)
         {
             throw new ObjectNotFoundException("null");

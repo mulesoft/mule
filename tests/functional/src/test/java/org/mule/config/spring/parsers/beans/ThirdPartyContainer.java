@@ -7,16 +7,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transformers.xml;
 
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transformer.simple.ObjectToByteArray;
+package org.mule.config.spring.parsers.beans;
 
-public class TransformerWeightingsTestCase extends AbstractMuleTestCase
+public class ThirdPartyContainer
 {
-    public void testNearMatch() throws Exception
-    {
-        ObjectToByteArray trans = new ObjectToByteArray();
 
+    private Object thing;
+
+    public Object getThing()
+    {
+        return thing;
     }
+
+    public void setThing(Object thing)
+    {
+        this.thing = thing;
+    }
+
 }

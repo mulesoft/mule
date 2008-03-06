@@ -20,7 +20,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleAdapter;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
-import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.routing.NestedRouter;
 import org.mule.api.service.Service;
@@ -100,7 +99,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
     {
         try
         {
-            return LifecycleLogic.startAll(service, service.start(), new LifecycleLogic.Closure()
+            return LifecycleTransitionResult.startOrStopAll(service.start(), new LifecycleTransitionResult.Closure()
             {
                 public LifecycleTransitionResult doContinue()
                 {
@@ -119,7 +118,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
     {
         try
         {
-            return LifecycleLogic.stopAll(service, service.stop(), new LifecycleLogic.Closure()
+            return LifecycleTransitionResult.startOrStopAll(service.stop(), new LifecycleTransitionResult.Closure()
             {
                 public LifecycleTransitionResult doContinue()
                 {
