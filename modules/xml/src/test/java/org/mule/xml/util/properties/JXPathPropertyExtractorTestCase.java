@@ -11,6 +11,7 @@
 package org.mule.xml.util.properties;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.module.xml.util.properties.JXPathPropertyExtractor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;

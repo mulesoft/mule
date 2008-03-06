@@ -10,7 +10,7 @@
 
 package org.mule.module.xml.config;
 
-import org.mule.xml.util.XMLUtils;
+import org.mule.module.xml.util.XMLUtils;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;

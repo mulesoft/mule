@@ -11,9 +11,9 @@
 package org.mule.module.xml.config;
 
 import org.mule.api.service.Service;
+import org.mule.module.xml.routing.FilteringXmlMessageSplitter;
+import org.mule.module.xml.routing.RoundRobinXmlSplitter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
-import org.mule.routing.outbound.FilteringXmlMessageSplitter;
-import org.mule.routing.outbound.RoundRobinXmlSplitter;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.List;

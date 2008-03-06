@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.module.xml.transformers.XsltTransformer;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
 

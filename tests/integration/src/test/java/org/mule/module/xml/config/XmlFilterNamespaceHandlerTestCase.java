@@ -11,9 +11,9 @@
 package org.mule.module.xml.config;
 
 import org.mule.api.service.Service;
+import org.mule.module.xml.filters.IsXmlFilter;
+import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.routing.filters.logic.NotFilter;
-import org.mule.routing.filters.xml.IsXmlFilter;
-import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.tck.FunctionalTestCase;
 

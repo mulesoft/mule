@@ -12,6 +12,7 @@ package org.mule.config.builders;
 
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.module.scripting.builders.ScriptConfigurationBuilder;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
 
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase

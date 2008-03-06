@@ -28,7 +28,7 @@
                 <inbound-endpoint address="vm://groovy.1"/>
             </inbound>
             <component>
-                <pooled-object class="org.mule.components.script.jsr223.ScriptMessageBuilder">
+                <pooled-object class="org.mule.module.scripting.component.ScriptMessageBuilder">
                     <property key="scriptEngineName" value="groovy"/>
                     <property key="scriptText" value-ref="scriptText1"/>
                 </pooled-object>
@@ -46,7 +46,7 @@
                 <inbound-endpoint address="vm://groovy.2"/>
             </inbound>
             <component>
-                <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
+                <pooled-object class="org.mule.module.scripting.component.ScriptComponent">
                     <property key="scriptEngineName" value="groovy"/>
                     <property key="scriptText" value-ref="scriptText2"/>
                 </pooled-object>
@@ -58,7 +58,7 @@
                 <inbound-endpoint address="vm://groovy.3"/>
             </inbound>
             <component>
-                <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
+                <pooled-object class="org.mule.module.scripting.component.ScriptComponent">
                     <property key="scriptEngineName" value="groovy"/>
                     <property key="scriptText" value-ref="scriptText3"/>
                 </pooled-object>

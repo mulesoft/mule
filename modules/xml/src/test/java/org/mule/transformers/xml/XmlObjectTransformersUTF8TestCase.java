@@ -11,6 +11,7 @@
 package org.mule.transformers.xml;
 
 import org.mule.api.transformer.Transformer;
+import org.mule.module.xml.transformers.XmlToObject;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.util.ArrayUtils;
 
@@ -19,7 +20,7 @@ import java.io.UnsupportedEncodingException;
 public class XmlObjectTransformersUTF8TestCase extends AbstractTransformerTestCase
 {
 
-    // this is "ábçdèf" in a Java source file encoding independent form.
+    // this is "ï¿½bï¿½dï¿½f" in a Java source file encoding independent form.
     private static final String TEST_STRING = "\u00E1b\u00E7d\u00E8f";
 
     private final byte[] testXml;

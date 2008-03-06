@@ -21,11 +21,11 @@ import org.mule.management.mbeans.MBeanServerFactory;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
-import org.mule.xml.util.XMLUtils;
 
 import java.net.URI;
 import java.util.HashMap;

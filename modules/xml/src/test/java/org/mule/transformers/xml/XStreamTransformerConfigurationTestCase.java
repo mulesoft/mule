@@ -11,6 +11,8 @@
 package org.mule.transformers.xml;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.module.xml.transformers.XStreamFactory;
+import org.mule.module.xml.transformers.XmlToObject;
 import org.mule.tck.AbstractMuleTestCase;
 
 import com.thoughtworks.xstream.XStream;

@@ -10,8 +10,8 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractTransformerTestCase;
-import org.mule.xml.util.XMLUtils;
 
 import javax.xml.transform.TransformerFactoryConfigurationError;
 

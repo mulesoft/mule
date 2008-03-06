@@ -15,6 +15,8 @@ import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
+import org.mule.module.xml.transformers.ObjectToXml;
+import org.mule.module.xml.transformers.XmlToObject;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 

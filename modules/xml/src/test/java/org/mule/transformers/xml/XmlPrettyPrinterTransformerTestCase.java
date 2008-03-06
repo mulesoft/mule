@@ -11,6 +11,7 @@
 package org.mule.transformers.xml;
 
 import org.mule.api.transformer.Transformer;
+import org.mule.module.xml.transformers.XmlPrettyPrinter;
 import org.mule.transformer.AbstractTransformerTestCase;
 
 import org.dom4j.io.OutputFormat;

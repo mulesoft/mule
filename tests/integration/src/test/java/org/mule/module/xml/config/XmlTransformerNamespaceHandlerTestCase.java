@@ -11,15 +11,15 @@
 package org.mule.module.xml.config;
 
 import org.mule.api.transformer.Transformer;
+import org.mule.module.xml.transformers.AbstractXmlTransformer;
+import org.mule.module.xml.transformers.DomDocumentToXml;
+import org.mule.module.xml.transformers.JXPathExtractor;
+import org.mule.module.xml.transformers.ObjectToXml;
+import org.mule.module.xml.transformers.XmlToDomDocument;
+import org.mule.module.xml.transformers.XmlToObject;
+import org.mule.module.xml.transformers.XsltTransformer;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
-import org.mule.transformers.xml.AbstractXmlTransformer;
-import org.mule.transformers.xml.DomDocumentToXml;
-import org.mule.transformers.xml.JXPathExtractor;
-import org.mule.transformers.xml.ObjectToXml;
-import org.mule.transformers.xml.XmlToDomDocument;
-import org.mule.transformers.xml.XmlToObject;
-import org.mule.transformers.xml.XsltTransformer;
 
 public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
 {

@@ -12,9 +12,9 @@ package org.mule.transport.cxf;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.IOUtils;
-import org.mule.xml.util.XMLUtils;
 
 import javax.xml.transform.TransformerFactoryConfigurationError;
 

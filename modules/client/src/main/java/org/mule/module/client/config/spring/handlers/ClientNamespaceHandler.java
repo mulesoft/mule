@@ -13,8 +13,8 @@ import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.module.client.config.spring.parsers.RemoteDispatcherAgentDefinitionParser;
+import org.mule.module.xml.transformers.XStreamWireFormat;
 import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
-import org.mule.transformers.xml.wire.XStreamWireFormat;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 

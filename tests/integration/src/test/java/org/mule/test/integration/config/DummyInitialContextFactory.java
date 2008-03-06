@@ -17,8 +17,8 @@ import org.mule.api.service.Service;
 import org.mule.component.simple.EchoComponent;
 import org.mule.jndi.SimpleContext;
 import org.mule.management.agents.Log4jAgent;
+import org.mule.module.xml.transformers.XmlToObject;
 import org.mule.tck.MuleTestUtils;
-import org.mule.transformers.xml.XmlToObject;
 import org.mule.transport.vm.VMConnector;
 import org.mule.util.object.ObjectFactory;
 

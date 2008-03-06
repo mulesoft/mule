@@ -11,9 +11,10 @@
 package org.mule.transformers.xml.wire;
 
 import org.mule.api.transformer.wire.WireFormat;
+import org.mule.module.xml.transformers.ObjectToXml;
+import org.mule.module.xml.transformers.XStreamWireFormat;
+import org.mule.module.xml.transformers.XmlToObject;
 import org.mule.transformer.wire.AbstractWireFormatTestCase;
-import org.mule.transformers.xml.ObjectToXml;
-import org.mule.transformers.xml.XmlToObject;
 
 public class XStreamWireFormatTestCase extends AbstractWireFormatTestCase
 {

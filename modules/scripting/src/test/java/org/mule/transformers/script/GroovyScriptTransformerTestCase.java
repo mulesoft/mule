@@ -11,6 +11,7 @@
 package org.mule.transformers.script;
 
 import org.mule.api.transformer.Transformer;
+import org.mule.module.scripting.transformers.ScriptTransformer;
 import org.mule.transformer.AbstractTransformerTestCase;
 
 import java.util.ArrayList;

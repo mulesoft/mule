@@ -15,7 +15,7 @@ import org.mule.api.lifecycle.FatalException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.example.errorhandler.exceptions.BusinessException;
-import org.mule.transformers.xml.ObjectToXml;
+import org.mule.module.xml.transformers.ObjectToXml;
 import org.mule.util.FileUtils;
 
 import java.io.IOException;
