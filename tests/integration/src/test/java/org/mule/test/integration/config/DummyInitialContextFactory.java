@@ -49,18 +49,12 @@ public class DummyInitialContextFactory implements ObjectFactory
         // do nothing
     }
 
-    // TODO HH: remove
-    public Object lookup(String arg0) throws Exception
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public void release(Object arg0) throws Exception
+    public void release(Object arg0)
     {
         // do nothing
     }
 
-    public Class getObjectClass() throws Exception
+    public Class getObjectClass()
     {
         throw new UnsupportedOperationException();
     }

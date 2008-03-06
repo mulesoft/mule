@@ -67,22 +67,29 @@ public class LifecycleLogic
         try
         {
             LifecycleTransitionResult result = (LifecycleTransitionResult) method.invoke(target, ClassUtils.NO_ARGS);
-            if (result != LifecycleTransitionResult.OK)
+            if (!isOk(result))
             {
                 if (null != exception)
                 {
+                    LifecycleException error;
                     if (exception.equals(InitialisationException.class))
                     {
-                        throw new InitialisationException(CoreMessages.nestedRetry(), (Initialisable) target);
+                        error = new InitialisationException(CoreMessages.nestedRetry(), (Initialisable) target);
                     }
                     else
                     {
-                        throw new LifecycleException(CoreMessages.nestedRetry(), target);
+                        error = new LifecycleException(CoreMessages.nestedRetry(), target);
                     }
+                    throw initCause(error, result);
                 }
                 else
                 {
-                    throw new IllegalStateException("Unexpected state from transition: " + result);
+                    IllegalStateException error = new IllegalStateException("Unexpected state from transition: " + result);
+                    if (null != result)
+                    {
+                        error.initCause(result.getThrowable());
+                    }
+                    throw error;
                 }
             }
             return result;
@@ -124,7 +131,7 @@ public class LifecycleLogic
     {
         return initialiseAll(component, status, new Closure()
         {
-            public LifecycleTransitionResult doContinue() throws InitialisationException
+            public LifecycleTransitionResult doContinue() throws LifecycleException
             {
                 return initialiseAll(children);
             }
@@ -137,7 +144,7 @@ public class LifecycleLogic
     public static LifecycleTransitionResult initialiseAll(Initialisable component, LifecycleTransitionResult status,
                                                           Closure rest) throws InitialisationException
     {
-        if (status == LifecycleTransitionResult.OK)
+        if (isOk(status))
         {
             try
             {
@@ -154,40 +161,62 @@ public class LifecycleLogic
         }
         else
         {
-            throw new InitialisationException(CoreMessages.nestedRetry(), component);
+            throw initCause(new InitialisationException(CoreMessages.nestedRetry(), component), status);
         }
     }
 
     public static LifecycleTransitionResult startAll(Startable component, LifecycleTransitionResult status,
                                                      Closure rest) throws MuleException
     {
-        if (status == LifecycleTransitionResult.OK)
+        if (isOk(status))
         {
             return rest.doContinue();
         }
         else
         {
-            throw new LifecycleException(CoreMessages.nestedRetry(), component);
+            throw initCause(new LifecycleException(CoreMessages.nestedRetry(), component), status);
         }
     }
 
     public static LifecycleTransitionResult stopAll(Stoppable component, LifecycleTransitionResult status,
                                                      Closure rest) throws MuleException
     {
-        if (status == LifecycleTransitionResult.OK)
+        if (isOk(status))
         {
             return rest.doContinue();
         }
         else
         {
-            throw new LifecycleException(CoreMessages.nestedRetry(), component);
+            throw initCause(new LifecycleException(CoreMessages.nestedRetry(), component), status);
         }
     }
-
-
+                                                                           
     public static interface Closure
     {
         LifecycleTransitionResult doContinue() throws MuleException;
+    }
+
+    public static LifecycleException initCause(LifecycleException exception, LifecycleTransitionResult result)
+    {
+        if (null != result)
+        {
+            exception.initCause(result.getThrowable());
+        }
+        return exception;
+    }
+
+    public static InitialisationException initCause(InitialisationException exception, LifecycleTransitionResult result)
+    {
+        if (null != result)
+        {
+            exception.initCause(result.getThrowable());
+        }
+        return exception;
+    }
+
+    public static boolean isOk(LifecycleTransitionResult result)
+    {
+        return null != result && result.isOk();
     }
 
 }

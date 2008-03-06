@@ -35,10 +35,8 @@ public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
         assertEquals("bar", headers.getProperty("foo"));
         assertEquals("boz", headers.getProperty("baz"));
         assertEquals("cde@example.com", c.getFromAddress());
-        assertEquals("password", c.getPassword());
         assertEquals("def@example.com", c.getReplyToAddresses());
         assertEquals("subject", c.getSubject());
-        assertEquals("bob@example.com", c.getUsername());
 
         // authenticator?
 
@@ -59,10 +57,8 @@ public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
         assertEquals("bar", headers.getProperty("foo"));
         assertEquals("boz", headers.getProperty("baz"));
         assertEquals("cde@example.com", c.getFromAddress());
-        assertEquals("password", c.getPassword());
         assertEquals("def@example.com", c.getReplyToAddresses());
         assertEquals("subject", c.getSubject());
-        assertEquals("bob@example.com", c.getUsername());
 
         // authenticator?
 

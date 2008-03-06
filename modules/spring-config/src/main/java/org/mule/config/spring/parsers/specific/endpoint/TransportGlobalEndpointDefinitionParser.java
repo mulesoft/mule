@@ -13,6 +13,7 @@ package org.mule.config.spring.parsers.specific.endpoint;
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.URIBuilder;
 
 /**
  * A parser for global endpoints.  Note that the blocking of "ref" is left to the schema.
@@ -49,9 +50,19 @@ public class TransportGlobalEndpointDefinitionParser extends AddressedEndpointDe
                                                    String[][] requiredAddressAttributes,
                                                    String[][] requiredProperties)
     {
+        this(metaOrProtocol, isMeta, URIBuilder.ALL_ATTRIBUTES,
+                endpointAttributes, requiredAddressAttributes, requiredProperties);
+    }
+
+    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
+                                                   String[] endpointAttributes,
+                                                   String[] addressAttributes,
+                                                   String[][] requiredAddressAttributes,
+                                                   String[][] requiredProperties)
+    {
         super(metaOrProtocol, isMeta,
                 new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class),
-                endpointAttributes, requiredAddressAttributes, requiredProperties);
+                addressAttributes, endpointAttributes, requiredAddressAttributes, requiredProperties);
     }
 
 }

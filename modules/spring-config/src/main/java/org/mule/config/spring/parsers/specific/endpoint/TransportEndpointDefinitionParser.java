@@ -12,13 +12,14 @@ package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
+import org.mule.endpoint.URIBuilder;
 
 /**
  * This is intended for use by endpoint-specific parsers for non-global endpoint
  * elements.
  *
  * <p>It generates both an endpoint (which should subclass
- * {@link org.mule.endpoint.MuleEndpoint}) and a
+ * {@link org.mule.api.endpoint.ImmutableEndpoint}) and a
  * {@link org.mule.endpoint.URIBuilder}.  The URI is
  * then injected into the endpoint.  So the associated schema can enable any of the
  * suitable {@link org.mule.endpoint.URIBuilder# ALL_ATTRIBUTES}
@@ -58,8 +59,18 @@ public class TransportEndpointDefinitionParser extends AddressedEndpointDefiniti
                                              String[][] requiredAddressAttributes,
                                              String[][] requiredProperties)
     {
+        this(metaOrProtocol, isMeta, endpoint, endpointAttributes, URIBuilder.ALL_ATTRIBUTES,
+                requiredAddressAttributes, requiredProperties);
+    }
+
+    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint,
+                                             String[] endpointAttributes,
+                                             String[] addressAttributes,
+                                             String[][] requiredAddressAttributes,
+                                             String[][] requiredProperties)
+    {
         super(metaOrProtocol, isMeta, new ChildEndpointDefinitionParser(endpoint),
-                endpointAttributes, requiredAddressAttributes, requiredProperties);
+                endpointAttributes, addressAttributes, requiredAddressAttributes, requiredProperties);
     }
 
 }

@@ -8,16 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api;
+package org.mule.interceptor;
 
-import java.util.List;
+import org.mule.api.MuleException;
 
-/**
- * Maintains a list of interceptors.
- */
-public interface InterceptorStack extends Interceptor
+public class InterceptorException extends MuleException
 {
 
-    List getInterceptors();
+    public InterceptorException(Throwable e)
+    {
+        super(e);
+    }
 
 }

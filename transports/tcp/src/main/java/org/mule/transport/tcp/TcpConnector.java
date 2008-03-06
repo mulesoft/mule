@@ -110,7 +110,14 @@ public class TcpConnector extends AbstractConnector
         {
             socket.setSoLinger(true, getSocketSoLinger());
         }
-        socket.setTcpNoDelay(isSendTcpNoDelay());
+        try
+        {
+            socket.setTcpNoDelay(isSendTcpNoDelay());
+        }
+        catch (SocketException e)
+        {
+            // MULE-2800 - Bug in Solaris
+        }
         socket.setKeepAlive(isKeepAlive());
     }
 

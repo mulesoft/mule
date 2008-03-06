@@ -1022,7 +1022,7 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractServiceType">
-        <xsd:attribute name="name" type="nonBlankString">
+        <xsd:attribute name="name" type="nonBlankString" use="required">
             <xsd:annotation>
                 <xsd:documentation>
                     The name used to identify this service.

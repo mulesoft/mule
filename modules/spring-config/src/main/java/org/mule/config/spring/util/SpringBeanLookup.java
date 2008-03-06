@@ -72,7 +72,7 @@ public class SpringBeanLookup implements ObjectFactory, ApplicationContextAware
         // Not implemented for Spring Beans
     }
 
-    public Class getObjectClass() throws Exception
+    public Class getObjectClass()
     {
         return applicationContext.getType(bean);
     }
@@ -82,7 +82,7 @@ public class SpringBeanLookup implements ObjectFactory, ApplicationContextAware
         return applicationContext.getBean(bean);
     }
 
-    public void release(Object object) throws Exception
+    public void release(Object object)
     {
         // Not implemented for Spring Beans
     }

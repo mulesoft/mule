@@ -116,7 +116,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase
                             {
                                 logger.debug("lifecycle phase: " + getName() + " for object: " + o);
                             }
-                            if (LifecycleTransitionResult.OK == applyLifecycle(o))
+                            if (applyLifecycle(o).isOk())
                             {
                                 target.remove();
                                 duplicates.add(o);

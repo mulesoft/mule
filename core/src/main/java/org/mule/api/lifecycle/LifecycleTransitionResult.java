@@ -12,20 +12,43 @@ package org.mule.api.lifecycle;
 
 import org.mule.util.ClassUtils;
 
+/**
+ * Restrict possible results - only OK or a retry based on some throwable are currently allowed.
+ */
 public final class LifecycleTransitionResult
 {
 
+    public static final String OK_NAME = "ok";
+    public static final String RETRY_NAME = "retry";
+
+
     /** Transition successful **/
-    public static final LifecycleTransitionResult OK = new LifecycleTransitionResult("ok");
+    public static final LifecycleTransitionResult OK = new LifecycleTransitionResult(OK_NAME, true, null);
 
-    /** Request retry once other components initialised **/
-    public static final LifecycleTransitionResult RETRY = new LifecycleTransitionResult("retry");
-
+    private boolean ok;
+    private Throwable throwable;
     private String name;
 
-    private LifecycleTransitionResult(String name)
+    private LifecycleTransitionResult(String name, boolean ok, Throwable throwable)
     {
         this.name = name;
+        this.ok = ok;
+        this.throwable = throwable;
+    }
+
+    public static LifecycleTransitionResult retry(Throwable throwable)
+    {
+        return new LifecycleTransitionResult(RETRY_NAME, false, throwable);
+    }
+
+    public boolean isOk()
+    {
+        return ok;
+    }
+
+    public Throwable getThrowable()
+    {
+        return throwable;
     }
 
     public String toString()

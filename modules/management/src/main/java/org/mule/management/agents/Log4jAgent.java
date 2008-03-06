@@ -47,7 +47,7 @@ public class Log4jAgent extends AbstractAgent
 
     public Log4jAgent()
     {
-        super("Log4j JMX Agent");
+        super("jmx-log4j");
     }
     
 

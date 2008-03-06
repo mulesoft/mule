@@ -15,10 +15,8 @@
                    ccAddresses="bcd@example.com"
                    contentType="foo/bar"
                    fromAddress="cde@example.com"
-                   password="password"
                    replyToAddresses="def@example.com"
-                   subject="subject"
-                   username="bob@example.com">
+                   subject="subject">
         <smtp:header key="foo" value="bar"/>
         <smtp:header key="baz" value="boz"/>
     </smtp:connector>
@@ -31,10 +29,8 @@
                      ccAddresses="bcd@example.com"
                      contentType="foo/bar"
                      fromAddress="cde@example.com"
-                     password="password"
                      replyToAddresses="def@example.com"
-                     subject="subject"
-                     username="bob@example.com">
+                     subject="subject">
         <smtps:header key="foo" value="bar"/>
         <smtps:header key="baz" value="boz"/>
         <smtps:tls-client clientKeyStore="greenmail-truststore"

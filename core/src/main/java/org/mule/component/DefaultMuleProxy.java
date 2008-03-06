@@ -55,6 +55,9 @@ public class DefaultMuleProxy implements MuleProxy
     /** Holds the actual UMO */
     private LifecycleAdapter umo;
 
+    // MULE-2676 workaround
+    private Object pojo;
+
     /** holds the UMO descriptor */
     private Service service;
 
@@ -74,7 +77,8 @@ public class DefaultMuleProxy implements MuleProxy
     public DefaultMuleProxy(Object pojoService, Service service, MuleContext muleContext)
             throws MuleException
     {
-        //this.pojoService = pojoService;
+        // MULE-2676 workaround
+        this.pojo = pojoService;
         this.service = service;
         this.muleContext = muleContext;
 
@@ -473,6 +477,11 @@ public class DefaultMuleProxy implements MuleProxy
                         CoreMessages.eventProcessingFailedFor(service.getName()), 
                         event.getMessage(), e));
             }
+        }
+        finally
+        {
+            // MULE-2676 workaround
+            service.getComponentFactory().release(pojo);
         }
     }
 

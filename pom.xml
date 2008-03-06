@@ -674,6 +674,16 @@
                 <scope>provided</scope>
             </dependency>
             -->
+            <!-- 
+                 This dependency is used in the axis transport, but needs to be
+                 excluded from the various distros as we use the newer version from
+                 the cxf transport.
+            -->
+            <dependency>
+                <groupId>axis</groupId>
+                <artifactId>axis-wsdl4j</artifactId>
+                <version>1.5.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     

@@ -23,4 +23,14 @@ org.mule.transport.cxf.bridge.BridgeTest
 # FunctionalTestComponent as the basis for a service...
 org.mule.transport.cxf.CxfCustomHttpHeaderTestCase
 
+# MULE-3047
+org.mule.transport.cxf.CxfConnectorHttpFunctionalTestCase
 
+# MULE-3048
+org.mule.transport.cxf.WsdlCallTestCase
+
+# MULE-3049
+org.mule.transport.cxf.CxfBasicTestCase
+
+# MULE-3051
+org.mule.transport.cxf.CxfComponentExceptionStrategyTestCase

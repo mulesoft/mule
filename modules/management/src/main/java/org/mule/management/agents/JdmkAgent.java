@@ -53,7 +53,7 @@ public class JdmkAgent extends AbstractAgent
 
     public JdmkAgent()
     {
-        super("JDMK Agent");
+        super("jdmk-agent");
     }
 
     protected Object createAdaptor() throws Exception

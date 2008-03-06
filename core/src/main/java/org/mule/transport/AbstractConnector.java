@@ -283,7 +283,7 @@ public abstract class AbstractConnector
 
         connectionStrategy = new SingleAttemptConnectionStrategy();
 
-        // TODO HH: dispatcher pool configuration needs to be extracted, maybe even
+        // TODO dispatcher pool configuration should be extracted, maybe even
         // moved into the factory?
         // NOTE: testOnBorrow MUST be FALSE. this is a bit of a design bug in
         // commons-pool since validate is used for both activation and passivation,

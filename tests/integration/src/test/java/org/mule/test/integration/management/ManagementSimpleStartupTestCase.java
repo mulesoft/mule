@@ -24,9 +24,9 @@ public class ManagementSimpleStartupTestCase extends FunctionalTestCase
 
     public void testAgentConfiguration() throws MuleException
     {
-        DefaultJmxSupportAgent agent = (DefaultJmxSupportAgent) muleContext.getRegistry().lookupAgent("jmxAgent");
+        DefaultJmxSupportAgent agent = (DefaultJmxSupportAgent) muleContext.getRegistry().lookupAgent("jmx-default-config");
         assertNotNull(agent);
-        // tehse values are different from DEFAULT_HOST and DEfAULT_PORT in agent 
+        // these values are different from DEFAULT_HOST and DEFAULT_PORT in agent
         assertNotNull(agent.getHost());
         assertEquals("0.0.0.0", agent.getHost());
         assertNotNull(agent.getPort());

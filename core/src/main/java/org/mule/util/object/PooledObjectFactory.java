@@ -63,6 +63,7 @@ public class PooledObjectFactory extends AbstractObjectFactory implements Poolab
         this.poolingProfile = poolingProfile;
     }
 
+    // @Override
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
         super.initialise();
@@ -129,6 +130,7 @@ public class PooledObjectFactory extends AbstractObjectFactory implements Poolab
         }
     }
 
+    // @Override
     public void dispose()
     {
         if (pool != null)
@@ -139,7 +141,7 @@ public class PooledObjectFactory extends AbstractObjectFactory implements Poolab
             }
             catch (Exception e)
             {
-                logger.warn(e);
+                // close() never throws - wrong method signature
             }
             finally
             {
@@ -149,21 +151,28 @@ public class PooledObjectFactory extends AbstractObjectFactory implements Poolab
     }
 
     /**
-     * Creates a new instance of the object on each call.
+     * Returns an instance from the internal object pool.
      */
+    // @Override
     public Object getInstance() throws Exception
     {
-        // TODO HH: fallout from MULE-2676 prevents this from working properly..this is SO WRONG!
-        return super.getInstance();
-        // return pool.borrowObject();
+        return pool.borrowObject();
     }
 
     /**
-     * Returns the object instance to the pool.
+     * Returns the given object instance to the pool.
      */
-    public void release(Object object) throws Exception
+    // @Override
+    public void release(Object object)
     {
-        pool.returnObject(object);
+        try
+        {
+            pool.returnObject(object);
+        }
+        catch (Exception ex)
+        {
+            // declared Exception is never thrown from pool; this is a bug in the method signature
+        }
     }
 
     // //////////////////////////////////////////////////////////////////////////////////////////////

@@ -133,13 +133,13 @@ public class JndiObjectFactory implements ObjectFactory, Initialisable, Disposab
     }
 
     /** {@inheritDoc} */
-    public void release(Object object) throws Exception
+    public void release(Object object)
     {
         throw new UnsupportedOperationException();
     }
     
     /** {@inheritDoc} */
-    public Class getObjectClass() throws Exception
+    public Class getObjectClass()
     {
         throw new UnsupportedOperationException();
     }

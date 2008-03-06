@@ -135,5 +135,10 @@
             <artifactId>mail</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wsdl4j</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

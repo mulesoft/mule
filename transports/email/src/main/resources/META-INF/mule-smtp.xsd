@@ -53,13 +53,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="password" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Password needed for authentication at the server.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="replyToAddresses" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -71,13 +64,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The subject for the outgoing message.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="username" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Username needed for authentication at the server.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

@@ -19,42 +19,11 @@ import org.mule.tck.services.UniqueComponent;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.util.ExceptionUtils;
-import org.mule.util.UUID;
 
 public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
 {
     public static final byte MAX_ACTIVE = 3;
     public static final long MAX_WAIT = 1500;
-
-    // @Override
-    public void testInitialise()
-    {
-        // TODO HH: auto-generated method stub
-    }
-
-    // @Override
-    public void testDispose()
-    {
-        // TODO HH: auto-generated method stub
-    }
-
-    // @Override
-    public void testGet()
-    {
-        // TODO HH: auto-generated method stub
-    }
-
-    // @Override
-    public void testGetObjectClass()
-    {
-        // TODO HH: auto-generated method stub
-    }
-
-    // @Override
-    public void testRelease()
-    {
-        // TODO HH: auto-generated method stub
-    }
 
     protected PoolingProfile getDefaultPoolingProfile()
     {
@@ -62,7 +31,6 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         pp.setMaxActive(MAX_ACTIVE);
         pp.setMaxWait(MAX_WAIT);
         pp.setInitialisationPolicy(PoolingProfile.INITIALISE_NONE);
-
         return pp;
     }
 
@@ -265,14 +233,15 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         assertFalse("Service IDs " + id2 + " and " + id3 + " should be different", id2.equals(id3));
     }
 
-    // TODO HH: makes no sense?!
-    public void _testOnRemoveCallsDispose() throws Exception
+    public void testDisposingFactoryDisposesObject() throws Exception
     {
         PooledObjectFactory of = new PooledObjectFactory(WaterMelon.class, getDefaultPoolingProfile());
         of.initialise();
 
         WaterMelon wm = (WaterMelon) of.getInstance();
         of.release(wm);
+        of.dispose();
+
         assertEquals("disposed", wm.getState());
     }
 
@@ -333,11 +302,6 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
             this.time = time;
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Runnable#run()
-         */
         public void run()
         {
             try

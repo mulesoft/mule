@@ -51,7 +51,7 @@ public class RmiRegistryAgent extends AbstractAgent
 
     public RmiRegistryAgent()
     {
-        super("RMI Agent");
+        super("rmi-server");
     }
 
     public String getDescription()

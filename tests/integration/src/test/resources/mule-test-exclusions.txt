@@ -110,4 +110,4 @@ org.mule.test.integration.client.MuleClientRemotingTcpTestCase
 org.mule.test.integration.client.MuleClientRemotingJmsTestCase
 
 # MULE-3002
-org.mule.test.integration.management.ManagementSimpleStartupTestCase
+#org.mule.test.integration.management.ManagementSimpleStartupTestCase

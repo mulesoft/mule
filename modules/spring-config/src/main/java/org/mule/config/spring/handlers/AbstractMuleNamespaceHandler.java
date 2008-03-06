@@ -39,6 +39,10 @@ import org.w3c.dom.Element;
 public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSupport
 {
 
+    public static final String GLOBAL_ENDPOINT = "endpoint";
+    public static final String INBOUND_ENDPOINT = "inbound-endpoint";
+    public static final String OUTBOUND_ENDPOINT = "outbound-endpoint"; 
+
     /**
      * @param name The name of the element to be ignored.
      */

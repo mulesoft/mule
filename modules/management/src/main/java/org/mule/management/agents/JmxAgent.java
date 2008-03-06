@@ -124,7 +124,7 @@ public class JmxAgent extends AbstractAgent
 
     public JmxAgent()
     {
-        super("JMX Agent");
+        super("jmx-agent");
         connectorServerProperties = new HashMap(DEFAULT_CONNECTOR_SERVER_PROPERTIES);
     }
 
@@ -265,9 +265,8 @@ public class JmxAgent extends AbstractAgent
             }
             catch (IOException e)
             {
-                logger.debug("Trapping IOException", e);
                 // this probably means that the RMI server isn't started so we request a retry
-                return LifecycleTransitionResult.RETRY;
+                return LifecycleTransitionResult.retry(e);
             }
             catch (Exception e)
             {

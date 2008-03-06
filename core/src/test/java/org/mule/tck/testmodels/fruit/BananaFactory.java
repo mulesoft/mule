@@ -34,12 +34,12 @@ public class BananaFactory implements ObjectFactory
         return new Banana();
     }
     
-    public void release(Object object) throws Exception
+    public void release(Object object)
     {
         throw new UnsupportedOperationException();
     }
     
-    public Class getObjectClass() throws Exception
+    public Class getObjectClass()
     {
         return Banana.class;
     }

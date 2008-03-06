@@ -664,9 +664,11 @@ public abstract class AbstractService implements Service
             if (receiver != null && endpoint.getConnector().isStarted()
                     && endpoint.getInitialState().equals(ImmutableEndpoint.INITIAL_STATE_STARTED))
             {
-                if (LifecycleTransitionResult.OK != receiver.start())
+                LifecycleTransitionResult result = receiver.start();
+                if (! result.isOk())
                 {
-                    throw new InitialisationException(CoreMessages.nestedRetry(), receiver);
+                    throw (InitialisationException) new InitialisationException(CoreMessages.nestedRetry(), receiver)
+                            .initCause(result.getThrowable());
                 }
             }
         }
@@ -686,9 +688,11 @@ public abstract class AbstractService implements Service
                     endpoint);
             if (receiver != null)
             {
-                if (LifecycleTransitionResult.OK != receiver.stop())
+                LifecycleTransitionResult result = receiver.stop();
+                if (! result.isOk())
                 {
-                    throw new LifecycleException(CoreMessages.nestedRetry(), receiver);
+                    throw (InitialisationException) new InitialisationException(CoreMessages.nestedRetry(), receiver)
+                            .initCause(result.getThrowable());
                 }
             }
         }
@@ -773,9 +777,9 @@ public abstract class AbstractService implements Service
         this.muleContext = context;
     }
 
-    protected MuleProxy createComponentProxy(Object pojoService) throws MuleException
+    protected MuleProxy createComponentProxy(Object pojo) throws MuleException
     {
-        MuleProxy proxy = new DefaultMuleProxy(pojoService, this, muleContext);
+        MuleProxy proxy = new DefaultMuleProxy(pojo, this, muleContext);
         proxy.setStatistics(getStatistics());
         return proxy;
     }

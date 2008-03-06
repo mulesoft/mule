@@ -66,12 +66,9 @@
             <version>1.4</version>
             <scope>provided</scope>
         </dependency>
-        <!-- In Axis 1.4, this is a runtime dependency so we need to pull
-             it in explicitly -->
         <dependency>
             <groupId>axis</groupId>
             <artifactId>axis-wsdl4j</artifactId>
-            <version>1.5.1</version>
         </dependency>
         <!-- needed by the Axis Service component -->
         <dependency>

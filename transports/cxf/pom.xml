@@ -252,6 +252,12 @@
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${cxfVersion}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- For dynamic client, which compiles stuff on the fly -->
         <dependency>

@@ -51,7 +51,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
 
     public Log4jNotificationLoggerAgent()
     {
-        super("Log4J Notification Agent");
+        super("log4j-notifications");
     }
 
     /**

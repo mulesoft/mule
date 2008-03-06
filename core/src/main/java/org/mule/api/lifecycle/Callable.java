@@ -20,6 +20,7 @@ import org.mule.api.MuleEventContext;
  */
 public interface Callable extends EventListener
 {
+
     /**
      * Passes the event to the listener
      * 
@@ -40,4 +41,5 @@ public interface Callable extends EventListener
      *             exceptionListener associated with the service
      */
     Object onCall(MuleEventContext eventContext) throws Exception;
+
 }

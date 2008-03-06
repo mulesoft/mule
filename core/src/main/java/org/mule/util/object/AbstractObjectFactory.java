@@ -137,7 +137,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, ServiceAwa
     /**
      * Disposes of the object if it is {@link Disposable}.
      */
-    public void release(Object object) throws Exception
+    public void release(Object object)
     {
         if (object instanceof Disposable)
         {

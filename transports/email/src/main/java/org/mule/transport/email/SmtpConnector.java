@@ -11,7 +11,6 @@
 package org.mule.transport.email;
 
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 
@@ -28,9 +27,6 @@ public class SmtpConnector extends AbstractMailConnector
     public static final String DEFAULT_SMTP_HOST = "localhost";
     public static final int DEFAULT_SMTP_PORT = 25;
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";
-
-    private String username;
-    private String password;
 
     /**
      * Holds value of bcc addresses.
@@ -78,17 +74,6 @@ public class SmtpConnector extends AbstractMailConnector
     public String getProtocol()
     {
         return "smtp";
-    }
-
-    //@java.lang.Override
-    protected void doInitialise() throws InitialisationException
-    {
-        //If the User ID for SMTP is an email address and the from address is not set, then
-        //use the username
-        if(getFromAddress()==null && getUsername()!=null && getUsername().indexOf('@') > -1)
-        {
-            setFromAddress(getUsername());
-        }
     }
 
     /*
@@ -187,26 +172,6 @@ public class SmtpConnector extends AbstractMailConnector
     public int getDefaultPort()
     {
         return DEFAULT_SMTP_PORT;
-    }
-
-    public String getPassword()
-    {
-        return password;
-    }
-
-    public void setPassword(String password)
-    {
-        this.password = password;
-    }
-
-    public String getUsername()
-    {
-        return username;
-    }
-
-    public void setUsername(String username)
-    {
-        this.username = username;
     }
 
 }

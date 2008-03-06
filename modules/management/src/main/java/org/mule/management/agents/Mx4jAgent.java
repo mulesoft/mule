@@ -101,7 +101,7 @@ public class Mx4jAgent extends AbstractAgent
 
     public Mx4jAgent()
     {
-        super("MX4J Agent");
+        super("jmx-mx4j-adaptor");
     }
 
     protected HttpAdaptor createAdaptor() throws Exception

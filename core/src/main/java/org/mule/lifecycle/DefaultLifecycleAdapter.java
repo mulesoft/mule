@@ -12,7 +12,7 @@ package org.mule.lifecycle;
 
 import org.mule.RequestContext;
 import org.mule.VoidResult;
-import org.mule.api.Invocation;
+import org.mule.api.interceptor.Invocation;
 import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.DefaultMuleException;

@@ -10,7 +10,7 @@
 
 package org.mule.api.lifecycle;
 
-import org.mule.api.Interceptor;
+import org.mule.api.interceptor.Interceptor;
 import org.mule.api.service.Service;
 
 /**

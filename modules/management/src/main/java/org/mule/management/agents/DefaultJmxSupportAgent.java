@@ -40,7 +40,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
 
     public DefaultJmxSupportAgent()
     {
-        super("Default Jmx");
+        super("jmx-default-config");
     }
 
     /**
