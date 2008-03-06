@@ -69,6 +69,8 @@
 
     <link><item>mule:property</item><page>Additional+Configuration</page></link>
     <link><item>mule:properties</item><page>Additional+Configuration</page></link>
+    <link><item>mule:jndi-provider-property</item><page>Additional+Configuration</page></link>
+    <link><item>mule:jndi-provider-properties</item><page>Additional+Configuration</page></link>
     <link><item>mule:custom-transaction</item><page>Additional+Configuration</page></link>
     <link><item>jms:transaction</item><page>Additional+Configuration</page></link>
     <link><item>jms:client-ack-transaction</item><page>Additional+Configuration</page></link>
@@ -127,11 +129,6 @@
     <link><item>xml:xml-to-object-transformer</item><page>Additional+Configuration</page></link>
     <link><item>xml:xslt-transformer</item><page>Additional+Configuration</page></link>
     <link><item>xml:xml-prettyprinter-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>email:email-to-string-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>email:string-to-email-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>email:object-to-mime-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>email:mime-to-bytes-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>email:bytes-to-mime-transformer</item><page>Additional+Configuration</page></link>
     <link><item>soap:http-to-soap-request-transformer</item><page>Additional+Configuration</page></link>
     <link><item>http:http-client-response-to-object-transformer</item><page>Additional+Configuration</page></link>
     <link><item>http:http-response-to-string-transformer</item><page>Additional+Configuration</page></link>
@@ -171,14 +168,31 @@
     <link><item>axis:soap-return</item><page>Axis+Transport</page></link>
     <link><item>axis:supported-scheme</item><page>Axis+Transport</page></link>
 
-    <link><item>bpm:connector</item><page>Bpm+Transport</page></link>
-    <link><item>bpm:inbound-endpoint</item><page>Bpm+Transport</page></link>
-    <link><item>bpm:outbound-endpoint</item><page>Bpm+Transport</page></link>
-    <link><item>bpm:endpoint</item><page>Bpm+Transport</page></link>
+    <link><item>bpm:connector</item><page>BPM+Transport</page></link>
+    <link><item>bpm:inbound-endpoint</item><page>BPM+Transport</page></link>
+    <link><item>bpm:outbound-endpoint</item><page>BPM+Transport</page></link>
+    <link><item>bpm:endpoint</item><page>BPM+Transport</page></link>
 
-    <link><item>cxf:connector</item><page>Cxf+Transport</page></link>
-    <link><item>cxf:inbound-endpoint</item><page>Cxf+Transport</page></link>
-    <link><item>cxf:outbound-endpoint</item><page>Cxf+Transport</page></link>
+    <link><item>cxf:connector</item><page>CXF+Transport</page></link>
+    <link><item>cxf:inbound-endpoint</item><page>CXF+Transport</page></link>
+    <link><item>cxf:outbound-endpoint</item><page>CXF+Transport</page></link>
     <link><item>cxf:endpoint</item><page>Cxf+Transport</page></link>
+    <link><item>cxf:features</item><page>Cxf+Transport</page></link>
+
+    <link><item>ejb:connector</item><page>EJB+Transport</page></link>
+    <link><item>ejb:inbound-endpoint</item><page>EJB+Transport</page></link>
+    <link><item>ejb:outbound-endpoint</item><page>EJB+Transport</page></link>
+    <link><item>ejb:endpoint</item><page>EJB+Transport</page></link>
+
+    <link><item>email:email-to-string-transformer</item><page>Email+Transport</page></link>
+    <link><item>email:string-to-email-transformer</item><page>Email+Transport</page></link>
+    <link><item>email:object-to-mime-transformer</item><page>Email+Transport</page></link>
+    <link><item>email:mime-to-bytes-transformer</item><page>Email+Transport</page></link>
+    <link><item>email:bytes-to-mime-transformer</item><page>Email+Transport</page></link>
+
+    <link><item>file:connector</item><page>File+Transport</page></link>
+    <link><item>file:inbound-endpoint</item><page>File+Transport</page></link>
+    <link><item>file:outbound-endpoint</item><page>File+Transport</page></link>
+    <link><item>file:endpoint</item><page>File+Transport</page></link>
 
 </links>

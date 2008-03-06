@@ -58,7 +58,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
     private Bus bus;
     private String configurationLocation;
     private String defaultFrontend = CxfConstants.JAX_WS_FRONTEND;
-    private List<SedaService> components = new ArrayList<SedaService>();
+    private List<SedaService> services = new ArrayList<SedaService>();
     
     public CxfConnector()
     {
@@ -103,7 +103,8 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         extension.registerConduitInitiator(MuleUniversalTransport.TRANSPORT_ID, transport);
         
         // Registers the listener
-        try{
+        try
+        {
         	muleContext.registerListener(this);
         }
         catch (Exception e)
@@ -243,7 +244,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         c.setInboundRouter(new DefaultInboundRouterCollection());
         c.getInboundRouter().addEndpoint(serviceEndpoint);
         
-        components.add(c);
+        services.add(c);
     }
 
     /**
@@ -280,7 +281,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         // listener is available
         if (event.getAction() == ManagerNotification.MANAGER_STARTED)
         {
-            for (Service c : components)
+            for (Service c : services)
             {
                 try
                 {

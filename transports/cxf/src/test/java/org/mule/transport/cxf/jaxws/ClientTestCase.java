@@ -21,7 +21,7 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 
 public class ClientTestCase extends FunctionalTestCase
 {
-    public void testGeneratedClient() throws Exception
+    public void testGeneratedClientWithQuartz() throws Exception
     {
         GreeterImpl impl = getGreeter();
         

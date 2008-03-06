@@ -26,8 +26,6 @@ import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
  */
 public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
 {
-    public static final String DEFAULT_WSDL_TRANSPORT = "org.codehaus.xfire.transport.http.SoapHttpTransport";
-
     public CxfWsdlMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
@@ -43,26 +41,35 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
                 @Override
                 public void initialize() throws Exception, IOException
                 {
-
                     String wsdlUrl = endpoint.getEndpointURI().getAddress();
                     String serviceName = endpoint.getEndpointURI().getAddress();
-                    
-                    // If the property specified an alternative WSDL url, use it
-                    if (endpoint.getProperty("wsdlUrl") != null
-                        && StringUtils.isNotBlank(endpoint.getProperty("wsdlUrl").toString()))
-                    {
-                        wsdlUrl = (String) endpoint.getProperty("wsdlUrl");
-                    }
+                    String portName = null;
 
-                    if (serviceName.indexOf("?") > -1)
+                    // If the property specified an alternative WSDL url, use it
+                    if (endpoint.getProperty("wsdlLocation") != null && StringUtils.isNotBlank(endpoint.getProperty("wsdlLocation").toString()))
+                    {
+                        wsdlUrl = (String) endpoint.getProperty("wsdlLocation");
+                    }
+                    
+                    // If the property specified an alternative service, use it
+                    if (endpoint.getProperty("service") != null && StringUtils.isNotBlank(endpoint.getProperty("service").toString()))
+                    {
+                        serviceName = (String) endpoint.getProperty("service");
+                    } else if (serviceName.indexOf("?") > -1)
                     {
                         serviceName = serviceName.substring(0, serviceName.lastIndexOf('?'));
                     }
-
+                    
+                    // If the property specified an alternative port, use it
+                    if (endpoint.getProperty("port") != null && StringUtils.isNotBlank(endpoint.getProperty("port").toString()))
+                    {
+                        portName = (String) endpoint.getProperty("port");
+                    }
+                    
                     try
                     {
                         DynamicClientFactory cf = DynamicClientFactory.newInstance(bus);
-                        this.client = cf.createClient(wsdlUrl, new QName(serviceName));
+                        this.client = cf.createClient(wsdlUrl, QName.valueOf(serviceName), (portName == null ? null : QName.valueOf(portName)));
                     }
                     catch (Exception ex)
                     {

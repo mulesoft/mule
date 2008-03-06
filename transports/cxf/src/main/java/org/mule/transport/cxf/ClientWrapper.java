@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -37,8 +38,10 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.MethodDispatcher;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -72,6 +75,7 @@ public class ClientWrapper
         return proxy;
     }
 
+    @SuppressWarnings("unchecked")
     public void initialize() throws Exception, IOException
     {
         String clientClass = (String) endpoint.getProperty(CxfConstants.CLIENT_CLASS);
@@ -82,6 +86,30 @@ public class ClientWrapper
         else
         {
             createClientFromLocalServer(bus);
+        }
+        
+        addInterceptors(client.getInInterceptors(), (List<Interceptor>) endpoint.getProperty(CxfConstants.IN_INTERCEPTORS));
+        addInterceptors(client.getInFaultInterceptors(), (List<Interceptor>) endpoint.getProperty(CxfConstants.IN_FAULT_INTERCEPTORS));
+        addInterceptors(client.getOutInterceptors(), (List<Interceptor>) endpoint.getProperty(CxfConstants.OUT_INTERCEPTORS));
+        addInterceptors(client.getOutFaultInterceptors(), (List<Interceptor>) endpoint.getProperty(CxfConstants.OUT_FAULT_INTERCEPTORS));
+        
+        List<AbstractFeature> features = (List<AbstractFeature>) endpoint.getProperty(CxfConstants.OUT_FAULT_INTERCEPTORS);
+        
+        if (features != null)
+        {
+            for (AbstractFeature f : features)
+            {
+                f.initialize(client, bus);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addInterceptors(List<Interceptor> col, List<Interceptor> supplied)
+    {
+        if (supplied != null) 
+        {
+            col.addAll(supplied);
         }
     }
 

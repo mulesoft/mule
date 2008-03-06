@@ -10,8 +10,6 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:element name="connector" type="emailDownloadConnectorType"/>
-
     <xsd:complexType name="emailDownloadConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">

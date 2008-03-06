@@ -38,6 +38,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-cxf</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ejb</artifactId>
             <version>${version}</version>
         </dependency>
@@ -187,11 +192,11 @@
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
+        <!-- dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-wssecurity</artifactId>
             <version>${version}</version>
-        </dependency>
+        </dependency -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>

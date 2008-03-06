@@ -17,6 +17,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.endpoint.EndpointNotFoundException;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
@@ -52,6 +53,7 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
+import org.xmlsoap.schemas.wsdl.http.AddressType;
 
 /**
  * The CXF receives messages from Mule, converts them into CXF messages and dispatches
@@ -100,44 +102,62 @@ public class CxfServiceComponent implements Callable, Lifecycle
         // if http request
         String request = eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY,
             StringUtils.EMPTY);
+        String uri = eventContext.getEndpointURI().toString();
 
-        if (request.indexOf('?') > -1)
+        if (request.indexOf('?') > -1 || uri.indexOf('?') > -1)
         {
-            return generateWSDLOrXSD(eventContext, request);
+            return generateWSDLOrXSD(eventContext, request, uri);
         }
         else
         {
-            String uri = eventContext.getEndpointURI().toString();
-
             return sendToDestination(eventContext, uri);
         }
     }
 
-    protected Object generateWSDLOrXSD(MuleEventContext eventContext, String req)
+    protected Object generateWSDLOrXSD(MuleEventContext eventContext, String req, String uri)
         throws EndpointNotFoundException, IOException
     {
+        
         // TODO: Is there a way to make this not so ugly?
-        String uriBase = eventContext.getEndpointURI().getAddress().toString();
-        int qIdx = uriBase.indexOf('?');
-        if (qIdx > -1) {
-            uriBase = uriBase.substring(0, qIdx);
+        String ctxUri;
+        String uriBase = null;
+        
+        EndpointURI epUri = eventContext.getEndpointURI();
+        String host = (String) eventContext.getMessage().getProperty("Host", epUri.getHost());
+        
+        // This is the case of the HTTP message receiver. The servlet one sends different info
+        if (req != null && req.length() > 0) {
+            
+            uriBase = epUri.getScheme() + "://" + host + epUri.getPath();
+            int qIdx = uriBase.indexOf('?');
+            if (qIdx > -1) {
+                uriBase = uriBase.substring(0, qIdx);
+            }
+            
+            qIdx = req.indexOf('?');
+            if (qIdx > -1) {
+                req = req.substring(qIdx);
+            }
+            
+            qIdx = req.indexOf('&');
+            if (qIdx > -1) {
+                req = req.substring(0, qIdx);
+            }
+            
+            uri = uriBase + req;
         }
         
-        qIdx = req.indexOf('?');
-        if (qIdx > -1) {
-            req = req.substring(qIdx);
-        }
+        ctxUri = eventContext.getEndpointURI().getPath();
         
-        qIdx = req.indexOf('&');
-        if (qIdx > -1) {
-            req = req.substring(0, qIdx);
-        }
-        
-        String uri = uriBase + req;
-        
-        String ctxUri = eventContext.getEndpointURI().getPath();
-
         EndpointInfo ei = receiver.getServer().getEndpoint().getEndpointInfo();
+
+        if (uriBase != null) {
+            ei.setAddress(uriBase);
+            
+            if (ei.getExtensor(AddressType.class) != null) {
+                ei.getExtensor(AddressType.class).setLocation(uriBase);
+            }
+        }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String ct = null;
@@ -180,7 +200,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
             if (payload instanceof InputStream)
             {
                 m.put(Message.ENCODING, ctx.getEncoding());
-                m.setContent(InputStream.class, (InputStream) payload);
+                m.setContent(InputStream.class, payload);
             }
             else if (payload instanceof Reader)
             {

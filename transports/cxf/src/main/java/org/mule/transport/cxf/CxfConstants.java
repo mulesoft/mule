@@ -11,9 +11,13 @@ public interface CxfConstants {
     String NAME = "name";
     String CLIENT_CLASS = "clientClass";
     String SERVICE_INTERFACE = "serviceInterface";
-    String CLIENT_PORT = "port";
+    String CLIENT_PORT = "wsdlPort";
     String OPERATION = "operation";
     String BRIDGE = "bridge";
     String SERVICE_CLASS = "serviceClass";
     String FEATURES = "features";
+    String IN_INTERCEPTORS = "inInterceptors";
+    String IN_FAULT_INTERCEPTORS = "inFaultInterceptors";
+    String OUT_INTERCEPTORS = "outInterceptors";
+    String OUT_FAULT_INTERCEPTORS = "outFaultInterceptors";
 }

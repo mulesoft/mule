@@ -39,6 +39,7 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
@@ -119,6 +120,11 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             if (features != null) {
                 sfb.setFeatures(features);
             }
+            
+            sfb.setInInterceptors((List<Interceptor>) endpointProps.get("inInterceptors"));
+            sfb.setInFaultInterceptors((List<Interceptor>) endpointProps.get("inFaultInterceptors"));
+            sfb.setOutInterceptors((List<Interceptor>) endpointProps.get("outInterceptors"));
+            sfb.setOutFaultInterceptors((List<Interceptor>) endpointProps.get("outFaultInterceptors"));
 
             // Aegis, JAXB, other?
             if (databinding != null)

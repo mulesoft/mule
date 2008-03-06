@@ -16,14 +16,20 @@
     </properties>
   </endpoint>
   
-  <endpoint address="cxf:http://localhost:63081/services/greeter" name="clientEndpoint">
-     <properties>
-       <spring:entry key="clientClass" value="org.apache.hello_world_soap_http.SOAPService"/>
-       <spring:entry key="port" value="SoapPort"/>
-       <spring:entry key="wsdlLocation" value="classpath:/wsdl/hello_world.wsdl"/>
-     </properties>
-   </endpoint>
-   
+  <cxf:endpoint 
+      name="clientEndpoint" 
+      address="http://localhost:63081/services/greeter"
+      clientClass="org.apache.hello_world_soap_http.SOAPService" 
+      wsdlPort="SoapPort" 
+      wsdlLocation="classpath:/wsdl/hello_world.wsdl">
+      <cxf:inInterceptors>
+          <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>    
+      </cxf:inInterceptors>
+      <cxf:outInterceptors>
+          <spring:bean id="foo2" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>    
+      </cxf:outInterceptors>
+  </cxf:endpoint>
+    
   <model name="TestCxfModel">
   
     <service name="greeterService">
@@ -39,19 +45,17 @@
       <inbound>
         <inbound-endpoint ref="quartz.in"/>
       </inbound>
-       <component>
-         <singleton-object class="org.mule.providers.cxf.jaxws.ClientMessageGenerator"/>
-       </component>
+      <component>
+          <singleton-object class="org.mule.transport.cxf.jaxws.ClientMessageGenerator"/>
+      </component>
 	  <outbound>
 	    <outbound-pass-through-router>
-	       <outbound-endpoint address="cxf:http://localhost:63081/services/greeter">
-	         <properties>
-	           <spring:entry key="clientClass" value="org.apache.hello_world_soap_http.SOAPService"/>
-	           <spring:entry key="port" value="SoapPort"/>
-	           <spring:entry key="wsdlLocation" value="classpath:/wsdl/hello_world.wsdl"/>
-	           <spring:entry key="operation" value="greetMe"/>
-	         </properties>
-	       </outbound-endpoint>
+	       <cxf:outbound-endpoint 
+	         address="http://localhost:63081/services/greeter"
+	         clientClass="org.apache.hello_world_soap_http.SOAPService" 
+	         wsdlPort="SoapPort" 
+	         wsdlLocation="classpath:/wsdl/hello_world.wsdl" 
+	         operation="greetMe"/>
 	     </outbound-pass-through-router>
 	   </outbound>
     </service>

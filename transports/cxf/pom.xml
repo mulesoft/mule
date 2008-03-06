@@ -51,6 +51,11 @@
             <artifactId>mule-transport-tcp</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+            <version>1.0.1</version>
+        </dependency>
 
         <!-- CXF dependencies -->
         <dependency>
@@ -67,6 +72,11 @@
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
                 </exclusion>
                 <!-- We use slf4j -->
                 <exclusion>
@@ -90,6 +100,11 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
                 </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
                 <!-- We use slf4j -->
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -111,6 +126,11 @@
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
                 </exclusion>
                 <!-- We use slf4j -->
                 <exclusion>
@@ -134,6 +154,11 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
                 </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
                 <!-- We use slf4j -->
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -155,6 +180,11 @@
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
                 </exclusion>
                 <!-- We use slf4j -->
                 <exclusion>
@@ -178,6 +208,11 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
                 </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
                 <!-- We use slf4j -->
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -200,12 +235,23 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
                 </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
                 <!-- We use slf4j -->
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-security</artifactId>
+            <version>${cxfVersion}</version>
+            <scope>test</scope>
         </dependency>
         <!-- For dynamic client, which compiles stuff on the fly -->
         <dependency>

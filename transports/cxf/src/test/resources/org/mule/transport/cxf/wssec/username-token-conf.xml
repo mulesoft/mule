@@ -1,0 +1,81 @@
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
+    
+	<endpoint name="quartz.in" address="quartz:/eventTimer">
+		<properties>
+			<spring:entry key="repeatInterval" value="1000" />
+			<spring:entry key="repeatCount" value="0" />
+			<spring:entry key="startDelay" value="1000" />
+			<spring:entry key="payloadClassName" value="" />
+		</properties>
+	</endpoint>
+
+	<spring:bean id="serverCallback" class="org.mule.transport.cxf.wssec.ServerPasswordCallback"/>
+    <spring:bean id="clientCallback" class="org.mule.transport.cxf.wssec.ClientPasswordCallback"/>
+    
+    <cxf:endpoint address="http://localhost:63081/services/greeter"
+		name="clientEndpoint"
+		clientClass="org.apache.hello_world_soap_http.SOAPService"
+		wsdlPort="SoapPort"
+		wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+		operation="greetMe">
+		<cxf:outInterceptors>
+		  <spring:bean class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor" />
+          <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+              <spring:constructor-arg>
+                  <spring:map>
+                      <spring:entry key="action" value="UsernameToken" />
+                      <spring:entry key="user" value="joe" />
+                      <spring:entry key="passwordType" value="PasswordDigest" />
+                      <!-- The callback supplies the password so its not stored in our config file -->
+                      <spring:entry key="passwordCallbackRef" value-ref="clientCallback" />
+                  </spring:map>
+              </spring:constructor-arg>
+          </spring:bean>    
+		</cxf:outInterceptors>
+	</cxf:endpoint>
+
+	<model name="TestCxfModel">
+
+		<service name="greeterService">
+			<inbound>
+				<cxf:inbound-endpoint address="http://localhost:63081/services/greeter">
+					<cxf:inInterceptors>
+						<spring:bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor" />
+						<spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+							<spring:constructor-arg>
+								<spring:map>
+									<spring:entry key="action" value="UsernameToken" />
+									<spring:entry key="passwordCallbackRef" value-ref="serverCallback" />
+								</spring:map>
+							</spring:constructor-arg>
+						</spring:bean>
+					</cxf:inInterceptors>
+				</cxf:inbound-endpoint>
+			</inbound>
+			<component>
+				<singleton-object class="org.apache.hello_world_soap_http.GreeterImpl" />
+			</component>
+		</service>
+
+		<service name="cxfClient">
+			<inbound>
+				<inbound-endpoint ref="quartz.in" />
+			</inbound>
+			<component>
+				<singleton-object class="org.mule.transport.cxf.jaxws.ClientMessageGenerator" />
+			</component>
+			<outbound>
+				<outbound-pass-through-router>
+					<outbound-endpoint ref="clientEndpoint"/>
+				</outbound-pass-through-router>
+			</outbound>
+		</service>
+	</model>
+</mule>

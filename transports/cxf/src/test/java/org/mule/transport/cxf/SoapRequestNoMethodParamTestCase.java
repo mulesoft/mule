@@ -18,9 +18,9 @@ import org.mule.tck.FunctionalTestCase;
 public class SoapRequestNoMethodParamTestCase extends FunctionalTestCase
 {
     private static final String request = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soap:Body><receive xmlns=\"http://www.muleumo.org\"><src xmlns=\"http://www.muleumo.org\">Test String</src></receive></soap:Body></soap:Envelope>";
-    private static final String response = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns1:receiveResponse xmlns:ns1=\"http://services.testmodels.tck.mule.org/\"><return xmlns=\"http://services.testmodels.tck.mule.org/\">Received: Test String</return></ns1:receiveResponse></soap:Body></soap:Envelope>";
+    private static final String response = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns1:receiveResponse xmlns:ns1=\"http://services.testmodels.tck.mule.org/\"><ns1:return>Received: null</ns1:return></ns1:receiveResponse></soap:Body></soap:Envelope>";
 
-    public void testXFireSoapRequest() throws Exception
+    public void testCXFSoapRequest() throws Exception
     {
         MuleClient client = new MuleClient();
 
