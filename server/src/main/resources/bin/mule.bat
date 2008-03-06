@@ -29,7 +29,7 @@ rem ###############################################################
 
 rem MULE_HOME must be set
 if "%MULE_HOME%" == "" (
-   echo "You must set the MULE_HOME environment variable before starting Mule"
+   echo You must set the MULE_HOME environment variable before starting Mule
    goto :eof
 )
 
@@ -67,11 +67,10 @@ rem Find the requested command.
 for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^pause$ ^resume$ ^stop$ ^restart$ ^install$ ^remove"') do call :exec set COMMAND=%%v
 
 if "%COMMAND%" == "" (
-    echo Usage: %0 { console : start : pause : resume : stop : restart : install : remove }
     rem ###############################################################
     rem Customized for Mule
     rem ###############################################################
-    echo No command specified, running in console/foreground mode by default, use Ctrl-C to exit...
+    echo Running in console/foreground mode by default, use Ctrl-C to exit...
     set COMMAND=:console
     rem pause
     rem goto :eof
