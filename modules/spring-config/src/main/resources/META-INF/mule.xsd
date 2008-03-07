@@ -3180,7 +3180,7 @@
                 to all connectors using this transport.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:attribute name="clientKeyStore" type="xsd:string">
+        <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The location (which will be resolved relative to the current classpath and file system, if
@@ -3188,14 +3188,14 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="clientKeyStorePassword" type="xsd:string">
+        <xsd:attribute name="storePassword" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The password used to protect the keystore.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="clientKeyStoreType" type="substitutableClass">
+        <xsd:attribute name="class" type="substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
                     The type of keystore used (a Java class name).
@@ -3214,7 +3214,7 @@
                 (and associated private keys) necessary for identification.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:attribute name="keyStore" type="xsd:string">
+        <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The location (which will be resolved relative to the current classpath and file system, if
@@ -3222,7 +3222,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="keyStoreType" type="substitutableClass">
+        <xsd:attribute name="class" type="substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
                     The type of keystore used (a Java class name).
@@ -3236,14 +3236,14 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="keyStorePassword" type="xsd:string">
+        <xsd:attribute name="storePassword" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The password used to protect the keystore.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="keyManagerAlgorithm" type="xsd:string">
+        <xsd:attribute name="algorithm" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The algorithm used by the key store.
@@ -3262,7 +3262,7 @@
                 "really is" the expected identity.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:attribute name="trustStore" type="xsd:string">
+        <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The location (which will be resolved relative to the current classpath and file system, if
@@ -3270,7 +3270,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="trustStorePassword" type="xsd:string">
+        <xsd:attribute name="storePassword" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The password used to protected the trust store.
@@ -3284,11 +3284,11 @@
     <xsd:complexType name="tlsServerTrustStoreType">
         <xsd:complexContent>
             <xsd:extension base="tlsTrustStoreType">
-                <xsd:attribute name="trustStoreType" type="substitutableClass"/>
-                <xsd:attribute name="trustManagerAlgorithm" type="xsd:string"/>
+                <xsd:attribute name="class" type="substitutableClass"/>
+                <xsd:attribute name="algorithm" type="xsd:string"/>
                 <!-- should be of type TrustManagerFactory -->
-                <xsd:attribute name="trustManagerFactory" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="explicitTrustStoreOnly" type="substitutableBoolean"/>
+                <xsd:attribute name="factory-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="explicitOnly" type="substitutableBoolean"/>
                 <xsd:attribute name="requireClientAuthentication" type="substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -3302,7 +3302,7 @@
                 WARNING - Untested.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:attribute name="protocolHandler" type="xsd:string">
+        <xsd:attribute name="property" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     Set the java.protocol.handler.pkgs system property.

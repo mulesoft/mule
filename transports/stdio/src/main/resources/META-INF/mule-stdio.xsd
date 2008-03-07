@@ -43,6 +43,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="outputMessageCode" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Code used to retrieve output message from resource bundle.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="resourceBundle" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>

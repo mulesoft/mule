@@ -11,8 +11,8 @@
 package org.mule.transformers.xml;
 
 import org.mule.api.transformer.Transformer;
-import org.mule.module.xml.transformers.DomDocumentToXml;
-import org.mule.module.xml.transformers.XmlToDomDocument;
+import org.mule.module.xml.transformer.DomDocumentToXml;
+import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.util.IOUtils;
 
 import org.dom4j.DocumentHelper;

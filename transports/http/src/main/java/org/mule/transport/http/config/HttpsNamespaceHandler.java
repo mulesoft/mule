@@ -11,6 +11,10 @@ package org.mule.transport.http.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.http.HttpsConnector;
 
@@ -23,10 +27,10 @@ public class HttpsNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerStandardTransportEndpoints(HttpsConnector.HTTPS, URIBuilder.SOCKET_ATTRIBUTES);
         registerConnectorDefinitionParser(HttpsConnector.class);
-        registerBeanDefinitionParser("tls-key-store", new ParentDefinitionParser());
-        registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
-        registerBeanDefinitionParser("tls-server", new ParentDefinitionParser());
-        registerBeanDefinitionParser("tls-protocol-handler", new ParentDefinitionParser());
+        registerBeanDefinitionParser("tls-key-store", new KeyStoreDefinitionParser());
+        registerBeanDefinitionParser("tls-client", new ClientKeyStoreDefinitionParser());
+        registerBeanDefinitionParser("tls-server", new TrustStoreDefinitionParser());
+        registerBeanDefinitionParser("tls-protocol-handler", new ProtocolHandlerDefinitionParser());
     }
 
 }

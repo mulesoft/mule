@@ -15,9 +15,9 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.routing.ResponseRouter;
 import org.mule.config.MuleConfiguration;
 import org.mule.routing.AbstractRouter;
-import org.mule.routing.CorrelationPropertiesExtractor;
+import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
 import org.mule.util.ClassUtils;
-import org.mule.util.properties.PropertyExtractor;
+import org.mule.util.expression.ExpressionEvaluator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,14 +34,14 @@ public abstract class AbstractResponseRouter extends AbstractRouter implements R
 
     private boolean failOnTimeout = true;
 
-    protected PropertyExtractor propertyExtractor = new CorrelationPropertiesExtractor();
+    protected ExpressionEvaluator propertyExtractor = new CorrelationPropertiesExpressionEvaluator();
 
-    public PropertyExtractor getPropertyExtractor()
+    public ExpressionEvaluator getPropertyExtractor()
     {
         return propertyExtractor;
     }
 
-    public void setPropertyExtractor(PropertyExtractor propertyExtractor)
+    public void setPropertyExtractor(ExpressionEvaluator propertyExtractor)
     {
         this.propertyExtractor = propertyExtractor;
     }
@@ -55,7 +55,7 @@ public abstract class AbstractResponseRouter extends AbstractRouter implements R
     {
         try
         {
-            this.propertyExtractor = (PropertyExtractor) ClassUtils.instanciateClass(className, null,
+            this.propertyExtractor = (ExpressionEvaluator) ClassUtils.instanciateClass(className, null,
                 getClass());
         }
         catch (Exception ex)
@@ -86,7 +86,7 @@ public abstract class AbstractResponseRouter extends AbstractRouter implements R
      */
     protected Object getReplyAggregateIdentifier(MuleMessage message)
     {
-        return propertyExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
+        return propertyExtractor.evaluate(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
     }
 
     /**
@@ -101,7 +101,7 @@ public abstract class AbstractResponseRouter extends AbstractRouter implements R
      */
     protected Object getCallResponseAggregateIdentifier(MuleMessage message)
     {
-        return propertyExtractor.getProperty(MuleProperties.MULE_MESSAGE_ID_PROPERTY, message);
+        return propertyExtractor.evaluate(MuleProperties.MULE_MESSAGE_ID_PROPERTY, message);
     }
 
     public boolean isFailOnTimeout()

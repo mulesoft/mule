@@ -18,8 +18,8 @@ import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.client.remoting.notifications.RemoteDispatcherNotification;
-import org.mule.module.client.remoting.notifications.RemoteDispatcherNotificationListener;
+import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
+import org.mule.module.client.remoting.notification.RemoteDispatcherNotificationListener;
 import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
 
 import org.apache.commons.logging.Log;

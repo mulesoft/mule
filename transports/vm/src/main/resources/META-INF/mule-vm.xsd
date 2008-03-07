@@ -17,7 +17,15 @@
                 <xsd:sequence>
                     <xsd:element name="queueProfile" type="mule:queueProfileType" minOccurs="0"/>
                 </xsd:sequence>
-                <xsd:attribute name="queueEvents" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="queueEvents" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Determines if queues should be set up for listeners on the connector.
+                            If this is false the connector simply forwards events to components via the Mule server.
+                            If it is set then the queues are configured using the queuing profile.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="queueTimeout" type="xsd:positiveInteger"/>
             </xsd:extension>
         </xsd:complexContent>

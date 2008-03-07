@@ -10,9 +10,9 @@
 
     <!-- keepSendSocketOpen is required for the Async test case?  see TCP -->
     <tls:connector name="tlsConnector" keepSendSocketOpen="true">
-        <tls:tls-client clientKeyStore="clientKeyStore" clientKeyStorePassword="mulepassword"/>
-        <tls:tls-key-store keyStore="serverKeystore" keyStorePassword="mulepassword" keyPassword="mulepassword"/>
-        <tls:tls-server trustStore="trustStore" trustStorePassword="mulepassword"/>
+        <tls:client path="clientKeyStore" storePassword="mulepassword"/>
+        <tls:key-store path="serverKeystore" storePassword="mulepassword" keyPassword="mulepassword"/>
+        <tls:server path="trustStore" storePassword="mulepassword"/>
     </tls:connector>
 
     <tls:endpoint name="sendEndpoint" connector-ref="tlsConnector" address="tls://localhost:60198" synchronous="true"/>

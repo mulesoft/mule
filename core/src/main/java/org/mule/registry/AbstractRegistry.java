@@ -20,7 +20,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.UUID;
-import org.mule.util.properties.PropertyExtractorManager;
+import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.util.Collection;
 
@@ -69,6 +69,7 @@ public abstract class AbstractRegistry implements Registry
             doDispose();
             lifecycleManager.firePhase(MuleServer.getMuleContext(), Disposable.PHASE_NAME);
             PropertyExtractorManager.clear();
+            ExpressionEvaluatorManager.clearEvaluators();
         }
         catch (Exception e)
         {

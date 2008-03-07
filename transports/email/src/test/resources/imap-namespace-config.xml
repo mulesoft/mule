@@ -18,8 +18,8 @@
 
     <imaps:connector name="imapsConnector" backupEnabled="false" backupFolder="newBackup" checkFrequency="1234"
                      mailboxFolder="newMailbox" deleteReadMessages="false">
-        <imaps:tls-client clientKeyStore="greenmail-truststore" clientKeyStorePassword="password"/>
-        <imaps:tls-trust-store trustStore="greenmail-truststore" trustStorePassword="password"/>
+        <imaps:tls-client path="greenmail-truststore" storePassword="password"/>
+        <imaps:tls-trust-store path="greenmail-truststore" storePassword="password"/>
     </imaps:connector>
 
     <imap:endpoint name="global1" host="localhost" password="secret" port="123" user="bob"/>

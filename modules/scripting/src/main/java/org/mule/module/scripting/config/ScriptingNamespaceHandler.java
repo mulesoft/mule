@@ -20,7 +20,7 @@ public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler
         registerIgnoredElement("lang");
 
         registerBeanDefinitionParser("script", new ScriptDefinitionParser(false));
-        registerBeanDefinitionParser("groovyRefreshable", new GroovyRefreshableBeanBuilderParser(false));
+        registerBeanDefinitionParser("groovy-refreshable", new GroovyRefreshableBeanBuilderParser(false));
     }
 
 }

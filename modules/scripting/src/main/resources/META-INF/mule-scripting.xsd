@@ -20,7 +20,7 @@
         </xsd:complexType>
     </xsd:element>
     
-    <xsd:element name="groovyRefreshable" substitutionGroup="mule:abstract-extension">
+    <xsd:element name="groovy-refreshable" substitutionGroup="mule:abstract-extension">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="mule:abstractExtensionType">

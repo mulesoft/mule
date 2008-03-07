@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.transaction;
 
-import org.mule.module.jboss.transactions.JBossArjunaTransactionManagerFactory;
+import org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;

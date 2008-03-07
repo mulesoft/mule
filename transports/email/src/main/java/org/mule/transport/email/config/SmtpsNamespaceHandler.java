@@ -12,6 +12,8 @@ package org.mule.transport.email.config;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.SmtpsConnector;
@@ -33,8 +35,8 @@ public class SmtpsNamespaceHandler extends AbstractMuleNamespaceHandler
                 .addAlias("replyTo", MailProperties.REPLY_TO_ADDRESSES_PROPERTY);
         registerConnectorDefinitionParser(SmtpsConnector.class);
         registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "key", "value"));
-        registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());
-        registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
+        registerBeanDefinitionParser("tls-trust-store", new TrustStoreDefinitionParser());
+        registerBeanDefinitionParser("tls-client", new ClientKeyStoreDefinitionParser());
     }
     
 }

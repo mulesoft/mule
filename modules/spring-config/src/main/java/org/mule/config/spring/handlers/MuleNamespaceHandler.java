@@ -70,7 +70,7 @@ import org.mule.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.model.seda.SedaService;
 import org.mule.model.seda.SedaModel;
-import org.mule.routing.CorrelationPropertiesExtractor;
+import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.EqualsFilter;
@@ -137,9 +137,9 @@ import org.mule.transport.SimpleRetryConnectionStrategy;
 import org.mule.util.object.PooledObjectFactory;
 import org.mule.util.object.PrototypeObjectFactory;
 import org.mule.util.object.SingletonObjectFactory;
-import org.mule.util.properties.FunctionPropertyExtractor;
-import org.mule.util.properties.MapPayloadPropertyExtractor;
-import org.mule.util.properties.MessageHeaderPropertyExtractor;
+import org.mule.util.expression.FunctionExpressionEvaluator;
+import org.mule.util.expression.MapPayloadExpressionEvaluator;
+import org.mule.util.expression.MessageHeaderExpressionEvaluator;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -315,11 +315,11 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("single-async-reply-router", new RouterDefinitionParser(SingleResponseRouter.class));
 
         //Property Extractors
-        registerBeanDefinitionParser("function-property-extractor", new ChildDefinitionParser("propertyExtractor", FunctionPropertyExtractor.class));
-        registerBeanDefinitionParser("correlation-property-extractor", new ChildDefinitionParser("propertyExtractor", CorrelationPropertiesExtractor.class));
+        registerBeanDefinitionParser("function-property-extractor", new ChildDefinitionParser("propertyExtractor", FunctionExpressionEvaluator.class));
+        registerBeanDefinitionParser("correlation-property-extractor", new ChildDefinitionParser("propertyExtractor", CorrelationPropertiesExpressionEvaluator.class));
         registerBeanDefinitionParser("custom-property-extractor", new ChildDefinitionParser("propertyExtractor"));
-        registerBeanDefinitionParser("map-property-extractor", new ChildDefinitionParser("propertyExtractor", MapPayloadPropertyExtractor.class));
-        registerBeanDefinitionParser("message-property-extractor", new ChildDefinitionParser("propertyExtractor", MessageHeaderPropertyExtractor.class));
+        registerBeanDefinitionParser("map-property-extractor", new ChildDefinitionParser("propertyExtractor", MapPayloadExpressionEvaluator.class));
+        registerBeanDefinitionParser("message-property-extractor", new ChildDefinitionParser("propertyExtractor", MessageHeaderExpressionEvaluator.class));
 
         //Catch all Strategies
         registerBeanDefinitionParser("logging-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", LoggingCatchAllStrategy.class));

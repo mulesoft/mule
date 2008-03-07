@@ -15,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.component.Component;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -28,7 +29,6 @@ import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
 import org.mule.api.model.ModelException;
-import org.mule.api.model.MuleProxy;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.NestedRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
@@ -38,7 +38,7 @@ import org.mule.api.service.ServiceAware;
 import org.mule.api.service.ServiceException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.component.DefaultMuleProxy;
+import org.mule.component.JavaComponent;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -776,9 +776,9 @@ public abstract class AbstractService implements Service
         this.muleContext = context;
     }
 
-    protected MuleProxy createComponentProxy(Object pojo) throws MuleException
+    protected Component createComponentProxy(Object pojo) throws MuleException
     {
-        MuleProxy proxy = new DefaultMuleProxy(pojo, this, muleContext);
+        Component proxy = new JavaComponent(pojo, this, muleContext);
         proxy.setStatistics(getStatistics());
         return proxy;
     }

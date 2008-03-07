@@ -11,7 +11,7 @@
 package org.mule.transformers.xml;
 
 import org.mule.api.transformer.Transformer;
-import org.mule.module.xml.transformers.XmlToObject;
+import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.util.ArrayUtils;
 

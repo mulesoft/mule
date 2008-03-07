@@ -10,6 +10,7 @@
 
 package org.mule.management.agents;
 
+import org.mule.module.management.agent.RmiRegistryAgent;
 import org.mule.tck.AbstractMuleTestCase;
 
 public class RmiRegistryAgentTestCase extends AbstractMuleTestCase

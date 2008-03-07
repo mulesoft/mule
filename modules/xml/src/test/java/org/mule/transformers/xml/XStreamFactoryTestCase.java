@@ -10,7 +10,7 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.module.xml.transformers.XStreamFactory;
+import org.mule.module.xml.transformer.XStreamFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.StringUtils;
 

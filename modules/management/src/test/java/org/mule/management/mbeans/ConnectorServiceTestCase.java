@@ -12,7 +12,7 @@ package org.mule.management.mbeans;
 
 import org.mule.api.transport.Connector;
 import org.mule.management.AbstractMuleJmxTestCase;
-import org.mule.management.agents.JmxAgent;
+import org.mule.module.management.agent.JmxAgent;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import java.util.Set;

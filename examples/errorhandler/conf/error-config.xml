@@ -7,6 +7,7 @@
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
        xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.0"
        xmlns:email="http://www.mulesource.org/schema/mule/email/2.0"
+       xmlns:xm="http://www.mulesource.org/schema/mule/xml/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
@@ -14,7 +15,8 @@
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
        http://www.mulesource.org/schema/mule/smtp/2.0 http://www.mulesource.org/schema/mule/smtp/2.0/mule-smtp.xsd
-       http://www.mulesource.org/schema/mule/email/2.0 http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd">
+       http://www.mulesource.org/schema/mule/email/2.0 http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd">
 
     <description>
         This example demonstrates how to publish events to multiple outbound endpoints. 
@@ -68,12 +70,10 @@
     <email:string-to-email-transformer name="StringToEmailMessage"/>
     <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
     <jms:jmsmessage-to-object-transformer name="JMSMessageToObject"/>
-    <custom-transformer name="XMLToExceptionBean"
-                             class="org.mule.transformers.xml.XmlToObject"
-                             returnClass="org.mule.example.errorhandler.ExceptionBean"/>
-    <custom-transformer name="ExceptionBeanToXML" 
-                             class="org.mule.transformers.xml.ObjectToXml"
-                             returnClass="java.lang.String"/>
+    <xm:xml-to-object-transformer name="XMLToExceptionBean"
+                                  returnClass="org.mule.example.errorhandler.ExceptionBean"/>
+    <xm:object-to-xml-transformer name="ExceptionBeanToXML" 
+                                  returnClass="java.lang.String"/>
     <custom-transformer name="ExceptionBeanToErrorMessage" 
                              class="org.mule.example.errorhandler.ExceptionBeanToErrorMessage"
                              returnClass="org.mule.example.errorhandler.ErrorMessage"/>

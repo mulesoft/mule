@@ -9,8 +9,8 @@
  */
 package org.mule.management.mbeans;
 
-import org.mule.management.mbeans.YourKitProfilerServiceMBean;
 import org.mule.management.AbstractMuleJmxTestCase;
+import org.mule.module.management.mbean.YourKitProfilerServiceMBean;
 
 import java.lang.reflect.Method;
 

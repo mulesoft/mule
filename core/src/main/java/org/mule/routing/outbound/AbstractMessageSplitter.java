@@ -40,7 +40,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
     {
-        String correlationId = (String) propertyExtractor.getProperty(
+        String correlationId = (String) propertyExtractor.evaluate(
             MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
 
         this.initialise(message);

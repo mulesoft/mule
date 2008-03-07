@@ -18,8 +18,8 @@
 
     <pop3s:connector name="pop3sConnector" backupEnabled="true" backupFolder="newBackup" checkFrequency="1234"
                      mailboxFolder="newMailbox" deleteReadMessages="false">
-        <pop3s:tls-client clientKeyStore="greenmail-truststore" clientKeyStorePassword="password"/>
-        <pop3s:tls-trust-store trustStore="greenmail-truststore" trustStorePassword="password"/>
+        <pop3s:tls-client path="greenmail-truststore" storePassword="password"/>
+        <pop3s:tls-trust-store path="greenmail-truststore" storePassword="password"/>
     </pop3s:connector>
 
     <pop3:endpoint name="global1" host="localhost" password="secret" port="123" user="bob"/>

@@ -163,19 +163,38 @@ public class SchemaDocsMain
         }
     }
 
+    // this avoids using File objects since we may be dealing with classpath jars etc etc
     protected String tagFromFileName(String name)
     {
-        int index = name.lastIndexOf(".");
-        name = name.substring(0, index);
-        index = name.lastIndexOf("-");
-        // make sure "-" is in last file step
-        if (index > -1 && index > name.lastIndexOf("/"))
+        String dropExtension = toLeftOf(name, ".", name);
+        String dropSlash = toRightOf(dropExtension, "/", dropExtension);
+        String dropBackslash = toRightOf(dropSlash, "\\", dropSlash);
+        return toLeftOf(dropBackslash, "-", "mule");
+    }
+
+    protected String toRightOf(String text, String delim, String deflt)
+    {
+        int index = text.indexOf(delim);
+        if (index > -1)
         {
-            return name.substring(index+1);
+            return text.substring(index+1);
         }
         else
         {
-            return "mule";
+            return deflt;
+        }
+    }
+
+    protected String toLeftOf(String text, String delim, String deflt)
+    {
+        int index = text.lastIndexOf(delim);
+        if (index > -1)
+        {
+            return text.substring(0, index);
+        }
+        else
+        {
+            return deflt;
         }
     }
 

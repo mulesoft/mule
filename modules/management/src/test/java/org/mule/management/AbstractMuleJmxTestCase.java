@@ -11,10 +11,10 @@
 package org.mule.management;
 
 import org.mule.RegistryContext;
-import org.mule.management.agents.RmiRegistryAgent;
-import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
-import org.mule.management.support.JmxSupport;
-import org.mule.management.support.JmxSupportFactory;
+import org.mule.module.management.agent.RmiRegistryAgent;
+import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.module.management.support.JmxSupport;
+import org.mule.module.management.support.JmxSupportFactory;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.Iterator;

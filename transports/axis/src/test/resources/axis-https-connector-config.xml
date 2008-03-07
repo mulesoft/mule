@@ -11,8 +11,8 @@
        http://www.mulesource.org/schema/mule/https/2.0 http://www.mulesource.org/schema/mule/https/2.0/mule-https.xsd">
 
     <https:connector name="myHttpsConnector">
-        <https:tls-key-store keyStore="axisServerKeystore" keyStorePassword="mulepassword" keyPassword="mulepassword"/>
-        <https:tls-server trustStore="axisTrustStore" trustStorePassword="mulepassword"
+        <https:tls-key-store path="axisServerKeystore" storePassword="mulepassword" keyPassword="mulepassword"/>
+        <https:tls-server path="axisTrustStore" storePassword="mulepassword"
                           requireClientAuthentication="false"/>
     </https:connector>
 

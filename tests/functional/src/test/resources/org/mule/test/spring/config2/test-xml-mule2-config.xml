@@ -34,16 +34,6 @@
             <!-- TODO -->
             <!-- no way to specify connection strategy on a connector? -->
         </test:connector>
-        <!-- connector name="dummyConnector" className="org.mule.tck.testmodels.mule.TestConnector">
-        <threading-profile id="dispatcher" maxBufferSize="2"/>
-        <exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
-        <connection-strategy className="org.mule.transport.SimpleRetryConnectionStrategy">
-            <properties>
-                <property name="retryCount" value="4"/>
-                <property name="frequency" value="3000"/>
-            </properties>
-        </connection-strategy>
-        </connector -->
 
         <mule:endpoint name="AppleQueue" address="test://apple.queue"/>
         <mule:endpoint name="Banana_Queue" address="test://banana.queue"/>
@@ -234,7 +224,7 @@
                 <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
                 <mule:async-reply>
                     <mule:single-async-reply-router>
-                        <mule:custom-property-extractor class="org.mule.util.properties.FunctionPropertyExtractor"/>
+                        <mule:custom-property-extractor class="org.mule.util.expression.FunctionExpressionEvaluator"/>
                     </mule:single-async-reply-router>
                 </mule:async-reply>
             </mule:service>

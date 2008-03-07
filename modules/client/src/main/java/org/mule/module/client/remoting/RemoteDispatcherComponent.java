@@ -39,7 +39,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.model.seda.SedaService;
-import org.mule.module.client.remoting.notifications.RemoteDispatcherNotification;
+import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
 import org.mule.util.MapUtils;

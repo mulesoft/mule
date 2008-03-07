@@ -7,8 +7,8 @@
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
-                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
 
     <xsd:complexType name="filenameParserType">
         <xsd:annotation>
@@ -16,25 +16,8 @@
                 This controls the mapping from filename patterns to filenames.
                 Is requires an implementation of the FilenameParser interface,
                 which is used to control how filename patterns are used to generate file names.
-                The file provider has a default implementation called
-                SimpleFilenameParser that understands the following patterns:
-                <ul>
-                    <li>${DATE} - the current date in the format dd-MM-yy_HH-mm-ss.SS;</li>
-                    <li>${DATE:yy-MM-dd} - the current date using the specified format;</li>
-                    <li>${SYSTIME} - The current system time milliseconds;</li>
-                    <li>${UUID} - A generated Universally unique id;</li>
-                    <li>${ORIGINALNAME} - The original file name if the file being written was read from another location;</li>
-                    <li>${COUNT} - An incremental counter.</li>
-                </ul>
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required">
-            <xsd:annotation>
-                <xsd:documentation>
-                    An implementation of the FilenameParser interface.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:element name="connector" type="fileConnectorType" substitutionGroup="mule:abstract-connector"/>
@@ -42,7 +25,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence minOccurs="0" maxOccurs="1">
-                    <xsd:element name="filename-parser" type="filenameParserType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element ref="abstract-filenameParser"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="inboundAttributes"/>
                 <xsd:attributeGroup ref="outboundAttributes"/>
@@ -105,10 +88,13 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="file-to-byte-array-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="file-to-string-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="file-to-byte-array-transformer" type="mule:abstractTransformerType"
+                 substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="file-to-string-transformer" type="mule:abstractTransformerType"
+                 substitutionGroup="mule:abstract-transformer"/>
 
-    <xsd:element name="filename-wildcard-filter" type="mule:wildcardFilterType" substitutionGroup="mule:abstract-filter"/>
+    <xsd:element name="filename-wildcard-filter" type="mule:wildcardFilterType"
+                 substitutionGroup="mule:abstract-filter"/>
 
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
@@ -120,7 +106,8 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType"
+                 substitutionGroup="mule:abstract-outbound-endpoint"/>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
@@ -212,4 +199,84 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
+    <xsd:element name="legacy-filename-parser" type="filenameParserType" substitutionGroup="abstract-filenameParser">
+        <xsd:annotation>
+            <xsd:documentation>
+                The file connector uses this as a default implementation, it understands the following patterns:
+                <ul>
+                    <li>${DATE} - the current date in the format dd-MM-yy_HH-mm-ss.SS;</li>
+                    <li>${DATE:yy-MM-dd} - the current date using the specified format;</li>
+                    <li>${SYSTIME} - The current system time milliseconds;</li>
+                    <li>${UUID} - A generated Universally unique id;</li>
+                    <li>${ORIGINALNAME} - The original file name if the file being written was read from another
+                        location;
+                    </li>
+                    <li>${COUNT} - An incremental counter.</li>
+                </ul>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="expression-filename-parser" type="filenameParserType"
+                 substitutionGroup="abstract-filenameParser">
+        <xsd:annotation>
+            <xsd:documentation>
+                ExpressionFilenameParser can use any expression language supported by Mule
+                to construct a file name for the current message. Expressions can be xpath, xquery, ognl, mvel, header,
+                function
+                and more. For more information see http://muledocs.org/v2/Expressions.
+
+                For example an xpath expression can be defined to pull a message id out of an xml message and use that
+                as the file name -
+
+                ${xpath:/message/header/@id}
+
+                This parser superseeds the legacy-filename-parser which has been kept in
+                Mule 2 for
+                compatibility. The following demonstrates how to achieve the same results when using the
+                expression-filename-parser over the legacy-filename-parser.
+                <ul>
+                    <li>${DATE} : ${function:dateStamp}</li>
+                    <li>${DATE:yy-MM-dd} : ${function:dateStamp(yy-MM-dd)}</li>
+                    <li>${SYSTIME} : ${function:systime}</li>
+                    <li>${UUID} : ${function:uuid}</li>
+                    <li>${ORIGINALNAME} : ${header:originalFilename}</li>
+                    <li>${COUNT} : ${function:counter} - note that this is a global counter. If you want a local counter
+                        per file connector then you should use the legacy-filename-parser.
+                    </li>
+                    <li>${[Message Property Name]} : ${header:[Message Property Name]}</li>
+                </ul>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="custom-filename-parser" type="customFilenameParserType"
+                 substitutionGroup="abstract-filenameParser">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allows the user to specify custom filename parser. The implementation has to implement
+                org.mule.transports.file.FilenameParser.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customFilenameParserType">
+        <xsd:complexContent>
+            <xsd:extension base="filenameParserType">
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The implementation class name that implement s
+                            org.mule.transports.file.FilenameParser.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-filenameParser" abstract="true" type="filenameParserType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for flename parser elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 </xsd:schema>

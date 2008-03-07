@@ -159,10 +159,10 @@
 
     <xsl:template match="xsd:attribute[@name]" mode="attributes">
         <tr>
-            <td rowspan="1">
+            <td class="confluenceTd" rowspan="1">
                 <xsl:value-of select="@name"/>
             </td>
-            <td style="text-align: center">
+            <td class="confluenceTd" style="text-align: center">
                 <xsl:choose>
                     <xsl:when test="string-length(@type)">
                         <xsl:call-template name="rewrite-type">
@@ -179,16 +179,16 @@
                     </xsl:when>
                 </xsl:choose>
             </td>
-            <td style="text-align: center">
+            <td class="confluenceTd" style="text-align: center">
                 <xsl:choose>
                     <xsl:when test="@required">yes</xsl:when>
                     <xsl:otherwise>no</xsl:otherwise>
                 </xsl:choose>
             </td>
-            <td style="text-align: center">
+            <td class="confluenceTd" style="text-align: center">
                 <xsl:if test="@default"><xsl:value-of select="@default"/></xsl:if>
             </td>
-            <td>
+            <td class="confluenceTd">
                 <xsl:if test="xsd:annotation/xsd:documentation/text()|xsd:annotation/xsd:documentation/*">
                     <p>
                         <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()" mode="copy"/>
@@ -261,7 +261,7 @@
         <!--element ref <xsl:value-of select="@ref"/>-->
         <tr>
             <xsl:variable name="ref" select="@ref"/>
-            <td rowspan="1">
+            <td class="confluenceTd" rowspan="1">
                 <xsl:choose>
                     <xsl:when test="contains(@ref, ':abstract-')">
                         <xsl:variable name="name" select="substring-after(@ref, ':abstract-')"/>
@@ -276,7 +276,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </td>
-            <td>
+            <td class="confluenceTd">
                 <!-- include both ref and element doc -->
                 <xsl:apply-templates select="." mode="elements-doc"/>
                 <xsl:apply-templates
@@ -355,14 +355,14 @@
         <!--element <xsl:value-of select="@name"/>-->
         <tr>
             <xsl:variable name="name" select="@name"/>
-            <td rowspan="1">
+            <td class="confluenceTd" rowspan="1">
                 <xsl:call-template name="link">
                     <xsl:with-param name="item">
                         <xsl:value-of select="@name"/>
                     </xsl:with-param>
                 </xsl:call-template>
             </td>
-            <td>
+            <td class="confluenceTd">
                 <xsl:apply-templates select="." mode="elements-doc"/>
             </td>
         </tr>

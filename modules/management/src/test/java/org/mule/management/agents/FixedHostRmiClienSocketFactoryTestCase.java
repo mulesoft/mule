@@ -10,6 +10,7 @@
 
 package org.mule.management.agents;
 
+import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.net.InetAddress;

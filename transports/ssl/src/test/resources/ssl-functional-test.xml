@@ -10,9 +10,9 @@
 
     <!-- keepSendSocketOpen is required for the Async test case?  see TCP -->
     <ssl:connector name="SslConnector" keepSendSocketOpen="true">
-        <ssl:ssl-client clientKeyStore="clientKeyStore" clientKeyStorePassword="mulepassword"/>
-        <ssl:ssl-key-store keyStore="serverKeystore" keyStorePassword="mulepassword" keyPassword="mulepassword"/>
-        <ssl:ssl-server trustStore="trustStore" trustStorePassword="mulepassword"/>
+        <ssl:client path="clientKeyStore" storePassword="mulepassword"/>
+        <ssl:key-store path="serverKeystore" storePassword="mulepassword" keyPassword="mulepassword"/>
+        <ssl:server path="trustStore" storePassword="mulepassword"/>
     </ssl:connector>
 
     <endpoint name="sendEndpoint" address="ssl://localhost:60198" synchronous="true"/>

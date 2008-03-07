@@ -17,13 +17,13 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.component.Component;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.model.MuleProxy;
 import org.mule.api.service.ServiceException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.QueueProfile;
@@ -227,18 +227,18 @@ public class SedaService extends AbstractService implements Work, WorkListener
     {
         MuleMessage result = null;
         Object pojoService = null;
-        MuleProxy proxy = null;
+        Component component = null;
         try
         {
             pojoService = getOrCreateService();
-            proxy = createComponentProxy(pojoService);
+            component = createComponentProxy(pojoService);
             //proxy.start();
 
             if (logger.isDebugEnabled())
             {
-                logger.debug(this + " : got proxy for " + event.getId() + " = " + proxy);
+                logger.debug(this + " : got proxy for " + event.getId() + " = " + component);
             }
-            result = (MuleMessage) proxy.onCall(event);
+            result = (MuleMessage) component.onCall(event);
         }
         catch (MuleException e)
         {
@@ -283,7 +283,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
     {
         DefaultMuleEvent event = null;
         Object pojoService = null;
-        MuleProxy proxy = null;
+        Component component = null;
         QueueSession queueSession = muleContext.getQueueManager().getQueueSession();
 
         while (!stopped.get())
@@ -319,10 +319,10 @@ public class SedaService extends AbstractService implements Work, WorkListener
                     }
 
                     pojoService = getOrCreateService();
-                    proxy = createComponentProxy(pojoService);
+                    component = createComponentProxy(pojoService);
                     //proxy.start();
-                    proxy.onEvent(queueSession, event);
-                    workManager.scheduleWork(proxy, WorkManager.INDEFINITE, null, this);
+                    component.onEvent(queueSession, event);
+                    workManager.scheduleWork(component, WorkManager.INDEFINITE, null, this);
                 }
             }
             catch (Exception e)

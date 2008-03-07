@@ -13,6 +13,7 @@ package org.mule.management.mbeans;
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.management.stats.SedaServiceStatistics;
+import org.mule.module.management.mbean.ServiceStats;
 
 import java.util.Set;
 

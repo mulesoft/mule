@@ -11,8 +11,8 @@
 package org.mule.model.seda.optimised;
 
 import org.mule.api.MuleException;
+import org.mule.api.component.Component;
 import org.mule.api.lifecycle.Callable;
-import org.mule.api.model.MuleProxy;
 import org.mule.model.seda.SedaService;
 
 /**
@@ -35,14 +35,14 @@ public class OptimisedSedaService extends SedaService
     }
 
     //@Override
-    protected MuleProxy createComponentProxy(Object pojoService) throws MuleException
+    protected Component createComponentProxy(Object pojoService) throws MuleException
     {
         if (!(pojoService instanceof Callable))
         {
             throw new IllegalArgumentException("Components for the Optimised Mule proxy must implement: "
                                                + Callable.class.getName());
         }
-        MuleProxy proxy = new OptimisedMuleProxy((Callable) pojoService, this);
+        Component proxy = new OptimisedJavaComponent((Callable) pojoService, this);
         proxy.setStatistics(getStatistics());
         return proxy;
     }

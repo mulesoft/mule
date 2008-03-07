@@ -21,11 +21,11 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
-import org.mule.routing.CorrelationPropertiesExtractor;
+import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
-import org.mule.util.properties.PropertyExtractor;
+import org.mule.util.expression.ExpressionEvaluator;
 
 import java.util.Iterator;
 import java.util.List;
@@ -56,7 +56,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
     protected int enableCorrelation = ENABLE_CORRELATION_IF_NOT_SET;
 
-    protected PropertyExtractor propertyExtractor = new CorrelationPropertiesExtractor();
+    protected ExpressionEvaluator propertyExtractor = new CorrelationPropertiesExpressionEvaluator();
 
     protected TransactionConfig transactionConfig;
 
@@ -193,7 +193,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
 
             String correlation;
-            Object o = propertyExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
+            Object o = propertyExtractor.evaluate(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
             if (logger.isDebugEnabled())
             {
                 logger.debug("Extracted correlation Id as: " + o);
@@ -293,12 +293,12 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
     }
 
-    public PropertyExtractor getPropertyExtractor()
+    public ExpressionEvaluator getPropertyExtractor()
     {
         return propertyExtractor;
     }
 
-    public void setPropertyExtractor(PropertyExtractor propertyExtractor)
+    public void setPropertyExtractor(ExpressionEvaluator propertyExtractor)
     {
         this.propertyExtractor = propertyExtractor;
     }
@@ -307,7 +307,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     {
         try
         {
-            this.propertyExtractor = (PropertyExtractor) ClassUtils.instanciateClass(className, null,
+            this.propertyExtractor = (ExpressionEvaluator) ClassUtils.instanciateClass(className, null,
                 getClass());
         }
         catch (Exception ex)

@@ -19,7 +19,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
-import org.mule.module.xml.transformers.ObjectToXml;
+import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transformer.TransformerUtils;

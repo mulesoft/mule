@@ -11,6 +11,7 @@
 package org.mule.management.agents;
 
 import org.mule.management.AbstractMuleJmxTestCase;
+import org.mule.module.management.agent.Log4jAgent;
 
 import javax.management.ObjectName;
 

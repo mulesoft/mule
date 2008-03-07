@@ -13,11 +13,11 @@
                      receiveBufferSize="4567" sendBufferSize="5678" socketSoLinger="6789" serverSoTimeout="7890"
                      enableCookies="true" keepAlive="true" keepSendSocketOpen="true" sendTcpNoDelay="true"
                      validateConnections="false">
-        <https:tls-client clientKeyStore="clientKeystore" clientKeyStorePassword="mulepassword"/>
-        <https:tls-key-store keyPassword="mulepassword" keyStore="serverKeystore" keyStorePassword="mulepassword"/>
-        <https:tls-server trustStore="trustStore" trustStorePassword="mulepassword" explicitTrustStoreOnly="true"
+        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <https:tls-key-store keyPassword="mulepassword" path="serverKeystore" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword" explicitOnly="true"
                           requireClientAuthentication="true"/>
-        <https:tls-protocol-handler protocolHandler="foo"/>
+        <https:tls-protocol-handler property="foo"/>
     </https:connector>
 
 </mule>

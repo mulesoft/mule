@@ -11,6 +11,10 @@ package org.mule.transport.ssl.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.ssl.SslConnector;
 
@@ -24,10 +28,10 @@ public class SslNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerStandardTransportEndpoints(SslConnector.SSL, URIBuilder.SOCKET_ATTRIBUTES);
         registerConnectorDefinitionParser(SslConnector.class);
-        registerBeanDefinitionParser("ssl-key-store", new ParentDefinitionParser());
-        registerBeanDefinitionParser("ssl-client", new ParentDefinitionParser());
-        registerBeanDefinitionParser("ssl-server", new ParentDefinitionParser());
-        registerBeanDefinitionParser("ssl-protocol-handler", new ParentDefinitionParser());
+        registerBeanDefinitionParser("key-store", new KeyStoreDefinitionParser());
+        registerBeanDefinitionParser("client", new ClientKeyStoreDefinitionParser());
+        registerBeanDefinitionParser("server", new TrustStoreDefinitionParser());
+        registerBeanDefinitionParser("protocol-handler", new ProtocolHandlerDefinitionParser());
     }
     
 }

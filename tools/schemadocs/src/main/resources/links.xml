@@ -60,8 +60,6 @@
     <link><item>mule:message-chunking-router</item><page>Configuring+Models</page></link>
     <link><item>mule:static-recipient-list-router</item><page>Configuring+Models</page></link>
     <link><item>mule:custom-outbound-router</item><page>Configuring+Models</page></link>
-    <link><item>xml:message-splitter</item><page>Configuring+Models</page></link>
-    <link><item>xml:round-robin-splitter</item><page>Configuring+Models</page></link>
 
     <link><item>mule:property</item><page>Additional+Configuration</page></link>
     <link><item>mule:properties</item><page>Additional+Configuration</page></link>
@@ -78,17 +76,11 @@
     <link><item>mule:exception-type-filter</item><page>Additional+Configuration</page></link>
     <link><item>mule:payload-type-filter</item><page>Additional+Configuration</page></link>
     <link><item>mule:custom-filter</item><page>Additional+Configuration</page></link>
-    <link><item>xml:is-xml-filter</item><page>Additional+Configuration</page></link>
-    <link><item>xml:jxpath-filter</item><page>Additional+Configuration</page></link>
-    <link><item>ognl:filter</item><page>Additional+Configuration</page></link>
     <link><item>mule:custom-property-extractor</item><page>Additional+Configuration</page></link>
     <link><item>mule:map-property-extractor</item><page>Additional+Configuration</page></link>
     <link><item>mule:message-property-extractor</item><page>Additional+Configuration</page></link>
     <link><item>mule:correlation-property-extractor</item><page>Additional+Configuration</page></link>
     <link><item>mule:function-property-extractor</item><page>Additional+Configuration</page></link>
-    <link><item>xml:jxpath-property-extractor</item><page>Additional+Configuration</page></link>
-    <link><item>xml:xpath-property-extractor</item><page>Additional+Configuration</page></link>
-    <link><item>xml:bean-property-extractor</item><page>Additional+Configuration</page></link>
     <link><item>mule:transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:custom-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:message-properties-transformer</item><page>Additional+Configuration</page></link>
@@ -111,19 +103,7 @@
     <link><item>mule:append-string-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:encrypt-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:decrypt-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>xml:dom-to-xml-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>xml:dom-to-output-handler-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>xml:jxpath-extractor-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>xml:object-to-xml-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>xml:xml-to-dom-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>xml:xml-to-object-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>xml:xslt-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>xml:xml-prettyprinter-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>soap:http-to-soap-request-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:encryption-security-filter</item><page>Additional+Configuration</page></link>
-    <link><item>jaas:jaas-security-filter</item><page>Additional+Configuration</page></link>
-    <link><item>acegi:http-security-filter</item><page>Additional+Configuration</page></link>
-    <link><item>pgp:security-filter</item><page>Additional+Configuration</page></link>
     
     <link><item>mule:inbound-endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:outbound-endpoint</item><page>Configuring+Endpoints</page></link>
@@ -278,5 +258,166 @@
     <link><item>rmi:inbound-endpoint</item><page>RMI+Transport</page></link>
     <link><item>rmi:outbound-endpoint</item><page>RMI+Transport</page></link>
     <link><item>rmi:endpoint</item><page>RMI+Transport</page></link>
+
+    <link><item>servlet:connector</item><page>Servlet+Transport</page></link>
+    <link><item>servlet:inbound-endpoint</item><page>Servlet+Transport</page></link>
+    <link><item>servlet:outbound-endpoint</item><page>Servlet+Transport</page></link>
+    <link><item>servlet:endpoint</item><page>Servlet+Transport</page></link>
+
+    <link><item>smtp:connector</item><page>SMTP+Transport</page></link>
+    <link><item>smtp:header</item><page>SMTP+Transport</page></link>
+    <link><item>smtp:outbound-endpoint</item><page>SMTP+Transport</page></link>
+    <link><item>smtp:endpoint</item><page>SMTP+Transport</page></link>
+
+    <link><item>smtps:connector</item><page>SMTPS+Transport</page></link>
+    <link><item>smtps:header</item><page>SMTPS+Transport</page></link>
+    <link><item>smtps:tls-client</item><page>SMTPS+Transport</page></link>
+    <link><item>smtps:tls-trust-store</item><page>SMTPS+Transport</page></link>
+    <link><item>smtps:outbound-endpoint</item><page>SMTPS+Transport</page></link>
+    <link><item>smtps:endpoint</item><page>SMTPS+Transport</page></link>
+
+    <link><item>soap:http-to-soap-request-transformer</item><page>SOAP+Transport</page></link>
+
+    <link><item>ssl:connector</item><page>SSL+Transport</page></link>
+    <link><item>ssl:client</item><page>SSL+Transport</page></link>
+    <link><item>ssl:key-store</item><page>SSL+Transport</page></link>
+    <link><item>ssl:server</item><page>SSL+Transport</page></link>
+    <link><item>ssl:protocol-handler</item><page>SSL+Transport</page></link>
+    <link><item>ssl:inbound-endpoint</item><page>SSL+Transport</page></link>
+    <link><item>ssl:outbound-endpoint</item><page>SSL+Transport</page></link>
+    <link><item>ssl:endpoint</item><page>SSL+Transport</page></link>
+
+    <link><item>stdio:connector</item><page>STDIO+Transport</page></link>
+    <link><item>stdio:inbound-endpoint</item><page>STDIO+Transport</page></link>
+    <link><item>stdio:outbound-endpoint</item><page>STDIO+Transport</page></link>
+    <link><item>stdio:endpoint</item><page>STDIO+Transport</page></link>
+
+    <link><item>tcp:connector</item><page>TCP+Transport</page></link>
+    <link><item>tcp:streaming-protocol</item><page>TCP+Transport</page></link>
+    <link><item>tcp:xml-protocol</item><page>TCP+Transport</page></link>
+    <link><item>tcp:xml-eof-protocol</item><page>TCP+Transport</page></link>
+    <link><item>tcp:eof-protocol</item><page>TCP+Transport</page></link>
+    <link><item>tcp:direct-protocol</item><page>TCP+Transport</page></link>
+    <link><item>tcp:safe-protocol</item><page>TCP+Transport</page></link>
+    <link><item>tcp:length-protocol</item><page>TCP+Transport</page></link>
+    <link><item>tcp:custom-protocol</item><page>TCP+Transport</page></link>
+    <link><item>tcp:inbound-endpoint</item><page>TCP+Transport</page></link>
+    <link><item>tcp:outbound-endpoint</item><page>TCP+Transport</page></link>
+    <link><item>tcp:endpoint</item><page>TCP+Transport</page></link>
+
+    <link><item>tls:connector</item><page>TLS+Transport</page></link>
+    <link><item>tls:client</item><page>TLS+Transport</page></link>
+    <link><item>tls:key-store</item><page>TLS+Transport</page></link>
+    <link><item>tls:server</item><page>TLS+Transport</page></link>
+    <link><item>tls:protocol-handler</item><page>TLS+Transport</page></link>
+    <link><item>tls:inbound-endpoint</item><page>TLS+Transport</page></link>
+    <link><item>tls:outbound-endpoint</item><page>TLS+Transport</page></link>
+    <link><item>tls:endpoint</item><page>TLS+Transport</page></link>
+
+    <link><item>udp:connector</item><page>UDP+Transport</page></link>
+    <link><item>udp:inbound-endpoint</item><page>UDP+Transport</page></link>
+    <link><item>udp:outbound-endpoint</item><page>UDP+Transport</page></link>
+    <link><item>udp:endpoint</item><page>UDP+Transport</page></link>
+    
+    <link><item>vm:connector</item><page>VM+Transport</page></link>
+    <link><item>vm:queueProfile</item><page>VM+Transport</page></link>
+    <link><item>vm:inbound-endpoint</item><page>VM+Transport</page></link>
+    <link><item>vm:outbound-endpoint</item><page>VM+Transport</page></link>
+    <link><item>vm:endpoint</item><page>VM+Transport</page></link>
+
+    <link><item>wsdl-xfire:inbound-endpoint</item><page>WSDL-XFire+Transport</page></link>
+    <link><item>wsdl-xfire:outbound-endpoint</item><page>WSDL-XFire+Transport</page></link>
+    <link><item>wsdl-xfire:endpoint</item><page>WSDL-XFire+Transport</page></link>
+
+    <link><item>xfire:connector</item><page>XFire+Transport</page></link>
+    <link><item>xfire:client-in-handler</item><page>XFire+Transport</page></link>
+    <link><item>xfire:client-out-handler</item><page>XFire+Transport</page></link>
+    <link><item>xfire:client-service</item><page>XFire+Transport</page></link>
+    <link><item>xfire:server-in-handler</item><page>XFire+Transport</page></link>
+    <link><item>xfire:server-out-handler</item><page>XFire+Transport</page></link>
+    <link><item>xfire:inbound-endpoint</item><page>XFire+Transport</page></link>
+    <link><item>xfire:outbound-endpoint</item><page>XFire+Transport</page></link>
+    <link><item>xfire:endpoint</item><page>XFire+Transport</page></link>
+    <link><item>xfire:soap-11-transport</item><page>XFire+Transport</page></link>
+    <link><item>xfire:complex-type</item><page>XFire+Transport</page></link>
+
+    <link><item>xmpp:connector</item><page>XMPP+Transport</page></link>
+    <link><item>xmpp:inbound-endpoint</item><page>XMPP+Transport</page></link>
+    <link><item>xmpp:outbound-endpoint</item><page>XMPP+Transport</page></link>
+    <link><item>xmpp:endpoint</item><page>XMPP+Transport</page></link>
+
+    <link><item>xmpps:connector</item><page>XMPPS+Transport</page></link>
+    <link><item>xmpps:inbound-endpoint</item><page>XMPPS+Transport</page></link>
+    <link><item>xmpps:outbound-endpoint</item><page>XMPPS+Transport</page></link>
+    <link><item>xmpps:endpoint</item><page>XMPPS+Transport</page></link>
+
+    <link><item>acegi:security-manager</item><page>Acegi+Module</page></link>
+    <link><item>acegi:delegate-security-provider</item><page>Acegi+Module</page></link>
+    <link><item>acegi:security-property</item><page>Acegi+Module</page></link>
+    <link><item>acegi:http-security-filter</item><page>Acegi+Module</page></link>
+
+    <link><item>client:remote-dispatcher-agent</item><page>Client+Module</page></link>
+    <link><item>client:remote-endpoint</item><page>Client+Module</page></link>
+    <link><item>client:xml-wire-format</item><page>Client+Module</page></link>
+    <link><item>client:serialization-wire-format</item><page>Client+Module</page></link>
+    <link><item>client:custom-wire-format</item><page>Client+Module</page></link>
+
+    <link><item>jaas:security-manager</item><page>JAAS+Module</page></link>
+    <link><item>jaas:password-encryption-strategy</item><page>JAAS+Module</page></link>
+    <link><item>jaas:security-provider</item><page>JAAS+Module</page></link>
+    <link><item>jaas:jaas-security-filter</item><page>JAAS+Module</page></link>
+
+    <link><item>jbossts:transaction-manager</item><page>JBossTS+Module</page></link>
+
+    <link><item>management:jmx-server</item><page>Management+Module</page></link>
+    <link><item>management:connector-server</item><page>Management+Module</page></link>
+    <link><item>management:credentials</item><page>Management+Module</page></link>
+    <link><item>management:jmx-mx4j-adaptor</item><page>Management+Module</page></link>
+    <link><item>management:socketFactoryProperties</item><page>Management+Module</page></link>
+    <link><item>management:rmi-server</item><page>Management+Module</page></link>
+    <link><item>management:jmx-log4j</item><page>Management+Module</page></link>
+    <link><item>management:jmx-default-config</item><page>Management+Module</page></link>
+    <link><item>management:credentials</item><page>Management+Module</page></link>
+    <link><item>management:jmx-notifications</item><page>Management+Module</page></link>
+    <link><item>management:log4j-notifications</item><page>Management+Module</page></link>
+    <link><item>management:level-mapping</item><page>Management+Module</page></link>
+    <link><item>management:chainsaw-notifications</item><page>Management+Module</page></link>
+    <link><item>management:level-mapping</item><page>Management+Module</page></link>
+    <link><item>management:publish-notifications</item><page>Management+Module</page></link>
+    <link><item>management:yourkit-profiler</item><page>Management+Module</page></link>
+    <link><item>management:custom-agent</item><page>Management+Module</page></link>
+
+    <link><item>ognl:filter</item><page>OGNL+Module</page></link>
+    <link><item>ognl:expression</item><page>OGNL+Module</page></link>
+
+    <link><item>pgp:security-manager</item><page>PGP+Module</page></link>
+    <link><item>pgp:security-provider</item><page>PGP+Module</page></link>
+    <link><item>pgp:keybased-encryption-strategy</item><page>PGP+Module</page></link>
+    <link><item>pgp:security-filter</item><page>PGP+Module</page></link>
+
+    <link><item>scripting:script</item><page>Scripting+Module</page></link>
+    <link><item>scripting:groovy-refreshable</item><page>Scripting+Module</page></link>
+    <link><item>scripting:lang</item><page>Scripting+Module</page></link>
+
+    <link><item>xml:is-xml-filter</item><page>XML+Module</page></link>
+    <link><item>xml:jxpath-filter</item><page>XML+Module</page></link>
+    <link><item>xml:namespace</item><page>XML+Module</page></link>
+    <link><item>xml:context-property</item><page>XML+Module</page></link>
+    <link><item>xml:message-splitter</item><page>XML+Module</page></link>
+    <link><item>xml:namespace</item><page>XML+Module</page></link>
+    <link><item>xml:round-robin-splitter</item><page>XML+Module</page></link>
+    <link><item>xml:dom-to-xml-transformer</item><page>XML+Module</page></link>
+    <link><item>xml:dom-to-output-handler-transformer</item><page>XML+Module</page></link>
+    <link><item>xml:jxpath-extractor-transformer</item><page>XML+Module</page></link>
+    <link><item>xml:object-to-xml-transformer</item><page>XML+Module</page></link>
+    <link><item>xml:xml-to-dom-transformer</item><page>XML+Module</page></link>
+    <link><item>xml:xml-to-object-transformer</item><page>XML+Module</page></link>
+    <link><item>xml:xslt-transformer</item><page>XML+Module</page></link>
+    <link><item>xml:xslt-text</item><page>XML+Module</page></link>
+    <link><item>xml:context-property</item><page>XML+Module</page></link>
+    <link><item>xml:xml-prettyprinter-transformer</item><page>XML+Module</page></link>
+    <link><item>xml:jxpath-property-extractor</item><page>XML+Module</page></link>
+    <link><item>xml:xpath-property-extractor</item><page>XML+Module</page></link>
+    <link><item>xml:bean-property-extractor</item><page>XML+Module</page></link>
 
 </links>

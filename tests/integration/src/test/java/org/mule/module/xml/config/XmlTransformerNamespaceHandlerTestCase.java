@@ -11,13 +11,13 @@
 package org.mule.module.xml.config;
 
 import org.mule.api.transformer.Transformer;
-import org.mule.module.xml.transformers.AbstractXmlTransformer;
-import org.mule.module.xml.transformers.DomDocumentToXml;
-import org.mule.module.xml.transformers.JXPathExtractor;
-import org.mule.module.xml.transformers.ObjectToXml;
-import org.mule.module.xml.transformers.XmlToDomDocument;
-import org.mule.module.xml.transformers.XmlToObject;
-import org.mule.module.xml.transformers.XsltTransformer;
+import org.mule.module.xml.transformer.AbstractXmlTransformer;
+import org.mule.module.xml.transformer.DomDocumentToXml;
+import org.mule.module.xml.transformer.JXPathExtractor;
+import org.mule.module.xml.transformer.ObjectToXml;
+import org.mule.module.xml.transformer.XmlToDomDocument;
+import org.mule.module.xml.transformer.XmlToObject;
+import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
 

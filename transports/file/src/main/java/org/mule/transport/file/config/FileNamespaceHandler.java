@@ -13,14 +13,16 @@ import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.endpoint.URIBuilder;
+import org.mule.transport.file.ExpressionFilenameParser;
 import org.mule.transport.file.FileConnector;
 import org.mule.transport.file.FilenameParser;
+import org.mule.transport.file.SimpleFilenameParser;
 import org.mule.transport.file.filters.FilenameWildcardFilter;
 import org.mule.transport.file.transformers.FileToByteArray;
 import org.mule.transport.file.transformers.FileToString;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
+ * Reigsters a Bean Definition Parser for handling <code><file:connector></code> elements.
  *
  */
 public class FileNamespaceHandler extends AbstractMuleNamespaceHandler
@@ -30,8 +32,11 @@ public class FileNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerStandardTransportEndpoints(FileConnector.FILE, URIBuilder.PATH_ATTRIBUTES);
         registerConnectorDefinitionParser(FileConnector.class);
-        registerBeanDefinitionParser("filename-parser",
-                    new ChildDefinitionParser("filenameParser", null, FilenameParser.class));
+
+        registerBeanDefinitionParser("custom-filename-parser", new ChildDefinitionParser("filenameParser", null, FilenameParser.class));
+        registerBeanDefinitionParser("legacy-filename-parser", new ChildDefinitionParser("filenameParser", SimpleFilenameParser.class));
+        registerBeanDefinitionParser("expression-filename-parser", new ChildDefinitionParser("filenameParser", ExpressionFilenameParser.class));
+
         registerBeanDefinitionParser("file-to-byte-array-transformer", new MuleOrphanDefinitionParser(FileToByteArray.class, false));
         registerBeanDefinitionParser("file-to-string-transformer", new MuleOrphanDefinitionParser(FileToString.class, false));
         registerBeanDefinitionParser("filename-wildcard-filter", new ChildDefinitionParser("filter", FilenameWildcardFilter.class));

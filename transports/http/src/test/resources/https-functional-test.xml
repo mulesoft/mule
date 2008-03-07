@@ -9,9 +9,9 @@
        http://www.mulesource.org/schema/mule/https/2.0 http://www.mulesource.org/schema/mule/https/2.0/mule-https.xsd">
 
     <https:connector name="httpConnector">
-        <https:tls-client clientKeyStore="clientKeystore" clientKeyStorePassword="mulepassword"/>
-        <https:tls-key-store keyStore="serverKeystore" keyPassword="mulepassword" keyStorePassword="mulepassword"/>
-        <https:tls-server trustStore="trustStore" trustStorePassword="mulepassword"/>
+        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword"/>
     </https:connector>
 
     <https:endpoint name="clientEndpoint" host="localhost" port="60202" synchronous="true" connector-ref="httpConnector"/>

@@ -11,6 +11,7 @@
 package org.mule.module.jboss.transactions;
 
 import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
 import org.mule.tck.AbstractTxThreadAssociationTestCase;
 
 public class JBossArjunaTxThreadAssociationTestCase extends AbstractTxThreadAssociationTestCase

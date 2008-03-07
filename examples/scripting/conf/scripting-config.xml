@@ -32,7 +32,7 @@
                 <inbound-endpoint address="vm://scripting"/>
             </inbound>
             <component>
-                <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
+                <pooled-object class="org.mule.module.scripting.component.ScriptComponent">
                     <property key="scriptEngineName" value="groovy"/>
                     <property key="scriptText" value-ref="scriptText"/>
                 </pooled-object>

@@ -14,6 +14,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.model.seda.SedaService;
 import org.mule.model.seda.SedaModel;
+import org.mule.module.management.mbean.ServiceService;
 import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.Set;

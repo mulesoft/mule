@@ -10,7 +10,7 @@
 
 package org.mule.module.xml.config;
 
-import org.mule.module.xml.transformers.XmlPrettyPrinter;
+import org.mule.module.xml.transformer.XmlPrettyPrinter;
 import org.mule.tck.FunctionalTestCase;
 
 public class XmlPrettyPrinterConfigurationTestCase extends FunctionalTestCase

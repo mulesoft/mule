@@ -10,6 +10,9 @@
 
 package org.mule.management.agents;
 
+import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
+import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.RmiRegistryAgent;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.Arrays;

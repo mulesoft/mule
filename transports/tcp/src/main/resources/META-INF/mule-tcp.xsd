@@ -133,30 +133,104 @@
     </xsd:complexType>
 
     <xsd:element name="abstract-protocol" abstract="true" type="abstractProtocolType"/>
-    <xsd:element name="streaming-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol"/>
-    <xsd:element name="xml-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol"/>
-    <xsd:element name="xml-eof-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol"/>
     <xsd:complexType name="abstractProtocolType"/>
 
-    <xsd:element name="eof-protocol" type="byteOrMessageProtocolType" substitutionGroup="abstract-protocol"/>
-    <xsd:element name="direct-protocol" type="byteOrMessageProtocolType" substitutionGroup="abstract-protocol"/>
+    <xsd:element name="streaming-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol">
+        <xsd:annotation>
+            <xsd:documentation>
+                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
+                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
+                However, this is not an issue with streaming, so this is an alias for the "direct" (null) protocol.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="xml-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol">
+        <xsd:annotation>
+            <xsd:documentation>
+                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
+                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
+                This protocol uses XML syntax to isolate messages from the stream of bytes received, so it
+                will only work with well-formed XML.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="xml-eof-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol">
+        <xsd:annotation>
+            <xsd:documentation>
+                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
+                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
+                This protocol is similar to "xml-protocol", but will also use socket closure to terminate
+                a message (even if the XML is not well-formed).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="eof-protocol" type="byteOrMessageProtocolType" substitutionGroup="abstract-protocol">
+        <xsd:annotation>
+            <xsd:documentation>
+                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
+                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
+                This protocol simply accumulates all data until the socket closes and places it in a single
+                message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="direct-protocol" type="byteOrMessageProtocolType" substitutionGroup="abstract-protocol">
+        <xsd:annotation>
+            <xsd:documentation>
+                TCP does not guarantee that a data written to a socket are transmitted in a single packet.
+                Using this "null" protocol does not change the normal TCP behaviour, so message fragmentation
+                may occur
+                (ie a single sent message may be received in several pieces, each as a separate received message).
+                This was the default behaviour in Mule 1.x - normally it is not a good choice for messaging
+                within Mule, but it may be necessary to interface with external TCP-based protocols.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:complexType name="byteOrMessageProtocolType">
         <xsd:complexContent>
             <xsd:extension base="abstractProtocolType">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Do not send the entire mule message object (including properties etc),
-                        just the payload (contents)?  This defaults to true when the protocol
-                        is not specified explicitly (when the safe protocol is used).
-                    </xsd:documentation>
-                </xsd:annotation>
-                <xsd:attribute name="payloadOnly" type="mule:substitutableBoolean" use="required"/>
+                <xsd:attribute name="payloadOnly" type="mule:substitutableBoolean" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Do not send the entire mule message object (including properties etc),
+                            just the payload (contents)?  This defaults to true when the protocol
+                            is not specified explicitly (when the safe protocol is used).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="safe-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol"/>
-    <xsd:element name="length-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol"/>
+    <xsd:element name="safe-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol">
+        <xsd:annotation>
+            <xsd:documentation>
+                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
+                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
+                This protocol is similar to "length-protocol", but also includes a prefix.
+                Verification of the prefix allows mis-matched protocols to be detected and avoids interpreting
+                "random" data as a message length (which may give out of memory errors).
+                This is the default protocol in Mule 2.x.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="length-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol">
+        <xsd:annotation>
+            <xsd:documentation>
+                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
+                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
+                This protocol precedes each message with the number of bytes sent so that an entire message
+                can be constructed on the received.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:complexType name="lengthProtocolType">
         <xsd:complexContent>
             <xsd:extension base="byteOrMessageProtocolType">
@@ -173,11 +247,25 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-protocol" type="customProtocolType" substitutionGroup="abstract-protocol"/>
+    <xsd:element name="custom-protocol" type="customProtocolType" substitutionGroup="abstract-protocol">
+        <xsd:annotation>
+            <xsd:documentation>
+                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
+                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
+                The user may supply their own protocol implementation via this element.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="customProtocolType">
         <xsd:complexContent>
             <xsd:extension base="abstractProtocolType">
-                <xsd:attribute name="class" type="xsd:string" use="required"/>
+                <xsd:attribute name="class" type="mule:substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A class that implements the TcpProtocol interface.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

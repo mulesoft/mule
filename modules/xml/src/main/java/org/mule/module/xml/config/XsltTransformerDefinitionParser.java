@@ -11,7 +11,7 @@
 package org.mule.module.xml.config;
 
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.module.xml.transformers.XsltTransformer;
+import org.mule.module.xml.transformer.XsltTransformer;
 
 public class XsltTransformerDefinitionParser extends MuleOrphanDefinitionParser
 {

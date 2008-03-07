@@ -13,12 +13,12 @@ package org.mule.tck.testmodels.mule;
 import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.service.Service;
-import org.mule.component.DefaultMuleProxy;
+import org.mule.component.JavaComponent;
 
 /**
  * Makes the underlying POJO service object available for unit testing.
  */
-public class TestMuleProxy extends DefaultMuleProxy
+public class TestMuleProxy extends JavaComponent
 {
     private Object pojoService;
     

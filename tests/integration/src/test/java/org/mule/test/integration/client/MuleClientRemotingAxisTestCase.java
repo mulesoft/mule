@@ -13,7 +13,7 @@ package org.mule.test.integration.client;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
-import org.mule.module.xml.transformers.XStreamWireFormat;
+import org.mule.module.xml.transformer.XStreamWireFormat;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.services.Person;
 

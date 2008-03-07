@@ -36,7 +36,7 @@ import org.mule.module.client.i18n.ClientMessages;
 import org.mule.module.client.remoting.RemoteDispatcherException;
 import org.mule.module.client.remoting.ServerHandshake;
 import org.mule.module.client.remoting.UnsupportedWireFormatException;
-import org.mule.module.client.remoting.notifications.RemoteDispatcherNotification;
+import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
 import org.mule.security.MuleCredentials;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;

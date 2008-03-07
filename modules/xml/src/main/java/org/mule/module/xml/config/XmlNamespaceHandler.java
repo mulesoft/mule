@@ -20,16 +20,16 @@ import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.module.xml.routing.FilteringXmlMessageSplitter;
 import org.mule.module.xml.routing.RoundRobinXmlSplitter;
-import org.mule.module.xml.transformers.DocumentToOutputHandler;
-import org.mule.module.xml.transformers.DomDocumentToXml;
-import org.mule.module.xml.transformers.JXPathExtractor;
-import org.mule.module.xml.transformers.ObjectToXml;
-import org.mule.module.xml.transformers.XmlPrettyPrinter;
-import org.mule.module.xml.transformers.XmlToDomDocument;
-import org.mule.module.xml.transformers.XmlToObject;
-import org.mule.module.xml.util.properties.BeanPayloadPropertyExtractor;
-import org.mule.module.xml.util.properties.JXPathPropertyExtractor;
-import org.mule.module.xml.util.properties.XPathPayloadPropertyExtractor;
+import org.mule.module.xml.transformer.DocumentToOutputHandler;
+import org.mule.module.xml.transformer.DomDocumentToXml;
+import org.mule.module.xml.transformer.JXPathExtractor;
+import org.mule.module.xml.transformer.ObjectToXml;
+import org.mule.module.xml.transformer.XmlPrettyPrinter;
+import org.mule.module.xml.transformer.XmlToDomDocument;
+import org.mule.module.xml.transformer.XmlToObject;
+import org.mule.module.xml.expression.BeanPayloadExpressionEvaluator;
+import org.mule.module.xml.expression.JXPathExpressionEvaluator;
+import org.mule.module.xml.expression.XPathExpressionEvaluator;
 
 public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -48,9 +48,9 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("xml-to-object-transformer", new MuleOrphanDefinitionParser(XmlToObject.class, false));
         registerBeanDefinitionParser("xml-prettyprinter-transformer", new TransformerDefinitionParser(XmlPrettyPrinter.class));
         registerBeanDefinitionParser("xslt-transformer", new XsltTransformerDefinitionParser());
-        registerBeanDefinitionParser("jxpath-property-extractor", new ChildDefinitionParser("propertyExtractor", JXPathPropertyExtractor.class));
-        registerBeanDefinitionParser("xpath-property-extractor", new ChildDefinitionParser("propertyExtractor", XPathPayloadPropertyExtractor.class));
-        registerBeanDefinitionParser("bean-property-extractor", new ChildDefinitionParser("propertyExtractor", BeanPayloadPropertyExtractor.class));
+        registerBeanDefinitionParser("jxpath-property-extractor", new ChildDefinitionParser("propertyExtractor", JXPathExpressionEvaluator.class));
+        registerBeanDefinitionParser("xpath-property-extractor", new ChildDefinitionParser("propertyExtractor", XPathExpressionEvaluator.class));
+        registerBeanDefinitionParser("bean-property-extractor", new ChildDefinitionParser("propertyExtractor", BeanPayloadExpressionEvaluator.class));
         registerBeanDefinitionParser("namespace", new ChildMapEntryDefinitionParser("namespaces", "prefix", "uri"));
         registerBeanDefinitionParser("context-property", new ChildMapEntryDefinitionParser("contextProperties", "key", "value"));
         registerBeanDefinitionParser("xslt-text", new XsltTextDefinitionParser("xslt", String.class));

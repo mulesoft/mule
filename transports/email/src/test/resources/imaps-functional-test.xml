@@ -13,8 +13,8 @@
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <imaps:connector name="imapsConnector">
-        <imaps:tls-client clientKeyStore="clientKeystore" clientKeyStorePassword="mulepassword"/>
-        <imaps:tls-trust-store trustStore="greenmail-truststore" trustStorePassword="password"/>
+        <imaps:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <imaps:tls-trust-store path="greenmail-truststore" storePassword="password"/>
     </imaps:connector>
     <vm:connector name="vmConnector" queueEvents="true"/>
 

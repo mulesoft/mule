@@ -29,13 +29,13 @@
         to set the attribute methodName. The GroovyRefreshableBeanBuilder will check for this interface
         and if the bean does inherit from this interface, it will execute the onCall() method 
     -->
-    <scripting:groovyRefreshable name="groovyRefreshableCallable" refreshableBean-ref="groovy_class_callable"/>
+    <scripting:groovy-refreshable name="groovyRefreshableCallable" refreshableBean-ref="groovy_class_callable"/>
 
     <!--
         The script for this class will never inherit from the Callable interface. Due to this fact, the user
         will need to set methodName attribute and the GroovyRefreshableBeanBuilder will execute this method
     -->
-    <scripting:groovyRefreshable name="groovyRefreshableBean" refreshableBean-ref="groovy_class_bean"
+    <scripting:groovy-refreshable name="groovyRefreshableBean" refreshableBean-ref="groovy_class_bean"
                                  methodName="receive"/>
 
     <!--
@@ -44,7 +44,7 @@
         the Callable and execute the method specified by the methodName attribute. This tests whether the 
         GroovyRefreshableBeanBuilder supports a change in the interfaces implemented by the refreshable bean.
     -->
-    <scripting:groovyRefreshable name="groovyRefreshableBeanChangeInterfaces"
+    <scripting:groovy-refreshable name="groovyRefreshableBeanChangeInterfaces"
                                  refreshableBean-ref="groovy_class_changeInterfaces" methodName="receive"/>
 
     <model name="main">

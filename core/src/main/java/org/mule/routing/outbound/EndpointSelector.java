@@ -19,7 +19,7 @@ import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
-import org.mule.util.properties.PropertyExtractorManager;
+import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -58,7 +58,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
         List endpoints;
         String endpointName;
         
-        Object property = PropertyExtractorManager.processExpression(getSelectorProperty(), message);
+        Object property = ExpressionEvaluatorManager.evaluate(getSelectorProperty(), message);
         if(property ==null)
         {
             throw new CouldNotRouteOutboundMessageException(

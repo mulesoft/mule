@@ -19,13 +19,13 @@ import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.routing.CorrelationPropertiesExtractor;
+import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.util.properties.FunctionPropertyExtractor;
+import org.mule.util.expression.FunctionExpressionEvaluator;
 
 import java.util.List;
 
@@ -71,7 +71,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertEquals(1, routers.size());
         AbstractOutboundRouter theRouter = (AbstractOutboundRouter)routers.get(0);
         // the one we put in the config
-        assertTrue(theRouter.getPropertyExtractor() instanceof CorrelationPropertiesExtractor);
+        assertTrue(theRouter.getPropertyExtractor() instanceof CorrelationPropertiesExpressionEvaluator);
     }
 
     public void testPropertyExtractorResponseRouterConfig() throws Exception
@@ -85,7 +85,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertEquals(1, routers.size());
         AbstractResponseRouter theRouter = (AbstractResponseRouter)routers.get(0);
         // the one we put in the config
-        assertTrue(theRouter.getPropertyExtractor() instanceof FunctionPropertyExtractor);
+        assertTrue(theRouter.getPropertyExtractor() instanceof FunctionExpressionEvaluator);
     }
 
     public void testPropertyTypesConfig() throws Exception

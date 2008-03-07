@@ -1,1 +1,1 @@
-http\://www.mulesource.org/schema/mule/management/2.0=org.mule.management.config.ManagementNamespaceHandler
+http\://www.mulesource.org/schema/mule/management/2.0=org.mule.module.management.config.ManagementNamespaceHandler

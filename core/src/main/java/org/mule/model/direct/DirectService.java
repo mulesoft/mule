@@ -11,11 +11,11 @@
 package org.mule.model.direct;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.component.Component;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.model.MuleProxy;
 import org.mule.service.AbstractService;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class DirectService extends AbstractService
     private static final long serialVersionUID = -8590955440156945732L;
 
     protected List interceptorList = null;
-    protected MuleProxy proxy;
+    protected Component component;
     protected Object pojoService;
 
     public DirectService()
@@ -45,7 +45,7 @@ public class DirectService extends AbstractService
         try
         {
             pojoService = getOrCreateService();
-            proxy = createComponentProxy(pojoService);
+            component = createComponentProxy(pojoService);
         }
         catch (MuleException e)
         {
@@ -70,7 +70,7 @@ public class DirectService extends AbstractService
     protected MuleMessage doSend(MuleEvent event) throws MuleException
     {
 
-        Object obj = proxy.onCall(event);
+        Object obj = component.onCall(event);
         if (obj instanceof MuleMessage)
         {
             return (MuleMessage) obj;
@@ -83,26 +83,26 @@ public class DirectService extends AbstractService
 
     protected void doDispatch(MuleEvent event) throws MuleException
     {
-        proxy.onCall(event);
+        component.onCall(event);
     }
 
     protected void doStop() throws MuleException
     {
-        proxy.stop();
+        component.stop();
     }
 
     protected void doStart() throws MuleException
     {
-        proxy.start();
+        component.start();
     }
 
     protected void doPause()
     {
-        proxy.suspend();
+        component.suspend();
     }
 
     protected void doResume()
     {
-        proxy.resume();
+        component.resume();
     }
 }

@@ -15,11 +15,6 @@
 
     <xsd:element name="connector" type="smtpConnectorType" substitutionGroup="mule:abstract-connector"/>
 
-    <xsd:complexType name="headerType">
-        <xsd:attribute name="key" type="xsd:string" use="required"/>
-        <xsd:attribute name="value" type="xsd:string" use="required"/>
-    </xsd:complexType>
-
     <!-- separate base so that header is separate and in local namespace -->
     <xsd:complexType name="baseSmtpConnectorType">
         <xsd:complexContent>
@@ -63,7 +58,7 @@
                 <xsd:attribute name="subject" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The subject for the outgoing message.
+                            The default subject for the outgoing message if none is set in the message.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -75,10 +70,10 @@
         <xsd:complexContent>
             <xsd:extension base="baseSmtpConnectorType">
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                    <xsd:element name="header" type="headerType">
+                    <xsd:element name="header" type="mule:keyValueType">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Additional header name and value.
+                                Additional header name and value, added to the message.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -108,12 +103,48 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="addressProperties">
-        <xsd:attribute name="to" type="xsd:string"/>
-        <xsd:attribute name="from" type="xsd:string"/>
-        <xsd:attribute name="subject" type="xsd:string"/>
-        <xsd:attribute name="cc" type="xsd:string"/>
-        <xsd:attribute name="bcc" type="xsd:string"/>
-        <xsd:attribute name="replyTo" type="xsd:string"/>
+        <xsd:attribute name="to" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The destination for the email.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="from" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The address of the sender of the email.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="subject" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The email subject.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="cc" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A comma separated list of email addresses to carbon copy to.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="bcc" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A comma separated list of email addresses to blind carbon copy to.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="replyTo" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The address used by default if someone replies to the email.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
 </xsd:schema>

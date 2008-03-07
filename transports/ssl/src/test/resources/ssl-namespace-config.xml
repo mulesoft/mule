@@ -10,19 +10,19 @@
 
 
     <ssl:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">
-        <ssl:ssl-client
-                clientKeyStore="clientKeystore"
-                clientKeyStorePassword="mulepassword"/>
-        <ssl:ssl-key-store
+        <ssl:client
+                path="clientKeystore"
+                storePassword="mulepassword"/>
+        <ssl:key-store
                 keyPassword="mulepassword"
-                keyStore="serverKeystore"
-                keyStorePassword="mulepassword"/>
-        <ssl:ssl-server
-                trustStore="trustStore"
-                trustStorePassword="mulepassword"
-                explicitTrustStoreOnly="true"
+                path="serverKeystore"
+                storePassword="mulepassword"/>
+        <ssl:server
+                path="trustStore"
+                storePassword="mulepassword"
+                explicitOnly="true"
                 requireClientAuthentication="true"/>
-        <ssl:ssl-protocol-handler protocolHandler="foo"/>
+        <ssl:protocol-handler property="foo"/>
     </ssl:connector>
 
 </mule>

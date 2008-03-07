@@ -10,6 +10,7 @@
 
 package org.mule.management.support;
 
+import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.Collections;

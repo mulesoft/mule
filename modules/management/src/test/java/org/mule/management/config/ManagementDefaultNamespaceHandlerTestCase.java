@@ -11,9 +11,9 @@
 package org.mule.management.config;
 
 import org.mule.api.agent.Agent;
-import org.mule.management.agents.JmxAgent;
-import org.mule.management.agents.JmxServerNotificationAgent;
-import org.mule.management.agents.Log4jAgent;
+import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxServerNotificationAgent;
+import org.mule.module.management.agent.Log4jAgent;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.Collection;

@@ -23,7 +23,7 @@
             <xsd:extension base="smtp:baseSmtpConnectorType">
                 <xsd:sequence>
                     <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                        <xsd:element name="header" type="smtp:headerType"/>
+                        <xsd:element name="header" type="mule:keyValueType"/>
                     </xsd:sequence>
                     <xsd:sequence>
                         <xsd:element name="tls-client" type="mule:tlsClientKeyStoreType"/>

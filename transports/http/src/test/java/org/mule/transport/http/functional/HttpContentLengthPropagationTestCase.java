@@ -13,7 +13,7 @@ package org.mule.transport.http.functional;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.module.xml.transformers.XsltTransformer;
+import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.IOUtils;
 

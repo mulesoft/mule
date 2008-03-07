@@ -10,8 +10,9 @@
 package org.mule.management.support;
 
 import org.mule.management.AbstractMuleJmxTestCase;
-import org.mule.management.agents.JmxAgent;
-import org.mule.management.mbeans.StatisticsService;
+import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.mbean.StatisticsService;
+import org.mule.module.management.support.JmxModernSupport;
 
 import java.util.Arrays;
 import java.util.List;

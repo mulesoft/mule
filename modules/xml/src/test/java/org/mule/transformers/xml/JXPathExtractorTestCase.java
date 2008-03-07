@@ -10,7 +10,7 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.module.xml.transformers.JXPathExtractor;
+import org.mule.module.xml.transformer.JXPathExtractor;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.List;

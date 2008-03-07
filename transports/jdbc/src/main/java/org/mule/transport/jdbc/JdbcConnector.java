@@ -22,7 +22,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
-import org.mule.util.properties.PropertyExtractorManager;
+import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.sql.Connection;
 import java.util.List;
@@ -250,7 +250,7 @@ public class JdbcConnector extends AbstractConnector
             boolean foundValue = false;
             if (message != null)
             {
-                value = PropertyExtractorManager.processExpression(name, message);
+                value = ExpressionEvaluatorManager.evaluate(name, message);
                 foundValue = value!=null;
             }
             if (!foundValue)

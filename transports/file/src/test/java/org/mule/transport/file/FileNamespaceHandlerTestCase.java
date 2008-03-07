@@ -55,7 +55,19 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
 
         FilenameParser parser = c.getFilenameParser();
-        assertTrue(parser.getClass().getName(), c.getFilenameParser() instanceof SecondDummyFilenameParser);
+        assertTrue(parser.getClass().getName(), c.getFilenameParser() instanceof SimpleFilenameParser);
+
+        assertTrue(c.isConnected());
+        assertTrue(c.isStarted());
+    }
+
+    public void testThirdConnector() throws Exception
+    {
+        FileConnector c = (FileConnector)muleContext.getRegistry().lookupConnector("thirdConnector");
+        assertNotNull(c);
+
+        FilenameParser parser = c.getFilenameParser();
+        assertTrue(parser.getClass().getName(), c.getFilenameParser() instanceof ExpressionFilenameParser);
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
