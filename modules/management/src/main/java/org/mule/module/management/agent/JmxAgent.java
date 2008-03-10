@@ -10,7 +10,6 @@
 package org.mule.module.management.agent;
 
 import org.mule.AbstractAgent;
-import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.notification.MuleContextNotificationListener;
@@ -230,7 +229,7 @@ public class JmxAgent extends AbstractAgent
             }
         };
 
-        if (StringUtils.isBlank(muleContext.getId()))
+        if (StringUtils.isBlank(muleContext.getConfiguration().getId()))
         {
             // TODO i18n the message properly
             throw new IllegalArgumentException(
@@ -411,7 +410,7 @@ public class JmxAgent extends AbstractAgent
                                                          InstanceAlreadyExistsException, MalformedObjectNameException
     {
         ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.Configuration,name=GlobalConfiguration");
-        MuleConfigurationServiceMBean serviceMBean = new MuleConfigurationService(RegistryContext.getConfiguration());
+        MuleConfigurationServiceMBean serviceMBean = new MuleConfigurationService(muleContext.getConfiguration());
         logger.debug("Registering configuration with name: " + on);
         mBeanServer.registerMBean(serviceMBean, on);
         registeredMBeans.add(on);

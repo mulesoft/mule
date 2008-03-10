@@ -11,8 +11,8 @@
 package org.mule.module.management.mbean;
 
 import org.mule.MuleServer;
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.config.MuleManifest;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
@@ -89,7 +89,7 @@ public class MuleService implements MuleServiceMBean
     {
         if (!isStopped())
         {
-            return new Date(muleContext.getStartDate());
+            return new Date(muleContext.getConfiguration().getStartDate());
         }
         else
         {
@@ -155,7 +155,7 @@ public class MuleService implements MuleServiceMBean
 
     public String getServerId()
     {
-        return muleContext.getId();
+        return muleContext.getConfiguration().getId();
     }
 
     public String getHostname()
@@ -219,7 +219,7 @@ public class MuleService implements MuleServiceMBean
 
     public String getInstanceId()
     {
-        return muleContext.getId();
+        return muleContext.getConfiguration().getId();
     }
 
     public String getConfigBuilderClassName()
