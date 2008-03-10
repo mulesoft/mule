@@ -10,7 +10,7 @@
 
 package org.mule.module.jboss.transaction;
 
-import org.mule.RegistryContext;
+import org.mule.MuleServer;
 import org.mule.api.transaction.TransactionManagerFactory;
 
 import com.arjuna.ats.arjuna.common.Environment;
@@ -51,7 +51,7 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
         {
             if (!properties.containsKey(Environment.OBJECTSTORE_DIR))
             {
-                final String muleInternalDir = RegistryContext.getConfiguration().getWorkingDirectory();
+                final String muleInternalDir = MuleServer.getMuleContext().getConfiguration().getWorkingDirectory();
                 arjPropertyManager.propertyManager.setProperty(Environment.OBJECTSTORE_DIR, muleInternalDir + "/transaction-log");
             }
 
