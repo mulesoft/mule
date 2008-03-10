@@ -68,7 +68,6 @@ public abstract class AbstractRegistry implements Registry
         {
             doDispose();
             lifecycleManager.firePhase(MuleServer.getMuleContext(), Disposable.PHASE_NAME);
-            PropertyExtractorManager.clear();
             ExpressionEvaluatorManager.clearEvaluators();
         }
         catch (Exception e)
