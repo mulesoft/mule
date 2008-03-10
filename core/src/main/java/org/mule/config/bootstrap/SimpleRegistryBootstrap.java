@@ -15,11 +15,8 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
-<<<<<<< .working
 import org.mule.api.registry.MuleRegistry;
-=======
 import org.mule.api.registry.ObjectProcessor;
->>>>>>> .merge-right.r11236
 import org.mule.api.registry.Registry;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
