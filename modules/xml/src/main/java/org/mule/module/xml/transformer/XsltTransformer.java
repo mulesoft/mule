@@ -21,7 +21,7 @@ import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
-import org.mule.util.properties.PropertyExtractorManager;
+import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -474,7 +474,7 @@ public class XsltTransformer extends AbstractXmlTransformer
                 {
                     throw new TransformerException(CoreMessages.noCurrentEventForTransformer(), this);
                 }
-                return PropertyExtractorManager.processExpression(value.toString(), context.getMessage());
+                return ExpressionEvaluatorManager.evaluate(value.toString(), context.getMessage());
             }
         }
 
