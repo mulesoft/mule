@@ -11,6 +11,7 @@
 package org.mule.util.expression;
 
 import org.mule.api.transport.MessageAdapter;
+import org.mule.config.i18n.CoreMessages;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,15 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
 
     public Object evaluate(String expression, Object message)
     {
+        boolean required = false;
+
+        //This is a bit of a hack to manage required headers
+        if(expression.endsWith("required"))
+        {
+            required = true;
+            expression = expression.substring(0, expression.length() - 8);
+        }
+        
         if (message instanceof MessageAdapter)
         {
             StringTokenizer tokenizer = new StringTokenizer(expression, DELIM);
@@ -46,6 +56,10 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
                 if (val != null)
                 {
                     result.put(s, val);
+                }
+                else if(required)
+                {
+                    throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(NAME, expression));
                 }
             }
             if (result.size() == 0)

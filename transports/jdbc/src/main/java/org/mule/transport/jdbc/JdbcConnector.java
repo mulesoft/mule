@@ -248,7 +248,8 @@ public class JdbcConnector extends AbstractConnector
             Object value = null;
             // If we find a value and it happens to be null, thats acceptable
             boolean foundValue = false;
-            if (message != null)
+            //There must be an expression namespace to use the ExpresionEvaluator i.e. header:type
+            if (message != null && ExpressionEvaluatorManager.isValidExpression(name))
             {
                 value = ExpressionEvaluatorManager.evaluate(name, message);
                 foundValue = value!=null;

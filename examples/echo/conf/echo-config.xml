@@ -42,7 +42,7 @@
                 <vm:inbound-endpoint address="vm://echo"/>
             </inbound>
 
-            <component class="org.mule.component.simple.EchoComponent"/>
+            <echo-component/>
 
             <!--
                 An outbound router can have one or more router configurations that can be

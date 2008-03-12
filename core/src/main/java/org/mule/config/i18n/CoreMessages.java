@@ -1076,10 +1076,13 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 262, phase, component);
     }
 
-
     public static Message expressionEvaluatorReturnedNull(String name, String expr)
     {
         return createMessage(BUNDLE_PATH, 263, name, expr);
     }
 
+    public static Message expressionInvalidForProperty(String property, String expr)
+    {
+        return createMessage(BUNDLE_PATH, 264, property, expr);
+    }
 }

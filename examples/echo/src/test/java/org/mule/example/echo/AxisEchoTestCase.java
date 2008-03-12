@@ -10,42 +10,12 @@
 
 package org.mule.example.echo;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.NullPayload;
-import org.mule.util.IOUtils;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.custommonkey.xmlunit.XMLAssert;
 
 /**
- * Tests the Echo example using Axis
+ * Tests the Echo example using Axis.
  */
-public class AxisEchoTestCase extends FunctionalTestCase
+public class AxisEchoTestCase extends AbstractEchoTestCase
 {
-
-    private String expectedGetResponse;
-    private String expectedPostResponse;
-
-    protected void doSetUp() throws Exception
-    {
-        try
-        {
-            expectedGetResponse = IOUtils.getResourceAsString(getExpectedGetResponseResource(),
-                this.getClass());
-            expectedPostResponse = IOUtils.getResourceAsString(getExpectedPostResponseResource(),
-                this.getClass());
-        }
-        catch (IOException ioex)
-        {
-            fail(ioex.getMessage());
-        }
-    }
-
     protected String getExpectedGetResponseResource()
     {
         return "echo-axis-get-response.xml";
@@ -65,43 +35,4 @@ public class AxisEchoTestCase extends FunctionalTestCase
     {
         return "axis";
     }
-
-    public void testPostEcho() throws Exception
-    {
-        MuleClient client = new MuleClient();
-        MuleMessage result = client.send("http://localhost:65081/services/EchoUMO?method=echo", "hello", null);
-        assertNotNull(result);
-        assertNull(result.getExceptionPayload());
-        assertFalse(result.getPayload() instanceof NullPayload);
-        XMLAssert.assertXMLEqual(expectedPostResponse, result.getPayloadAsString());
-    }
-
-    public void testGetEcho() throws Exception
-    {
-        MuleClient client = new MuleClient();
-        Map props = new HashMap();
-        props.put("http.method", "GET");
-        MuleMessage result = client.send("http://localhost:65081/services/EchoUMO?method=echo", "hello", props);
-        assertNotNull(result);
-        // TODO: MULE-1113
-        if ((this instanceof XFireEchoTestCase))
-        {
-            assertNull(result.getExceptionPayload());
-        }
-        assertFalse(result.getPayload() instanceof NullPayload);
-        
-        XMLAssert.assertXMLEqual(expectedGetResponse, result.getPayloadAsString());
-    }
-
-    public void testSoapPostEcho() throws Exception
-    {
-        MuleClient client = new MuleClient();
-        MuleMessage result = client.send(
-            getProtocol() + ":http://localhost:65082/services/EchoUMO?method=echo", "hello", null);
-        assertNotNull(result);
-        assertNull(result.getExceptionPayload());
-        assertFalse(result.getPayload() instanceof NullPayload);
-        assertEquals("hello", result.getPayload());
-    }
-
 }

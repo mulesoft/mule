@@ -36,7 +36,7 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-                <endpoint-selector-router selectorProperty="${xpath:/endpoint}">
+                <endpoint-selector-router selectorExpression="${xpath:/endpoint}">
                     <vm:outbound-endpoint name="matchingEndpoint1" path="match1" connector-ref="queue"/>
                     <outbound-endpoint name="matchingEndpoint2" address="vm://match2" connector-ref="queue"/>
                 </endpoint-selector-router>

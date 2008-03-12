@@ -177,31 +177,6 @@ public class JmxAgent extends AbstractAgent
         {
             throw new InitialisationException(ManagementMessages.cannotLocateOrCreateServer(), this);
         }
-        if (connectorServerUrl != null)
-        {
-            try
-            {
-                JMXServiceURL url = new JMXServiceURL(connectorServerUrl);
-                if (connectorServerProperties == null)
-                {
-                    connectorServerProperties = new HashMap(DEFAULT_CONNECTOR_SERVER_PROPERTIES);
-                }
-                // TODO custom authenticator may have its own security config, refactor
-                if (!credentials.isEmpty())
-                {
-                    JMXAuthenticator jmxAuthenticator = (JMXAuthenticator) ClassUtils.instanciateClass(
-                            DEFAULT_JMX_AUTHENTICATOR, ClassUtils.NO_ARGS);
-                    // TODO support for custom authenticators
-                    ((SimplePasswordJmxAuthenticator) jmxAuthenticator).setCredentials(credentials);
-                    connectorServerProperties.put(JMXConnectorServer.AUTHENTICATOR, jmxAuthenticator);
-                }
-                connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, connectorServerProperties, mBeanServer);
-            }
-            catch (Exception e)
-            {
-                throw new InitialisationException(CoreMessages.failedToCreate("Jmx Connector"), e, this);
-            }
-        }
 
         // We need to register all the services once the server has initialised
         MuleContextNotificationListener l = new MuleContextNotificationListener()
@@ -252,38 +227,52 @@ public class JmxAgent extends AbstractAgent
      * @see org.mule.api.lifecycle.Startable#start()
      */
     public LifecycleTransitionResult start() throws MuleException
-    {        
-        if (connectorServer != null)
+    {
+        try
         {
-            try
+            logger.info("Creating and starting JMX agent connector Server");
+            if (connectorServerUrl != null)
             {
-                // detect without starting - more complex (need to configure rmi address)
-                // and doesn't currently offer any advantage
-//                Socket socket = new Socket("localhost", 1099);
-//                socket.close();
-                logger.info("Starting JMX agent connector Server");
+                JMXServiceURL url = new JMXServiceURL(connectorServerUrl);
+                if (connectorServerProperties == null)
+                {
+                    connectorServerProperties = new HashMap(DEFAULT_CONNECTOR_SERVER_PROPERTIES);
+                }
+                // TODO custom authenticator may have its own security config,
+                // refactor
+                if (!credentials.isEmpty())
+                {
+                    JMXAuthenticator jmxAuthenticator = (JMXAuthenticator)ClassUtils.instanciateClass(
+                        DEFAULT_JMX_AUTHENTICATOR, ClassUtils.NO_ARGS);
+                    // TODO support for custom authenticators
+                    ((SimplePasswordJmxAuthenticator)jmxAuthenticator).setCredentials(credentials);
+                    connectorServerProperties.put(JMXConnectorServer.AUTHENTICATOR, jmxAuthenticator);
+                }
+                connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url,
+                    connectorServerProperties, mBeanServer);
                 connectorServer.start();
             }
-            catch (ExportException e)
-            {
-                throw new JmxManagementException(CoreMessages.failedToStart("Jmx Agent"), e);
-            }
-            catch (IOException e)
-            {
-                // this probably means that the RMI server isn't started so we request a retry
-                return LifecycleTransitionResult.retry(e, this);
-            }
-            catch (Exception e)
-            {
-                throw new JmxManagementException(CoreMessages.failedToStart("Jmx Agent"), e);
-            }
+        }
+        catch (ExportException e)
+        {
+            throw new JmxManagementException(CoreMessages.failedToStart("Jmx Agent"), e);
+        }
+        catch (IOException e)
+        {
+            // this probably means that the RMI server isn't started so we request a
+            // retry
+            return LifecycleTransitionResult.retry(e, this);
+        }
+        catch (Exception e)
+        {
+            throw new JmxManagementException(CoreMessages.failedToStart("Jmx Agent"), e);
         }
         return LifecycleTransitionResult.OK;
     }
 
     /**
      * {@inheritDoc} (non-Javadoc)
-     *
+     * 
      * @see org.mule.api.lifecycle.Stoppable#stop()
      */
     public LifecycleTransitionResult stop() throws MuleException

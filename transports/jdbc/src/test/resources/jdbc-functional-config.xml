@@ -18,7 +18,7 @@
             </component>
             <outbound>
                 <outbound-pass-through-router>
-                    <jdbc:outbound-endpoint address="jdbc://writeTest?type=2"/>
+                    <jdbc:outbound-endpoint address="jdbc://writeTest?type=2" />
                 </outbound-pass-through-router>
             </outbound>
         </service>

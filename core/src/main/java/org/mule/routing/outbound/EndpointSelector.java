@@ -47,8 +47,9 @@ import java.util.List;
 public class EndpointSelector extends FilteringOutboundRouter implements MuleContextAware
 {
     public static final String DEFAULT_SELECTOR_PROPERTY = "endpoint";
+    public static final String DEFAULT_SELECTOR_EXPRESSION = "header:endpoint";
 
-    private String selectorProperty = DEFAULT_SELECTOR_PROPERTY;
+    private String selectorExpression = DEFAULT_SELECTOR_EXPRESSION;
 
 
 
@@ -57,12 +58,19 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
     {
         List endpoints;
         String endpointName;
-        
-        Object property = ExpressionEvaluatorManager.evaluate(getSelectorProperty(), message);
+
+        String prop = getSelectorExpression();
+        if(!ExpressionEvaluatorManager.isValidExpression(prop))
+        {
+            throw new CouldNotRouteOutboundMessageException(
+                    CoreMessages.expressionInvalidForProperty("selectorExpression", prop), message, null);
+        }
+
+        Object property = ExpressionEvaluatorManager.evaluate(prop, message);
         if(property ==null)
         {
             throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.propertyIsNotSetOnEvent(getSelectorProperty()), message, null);
+                    CoreMessages.propertyIsNotSetOnEvent(getSelectorExpression()), message, null);
         }
 
         if (property instanceof String)
@@ -77,7 +85,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
         else
         {
             throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSupportedType(
-                    getSelectorProperty(), new Class[]{String.class, List.class}, property.getClass()), message, null);
+                    getSelectorExpression(), new Class[]{String.class, List.class}, property.getClass()), message, null);
         }
 
         MuleMessage result = null;
@@ -88,7 +96,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
             if(StringUtils.isEmpty(endpointName))
             {
                 throw new CouldNotRouteOutboundMessageException(
-                        CoreMessages.objectIsNull("Endpoint Name: " + getSelectorProperty()), message, null);
+                        CoreMessages.objectIsNull("Endpoint Name: " + getSelectorExpression()), message, null);
             }
             OutboundEndpoint ep = null;
             try
@@ -142,13 +150,13 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
         return getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
     }
 
-    public String getSelectorProperty()
+    public String getSelectorExpression()
     {
-        return selectorProperty;
+        return selectorExpression;
     }
 
-    public void setSelectorProperty(String selectorProperty)
+    public void setSelectorExpression(String selectorExpression)
     {
-        this.selectorProperty = selectorProperty;
+        this.selectorExpression = selectorExpression;
     }
 }

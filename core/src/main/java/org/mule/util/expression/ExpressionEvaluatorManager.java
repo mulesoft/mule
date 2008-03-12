@@ -61,12 +61,17 @@ public class ExpressionEvaluatorManager
         return evaluator;
     }
 
-    public static Object evaluate(String expression, Object object)
+    public static Object evaluate(String expression, Object object) throws ExpressionRuntimeException
     {
-        return evaluate(expression, object, DEFAULT_EXPRESSION_PREFIX);
+        return evaluate(expression, object, DEFAULT_EXPRESSION_PREFIX, false);
+    }
+
+    public static Object evaluate(String expression, Object object, boolean failIfNull) throws ExpressionRuntimeException
+    {
+        return evaluate(expression, object, DEFAULT_EXPRESSION_PREFIX, failIfNull);
     }
     
-    public static Object evaluate(String expression, Object object, String expressionPrefix)
+    public static Object evaluate(String expression, Object object, String expressionPrefix, boolean failIfNull) throws ExpressionRuntimeException
     {
         String name;
 
@@ -94,7 +99,12 @@ public class ExpressionEvaluatorManager
         {
             throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(name).getMessage());
         }
-        return extractor.evaluate(expression, object);
+        Object result = extractor.evaluate(expression, object);
+        if(result==null && failIfNull)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(name, expression));
+        }
+        return result;
     }
 
     public static synchronized void clearEvaluators()
@@ -109,4 +119,29 @@ public class ExpressionEvaluatorManager
         }
         evaluator.clear();
     }
+
+    public static boolean isValidExpression(String expression)
+    {
+        return isValidExpression(expression, DEFAULT_EXPRESSION_PREFIX);
+    }
+
+    public static boolean isValidExpression(String expression, String expressionPrefix)
+    {
+        if(expression.startsWith(expressionPrefix))
+        {
+            expression = expression.substring(2, expression.length()-1);
+        }
+        String name;
+        int i = expression.indexOf(":");
+        if(i>-1)
+        {
+            name = expression.substring(0, i);
+        }
+        else
+        {
+            name = expression;
+        }
+        return isEvaluatorRegistered(name);
+    }
+
 }

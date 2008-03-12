@@ -39,7 +39,7 @@
                 <!-- this property is set from the test case as something like "${bean:childBean.value}"
                  or ${xpath:/endpoints/endpoint}
                  -->
-                <endpoint-selector-router selectorProperty="${selector.property}">
+                <endpoint-selector-router selectorExpression="${selector.property}">
                     <!-- this could be a global endpoint too once MULE-2595  is fixed -->                    
                     <vm:outbound-endpoint name="matchingEndpoint1" path="match1" connector-ref="queue"/>
                     <outbound-endpoint name="matchingEndpoint2" address="vm://match2" connector-ref="queue"/>

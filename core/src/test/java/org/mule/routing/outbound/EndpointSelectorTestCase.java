@@ -74,7 +74,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     {
         Map props = new HashMap();
         props.put("apple", "red");
-        props.put(router.getSelectorProperty(), "dest3");
+        props.put(router.DEFAULT_SELECTOR_PROPERTY, "dest3");
         props.put("banana", "yellow");
         MuleMessage message = new DefaultMuleMessage("test event", props);
 
@@ -88,7 +88,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     {
         // The "wayOut" property will determine which endpoint the message gets sent
         // to.
-        router.setSelectorProperty("wayOut");
+        router.setSelectorExpression("header:wayOut");
 
         Map props = new HashMap();
         props.put("apple", "red");
@@ -105,7 +105,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     public void testSelectEndpointNoMatch() throws Exception
     {
         Map props = new HashMap();
-        props.put(router.getSelectorProperty(), "dest5");
+        props.put(router.DEFAULT_SELECTOR_PROPERTY, "dest5");
 
         try
         {

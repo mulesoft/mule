@@ -17,22 +17,25 @@ import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Returns the message payload.  If the expression is set to a class name then Mule will attempt to transform the payload by
  * discovering the correct transformer(s) in the registry. This is only suited for simple transformations between common types.
- *
+ * <p/>
  * <code>
  * ${payload:byte[]}
  * </code>
- *
+ * <p/>
  * or
- *
+ * <p/>
  * <code>
  * ${payload:org.mule.api.OutputHandler}
  * </code>
- *
+ * <p/>
  * If the object passed in is not a MuleMessage, the same object will be returned.
- * 
+ *
  * @see ExpressionEvaluator
  * @see ExpressionEvaluatorManager
  */
@@ -41,11 +44,16 @@ public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator
     public static final String NAME = "payload";
     public static final String BYTE_ARRAY = "byte[]";
 
+    /**
+     * logger used by this class
+     */
+    protected transient final Log logger = LogFactory.getLog(MessagePayloadExpressionEvaluator.class);
+
     public Object evaluate(String expression, Object message)
     {
         if (message instanceof MuleMessage)
         {
-            if(expression==null)
+            if (expression == null)
             {
                 return ((MuleMessage) message).getPayload();
             }
@@ -53,7 +61,7 @@ public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator
             {
                 try
                 {
-                    if(expression.equals(BYTE_ARRAY))
+                    if (expression.equals(BYTE_ARRAY))
                     {
                         return ((MuleMessage) message).getPayload(byte[].class);
                     }
@@ -72,20 +80,29 @@ public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator
                 }
             }
         }
-        if (message instanceof MessageAdapter)
+        else
         {
-            return ((MessageAdapter) message).getPayload();
+            logger.warn("Message is not of type MuleMessage, the expression will return the object without modification");
+            if (message instanceof MessageAdapter)
+            {
+                return ((MessageAdapter) message).getPayload();
+            }
         }
         return message;
+
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public String getName()
     {
         return NAME;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void setName(String name)
     {
         throw new UnsupportedOperationException("setName");

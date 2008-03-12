@@ -108,10 +108,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase
                         }
                         else
                         {
-                            // delayed start for rmi registry (forces retry request from jmx)
-//                            if (o.getClass().getName().indexOf("RmiRegistryAgent") > -1 && 0 == retryCount) continue;
-                            // delayed start for jmx (forces correct ordering for jmx)
-//                            if (o.getClass().getName().indexOf("JmxAgent") > -1 && 0 == retryCount) continue;
                             if (logger.isDebugEnabled())
                             {
                                 logger.debug("lifecycle phase: " + getName() + " for object: " + o);

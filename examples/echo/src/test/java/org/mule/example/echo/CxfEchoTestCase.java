@@ -11,13 +11,13 @@
 package org.mule.example.echo;
 
 /**
- * Tests the echo example using XFire.
+ * Tests the echo example using CXF.
  */
-public class XFireEchoTestCase extends AbstractEchoTestCase
+public class CxfEchoTestCase extends AbstractEchoTestCase
 {
     protected String getConfigResources()
     {
-        return "echo-xfire-config.xml";
+        return "echo-cxf-config.xml";
     }
 
     protected String getExpectedGetResponseResource()
@@ -32,7 +32,7 @@ public class XFireEchoTestCase extends AbstractEchoTestCase
 
     protected String getProtocol()
     {
-        return "xfire";
+        return "cxf";
     }
 
 }

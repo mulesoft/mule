@@ -124,6 +124,7 @@ import org.mule.transformer.encryption.EncryptionTransformer;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.simple.ByteArrayToSerializable;
+import org.mule.transformer.simple.ExpressionTransformer;
 import org.mule.transformer.simple.HexStringToByteArray;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 import org.mule.transformer.simple.ObjectToByteArray;
@@ -133,7 +134,7 @@ import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.transport.SimpleRetryConnectionStrategy;
 import org.mule.util.expression.FunctionExpressionEvaluator;
 import org.mule.util.expression.MapPayloadExpressionEvaluator;
-import org.mule.util.expression.MessageHeaderExpressionEvaluator;
+import org.mule.util.expression.MessageHeadersExpressionEvaluator;
 import org.mule.util.object.PooledObjectFactory;
 import org.mule.util.object.PrototypeObjectFactory;
 import org.mule.util.object.SingletonObjectFactory;
@@ -188,6 +189,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-transformer", new TransformerDefinitionParser());
         registerBeanDefinitionParser("no-action-transformer", new TransformerDefinitionParser(NoActionTransformer.class));
         registerBeanDefinitionParser("message-properties-transformer", new TransformerDefinitionParser(MessagePropertiesTransformer.class));
+
+        registerBeanDefinitionParser("expression-transformer", new TransformerDefinitionParser(ExpressionTransformer.class));
+        registerBeanDefinitionParser("return-argument", new ChildDefinitionParser("argument", ExpressionTransformer.Argument.class));
 
         registerBeanDefinitionParser("base64-encoder-transformer", new TransformerDefinitionParser(Base64Encoder.class));
         registerBeanDefinitionParser("base64-decoder-transformer", new TransformerDefinitionParser(Base64Decoder.class));
@@ -310,7 +314,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("correlation-property-extractor", new ChildDefinitionParser("propertyExtractor", CorrelationPropertiesExpressionEvaluator.class));
         registerBeanDefinitionParser("custom-property-extractor", new ChildDefinitionParser("propertyExtractor"));
         registerBeanDefinitionParser("map-property-extractor", new ChildDefinitionParser("propertyExtractor", MapPayloadExpressionEvaluator.class));
-        registerBeanDefinitionParser("message-property-extractor", new ChildDefinitionParser("propertyExtractor", MessageHeaderExpressionEvaluator.class));
+        registerBeanDefinitionParser("message-property-extractor", new ChildDefinitionParser("propertyExtractor", MessageHeadersExpressionEvaluator.class));
 
         //Catch all Strategies
         registerBeanDefinitionParser("logging-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", LoggingCatchAllStrategy.class));

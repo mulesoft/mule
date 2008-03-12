@@ -61,10 +61,6 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         result = parser.getFilename(adapter, "Test8_${header:foo}.txt");
         assertEquals("Test8_bar.txt", result);
 
-        //header is the default Expression Handler
-        result = parser.getFilename(adapter, "Test8_${foo}.txt");
-        assertEquals("Test8_bar.txt", result);
-
         result = parser.getFilename(adapter, "Test9_${header:xxx}.txt");
         assertEquals("Test9_${header:xxx}.txt", result);
 
@@ -94,10 +90,6 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         assertEquals("Test7_originalName.txt", result);
 
         result = parser.getFilename(adapter, "Test8_[header:foo].txt");
-        assertEquals("Test8_bar.txt", result);
-
-        //Header should be the default ExpressionEvaluator
-        result = parser.getFilename(adapter, "Test8_[foo].txt");
         assertEquals("Test8_bar.txt", result);
 
         result = parser.getFilename(adapter, "Test9_[header:xxx].txt");

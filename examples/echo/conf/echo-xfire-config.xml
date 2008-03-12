@@ -27,7 +27,7 @@
                 </inbound-endpoint>
                 <inbound-endpoint address="xfire:http://localhost:65082/services"/>
             </inbound>
-            <component class="org.mule.component.simple.EchoComponent"/>
+            <echo-component/>
         </service>
     </model>
     
