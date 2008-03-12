@@ -352,8 +352,16 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         {
             if (connector != null)
             {
-                newConnector = (Connector) ClassUtils.loadClass(connector, classLoader)
-                        .newInstance();
+                Class connectorClass;
+                if (classLoader != null)
+                {
+                    connectorClass = ClassUtils.loadClass(connector, classLoader);
+                }
+                else
+                {
+                    connectorClass = ClassUtils.loadClass(connector, getClass());
+                }
+                newConnector = (Connector) connectorClass.newInstance();
             }
             else
             {
