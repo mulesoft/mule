@@ -85,7 +85,7 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
         }
         else if (name.equalsIgnoreCase(SYSTIME_FUNCTION))
         {
-            return System.currentTimeMillis();
+            return new Long(System.currentTimeMillis());
         }
         else if (name.equalsIgnoreCase(HOSTNAME_FUNCTION))
         {
@@ -111,7 +111,7 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
         }
         else if (name.equalsIgnoreCase(COUNT_FUNCTION))
         {
-            return count.getAndIncrement();
+            return new Long(count.getAndIncrement());
         }
         else
         {

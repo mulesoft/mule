@@ -13,6 +13,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.MessageAdapter;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.module.scripting.component.Scriptable;
 import org.mule.util.expression.ExpressionEvaluator;
 
@@ -92,7 +93,8 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
             }
             catch (InitialisationException e)
             {
-                throw new MuleRuntimeException(e);
+                throw new MuleRuntimeException(
+                    CoreMessages.initialisationFailure("An error occurred initialising script."), e);
             }
             cache.put(expression, script);
         }

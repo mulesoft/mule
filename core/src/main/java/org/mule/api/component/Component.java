@@ -18,7 +18,9 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.management.stats.ServiceStatistics;
-import org.mule.util.queue.QueueSession;
+import org.mule.model.seda.SedaService;
+
+import java.beans.ExceptionListener;
 
 import javax.resource.spi.work.Work;
 
@@ -26,57 +28,57 @@ import javax.resource.spi.work.Work;
  * A <code>Component</code> is a invoked by a {@link Service} for each incoming
  * {@link MuleEvent} routed on by the {@link InboundRouterCollection}. A component
  * processes a {@link MuleEvent} by invoking the component instance that has been
- * configured, optionally returning a result. <br/> Implementations of
- * <code/>Component</code> can use different types of component implementation,
- * implement component instance pooling or implement <i>binding's<i/> which allow
- * for service composition. <br/><br/> <b>TODO</b> <code>Component</code>
+ * configured, optionally returning a result with running synchronously. <br/>
+ * Implementations of <code/>Component</code> can use different types of component
+ * implementation, implement component instance pooling or implement <i>binding's<i/>
+ * which allow for service composition. <br/><br/> <b>TODO</b> <code>Component</code>
  * implementations should be state-less.
  */
 public interface Component extends Work, Startable, Stoppable, Disposable
 {
 
     /**
-     * Sets the current event being processed
+     * Makes a asynchronous invocation of the component This is not currently used
+     * because rather than calling onEvent(), setEvent() and then run() is used.
+     * <br/> See <a
+     * href="http://mule.mulesource.org/jira/browse/MULE-3083">http://mule.mulesource.org/jira/browse/MULE-3083</a>
      * 
-     * @param event the event being processed
+     * @param event the event to pass to the component
      */
-    void onEvent(QueueSession session, MuleEvent event);
-
-    ServiceStatistics getStatistics();
-
-    void setStatistics(ServiceStatistics stat);
+    //void onEvent(MuleEvent event);
 
     /**
-     * Makes a synchronous call on the UMO
+     * Makes a synchronous invocation of the component
      * 
-     * @param event the event to pass to the UMO
-     * @return the return event from the UMO
+     * @param event the event to pass to the component
+     * @return the return event from the component
      * @throws MuleException if the call fails
      */
     Object onCall(MuleEvent event) throws MuleException;
 
     /**
      * When an exception occurs this method can be called to invoke the configured
-     * UMOExceptionStrategy on the UMO
+     * UMOExceptionStrategy on the {@link Service}
      * 
-     * @param exception If the UMOExceptionStrategy implementation fails
+     * @param exception If the {@link ExceptionListener} implementation fails
      */
     void handleException(Exception exception);
 
     /**
-     * Determines if the proxy is suspended
+     * Sets the current event being processed This is currently used to set a
+     * Components event so that {@link SedaService} can then schedule a job that will
+     * invoke {@link Component} run() and the event will be available for processing.
+     * This is currently used followed by scheduling of a {@link Component} job
+     * rather than using onEvent() directly because otherwise with the way SEDA
+     * events are consumed would mean only one event would processed at the same
+     * time.<br/> See <a
+     * href="http://mule.mulesource.org/jira/browse/MULE-3083">http://mule.mulesource.org/jira/browse/MULE-3083</a>
      * 
-     * @return true if the proxy (and the UMO) are suspended
+     * @param event the event being processed
      */
-    boolean isSuspended();
+    void setEvent(MuleEvent event);
+    
+    ServiceStatistics getStatistics();
 
-    /**
-     * Controls the suspension of the UMO event processing
-     */
-    void suspend();
-
-    /**
-     * Triggers the UMO to resume processing of events if it is suspended
-     */
-    void resume();
+    void setStatistics(ServiceStatistics stat);
 }

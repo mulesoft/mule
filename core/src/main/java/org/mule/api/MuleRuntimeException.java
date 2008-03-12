@@ -26,14 +26,6 @@ public class MuleRuntimeException extends RuntimeException
     private static final long serialVersionUID = 6728041560892553159L;
 
     /**
-     * @param cause the exception that triggered this exception
-     */
-    public MuleRuntimeException(Exception cause)
-    {
-        super(cause);
-    }
-
-    /**
      * @param message the exception message
      */
     public MuleRuntimeException(Message message)

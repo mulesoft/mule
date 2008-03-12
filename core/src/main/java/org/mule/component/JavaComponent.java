@@ -10,7 +10,6 @@
 
 package org.mule.component;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
@@ -37,7 +36,6 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
 import org.mule.util.object.ObjectFactory;
-import org.mule.util.queue.QueueSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,12 +68,7 @@ public class JavaComponent implements Component
     /** holds the UMO descriptor */
     private Service service;
 
-    /** Determines if the proxy is suspended */
-    private boolean suspended = true;
-
     private ServiceStatistics stat = null;
-
-    private QueueSession queueSession = null;
 
     protected MuleContext muleContext;
     
@@ -140,6 +133,18 @@ public class JavaComponent implements Component
     public void dispose()
     {
         checkDisposed();
+        if (umo.isStarted())
+        {
+            try
+            {
+                umo.stop();
+            }
+            catch (MuleException e)
+            {
+                logger.error(CoreMessages.failedToStop("Service '" + service.getName() + "'"), e);
+            }
+        }
+        umo.dispose();
     }
 
     private void checkDisposed()
@@ -155,9 +160,8 @@ public class JavaComponent implements Component
      *
      * @param event the event being processed
      */
-    public void onEvent(QueueSession session, MuleEvent event)
+    public void setEvent(MuleEvent event)
     {
-        this.queueSession = session;
         this.event = event;
     }
 
@@ -268,8 +272,7 @@ public class JavaComponent implements Component
             }
             else
             {
-                returnMessage = event.getSession().sendEvent(event);
-                processReplyTo(returnMessage);
+                throw new IllegalStateException("Unable to process outbound event, components only process incoming events.");
             }
 
             // stats
@@ -325,26 +328,11 @@ public class JavaComponent implements Component
         return "proxy for: " + service.toString();
     }
 
-    /**
-     * Determines if the proxy is suspended
-     *
-     * @return true if the proxy (and the UMO) are suspended
-     */
-    public boolean isSuspended()
-    {
-        return suspended;
-    }
 
     /** Controls the suspension of the UMO event processing */
     public void suspend()
     {
-        suspended = true;
-    }
-
-    /** Triggers the UMO to resume processing of events if it is suspended */
-    public void resume()
-    {
-        suspended = false;
+        //suspended = true;
     }
 
     protected ReplyToHandler getReplyToHandler(MuleMessage message, InboundEndpoint endpoint)
@@ -361,41 +349,6 @@ public class JavaComponent implements Component
             }
         }
         return replyToHandler;
-    }
-
-    private void processReplyTo(MuleMessage returnMessage) throws MuleException
-    {
-        if (returnMessage != null && returnMessage.getReplyTo() != null)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("sending reply to: " + returnMessage.getReplyTo());
-            }
-
-            // get the endpointUri for this uri
-            OutboundEndpoint endpoint = muleContext.getRegistry()
-                .lookupEndpointFactory()
-                .getOutboundEndpoint(returnMessage.getReplyTo().toString());
-            // make sure remove the replyTo property as not cause a a forever
-            // replyto loop
-            returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-
-            // Create the replyTo event asynchronous
-            MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, endpoint, event.getSession(), false);
-
-            // queue the event
-            onEvent(queueSession, replyToEvent);
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("reply to sent: " + returnMessage.getReplyTo());
-            }
-
-            if (stat.isEnabled())
-            {
-                stat.incSentReplyToEvent();
-            }
-        }
     }
 
     public void run()

@@ -15,7 +15,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.container.JndiContextHelper;
+import org.mule.util.JndiContextHelper;
 import org.mule.util.StringUtils;
 
 import java.util.Map;

@@ -17,11 +17,11 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.ServiceException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.Message;
 import org.mule.module.jca.i18n.JcaMessages;
 import org.mule.service.AbstractService;
 
@@ -120,22 +120,10 @@ public class JcaService extends AbstractService implements WorkListener
      * the container. The container might create a Proxy object to intercept the actual method call to
      * implement transaction,security related functionalities
      */
-    public Object getManagedInstance() throws MuleException
+    public Object getManagedInstance() throws UnavailableException, MuleException
     {
-        Object managedInstance = null;
-        try
-        {
-
-            MessageEndpointFactory messageEndpointFactory = (MessageEndpointFactory) getOrCreateService();
-            managedInstance = messageEndpointFactory.createEndpoint(null);
-        }
-        catch (UnavailableException e)
-        {
-
-            logger.error("Request Failed to allocate Managed Instance" + e.getMessage(), e);
-            throw new ObjectNotFoundException(this.getName(), e);
-        }
-        return managedInstance;
+        MessageEndpointFactory messageEndpointFactory = (MessageEndpointFactory) getOrCreateService();
+        return messageEndpointFactory.createEndpoint(null);
     }
 
     public class MuleJcaWorker implements Work
@@ -168,7 +156,13 @@ public class JcaService extends AbstractService implements WorkListener
             }
             catch (Exception e)
             {
-                if (e instanceof MessagingException)
+                if (e instanceof UnavailableException)
+                {
+                    Message message = JcaMessages.cannotAllocateManagedInstance();
+                    logger.error(message);
+                    handleException(new MessagingException(message, e));
+                }
+                else if (e instanceof MessagingException)
                 {
                     logger.error("Failed to execute  JCAEndPoint " + e.getMessage(), e);
                     handleException(e);

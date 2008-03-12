@@ -59,13 +59,15 @@ public abstract class AbstractClientRemotingTestCase extends FunctionalTestCase
         muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getRemoteEndpointUri());
-        MuleMessage message = dispatcher.receiveRemote(remoteEndpoint, RECEIVE_TIMEOUT);
+        // Doubling timeout see MULE-3000
+        MuleMessage message = dispatcher.receiveRemote(remoteEndpoint, RECEIVE_TIMEOUT * 2);
         assertNull(message);
         // We do a send instead of a dispatch here so the operation is
         // synchronous thus eaiser to test
         dispatcher.sendRemote(remoteEndpoint, "Test Remote Message 2", null);
 
-        message = dispatcher.receiveRemote(remoteEndpoint, RECEIVE_TIMEOUT);
+        // Doubling timeout see MULE-3000
+        message = dispatcher.receiveRemote(remoteEndpoint, RECEIVE_TIMEOUT * 2);
         assertNotNull(message);
         assertEquals("Test Remote Message 2", message.getPayload());
     }

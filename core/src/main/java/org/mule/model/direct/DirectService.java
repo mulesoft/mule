@@ -96,13 +96,4 @@ public class DirectService extends AbstractService
         component.start();
     }
 
-    protected void doPause()
-    {
-        component.suspend();
-    }
-
-    protected void doResume()
-    {
-        component.resume();
-    }
 }

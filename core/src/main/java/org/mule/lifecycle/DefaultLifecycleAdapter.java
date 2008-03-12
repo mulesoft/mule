@@ -12,14 +12,18 @@ package org.mule.lifecycle;
 
 import org.mule.RequestContext;
 import org.mule.VoidResult;
-import org.mule.api.interceptor.Invocation;
-import org.mule.api.MuleException;
-import org.mule.api.MuleEvent;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.interceptor.Invocation;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleAdapter;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.routing.NestedRouter;
 import org.mule.api.service.Service;
@@ -54,30 +58,33 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
     /** logger used by this class */
     protected static final Log logger = LogFactory.getLog(DefaultLifecycleAdapter.class);
 
-    private Object pojoService;
+    private Object componentObject;
     private Service service;
+    private boolean isStoppable = false;
+    private boolean isStartable = false;
+    private boolean isDisposable = false;
 
     private boolean started = false;
     private boolean disposed = false;
 
     private EntryPointResolverSet entryPointResolver;
 
-    public DefaultLifecycleAdapter(Object pojoService, Service service) throws MuleException
+    public DefaultLifecycleAdapter(Object componentObject, Service service) throws MuleException
     {
-        this(pojoService, service, new LegacyEntryPointResolverSet());
+        this(componentObject, service, new LegacyEntryPointResolverSet());
     }
 
-    public DefaultLifecycleAdapter(Object pojoService,
+    public DefaultLifecycleAdapter(Object componentObject,
                                    Service service,
                                    EntryPointResolverSet epResolver) throws MuleException
     {
-        initialise(pojoService, service, epResolver);
+        initialise(componentObject, service, epResolver);
     }
 
-    protected void initialise(Object pojoService, Service service, EntryPointResolverSet entryPointResolver)
+    protected void initialise(Object componentObject, Service service, EntryPointResolverSet entryPointResolver)
             throws MuleException
     {
-        if (pojoService == null)
+        if (componentObject == null)
         {
             throw new IllegalArgumentException("POJO Service cannot be null");
         }
@@ -85,64 +92,90 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         {
             entryPointResolver = new LegacyEntryPointResolverSet();
         }
-        this.pojoService = pojoService;
+        this.componentObject = componentObject;
         this.service = service;
         this.entryPointResolver = entryPointResolver;
-        if (pojoService instanceof ServiceAware)
+
+        isStartable = Startable.class.isInstance(componentObject);
+        isStoppable = Stoppable.class.isInstance(componentObject);
+        isDisposable = Disposable.class.isInstance(componentObject);
+
+        if (componentObject instanceof ServiceAware)
         {
-            ((ServiceAware) pojoService).setService(service);
+            ((ServiceAware) componentObject).setService(service);
         }
         configureNestedRouter();
     }
 
     public LifecycleTransitionResult start() throws MuleException
     {
-        try
+        if (isStartable)
         {
-            return LifecycleTransitionResult.startOrStopAll(service.start(), new LifecycleTransitionResult.Closure()
+            try
             {
-                public LifecycleTransitionResult doContinue()
-                {
-                    started = true;
-                    return LifecycleTransitionResult.OK;
-                }});
+                return LifecycleTransitionResult.startOrStopAll(((Startable) componentObject).start(),
+                    new LifecycleTransitionResult.Closure()
+                    {
+                        public LifecycleTransitionResult doContinue()
+                        {
+                            started = true;
+                            return LifecycleTransitionResult.OK;
+                        }
+                    });
+            }
+            catch (Exception e)
+            {
+                throw new DefaultMuleException(CoreMessages.failedToStart("UMO Service: " + service.getName()), e);
+            }
+
         }
-        catch (Exception e)
+        else
         {
-            throw new DefaultMuleException(
-                    CoreMessages.failedToStart("UMO Service: " + service.getName()), e);
+            started = true;
+            return LifecycleTransitionResult.OK;
         }
     }
 
     public LifecycleTransitionResult stop() throws MuleException
     {
-        try
+        if (isStoppable)
         {
-            return LifecycleTransitionResult.startOrStopAll(service.stop(), new LifecycleTransitionResult.Closure()
+            try
             {
-                public LifecycleTransitionResult doContinue()
+                return LifecycleTransitionResult.startOrStopAll(((Stoppable) componentObject).stop(), new LifecycleTransitionResult.Closure()
                 {
-                    started = false;
-                    return LifecycleTransitionResult.OK;
-                }});
+                    public LifecycleTransitionResult doContinue()
+                    {
+                        started = false;
+                        return LifecycleTransitionResult.OK;
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                throw new DefaultMuleException(CoreMessages.failedToStop("UMO Service: " + service.getName()), e);
+            }
         }
-        catch (Exception e)
+        else
         {
-            throw new DefaultMuleException(
-                    CoreMessages.failedToStop("UMO Service: " + service.getName()), e);
+            started = false;
+            return LifecycleTransitionResult.OK;
         }
     }
 
     public void dispose()
     {
-        try
+        if (isDisposable)
         {
-            service.dispose();
-        }
-        catch (Exception e)
-        {
-            // TODO MULE-863: Handle or fail
-            logger.error("failed to dispose: " + service.getName(), e);
+            try
+            {
+                ((Disposable) componentObject).dispose();
+            }
+            catch (Exception e)
+            {
+                // TODO MULE-863: Handle or fail
+                logger.error("failed to dispose: " + service.getName(), e);
+            }
         }
         disposed = true;
     }
@@ -176,12 +209,12 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
             //Use the overriding entrypoint resolver if one is set
             if (service.getEntryPointResolverSet() != null)
             {
-                result = service.getEntryPointResolverSet().invoke(pojoService, RequestContext.getEventContext());
+                result = service.getEntryPointResolverSet().invoke(componentObject, RequestContext.getEventContext());
 
             }
             else
             {
-                result = entryPointResolver.invoke(pojoService, RequestContext.getEventContext());
+                result = entryPointResolver.invoke(componentObject, RequestContext.getEventContext());
             }
         }
         catch (Exception e)
@@ -218,7 +251,11 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
 
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        return service.initialise();
+        if (Initialisable.class.isInstance(componentObject))
+        {
+            ((Initialisable) componentObject).initialise();
+        }
+        return LifecycleTransitionResult.OK;
     }
 
     protected void configureNestedRouter() throws MuleException
@@ -238,7 +275,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
                     // and just routes away using a mule client
                     // ( using the high level Mule client is probably
                     // a bit agricultural but this is just POC stuff )
-                    proxy = nestedRouter.createProxy(pojoService);
+                    proxy = nestedRouter.createProxy(componentObject);
                     bindings.put(nestedRouter.getInterface(), proxy);
 
                     //Now lets set the proxy on the Service object
@@ -246,7 +283,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
 
 
                     List methods =
-                            ClassUtils.getSatisfiableMethods(pojoService.getClass(),
+                            ClassUtils.getSatisfiableMethods(componentObject.getClass(),
                                     new Class[]{nestedRouter.getInterface()}, true, false, null);
                     if (methods.size() == 1)
                     {
@@ -255,23 +292,23 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
                     else if (methods.size() > 1)
                     {
                         throw new TooManySatisfiableMethodsException(
-                            pojoService.getClass(), new Class[]{nestedRouter.getInterface()});
+                            componentObject.getClass(), new Class[]{nestedRouter.getInterface()});
                     }
                     else
                     {
                         throw new NoSatisfiableMethodsException(
-                            pojoService.getClass(), new Class[]{nestedRouter.getInterface()});
+                            componentObject.getClass(), new Class[]{nestedRouter.getInterface()});
                     }
 
                     try
                     {
-                        setterMethod.invoke(pojoService, new Object[]{proxy});
+                        setterMethod.invoke(componentObject, new Object[]{proxy});
                     }
                     catch (Exception e)
                     {
                         throw new InitialisationException(
                                 CoreMessages.failedToSetProxyOnService(nestedRouter,
-                                    pojoService.getClass()), e, this);
+                                    componentObject.getClass()), e, this);
                     }
                 }
                 else

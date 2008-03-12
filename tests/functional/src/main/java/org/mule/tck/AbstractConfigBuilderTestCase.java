@@ -14,7 +14,6 @@ import org.mule.DefaultExceptionStrategy;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
@@ -350,7 +349,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     }
 
 
-    public void testNestedRouterProxyCreation() throws ObjectNotFoundException
+    public void testNestedRouterProxyCreation()
     {
         //Test that the proxy object was created and set on the service object
         Service orange = muleContext.getRegistry().lookupService("orangeComponent");

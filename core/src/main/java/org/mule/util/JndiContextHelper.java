@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.container;
+package org.mule.util;
 
 import java.util.Hashtable;
 import java.util.Map;

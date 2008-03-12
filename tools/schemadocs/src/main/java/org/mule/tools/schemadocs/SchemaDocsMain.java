@@ -164,17 +164,17 @@ public class SchemaDocsMain
     }
 
     // this avoids using File objects since we may be dealing with classpath jars etc etc
-    protected String tagFromFileName(String name)
+    protected static String tagFromFileName(String name)
     {
         String dropExtension = toLeftOf(name, ".", name);
-        String dropSlash = toRightOf(dropExtension, "/", dropExtension);
-        String dropBackslash = toRightOf(dropSlash, "\\", dropSlash);
-        return toLeftOf(dropBackslash, "-", "mule");
+        String dropSlash = toRightOf(dropExtension, "/", dropExtension, true);
+        String dropBackslash = toRightOf(dropSlash, "\\", dropSlash, true);
+        return toRightOf(dropBackslash, "-", "mule", false);
     }
 
-    protected String toRightOf(String text, String delim, String deflt)
+    protected static String toRightOf(String text, String delim, String deflt, boolean far)
     {
-        int index = text.indexOf(delim);
+        int index = far ? text.lastIndexOf(delim) : text.indexOf(delim);
         if (index > -1)
         {
             return text.substring(index+1);
@@ -185,7 +185,7 @@ public class SchemaDocsMain
         }
     }
 
-    protected String toLeftOf(String text, String delim, String deflt)
+    protected static String toLeftOf(String text, String delim, String deflt)
     {
         int index = text.lastIndexOf(delim);
         if (index > -1)

@@ -16,6 +16,9 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
+import org.mule.module.xml.expression.BeanPayloadExpressionEvaluator;
+import org.mule.module.xml.expression.JXPathExpressionEvaluator;
+import org.mule.module.xml.expression.XPathExpressionEvaluator;
 import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.module.xml.routing.FilteringXmlMessageSplitter;
@@ -27,9 +30,6 @@ import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlPrettyPrinter;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.transformer.XmlToObject;
-import org.mule.module.xml.expression.BeanPayloadExpressionEvaluator;
-import org.mule.module.xml.expression.JXPathExpressionEvaluator;
-import org.mule.module.xml.expression.XPathExpressionEvaluator;
 
 public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
 {

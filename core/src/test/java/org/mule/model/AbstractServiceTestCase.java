@@ -57,20 +57,6 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         assertFalse(service.isStarted());
         assertFalse(service.isPaused());
 
-        try
-        {
-            service.pause();
-            fail("Exception expected: Cannot pause an uninitialised service");
-        }
-        catch (MuleException e)
-        {
-            // expected 
-        }
-        catch (NullPointerException npe)
-        {
-            // TODO MULE-2843
-        }
-
         service.initialise();
 
         // Pausing a service that is not started does not throw an exception
@@ -91,20 +77,6 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
     {
         assertFalse(service.isStarted());
         assertFalse(service.isPaused());
-
-        try
-        {
-            service.resume();
-            fail("Exception expected: Cannot resume an uninitialised service");
-        }
-        catch (MuleException e)
-        {
-            // expected 
-        }
-        catch (NullPointerException npe)
-        {
-            // TODO MULE-2843
-        }
 
         service.initialise();
 

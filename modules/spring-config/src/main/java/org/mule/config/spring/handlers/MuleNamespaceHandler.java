@@ -29,6 +29,7 @@ import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
@@ -37,6 +38,7 @@ import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinition
 import org.mule.config.spring.parsers.specific.EnvironmentPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
+import org.mule.config.spring.parsers.specific.ModelDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
@@ -50,14 +52,9 @@ import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerRefDefinitionParser;
-import org.mule.config.spring.parsers.specific.ModelDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.util.SpringBeanLookup;
-import org.mule.container.JndiContainerContext;
-import org.mule.container.PropertiesContainerContext;
-import org.mule.container.RmiContainerContext;
 import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.resolvers.ArrayEntryPointResolver;
@@ -68,8 +65,8 @@ import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.model.resolvers.MethodHeaderPropertyEntryPointResolver;
 import org.mule.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.model.resolvers.ReflectionEntryPointResolver;
-import org.mule.model.seda.SedaService;
 import org.mule.model.seda.SedaModel;
+import org.mule.model.seda.SedaService;
 import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -84,13 +81,13 @@ import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.filters.logic.OrFilter;
 import org.mule.routing.inbound.CorrelationEventResequencer;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
+import org.mule.routing.inbound.ForwardingConsumer;
 import org.mule.routing.inbound.IdempotentReceiver;
 import org.mule.routing.inbound.IdempotentSecureHashReceiver;
 import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.routing.inbound.MessageChunkingAggregator;
 import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.routing.inbound.WireTap;
-import org.mule.routing.inbound.ForwardingConsumer;
 import org.mule.routing.nested.DefaultNestedRouter;
 import org.mule.routing.outbound.ChainingRouter;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
@@ -134,12 +131,12 @@ import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.transport.SimpleRetryConnectionStrategy;
-import org.mule.util.object.PooledObjectFactory;
-import org.mule.util.object.PrototypeObjectFactory;
-import org.mule.util.object.SingletonObjectFactory;
 import org.mule.util.expression.FunctionExpressionEvaluator;
 import org.mule.util.expression.MapPayloadExpressionEvaluator;
 import org.mule.util.expression.MessageHeaderExpressionEvaluator;
+import org.mule.util.object.PooledObjectFactory;
+import org.mule.util.object.PrototypeObjectFactory;
+import org.mule.util.object.SingletonObjectFactory;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -228,12 +225,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("inbound-endpoint", new GenericEndpointDefinitionParser(InboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("outbound-endpoint", new GenericEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
-
-        //Container contexts
-        registerBeanDefinitionParser("custom-container", new MuleOrphanDefinitionParser(true));
-        registerBeanDefinitionParser("rmi-container", new MuleOrphanDefinitionParser(RmiContainerContext.class, true));
-        registerBeanDefinitionParser("jndi-container", new MuleOrphanDefinitionParser(JndiContainerContext.class, true));
-        registerBeanDefinitionParser("properties-container", new MuleOrphanDefinitionParser(PropertiesContainerContext.class, true));
 
         // Models
         registerBeanDefinitionParser("model", new ModelDefinitionParser());

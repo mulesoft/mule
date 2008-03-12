@@ -17,8 +17,8 @@
     <xsd:complexType name="ftpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:sequence minOccurs="1" maxOccurs="1">
-                    <xsd:element name="filename-parser" type="file:filenameParserType" minOccurs="0"/>
+                <xsd:sequence minOccurs="0" maxOccurs="1">
+                    <xsd:element ref="abstract-filenameParser"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="inboundAttributes"/>
                 <xsd:attributeGroup ref="outboundAttributes"/>
@@ -150,5 +150,14 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
+    
+    <xsd:element name="abstract-filenameParser" abstract="true" type="file:filenameParserType"/>
+    
+    <xsd:element name="legacy-filename-parser" type="file:legacyFilenameParserType" 
+                 substitutionGroup="abstract-filenameParser"/>
+    <xsd:element name="expression-filename-parser" type="file:expressionFilenameParserType"
+                 substitutionGroup="abstract-filenameParser"/>
+    <xsd:element name="custom-filename-parser" type="file:customFilenameParserType"
+                 substitutionGroup="abstract-filenameParser"/>
 
 </xsd:schema>

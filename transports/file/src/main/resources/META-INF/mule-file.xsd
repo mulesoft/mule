@@ -199,7 +199,8 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:element name="legacy-filename-parser" type="filenameParserType" substitutionGroup="abstract-filenameParser">
+    <xsd:element name="legacy-filename-parser" type="legacyFilenameParserType" substitutionGroup="abstract-filenameParser"/>
+    <xsd:complexType name="legacyFilenameParserType">
         <xsd:annotation>
             <xsd:documentation>
                 The file connector uses this as a default implementation, it understands the following patterns:
@@ -215,9 +216,13 @@
                 </ul>
             </xsd:documentation>
         </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="expression-filename-parser" type="filenameParserType"
-                 substitutionGroup="abstract-filenameParser">
+        <xsd:complexContent>
+            <xsd:extension base="filenameParserType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="expression-filename-parser" type="expressionFilenameParserType" substitutionGroup="abstract-filenameParser"/>
+     <xsd:complexType name="expressionFilenameParserType">
         <xsd:annotation>
             <xsd:documentation>
                 ExpressionFilenameParser can use any expression language supported by Mule
@@ -247,7 +252,11 @@
                 </ul>
             </xsd:documentation>
         </xsd:annotation>
-    </xsd:element>
+        <xsd:complexContent>
+            <xsd:extension base="filenameParserType"/>
+        </xsd:complexContent>                
+    </xsd:complexType>
+    
     <xsd:element name="custom-filename-parser" type="customFilenameParserType"
                  substitutionGroup="abstract-filenameParser">
         <xsd:annotation>

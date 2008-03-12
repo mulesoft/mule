@@ -23,8 +23,8 @@ import org.w3c.dom.Document;
  */
 public class XMLUtils
 {
-        public static final String TRANSFORMER_FACTORY_JDK5 = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
-        
+    public static final String TRANSFORMER_FACTORY_JDK5 = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
+
     /**
      * Converts a DOM to an XML string.
      */

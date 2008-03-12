@@ -36,6 +36,13 @@ public class JcaMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 4);
     }
+    
+    public static Message cannotAllocateManagedInstance()
+    {
+        return createMessage(BUNDLE_PATH, 5);
+    }
+    
+    
 }
 
 

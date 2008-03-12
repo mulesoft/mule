@@ -321,7 +321,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
                     pojoService = getOrCreateService();
                     component = createComponentProxy(pojoService);
                     //proxy.start();
-                    component.onEvent(queueSession, event);
+                    component.setEvent(event);
                     workManager.scheduleWork(component, WorkManager.INDEFINITE, null, this);
                 }
             }

@@ -12,7 +12,6 @@ package org.mule.tck;
 
 import org.mule.AbstractExceptionListener;
 import org.mule.api.MuleException;
-import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
@@ -207,7 +206,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(1, route1.getEndpoints().size());
     }
 
-    public void testNestedRouterConfig() throws ObjectNotFoundException
+    public void testNestedRouterConfig()
     {
         // test outbound message router
         Service service = muleContext.getRegistry().lookupService("orangeComponent");

@@ -29,7 +29,6 @@ import org.mule.api.model.ModelException;
 import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.ServiceStatistics;
-import org.mule.util.queue.QueueSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -160,7 +159,7 @@ public class OptimisedJavaComponent implements Component
      * 
      * @param event the event being processed
      */
-    public void onEvent(QueueSession session, MuleEvent event)
+    public void setEvent(MuleEvent event)
     {
         this.event = event;
     }

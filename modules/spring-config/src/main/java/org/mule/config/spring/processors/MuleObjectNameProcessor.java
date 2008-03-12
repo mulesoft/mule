@@ -11,7 +11,6 @@
 package org.mule.config.spring.processors;
 
 import org.mule.api.agent.Agent;
-import org.mule.api.context.ContainerContext;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
@@ -78,10 +77,6 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
         else if (o instanceof Agent)
         {
             ((Agent)o).setName(s);
-        }
-        else if (o instanceof ContainerContext)
-        {
-            ((ContainerContext)o).setName(s);
         }
         return o;
     }
