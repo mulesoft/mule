@@ -38,7 +38,6 @@ import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
-import org.mule.util.FileUtils;
 import org.mule.util.queue.QueueManager;
 
 import java.util.Collection;
@@ -69,8 +68,6 @@ public class DefaultMuleContext implements MuleContext
      * as the one in the Registry.
      */
     protected LifecycleManager lifecycleManager;
-
-    protected Directories directories;
 
     protected ServerNotificationManager notificationManager;
 
@@ -116,8 +113,6 @@ public class DefaultMuleContext implements MuleContext
             
             // Initialize internal registries
             registryBroker.initialise();
-            
-            directories = new Directories(FileUtils.newFile(getConfiguration().getWorkingDirectory()));
 
             //We need to start the work manager straight away since we need it to fire notifications
             workManager.start();
@@ -125,7 +120,6 @@ public class DefaultMuleContext implements MuleContext
 
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISING));
 
-            directories.createDirectories();
             lifecycleManager.firePhase(this, Initialisable.PHASE_NAME);
 
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
@@ -153,8 +147,6 @@ public class DefaultMuleContext implements MuleContext
             }
 
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
-
-            directories.deleteMarkedDirectories();
 
             lifecycleManager.firePhase(this, Startable.PHASE_NAME);
 
@@ -301,11 +293,6 @@ public class DefaultMuleContext implements MuleContext
     public void setStatistics(AllStatistics stat)
     {
         this.stats = stat;
-    }
-
-    public Directories getDirectories()
-    {
-        return directories;
     }
 
     public void registerListener(ServerNotificationListener l) throws NotificationException

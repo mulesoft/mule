@@ -9,7 +9,6 @@
  */
 package org.mule.api;
 
-import org.mule.Directories;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
@@ -31,8 +30,6 @@ import javax.transaction.TransactionManager;
 
 public interface MuleContext extends Lifecycle
 {
-    Directories getDirectories();
-
     /**
      * Sets the Jta Transaction Manager to use with this Mule server instance
      *
