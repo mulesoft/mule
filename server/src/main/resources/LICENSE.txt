@@ -465,7 +465,7 @@ Subject to the limitations and other requirements in Section 14 of the License,
 the Original Developer requires You to display the following Attribution
 Information:
 
-Attribution Copyright Notice: Copyright (c) 2003-2007 MuleSource Inc. 
+Attribution Copyright Notice: Copyright (c) 2003-2008 MuleSource Inc. 
 Attribution Phrase (not exceeding 10 words): Powered by Mule. MuleSource is Open
 for Integration.
 Attribution URL: http://www.mulesource.com
