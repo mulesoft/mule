@@ -14,8 +14,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
@@ -137,11 +135,6 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     public List getTransformers()
     {
         return endpoint.getTransformers();
-    }
-
-    public LifecycleTransitionResult initialise() throws InitialisationException
-    {
-        return endpoint.initialise();
     }
 
     public boolean isDeleteUnacceptedMessages()

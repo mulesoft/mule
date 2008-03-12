@@ -20,7 +20,6 @@ import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MutableMessageAdapter;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.NullPayload;
@@ -514,8 +513,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
 
     public void applyTransformers(List transformers, Class outputType) throws TransformerException
     {
-        if (TransformerUtils.isDefined(transformers) && transformers.size() > 0 &&
-                !appliedTransformerHashCodes.contains(new Integer(transformers.hashCode())))
+        if (transformers.size() > 0 && !appliedTransformerHashCodes.contains(new Integer(transformers.hashCode())))
         {
             applyAllTransformers(transformers);
             appliedTransformerHashCodes.add(new Integer(transformers.hashCode()));
@@ -529,7 +527,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
 
     protected void applyAllTransformers(List transformers) throws TransformerException
     {
-        if (TransformerUtils.isDefined(transformers) && transformers.size() > 0)
+        if (transformers.size() > 0)
         {
 
             Iterator iterator = transformers.iterator();

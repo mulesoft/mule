@@ -18,6 +18,8 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
@@ -39,7 +41,6 @@ import org.mule.util.ClassUtils;
 import org.mule.util.MapCombiner;
 import org.mule.util.ObjectNameHelper;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -48,9 +49,10 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Abstract endpoint builder used for externalizing the complex creation logic of endpoints out of the
- * endpoint instance itself. <br/> The use of a builder allows i) Endpoints to be configured once and created
- * in a repeatable fashion (global endpoints), ii) Allow for much more extensibility in endpoint creation for
+ * Abstract endpoint builder used for externalizing the complex creation logic of
+ * endpoints out of the endpoint instance itself. <br/> The use of a builder allows
+ * i) Endpoints to be configured once and created in a repeatable fashion (global
+ * endpoints), ii) Allow for much more extensibility in endpoint creation for
  * transport specific endpoints, streaming endpoints etc.<br/>
  */
 public abstract class AbstractEndpointBuilder implements EndpointBuilder
@@ -58,11 +60,11 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     public static final String PROPERTY_REMOTE_SYNC = "remoteSync";
     public static final String PROPERTY_REMOTE_SYNC_TIMEOUT = "remoteSyncTimeout";
-    
+
     protected URIBuilder uriBuilder;
     protected Connector connector;
-    protected List transformers = TransformerUtils.UNDEFINED;
-    protected List responseTransformers = TransformerUtils.UNDEFINED;
+    protected List transformers;
+    protected List responseTransformers;
     protected String name;
     protected Map properties = new HashMap();
     protected TransactionConfig transactionConfig;
@@ -81,55 +83,14 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected String registryId = null;
     protected MuleContext muleContext;
 
-    public org.mule.api.endpoint.InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException
+    public InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException
     {
         return doBuildInboundEndpoint();
     }
 
-    public org.mule.api.endpoint.OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException
+    public OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException
     {
         return doBuildOutboundEndpoint();
-    }
-
-    protected void configureEndpoint(AbstractEndpoint ep) throws InitialisationException, EndpointException
-    {
-        // use an explicit value here to avoid caching
-        Map properties = getProperties();
-        // this sets values used below, if they appear as properties
-        setPropertiesFromProperties(properties);
-
-        // protected String registryId = null; ??
-        EndpointURI endpointURI = uriBuilder.getEndpoint();
-        endpointURI.initialise();
-        ep.setEndpointURI(endpointURI);
-        Connector connector = getConnector();
-        ep.setConnector(connector);
-
-        // Do not inherit from connector
-        ep.setProperties(properties);
-        ep.setSecurityFilter(getSecurityFilter());
-        ep.setTransactionConfig(getTransactionConfig());
-        ep.setName(getName(ep));
-
-        // Can inherit from connector
-        ep.setConnectionStrategy(getConnectionStrategy(connector));
-        ep.setDeleteUnacceptedMessages(getDeleteUnacceptedMessages(connector));
-        ep.setEncoding(getEndpointEncoding(connector));
-        ep.setFilter(getFilter(connector));
-        ep.setInitialState(getInitialState(connector));
-        ep.setRemoteSyncTimeout(getRemoteSyncTimeout(connector));
-
-        boolean remoteSync = getRemoteSync(connector);
-        ep.setRemoteSync(remoteSync);
-        if (remoteSync)
-        {
-            ep.setSynchronous(true);
-        }
-        else
-        {
-            ep.setSynchronous(getSynchronous(connector, ep));
-        }
-        ep.setMuleContext(muleContext);
     }
 
     protected void setPropertiesFromProperties(Map properties)
@@ -163,32 +124,104 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
     }
 
-    protected org.mule.api.endpoint.InboundEndpoint doBuildInboundEndpoint() throws InitialisationException, EndpointException
+    protected InboundEndpoint doBuildInboundEndpoint() throws InitialisationException, EndpointException
     {
-        DefaultInboundEndpoint ep = new DefaultInboundEndpoint();
-        configureEndpoint(ep);
-        ep.setTransformers(getInboundTransformers(ep.getConnector(), ep.getEndpointURI()));
-        ep.setResponseTransformers(getInboundEndpointResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
-        return ep;
+        // use an explicit value here to avoid caching
+        Map properties = getProperties();
+        // this sets values used below, if they appear as properties
+        setPropertiesFromProperties(properties);
+
+        if (uriBuilder == null)
+        {
+            throw new NullPointerException(CoreMessages.objectIsNull("uriBuilder").getMessage());
+        }
+
+        EndpointURI endpointURI = uriBuilder.getEndpoint();
+        endpointURI.initialise();
+
+        Connector connector = getConnector();
+
+        if (connector != null && endpointURI != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
+        {
+            throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
+                connector.getProtocol(), endpointURI).getMessage());
+        }
+
+        List transformers = getInboundTransformers(connector, endpointURI);
+        List responseTransformers = getInboundEndpointResponseTransformers(connector, endpointURI);
+
+        boolean remoteSync = getRemoteSync(connector);
+        boolean synchronous;
+        if (remoteSync)
+        {
+            synchronous = true;
+        }
+        else
+        {
+            synchronous = getSynchronous(connector, endpointURI);
+        }
+
+        return new DefaultInboundEndpoint(connector, endpointURI, transformers, responseTransformers,
+            getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
+            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous, remoteSync,
+            getRemoteSyncTimeout(connector), getInitialState(connector), getEndpointEncoding(connector), muleContext,
+            getConnectionStrategy(connector));
     }
 
-    protected org.mule.api.endpoint.OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
+    protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
     {
-        DefaultOutboundEndpoint ep = new DefaultOutboundEndpoint();
-        configureEndpoint(ep);
-        ep.setTransformers(getOutboundTransformers(ep.getConnector(), ep.getEndpointURI()));
-        ep.setResponseTransformers(getOutboundEndpointResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
-        return ep;
+        // use an explicit value here to avoid caching
+        Map properties = getProperties();
+        // this sets values used below, if they appear as properties
+        setPropertiesFromProperties(properties);
+
+        if (uriBuilder == null)
+        {
+            throw new NullPointerException(CoreMessages.objectIsNull("uriBuilder").getMessage());
+        }
+
+        EndpointURI endpointURI = uriBuilder.getEndpoint();
+        endpointURI.initialise();
+
+        Connector connector = getConnector();
+
+        if (connector != null && endpointURI != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
+        {
+            throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
+                connector.getProtocol(), endpointURI).getMessage());
+        }
+
+        List transformers = getOutboundTransformers(connector, endpointURI);
+        List responseTransformers = getOutboundEndpointResponseTransformers(connector, endpointURI);
+
+        boolean remoteSync = getRemoteSync(connector);
+        boolean synchronous;
+        if (remoteSync)
+        {
+            synchronous = true;
+        }
+        else
+        {
+            synchronous = getSynchronous(connector, endpointURI);
+        }
+
+        return new DefaultOutboundEndpoint(connector, endpointURI, transformers, responseTransformers,
+            getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
+            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous, remoteSync,
+            getRemoteSyncTimeout(connector), getInitialState(connector), getEndpointEncoding(connector), muleContext,
+            getConnectionStrategy(connector));
+
     }
 
-    protected boolean getSynchronous(Connector connector, ImmutableEndpoint endpoint)
+    protected boolean getSynchronous(Connector connector, EndpointURI endpointURI)
     {
-        return synchronous != null ? synchronous.booleanValue() : getDefaultSynchronous(connector, endpoint);
-    } 
+        return synchronous != null ? synchronous.booleanValue() : getDefaultSynchronous(connector,
+            endpointURI.getScheme());
+    }
 
-    protected boolean getDefaultSynchronous(Connector connector, ImmutableEndpoint endpoint)
+    protected boolean getDefaultSynchronous(Connector connector, String protocol)
     {
-        if (connector != null && connector.isSyncEnabled(endpoint))
+        if (connector != null && connector.isSyncEnabled(protocol))
         {
             return true;
         }
@@ -197,7 +230,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             return muleContext.getConfiguration().isDefaultSynchronousEndpoints();
         }
     }
-    
+
     protected ConnectionStrategy getConnectionStrategy(Connector connector)
     {
         return connectionStrategy != null ? connectionStrategy : getDefaultConnectionStrategy(connector);
@@ -215,7 +248,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected TransactionConfig getDefaultTransactionConfig()
     {
-        //TODO Do we need a new instance per endpoint, or can a single instance be shared?
+        // TODO Do we need a new instance per endpoint, or can a single instance be
+        // shared?
         return new MuleTransactionConfig();
     }
 
@@ -239,12 +273,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return getConnector(uriBuilder.getEndpoint(), muleContext);
     }
 
-    protected String getName(ImmutableEndpoint endpoint)
+    protected String getName(EndpointURI endpointURI)
     {
-        // uriBuilder cannot return an endpoint with an endpoint name (which is deprecated anyway)
-        // so we don't use it here
-        // String uriName = uriBuilder.getEndpoint().getEndpointName();
-        return name != null ? name : ObjectNameHelper.getEndpointName(endpoint);
+        return name != null ? name : ObjectNameHelper.getEndpointName(endpointURI);
     }
 
     protected Map getProperties()
@@ -344,14 +375,14 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         throws TransportFactoryException
     {
         // #1 Transformers set on builder
-        if (TransformerUtils.isDefined(transformers))
+        if (transformers != null)
         {
             return transformers;
         }
 
         // #2 Transformer specified on uri
         List transformers = getTransformersFromString(endpointURI.getTransformers());
-        if (TransformerUtils.isDefined(transformers))
+        if (transformers != null)
         {
             return transformers;
         }
@@ -364,8 +395,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         try
         {
-            return TransformerUtils.getDefaultInboundTransformers(getNonNullServiceDescriptor(
-                uriBuilder.getEndpoint().getSchemeMetaInfo(), getOverrides(connector)));
+            return TransformerUtils.getDefaultInboundTransformers(getNonNullServiceDescriptor(uriBuilder.getEndpoint()
+                .getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -377,14 +408,14 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         throws TransportFactoryException
     {
         // #1 Transformers set on builder
-        if (TransformerUtils.isDefined(transformers))
+        if (transformers != null)
         {
             return transformers;
         }
 
         // #2 Transformer specified on uri
         List transformers = getTransformersFromString(endpointURI.getTransformers());
-        if (TransformerUtils.isDefined(transformers))
+        if (transformers != null)
         {
             return transformers;
         }
@@ -397,8 +428,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         try
         {
-            return TransformerUtils.getDefaultOutboundTransformers(getNonNullServiceDescriptor(
-                uriBuilder.getEndpoint().getSchemeMetaInfo(), getOverrides(connector)));
+            return TransformerUtils.getDefaultOutboundTransformers(getNonNullServiceDescriptor(uriBuilder.getEndpoint()
+                .getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -410,14 +441,14 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         throws TransportFactoryException
     {
         // #1 Transformers set on builder
-        if (TransformerUtils.isDefined(responseTransformers))
+        if (responseTransformers != null)
         {
             return responseTransformers;
         }
 
         // #2 Transformer specified on uri
         List transformers = getTransformersFromString(endpointURI.getResponseTransformers());
-        if (TransformerUtils.isDefined(transformers))
+        if (transformers != null)
         {
             return transformers;
         }
@@ -430,26 +461,26 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         throws TransportFactoryException
     {
         // #1 Transformers set on builder
-        if (TransformerUtils.isDefined(responseTransformers))
+        if (responseTransformers != null)
         {
             return responseTransformers;
         }
 
         // #2 Transformer specified on uri
         List transformers = getTransformersFromString(endpointURI.getResponseTransformers());
-        if (TransformerUtils.isDefined(transformers))
+        if (transformers != null)
         {
             return transformers;
         }
-        return TransformerUtils.UNDEFINED;
+        return Collections.EMPTY_LIST;
     }
 
     protected List getDefaultResponseTransformers(Connector connector) throws TransportFactoryException
     {
         try
         {
-            return TransformerUtils.getDefaultResponseTransformers(getNonNullServiceDescriptor(
-                uriBuilder.getEndpoint().getSchemeMetaInfo(), getOverrides(connector)));
+            return TransformerUtils.getDefaultResponseTransformers(getNonNullServiceDescriptor(uriBuilder.getEndpoint()
+                .getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -499,8 +530,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
     }
 
-    private Connector getConnector(EndpointURI endpointURI, MuleContext muleContext)
-        throws EndpointException
+    private Connector getConnector(EndpointURI endpointURI, MuleContext muleContext) throws EndpointException
     {
         String scheme = uriBuilder.getEndpoint().getFullScheme();
         Connector connector;
@@ -547,12 +577,12 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         this.connector = connector;
 
     }
-    
+
     public void addTransformer(Transformer transformer)
     {
-        if (transformers == TransformerUtils.UNDEFINED)
+        if (transformers == null)
         {
-            transformers = new ArrayList();
+            transformers = new LinkedList();
         }
         transformers.add(transformer);
     }
@@ -586,7 +616,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     /**
      * Sets a property on the endpoint
-     *
+     * 
      * @param key the property key
      * @param value the value of the property
      */
@@ -683,55 +713,32 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         this.uriBuilder = URIBuilder;
 
     }
-    
-    //TODO Equals() and hashCode() only needed for tests, move to tests
+
+    // TODO Equals() and hashCode() only needed for tests, move to tests
     public int hashCode()
     {
-        return ClassUtils.hash(new Object[]{
-                connectionStrategy,
-                connector,
-                createConnector,
-                deleteUnacceptedMessages,
-                encoding,
-                uriBuilder,
-                filter,
-                initialState,
-                name,
-                properties,
-                remoteSync,
-                remoteSyncTimeout,
-                responseTransformers,
-                securityFilter,
-                synchronous,
-                transactionConfig,
-                transformers
-        });
+        return ClassUtils.hash(new Object[]{connectionStrategy, connector, createConnector, deleteUnacceptedMessages,
+            encoding, uriBuilder, filter, initialState, name, properties, remoteSync, remoteSyncTimeout,
+            responseTransformers, securityFilter, synchronous, transactionConfig, transformers});
     }
 
-    //TODO Equals() and hashCode() only needed for tests, move to tests
+    // TODO Equals() and hashCode() only needed for tests, move to tests
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
 
         final AbstractEndpointBuilder other = (AbstractEndpointBuilder) obj;
-        return equal(connectionStrategy, other.connectionStrategy)
-                && equal(connector, other.connector)
-                && equal(createConnector, other.createConnector)
-                && equal(deleteUnacceptedMessages, other.deleteUnacceptedMessages)
-                && equal(encoding, other.encoding)
-                && equal(uriBuilder, other.uriBuilder)
-                && equal(filter, other.filter)
-                && equal(initialState, other.initialState)
-                && equal(name, other.name)
-                && equal(properties, other.properties)
-                && equal(remoteSync, other.remoteSync)
-                && equal(remoteSyncTimeout, other.remoteSyncTimeout)
-                && equal(responseTransformers, other.responseTransformers)
-                && equal(securityFilter, other.securityFilter)
-                && equal(synchronous, other.synchronous)
-                && equal(transactionConfig, other.transactionConfig)
-                && equal(transformers, other.transformers);
+        return equal(connectionStrategy, other.connectionStrategy) && equal(connector, other.connector)
+               && equal(createConnector, other.createConnector)
+               && equal(deleteUnacceptedMessages, other.deleteUnacceptedMessages) && equal(encoding, other.encoding)
+               && equal(uriBuilder, other.uriBuilder) && equal(filter, other.filter)
+               && equal(initialState, other.initialState) && equal(name, other.name)
+               && equal(properties, other.properties) && equal(remoteSync, other.remoteSync)
+               && equal(remoteSyncTimeout, other.remoteSyncTimeout)
+               && equal(responseTransformers, other.responseTransformers)
+               && equal(securityFilter, other.securityFilter) && equal(synchronous, other.synchronous)
+               && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
     }
 
     protected static boolean equal(Object a, Object b)
@@ -776,5 +783,5 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         return builder;
     }
-    
+
 }

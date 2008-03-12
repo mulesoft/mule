@@ -248,4 +248,20 @@ public class IOUtils extends org.apache.commons.io.IOUtils
             }
         }
     }
+    
+    /**
+     * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toString(InputStream)</code>
+     * method but catches any {@link IOException} and wraps it into a {@link RuntimeException}.
+     */
+    public static String toString(InputStream input)
+    {
+        try
+        {
+            return org.apache.commons.io.IOUtils.toString(input);
+        }
+        catch (IOException iox)
+        {
+            throw new RuntimeException(iox);
+        }
+    }
 }

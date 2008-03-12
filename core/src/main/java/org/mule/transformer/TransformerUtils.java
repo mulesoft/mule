@@ -10,23 +10,19 @@
 
 package org.mule.transformer;
 
-import org.mule.api.MuleException;
+import org.mule.RegistryContext;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
-import org.mule.transformer.simple.VoidTransformer;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
-import org.mule.util.CollectionUtils;
-import org.mule.RegistryContext;
-import org.mule.config.i18n.CoreMessages;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.StringTokenizer;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,26 +32,11 @@ public class TransformerUtils
 
     public static final String COMMA = ",";
 
-    // Undefined transformers are "special" - they seem to indicate that either the endpoint is under
-    // construction, or that a value will be supplied later.  They are not the same as an empty list,
-    // which means "no transformer to be used" rather than "some special state".
-
-    // In the future we could test for an warn on UNDEFINED being passed to the "apply" methods
-    // below.  This is either an error or, in some cases, seems to be related to very late binding
-    // of transformers (see code in MuleClient, for example
-
-    // Null values for the transformer list are avoided completely in an attempt to make the code
-    // clearer.
-
-    public static final List UNDEFINED =
-            Collections.unmodifiableList(
-                    CollectionUtils.singletonList(VoidTransformer.getInstance()));
-    
     private static Log logger = LogFactory.getLog(AbstractTransformer.class);
 
     public static void initialiseAllTransformers(List transformers) throws InitialisationException
     {
-        if (isDefined(transformers))
+        if (transformers != null)
         {
             Iterator transformer = transformers.iterator();
             while (transformer.hasNext())
@@ -68,8 +49,6 @@ public class TransformerUtils
     public static String toString(List transformers)
     {
         StringBuffer buffer = new StringBuffer();
-        if (isDefined(transformers))
-        {
             Iterator transformer = transformers.iterator();
             while (transformer.hasNext())
             {
@@ -79,13 +58,12 @@ public class TransformerUtils
                     buffer.append(" -> ");
                 }
             }
-        }
         return buffer.toString();
     }
 
     public static Transformer firstOrNull(List transformers)
     {
-        if (isDefined(transformers) && 0 != transformers.size())
+        if (transformers != null && 0 != transformers.size())
         {
             return (Transformer) transformers.get(0);
         }
@@ -99,17 +77,6 @@ public class TransformerUtils
     {
         Transformer transformer = firstOrNull(transformers);
         return null != transformer && transformer.isSourceTypeSupported(clazz);
-    }
-
-    public static boolean isUndefined(List transformers)
-    {
-        // pointer equality
-        return null == transformers || UNDEFINED == transformers;
-    }
-
-    public static boolean isDefined(List transformers)
-    {
-        return !isUndefined(transformers);
     }
 
     protected static interface TransformerSource
@@ -128,7 +95,7 @@ public class TransformerUtils
         catch (MuleException e)
         {
             logger.debug(e.getMessage(), e);
-            return TransformerUtils.UNDEFINED;
+            return null;
         }
     }
 
@@ -194,7 +161,7 @@ public class TransformerUtils
         }
         else
         {
-            return UNDEFINED;
+            return null;
         }
     }
 

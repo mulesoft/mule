@@ -67,7 +67,7 @@ public class EndpointService implements EndpointServiceMBean
                 "Recevier is null for Endpoint MBean but the endpoint itself is a receiving endpoint");
         }
 
-        name = ObjectNameHelper.getEndpointName(endpoint);
+        name = ObjectNameHelper.getEndpointName(endpoint.getEndpointURI());
     }
 
     public String getAddress()

@@ -11,30 +11,25 @@
 package org.mule.endpoint;
 
 import org.mule.api.MuleContext;
-import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.TransformerUtils;
 import org.mule.util.ClassUtils;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,59 +50,61 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     /**
      * The endpoint used to communicate with the external system
      */
-    protected Connector connector = null;
+    private final Connector connector;
 
     /**
      * The endpointUri on which to send or receive information
      */
-    protected EndpointURI endpointUri = null;
+    private final EndpointURI endpointUri;
 
     /**
      * The transformers used to transform the incoming or outgoing data
      */
-    protected List transformers = new LinkedList();
+    private final List transformers;
 
     /**
      * The transformers used to transform the incoming or outgoing data
      */
-    protected List responseTransformers = new LinkedList();
+    private final List responseTransformers;
 
     /**
      * The name for the endpoint
      */
-    protected String name = null;
+    private final String name;
 
     /**
-     * Any additional properties for the endpoint
+     * Any additional properties for the endpoint 
+     * // TODO This should be final. See MULE-3105
+     * // TODO Shouldn't this be guarded from concurrent writes?
      */
-    protected Map properties = new HashMap();
+    private Map properties = new HashMap();
 
     /**
      * The transaction configuration for this endpoint
      */
-    protected TransactionConfig transactionConfig = null;
+    private final TransactionConfig transactionConfig;
 
     /**
      * event filter for this endpoint
      */
-    protected Filter filter = null;
+    private final Filter filter;
 
     /**
      * determines whether unaccepted filtered events should be removed from the
      * source. If they are not removed its up to the Message receiver to handle
      * recieving the same message again
      */
-    protected boolean deleteUnacceptedMessages = false;
+    private final boolean deleteUnacceptedMessages;
 
     /**
      * The security filter to apply to this endpoint
      */
-    protected EndpointSecurityFilter securityFilter = null;
+    private final EndpointSecurityFilter securityFilter;
 
     /**
      * whether events received by this endpoint should execute in a single thread
      */
-    protected boolean synchronous;
+    private final boolean synchronous;
 
     /**
      * Determines whether a synchronous call should block to obtain a response from a
@@ -117,32 +114,83 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      * replyTo destination. If the JMSReplyTo is already set on the message that
      * destination will be used instead.
      */
-    protected boolean remoteSync;
+    private final boolean remoteSync;
 
     /**
      * How long to block when performing a remote synchronisation to a remote host.
      * This property is optional and will be set to the default Synchonous MuleEvent
      * time out value if not set
      */
-    protected Integer remoteSyncTimeout = null;
+    private final int remoteSyncTimeout;
 
     /**
      * The state that the endpoint is initialised in such as started or stopped
      */
-    protected String initialState = INITIAL_STATE_STARTED;
+    private final String initialState;
 
-    protected String endpointEncoding;
+    private final String endpointEncoding;
 
-    protected MuleContext muleContext;
+    private final MuleContext muleContext;
 
-    protected ConnectionStrategy connectionStrategy;
+    private final ConnectionStrategy connectionStrategy;
 
-    /**
-     * Default constructor.
-     */
-    protected AbstractEndpoint()
+    public AbstractEndpoint(Connector connector,
+                            EndpointURI endpointUri,
+                            List transformers,
+                            List responseTransformers,
+                            String name,
+                            Map properties,
+                            TransactionConfig transactionConfig,
+                            Filter filter,
+                            boolean deleteUnacceptedMessages,
+                            EndpointSecurityFilter securityFilter,
+                            boolean synchronous,
+                            boolean remoteSync,
+                            int remoteSyncTimeout,
+                            String initialState,
+                            String endpointEncoding,
+                            MuleContext muleContext,
+                            ConnectionStrategy connectionStrategy)
     {
-        super();
+        this.connector = connector;
+        this.endpointUri = endpointUri;
+        if (transformers == null)
+        {
+            this.transformers = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
+        }
+        else
+        {
+            updateTransformerEndpoints(transformers);
+            this.transformers = Collections.unmodifiableList(transformers);
+        }
+        if (responseTransformers == null)
+        {
+            this.responseTransformers = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
+        }
+        else
+        {
+            updateTransformerEndpoints(responseTransformers);
+            this.responseTransformers = Collections.unmodifiableList(responseTransformers);
+        }
+        this.name = name;
+        // TODO Properties should be immutable. See MULE-3105
+        // this.properties = Collections.unmodifiableMap(properties);
+        this.properties.putAll(properties);
+        this.transactionConfig = transactionConfig;
+        this.filter = filter;
+        this.deleteUnacceptedMessages = deleteUnacceptedMessages;
+        this.securityFilter = securityFilter;
+        if (this.securityFilter != null)
+        {
+            this.securityFilter.setEndpoint(this);
+        }
+        this.synchronous = synchronous;
+        this.remoteSync = remoteSync;
+        this.remoteSyncTimeout = remoteSyncTimeout;
+        this.initialState = initialState;
+        this.endpointEncoding = endpointEncoding;
+        this.muleContext = muleContext;
+        this.connectionStrategy = connectionStrategy;
     }
 
     public EndpointURI getEndpointURI()
@@ -256,7 +304,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                // don't include lifecycle state as lifecycle code includes hashing
                // && equal(initialised, other.initialised)
                && equal(name, other.name) && equal(properties, other.properties) && remoteSync == other.remoteSync
-               && equal(remoteSyncTimeout, other.remoteSyncTimeout)
+               && remoteSyncTimeout == other.remoteSyncTimeout
                && equal(responseTransformers, other.responseTransformers)
                && equal(securityFilter, other.securityFilter) && synchronous == other.synchronous
                && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
@@ -265,13 +313,16 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{this.getClass(), connectionStrategy, connector,
-            deleteUnacceptedMessages ? Boolean.TRUE : Boolean.FALSE, endpointEncoding, endpointUri,
+            deleteUnacceptedMessages ? Boolean.TRUE : Boolean.FALSE,
+            endpointEncoding,
+            endpointUri,
             filter,
             initialState,
-            // don't include lifecycle state as lifeccle code includes hashing
+            // don't include lifecycle state as lifecycle code includes hashing
             // initialised,
-            name, properties, remoteSync ? Boolean.TRUE : Boolean.FALSE, remoteSyncTimeout, responseTransformers,
-            securityFilter, synchronous ? Boolean.TRUE : Boolean.FALSE, transactionConfig, transformers});
+            name, properties, remoteSync ? Boolean.TRUE : Boolean.FALSE, new Integer(remoteSyncTimeout),
+            responseTransformers, securityFilter, synchronous ? Boolean.TRUE : Boolean.FALSE, transactionConfig,
+            transformers});
     }
 
     public Filter getFilter()
@@ -287,13 +338,10 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     // TODO - remove (or fix)
     protected void updateTransformerEndpoints(List transformers)
     {
-        if (TransformerUtils.isDefined(transformers))
+        Iterator transformer = transformers.iterator();
+        while (transformer.hasNext())
         {
-            Iterator transformer = transformers.iterator();
-            while (transformer.hasNext())
-            {
-                ((Transformer) transformer.next()).setEndpoint(this);
-            }
+            ((Transformer) transformer.next()).setEndpoint(this);
         }
     }
 
@@ -343,11 +391,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      */
     public int getRemoteSyncTimeout()
     {
-        if (remoteSyncTimeout == null)
-        {
-            remoteSyncTimeout = new Integer(0);
-        }
-        return remoteSyncTimeout.intValue();
+        return remoteSyncTimeout;
     }
 
     /**
@@ -368,12 +412,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     public Object getProperty(Object key)
     {
-        Object value = properties.get(key);
-        if (value == null)
-        {
-            value = endpointUri.getParams().get(key);
-        }
-        return value;
+        return properties.get(key);
     }
 
     public MuleContext getMuleContext()
@@ -389,190 +428,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     public ConnectionStrategy getConnectionStrategy()
     {
         return connectionStrategy;
-    }
-
-    public LifecycleTransitionResult initialise() throws InitialisationException
-    {
-        // Nothing to initialise currently
-        return LifecycleTransitionResult.OK;
-    }
-
-    public void setEndpointURI(EndpointURI endpointUri) throws EndpointException
-    {
-        if (connector != null && endpointUri != null && !connector.supportsProtocol(endpointUri.getFullScheme()))
-        {
-            throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
-                connector.getProtocol(), endpointUri).getMessage());
-        }
-        if (endpointUri == null)
-        {
-            throw new NullPointerException(CoreMessages.objectIsNull("endpointURI").getMessage());
-        }
-
-        this.endpointUri = endpointUri;
-        properties.putAll(endpointUri.getParams());
-        try
-        {
-            endpointUri.initialise();
-        }
-        catch (InitialisationException e)
-        {
-            throw new EndpointException(e);
-        }
-    }
-
-    public void setEncoding(String endpointEncoding)
-    {
-        this.endpointEncoding = endpointEncoding;
-    }
-
-    public void setConnector(Connector connector)
-    {
-        if (connector != null && endpointUri != null && !connector.supportsProtocol(endpointUri.getFullScheme()))
-        {
-            throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
-                connector.getProtocol(), endpointUri).getMessage());
-        }
-        this.connector = connector;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public void setTransformers(List transformers)
-    {
-        this.transformers = transformers;
-        updateTransformerEndpoints(transformers);
-    }
-
-    public void setProperties(Map props)
-    {
-        properties.clear();
-        properties.putAll(props);
-    }
-
-    public void setTransactionConfig(TransactionConfig config)
-    {
-        transactionConfig = config;
-    }
-
-    public void setFilter(Filter filter)
-    {
-        this.filter = filter;
-    }
-
-    /**
-     * If a filter is configured on this endpoint, this property will determine if
-     * message that are not excepted by the filter are deleted
-     * 
-     * @param delete if message should be deleted, false otherwise
-     */
-    public void setDeleteUnacceptedMessages(boolean delete)
-    {
-        deleteUnacceptedMessages = delete;
-    }
-
-    /**
-     * Sets an EndpointSecurityFilter for this endpoint. If a filter is set all
-     * traffice via this endpoint with be subject to authentication.
-     * 
-     * @param filter the UMOSecurityFilter responsible for authenticating message
-     *            flow via this endpoint.
-     * @see org.mule.api.security.EndpointSecurityFilter
-     */
-    public void setSecurityFilter(EndpointSecurityFilter filter)
-    {
-        securityFilter = filter;
-        if (securityFilter != null)
-        {
-            securityFilter.setEndpoint(this);
-        }
-    }
-
-    /**
-     * Determines if requests originating from this endpoint should be synchronous
-     * i.e. execute in a single thread and possibly return an result. This property
-     * is only used when the endpoint is of type 'receiver'.
-     * 
-     * @param synchronous whether requests on this endpoint should execute in a
-     *            single thread. This property is only used when the endpoint is of
-     *            type 'receiver'
-     */
-    public void setSynchronous(boolean synchronous)
-    {
-        this.synchronous = synchronous;
-    }
-
-    /**
-     * For certain providers that support the notion of a backchannel such as sockets
-     * (outputStream) or Jms (ReplyTo) Mule can automatically wait for a response
-     * from a backchannel when dispatching over these protocols. This is different
-     * for synchronous as synchronous behavior only applies to in
-     * 
-     * @param value whether the endpoint should perfrom sync receives
-     */
-    public void setRemoteSync(boolean value)
-    {
-        this.remoteSync = value;
-        if (value)
-        {
-            this.synchronous = true;
-        }
-    }
-
-    /**
-     * The timeout value for remoteSync invocations
-     * 
-     * @param timeout the timeout in milliseconds
-     */
-    public void setRemoteSyncTimeout(int timeout)
-    {
-        this.remoteSyncTimeout = new Integer(timeout);
-    }
-
-    /**
-     * Sets the state the endpoint will be loaded in. The States are 'stopped' and
-     * 'started' (default)
-     * 
-     * @param state
-     */
-    public void setInitialState(String state)
-    {
-        this.initialState = state;
-    }
-
-    public void setResponseTransformers(List transformers)
-    {
-        this.responseTransformers =  transformers;
-        updateTransformerEndpoints(responseTransformers);
-    }
-
-    /**
-     * Sets a property on the endpoint
-     * 
-     * @param key the property key
-     * @param value the value of the property
-     */
-    public void setProperty(String key, Object value)
-    {
-        properties.put(key, value);
-    }
-
-    /**
-     * Setter for property 'connectionStrategy'.
-     * 
-     * @param connectionStrategy Value to set for property 'connectionStrategy'.
-     */
-    public void setConnectionStrategy(ConnectionStrategy connectionStrategy)
-    {
-        this.connectionStrategy = connectionStrategy;
-    }
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
     }
 
 }

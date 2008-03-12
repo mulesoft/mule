@@ -10,9 +10,8 @@
 
 package org.mule.routing.inbound;
 
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InvalidEndpointTypeException;
-import org.mule.endpoint.DefaultInboundEndpoint;
-import org.mule.endpoint.DefaultOutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -21,60 +20,62 @@ import java.util.List;
 public class InboundRouterCollectionTestCase extends AbstractMuleTestCase
 {
 
-    public void testAddGoodEndpoint()
+    public void testAddGoodEndpoint() throws Exception
     {
-        DefaultInboundRouterCollection router=new DefaultInboundRouterCollection();
-        DefaultInboundEndpoint endpoint=new DefaultInboundEndpoint();
+        DefaultInboundRouterCollection router = new DefaultInboundRouterCollection();
+        InboundEndpoint endpoint = getTestInboundEndpoint("test");
         router.addEndpoint(endpoint);
         assertNotNull(router.getEndpoints());
         assertTrue(router.getEndpoints().contains(endpoint));
     }
 
-    public void testSetGoodEndpoints()
+    public void testSetGoodEndpoints() throws Exception
     {
-        List list= new ArrayList();
-        list.add(new DefaultInboundEndpoint());
-        list.add(new DefaultInboundEndpoint());
-        DefaultInboundRouterCollection router=new DefaultInboundRouterCollection();
+        List list = new ArrayList();
+        list.add(getTestInboundEndpoint("test"));
+        list.add(getTestInboundEndpoint("test"));
+        DefaultInboundRouterCollection router = new DefaultInboundRouterCollection();
         assertNotNull(router.getEndpoints());
         assertEquals(0, router.getEndpoints().size());
-        router.addEndpoint(new DefaultInboundEndpoint());
+        router.addEndpoint(getTestInboundEndpoint("test"));
         assertEquals(1, router.getEndpoints().size());
         router.setEndpoints(list);
         assertNotNull(router.getEndpoints());
         assertEquals(2, router.getEndpoints().size());
     }
 
-    public void testSetBadEndpoints()
+    public void testSetBadEndpoints() throws Exception
     {
-        List list= new ArrayList();
-        list.add(new DefaultInboundEndpoint());
-        list.add(new DefaultOutboundEndpoint());
-        DefaultInboundRouterCollection router=new DefaultInboundRouterCollection();
-        try{
+        List list = new ArrayList();
+        list.add(getTestInboundEndpoint("test"));
+        list.add(getTestOutboundEndpoint("test"));
+        DefaultInboundRouterCollection router = new DefaultInboundRouterCollection();
+        try
+        {
             router.setEndpoints(list);
             fail("Invalid endpoint: Exception exceptions");
         }
-        catch(Exception e){
+        catch (Exception e)
+        {
             assertEquals(InvalidEndpointTypeException.class, e.getClass());
         }
     }
-    
-    public void testSetBad2Endpoints()
+
+    public void testSetBad2Endpoints() throws Exception
     {
-        List list= new ArrayList();
-        list.add(new DefaultInboundEndpoint());
-        list.add(new DefaultOutboundEndpoint());
-        DefaultInboundRouterCollection router=new DefaultInboundRouterCollection();
-        try{
+        List list = new ArrayList();
+        list.add(getTestInboundEndpoint("test"));
+        list.add(getTestOutboundEndpoint("test"));
+        DefaultInboundRouterCollection router = new DefaultInboundRouterCollection();
+        try
+        {
             router.setEndpoints(list);
             fail("Invalid endpoint: Exception exceptions");
         }
-        catch(Exception e){
+        catch (Exception e)
+        {
             assertEquals(InvalidEndpointTypeException.class, e.getClass());
         }
     }
 
 }
-
-

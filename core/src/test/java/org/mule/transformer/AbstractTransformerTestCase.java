@@ -17,7 +17,9 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
+import org.mule.util.IOUtils;
 
+import java.io.InputStream;
 import java.util.Arrays;
 
 public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
@@ -58,9 +60,10 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
     public void testRoundtripTransform() throws Exception
     {
-        if (this.getRoundTripTransformer() != null)
+        Transformer roundTripTransformer = this.getRoundTripTransformer();
+        if (roundTripTransformer != null)
         {
-            Object result = this.getRoundTripTransformer().transform(this.getResultData());
+            Object result = roundTripTransformer.transform(this.getResultData());
             assertNotNull(result);
 
             assertTrue(this.compareRoundtripResults(this.getTestData(), result));
@@ -144,6 +147,11 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
             return Arrays.equals((byte[]) expected, (byte[]) result);
         }
 
+        if (expected instanceof InputStream)
+        {
+            expected = IOUtils.toString((InputStream)expected);
+        }
+        
         // Special case for Strings: normalize comparison arguments
         if (expected instanceof String && result instanceof String)
         {

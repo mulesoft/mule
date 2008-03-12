@@ -12,7 +12,6 @@ package org.mule.util;
 
 import org.mule.RegistryContext;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.Connector;
 
 /**
@@ -32,27 +31,8 @@ public final class ObjectNameHelper
         // no-op
     }
 
-    public static String getEndpointName(ImmutableEndpoint endpoint)
+    public static String getEndpointName(final EndpointURI endpointUri)
     {
-        String name = endpoint.getName();
-        final EndpointURI endpointUri = endpoint.getEndpointURI();
-        if (name != null)
-        {
-            // If the name is the same as the address, we need to add the scheme
-            if (name.equals(endpointUri.getAddress()))
-            {
-                name = endpointUri.getScheme() + SEPARATOR + name;
-            }
-            name = replaceObjectNameChars(name);
-            // This causes a stack overflow because we call lookup endpoint
-            // Which causes a clone of the endpoint which in turn valudates the
-            // endpoint name with this method
-            return name;
-            // return ensureUniqueEndpoint(name);
-
-        }
-        else
-        {
             String address = endpointUri.getAddress();
             if (StringUtils.isBlank(address))
             {
@@ -62,10 +42,9 @@ public final class ObjectNameHelper
             // Make sure we include the endpoint scheme in the name
             address = (address.indexOf(":/") > -1 ? address : endpointUri.getScheme()
                             + SEPARATOR + address);
-            name = ENDPOINT_PREFIX + SEPARATOR + replaceObjectNameChars(address);
+            String name = ENDPOINT_PREFIX + SEPARATOR + replaceObjectNameChars(address);
 
             return ensureUniqueEndpoint(name);
-        }
     }
 
     protected static String ensureUniqueEndpoint(String name)

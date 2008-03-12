@@ -28,9 +28,10 @@ import javax.resource.spi.work.Work;
  * A <code>Component</code> is a invoked by a {@link Service} for each incoming
  * {@link MuleEvent} routed on by the {@link InboundRouterCollection}. A component
  * processes a {@link MuleEvent} by invoking the component instance that has been
- * configured, optionally returning a result with running synchronously. <br/>
- * Implementations of <code/>Component</code> can use different types of component
- * implementation, implement component instance pooling or implement <i>binding's<i/>
+ * configured, optionally returning a result with running synchronously. 
+ * <p/>
+ * Implementations of <code>Component</code> can use different types of component
+ * implementation, implement component instance pooling or implement <em>bindings</em>
  * which allow for service composition. <br/><br/> <b>TODO</b> <code>Component</code>
  * implementations should be state-less.
  */
@@ -65,8 +66,8 @@ public interface Component extends Work, Startable, Stoppable, Disposable
     void handleException(Exception exception);
 
     /**
-     * Sets the current event being processed This is currently used to set a
-     * Components event so that {@link SedaService} can then schedule a job that will
+     * Sets the current event being processed. This is currently used to set a
+     * Component's event so that {@link SedaService} can then schedule a job that will
      * invoke {@link Component} run() and the event will be available for processing.
      * This is currently used followed by scheduling of a {@link Component} job
      * rather than using onEvent() directly because otherwise with the way SEDA

@@ -11,8 +11,7 @@
 package org.mule;
 
 import org.mule.api.endpoint.InvalidEndpointTypeException;
-import org.mule.endpoint.DefaultInboundEndpoint;
-import org.mule.endpoint.DefaultOutboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.outbound.TransformerRouter;
 import org.mule.tck.AbstractMuleTestCase;
@@ -23,10 +22,10 @@ import java.util.List;
 public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
 {
 
-    public void testAddGoodEndpoint()
+    public void testAddGoodEndpoint() throws Exception
     {
         AbstractOutboundRouter router=new TransformerRouter();
-        DefaultOutboundEndpoint endpoint=new DefaultOutboundEndpoint();
+        OutboundEndpoint endpoint= getTestOutboundEndpoint("test");
         router.addEndpoint(endpoint);
         assertNotNull(router.getEndpoints());
         assertTrue(router.getEndpoints().contains(endpoint));    }
@@ -55,26 +54,26 @@ public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
 //        }
 //    }
 
-    public void testSetGoodEndpoints()
+    public void testSetGoodEndpoints() throws Exception
     {
         List list= new ArrayList();
-        list.add(new DefaultOutboundEndpoint());
-        list.add(new DefaultOutboundEndpoint());
+        list.add(getTestOutboundEndpoint("test"));
+        list.add(getTestOutboundEndpoint("test"));
         AbstractOutboundRouter router=new TransformerRouter();
         assertNotNull(router.getEndpoints());
         assertEquals(0, router.getEndpoints().size());
-        router.addEndpoint(new DefaultOutboundEndpoint());
+        router.addEndpoint(getTestOutboundEndpoint("test"));
         assertEquals(1, router.getEndpoints().size());
         router.setEndpoints(list);
         assertNotNull(router.getEndpoints());
         assertEquals(2, router.getEndpoints().size());
     }
 
-    public void testSetBadEndpoints()
+    public void testSetBadEndpoints() throws Exception
     {
         List list= new ArrayList();
-        list.add(new DefaultInboundEndpoint());
-        list.add(new DefaultOutboundEndpoint());
+        list.add(getTestInboundEndpoint("test"));
+        list.add(getTestOutboundEndpoint("test"));
         AbstractOutboundRouter router=new TransformerRouter();
         try{
             router.setEndpoints(list);
@@ -85,11 +84,11 @@ public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
         }
     }
     
-    public void testSetBad2Endpoints()
+    public void testSetBad2Endpoints() throws Exception
     {
         List list= new ArrayList();
-        list.add(new DefaultInboundEndpoint());
-        list.add(new DefaultOutboundEndpoint());
+        list.add(getTestInboundEndpoint("test"));
+        list.add(getTestOutboundEndpoint("test"));
         AbstractOutboundRouter router=new TransformerRouter();
         try{
             router.setEndpoints(list);
@@ -100,7 +99,4 @@ public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
         }
     }
 
-
 }
-
-

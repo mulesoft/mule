@@ -285,7 +285,7 @@ public abstract class AbstractService implements Service
         {
             if (initialState.equals(AbstractService.INITIAL_STATE_STOPPED))
             {
-                System.out.println("stopped");
+                logger.info("stopped");
             }
             if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_STOPPED))
             {

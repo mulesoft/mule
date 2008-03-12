@@ -41,14 +41,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>JavaComponent</code> is a Java {@link Component} implementation used to
+ * <code>JavaComponent</code> is a Java {@link Component} implementation that used to
  * invoke Java component implementations. A <code>JavaComponent</code> uses an
  * {@link ObjectFactory} to specify the object instance's source and allows for
  * singleton, pooled and prototype implementations to be used along with custom
- * {@link ObjectFactory} that allow component instances to be obtained from other
+ * ObjectFactories that allow component instances to be obtained from other
  * containers such as Spring. A <code>JavaComponent</code> uses a customizable
  * {@link EntryPointResolverSet} in order to work out which method should be invoked,
- * and allows bindings to be configure that use outbound endpoints to populate
+ * and allows bindings to be configured that use outbound endpoints to populate
  * component instance variables before invocation.
  */
 public class JavaComponent implements Component

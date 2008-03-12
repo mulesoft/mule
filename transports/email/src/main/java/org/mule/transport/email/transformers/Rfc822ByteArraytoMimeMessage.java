@@ -12,10 +12,12 @@ package org.mule.transport.email.transformers;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.email.AbstractMailConnector;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -27,6 +29,7 @@ public class Rfc822ByteArraytoMimeMessage extends AbstractTransformer
     public Rfc822ByteArraytoMimeMessage()
     {
         registerSourceType(byte[].class);
+        registerSourceType(InputStream.class);
         setReturnClass(MimeMessage.class);
     }
 
@@ -34,8 +37,20 @@ public class Rfc822ByteArraytoMimeMessage extends AbstractTransformer
     {
         try
         {
-            byte[] bytes = (byte[]) src;
-            return new MimeMessage(getSession(), new ByteArrayInputStream(bytes));
+            if (src instanceof byte[])
+            {
+                byte[] bytes = (byte[]) src;
+                return new MimeMessage(getSession(), new ByteArrayInputStream(bytes));
+            }
+            else if (src instanceof InputStream)
+            {
+                return new MimeMessage(getSession(), (InputStream)src);
+            }
+            else
+            {
+                throw new TransformerException(
+                    CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(this.getName(), src.getClass(), endpoint));
+            }
         }
         catch (MessagingException e)
         {

@@ -248,7 +248,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
             fail(e.getMessage());
         }
         assertNotNull(endpoint);
-        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
+        assertEquals(1, endpoint.getTransformers().size());
         assertTrue(endpoint.getTransformers().get(0) instanceof TestInboundTransformer);
 
         assertEquals(2, service.getInboundRouter().getEndpoints().size());
@@ -278,7 +278,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
             fail(e.getMessage());
         }
         assertNotNull(endpoint);
-        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
+        assertFalse(endpoint.getTransformers().isEmpty());
         assertTrue(endpoint.getTransformers().get(0) instanceof TestInboundTransformer);
     }
 

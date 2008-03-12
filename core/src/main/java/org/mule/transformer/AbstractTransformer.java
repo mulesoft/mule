@@ -76,7 +76,7 @@ public abstract class AbstractTransformer implements Transformer
     /** default constructor required for discovery */
     public AbstractTransformer()
     {
-
+        super();
     }
 
     protected Object checkReturnClass(Object object) throws TransformerException

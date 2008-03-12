@@ -43,7 +43,6 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.object.ObjectFactory;
@@ -174,7 +173,7 @@ public final class MuleTestUtils
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoingUri, context);
         endpointBuilder.setConnector(connector);
         endpointBuilder.setName(name);
-        if (TransformerUtils.isDefined(transformers))
+        if (transformers != null)
         {
             endpointBuilder.setTransformers(transformers);
         }

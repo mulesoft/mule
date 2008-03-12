@@ -2,9 +2,8 @@
 package org.mule.module.client;
 
 import org.mule.api.MuleException;
-import org.mule.tck.AbstractMuleTestCase;
 
-public class MuleClientTestCase extends AbstractMuleTestCase
+public class MuleClientTestCase extends AbstractMuleClientTestCase
 {
 
     public void testCreateMuleClient() throws MuleException

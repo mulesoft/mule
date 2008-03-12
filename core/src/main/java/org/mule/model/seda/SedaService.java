@@ -71,6 +71,8 @@ public class SedaService extends AbstractService implements Work, WorkListener
      * will be provided by the server
      */
     protected QueueProfile queueProfile;
+    
+    protected Queue queue;
 
     /** For Spring only */
     public SedaService()
@@ -118,6 +120,11 @@ public class SedaService extends AbstractService implements Work, WorkListener
             }
             // Setup event Queue (used for VM execution).  The queue has the same name as the service.
             queueProfile.configureQueue(name, muleContext.getQueueManager());
+            queue = muleContext.getQueueManager().getQueueSession().getQueue(name);
+            if (queue == null)
+            {
+                throw new InitialisationException(MessageFactory.createStaticMessage("Queue " + name + " not created for service " + name), this);
+            }
         }
         catch (InitialisationException e)
         {
@@ -402,12 +409,6 @@ public class SedaService extends AbstractService implements Work, WorkListener
 
     protected MuleEvent dequeue() throws Exception
     {
-        QueueSession session = muleContext.getQueueManager().getQueueSession();
-        Queue queue = session.getQueue(name);
-        if (queue == null)
-        {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Queue " + name + " not created for service " + name), this);
-        }
         if (logger.isDebugEnabled())
         {
             //logger.debug("Service " + name + " polling queue " + name + ", timeout = " + queueTimeout);

@@ -3,9 +3,8 @@ package org.mule.module.client;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.tck.AbstractMuleTestCase;
 
-public class MuleClientStandaloneTestCase extends AbstractMuleTestCase
+public class MuleClientStandaloneTestCase extends AbstractMuleClientTestCase
 {
 
     protected MuleContext createMuleContext() throws Exception

@@ -22,7 +22,6 @@ import org.mule.tck.testmodels.mule.TestInboundTransformer;
 import org.mule.tck.testmodels.mule.TestOutboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseTransformer;
 import org.mule.transaction.MuleTransactionConfig;
-import org.mule.transformer.TransformerUtils;
 import org.mule.transport.SingleAttemptConnectionStrategy;
 import org.mule.util.ObjectNameHelper;
 
@@ -31,7 +30,7 @@ import java.util.Random;
 public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
 {
 
-    //@Override
+    // @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -40,8 +39,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         muleContext.getConfiguration().setDefaultSynchronousEventTimeout(new Random().nextInt());
         muleContext.getConfiguration().setDefaultEncoding("US-ASCII");
     }
-    
-    
+
     public void testBuildInboundEndpoint() throws MuleException
     {
         String uri = "test://address";
@@ -51,9 +49,11 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
             ImmutableEndpoint ep = endpointBuilder.buildInboundEndpoint();
             assertTrue(ep instanceof InboundEndpoint);
             assertFalse(ep instanceof OutboundEndpoint);
-            assertTrue(TransformerUtils.isDefined(ep.getTransformers()));
+            assertNotNull(ep.getTransformers());
+            assertEquals(1, ep.getTransformers().size());
             assertTrue(ep.getTransformers().get(0) instanceof TestInboundTransformer);
-            assertTrue(TransformerUtils.isDefined(ep.getResponseTransformers()));
+            assertNotNull(ep.getResponseTransformers());
+            assertEquals(1, ep.getResponseTransformers().size());
             assertTrue(ep.getResponseTransformers().get(0) instanceof TestResponseTransformer);
             testDefaultCommonEndpointAttributes(ep);
         }
@@ -72,9 +72,9 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
             ImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
             assertFalse(ep instanceof InboundEndpoint);
             assertTrue(ep instanceof OutboundEndpoint);
-            assertTrue(TransformerUtils.isDefined(ep.getTransformers()));
+            assertTrue(ep.getTransformers() != null);
             assertTrue(ep.getTransformers().get(0) instanceof TestOutboundTransformer);
-            assertTrue(TransformerUtils.isUndefined(ep.getResponseTransformers()));
+            assertTrue(ep.getResponseTransformers().isEmpty());
             testDefaultCommonEndpointAttributes(ep);
         }
         catch (Exception e)
@@ -83,13 +83,13 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         }
     }
 
-    // TODO DF: Test more than defaults with tests using builder to set non-default values
+    // TODO DF: Test more than defaults with tests using builder to set non-default
+    // values
 
     protected void testDefaultCommonEndpointAttributes(ImmutableEndpoint ep)
     {
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-        assertEquals(muleContext.getConfiguration().getDefaultSynchronousEventTimeout(),
-            ep.getRemoteSyncTimeout());
+        assertEquals(muleContext.getConfiguration().getDefaultSynchronousEventTimeout(), ep.getRemoteSyncTimeout());
         assertEquals(muleContext.getConfiguration().isDefaultSynchronousEndpoints()
                      || muleContext.getConfiguration().isDefaultRemoteSync(), ep.isSynchronous());
         assertEquals(muleContext.getConfiguration().isDefaultRemoteSync(), ep.isRemoteSync());
@@ -98,18 +98,18 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);
         assertEquals(null, ep.getSecurityFilter());
         assertTrue(ep.getConnector() instanceof TestConnector);
-        assertEquals(ObjectNameHelper.getEndpointName(ep), ep.getName());
+        assertEquals(ObjectNameHelper.getEndpointName(ep.getEndpointURI()), ep.getName());
         assertFalse(ep.isDeleteUnacceptedMessages());
         assertEquals(muleContext.getConfiguration().getDefaultEncoding(), ep.getEncoding());
         assertEquals(null, ep.getFilter());
         assertEquals(ImmutableEndpoint.INITIAL_STATE_STARTED, ep.getInitialState());
     }
-    
+
     public void testHasSetEncodingMethod() throws EndpointException, SecurityException, NoSuchMethodException
     {
         String uri = "test://address";
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
         assertNotNull(endpointBuilder.getClass().getMethod("setEncoding", new Class[]{String.class}));
     }
-    
+
 }

@@ -10,22 +10,55 @@
 
 package org.mule.endpoint;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.routing.filter.Filter;
+import org.mule.api.security.EndpointSecurityFilter;
+import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transport.ConnectionStrategy;
+import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.MuleManifest;
+
+import java.util.List;
+import java.util.Map;
 
 public class DefaultOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint
 {
 
     private static final long serialVersionUID = 8860985949279708638L;
 
+    public DefaultOutboundEndpoint(Connector connector,
+                                   EndpointURI endpointUri,
+                                   List transformers,
+                                   List responseTransformers,
+                                   String name,
+                                   Map properties,
+                                   TransactionConfig transactionConfig,
+                                   Filter filter,
+                                   boolean deleteUnacceptedMessage,
+                                   EndpointSecurityFilter securityFilter,
+                                   boolean synchronous,
+                                   boolean remoteSync,
+                                   int remoteSyncTimeout,
+                                   String initialState,
+                                   String endpointEncoding,
+                                   MuleContext muleContext,
+                                   ConnectionStrategy connectionStrategy)
+    {
+        super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
+            deleteUnacceptedMessage, securityFilter, synchronous, remoteSync, remoteSyncTimeout, initialState,
+            endpointEncoding, muleContext, connectionStrategy);
+    }
+
     public void dispatch(MuleEvent event) throws DispatchException
     {
-        if (connector != null)
+        if (getConnector() != null)
         {
-            connector.dispatch(this, event);
+            getConnector().dispatch(this, event);
         }
         else
         {
@@ -38,9 +71,9 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 
     public MuleMessage send(MuleEvent event) throws DispatchException
     {
-        if (connector != null)
+        if (getConnector() != null)
         {
-            return connector.send(this, event);
+            return getConnector().send(this, event);
         }
         else
         {

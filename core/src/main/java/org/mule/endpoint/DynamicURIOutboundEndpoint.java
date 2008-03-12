@@ -15,8 +15,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
@@ -28,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Allow's EndpointURI to be set and changed dynamically by wrapping up an immutable endpoint instance.
+ * Allow's EndpointURI to be set and changed dynamically by wrapping up an immutable
+ * endpoint instance.
  */
 public class DynamicURIOutboundEndpoint implements OutboundEndpoint
 {
@@ -144,11 +143,6 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     public List getTransformers()
     {
         return endpoint.getTransformers();
-    }
-
-    public LifecycleTransitionResult initialise() throws InitialisationException
-    {
-        return endpoint.initialise();
     }
 
     public boolean isDeleteUnacceptedMessages()

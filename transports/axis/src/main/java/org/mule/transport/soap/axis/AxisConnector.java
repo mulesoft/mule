@@ -25,7 +25,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
-import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.http.servlet.ServletConnector;
 import org.mule.transport.service.TransportFactory;
@@ -384,8 +383,10 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         serviceEndpointbuilder.setSynchronous(sync);
         serviceEndpointbuilder.setName(ep.getScheme() + ":" + serviceName);
         // Set the transformers on the endpoint too
-        serviceEndpointbuilder.setTransformers(receiver.getEndpoint().getTransformers());
-        serviceEndpointbuilder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers());
+        serviceEndpointbuilder.setTransformers(receiver.getEndpoint().getTransformers().isEmpty() ? null
+                                                                                                  : receiver.getEndpoint().getTransformers());
+        serviceEndpointbuilder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers().isEmpty() ? null
+                                                                                                                 : receiver.getEndpoint().getResponseTransformers());
         // set the filter on the axis endpoint on the real receiver endpoint
         serviceEndpointbuilder.setFilter(receiver.getEndpoint().getFilter());
         // set the Security filter on the axis endpoint on the real receiver
@@ -396,8 +397,6 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         // filters and transformers will get invoked twice?
         EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint(),
             muleContext);
-        receiverEndpointBuilder.setTransformers(TransformerUtils.UNDEFINED);
-        receiverEndpointBuilder.setResponseTransformers(TransformerUtils.UNDEFINED);
         // Remove the Axis filter now
         receiverEndpointBuilder.setFilter(null);
         // Remove the Axis Receiver Security filter now
@@ -669,17 +668,17 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         }
     }
     
-    public boolean isSyncEnabled(ImmutableEndpoint endpoint)
+    public boolean isSyncEnabled(String protocol)
     {
-        String scheme = endpoint.getEndpointURI().getScheme().toLowerCase();
-        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")
-            || scheme.equals("servlet"))
+        protocol = protocol.toLowerCase();
+        if (protocol.equals("http") || protocol.equals("https") || protocol.equals("ssl") || protocol.equals("tcp")
+            || protocol.equals("servlet"))
         {
             return true;
         }
         else
         {
-            return super.isSyncEnabled(endpoint);
+            return super.isSyncEnabled(protocol);
         }
     }
 

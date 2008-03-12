@@ -10,13 +10,12 @@
 
 package org.mule.transport.jms;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.service.AbstractService;
-import org.mule.transformer.TransformerUtils;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.StringMessageUtils;
@@ -67,22 +66,19 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             //This is a work around for JmsTransformers where the current endpoint needs
             //to be set on the transformer so that a JMSMEssage can be created correctly
             Class srcType = returnMessage.getPayload().getClass();
-            if (TransformerUtils.isDefined(getTransformers()))
-            {
                 for (Iterator iterator = getTransformers().iterator(); iterator.hasNext();)
+            {
+                Transformer t = (Transformer) iterator.next();
+                if (t.isSourceTypeSupported(srcType))
                 {
-                    Transformer t = (Transformer) iterator.next();
-                    if (t.isSourceTypeSupported(srcType))
+                    if (t.getEndpoint() == null)
                     {
-                        if (t.getEndpoint() == null)
-                        {
-                            t.setEndpoint(getEndpoint(event, "jms://temporary"));
-                            break;
-                        }
+                        t.setEndpoint(getEndpoint(event, "jms://temporary"));
+                        break;
                     }
                 }
-                returnMessage.applyTransformers(getTransformers());
             }
+            returnMessage.applyTransformers(getTransformers());
             Object payload = returnMessage.getPayload();
 
             if (replyToDestination instanceof Topic && replyToDestination instanceof Queue

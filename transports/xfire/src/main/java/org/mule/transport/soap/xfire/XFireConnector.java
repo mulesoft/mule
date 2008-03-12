@@ -28,7 +28,6 @@ import org.mule.context.notification.NotificationException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
-import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnectable;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.FatalConnectException;
@@ -409,8 +408,10 @@ public class XFireConnector extends AbstractConnector
         serviceEndpointbuilder.setSynchronous(sync);
         serviceEndpointbuilder.setName(ep.getScheme() + ":" + serviceName);
         // Set the transformers on the endpoint too
-        serviceEndpointbuilder.setTransformers(receiver.getEndpoint().getTransformers());
-        serviceEndpointbuilder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers());
+        serviceEndpointbuilder.setTransformers(receiver.getEndpoint().getTransformers().isEmpty() ? null
+                                                                                                  : receiver.getEndpoint().getTransformers());
+        serviceEndpointbuilder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers().isEmpty() ? null
+                                                                                                                 : receiver.getEndpoint().getResponseTransformers());
         // set the filter on the axis endpoint on the real receiver endpoint
         serviceEndpointbuilder.setFilter(receiver.getEndpoint().getFilter());
         // set the Security filter on the axis endpoint on the real receiver
@@ -421,8 +422,6 @@ public class XFireConnector extends AbstractConnector
         // filters and transformers will get invoked twice?
         EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint(),
             muleContext);
-        receiverEndpointBuilder.setTransformers(TransformerUtils.UNDEFINED);
-        receiverEndpointBuilder.setResponseTransformers(TransformerUtils.UNDEFINED);
         // Remove the Axis filter now
         receiverEndpointBuilder.setFilter(null);
         // Remove the Axis Receiver Security filter now
@@ -609,17 +608,17 @@ public class XFireConnector extends AbstractConnector
         transportClass = clazz;
     }
     
-    public boolean isSyncEnabled(ImmutableEndpoint endpoint)
+    public boolean isSyncEnabled(String protocol)
     {
-        String scheme = endpoint.getEndpointURI().getScheme().toLowerCase();
-        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")
-            || scheme.equals("servlet"))
+        protocol = protocol.toLowerCase();
+        if (protocol.equals("http") || protocol.equals("https") || protocol.equals("ssl") || protocol.equals("tcp")
+            || protocol.equals("servlet"))
         {
             return true;
         }
         else
         {
-            return super.isSyncEnabled(endpoint);
+            return super.isSyncEnabled(protocol);
         }
     }
 

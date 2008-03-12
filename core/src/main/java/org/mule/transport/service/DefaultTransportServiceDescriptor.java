@@ -30,7 +30,6 @@ import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.UrlEndpointURIBuilder;
 import org.mule.transaction.XaTransactionFactory;
-import org.mule.transformer.TransformerUtils;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -407,7 +406,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("inbound", defaultInboundTransformer), e);
             }
         }
-        return TransformerUtils.UNDEFINED;
+        return null;
     }
 
     /* (non-Javadoc)
@@ -433,7 +432,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("outbound", defaultOutboundTransformer), e);
             }
         }
-        return TransformerUtils.UNDEFINED;
+        return null;
     }
 
     /* (non-Javadoc)
@@ -459,7 +458,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("response", defaultResponseTransformer), e);
             }
         }
-        return TransformerUtils.UNDEFINED;
+        return null;
     }
 
     /* (non-Javadoc)

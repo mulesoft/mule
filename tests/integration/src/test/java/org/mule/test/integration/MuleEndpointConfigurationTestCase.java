@@ -22,7 +22,6 @@ import org.mule.api.service.Service;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleTestUtils;
-import org.mule.transformer.TransformerUtils;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.vm.VMConnector;
 
@@ -71,7 +70,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         endpoint = (ImmutableEndpoint)router2.getEndpoints().get(1);
         assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("test.queue2", endpoint.getEndpointURI().getAddress());
-        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
+        assertFalse(endpoint.getTransformers().isEmpty());
         assertTrue(endpoint instanceof OutboundEndpoint);
 
     }
@@ -87,7 +86,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertNotNull(endpoint);
         assertEquals(VMConnector.VM, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("queue4", endpoint.getEndpointURI().getAddress());
-        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
+        assertFalse(endpoint.getTransformers().isEmpty());
         assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
         assertTrue(endpoint instanceof InboundEndpoint);
     }
@@ -114,7 +113,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         endpoint = (ImmutableEndpoint)router.getEndpoints().get(1);
         assertEquals(VMConnector.VM, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("yet.another.queue", endpoint.getEndpointURI().getAddress());
-        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
+        assertFalse(endpoint.getTransformers().isEmpty());
         assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
         assertTrue(endpoint instanceof OutboundEndpoint);
     }

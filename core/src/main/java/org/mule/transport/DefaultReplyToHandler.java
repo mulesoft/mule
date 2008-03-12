@@ -98,12 +98,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
             EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpointUri);
             if (transformers == null)
             {
-                transformers = event.getEndpoint().getResponseTransformers();
-            }
-
-            if (transformers != null)
-            {
-                endpointBuilder.setTransformers(transformers);
+                endpointBuilder.setTransformers(event.getEndpoint().getResponseTransformers());
             }
             endpoint = endpointFactory.getOutboundEndpoint(endpointBuilder);
             endpointCache.put(endpointUri, endpoint);

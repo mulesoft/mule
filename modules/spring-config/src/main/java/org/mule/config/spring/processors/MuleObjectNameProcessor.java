@@ -15,8 +15,6 @@ import org.mule.api.model.Model;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.endpoint.AbstractEndpoint;
-import org.mule.util.ObjectNameHelper;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -46,18 +44,6 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
             if (((Transformer)o).getName() == null || overwrite)
             {
                ((Transformer)o).setName(s);
-            }
-        }
-        else if (o instanceof AbstractEndpoint)
-        {
-            // spring uses the class name of the object as the name if no other
-            // id is set; this is no good for endpoints
-            if ((((AbstractEndpoint)o).getName() == null || overwrite)
-                && !AbstractEndpoint.class.getName().equals(s))
-            {
-                final AbstractEndpoint endpoint = (AbstractEndpoint) o;
-                final String name = ObjectNameHelper.getEndpointName(endpoint);
-                endpoint.setName(name);
             }
         }
         else if (o instanceof Service)

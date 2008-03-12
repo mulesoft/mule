@@ -17,24 +17,11 @@ org.mule.transport.cxf.client.GeneratedClientTestCase
 org.mule.transport.cxf.bridge.BridgeTest
 
 # Doesn't work on build server for some reason?
-# org.mule.transport.cxf.jaxws.ClientTestCase
+org.mule.transport.cxf.jaxws.ClientTestCase
 
 # Weird serialization issues.. We shouldn't be using
 # FunctionalTestComponent as the basis for a service...
 org.mule.transport.cxf.CxfCustomHttpHeaderTestCase
 
-# MULE-3047
-org.mule.transport.cxf.CxfConnectorHttpFunctionalTestCase
 
-# MULE-3048
-org.mule.transport.cxf.WsdlCallTestCase
-
-# MULE-3049
-org.mule.transport.cxf.CxfBasicTestCase
-
-# MULE-3051
-org.mule.transport.cxf.CxfComponentExceptionStrategyTestCase
-
-# MULE-3054
-org.mule.transport.cxf.jaxws.ClientTestCase
 

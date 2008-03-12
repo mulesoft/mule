@@ -23,8 +23,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
-import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.ModelNotification;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.transport.NullPayload;
 
 import java.util.ArrayList;
@@ -96,8 +96,6 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
             }
             try
             {
-                System.out.println("************************************************");
-                System.out.println(e.getActionName(e.getAction()));
                 MuleMessage msg = new DefaultMuleMessage(e.toString(), (Map) null);
                 MuleEvent event = new DefaultMuleEvent(msg, logEndpoint, session, false);
                 logEndpoint.dispatch(event);

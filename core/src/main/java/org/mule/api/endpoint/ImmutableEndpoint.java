@@ -11,7 +11,6 @@
 package org.mule.api.endpoint;
 
 import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
@@ -27,7 +26,7 @@ import java.util.Map;
  * sent or received. An Enpoint is an Resource address (EndpointUri), with associated
  * transformation, transaction and filtering rules.
  */
-public interface ImmutableEndpoint extends Serializable, Initialisable
+public interface ImmutableEndpoint extends Serializable
 {
 
     public static final String INITIAL_STATE_STARTED = "started";
@@ -83,14 +82,15 @@ public interface ImmutableEndpoint extends Serializable, Initialisable
      * tranformation for an inbound event can be forced by the user by calling the
      * inbound event.getTransformedMessage(). A tranformation for an outbound event
      * is called or when the UMO dispatchEvent() or sendEvent() methods are called.
+     * If an endpoint has no transformers an empty list is returned.
      *
      * @return the transformers to use when receiving or sending data
      */
     List getTransformers();
 
     /**
-     * The transformers used when a response is returned from invoking this endpoint
-     *
+     * The transformers used when a response is returned from invoking this endpoint.
+     * If an endpoint has no response transformers an empty list is returned.
      * @return the transformer to use when receiving the response data
      */
     List getResponseTransformers();

@@ -12,7 +12,10 @@ package org.mule.transformer.simple;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
+
+import java.io.InputStream;
 
 /**
  * <code>StringToObjectArray</code> converts a String into an object array. This
@@ -30,6 +33,7 @@ public class StringToObjectArray extends AbstractTransformer
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);
+        registerSourceType(InputStream.class);
         setReturnClass(Object[].class);
     }
 
@@ -40,6 +44,18 @@ public class StringToObjectArray extends AbstractTransformer
         if (src instanceof byte[])
         {
             in = new String((byte[])src);
+        }
+        else if (src instanceof InputStream)
+        {
+            InputStream input = (InputStream) src;
+            try
+            {
+                in = IOUtils.toString(input);
+            }
+            finally
+            {
+                IOUtils.closeQuietly(input);
+            }
         }
         else
         {
@@ -56,9 +72,13 @@ public class StringToObjectArray extends AbstractTransformer
     public String getDelimiter()
     {
         if (delimiter == null)
+        {
             return DEFAULT_DELIMITER;
+        }
         else
+        {
             return delimiter;
+        }
     }
 
     /**

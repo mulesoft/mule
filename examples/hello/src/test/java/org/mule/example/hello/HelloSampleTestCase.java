@@ -12,6 +12,9 @@ package org.mule.example.hello;
 
 import org.mule.tck.AbstractMuleTestCase;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 public class HelloSampleTestCase extends AbstractMuleTestCase
 {
 
@@ -55,7 +58,6 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
     {
         String temp = "Wilma";
         StringToNameString trans = new StringToNameString();
-        trans.setReturnClass(NameString.class);
         Object result = trans.transform(temp);
 
         assertNotNull(result);
@@ -81,7 +83,6 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
     {
         String temp = "whateverUrl?name=Wilma";
         HttpRequestToNameString trans = new HttpRequestToNameString();
-        trans.setReturnClass(NameString.class);
         Object result = trans.transform(temp);
 
         assertNotNull(result);
@@ -103,11 +104,24 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
         assertEquals("Another Wilma", name.getName());
     }
     
+    public void testHttpRequestToNameStreamingTransformer() throws Exception
+    {
+        InputStream in = new ByteArrayInputStream("whateverUrl?name=Wilma".getBytes());
+        HttpRequestToNameString transformer = new HttpRequestToNameString();
+        Object result = transformer.transform(in);
+        
+        assertNotNull(result);
+        assertTrue(result instanceof NameString);
+        
+        NameString name = (NameString)result;
+        assertNotNull(name.getName());
+        assertNull(name.getGreeting());
+    }
+    
     public void testStdinToNameTransformer() throws Exception
     {
         String temp = "Wilma";
         StdinToNameString trans = new StdinToNameString();
-        trans.setReturnClass(NameString.class);
         Object result = trans.transform(temp);
 
         assertNotNull(result);

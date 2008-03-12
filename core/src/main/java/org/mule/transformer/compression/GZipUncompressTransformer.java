@@ -12,8 +12,10 @@ package org.mule.transformer.compression;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.util.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.commons.lang.SerializationUtils;
 
@@ -35,12 +37,30 @@ public class GZipUncompressTransformer extends GZipCompressTransformer
 
         try
         {
-            buffer = getStrategy().uncompressByteArray((byte[]) src);
+            byte[] input = null;
+            if (src instanceof InputStream)
+            {
+                InputStream inputStream = (InputStream)src;
+                try
+                {
+                    input = IOUtils.toByteArray(inputStream);
+                }
+                finally
+                {
+                    inputStream.close();
+                }
+            }
+            else
+            {
+                input = (byte[])src;
+            }
+
+            buffer = getStrategy().uncompressByteArray(input);
         }
         catch (IOException e)
         {
-            throw new TransformerException(MessageFactory.createStaticMessage("Failed to uncompress message."),
-                this, e);
+            throw new TransformerException(
+                MessageFactory.createStaticMessage("Failed to uncompress message."), this, e);
         }
 
         if (!getReturnClass().equals(byte[].class))

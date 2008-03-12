@@ -56,7 +56,8 @@ import java.util.List;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -105,6 +106,9 @@ public class MuleClient implements Disposable
     private MuleCredentials user;
 
     private DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+    
+    private ConcurrentMap inboundEndpointCache = new ConcurrentHashMap();
+    private ConcurrentMap outboundEndpointCache = new ConcurrentHashMap();
 
     /**
      * Creates a default Mule client that will use the default serverEndpoint to
@@ -281,7 +285,7 @@ public class MuleClient implements Disposable
     /**
      * sends an event synchronously to a components
      * 
-     * @param service the name of the Mule components to send to
+     * @param component the name of the Mule components to send to
      * @param transformers a comma separated list of transformers to apply to the
      *            result message
      * @param payload the object that is the payload of the event
@@ -355,7 +359,7 @@ public class MuleClient implements Disposable
     /**
      * dispatches an event asynchronously to the components
      * 
-     * @param service the name of the Mule components to dispatch to
+     * @param component the name of the Mule components to dispatch to
      * @param payload the object that is the payload of the event
      * @param messageProperties any properties to be associated with the payload. as
      *            null
@@ -490,7 +494,7 @@ public class MuleClient implements Disposable
      * Users can endpoint a url to a remote Mule server in the constructor of a Mule
      * client, by default the default Mule server url tcp://localhost:60504 is used.
      * 
-     * @param service the name of the Mule components to send to
+     * @param component the name of the Mule components to send to
      * @param transformers a comma separated list of transformers to apply to the
      *            result message
      * @param payload the object that is the payload of the event
@@ -516,7 +520,7 @@ public class MuleClient implements Disposable
      * Users can endpoint a url to a remote Mule server in the constructor of a Mule
      * client, by default the default Mule server url tcp://localhost:60504 is used.
      * 
-     * @param service the name of the Mule components to send to
+     * @param component the name of the Mule components to send to
      * @param transformers a comma separated list of transformers to apply to the
      *            result message
      * @param message the message to send
@@ -764,12 +768,44 @@ public class MuleClient implements Disposable
 
     protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException
     {
-        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(uri);
+        // There was a potential leak here between get() and putIfAbsent(). This
+        // would cause the endpoint that was created to be used rather an endpoint
+        // with the same key that has been created and put in the cache by another
+        // thread. To avoid this we test for the result of putIfAbsent result and if
+        // it is non-null then an endpoint was created and added concurrently and we
+        // return this instance instead.
+        InboundEndpoint endpoint = (InboundEndpoint) inboundEndpointCache.get(uri);
+        if (endpoint == null)
+        {
+            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(uri);
+            InboundEndpoint concurrentlyAddedEndpoint = (InboundEndpoint) inboundEndpointCache.putIfAbsent(uri, endpoint);
+            if (concurrentlyAddedEndpoint != null)
+            {
+                return concurrentlyAddedEndpoint;
+            }
+        }
+        return endpoint;
     }
 
     protected OutboundEndpoint getOutboundEndpoint(String uri) throws MuleException
     {
-        return muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+        // There was a potential leak here between get() and putIfAbsent(). This
+        // would cause the endpoint that was created to be used rather an endpoint
+        // with the same key that has been created and put in the cache by another
+        // thread. To avoid this we test for the result of putIfAbsent result and if
+        // it is non-null then an endpoint was created and added concurrently and we
+        // return this instance instead.
+        OutboundEndpoint endpoint = (OutboundEndpoint) outboundEndpointCache.get(uri);
+        if (endpoint == null)
+        {
+            endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+            OutboundEndpoint concurrentlyAddedEndpoint = (OutboundEndpoint) outboundEndpointCache.putIfAbsent(uri, endpoint);
+            if (concurrentlyAddedEndpoint != null)
+            {
+                return concurrentlyAddedEndpoint;
+            }
+        }
+        return endpoint;
     }
 
     protected ImmutableEndpoint getDefaultClientEndpoint(Service service, Object payload)
@@ -860,7 +896,7 @@ public class MuleClient implements Disposable
      * given url. By default the ThreadingProfile for the components will be set so
      * that there will only be one thread of execution.
      * 
-     * @param service any java object, Mule will it's endpointUri discovery to
+     * @param component any java object, Mule will it's endpointUri discovery to
      *            determine which event to invoke based on the evnet payload type
      * @param name The identifying name of the components. This can be used to later
      *            unregister it
@@ -882,7 +918,7 @@ public class MuleClient implements Disposable
      * on the given urls. By default the ThreadingProfile for the components will be
      * set so that there will only be one thread of execution.
      * 
-     * @param service any java object, Mule will it's endpointUri discovery to
+     * @param component any java object, Mule will it's endpointUri discovery to
      *            determine which event to invoke based on the evnet payload type
      * @param name The identifying name of the components. This can be used to later
      *            unregister it

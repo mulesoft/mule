@@ -53,7 +53,8 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
 
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        return LifecycleTransitionResult.initialiseAll(super.initialise(), endpoints.iterator());
+        super.initialise();
+        return LifecycleTransitionResult.OK;
     }
 
     public MuleMessage route(MuleEvent event) throws MessagingException

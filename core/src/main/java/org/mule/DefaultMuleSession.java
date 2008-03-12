@@ -27,7 +27,6 @@ import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReceiveException;
 import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.UUID;
 
@@ -212,7 +211,7 @@ public final class DefaultMuleSession implements MuleSession
 
         // Handles the situation where a response has been received via a remote
         // ReplyTo channel.
-        if (endpoint.isRemoteSync() && TransformerUtils.isDefined(endpoint.getResponseTransformers()) && result != null)
+        if (endpoint.isRemoteSync() && result != null)
         {
             result.applyTransformers(endpoint.getResponseTransformers());
         }

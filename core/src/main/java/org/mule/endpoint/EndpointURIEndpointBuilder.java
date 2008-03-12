@@ -26,19 +26,21 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
 
     /**
      * Called from Spring
-     *
+     * 
      * @param global The global endpoint "template"
      * @throws EndpointException
      */
     public EndpointURIEndpointBuilder(EndpointURIEndpointBuilder global) throws EndpointException
     {
         // can't (concisely) use setters where null is a possibility
-        // for consistency, set directly on all fields (this also avoids logic in getters)
+        // for consistency, set directly on all fields (this also avoids logic in
+        // getters)
         uriBuilder = global.uriBuilder;
         connector = global.connector;
         transformers = global.transformers;
         responseTransformers = global.responseTransformers;
-        name = global.name; // this seems a bit odd, but is tested for in the big spring config test case
+        name = global.name; // this seems a bit odd, but is tested for in the big
+                            // spring config test case
         properties = global.properties;
         transactionConfig = global.transactionConfig;
         filter = global.filter;
@@ -79,8 +81,8 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
         setName(source.getName());
         setEncoding(source.getEncoding());
         setConnector(source.getConnector());
-        setTransformers(source.getTransformers());
-        setResponseTransformers(source.getResponseTransformers());
+        setTransformers(source.getTransformers().isEmpty() ? null : source.getTransformers());
+        setResponseTransformers(source.getResponseTransformers().isEmpty() ? null : source.getResponseTransformers());
         setProperties(source.getProperties());
         setTransactionConfig(source.getTransactionConfig());
         setDeleteUnacceptedMessages(source.isDeleteUnacceptedMessages());

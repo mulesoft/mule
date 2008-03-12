@@ -12,7 +12,9 @@ package org.mule.example.hello;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.util.IOUtils;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
@@ -25,18 +27,13 @@ public class HttpRequestToNameString extends AbstractTransformer
         super();
         this.registerSourceType(String.class);
         this.registerSourceType(byte[].class);
+        this.registerSourceType(InputStream.class);
         this.setReturnClass(NameString.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transformer.AbstractTransformer#doTransform(java.lang.Object)
-     */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         return new NameString(extractNameValue(extractRequestQuery(convertRequestToString(src, encoding))));
-        
     }
     
     private String convertRequestToString(Object src, String encoding)
@@ -59,6 +56,18 @@ public class HttpRequestToNameString extends AbstractTransformer
             else
             {
                 srcAsString = new String((byte[])src);
+            }
+        }
+        else if (src instanceof InputStream)
+        {
+            InputStream input = (InputStream) src;
+            try
+            {
+                srcAsString = IOUtils.toString(input);
+            }
+            finally
+            {
+                IOUtils.closeQuietly(input);
             }
         }
         else

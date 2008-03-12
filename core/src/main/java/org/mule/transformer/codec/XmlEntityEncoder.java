@@ -15,6 +15,10 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.util.XMLEntityCodec;
 
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
+
 /**
  * Encodes a string with XML entities
  */
@@ -25,6 +29,7 @@ public class XmlEntityEncoder extends AbstractTransformer
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);
+        registerSourceType(InputStream.class);
         setReturnClass(String.class);
     }
 
@@ -38,7 +43,11 @@ public class XmlEntityEncoder extends AbstractTransformer
             {
                 data = new String((byte[]) src, encoding);
             }
-            else
+            else if (src instanceof InputStream)
+            {
+                data = IOUtils.toString((InputStream)src);
+            }
+            else 
             {
                 data = (String) src;
             }

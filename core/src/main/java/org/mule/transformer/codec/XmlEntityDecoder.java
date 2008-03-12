@@ -13,7 +13,10 @@ package org.mule.transformer.codec;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.util.IOUtils;
 import org.mule.util.XMLEntityCodec;
+
+import java.io.InputStream;
 
 /**
  * Decodes a String or byte[] containing XML entities
@@ -25,6 +28,7 @@ public class XmlEntityDecoder extends AbstractTransformer
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);
+        registerSourceType(InputStream.class);
         setReturnClass(String.class);
     }
 
@@ -37,6 +41,10 @@ public class XmlEntityDecoder extends AbstractTransformer
             if (src instanceof byte[])
             {
                 data = new String((byte[]) src, encoding);
+            }
+            else if (src instanceof InputStream)
+            {
+                data = IOUtils.toString((InputStream)src);
             }
             else
             {

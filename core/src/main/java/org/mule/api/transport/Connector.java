@@ -154,7 +154,7 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      * @return
      * @see ImmutableEndpoint#isSynchronous()
      */
-    boolean isSyncEnabled(ImmutableEndpoint endpoint);
+    boolean isSyncEnabled(String protocol);
 
     /**
      * Dispatches an event from the endpoint to the external system

@@ -11,9 +11,11 @@
 package org.mule.transformer.compression;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.util.IOUtils;
 import org.mule.util.compression.GZipCompression;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 
 import org.apache.commons.lang.SerializationUtils;
@@ -31,6 +33,7 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
         this.setStrategy(new GZipCompression());
         this.registerSourceType(Serializable.class);
         this.registerSourceType(byte[].class);
+        this.registerSourceType(InputStream.class);
         this.setReturnClass(byte[].class);
     }
 
@@ -42,6 +45,18 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
             if (src instanceof byte[])
             {
                 data = (byte[]) src;
+            }
+            else if (src instanceof InputStream)
+            {
+                InputStream input = (InputStream)src;
+                try
+                {
+                    data = IOUtils.toByteArray(input);
+                }
+                finally
+                {
+                    input.close();
+                }
             }
             else
             {

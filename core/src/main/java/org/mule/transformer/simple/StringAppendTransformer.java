@@ -12,7 +12,10 @@ package org.mule.transformer.simple;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
+
+import java.io.InputStream;
 
 public class StringAppendTransformer extends AbstractTransformer
 {
@@ -30,6 +33,7 @@ public class StringAppendTransformer extends AbstractTransformer
         setReturnClass(String.class);
         registerSourceType(String.class);
         registerSourceType(byte[].class);
+        registerSourceType(InputStream.class);
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
@@ -38,6 +42,18 @@ public class StringAppendTransformer extends AbstractTransformer
         if (src instanceof byte[])
         {
             string = new String((byte[]) src);
+        }
+        else if (src instanceof InputStream)
+        {
+            InputStream input = (InputStream) src;
+            try
+            {
+                string = IOUtils.toString(input);
+            }
+            finally
+            {
+                IOUtils.closeQuietly(input);
+            }
         }
         else
         {
