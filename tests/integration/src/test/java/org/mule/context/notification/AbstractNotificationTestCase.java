@@ -10,8 +10,8 @@
 
 package org.mule.context.notification;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.api.context.notification.ServerNotification;
+import org.mule.tck.FunctionalTestCase;
 
 import java.util.Iterator;
 
@@ -23,6 +23,12 @@ public abstract class AbstractNotificationTestCase extends FunctionalTestCase
 
     private AbstractNotificationLogger notifications;
 
+    public AbstractNotificationTestCase()
+    {
+        super();
+        setDisposeManagerPerSuite(true);
+    }
+    
     public final void testNotifications() throws Exception
     {
         doTest();
