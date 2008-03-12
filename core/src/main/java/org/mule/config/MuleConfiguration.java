@@ -16,9 +16,6 @@ import org.mule.api.agent.Agent;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.DefaultWorkListener;
 import org.mule.api.lifecycle.FatalException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transport.ConnectionStrategy;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.SingleAttemptConnectionStrategy;
@@ -52,7 +49,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>MuleContext</code>. Once the <code>MuleContext</code> has been
  * initialised this class is immutable.
  */
-public class MuleConfiguration implements Initialisable
+public class MuleConfiguration 
 {
     /**
      * The prefix for any Mule-specific properties set in the system properties
@@ -137,8 +134,10 @@ public class MuleConfiguration implements Initialisable
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public MuleConfiguration()  
     {
+        super();
+        
         // Apply any settings which come from the JVM system properties.
         applySystemProperties();
         
@@ -148,17 +147,16 @@ public class MuleConfiguration implements Initialisable
             validateEncoding();
             validateXML();
         }
-        catch (Exception e)
+        catch (FatalException e)
         {
-            throw new InitialisationException(e, this);
-        }        
-        return LifecycleTransitionResult.OK;
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * Apply any settings which come from the JVM system properties.
      */
-    protected void applySystemProperties() throws InitialisationException
+    protected void applySystemProperties() 
     {
         String p;
         
@@ -249,7 +247,7 @@ public class MuleConfiguration implements Initialisable
         }
     }
     
-    protected void setupIds() throws InitialisationException
+    protected void setupIds() 
     {
         if (clusterId == null)
         {
