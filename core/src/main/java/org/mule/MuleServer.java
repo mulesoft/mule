@@ -262,11 +262,11 @@ public class MuleServer implements Runnable
     /**
      * Sets the configuration builder to use for this server. Note that if a builder
      * is not set and the server's start method is called the default is an instance
-     * of <code>MuleXmlConfigurationBuilder</code>.
+     * of <code>SpringXmlConfigurationBuilder</code>.
      * 
      * @param builderClassName the configuration builder FQN to use
      * @throws ClassNotFoundException if the class with the given name can not be
-     *             loaded
+     *          loaded
      */
     public static void setConfigBuilderClassName(String builderClassName) throws ClassNotFoundException
     {
@@ -433,7 +433,7 @@ public class MuleServer implements Runnable
     }
 
     /**
-     * Setter for property messengerURL.
+     * Setter for property configurationResources.
      * 
      * @param configurationResources New value of property configurationResources.
      */
