@@ -80,9 +80,9 @@ public class SingletonObjectFactory extends AbstractObjectFactory
     // @Override
     public void dispose()
     {
-        logger.debug("Disposing object instance: " + instance.toString());
         if (instance != null && instance instanceof Disposable)
         {
+            logger.debug("Disposing object instance: " + instance.toString());
             ((Disposable) instance).dispose();
         }
         instance = null;
