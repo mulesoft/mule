@@ -15,14 +15,14 @@ import org.mule.util.expression.ExpressionEvaluator;
 import org.mule.util.expression.ExpressionEvaluatorManager;
 
 /** 
- * Registers PropertyExtractors with the {@link org.mule.util.expression.ExpressionEvaluatorManager} so that they will
- * be resolved at runtime.
+ * Registers ExpressionEvaluators with the {@link org.mule.util.expression.ExpressionEvaluatorManager} so that they will
+ * be resolved at run-time.
  * {@link org.mule.util.expression.ExpressionEvaluator} objects are used to execute property expressions (usually on the
- * current message) at runtime to extracta dynamic value.
+ * current message) at run-time to extract a dynamic value.
  */
-public class PropertyExtractorProcessor implements ObjectProcessor, Disposable
+public class ExpressionEvaluatorProcessor implements ObjectProcessor, Disposable
 {
-    public PropertyExtractorProcessor()
+    public ExpressionEvaluatorProcessor()
     {
         ExpressionEvaluatorManager.clearEvaluators();
     }

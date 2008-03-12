@@ -12,27 +12,26 @@ package org.mule.util.expression;
 
 import org.mule.api.transport.MessageAdapter;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
+import javax.activation.DataHandler;
 
 /**
- * Looks up the property on the message using the property name given.
+ * Looks up an attachment with the given name.
  *
- * @see MessageHeadersListExpressionEvaluator
- * @see MessageHeadersExpressionEvaluator
- * @see ExpressionEvaluator
- * @see ExpressionEvaluatorManager
+ * @see org.mule.util.expression.MessageAttachmentsListExpressionEvaluator
+ * @see org.mule.util.expression.MessageAttachmentsExpressionEvaluator
+ * @see org.mule.util.expression.ExpressionEvaluator
+ * @see org.mule.util.expression.ExpressionEvaluatorManager
  */
-public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
+public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
 {
-    public static final String NAME = "header";
+    public static final String NAME = "attachment";
 
-    public Object evaluate(String expression, Object message)
+    public Object evaluate(String name, Object message)
     {
         if (message instanceof MessageAdapter)
         {
-            return ((MessageAdapter) message).getProperty(expression);
+            DataHandler dh = ((MessageAdapter) message).getAttachment(name);
+            return dh;
         }
         return null;
     }

@@ -7,9 +7,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.expression;
+package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.util.expression.FunctionExpressionEvaluator;
+import org.mule.util.expression.ExpressionEvaluatorManager;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -17,7 +19,7 @@ import java.net.InetAddress;
 import java.sql.Timestamp;
 import java.util.Date;
 
-public class FunctionPropertyExtractorTestCase extends AbstractMuleTestCase
+public class FunctionExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
     public void testFunctions() throws Exception
     {
@@ -54,30 +56,28 @@ public class FunctionPropertyExtractorTestCase extends AbstractMuleTestCase
 
     public void testFunctionsFromExtractorManager() throws Exception
     {
-        ExpressionEvaluatorManager.setDefaultEvaluator(FunctionExpressionEvaluator.NAME);
-        
         MuleMessage message = new DefaultMuleMessage("test");
-        Object o = ExpressionEvaluatorManager.evaluate("uuid", message);
+        Object o = ExpressionEvaluatorManager.evaluate("function:uuid", message);
         assertNotNull(o);
-        o = ExpressionEvaluatorManager.evaluate("now", message);
+        o = ExpressionEvaluatorManager.evaluate("function:now", message);
         assertNotNull(o);
         assertTrue(o instanceof Timestamp);
 
-        o = ExpressionEvaluatorManager.evaluate("date", message);
+        o = ExpressionEvaluatorManager.evaluate("function:date", message);
         assertNotNull(o);
         assertTrue(o instanceof Date);
 
-        o = ExpressionEvaluatorManager.evaluate("hostname", message);
+        o = ExpressionEvaluatorManager.evaluate("function:hostname", message);
         assertNotNull(o);
         assertEquals(InetAddress.getLocalHost().getHostName(), o);
 
-        o = ExpressionEvaluatorManager.evaluate("ip", message);
+        o = ExpressionEvaluatorManager.evaluate("function:ip", message);
         assertNotNull(o);
         assertEquals(InetAddress.getLocalHost().getHostAddress(), o);
 
         try
         {
-            o = ExpressionEvaluatorManager.evaluate("bork", message);
+            o = ExpressionEvaluatorManager.evaluate("function:bork", message);
             fail("bork is not a valid function");
         }
         catch (Exception e)

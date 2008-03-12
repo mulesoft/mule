@@ -24,7 +24,6 @@ import org.mule.routing.filters.RegExFilter;
 import org.mule.transport.NullPayload;
 import org.mule.util.expression.ExpressionEvaluator;
 import org.mule.util.expression.ExpressionEvaluatorManager;
-import org.mule.util.expression.MessageHeaderExpressionEvaluator;
 
 import java.net.MalformedURLException;
 import java.net.URL;

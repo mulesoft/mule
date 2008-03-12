@@ -51,7 +51,7 @@ public class TransientRegistry extends AbstractRegistry
     {
         super(REGISTRY_ID);
         getObjectTypeMap(ObjectProcessor.class).put("_mulePropertyExtractorProcessor",
-                new PropertyExtractorProcessor());
+                new ExpressionEvaluatorProcessor());
     }
 
     protected LifecycleManager createLifecycleManager()

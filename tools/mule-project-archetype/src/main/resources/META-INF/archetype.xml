@@ -28,7 +28,6 @@
             <name>projectType</name>
             <description>What type of project is this?
                 - [s]tand alone project
-                - [e]xample project that may be hosted on the MuleForge or in the Mule distribution
                 - [m]ule module to be hosted on the MuleForge on in the Mule distribution
             </description>
             <defvalue>s</defvalue>
@@ -51,6 +50,10 @@
         <template>
             <file>pom.vm</file>
             <output>pom.xml</output>
+        </template>
+        <template>
+            <file>LICENSE.vm</file>
+            <output>LICENSE.txt</output>
         </template>
         <template>
             <file>assembly.xml.vm</file>

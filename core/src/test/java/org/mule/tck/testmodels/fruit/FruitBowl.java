@@ -10,6 +10,7 @@
 
 package org.mule.tck.testmodels.fruit;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -68,6 +69,11 @@ public class FruitBowl
         bowl.put(Banana.class, banana);
         return new Fruit[]{banana, apple};
 
+    }
+
+    public List getFruit()
+    {
+        return new ArrayList(bowl.values());
     }
 
     public Object consumeFruit(FruitLover fruitlover)

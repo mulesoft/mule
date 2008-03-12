@@ -1010,7 +1010,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 250, name);
     }
 
-    public static Message noExtractorRegisteredWithKey(String key)
+    public static Message expressionEvaluatorNotRegistered(String key)
     {
         return createMessage(BUNDLE_PATH, 251, key);
     }
@@ -1074,6 +1074,12 @@ public class CoreMessages extends MessageFactory
     public static Message exceededRetry(Object phase, Object component)
     {
         return createMessage(BUNDLE_PATH, 262, phase, component);
+    }
+
+
+    public static Message expressionEvaluatorReturnedNull(String name, String expr)
+    {
+        return createMessage(BUNDLE_PATH, 263, name, expr);
     }
 
 }

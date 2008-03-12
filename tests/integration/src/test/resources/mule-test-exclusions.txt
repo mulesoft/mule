@@ -106,9 +106,8 @@ org.mule.config.spring.VmSchemaValidationTestCase
 org.mule.config.spring.ComponentInterceptorTestCase
 
 # MULE-3000
-#Increased time-outs and removed exclusions to re-test.
-#org.mule.test.integration.client.MuleClientRemotingTcpTestCase
-#org.mule.test.integration.client.MuleClientRemotingJmsTestCase
+org.mule.test.integration.client.MuleClientRemotingTcpTestCase
+org.mule.test.integration.client.MuleClientRemotingJmsTestCase
 
 # MULE-3002
 #org.mule.test.integration.management.ManagementSimpleStartupTestCase

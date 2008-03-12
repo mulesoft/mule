@@ -24,11 +24,8 @@ import java.util.Map;
  * */
 public class ExpressionEvaluatorManager
 {
-    public static final String DEFAULT_EVALUATOR_NAME = MessageHeaderExpressionEvaluator.NAME;
 
     public static final String DEFAULT_EXPRESSION_PREFIX = "${";
-
-    private static String defaultEvaluator = DEFAULT_EVALUATOR_NAME;
 
     private static Map evaluator = new HashMap(8);
 
@@ -55,10 +52,7 @@ public class ExpressionEvaluatorManager
         {
             return null;
         }
-        if(name.equals(getDefaultEvaluator()))
-        {
-            setDefaultEvaluator(DEFAULT_EVALUATOR_NAME);
-        }
+        
         ExpressionEvaluator evaluator = (ExpressionEvaluator) ExpressionEvaluatorManager.evaluator.remove(name);
         if(evaluator instanceof Disposable)
         {
@@ -74,7 +68,7 @@ public class ExpressionEvaluatorManager
     
     public static Object evaluate(String expression, Object object, String expressionPrefix)
     {
-        String name = getDefaultEvaluator();
+        String name;
 
         if(expression==null)
         {
@@ -90,31 +84,21 @@ public class ExpressionEvaluatorManager
             name = expression.substring(0, i);
             expression = expression.substring(i+1);
         }
+        else
+        {
+            name = expression;
+            expression = null;
+        }
         ExpressionEvaluator extractor = (ExpressionEvaluator) evaluator.get(name);
         if(extractor==null)
         {
-            throw new IllegalArgumentException(CoreMessages.noExtractorRegisteredWithKey(name).getMessage());
+            throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(name).getMessage());
         }
         return extractor.evaluate(expression, object);
     }
 
-    public static String getDefaultEvaluator()
-    {
-        return defaultEvaluator;
-    }
-
-    public static void setDefaultEvaluator(String defaultEvaluator)
-    {
-        if(evaluator.get(defaultEvaluator)==null)
-        {
-            throw new IllegalArgumentException(defaultEvaluator);
-        }
-        ExpressionEvaluatorManager.defaultEvaluator = defaultEvaluator;
-    }
-
     public static synchronized void clearEvaluators()
     {
-        defaultEvaluator = DEFAULT_EVALUATOR_NAME;
         for (Iterator iterator = evaluator.values().iterator(); iterator.hasNext();)
         {
             ExpressionEvaluator evaluator = (ExpressionEvaluator)iterator.next();
