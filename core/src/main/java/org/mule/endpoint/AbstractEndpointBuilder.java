@@ -32,7 +32,6 @@ import org.mule.config.i18n.Message;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
-import org.mule.transport.SingleAttemptConnectionStrategy;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
@@ -59,7 +58,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     public static final String PROPERTY_REMOTE_SYNC = "remoteSync";
     public static final String PROPERTY_REMOTE_SYNC_TIMEOUT = "remoteSyncTimeout";
-
+    
     protected URIBuilder uriBuilder;
     protected Connector connector;
     protected List transformers = TransformerUtils.UNDEFINED;
@@ -206,7 +205,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected ConnectionStrategy getDefaultConnectionStrategy(Connector connector)
     {
-        return new SingleAttemptConnectionStrategy();
+        return muleContext.getConfiguration().getDefaultConnectionStrategy();
     }
 
     protected TransactionConfig getTransactionConfig()
@@ -216,6 +215,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected TransactionConfig getDefaultTransactionConfig()
     {
+        //TODO Do we need a new instance per endpoint, or can a single instance be shared?
         return new MuleTransactionConfig();
     }
 

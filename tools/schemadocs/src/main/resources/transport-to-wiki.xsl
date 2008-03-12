@@ -51,7 +51,7 @@ h2. Detailed Configuration Information
     <xsl:template match="xsd:element[@name]" mode="wiki-content">
 
 {cache:showDate=true|showRefresh=true}
-{xslt:style=#http://svn.codehaus.org/mule/branches/mule-2.0.x/tools/schemadocs/src/main/resources/single-doc-html.xsl|source=#http://dev.mulesource.com/docs/xsd-doc/normalized.xsd|elementName=<xsl:value-of select="$transport"/>:<xsl:value-of select="@name"/>}
+{xslt:style=#http://svn.codehaus.org/mule/branches/mule-2.0.x/tools/schemadocs/src/main/resources/xslt/single-element.xsl|source=#http://dev.mulesource.com/docs/xsd-doc/normalized.xsd|elementName=<xsl:value-of select="$transport"/>:<xsl:value-of select="@name"/>}
 {xslt}
 {cache}
 

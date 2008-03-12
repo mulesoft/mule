@@ -77,13 +77,13 @@ public class DefaultEndpointFactory implements EndpointFactory
 
     public InboundEndpoint getInboundEndpoint(EndpointBuilder builder) throws MuleException
     {
-        ImmutableEndpoint endpoint = builder.buildInboundEndpoint();
+        InboundEndpoint endpoint = builder.buildInboundEndpoint();
         return (InboundEndpoint) registerEndpoint(endpoint);
     }
 
     public OutboundEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException
     {
-        ImmutableEndpoint endpoint = builder.buildOutboundEndpoint();
+        OutboundEndpoint endpoint = builder.buildOutboundEndpoint();
         return (OutboundEndpoint) registerEndpoint(endpoint);
     }
 

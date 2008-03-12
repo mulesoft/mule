@@ -13,6 +13,7 @@ package org.mule.transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.transaction.constraints.ConstraintFilter;
+import org.mule.util.ClassUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -185,5 +186,23 @@ public class MuleTransactionConfig implements TransactionConfig
             .append(timeout)
             .append("}");
         return buf.toString();
+    }
+    
+    public int hashCode()
+    {
+        return ClassUtils.hash(new Object[]{factory, new Byte(action), constraint, new Integer(timeout)});
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final MuleTransactionConfig other = (MuleTransactionConfig) obj;
+        return ClassUtils.equal(factory, other.factory)
+               && ClassUtils.equal(new Byte(action), new Byte(other.action))
+               && ClassUtils.equal(constraint, other.constraint)
+               && ClassUtils.equal(new Integer(timeout), new Integer(other.timeout));
+
     }
 }

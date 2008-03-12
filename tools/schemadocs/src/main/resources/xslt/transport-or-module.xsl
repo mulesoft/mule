@@ -6,43 +6,37 @@
 
     <!-- $Id: -->
 
-    <!-- generate text to cut+paste into the wiki and links document
+    <!-- generate documentation for an entire transport or module
 
-         this should be run on a transport's schema
-
-         for example,
-         saxon ./transports/http/src/main/resources/META-INF/mule-https.xsd \
-               ./tools/schemadocs/src/main/resources/transport-to-wiki.xsl transport=https
-
+         to be embedded in confluence pages
     -->
 
     <!-- the transport we are generating docs for -->
     <xsl:param name="transport"/>
     <xsl:variable name="prefix" select="concat($transport, ':')"/>
+    <xsl:variable name="abstract" select="concat($prefix, 'abstract')"/>
 
     <xsl:output method="html"/>
     <!-- xsl:include href="schemadoc-core.xsl"/ -->
-    <!-- xsl:include href="http://svn.codehaus.org/mule/branches/mule-2.0.x/tools/schemadocs/src/main/resources/xslt/schemadoc-core.xsl"/ -->
+    <xsl:include href="http://svn.codehaus.org/mule/branches/mule-2.0.x/tools/schemadocs/src/main/resources/xslt/schemadoc-core.xsl"/>
 
     <xsl:template match="/">
         <html>
             <body>
-                poop
-            </body>
-        </html>
-        <!-- html>
-            <body>
 <h2>Detailed Configuration Information</h2>
-        <xsl:apply-templates select="//xsd:element[@name=concat($prefix, 'connector')]" mode="wiki-menu-connector"/>
+                <ul>
+        <xsl:apply-templates select="//xsd:element[@name=concat($prefix, 'connector')]" mode="wiki-menu"/>
         <xsl:apply-templates select="//xsd:element[@name=concat($prefix, 'inbound-endpoint')]" mode="wiki-menu"/>
         <xsl:apply-templates select="//xsd:element[@name=concat($prefix, 'outbound-endpoint')]" mode="wiki-menu"/>
-        <xsl:apply-templates select="//xsd:element[@name=concat($prefix, 'endpoint')]" mode="wiki-menu-global"/>
+        <xsl:apply-templates select="//xsd:element[@name=concat($prefix, 'endpoint')]" mode="wiki-menu"/>
         <xsl:apply-templates select="//xsd:element[
         @name!=concat($prefix, 'connector') and
         @name!=concat($prefix, 'endpoint') and
         @name!=concat($prefix, 'inbound-endpoint') and
         @name!=concat($prefix, 'outbound-endpoint') and
-        starts-with(@name, $prefix)]" mode="wiki-menu"/>
+        starts-with(@name, $prefix) and
+        not(starts-with(@name, $abstract))]" mode="wiki-menu"/>
+                </ul>
 
         <xsl:apply-templates select="//xsd:element[@name=concat($prefix, 'connector')]" mode="single-element"/>
         <xsl:apply-templates select="//xsd:element[@name=concat($prefix, 'inbound-endpoint')]" mode="single-element"/>
@@ -53,21 +47,23 @@
         @name!=concat($prefix, 'endpoint') and
         @name!=concat($prefix, 'inbound-endpoint') and
         @name!=concat($prefix, 'outbound-endpoint') and
-        starts-with(@name, $prefix)]" mode="single-element"/>
+        starts-with(@name, $prefix) and
+        not(starts-with(@name, $abstract))]" mode="single-element"/>
         <xsl:text>
 
 </xsl:text>
             </body>
-        </html -->
+        </html>
     </xsl:template>
 
-    <xsl:template match="xsd:element[@name]" mode="wiki-menu-connector"><xsl:variable name="textname" select="translate(@name, '-', ' ')"/>
-* [<xsl:value-of select="upper-case(substring($transport, 1, 1))"/><xsl:value-of select="substring($transport, 2)"/> connector|#<xsl:value-of select="$transport"/>-<xsl:value-of select="@name"/>]</xsl:template>
-
-    <xsl:template match="xsd:element[@name]" mode="wiki-menu-global"><xsl:variable name="textname" select="translate(@name, '-', ' ')"/>
-* [Global endpoint|#<xsl:value-of select="$transport"/>-<xsl:value-of select="@name"/>]</xsl:template>
-
-    <xsl:template match="xsd:element[@name]" mode="wiki-menu"><xsl:variable name="textname" select="translate(substring-after(@name, ':'), '-', ' ')"/>
-* [<xsl:value-of select="upper-case(substring($textname, 1, 1))"/><xsl:value-of select="substring($textname, 2)"/>|#<xsl:value-of select="$transport"/>-<xsl:value-of select="@name"/>]</xsl:template>
+    <xsl:template match="xsd:element[@name]" mode="wiki-menu">
+        <li>
+            <xsl:call-template name="link">
+                <xsl:with-param name="item">
+                    <xsl:value-of select="@name"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </li>
+    </xsl:template>
 
 </xsl:stylesheet>

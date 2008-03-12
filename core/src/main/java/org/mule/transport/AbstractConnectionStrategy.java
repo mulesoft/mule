@@ -16,6 +16,7 @@ import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.util.ClassUtils;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -155,6 +156,22 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
         {
             return connectable.toString();
         }
+    }
+
+    public int hashCode()
+    {
+        return ClassUtils.hash(new Object[]{doThreading ? Boolean.TRUE : Boolean.FALSE, workManager});
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final AbstractConnectionStrategy other = (AbstractConnectionStrategy) obj;
+        return ClassUtils.equal(new Boolean(doThreading), new Boolean(other.doThreading))
+               && ClassUtils.equal(workManager, other.workManager);
+
     }
 
 }

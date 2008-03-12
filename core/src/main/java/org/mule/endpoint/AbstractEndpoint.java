@@ -35,9 +35,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -68,12 +65,12 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     /**
      * The transformers used to transform the incoming or outgoing data
      */
-    protected AtomicReference transformers = new AtomicReference(new LinkedList());
+    protected List transformers = new LinkedList();
 
     /**
      * The transformers used to transform the incoming or outgoing data
      */
-    protected AtomicReference responseTransformers = new AtomicReference(new LinkedList());
+    protected List responseTransformers = new LinkedList();
 
     /**
      * The name for the endpoint
@@ -101,11 +98,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      * recieving the same message again
      */
     protected boolean deleteUnacceptedMessages = false;
-
-    /**
-     * has this endpoint been initialised
-     */
-    protected AtomicBoolean initialised = new AtomicBoolean(false);
 
     /**
      * The security filter to apply to this endpoint
@@ -175,7 +167,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     public List getTransformers()
     {
-        return (List) transformers.get();
+        return transformers;
     }
 
     public Map getProperties()
@@ -226,12 +218,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         }
 
         return ClassUtils.getClassName(getClass()) + "{endpointUri=" + sanitizedEndPointUri + ", connector="
-               + connector + ", transformer=" + transformers.get() + ", name='" + name + "'" + ", properties="
-               + properties + ", transactionConfig=" + transactionConfig + ", filter=" + filter
-               + ", deleteUnacceptedMessages=" + deleteUnacceptedMessages + ", initialised=" + initialised
-               + ", securityFilter=" + securityFilter + ", synchronous=" + synchronous + ", initialState="
-               + initialState + ", remoteSync=" + remoteSync + ", remoteSyncTimeout=" + remoteSyncTimeout
-               + ", endpointEncoding=" + endpointEncoding + "}";
+               + connector + ", transformer=" + transformers + ", name='" + name + "'" + ", properties=" + properties
+               + ", transactionConfig=" + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
+               + deleteUnacceptedMessages + ", securityFilter=" + securityFilter + ", synchronous=" + synchronous
+               + ", initialState=" + initialState + ", remoteSync=" + remoteSync + ", remoteSyncTimeout="
+               + remoteSyncTimeout + ", endpointEncoding=" + endpointEncoding + "}";
     }
 
     public String getProtocol()
@@ -273,7 +264,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     public int hashCode()
     {
-        return ClassUtils.hash(new Object[]{connectionStrategy, connector,
+        return ClassUtils.hash(new Object[]{this.getClass(), connectionStrategy, connector,
             deleteUnacceptedMessages ? Boolean.TRUE : Boolean.FALSE, endpointEncoding, endpointUri,
             filter,
             initialState,
@@ -294,9 +285,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     }
 
     // TODO - remove (or fix)
-    protected void updateTransformerEndpoints(AtomicReference reference)
+    protected void updateTransformerEndpoints(List transformers)
     {
-        List transformers = (List) reference.get();
         if (TransformerUtils.isDefined(transformers))
         {
             Iterator transformer = transformers.iterator();
@@ -373,7 +363,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     public List getResponseTransformers()
     {
-        return (List) responseTransformers.get();
+        return responseTransformers;
     }
 
     public Object getProperty(Object key)
@@ -453,13 +443,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     public void setTransformers(List transformers)
     {
-        setTransformers(this.transformers, transformers);
-    }
-
-    protected void setTransformers(AtomicReference reference, List transformers)
-    {
-        reference.set(transformers);
-        updateTransformerEndpoints(reference);
+        this.transformers = transformers;
+        updateTransformerEndpoints(transformers);
     }
 
     public void setProperties(Map props)
@@ -560,7 +545,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     public void setResponseTransformers(List transformers)
     {
-        setTransformers(responseTransformers, transformers);
+        this.responseTransformers =  transformers;
         updateTransformerEndpoints(responseTransformers);
     }
 
