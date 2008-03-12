@@ -34,6 +34,12 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
     // @Override
     protected void doSetUp() throws Exception
     {
+        Map props = new HashMap();
+        props.put("object", new Apple());
+        props.put("number", new Integer(1));
+        props.put("string", "hello");
+        testObject = new DefaultMuleMessage("test", props);
+        
         RequestContext.setEvent(
                 new DefaultMuleEvent(testObject, getTestOutboundEndpoint("test"),
                 MuleTestUtils.getTestSession(muleContext), true));
@@ -52,15 +58,6 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
         // this depends on the ordering of properties in the map.
         // because we now make a copy of maps in RequestContext this order can change
         //super.testTransform();
-    }
-
-    public SerializedUMOMessageTransformersTestCase()
-    {
-        Map props = new HashMap();
-        props.put("object", new Apple());
-        props.put("number", new Integer(1));
-        props.put("string", "hello");
-        testObject = new DefaultMuleMessage("test", props);
     }
 
     public Transformer getTransformer() throws Exception

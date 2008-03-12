@@ -12,7 +12,6 @@ package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
-import org.mule.config.MuleConfiguration;
 import org.mule.util.FileUtils;
 import org.mule.util.file.DeleteException;
 
@@ -32,9 +31,11 @@ import org.safehaus.uuid.UUIDGenerator;
 
 public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleContextAware
 {
-
     private static final Log logger = LogFactory.getLog(FilePersistenceStrategy.class);
 
+   /** The default queueStore directory for persistence */
+   public static final String DEFAULT_QUEUE_STORE = "queuestore";
+    
     public static final String EXTENSION = ".msg";
 
     private File store;
@@ -182,8 +183,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
      */
     public void open() throws IOException
     {
-        String path = muleContext.getConfiguration().getWorkingDirectory() + File.separator
-                      + MuleConfiguration.DEFAULT_QUEUE_STORE;
+        String path = muleContext.getConfiguration().getWorkingDirectory() + File.separator + DEFAULT_QUEUE_STORE;
         store = FileUtils.newFile(path).getCanonicalFile();
         store.mkdirs();
     }

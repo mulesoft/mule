@@ -10,51 +10,16 @@
 
 package org.mule.api.config;
 
-/**
- * <code>MuleProperties</code> is a set of constants pertaining to Mule system
- * properties.
- */
 
+/**
+ * <code>MuleProperties</code> is a set of constants pertaining to Mule properties.
+ */
 public interface MuleProperties
 {
     /**
      * The prefix for any Mule-specific properties set on an event
      */
     String PROPERTY_PREFIX = "MULE_";
-
-    /**
-     * The prefix for any Mule-specific properties set in the system properties
-     */
-    String SYSTEM_PROPERTY_PREFIX = "org.mule.";
-
-    /********************************************************************************
-     * System properties that can be set as VM arguments
-     *******************************************************************************/
-
-    /** Disable the Admin agent */
-    String DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX
-                                                                     + "disable.server.connections";
-
-    /** Configuration parsing properties */
-    String XML_VALIDATE_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "xml.validate";
-
-    /** Path to a Mule Dtd to use */
-    String XML_DTD_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "xml.dtd";
-
-    /** Default Ecoding used by the server */
-    String MULE_ENCODING_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "encoding";
-
-    /** The operatirng system encoding */
-    String MULE_OS_ENCODING_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "osEncoding";
-    
-    /**
-     * whether a configuration builder should start the server after it has been
-     * configured, The default is true
-     */
-    String MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX
-                                                                  + "start.after.config";
-
-    String MULE_THREAD_UNSAFE_MESSAGES_PROPERTY = SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages";
 
     // End System properties
 
@@ -144,12 +109,11 @@ public interface MuleProperties
     String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
     String OBJECT_WORK_MANAGER = "_muleWorkManager";
     String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
-    
-    
-    //Debug Options
-    String DEBUG_CACHE_MESSAGE_AS_BYTES = SYSTEM_PROPERTY_PREFIX + "message.cacheBytes";
-    String DEBUG_CACHE_ORIGINAL_MESSAGE = SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal";
-    String DEBUG_ENABLE_STREAMING = SYSTEM_PROPERTY_PREFIX + "streaming.enable";
-    String DEBUG_ASSERT_MESSAGE_ACCESS = SYSTEM_PROPERTY_PREFIX + "message.assertAccess";
-    String DEBUG_AUTO_WRAP_TRANSFORM = SYSTEM_PROPERTY_PREFIX + "transform.autoWrap";
+
+    /**
+    * Specifies whether mule should process messages sysnchonously, i.e. that a
+    * mule-model can only process one message at a time, or asynchronously. The
+    * default value is 'false'.
+    */
+    String SYNCHRONOUS_PROPERTY = "synchronous";
 }

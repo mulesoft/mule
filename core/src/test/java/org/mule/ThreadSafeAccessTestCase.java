@@ -12,7 +12,6 @@ package org.mule;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.api.config.MuleProperties;
 import org.mule.model.direct.DirectService;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -22,10 +21,9 @@ import java.util.Map;
 
 public class ThreadSafeAccessTestCase extends AbstractMuleTestCase
 {
-
     protected void doSetUp() throws Exception
     {
-        System.setProperty(MuleProperties.MULE_THREAD_UNSAFE_MESSAGES_PROPERTY, "false");
+        muleContext.getConfiguration().setFailOnMessageScribbling(true);
     }
 
     public void testMessage() throws InterruptedException
@@ -53,7 +51,7 @@ public class ThreadSafeAccessTestCase extends AbstractMuleTestCase
     {
         try
         {
-            System.setProperty(MuleProperties.MULE_THREAD_UNSAFE_MESSAGES_PROPERTY, "true");
+            muleContext.getConfiguration().setFailOnMessageScribbling(false);
             ThreadSafeAccess target = new DefaultMessageAdapter(new Object());
             newThread(target, false, new boolean[]{true, true, false, true});
             newThread(target, false, new boolean[]{false});
@@ -61,7 +59,7 @@ public class ThreadSafeAccessTestCase extends AbstractMuleTestCase
         }
         finally
         {
-            System.getProperties().remove(MuleProperties.MULE_THREAD_UNSAFE_MESSAGES_PROPERTY);
+            muleContext.getConfiguration().setFailOnMessageScribbling(true);
         }
     }
 

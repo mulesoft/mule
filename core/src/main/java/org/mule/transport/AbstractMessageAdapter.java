@@ -10,6 +10,7 @@
 
 package org.mule.transport;
 
+import org.mule.MuleServer;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
@@ -19,7 +20,6 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.UniqueIdNotSupportedException;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.DebugOptions;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -48,12 +48,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSafeAccess
 {
-    /**
-     * Should we fail when we detect scribbling?  This can be overridden by setting the
-     * property {@link org.mule.api.config.MuleProperties#MULE_THREAD_UNSAFE_MESSAGES_PROPERTY}
-     */
-    public static final boolean DEFAULT_FAILFAST = true;
-
     /** logger used by this class */
     protected static transient Log logger;
 
@@ -489,7 +483,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     /** {@inheritDoc} */
     public void assertAccess(boolean write)
     {
-        if(DebugOptions.isAssertMessageAccess())
+        if (MuleServer.getMuleContext().getConfiguration().isAssertMessageAccess())
         {
             initAccessControl();
             setOwner();
@@ -573,8 +567,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
 
     protected boolean isDisabled()
     {
-        return org.apache.commons.collections.MapUtils.getBooleanValue(System.getProperties(),
-                MuleProperties.MULE_THREAD_UNSAFE_MESSAGES_PROPERTY, !DEFAULT_FAILFAST);
+        return !MuleServer.getMuleContext().getConfiguration().isFailOnMessageScribbling();
     }
 
     private synchronized void initAccessControl()
@@ -592,7 +585,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     /** {@inheritDoc} */
     public synchronized void resetAccessControl()
     {
-        if(DebugOptions.isAssertMessageAccess())
+        if (MuleServer.getMuleContext().getConfiguration().isAssertMessageAccess())
         {
             assertAccess(WRITE);
             ownerThread.set(null);

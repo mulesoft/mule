@@ -10,20 +10,18 @@
 
 package org.mule.module.management.mbean;
 
-import org.mule.config.ConfigResource;
 import org.mule.config.MuleConfiguration;
 
 /**
  * <code>MuleConfigurationService</code> exposes the MuleConfiguration settings as
  * a management service
  * 
+ * TODO I'm not sure this is relevant anymore since the MuleConfiguration should
+ * be immutable after startup.
  */
 public class MuleConfigurationService implements MuleConfigurationServiceMBean
 {
-
-
     private  MuleConfiguration muleConfiguration;
-
 
     public MuleConfigurationService(MuleConfiguration muleConfiguration)
     {
@@ -71,12 +69,6 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         muleConfiguration.setWorkingDirectory(workingDirectory);
     }
 
-    public ConfigResource[] getConfigResources()
-    {
-        return muleConfiguration.getConfigResources();
-    }
-
-
     public int getTransactionTimeout()
     {
         return muleConfiguration.getDefaultTransactionTimeout();
@@ -101,15 +93,5 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
     public void setEncoding(String encoding)
     {
         muleConfiguration.setDefaultEncoding(encoding);
-    }
-
-    public String getOSEncoding()
-    {
-        return muleConfiguration.getDefaultOSEncoding();
-    }
-
-    public void setOSEncoding(String encoding)
-    {
-        muleConfiguration.setDefaultOSEncoding(encoding);
     }
 }

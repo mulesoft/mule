@@ -11,12 +11,12 @@
 package org.mule.transformer;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.MuleServer;
 import org.mule.RequestContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.DebugOptions;
 
 /**
  * <code>AbstractMessageAwareTransformer</code> is a transformer that has a reference
@@ -48,7 +48,7 @@ public abstract class AbstractMessageAwareTransformer extends AbstractTransforme
         {
             message = (MuleMessage)src;
         }
-        else if(DebugOptions.isAutoWrapMessageAwareTransform())
+        else if (MuleServer.getMuleContext().getConfiguration().isAutoWrapMessageAwareTransform())
         {
             message = new DefaultMuleMessage(src);
         }

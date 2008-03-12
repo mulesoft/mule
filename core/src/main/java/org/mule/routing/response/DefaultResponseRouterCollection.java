@@ -21,7 +21,6 @@ import org.mule.api.routing.ResponseRouter;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.routing.Router;
 import org.mule.api.routing.RoutingException;
-import org.mule.config.MuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
@@ -39,7 +38,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 public class DefaultResponseRouterCollection extends AbstractRouterCollection implements ResponseRouterCollection
 {
     private volatile List endpoints = new CopyOnWriteArrayList();
-    private volatile int timeout = MuleConfiguration.DEFAULT_TIMEOUT;
+    private volatile int timeout = -1; // undefined
     private volatile boolean failOnTimeout = true;
 
     public DefaultResponseRouterCollection()
@@ -50,6 +49,10 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
 
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
+        if (timeout == -1) // undefined
+        {
+            setTimeout(muleContext.getConfiguration().getDefaultSynchronousEventTimeout());
+        }
         return LifecycleTransitionResult.initialiseAll(super.initialise(), endpoints.iterator());
     }
 

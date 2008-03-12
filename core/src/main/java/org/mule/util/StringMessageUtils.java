@@ -10,8 +10,8 @@
 
 package org.mule.util;
 
+import org.mule.MuleServer;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 
 import java.io.UnsupportedEncodingException;
@@ -28,10 +28,6 @@ import java.util.Map;
 // @ThreadSafe
 public final class StringMessageUtils
 {
-    // Character encoding properties
-    public static final String DEFAULT_ENCODING = "UTF-8";
-    public static final String DEFAULT_OS_ENCODING = System.getProperty("file.encoding");
-
     // The maximum number of Collection and Array elements used for messages
     public static final int MAX_ELEMENTS = 50;
     public static final int DEFAULT_MESSAGE_WIDTH = 80;
@@ -128,16 +124,15 @@ public final class StringMessageUtils
             buf.append(" ");
             buf.append(messages.get(i));
 
+            String osEncoding = System.getProperty("file.encoding");
             int padding;
             try
             {
-                padding = trimLength - messages.get(i).toString().getBytes(getOSEncoding()).length;
+                padding = trimLength - messages.get(i).toString().getBytes(osEncoding).length;
             }
             catch (UnsupportedEncodingException ueex)
             {
-                throw new MuleRuntimeException(
-                    CoreMessages.failedToConvertStringUsingEncoding(getOSEncoding()),
-                    ueex);
+                throw new MuleRuntimeException(CoreMessages.failedToConvertStringUsingEncoding(osEncoding), ueex);
             }
             if (padding > 0)
             {
@@ -179,7 +174,7 @@ public final class StringMessageUtils
     {
         try
         {
-            return string.getBytes(getEncoding());
+            return string.getBytes(MuleServer.getMuleContext().getConfiguration().getDefaultEncoding());
         }
         catch (UnsupportedEncodingException e)
         {
@@ -199,24 +194,6 @@ public final class StringMessageUtils
             // We can ignore this as the encoding is validated on start up
             return null;
         }
-    }
-
-    private static String getEncoding()
-    {
-        // Note that the org.mule.encoding property will not be set by Mule until the
-        // MuleManager.initialise method is called, thus if you need to set an
-        // encoding other than UTF-8 before the Manager is invoked, you can set this
-        // property on the JVM
-        return System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, DEFAULT_ENCODING);
-    }
-
-    private static String getOSEncoding()
-    {
-        // Note that the org.mule.osEncoding property will not be set by Mule until
-        // the MuleManager.initialise method is called, thus if you need to set an
-        // encoding other than UTF-8 before the Manager is invoked, you can set this
-        // property on the JVM
-        return System.getProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY, DEFAULT_OS_ENCODING);
     }
 
     /**

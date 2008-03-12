@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.parsers.specific.endpoint.support;
 
+import org.mule.api.config.MuleProperties;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
@@ -18,9 +19,8 @@ import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParse
 import org.mule.config.spring.parsers.processors.BlockAttribute;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
-import org.mule.config.MuleConfiguration;
-import org.mule.endpoint.URIBuilder;
 import org.mule.endpoint.AbstractEndpointBuilder;
+import org.mule.endpoint.URIBuilder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +42,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     public static final boolean PROTOCOL = ChildAddressDefinitionParser.PROTOCOL;
     public static final String PROPERTIES = "properties";
     public static final String[] RESTRICTED_ENDPOINT_ATTRIBUTES =
-            new String[]{MuleConfiguration.SYNCHRONOUS_PROPERTY, AbstractEndpointBuilder.PROPERTY_REMOTE_SYNC,
+            new String[]{MuleProperties.SYNCHRONOUS_PROPERTY, AbstractEndpointBuilder.PROPERTY_REMOTE_SYNC,
                     AbstractEndpointBuilder.PROPERTY_REMOTE_SYNC_TIMEOUT, "encoding",
                     "connector", "createConnector", "transformer", "responseTransformer"};
 

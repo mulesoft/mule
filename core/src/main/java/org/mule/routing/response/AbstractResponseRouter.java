@@ -12,8 +12,9 @@ package org.mule.routing.response;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.ResponseRouter;
-import org.mule.config.MuleConfiguration;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
 import org.mule.util.ClassUtils;
@@ -30,12 +31,22 @@ public abstract class AbstractResponseRouter extends AbstractRouter implements R
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private int timeout = MuleConfiguration.DEFAULT_TIMEOUT;
-
+    private int timeout = -1; // undefined
+    
     private boolean failOnTimeout = true;
 
     protected ExpressionEvaluator propertyExtractor = new CorrelationPropertiesExpressionEvaluator();
 
+    //@Override
+    public LifecycleTransitionResult initialise() throws InitialisationException
+    {
+        if (timeout == -1) // undefined
+        {
+            setTimeout(muleContext.getConfiguration().getDefaultSynchronousEventTimeout());
+        }
+        return super.initialise();
+    }
+    
     public ExpressionEvaluator getPropertyExtractor()
     {
         return propertyExtractor;

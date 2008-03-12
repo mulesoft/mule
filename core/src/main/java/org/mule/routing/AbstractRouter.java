@@ -26,7 +26,7 @@ public abstract class AbstractRouter implements Router, MuleContextAware
 
     private RouterStatistics routerStatistics;
 
-    private MuleContext muleContext;
+    protected MuleContext muleContext;
 
     // default impl does nothing
     public LifecycleTransitionResult initialise() throws InitialisationException
