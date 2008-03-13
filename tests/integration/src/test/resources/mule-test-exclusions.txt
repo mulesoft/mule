@@ -47,6 +47,11 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # Mule 2.0.x failures
 ##########################################################################
 
+# MULE-3107
+# Throws "Specification not exhausted: class org.mule.context.notification.ManagerNotification: 108"
+# I don't understand what this is trying to test for exactly
+org.mule.context.notification.ServerNotificationManagerTestCase
+
 # MULE-2736
 # Hangs for a long, long time
 org.mule.test.integration.transaction.XAJdbcMule1479TestCase
@@ -69,14 +74,6 @@ org.mule.test.integration.util.ObjectNameHelperTestCase
 # MULE-2620
 org.mule.module.xml.functional.BeanPropertyExtractorMultipleEndpointsTestCase
 org.mule.module.xml.functional.BeanPropertyExtractorTestCase
-
-##########################################################################
-# Mule 2.x failures
-##########################################################################
-
-# Throws "Specification not exhausted: class org.mule.context.notification.ManagerNotification: 108"
-# I don't understand what this is trying to test for exactly
-org.mule.context.notification.ServerNotificationManagerTestCase
 
 ##########################################################################
 # Low priority
