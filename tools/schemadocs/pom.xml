@@ -216,25 +216,6 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
         </dependency>
-        <!--
-            Bind log4j statically, but preserve
-            the clogging API compatibility.
-         -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl104-over-slf4j</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <profiles>

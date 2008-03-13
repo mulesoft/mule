@@ -19,6 +19,11 @@
         <module>bobberplus</module>
         <module>mule-transport-archetype</module>
         <module>mule-project-archetype</module>
+        <!-- Disable schemadocs module for now because it is causing CI to fail 
+             with a meaningless error message: 
+               "Error for project: Schema Docs (during install)... null... org/​apache/​commons/​logging/​LogFactory"
+             See for example, http://dev.mulesource.com/bamboo/browse/MULE-MULE2JDK5-219/log
         <module>schemadocs</module>
+        -->
     </modules>
 </project>
