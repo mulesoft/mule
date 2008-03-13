@@ -9,3 +9,8 @@ org.mule.test.firewall.FirewallTestCase
 
 # MULE-3005
 org.mule.test.spring.SpringIdsMule3005TestCase
+
+# MULE-3108
+# I don't understand what kind of magic was making this test work previously 
+# since "name" is a required attribute on <service> according to the schema.
+org.mule.config.spring.DefaultModelAndServiceNames
