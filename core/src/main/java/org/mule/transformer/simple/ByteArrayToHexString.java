@@ -12,7 +12,11 @@ package org.mule.transformer.simple;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
+
+import java.io.InputStream;
+
 
 /**
  * Converts a Byte array to a Hex String.
@@ -24,6 +28,7 @@ public class ByteArrayToHexString extends AbstractTransformer
     public ByteArrayToHexString()
     {
         registerSourceType(byte[].class);
+        registerSourceType(InputStream.class);
         setReturnClass(String.class);
     }
 
@@ -46,7 +51,25 @@ public class ByteArrayToHexString extends AbstractTransformer
 
         try
         {
-            return StringUtils.toHexString((byte[]) src, upperCase);
+            byte[] bytes = null;
+            if (src instanceof InputStream)
+            {
+                InputStream input = (InputStream) src;
+                try
+                {
+                    bytes = IOUtils.toByteArray(input);
+                }
+                finally
+                {
+                    IOUtils.closeQuietly(input);
+                }
+            }
+            else
+            {
+                bytes = (byte[]) src;
+            }
+                
+            return StringUtils.toHexString(bytes, upperCase);
         }
         catch (Exception ex)
         {

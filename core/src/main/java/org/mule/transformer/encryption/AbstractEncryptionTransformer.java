@@ -17,7 +17,9 @@ import org.mule.api.security.CryptoFailureException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.util.IOUtils;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -34,6 +36,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
     {
         registerSourceType(byte[].class);
         registerSourceType(String.class);
+        registerSourceType(InputStream.class);
         setReturnClass(byte[].class);
     }
 
@@ -57,6 +60,18 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
         if (src instanceof String)
         {
             buf = src.toString().getBytes();
+        }
+        else if (src instanceof InputStream)
+        {
+            InputStream input = (InputStream) src;
+            try
+            {
+                buf = IOUtils.toByteArray(input);
+            }
+            finally
+            {
+                IOUtils.closeQuietly(input);
+            }
         }
         else
         {

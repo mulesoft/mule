@@ -38,7 +38,6 @@ public class SerialisedObjectTransformersTestCase extends AbstractTransformerTes
     public Object getResultData()
     {
         return SerializationUtils.serialize(testObject);
-
     }
 
 }

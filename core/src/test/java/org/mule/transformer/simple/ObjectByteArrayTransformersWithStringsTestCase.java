@@ -10,22 +10,10 @@
 
 package org.mule.transformer.simple;
 
-import org.mule.api.transformer.Transformer;
-import org.mule.transformer.AbstractTransformerTestCase;
 
-public class ObjectByteArrayTransformersWithStringsTestCase extends AbstractTransformerTestCase
+public class ObjectByteArrayTransformersWithStringsTestCase extends ObjectByteArrayTransformersWithObjectsTestCase
 {
     private String testObject = "test";
-
-    public Transformer getTransformer() throws Exception
-    {
-        return new ObjectToByteArray();
-    }
-
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        return new ByteArrayToObject();
-    }
 
     public Object getTestData()
     {

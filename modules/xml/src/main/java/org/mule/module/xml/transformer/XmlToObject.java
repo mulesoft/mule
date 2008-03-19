@@ -59,10 +59,12 @@ public class XmlToObject extends AbstractXStreamTransformer
                 throw new TransformerException(this, uee);
             }
         }
-        else if(src instanceof InputStream){
+        else if(src instanceof InputStream)
+        {
+            InputStream input = (InputStream) src;
             try
             {
-                Reader xml = new InputStreamReader((InputStream) src, outputEncoding);
+                Reader xml = new InputStreamReader(input, outputEncoding);
                 return getXStream().fromXML(xml);
             }
             catch (UnsupportedEncodingException uee)
@@ -73,7 +75,7 @@ public class XmlToObject extends AbstractXStreamTransformer
             {
                 try
                 {
-                    ((InputStream) src).close();
+                    input.close();
                 }
                 catch (IOException e)
                 {

@@ -14,6 +14,8 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformerTestCase;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 
 public class HexStringByteArrayTransformersTestCase extends AbstractTransformerTestCase
@@ -74,6 +76,14 @@ public class HexStringByteArrayTransformersTestCase extends AbstractTransformerT
         t.setUpperCase(true);
 
         assertEquals(((String)getTestData()).toUpperCase(), t.transform(getResultData()));
+    }
+    
+    public void testStreaming() throws TransformerException
+    {
+        ByteArrayToHexString transformer = new ByteArrayToHexString();
+        InputStream input = new ByteArrayInputStream((byte[]) this.getResultData());
+        
+        assertEquals(this.getTestData(), transformer.transform(input));
     }
 
 }

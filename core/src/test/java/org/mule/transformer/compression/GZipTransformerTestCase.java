@@ -15,12 +15,11 @@ import org.mule.api.transformer.Transformer;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.util.compression.GZipCompression;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang.SerializationUtils;
 
 public class GZipTransformerTestCase extends AbstractTransformerTestCase
 {
+    protected static final String TEST_DATA = "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";
     protected GZipCompression strat;
 
     // @Override
@@ -33,7 +32,7 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
     {
         try
         {
-            return strat.compressByteArray(SerializationUtils.serialize((Serializable) this.getTestData()));
+            return strat.compressByteArray(SerializationUtils.serialize(TEST_DATA));
         }
         catch (Exception e)
         {
@@ -44,7 +43,7 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
 
     public Object getTestData()
     {
-        return "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";
+        return TEST_DATA;
     }
 
     public Transformer getTransformer()

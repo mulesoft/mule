@@ -11,14 +11,20 @@
 package org.mule.transformer.simple;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.util.IOUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectStreamConstants;
+import java.io.PushbackInputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * <code>ByteArrayToObject</code> works in the same way as
- * <code>ByteArrayToSerializable</code> but checks if th byte array is a serialised
- * object and if not will return a String created from the bytes is the returnType on
- * the transformer.
+ * <code>ByteArrayToSerializable</code> but checks if the byte array is a
+ * serialised object and if not will return a String created from the bytes as the
+ * returnType on the transformer.
  */
 public class ByteArrayToObject extends ByteArrayToSerializable
 {
@@ -26,23 +32,65 @@ public class ByteArrayToObject extends ByteArrayToSerializable
     // @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        byte[] bytes = (byte[]) src;
-
-        if (bytes[0] == (byte) ((ObjectStreamConstants.STREAM_MAGIC >>> 8) & 0xFF))
+        if (src instanceof byte[])
         {
-            return super.doTransform(src, encoding);
+            byte[] bytes = (byte[])src;
+
+            if (this.checkStreamHeader(bytes[0]))
+            {
+                return super.doTransform(src, encoding);
+            }
+            else
+            {
+                try
+                {
+                    return new String(bytes, encoding);
+                }
+                catch (UnsupportedEncodingException e)
+                {
+                    throw new TransformerException(this, e);
+                }
+            }
         }
-        else
+        else if (src instanceof InputStream)
         {
             try
             {
-                return new String(bytes, encoding);
+                PushbackInputStream pushbackStream = new PushbackInputStream((InputStream)src);
+                int firstByte = pushbackStream.read();
+                pushbackStream.unread((byte)firstByte);
+                
+                if (this.checkStreamHeader((byte)firstByte))
+                {
+                    return super.doTransform(pushbackStream, encoding);
+                }
+                else
+                {
+                    try
+                    {
+                        return IOUtils.toString(pushbackStream, encoding);
+                    }
+                    finally
+                    {
+                        // this also closes the underlying stream that's stored in src
+                        pushbackStream.close();
+                    }
+                }
             }
-            catch (Exception e)
+            catch (IOException iox)
             {
-                throw new TransformerException(this, e);
+                throw new TransformerException(this, iox);
             }
+        }
+        else
+        {
+            throw new TransformerException(CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(
+                this.getName(), src.getClass(), endpoint));
         }
     }
 
+    private boolean checkStreamHeader(byte firstByte)
+    {
+        return (firstByte == (byte)((ObjectStreamConstants.STREAM_MAGIC >>> 8) & 0xFF));
+    }
 }

@@ -1,0 +1,41 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.transformer.simple;
+
+import org.mule.util.IOUtils;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+public class ObjectByteArrayTransformersWithResultStreamTestCase extends
+    ObjectByteArrayTransformersWithObjectsTestCase
+{
+
+    // @Override
+    public Object getResultData()
+    {
+        byte[] resultData = (byte[])super.getResultData();
+        return new ByteArrayInputStream(resultData);
+    }
+
+    // @Override
+    public boolean compareResults(Object expected, Object result)
+    {
+        if (expected instanceof InputStream)
+        {
+            InputStream input = (InputStream)expected;
+            byte[] bytes = IOUtils.toByteArray(input);
+            return super.compareResults(bytes, result);
+        }
+        return super.compareResults(expected, result);
+    }
+
+}

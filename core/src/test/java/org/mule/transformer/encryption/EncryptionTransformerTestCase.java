@@ -20,6 +20,8 @@ import java.util.Arrays;
 
 public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
 {
+    private static final String TEST_DATA = "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";
+    
     private PasswordBasedEncryptionStrategy strat;
 
     // @Override
@@ -34,7 +36,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     {
         try
         {
-            return strat.encrypt(getTestData().toString().getBytes(), null);
+            return strat.encrypt(TEST_DATA.getBytes(), null);
         }
         catch (CryptoFailureException e)
         {
@@ -45,7 +47,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
 
     public Object getTestData()
     {
-        return "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";
+        return TEST_DATA;
     }
 
     public Transformer getTransformer()

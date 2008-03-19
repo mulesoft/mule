@@ -46,7 +46,6 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
             else
             {
                 return SerializationUtils.deserialize((InputStream) src);
-
             }
         }
         catch (Exception e)

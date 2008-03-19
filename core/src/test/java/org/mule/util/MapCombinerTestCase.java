@@ -17,8 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 public class MapCombinerTestCase extends AbstractMuleTestCase
 {
 
@@ -59,8 +57,8 @@ public class MapCombinerTestCase extends AbstractMuleTestCase
         combiner.setList(new LinkedList());
         combiner.getList().add(map1);
         combiner.getList().add(map2);
-        Assert.assertFalse(combiner.isEmpty()); // trigger merge
-        Assert.assertEquals(combiner, map3);
+        assertFalse(combiner.isEmpty()); // trigger merge
+        assertEquals(combiner, map3);
     }
 
     public void testInfrastructure()
@@ -76,7 +74,7 @@ public class MapCombinerTestCase extends AbstractMuleTestCase
     {
         Map map = new HashMap();
         String empty = fillMap(map, spec);
-        Assert.assertTrue("after parsing " + spec + " left with " + empty, empty.equals(""));
+        assertTrue("after parsing " + spec + " left with " + empty, empty.equals(""));
         return map;
     }
 
@@ -85,7 +83,7 @@ public class MapCombinerTestCase extends AbstractMuleTestCase
         spec = drop(spec, "[");
         while (! spec.startsWith("]"))
         {
-            Assert.assertTrue("spec finished early (missing ']'?)", spec.length() > 1);
+            assertTrue("spec finished early (missing ']'?)", spec.length() > 1);
             String key = spec.substring(0, 1);
             spec = drop(spec, key);
             spec = drop(spec, ":");
@@ -120,7 +118,7 @@ public class MapCombinerTestCase extends AbstractMuleTestCase
         spec = drop(spec, "(");
         while (! spec.startsWith(")"))
         {
-            Assert.assertTrue("spec finished early (missing ')'?)", spec.length() > 1);
+            assertTrue("spec finished early (missing ')'?)", spec.length() > 1);
             if (spec.startsWith("["))
             {
                 Map value = new HashMap();
@@ -149,7 +147,7 @@ public class MapCombinerTestCase extends AbstractMuleTestCase
 
     protected static String drop(String spec, String delim)
     {
-        Assert.assertTrue("expected " + delim + " but spec is " + spec, spec.startsWith(delim));
+        assertTrue("expected " + delim + " but spec is " + spec, spec.startsWith(delim));
         return spec.substring(1);
     }
 

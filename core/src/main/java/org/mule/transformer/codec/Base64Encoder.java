@@ -14,6 +14,9 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.util.Base64;
+import org.mule.util.IOUtils;
+
+import java.io.InputStream;
 
 /**
  * <code>Base64Encoder</code> transforms strings or byte arrays into Base64 encoded
@@ -26,6 +29,7 @@ public class Base64Encoder extends AbstractTransformer
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);
+        registerSourceType(InputStream.class);
         setReturnClass(String.class);
     }
 
@@ -38,6 +42,18 @@ public class Base64Encoder extends AbstractTransformer
             if (src instanceof String)
             {
                 buf = ((String) src).getBytes(encoding);
+            }
+            else if (src instanceof InputStream)
+            {
+                InputStream input = (InputStream) src;
+                try
+                {
+                    buf = IOUtils.toByteArray(input);
+                }
+                finally
+                {
+                    input.close();
+                }
             }
             else
             {

@@ -264,4 +264,20 @@ public class IOUtils extends org.apache.commons.io.IOUtils
             throw new RuntimeException(iox);
         }
     }
+    
+    /**
+     * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toByteArray(InputStream)</code>
+     * method but catches any {@link IOException} and wraps it into a {@link RuntimeException}.
+     */
+    public static byte[] toByteArray(InputStream input)
+    {
+        try
+        {
+            return org.apache.commons.io.IOUtils.toByteArray(input);
+        }
+        catch (IOException iox)
+        {
+            throw new RuntimeException(iox);
+        }
+    }
 }

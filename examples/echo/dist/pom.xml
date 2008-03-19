@@ -89,10 +89,6 @@
         <resources>
             <resource>
                 <directory>conf</directory>
-                <excludes>
-                    <!-- MULE-2531: do not bundle log4j.properties for the full distribution -->
-                    <exclude>log4j.properties</exclude>
-                </excludes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>

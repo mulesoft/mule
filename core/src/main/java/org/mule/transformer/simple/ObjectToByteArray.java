@@ -60,9 +60,7 @@ public class ObjectToByteArray extends SerializableToByteArray
             throw new TransformerException(this, e);
         }
 
-
         return super.doTransform(src, encoding);
-
     }
 
 }

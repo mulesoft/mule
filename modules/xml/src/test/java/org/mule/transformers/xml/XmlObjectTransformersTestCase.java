@@ -11,9 +11,12 @@
 package org.mule.transformers.xml;
 
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import java.io.ByteArrayInputStream;
 
 public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCase
 {
@@ -44,5 +47,13 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
     {
         return "<org.mule.tck.testmodels.fruit.Apple>\n" + "  <bitten>false</bitten>\n"
                + "  <washed>true</washed>\n" + "</org.mule.tck.testmodels.fruit.Apple>";
+    }
+    
+    public void testStreaming() throws TransformerException
+    {
+        XmlToObject transformer = new XmlToObject();
+        
+        String input = (String) this.getResultData();
+        assertEquals(testObject, transformer.transform(new ByteArrayInputStream(input.getBytes())));
     }
 }
