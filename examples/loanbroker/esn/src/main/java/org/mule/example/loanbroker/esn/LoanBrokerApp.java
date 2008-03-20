@@ -115,7 +115,7 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
         int response = 0;
         String provider = "axis";
 
-        while (response != 'a' && response != 'x')
+        while (response != 'a' && response != 'c')
         {
             System.out.println("\n" + LocaleMessage.menuOptionSoap());
             response = readCharacter();
@@ -126,9 +126,9 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
                     provider = "axis";
                     break;
                 }
-                case 'x' :
+                case 'c' :
                 {
-                    provider = "xfire";
+                    provider = "cxf";
                     break;
                 }
             }

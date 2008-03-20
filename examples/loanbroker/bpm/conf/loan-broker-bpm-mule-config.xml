@@ -69,7 +69,7 @@
             </inbound>
             <component class="org.mule.example.loanbroker.DefaultLoanBroker" />
             <outbound>
-                <endpoint-selector-router selectorProperty="endpoint">
+                <endpoint-selector-router selectorExpression="header:endpoint">
                     <!-- Outgoing message = Customer -->
                     <outbound-endpoint ref="CreditAgency" />
 

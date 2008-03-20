@@ -15,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.FatalException;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.FileUtils;
@@ -335,7 +336,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration
 
     public void setWorkingDirectory(String workingDirectory)
     {
-        if (verifyContextNotStarted())
+        if (verifyContextNotInitialized())
         {
             // fix windows backslashes in absolute paths, convert them to forward ones
             this.workingDirectory = FileUtils.newFile(workingDirectory).getAbsolutePath().replaceAll("\\\\", "/");
@@ -376,7 +377,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration
 
     public void setDefaultEncoding(String encoding)
     {
-        if (verifyContextNotStarted())
+        if (verifyContextNotInitialized())
         {
             this.encoding = encoding;
         }
@@ -392,7 +393,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration
 
     public void setId(String id)
     {
-        if (verifyContextNotStarted())
+        if (verifyContextNotInitialized())
         {
             if (StringUtils.isBlank(id))
             {
@@ -412,7 +413,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration
 
     public void setClusterId(String clusterId)
     {
-        if (verifyContextNotStarted())
+        if (verifyContextNotInitialized())
         {
             this.clusterId = clusterId;
         }
@@ -428,7 +429,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration
 
     public void setDomainId(String domainId)
     {
-        if (verifyContextNotStarted())
+        if (verifyContextNotInitialized())
         {
             this.domainId = domainId;
         }
@@ -562,6 +563,20 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
+    protected boolean verifyContextNotInitialized()
+    {
+        MuleContext context = MuleServer.getMuleContext();
+        if (context != null && context.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME))
+        {
+            logger.warn("Cannot modify MuleConfiguration once the MuleContext has been initialized.  Modification will be ignored.");
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    
     protected boolean verifyContextNotStarted()
     {
         MuleContext context = MuleServer.getMuleContext();
