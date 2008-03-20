@@ -21,11 +21,8 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class MessageFactory extends Object
 {
-    /**
-     * logger used by this class
-     */
-    private static final Log logger = LogFactory.getLog(MessageFactory.class);
-
+    private static final CoreMessages factory = new CoreMessages();
+    
     /**
      * This error code is used for {@link Message} instances that are not read from a
      * resource bundles but are created only with a string.
@@ -33,6 +30,7 @@ public abstract class MessageFactory extends Object
     private static final int STATIC_ERROR_CODE = -1;
     private static final transient Object[] EMPTY_ARGS = new Object[]{};
 
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     /**
      * Computes the bundle's full path 
@@ -56,7 +54,7 @@ public abstract class MessageFactory extends Object
      * @param arg
      * @see getBundlePath()
      */
-    protected static Message createMessage(String bundlePath, int code, Object arg)
+    protected Message createMessage(String bundlePath, int code, Object arg)
     {
         return createMessage(bundlePath, code, new Object[] {arg});
     }
@@ -71,7 +69,7 @@ public abstract class MessageFactory extends Object
      * @param arg2
      * @see getBundlePath()
      */
-    protected static Message createMessage(String bundlePath, int code, Object arg1, Object arg2)
+    protected Message createMessage(String bundlePath, int code, Object arg1, Object arg2)
     {
         return createMessage(bundlePath, code, new Object[] {arg1, arg2});
     }
@@ -87,7 +85,7 @@ public abstract class MessageFactory extends Object
      * @param arg3
      * @see getBundlePath()
      */
-    protected static Message createMessage(String bundlePath, int code, Object arg1, Object arg2, 
+    protected Message createMessage(String bundlePath, int code, Object arg1, Object arg2, 
         Object arg3)
     {
         return createMessage(bundlePath, code, new Object[] {arg1, arg2, arg3});
@@ -105,7 +103,7 @@ public abstract class MessageFactory extends Object
      * @param arguments
      * @see getBundlePath()
      */
-    protected static Message createMessage(String bundlePath, int code, Object[] arguments)
+    protected Message createMessage(String bundlePath, int code, Object[] arguments)
     {
         String messageString = getString(bundlePath, code, arguments);
         return new Message(messageString, code, arguments);
@@ -118,7 +116,7 @@ public abstract class MessageFactory extends Object
      * @param bundlePath complete path to the resource bundle for lookup
      * @param code numeric code of the message
      */
-    protected static Message createMessage(String bundlePath, int code)
+    protected Message createMessage(String bundlePath, int code)
     {
         String messageString = getString(bundlePath, code, null);
         return new Message(messageString, code, EMPTY_ARGS);
@@ -142,7 +140,7 @@ public abstract class MessageFactory extends Object
      * @param code numeric code of the message
      * @return formatted error message as {@link String}
      */
-    protected static String getString(String bundlePath, int code)
+    protected String getString(String bundlePath, int code)
     {
         return getString(bundlePath, code, null);
     }
@@ -155,7 +153,7 @@ public abstract class MessageFactory extends Object
      * @param arg
      * @return formatted error message as {@link String}
      */
-    protected static String getString(String bundlePath, int code, Object arg)
+    protected String getString(String bundlePath, int code, Object arg)
     {
         Object[] arguments = new Object[] {arg};
         return getString(bundlePath, code, arguments);
@@ -170,13 +168,13 @@ public abstract class MessageFactory extends Object
      * @param arg2
      * @return formatted error message as {@link String}
      */
-    protected static String getString(String bundlePath, int code, Object arg1, Object arg2)
+    protected String getString(String bundlePath, int code, Object arg1, Object arg2)
     {
         Object[] arguments = new Object[] {arg1, arg2};
         return getString(bundlePath, code, arguments);
     }
 
-    protected static String getString(String bundlePath, int code, Object[] args)
+    protected String getString(String bundlePath, int code, Object[] args)
     {
         // We will throw a MissingResourceException if the bundle name is invalid
         // This happens if the code references a bundle name that just doesn't exist
@@ -203,15 +201,25 @@ public abstract class MessageFactory extends Object
     /**
      * @throws MissingResourceException if resource is missing
      */
-    private static ResourceBundle getBundle(String bundlePath)
+    private ResourceBundle getBundle(String bundlePath)
     {
         Locale locale = Locale.getDefault();
         if (logger.isTraceEnabled())
         {
             logger.trace("Loading resource bundle: " + bundlePath + " for locale " + locale);
         }
-        ResourceBundle bundle = ResourceBundle.getBundle(bundlePath, locale);
+        ResourceBundle bundle = ResourceBundle.getBundle(bundlePath, locale, getClassLoader());
         return bundle;
+    }
+
+    /**
+     * Override this method to return the classloader for the bundle/module which 
+     * contains the needed resource files.
+     */
+    protected ClassLoader getClassLoader()
+    {
+        // Assume the MessageFactory implementation class is in the same module as its resources.
+        return getClass().getClassLoader();
     }
 }
 

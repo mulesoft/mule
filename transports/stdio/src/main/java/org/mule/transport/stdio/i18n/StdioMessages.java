@@ -16,11 +16,13 @@ import org.mule.transport.stdio.StdioConnector;
 
 public class StdioMessages extends MessageFactory
 {
+    private static final StdioMessages factory = new StdioMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath(StdioConnector.STDIO);
 
     public static Message couldNotFindStreamWithName(String name)
     {
-        return createMessage(BUNDLE_PATH, 1, name);
+        return factory.createMessage(BUNDLE_PATH, 1, name);
     }
 }
 

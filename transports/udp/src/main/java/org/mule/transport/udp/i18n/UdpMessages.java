@@ -18,16 +18,18 @@ import java.net.URI;
 
 public class UdpMessages extends MessageFactory
 {
+    private static final UdpMessages factory = new UdpMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath(UdpConnector.UDP);
 
     public static Message failedToBind(URI uri)
     {
-        return createMessage(BUNDLE_PATH, 1, uri);
+        return factory.createMessage(BUNDLE_PATH, 1, uri);
     }
 
     public static Message failedToLocateHost(URI uri)
     {
-        return createMessage(BUNDLE_PATH, 2, uri);
+        return factory.createMessage(BUNDLE_PATH, 2, uri);
     }
 }
 

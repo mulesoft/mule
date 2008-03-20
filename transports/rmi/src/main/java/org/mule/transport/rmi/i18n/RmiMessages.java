@@ -15,21 +15,23 @@ import org.mule.config.i18n.MessageFactory;
 
 public class RmiMessages extends MessageFactory
 {
+    private static final RmiMessages factory = new RmiMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("rmi");
 
     public static Message messageParamServiceMethodNotSet()
     {
-        return createMessage(BUNDLE_PATH, 1);
+        return factory.createMessage(BUNDLE_PATH, 1);
     }
 
     public static Message messageReceiverNeedsRmiAble()
     {
-        return createMessage(BUNDLE_PATH, 10);
+        return factory.createMessage(BUNDLE_PATH, 10);
     }
 
     public static Message serviceClassInvocationFailed()
     {
-        return createMessage(BUNDLE_PATH, 11);
+        return factory.createMessage(BUNDLE_PATH, 11);
     }
 }
 

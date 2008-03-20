@@ -16,41 +16,43 @@ import org.mule.config.i18n.MessageFactory;
 
 public class FileMessages extends MessageFactory
 {
+    private static final FileMessages factory = new FileMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("file");
 
     public static Message errorWhileListingFiles()
     {
-        return createMessage(BUNDLE_PATH, 1);
+        return factory.createMessage(BUNDLE_PATH, 1);
     }
 
     public static Message exceptionWhileProcessing(String name, String string)
     {
-        return createMessage(BUNDLE_PATH, 2, name, string);
+        return factory.createMessage(BUNDLE_PATH, 2, name, string);
     }
 
     public static Message failedToDeleteFile(String path)
     {
-        return createMessage(BUNDLE_PATH, 3, path);
+        return factory.createMessage(BUNDLE_PATH, 3, path);
     }
 
     public static Message failedToMoveFile(String from, String to)
     {
-        return createMessage(BUNDLE_PATH, 4, from, to);
+        return factory.createMessage(BUNDLE_PATH, 4, from, to);
     }
 
     public static Message moveToDirectoryNotWritable()
     {
-        return createMessage(BUNDLE_PATH, 5);
+        return factory.createMessage(BUNDLE_PATH, 5);
     }
 
     public static Message invalidFileFilter(EndpointURI endpointURI)
     {
-        return createMessage(BUNDLE_PATH, 6, endpointURI);
+        return factory.createMessage(BUNDLE_PATH, 6, endpointURI);
     }
 
     public static Message fileDoesNotExist(String string)
     {
-        return createMessage(BUNDLE_PATH, 7, string);
+        return factory.createMessage(BUNDLE_PATH, 7, string);
     }
 }
 

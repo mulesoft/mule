@@ -16,11 +16,13 @@ import org.mule.transport.vm.VMConnector;
 
 public class VMMessages extends MessageFactory
 {
+    private static final VMMessages factory = new VMMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath(VMConnector.VM);
 
     public static Message noReceiverForEndpoint(String name, Object uri)
     {
-        return createMessage(BUNDLE_PATH, 1, name, uri);
+        return factory.createMessage(BUNDLE_PATH, 1, name, uri);
     }
 }
 

@@ -15,16 +15,18 @@ import org.mule.config.i18n.MessageFactory;
 
 public class EjbMessages extends MessageFactory
 {
+    private static final EjbMessages factory = new EjbMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("ejb");
 
     public static Message ejbObjectMissingCreate(Object key)
     {
-        return createMessage(BUNDLE_PATH, 3);
+        return factory.createMessage(BUNDLE_PATH, 3);
     }
 
     public static Message ejbKeyRefNotValid(Object key)
     {
-        return createMessage(BUNDLE_PATH, 4);
+        return factory.createMessage(BUNDLE_PATH, 4);
     }
 }
 

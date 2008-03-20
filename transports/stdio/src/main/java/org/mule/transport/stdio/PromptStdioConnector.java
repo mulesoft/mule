@@ -29,7 +29,7 @@ import java.io.OutputStream;
  * default and add some basic fuctionality for writing out prompt messages.
  */
 public class PromptStdioConnector extends StdioConnector
-{
+{   
     private String promptMessage;
     private String promptMessageCode = null;
     private String resourceBundle = null;
@@ -250,9 +250,11 @@ public class PromptStdioConnector extends StdioConnector
      */
     private static class StdioMessageFactory extends MessageFactory
     {
+        private static final StdioMessageFactory factory = new StdioMessageFactory();
+        
         protected static String getString(String bundlePath, String code)
         {
-            return MessageFactory.getString(bundlePath, Integer.parseInt(code));
+            return factory.getString(bundlePath, Integer.parseInt(code));
         }
     }
 }

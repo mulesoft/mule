@@ -15,31 +15,33 @@ import org.mule.config.i18n.MessageFactory;
 
 public class JcaMessages extends MessageFactory
 {
+    private static final JcaMessages factory = new JcaMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("jca");
 
     public static Message authDeniedOnEndpoint(Object endpoint)
     {
-        return createMessage(BUNDLE_PATH, 1, endpoint);
+        return factory.createMessage(BUNDLE_PATH, 1, endpoint);
     }
 
     public static Message objectMarkedInvalid(String string)
     {
-        return createMessage(BUNDLE_PATH, 2, string);
+        return factory.createMessage(BUNDLE_PATH, 2, string);
     }
 
     public static Object objectIsDisposed(Object object)
     {
-        return createMessage(BUNDLE_PATH, 3, object);
+        return factory.createMessage(BUNDLE_PATH, 3, object);
     }
     
     public static Message cannotPauseResumeJcaComponent()
     {
-        return createMessage(BUNDLE_PATH, 4);
+        return factory.createMessage(BUNDLE_PATH, 4);
     }
     
     public static Message cannotAllocateManagedInstance()
     {
-        return createMessage(BUNDLE_PATH, 5);
+        return factory.createMessage(BUNDLE_PATH, 5);
     }
     
     

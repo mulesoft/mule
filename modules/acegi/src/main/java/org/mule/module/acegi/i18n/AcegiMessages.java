@@ -15,16 +15,18 @@ import org.mule.config.i18n.MessageFactory;
 
 public class AcegiMessages extends MessageFactory
 {
+    private static final AcegiMessages factory = new AcegiMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("acegi");
 
     public static Message basicFilterCannotHandleHeader(String header)
     {
-        return createMessage(BUNDLE_PATH, 1, header);
+        return factory.createMessage(BUNDLE_PATH, 1, header);
     }
 
     public static Message authRealmMustBeSetOnFilter()
     {
-        return createMessage(BUNDLE_PATH, 2);
+        return factory.createMessage(BUNDLE_PATH, 2);
     }
 }
 

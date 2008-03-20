@@ -15,11 +15,13 @@ import org.mule.config.i18n.MessageFactory;
 
 public class EmailMessages extends MessageFactory
 {
+    private static final EmailMessages factory = new EmailMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("email");
 
     public static Message routingError()
     {
-        return createMessage(BUNDLE_PATH, 3);
+        return factory.createMessage(BUNDLE_PATH, 3);
     }
 }
 

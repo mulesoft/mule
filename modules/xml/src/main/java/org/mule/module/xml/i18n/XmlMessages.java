@@ -12,18 +12,19 @@ package org.mule.module.xml.i18n;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 
-/** TODO */
 public class XmlMessages extends MessageFactory
 {
+    private static final XmlMessages factory = new XmlMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("xml");
 
     public static Message failedToProcessXPath(String expression)
     {
-        return createMessage(BUNDLE_PATH, 1, expression);
+        return factory.createMessage(BUNDLE_PATH, 1, expression);
     }
 
     public static Message domTypeNotSupported(Class type)
     {
-        return createMessage(BUNDLE_PATH, 2, type);
+        return factory.createMessage(BUNDLE_PATH, 2, type);
     }
 }

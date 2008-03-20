@@ -19,6 +19,8 @@ import org.mule.config.i18n.MessageFactory;
  */
 public class LocaleMessage extends MessageFactory
 {
+    private static final LocaleMessage factory = new LocaleMessage();
+    
     /**
      * Note that the messages for this example are not in mule's standard
      * META-INF/services/org/mule/i18n folder but in a different resource bundle.
@@ -30,6 +32,6 @@ public class LocaleMessage extends MessageFactory
     {
         String[] params = { symbol, name, date, last, change, open, high,
             low, volume, previousClose };
-        return getString(BUNDLE_PATH, 1, params);
+        return factory.getString(BUNDLE_PATH, 1, params);
     }
 }

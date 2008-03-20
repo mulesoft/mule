@@ -15,31 +15,33 @@ import org.mule.config.i18n.MessageFactory;
 
 public class PGPMessages extends MessageFactory
 {
+    private static final PGPMessages factory = new PGPMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("pgp");
 
     public static Message noPublicKeyForUser(String userId)
     {
-        return createMessage(BUNDLE_PATH, 1, userId);
+        return factory.createMessage(BUNDLE_PATH, 1, userId);
     }
 
     public static Message noSignedMessageFound()
     {
-        return createMessage(BUNDLE_PATH, 2);
+        return factory.createMessage(BUNDLE_PATH, 2);
     }
 
     public static Message invalidSignature()
     {
-        return createMessage(BUNDLE_PATH, 3);
+        return factory.createMessage(BUNDLE_PATH, 3);
     }
 
     public static Message errorVerifySignature()
     {
-        return createMessage(BUNDLE_PATH, 4);
+        return factory.createMessage(BUNDLE_PATH, 4);
     }
 
     public static Message encryptionStrategyNotSet()
     {
-        return createMessage(BUNDLE_PATH, 5);
+        return factory.createMessage(BUNDLE_PATH, 5);
     }
 }
 

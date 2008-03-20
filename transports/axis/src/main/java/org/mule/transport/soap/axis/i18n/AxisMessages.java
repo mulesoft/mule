@@ -15,21 +15,23 @@ import org.mule.config.i18n.MessageFactory;
 
 public class AxisMessages extends MessageFactory
 {
+    private static final AxisMessages factory = new AxisMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("axis");
 
     public static Message objectMustImplementAnInterface(String name)
     {
-        return createMessage(BUNDLE_PATH, 1, name);
+        return factory.createMessage(BUNDLE_PATH, 1, name);
     }
 
     public static String serverProviderAndServerConfigConfigured()
     {
-        return getString(BUNDLE_PATH, 2);
+        return factory.getString(BUNDLE_PATH, 2);
     }
 
     public static String clientProviderAndClientConfigConfigured()
     {
-        return getString(BUNDLE_PATH, 3);
+        return factory.getString(BUNDLE_PATH, 3);
     }
 }
 

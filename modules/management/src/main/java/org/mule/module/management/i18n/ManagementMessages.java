@@ -15,26 +15,28 @@ import org.mule.config.i18n.MessageFactory;
 
 public class ManagementMessages extends MessageFactory
 {
+    private static final ManagementMessages factory = new ManagementMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("management");
 
     public static Message createOrLocateShouldBeSet()
     {
-        return createMessage(BUNDLE_PATH, 1);
+        return factory.createMessage(BUNDLE_PATH, 1);
     }
 
     public static Message cannotLocateOrCreateServer()
     {
-        return createMessage(BUNDLE_PATH, 2);
+        return factory.createMessage(BUNDLE_PATH, 2);
     }
 
     public static Message noMBeanServerAvailable()
     {
-        return createMessage(BUNDLE_PATH, 3);
+        return factory.createMessage(BUNDLE_PATH, 3);
     }
 
     public static Message forceGC(long[] heapSizes)
     {
-        return createMessage(BUNDLE_PATH, 4, String.valueOf(heapSizes[0]), String.valueOf(heapSizes[1]));
+        return factory.createMessage(BUNDLE_PATH, 4, String.valueOf(heapSizes[0]), String.valueOf(heapSizes[1]));
     }
 
 

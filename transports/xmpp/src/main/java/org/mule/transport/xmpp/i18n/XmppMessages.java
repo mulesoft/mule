@@ -16,16 +16,18 @@ import org.mule.transport.xmpp.XmppConnector;
 
 public class XmppMessages extends MessageFactory
 {
+    private static final XmppMessages factory = new XmppMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath(XmppConnector.XMPP);
 
     public static Message noRecipientInUri()
     {
-        return createMessage(BUNDLE_PATH, 1);
+        return factory.createMessage(BUNDLE_PATH, 1);
     }
 
     public static Message nicknameMustBeSet()
     {
-        return createMessage(BUNDLE_PATH, 2);
+        return factory.createMessage(BUNDLE_PATH, 2);
     }
 }
 

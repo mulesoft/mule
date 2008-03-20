@@ -15,45 +15,47 @@ import org.mule.config.i18n.MessageFactory;
 
 public class QuartzMessages extends MessageFactory
 {
+    private static final QuartzMessages factory = new QuartzMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("quartz");
 
     public static Message cronExpressionOrIntervalMustBeSet()
     {
-        return createMessage(BUNDLE_PATH, 1);
+        return factory.createMessage(BUNDLE_PATH, 1);
     }
 
     public static Message invalidPayloadType()
     {
-        return createMessage(BUNDLE_PATH, 2);
+        return factory.createMessage(BUNDLE_PATH, 2);
     }
 
     public static Message invalidJobObject()
     {
-        return createMessage(BUNDLE_PATH, 3);
+        return factory.createMessage(BUNDLE_PATH, 3);
     }
 
     public static Message missingJobDetail(String detail)
     {
-        return createMessage(BUNDLE_PATH, 4, detail);
+        return factory.createMessage(BUNDLE_PATH, 4, detail);
     }
 
     public static Message receiverNotInJobDataMap()
     {
-        return createMessage(BUNDLE_PATH, 5);
+        return factory.createMessage(BUNDLE_PATH, 5);
     }
 
     public static Message connectorNotInJobDataMap()
     {
-        return createMessage(BUNDLE_PATH, 6);
+        return factory.createMessage(BUNDLE_PATH, 6);
     }
 
     public static Message noConnectorFound(String connectorName)
     {
-        return createMessage(BUNDLE_PATH, 7, connectorName);
+        return factory.createMessage(BUNDLE_PATH, 7, connectorName);
     }
 
     public static Message noReceiverInConnector(String receiver, String connector)
     {
-        return createMessage(BUNDLE_PATH, 8, receiver, connector);
+        return factory.createMessage(BUNDLE_PATH, 8, receiver, connector);
     }
 }

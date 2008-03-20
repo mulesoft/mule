@@ -17,76 +17,78 @@ import java.net.URI;
 
 public class HttpMessages extends MessageFactory
 {
+    private static final HttpMessages factory = new HttpMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("http");
 
     public static Message requestFailedWithStatus(String string)
     {
-        return createMessage(BUNDLE_PATH, 3, string);
+        return factory.createMessage(BUNDLE_PATH, 3, string);
     }
 
     public static Message unableToGetEndpointUri(String requestURI)
     {
-        return createMessage(BUNDLE_PATH, 4, requestURI);
+        return factory.createMessage(BUNDLE_PATH, 4, requestURI);
     }
 
     public static Message receiverPropertyNotSet()
     {
-        return createMessage(BUNDLE_PATH, 7);
+        return factory.createMessage(BUNDLE_PATH, 7);
     }
 
     public static Message httpParameterNotSet(String string)
     {
-        return createMessage(BUNDLE_PATH, 8, string);
+        return factory.createMessage(BUNDLE_PATH, 8, string);
     }
 
     public static Message noConnectorForProtocolServlet()
     {
-        return createMessage(BUNDLE_PATH, 9);
+        return factory.createMessage(BUNDLE_PATH, 9);
     }
 
     public static Message noServletConnectorFound(String name)
     {
-        return createMessage(BUNDLE_PATH, 10, name);
+        return factory.createMessage(BUNDLE_PATH, 10, name);
     }
 
     public static Message malformedSyntax()
     {
-        return createMessage(BUNDLE_PATH, 11);
+        return factory.createMessage(BUNDLE_PATH, 11);
     }
 
     public static Message methodNotAllowed(String method)
     {
-        return createMessage(BUNDLE_PATH, 12, method);
+        return factory.createMessage(BUNDLE_PATH, 12, method);
     }
 
     public static Message failedToConnect(URI uri)
     {
-        return createMessage(BUNDLE_PATH, 13, uri);
+        return factory.createMessage(BUNDLE_PATH, 13, uri);
     }
 
     public static Message cannotBindToAddress(String path)
     {
-        return createMessage(BUNDLE_PATH, 14, path);
+        return factory.createMessage(BUNDLE_PATH, 14, path);
     }
 
     public static Message eventPropertyNotSetCannotProcessRequest(String property)
     {
-        return createMessage(BUNDLE_PATH, 15, property);
+        return factory.createMessage(BUNDLE_PATH, 15, property);
     }
 
     public static Message unsupportedMethod(String method)
     {
-        return createMessage(BUNDLE_PATH, 16, method);
+        return factory.createMessage(BUNDLE_PATH, 16, method);
     }
 
     public static Message couldNotSendExpect100()
     {
-        return createMessage(BUNDLE_PATH, 17);
+        return factory.createMessage(BUNDLE_PATH, 17);
     }
 
     public static Message requestLineIsMalformed(String line)
     {
-        return createMessage(BUNDLE_PATH, 18, line);
+        return factory.createMessage(BUNDLE_PATH, 18, line);
     }
 }
 

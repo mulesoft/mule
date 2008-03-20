@@ -15,11 +15,13 @@ import org.mule.config.i18n.MessageFactory;
 
 public class SpringMessages extends MessageFactory
 {
+    private static final SpringMessages factory = new SpringMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("spring");
 
     public static Message failedToReinitMule()
     {
-        return createMessage(BUNDLE_PATH, 1);
+        return factory.createMessage(BUNDLE_PATH, 1);
     }
 }
 
