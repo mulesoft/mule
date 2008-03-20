@@ -421,7 +421,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException
     {
-        OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
+        OutboundEndpoint endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
         setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }

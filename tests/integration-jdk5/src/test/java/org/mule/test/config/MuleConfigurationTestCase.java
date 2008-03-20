@@ -11,7 +11,6 @@
 package org.mule.test.config;
 
 import org.mule.MuleServer;
-import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextBuilder;
@@ -28,7 +27,6 @@ public class MuleConfigurationTestCase extends TestCase
     {
         muleContext = null;
         MuleServer.setMuleContext(null);
-        RegistryContext.setRegistry(null);
     }
 
     private MuleContext muleContext;
