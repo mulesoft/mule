@@ -14,9 +14,12 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.soap.SoapConstants;
+import org.mule.util.TemplateParser;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -29,7 +32,10 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
+import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
@@ -45,7 +51,8 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
 
     protected final CxfConnector connector;
     protected ClientWrapper wrapper;
-    
+    private final TemplateParser soapActionTemplateParser = TemplateParser.createAntStyleParser();
+
     public CxfMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
@@ -126,6 +133,21 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSendWithProxy(MuleEvent event) throws Exception
     {
         Method method = wrapper.getMethod(event);
+
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(MuleProperties.MULE_EVENT_PROPERTY, event); 
+        
+        // Set custom soap action if set on the event or endpoint
+        String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+        if (soapAction != null)
+        {
+            soapAction = parseSoapAction(soapAction, new QName(method.getName()), event);
+            props.put(org.apache.cxf.binding.soap.SoapConstants.SOAP_ACTION, soapAction);
+        }
+        
+        BindingProvider bp = wrapper.getProxy();
+        bp.getRequestContext().putAll(props);
+        
         Object response = method.invoke(wrapper.getProxy(), getArgs(event));
         
         // TODO: handle holders
@@ -135,16 +157,23 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
 
     protected MuleMessage doSendWithClient(MuleEvent event) throws Exception
     {
+        BindingOperationInfo bop = wrapper.getOperation(event);
+        
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(MuleProperties.MULE_EVENT_PROPERTY, event); 
+        
         // Set custom soap action if set on the event or endpoint
-//        String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
-//        if (soapAction != null)
-//        {
-//            soapAction = parseSoapAction(soapAction, new QName(method), event);
-//            this.client.setProperty(org.codehaus.xfire.soap.SoapConstants.SOAP_ACTION, soapAction);
-//        }
-
-        Map<String, Object> exProps = new HashMap<String, Object>();
-        exProps.put(MuleProperties.MULE_EVENT_PROPERTY, event); 
+        String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+        if (soapAction != null)
+        {
+            soapAction = parseSoapAction(soapAction, bop.getName(), event);
+            props.put(org.apache.cxf.binding.soap.SoapConstants.SOAP_ACTION, soapAction);
+            event.getMessage().setProperty(SoapConstants.SOAP_ACTION_PROPERTY, soapAction);
+        }
+        
+        Map<String, Object> ctx = new HashMap<String, Object>();
+        ctx.put(Client.REQUEST_CONTEXT, props); 
+        ctx.put(Client.RESPONSE_CONTEXT, props); 
         
         // Set Custom Headers on the client
         Object[] arr = event.getMessage().getPropertyNames().toArray();
@@ -155,13 +184,11 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
             head = (String) arr[i];
             if ((head != null) && (!head.startsWith("MULE")))
             {
-                exProps.put((String) arr[i], event.getMessage().getProperty((String) arr[i]));
+                props.put((String) arr[i], event.getMessage().getProperty((String) arr[i]));
             }
         }
         
-        BindingOperationInfo bop = wrapper.getOperation(event);
-        
-        Object[] response = wrapper.getClient().invoke(bop, getArgs(event), exProps);
+        Object[] response = wrapper.getClient().invoke(bop, getArgs(event), ctx);
 
         return buildResponseMessage(event, response);
     }
@@ -188,5 +215,40 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         doSend(event);
     }
 
+    public String parseSoapAction(String soapAction, QName method, MuleEvent event)
+    {
+        EndpointURI endpointURI = event.getEndpoint().getEndpointURI();
+        Map<String, String> properties = new HashMap<String, String>();
+        MuleMessage msg = event.getMessage();
+        for (Iterator<?> iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+        {
+            String propertyKey = (String)iterator.next();
+            properties.put(propertyKey, msg.getProperty(propertyKey).toString());
+        }
+        properties.put(MuleProperties.MULE_METHOD_PROPERTY, method.getLocalPart());
+        properties.put("methodNamespace", method.getNamespaceURI());
+        properties.put("address", endpointURI.getAddress());
+        properties.put("scheme", endpointURI.getScheme());
+        properties.put("host", endpointURI.getHost());
+        properties.put("port", String.valueOf(endpointURI.getPort()));
+        properties.put("path", endpointURI.getPath());
+        properties.put("hostInfo", endpointURI.getScheme()
+                                   + "://"
+                                   + endpointURI.getHost()
+                                   + (endpointURI.getPort() > -1
+                                                   ? ":" + String.valueOf(endpointURI.getPort()) : ""));
+        if (event.getService() != null)
+        {
+            properties.put("serviceName", event.getService().getName());
+        }
 
+        soapAction = soapActionTemplateParser.parse(properties, soapAction);
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("SoapAction for this call is: " + soapAction);
+        }
+
+        return soapAction;
+    }
 }

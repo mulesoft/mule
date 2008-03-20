@@ -24,9 +24,9 @@
 
     <model name="model">
 
-        <service name="XFireSync">
+        <service name="CxfSync">
             <inbound>
-                <inbound-endpoint address="xfire:http://localhost:4444/services" synchronous="true"
+                <inbound-endpoint address="cxf:http://localhost:4444/services/CxfSync" synchronous="true"
                     responseTransformer-refs="customResponse" />
             </inbound>
             <echo-component />

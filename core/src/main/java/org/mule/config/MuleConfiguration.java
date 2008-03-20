@@ -11,14 +11,10 @@
 package org.mule.config;
 
 import org.mule.RegistryContext;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.agent.Agent;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.context.DefaultWorkListener;
 import org.mule.api.lifecycle.FatalException;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transport.SingleAttemptConnectionStrategy;
 import org.mule.util.FileUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringMessageUtils;
@@ -36,10 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.Manifest;
 
-import javax.resource.spi.work.WorkListener;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -101,16 +95,16 @@ public class MuleConfiguration
     private boolean failOnMessageScribbling = true;
     
     /** the unique id for this Mule instance */
-    private String id = UUID.getUUID();
+    private String id;
 
     /** If this node is part of a cluster then this is the shared cluster Id */
-    private String clusterId = null;
+    private String clusterId;
 
     /** The domain name that this instance belongs to. */
-    private String domainId = null;
+    private String domainId;
 
     /** the date in milliseconds from when the server was started */
-    private long startDate = System.currentTimeMillis();
+    private long startDate;
 
     // Debug options
     
@@ -124,14 +118,6 @@ public class MuleConfiguration
 
     private boolean autoWrapMessageAwareTransform = true;
     
-    /**
-     * The default connection Strategy used for a connector when one hasn't been
-     * defined for the connector
-     */
-    private ConnectionStrategy connectionStrategy = new SingleAttemptConnectionStrategy();
-
-    private WorkListener workListener = new DefaultWorkListener();
-
     protected transient Log logger = LogFactory.getLog(getClass());
 
     public MuleConfiguration()  
@@ -141,7 +127,29 @@ public class MuleConfiguration
         // Apply any settings which come from the JVM system properties.
         applySystemProperties();
         
-        setupIds();
+        if (id == null)
+        {
+            id = UUID.getUUID();
+        }
+        
+        if (clusterId == null)
+        {
+            clusterId = CoreMessages.notClustered().getMessage();
+        }
+
+        if (domainId == null)
+        {
+            try
+            {
+                domainId = InetAddress.getLocalHost().getHostName();
+            }
+            catch (UnknownHostException e)
+            {
+                logger.warn(e);
+                domainId = "org.mule";
+            }
+        }
+        
         try
         {
             validateEncoding();
@@ -151,6 +159,8 @@ public class MuleConfiguration
         {
             throw new RuntimeException(e);
         }
+
+        startDate = System.currentTimeMillis();
     }
 
     /**
@@ -247,27 +257,6 @@ public class MuleConfiguration
         }
     }
     
-    protected void setupIds() 
-    {
-        if (clusterId == null)
-        {
-            clusterId = CoreMessages.notClustered().getMessage();
-        }
-
-        if (domainId == null)
-        {
-            try
-            {
-                domainId = InetAddress.getLocalHost().getHostName();
-            }
-            catch (UnknownHostException e)
-            {
-                logger.warn(e);
-                domainId = "org.mule";
-            }
-        }
-    }
-
     protected void validateEncoding() throws FatalException
     {
         //Check we have a valid and supported encoding
@@ -445,36 +434,6 @@ public class MuleConfiguration
         return clientMode;
     }
 
-    /**
-     * Returns a clone of the default Connection strategy. The clone ensures that the
-     * connection strategy can be manipulated without affecting other connectors
-     * using the same strategy
-     * 
-     * @return a clone of the default Connection strategy
-     */
-    public ConnectionStrategy getDefaultConnectionStrategy()
-    {
-        try
-        {
-            return (ConnectionStrategy) BeanUtils.cloneBean(connectionStrategy);
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(CoreMessages.failedToClone("Connection Strategy"), e);
-        }
-    }
-
-    /**
-     * Sets the connection strategy used by all connectors managed in this Mule
-     * instance if the connector has no connection strategy specifically set on it.
-     * 
-     * @param connectionStrategy the default strategy to use
-     */
-    public void setDefaultConnectionStrategy(ConnectionStrategy connectionStrategy)
-    {
-        this.connectionStrategy = connectionStrategy;
-    }
-
     public String getDefaultEncoding()
     {
         return encoding;
@@ -483,20 +442,6 @@ public class MuleConfiguration
     public void setDefaultEncoding(String encoding)
     {
         this.encoding = encoding;
-    }
-
-    public WorkListener getDefaultWorkListener()
-    {
-        return workListener;
-    }
-
-    public void setDefaultWorkListener(WorkListener workListener)
-    {
-        if (workListener == null)
-        {
-            throw new NullPointerException("workListener");
-        }
-        this.workListener = workListener;
     }
 
     public String getId()

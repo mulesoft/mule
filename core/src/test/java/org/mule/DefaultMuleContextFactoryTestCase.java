@@ -16,7 +16,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
-import org.mule.api.transport.Connector;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
@@ -24,7 +23,7 @@ import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.model.seda.SedaModel;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.tck.testmodels.fruit.Banana;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +37,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     private static String TEST_STRING_VALUE = "test_value";
     private static String TEST_STRING_KEY2 = "test2";
     private static String TEST_STRING_VALUE2 = "test_value2";
-    private static String TEST_CONNECTOR_NAME = "testComponent";
+    private static String TEST_OBJECT_NAME = "testObject";
     private static String TEST_MODEL_NAME = "testModel";
 
     public void testCreateMuleContext() throws InitialisationException, ConfigurationException
@@ -230,8 +229,10 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         // Test Registry contents for existance of object configured by
         // TestConfigurationBuilder
         assertEquals(TEST_STRING_VALUE, muleContext.getRegistry().lookupObject(TEST_STRING_KEY));
-        assertNotNull(muleContext.getRegistry().lookupConnector(TEST_CONNECTOR_NAME));
-        assertEquals(TEST_CONNECTOR_NAME, muleContext.getRegistry().lookupConnector(TEST_CONNECTOR_NAME).getName());
+        
+        Object obj = muleContext.getRegistry().lookupObject(TEST_OBJECT_NAME);
+        assertNotNull(obj);
+        assertEquals(Banana.class, obj.getClass());
     }
 
     private void testConfigurationBuilder2Objects(MuleContext muleContext)
@@ -256,9 +257,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         protected void doConfigure(MuleContext muleContext) throws Exception
         {
             muleContext.getRegistry().registerObject(TEST_STRING_KEY, TEST_STRING_VALUE);
-            Connector testConnector = new TestConnector();
-            testConnector.setName(TEST_CONNECTOR_NAME);
-            muleContext.getRegistry().registerConnector(testConnector);
+            muleContext.getRegistry().registerObject(TEST_OBJECT_NAME, new Banana());
         }
     }
 

@@ -29,6 +29,7 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
         loanBrokerApp.run(false);
     }
 
+    @Override
     protected void init() throws Exception
     {
         // before initialisation occurs, the database must be cleaned and a new one created

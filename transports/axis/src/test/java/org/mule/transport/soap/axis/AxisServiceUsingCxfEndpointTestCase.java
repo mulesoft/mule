@@ -23,7 +23,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-public class AxisServiceUsingXFireEndpointTestCase extends FunctionalTestCase
+public class AxisServiceUsingCxfEndpointTestCase extends FunctionalTestCase
 {
 
     public void testAxis() throws Exception
@@ -56,7 +56,7 @@ public class AxisServiceUsingXFireEndpointTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "axis-using-xfire-config.xml";
+        return "axis-using-cxf-config.xml";
     }
 
 }

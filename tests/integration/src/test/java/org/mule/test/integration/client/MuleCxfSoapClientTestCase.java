@@ -10,11 +10,11 @@
 
 package org.mule.test.integration.client;
 
-public class MuleXFireSoapClientTestCase extends MuleAxisSoapClientTestCase
+public class MuleCxfSoapClientTestCase extends MuleAxisSoapClientTestCase
 {
     public String getSoapProvider()
     {
-        return "xfire";
+        return "cxf";
     }
 
     // TODO fix: xfire doesn't currently support overloaded methods

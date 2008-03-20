@@ -34,12 +34,33 @@ import org.mule.util.queue.MemoryPersistenceStrategy
 import org.mule.security.MuleSecurityManager
 import org.mule.endpoint.DefaultEndpointFactory
 import org.mule.api.config.MuleProperties;
+import org.mule.api.config.ThreadingProfile;
+import org.mule.config.ChainedThreadingProfile;
+import org.mule.transport.SingleAttemptConnectionStrategy;
 
+// Set up defaults / system objects
 QueueManager queueManager = new TransactionalQueueManager();
 queueManager.persistenceStrategy = new MemoryPersistenceStrategy()
 muleContext.registry.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
+
 muleContext.registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
+
 muleContext.registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
+
+ThreadingProfile defaultThreadingProfile = new ChainedThreadingProfile();
+defaultThreadingProfile.setThreadWaitTimeout(30);
+defaultThreadingProfile.setMaxThreadsActive(10);
+defaultThreadingProfile.setMaxThreadsIdle(10);
+defaultThreadingProfile.setMaxBufferSize(0);
+defaultThreadingProfile.setThreadTTL(60000);
+defaultThreadingProfile.setPoolExhaustedAction(ThreadingProfile.WHEN_EXHAUSTED_RUN);
+muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE,
+            new ChainedThreadingProfile(defaultThreadingProfile));
+muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE,
+            new ChainedThreadingProfile(defaultThreadingProfile));
+muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE,
+            new ChainedThreadingProfile(defaultThreadingProfile));
+muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_CONNECTION_STRATEGY, new SingleAttemptConnectionStrategy());
 
 muleContext.registry.registerObject("doCompression", "true")
 

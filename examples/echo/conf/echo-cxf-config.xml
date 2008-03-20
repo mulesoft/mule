@@ -11,7 +11,9 @@
        http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
 
     <description>
-        This config is identical to echo-config.xml but exposes the EchoUMO as a SOAP web service.
+        This config builds a JAX-WS service with CXF.
+        
+        We use a "serviceClass" which is a JAX-WS interface we've defined. It allows us
 
         To invoke the EchoUMO hit the following URL -
             http://localhost:65081/services/EchoUMO?method=echo&amp;param=Is there an echo?
@@ -21,15 +23,11 @@
             http://localhost:65081/services/EchoUMO?wsdl
     </description>
 
-    <cxf:connector name="cxf" defaultFrontend="simple"/>
-    
     <model name="echoSample">
         <service name="EchoUMO">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:65081/services">
-                    <soap:http-to-soap-request-transformer/>
-                </inbound-endpoint>
-                <inbound-endpoint address="cxf:http://localhost:65082/services"/>
+                <cxf:inbound-endpoint address="http://localhost:65082/services/EchoUMO"
+                                      serviceClass="org.mule.example.echo.Echo"/>
             </inbound>
             <echo-component/>
         </service>

@@ -259,11 +259,22 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        
         <!-- For dynamic client, which compiles stuff on the fly -->
         <dependency>
             <groupId>ant</groupId>
-            <artifactId>ant-nodeps</artifactId>
+            <artifactId>ant</artifactId>
             <version>1.6.5</version>
+            <exclusions>
+            	<exclusion>
+            	    <groupId>xerces</groupId>
+            	    <artifactId>xercesImpl</artifactId>
+            	</exclusion>
+            	<exclusion>
+            	    <groupId>xml-apis</groupId>
+            	    <artifactId>xml-apis</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Unit tests -->

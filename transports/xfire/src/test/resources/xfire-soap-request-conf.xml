@@ -11,7 +11,6 @@
     <!--
         Testing Xfire Soap Request
      -->
-    <configuration defaultSynchronousEndpoints="true"/>
 
     <model name="XfireSoapRequest">
         <service name="TestComponent">

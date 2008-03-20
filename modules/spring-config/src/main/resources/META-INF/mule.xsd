@@ -421,25 +421,10 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="workingDirectory" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The location used when scratch data etc is stored to disk.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="defaultSynchronousEventTimeout" type="xsd:string" default="3000">
             <xsd:annotation>
                 <xsd:documentation>
                     The default period (ms) to wait for a synchronous response.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="defaultEncoding" type="xsd:string" default="UTF-8">
-            <xsd:annotation>
-                <xsd:documentation>
-                    This is the encoding assumed when dealing with Strings
-                    if no more specific configuration is given.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -448,30 +433,6 @@
                 <xsd:documentation>
                     The default timeout for transactions,
                     used if no more specific configuration is given.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="serverId" type="nonBlankString">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Currently unused - see JIRA issue MULE-3005.
-                    This is used to identify the Mule instance.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="clusterId" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Currently unused - see JIRA issue MULE-3005.
-                    This is used to identify the Mule cluser.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="domainId" type="xsd:string" default="org.mule">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Currently unused - see JIRA issue MULE-3005.
-                    This is used to identify the Mule domain.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

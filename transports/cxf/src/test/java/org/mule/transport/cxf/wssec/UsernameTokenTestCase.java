@@ -22,8 +22,10 @@ public class UsernameTokenTestCase extends FunctionalTestCase
         GreeterImpl impl = getGreeter();
         
         int i = 0;
-        while (i < 100) {
-            if (impl.getInvocationCount() > 0) {
+        while (i < 100)
+        {
+            if (impl.getInvocationCount() > 0)
+            {
                 break;
             }
             Thread.sleep(50);

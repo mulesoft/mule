@@ -20,7 +20,7 @@ public class LoanBrokerEsbProgramaticTestCase extends AbstractLoanBrokerTestCase
         return "loan-broker-esb-mule-config.xml";
     }
 
-    //@Override
+    @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         // TODO Auto-generated method stub

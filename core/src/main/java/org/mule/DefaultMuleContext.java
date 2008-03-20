@@ -30,6 +30,7 @@ import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryBroker;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.api.transport.ConnectionStrategy;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
@@ -42,8 +43,10 @@ import org.mule.util.queue.QueueManager;
 
 import java.util.Collection;
 
+import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -62,6 +65,8 @@ public class DefaultMuleContext implements MuleContext
     private AllStatistics stats = new AllStatistics();
 
     private WorkManager workManager;
+
+    private WorkListener workListener;
 
     /**
      * LifecycleManager for the MuleContext.  Note: this is NOT the same lifecycle manager
@@ -116,7 +121,7 @@ public class DefaultMuleContext implements MuleContext
 
             //We need to start the work manager straight away since we need it to fire notifications
             workManager.start();
-            getNotificationManager().start(workManager);
+            getNotificationManager().start(workManager, workListener);
 
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISING));
 
@@ -426,6 +431,17 @@ public class DefaultMuleContext implements MuleContext
         this.workManager = workManager;
     }
 
+    public WorkListener getWorkListener()
+    {
+        return workListener;
+    }
+
+    public void setWorkListener(WorkListener workListener)
+    {
+        checkLifecycleForPropertySet("workListener", Initialisable.PHASE_NAME);
+        this.workListener = workListener;
+    }
+
     public QueueManager getQueueManager()
     {
         QueueManager queueManager = (QueueManager) registryBroker.lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER);
@@ -563,40 +579,47 @@ public class DefaultMuleContext implements MuleContext
 
     public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
     {
-        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE);
+        return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE);
     }
 
     public ThreadingProfile getDefaultMessageRequesterThreadingProfile()
     {
-        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE);
+        return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE);
     }
 
     public ThreadingProfile getDefaultMessageReceiverThreadingProfile()
     {
-        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE);
+        return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE);
     }
 
     public ThreadingProfile getDefaultComponentThreadingProfile()
     {
-        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE);
+        return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE);
     }
 
     public ThreadingProfile getDefaultThreadingProfile()
     {
-        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE);
+        return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE);
     }
 
-    private ThreadingProfile getThreadingProfile(String name)
+    /**
+     * Returns a clone of the default Connection strategy. The clone ensures that the
+     * connection strategy can be manipulated without affecting other connectors
+     * using the same strategy
+     * 
+     * @return a clone of the default Connection strategy
+     */
+    public ConnectionStrategy getDefaultConnectionStrategy()
     {
-        ThreadingProfile tp = (ThreadingProfile) registryBroker.lookupObject(name);
-        if (tp != null)
+        ConnectionStrategy defaultConnectionStrategy = 
+            (ConnectionStrategy) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_CONNECTION_STRATEGY);
+        try
         {
-            return tp;
+            return (ConnectionStrategy) BeanUtils.cloneBean(defaultConnectionStrategy);
         }
-        else
+        catch (Exception e)
         {
-            // only used in tests, where no registry is present
-            return ThreadingProfile.DEFAULT_THREADING_PROFILE;
+            throw new MuleRuntimeException(CoreMessages.failedToClone("Connection Strategy"), e);
         }
     }
 

@@ -10,8 +10,6 @@
 
     <cxf:connector name="cxf" defaultFrontend="simple"/>
     
-    <configuration defaultSynchronousEndpoints="true"/>
-
      <model name="TestCxfHeaders">
         <service name="TestComponent">
             <inbound>

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.context;
+package org.mule.work;
 
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;

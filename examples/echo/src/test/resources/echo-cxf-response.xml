@@ -1,0 +1,1 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><ns1:echoResponse xmlns:ns1="http://echo.example.mule.org/"><text>hello</text></ns1:echoResponse></soap:Body></soap:Envelope>

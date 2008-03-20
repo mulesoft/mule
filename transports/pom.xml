@@ -125,7 +125,6 @@
                 <module>tcp</module>
                 <module>udp</module>
                 <module>vm</module>
-                <module>xfire</module>
                 <module>xmpp</module>
             </modules>
         </profile>

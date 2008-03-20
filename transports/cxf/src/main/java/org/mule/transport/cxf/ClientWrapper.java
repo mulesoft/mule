@@ -19,6 +19,7 @@ import org.mule.api.transport.DispatchException;
 import org.mule.transport.cxf.i18n.CxfMessages;
 import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
 import org.mule.transport.cxf.support.MuleHeadersOutInterceptor;
+import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.transport.soap.i18n.SoapMessages;
 
 import java.io.IOException;
@@ -102,6 +103,8 @@ public class ClientWrapper
                 f.initialize(client, bus);
             }
         }
+
+        addMuleInterceptors();
     }
 
     @SuppressWarnings("unchecked")
@@ -279,16 +282,22 @@ public class ClientWrapper
             Endpoint cxfEP = cMo.getEndpoint();
 
             client = new ClientImpl(bus, cxfEP);
-            client.getInInterceptors().add(new MuleHeadersInInterceptor());
-            client.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
-            client.getOutInterceptors().add(new MuleHeadersOutInterceptor());
-            client.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
         }
         else
         {
             throw new Exception("Could not create client! No Server was found directly on the endpoint: "
                                 + uri);
         }
+    }
+
+    protected void addMuleInterceptors()
+    {
+        client.getInInterceptors().add(new MuleHeadersInInterceptor());
+        client.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
+        client.getOutInterceptors().add(new MuleHeadersOutInterceptor());
+        client.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
+        client.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
+        client.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
     }
 
     protected String getMethodOrOperationName(MuleEvent event) throws DispatchException

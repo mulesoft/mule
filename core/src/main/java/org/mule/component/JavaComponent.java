@@ -206,20 +206,7 @@ public class JavaComponent implements Component
                     startTime = System.currentTimeMillis();
                 }
 
-                if (service.getName().startsWith("_xfireServiceComponent") ||
-                    service.getName().startsWith("_axisServiceComponent"))
-                {
-                    // TODO MULE-2099 This is what the MethodFixInterceptor from Axis/XFire was doing.
-                    event.getMessage().setBooleanProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY, true);
-                }
                 returnMessage = umo.intercept(null);
-                
-                if (service.getName().startsWith("_xfireServiceComponent") ||
-                    service.getName().startsWith("_axisServiceComponent"))
-                {
-                    // TODO MULE-2099 This is what the MethodFixInterceptor from Axis/XFire was doing.
-                    returnMessage.removeProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY);
-                }
 
                 // stats
                 if (stat.isEnabled())

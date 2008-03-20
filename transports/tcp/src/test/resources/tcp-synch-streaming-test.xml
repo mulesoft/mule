@@ -12,8 +12,6 @@
         <tcp:streaming-protocol/>
     </tcp:connector>
 
-    <configuration serverId="TcpSynchStreaming" defaultSynchronousEndpoints="true"/>
-
     <model name="main">
         <service name="echo">
             <inbound>

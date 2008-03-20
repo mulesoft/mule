@@ -15,13 +15,13 @@ import org.mule.example.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase;
 
 public class AxisLoanBrokerAsynchronousFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCase
 {
-    // @Override
+    @Override
     protected String getConfigResources()
     {
         return "loan-broker-async-config.xml, loan-broker-axis-endpoints-config.xml";
     }
 
-    // @Override
+    @Override
     protected int getNumberOfRequests()
     {
         return 10;

@@ -10,8 +10,6 @@
 
 package org.mule.tck;
 
-import org.mule.RegistryContext;
-import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
@@ -43,13 +41,6 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         return new SpringXmlConfigurationBuilder(getConfigurationResources());
-    }
-
-    protected MuleContext createMuleContext() throws Exception
-    {
-        MuleContext mc = super.createMuleContext();
-        mc.getConfiguration().setDefaultWorkListener(new TestingWorkListener());
-        return mc;
     }
 
     //Delegate to an abstract method to ensure that FunctionalTestCases know they need to pass in config resources

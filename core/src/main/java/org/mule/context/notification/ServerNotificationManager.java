@@ -10,7 +10,6 @@
 
 package org.mule.context.notification;
 
-import org.mule.MuleServer;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
@@ -18,7 +17,6 @@ import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.config.MuleConfiguration;
 import org.mule.util.ClassUtils;
 
 import java.util.Collection;
@@ -70,7 +68,6 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     private boolean dynamic = false;
     private Configuration configuration = new Configuration();
     private AtomicBoolean disposed = new AtomicBoolean(false);
-    private WorkListener workListener = null;
     private BlockingDeque eventQueue = new LinkedBlockingDeque();
 
     public boolean isNotificationDynamic()
@@ -83,11 +80,11 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         this.dynamic = dynamic;
     }
 
-    public void start(WorkManager workManager) throws LifecycleException
+    public void start(WorkManager workManager, WorkListener workListener) throws LifecycleException
     {
         try
         {
-            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, getWorkListener());
+            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, workListener);
         }
         catch (WorkException e)
         {
@@ -192,7 +189,6 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     {
         disposed.set(true);
         configuration = null;
-        workListener = null;
     }
 
     protected void notifyListeners(ServerNotification notification)
@@ -223,29 +219,6 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
             }
         }
     }
-
-    public WorkListener getWorkListener()
-    {
-        if (null == workListener)
-        {
-            MuleConfiguration config = MuleServer.getMuleContext().getConfiguration();
-            if (null != config)
-            {
-                workListener = config.getDefaultWorkListener();
-            }
-        }
-        return workListener;
-    }
-
-    public void setWorkListener(WorkListener workListener)
-    {
-        if (null == workListener)
-        {
-            throw new IllegalArgumentException("workListener may not be null");
-        }
-        this.workListener = workListener;
-    }
-
 
     /**
      * Support string or class parameters

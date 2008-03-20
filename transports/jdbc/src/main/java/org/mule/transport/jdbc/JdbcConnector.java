@@ -100,8 +100,9 @@ public class JdbcConnector extends AbstractConnector
     }
 
     public String[] getReadAndAckStatements(ImmutableEndpoint endpoint)
-    {
+    {       
         String str;
+
         // Find read statement
         String readStmt;
         if ((str = (String)endpoint.getProperty("sql")) != null)
@@ -112,6 +113,7 @@ public class JdbcConnector extends AbstractConnector
         {
             readStmt = endpoint.getEndpointURI().getAddress();
         }
+        
         // Find ack statement
         String ackStmt;
         if ((str = (String)endpoint.getProperty("ack")) != null)
@@ -121,19 +123,21 @@ public class JdbcConnector extends AbstractConnector
             {
                 ackStmt = str;
             }
+            ackStmt = ackStmt.trim();
         }
         else
         {
             ackStmt = readStmt + ".ack";
             if ((str = getQuery(endpoint, ackStmt)) != null)
             {
-                ackStmt = str;
+                ackStmt = str.trim();
             }
             else
             {
                 ackStmt = null;
             }
         }
+        
         // Translate both using queries map
         if ((str = getQuery(endpoint, readStmt)) != null)
         {
@@ -143,6 +147,12 @@ public class JdbcConnector extends AbstractConnector
         {
             throw new IllegalArgumentException("Read statement should not be null");
         }
+        else
+        {
+            // MULE-3109: trim the readStatement for better user experience
+            readStmt = readStmt.trim();
+        }
+        
         if (!"select".equalsIgnoreCase(readStmt.substring(0, 6)) && !"call".equalsIgnoreCase(readStmt.substring(0, 4)))
         {
             throw new IllegalArgumentException("Read statement should be a select sql statement or a stored procedure");

@@ -221,13 +221,13 @@ public class TransientRegistry extends AbstractRegistry
      * @param key
      * @param value
      */
-    public void registerObject(String key, Object value, Object metadata) throws RegistrationException
+    public void registerObject(String key, Object object, Object metadata) throws RegistrationException
     {
         logger.debug("registering object");
         if (isInitialised() || isInitialising())
         {
             logger.debug("applying processors");
-            value = applyProcessors(value);
+            object = applyProcessors(object);
         }
 
         Map objectMap = getObjectTypeMap(metadata);
@@ -240,7 +240,7 @@ public class TransientRegistry extends AbstractRegistry
                 //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
                 logger.warn("TransientRegistry already contains an object named '" + key + "'.  The previous object will be overwritten.");
             }
-            objectMap.put(key, value);
+            objectMap.put(key, object);
             try
             {
                 MuleContext mc = MuleServer.getMuleContext();
@@ -248,12 +248,12 @@ public class TransientRegistry extends AbstractRegistry
                 if (mc != null)
                 {
                     logger.debug("applying lifecycle");
-                    mc.applyLifecycle(value);
+                    mc.applyLifecycle(object);
                 }
                 else
                 {
                     throw new RegistrationException("Unable to register object (\""
-                            + key + ":" + ClassUtils.getSimpleName(value.getClass())
+                            + key + ":" + ClassUtils.getSimpleName(object.getClass())
                             + "\") because MuleContext has not yet been created.");
                 }
             }

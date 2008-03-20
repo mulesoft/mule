@@ -42,7 +42,7 @@
                      </outbound-pass-through-router>
                  </outbound>
 
-                 <async-reply timeout="10000">
+                 <async-reply timeout="1000000">
                      <inbound-endpoint ref="LoanBrokerQuotes"/>
                      <custom-async-reply-router class="org.mule.example.loanbroker.routers.BankQuotesResponseAggregator"/>
                  </async-reply>

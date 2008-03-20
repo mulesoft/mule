@@ -23,6 +23,7 @@ Assembly descriptor for the composite Mule library (jar).
         <!-- Transports -->
         <include>org.mule.transports:mule-transport-axis</include>
         <include>org.mule.transports:mule-transport-bpm</include>
+        <include>org.mule.transports:mule-transport-cxf</include>
         <include>org.mule.transports:mule-transport-ejb</include>
         <include>org.mule.transports:mule-transport-email</include>
         <include>org.mule.transports:mule-transport-file</include>
@@ -40,7 +41,6 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.transports:mule-transport-tcp</include>
         <include>org.mule.transports:mule-transport-udp</include>
         <include>org.mule.transports:mule-transport-vm</include>
-        <include>org.mule.transports:mule-transport-xfire</include>
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
         <include>org.mule.modules:mule-module-1to2migration</include>

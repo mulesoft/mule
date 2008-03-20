@@ -29,7 +29,7 @@ public class JettyTestCase extends TestCase // TODO MULE-2768
     
     private Server jetty = null;
     
-    // @Override
+    @Override
     protected void setUp() throws Exception 
     {
         super.setUp();
@@ -43,7 +43,7 @@ public class JettyTestCase extends TestCase // TODO MULE-2768
         }
     }
 
-    // @Override
+    @Override
     protected void tearDown() throws Exception 
     {
         if (jetty != null)

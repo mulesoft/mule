@@ -42,7 +42,7 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
                 public void initialize() throws Exception, IOException
                 {
                     String wsdlUrl = endpoint.getEndpointURI().getAddress();
-                    String serviceName = endpoint.getEndpointURI().getAddress();
+                    String serviceName = null;
                     String portName = null;
 
                     // If the property specified an alternative WSDL url, use it
@@ -55,9 +55,6 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
                     if (endpoint.getProperty("service") != null && StringUtils.isNotBlank(endpoint.getProperty("service").toString()))
                     {
                         serviceName = (String) endpoint.getProperty("service");
-                    } else if (serviceName.indexOf("?") > -1)
-                    {
-                        serviceName = serviceName.substring(0, serviceName.lastIndexOf('?'));
                     }
                     
                     // If the property specified an alternative port, use it
@@ -69,7 +66,10 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
                     try
                     {
                         DynamicClientFactory cf = DynamicClientFactory.newInstance(bus);
-                        this.client = cf.createClient(wsdlUrl, QName.valueOf(serviceName), (portName == null ? null : QName.valueOf(portName)));
+                        this.client = cf.createClient(wsdlUrl, 
+                           (serviceName == null ? null : QName.valueOf(serviceName)), 
+                           (portName == null ? null : QName.valueOf(portName)));
+                        addMuleInterceptors();
                     }
                     catch (Exception ex)
                     {

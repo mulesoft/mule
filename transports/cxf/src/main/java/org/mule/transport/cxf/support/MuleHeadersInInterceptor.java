@@ -74,9 +74,10 @@ public class MuleHeadersInInterceptor extends BaseMuleHeaderInterceptor
             {
                 continue;
             }
-            if (SUPPORTED_HEADERS.contains(child_el.getTagName()))
+            
+            if (SUPPORTED_HEADERS.contains(child_el.getLocalName()))
             {
-                message.put(child_el.getTagName(), collectTextFrom(child_el));
+                message.put(child_el.getLocalName(), collectTextFrom(child_el));
             }
         }
     }
@@ -89,17 +90,14 @@ public class MuleHeadersInInterceptor extends BaseMuleHeaderInterceptor
     private String collectTextFrom(Element e)
     {
         NodeList children = e.getChildNodes();
-        // Uncomment for 1.5
-        // StringBuilder sb = new StringBuilder();
-        // Uncomment for 1.4
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int idx = 0;
         Node n;
         while ((n = children.item(idx++)) != null)
         {
             if (n.getNodeType() == Node.TEXT_NODE)
             {
-                sb.append((Text) n);
+                sb.append(((Text) n).getTextContent());
             }
         }
         return sb.toString();

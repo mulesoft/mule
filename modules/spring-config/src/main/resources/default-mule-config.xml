@@ -118,6 +118,8 @@
         <constructor-arg ref="_defaultThreadingProfile"/>
     </bean>
 
+    <bean name="_defaultConnectionStrategy" class="org.mule.transport.SingleAttemptConnectionStrategy"/>
+
     <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
     the transformers will be available even when using the the TransientRegistry only -->
 

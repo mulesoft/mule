@@ -3,11 +3,15 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+               http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd
+       		   http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
+	<cxf:connector name="cxf" defaultFrontend="simple"/>
+    
     <!-- Asynchronous VM connector (uses in-memory queues) -->
     <vm:connector name="asyncVm" queueEvents="true"/>
 
@@ -18,15 +22,15 @@
     <endpoint name="EchoAxisSend" address="axis:http://localhost:10080/mule/EchoService?method=echo"/>
     <endpoint name="EchoAxisReceive" address="axis:http://localhost:10080/mule"/>
     
-    <endpoint name="EchoXFireSend" address="xfire:http://localhost:10081/mule/EchoService?method=echo"/>
-    <endpoint name="EchoXFireReceive" address="xfire:http://localhost:10081/mule"/>
+    <endpoint name="EchoCxfSend" address="cxf:http://localhost:10081/mule/EchoService?method=echo"/>
+    <endpoint name="EchoCxfReceive" address="cxf:http://localhost:10081/mule/EchoService"/>
     
     <model name="ReplyToTestCase">
         <service name="EchoService">
             <inbound>
                 <inbound-endpoint ref="EchoVm"/>
                 <inbound-endpoint ref="EchoAxisReceive"/>
-                <inbound-endpoint ref="EchoXFireReceive"/>
+                <inbound-endpoint ref="EchoCxfReceive"/>
             </inbound>
             <echo-component/>
         </service>

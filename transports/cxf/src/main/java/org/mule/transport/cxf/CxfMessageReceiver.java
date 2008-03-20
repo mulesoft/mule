@@ -18,13 +18,16 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
+import org.mule.api.service.ServiceAware;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.cxf.i18n.CxfMessages;
+import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
 import org.mule.transport.cxf.support.ProviderService;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -79,10 +82,14 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             List<AbstractFeature> features = (List<AbstractFeature>) endpointProps.get(CxfConstants.FEATURES);
             
             Class<?> svcCls = null;
-            if (!StringUtils.isEmpty(serviceClassName)) {
+            Class<?> targetCls = getTargetClass();
+            if (!StringUtils.isEmpty(serviceClassName)) 
+            {
                 svcCls = ClassUtils.loadClass(serviceClassName, getClass());
-            } else {
-                svcCls = getInterface();
+            } 
+            else 
+            {
+                svcCls = targetCls;
             }
             
             if (BooleanUtils.toBoolean(bridge))
@@ -111,6 +118,8 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                 throw new CreateException(CxfMessages.invalidFrontend(frontend), this);
             }
 
+            sfb.setServiceBean(service.getComponentFactory().getInstance());
+
             // The binding - i.e. SOAP, XML, HTTP Binding, etc
             if (bindingId != null)
             {
@@ -126,6 +135,12 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             sfb.setOutInterceptors((List<Interceptor>) endpointProps.get("outInterceptors"));
             sfb.setOutFaultInterceptors((List<Interceptor>) endpointProps.get("outFaultInterceptors"));
 
+            if (sfb.getInInterceptors() == null) {
+                sfb.setInInterceptors(new ArrayList<Interceptor>());
+            }
+            
+            sfb.getInInterceptors().add(new MuleHeadersInInterceptor());
+            
             // Aegis, JAXB, other?
             if (databinding != null)
             {
@@ -146,6 +161,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             addIgnoredMethods(svcFac, Callable.class.getName());
             addIgnoredMethods(svcFac, Initialisable.class.getName());
             addIgnoredMethods(svcFac, Disposable.class.getName());
+            addIgnoredMethods(svcFac, ServiceAware.class.getName());
 
             String name = (String) endpointProps.get(CxfConstants.NAME);
             // check if there is the namespace property on the service
@@ -162,7 +178,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                 sync = true;
             }
 
-            sfb.setInvoker(new MuleInvoker(this, sync));
+            sfb.setInvoker(new MuleInvoker(this, targetCls, sync));
             sfb.setStart(false);
 
             Bus bus = connector.getCxfBus();
@@ -248,7 +264,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    private Class<?> getInterface() throws MuleException, ClassNotFoundException
+    private Class<?> getTargetClass() throws MuleException, ClassNotFoundException
     {
         try
         {

@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-xfire</artifactId>
+            <artifactId>mule-transport-cxf</artifactId>
             <version>${muleVersion}</version>
         </dependency>
 

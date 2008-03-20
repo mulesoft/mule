@@ -194,29 +194,46 @@ public class CxfServiceComponent implements Callable, Lifecycle
         try
         {
             MessageImpl m = new MessageImpl();
+            MuleMessage muleMsg = ctx.getMessage();
+            String method = (String) muleMsg.getProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+            String path = (String) muleMsg.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+            if (path == null) 
+            {
+                path = "";
+            }
+            
+            if (method != null) 
+            {
+                m.put(Message.HTTP_REQUEST_METHOD, method);
+                m.put(Message.PATH_INFO, path);
+                m.put(Message.BASE_PATH, ctx.getEndpointURI().getPath());
+                
+                if (!"GET".equals(method.toUpperCase())) 
+                {
+                    Object payload = ctx.transformMessage();
 
-            Object payload = ctx.transformMessage();
-
-            if (payload instanceof InputStream)
-            {
-                m.put(Message.ENCODING, ctx.getEncoding());
-                m.setContent(InputStream.class, payload);
+                    if (payload instanceof InputStream)
+                    {
+                        m.put(Message.ENCODING, ctx.getEncoding());
+                        m.setContent(InputStream.class, payload);
+                    }
+                    else if (payload instanceof Reader)
+                    {
+                        m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader((Reader) payload));
+                    }
+                    else if (payload instanceof byte[])
+                    {
+                        m.setContent(InputStream.class, new ByteArrayInputStream((byte[]) payload));
+                    }
+                    else
+                    {
+                        InputStream is = (InputStream) ctx.transformMessage(InputStream.class);
+                        m.put(Message.ENCODING, ctx.getEncoding());
+                        m.setContent(InputStream.class, is);
+                    }
+                }
             }
-            else if (payload instanceof Reader)
-            {
-                m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader((Reader) payload));
-            }
-            else if (payload instanceof byte[])
-            {
-                m.setContent(InputStream.class, new ByteArrayInputStream((byte[]) payload));
-            }
-            else
-            {
-                InputStream is = (InputStream) ctx.transformMessage(InputStream.class);
-                m.put(Message.ENCODING, ctx.getEncoding());
-                m.setContent(InputStream.class, is);
-            }
-
+            
             // TODO: Not sure if this is 100% correct - DBD
             String soapAction = getSoapAction(ctx.getMessage());
             m.put(org.mule.transport.soap.SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
@@ -239,7 +256,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
             d.getMessageObserver().onMessage(m);
 
             // TODO: Make this streaming...
-            Object result = obs.getCachedStream().getOut().toString();
+            Object result = obs.getCachedStream().getInputStream();
 
             // Handle a fault if there is one.
             Message resMsg = obs.getMessage();

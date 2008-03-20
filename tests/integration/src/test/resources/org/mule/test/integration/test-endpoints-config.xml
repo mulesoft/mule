@@ -13,7 +13,7 @@
        http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd">
 
-    <configuration serverId="server" defaultSynchronousEventTimeout="1001"/>
+    <configuration defaultSynchronousEventTimeout="1001"/>
 
     <vm:connector name="vmConnector1"/>
     <vm:connector name="vmConnector2"/>

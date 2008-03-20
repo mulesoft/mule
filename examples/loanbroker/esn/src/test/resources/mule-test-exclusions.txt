@@ -2,6 +2,3 @@
 # Test cases listed in this file are not run.
 #
 
-# MULE-3016
-org.mule.example.loanbroker.esn.XFireLoanBrokerAsynchronousMule3016TestCase
-

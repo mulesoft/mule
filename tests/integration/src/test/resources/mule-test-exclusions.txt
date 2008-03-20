@@ -108,3 +108,6 @@ org.mule.test.integration.client.MuleClientRemotingJmsTestCase
 
 # MULE-3002
 #org.mule.test.integration.management.ManagementSimpleStartupTestCase
+
+# This works, but it requires tools.jar on the classpath which we currently don't require:
+org.mule.test.integration.client.MuleClientWSDLExternalTestCase

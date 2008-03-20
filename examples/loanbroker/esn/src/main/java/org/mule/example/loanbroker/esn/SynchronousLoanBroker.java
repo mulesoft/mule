@@ -28,6 +28,7 @@ public class SynchronousLoanBroker extends DefaultLoanBroker
     //The transformers configured on the endpoint control how data is marshalled into and out of the call.
     private CreditAgencyService creditAgency;
 
+    @Override
     public Object getLoanQuote(CustomerQuoteRequest request) throws LoanBrokerException
     {
         super.getLoanQuote(request);

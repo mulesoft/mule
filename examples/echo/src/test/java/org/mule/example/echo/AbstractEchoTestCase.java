@@ -27,8 +27,8 @@ import org.custommonkey.xmlunit.XMLAssert;
  */
 public abstract class AbstractEchoTestCase extends FunctionalTestCase
 {
-    private String expectedGetResponse;
-    private String expectedPostResponse;
+    protected String expectedGetResponse;
+    protected String expectedPostResponse;
 
     protected void doSetUp() throws Exception
     {
@@ -69,7 +69,7 @@ public abstract class AbstractEchoTestCase extends FunctionalTestCase
         MuleMessage result = client.send("http://localhost:65081/services/EchoUMO?method=echo", "hello", props);
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);
-        
+        System.out.println("GOT " + result.getPayloadAsString());
         XMLAssert.assertXMLEqual(expectedGetResponse, result.getPayloadAsString());
     }
 

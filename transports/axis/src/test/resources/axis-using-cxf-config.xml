@@ -10,7 +10,7 @@
 
     <!-- TODO how to set the serverUrl in spring config files? -->
 
-    <model name="Testing_an_axis_service_using_xfire_dynamic_client">
+    <model name="Testing_an_axis_service_using_cxf_dynamic_client">
         <!-- hosting the Axis Service -->
         <service name="AxisService">
             <inbound>
@@ -43,7 +43,7 @@
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint
-                            address="wsdl-xfire:http://localhost:63381/services/AxisService?WSDL&amp;method=receive"/>
+                            address="wsdl-cxf:http://localhost:63381/services/AxisService?wsdl&amp;method=receive"/>
                 </outbound-pass-through-router>
             </outbound>
         </service>

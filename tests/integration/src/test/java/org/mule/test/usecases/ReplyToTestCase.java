@@ -71,7 +71,7 @@ public class ReplyToTestCase extends FunctionalTestCase
         assertNull("Extra message received at replyTo destination: " + result, result);        
     }
 
-    public void testXFire() throws Exception
+    public void testCxf() throws Exception
     {
         MuleClient client = new MuleClient();
         
@@ -79,7 +79,7 @@ public class ReplyToTestCase extends FunctionalTestCase
         msg.setReplyTo("ReplyTo");
         
         // Send asynchronous request
-        client.dispatch("EchoXFireSend", msg, null);
+        client.dispatch("EchoCxfSend", msg, null);
 
         // Wait for asynchronous response
         MuleMessage result = client.request("ReplyTo", RECEIVE_DELAY);

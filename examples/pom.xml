@@ -16,15 +16,9 @@
 
     <modules>
         <module>all-examples</module>
-        <module>echo</module>
         <module>errorhandler</module>
         <module>hello</module>
-        <module>loanbroker</module>
         <module>scripting</module>
-        <module>stockquote</module>
-        <!-- Not resolving Jetty dependency for some reason
-        <module>webapp</module>
-        -->
     </modules>
 
     <build>
@@ -78,4 +72,22 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>jdk15</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <modules>
+                <!-- all these examples depend on the cxf transport wich is JDK5 -->
+                <module>echo</module>
+                <module>loanbroker</module>
+                <module>stockquote</module>
+                <!-- Not resolving Jetty dependency for some reason
+                <module>webapp</module>
+                -->
+            </modules>
+        </profile>
+    </profiles>
 </project>

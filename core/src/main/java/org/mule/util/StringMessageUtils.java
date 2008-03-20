@@ -124,7 +124,7 @@ public final class StringMessageUtils
             buf.append(" ");
             buf.append(messages.get(i));
 
-            String osEncoding = System.getProperty("file.encoding");
+            String osEncoding = CharSetUtils.defaultCharsetName();
             int padding;
             try
             {

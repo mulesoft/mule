@@ -30,7 +30,6 @@
         <module>scripting</module>
         <module>spring-extras</module>
         <module>spring-config</module>
-        <module>wssecurity</module>
         <module>xml</module>
     </modules>
 </project>

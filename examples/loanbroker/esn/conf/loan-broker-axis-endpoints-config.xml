@@ -15,16 +15,6 @@
     Here we define components and endpoints using the Axis transport.
     </description>
 
-    <!-- for some reason Axis auto typing doesn't always work and you need to define the top-level
-         bean types for the objects you're passing around -->
-    <axis:connector name="axisConnector">
-        <axis:bean-type interface="org.mule.example.loanbroker.messages.CreditProfile"/>
-        <axis:bean-type interface="org.mule.example.loanbroker.messages.CreditProfile"/>
-        <axis:bean-type interface="org.mule.example.loanbroker.messages.Customer"/>
-        <axis:bean-type interface="org.mule.example.loanbroker.messages.CustomerQuoteRequest"/>
-        <axis:bean-type interface="org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest"/>
-        <axis:bean-type interface="org.mule.example.loanbroker.messages.LoanQuote"/>
-    </axis:connector>
 
     <custom-transformer name="ExtractCustomer" class="org.mule.transformer.simple.GetBeanProperty">
         <spring:property name="propertyName" value="customerRequest.customer" />

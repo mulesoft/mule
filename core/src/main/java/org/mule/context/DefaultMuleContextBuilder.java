@@ -44,7 +44,10 @@ import org.mule.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.lifecycle.phases.MuleContextStartPhase;
 import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.util.ClassUtils;
+import org.mule.work.DefaultWorkListener;
 import org.mule.work.MuleWorkManager;
+
+import javax.resource.spi.work.WorkListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,12 +60,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultMuleContextBuilder implements MuleContextBuilder
 {
-
     protected static final Log logger = LogFactory.getLog(DefaultMuleContextBuilder.class);
 
     protected LifecycleManager lifecycleManager;
 
     protected WorkManager workManager;
+
+    protected WorkListener workListener;
 
     protected ServerNotificationManager notificationManager;
 
@@ -74,26 +78,29 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         logger.debug("Building new DefaultMuleContext instance with MuleContextBuilder: " + this);
         MuleContext muleContext = new DefaultMuleContext(getLifecycleManager());
         muleContext.setWorkManager(getWorkManager());
+        muleContext.setWorkListener(getWorkListener());
         muleContext.setNotificationManager(getNotificationManager());
         return muleContext;
     }
 
-    public DefaultMuleContextBuilder setWorkManager(WorkManager workManager)
+    public void setWorkManager(WorkManager workManager)
     {
         this.workManager = workManager;
-        return this;
     }
 
-    public DefaultMuleContextBuilder setNotificationManager(ServerNotificationManager notificationManager)
+    public void setWorkListener(WorkListener workListener)
+    {
+        this.workListener = workListener;
+    }
+    
+    public void setNotificationManager(ServerNotificationManager notificationManager)
     {
         this.notificationManager = notificationManager;
-        return this;
     }
 
-    public DefaultMuleContextBuilder setLifecycleManager(LifecycleManager lifecycleManager)
+    public void setLifecycleManager(LifecycleManager lifecycleManager)
     {
         this.lifecycleManager = lifecycleManager;
-        return this;
     }
 
     protected LifecycleManager getLifecycleManager()
@@ -121,8 +128,19 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
         else
         {
-            // TODO This should look up "_defaultComponentThreadingProfile" from the Registry.
             return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, "MuleServer");
+        }
+    }
+
+    protected WorkListener getWorkListener()
+    {
+        if (workListener != null)
+        {
+            return workListener;
+        }
+        else
+        {
+            return new DefaultWorkListener();
         }
     }
 

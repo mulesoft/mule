@@ -11,6 +11,10 @@
 package org.mule.api.context;
 
 import org.mule.api.MuleContext;
+import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.context.notification.ServerNotificationManager;
+
+import javax.resource.spi.work.WorkListener;
 
 /**
  * Builder that is used to build instances of {@link MuleContext}. Implementing
@@ -19,7 +23,6 @@ import org.mule.api.MuleContext;
  */
 public interface MuleContextBuilder
 {
-
     /**
      * Builds a new {@link MuleContext} instance using configured builder instance.
      * Does not initialise or start MuleContext, only constructs the instance.
@@ -28,4 +31,11 @@ public interface MuleContextBuilder
      */
     MuleContext buildMuleContext();
 
+    void setWorkManager(WorkManager workManager);
+
+    void setWorkListener(WorkListener workListener);
+    
+    void setNotificationManager(ServerNotificationManager notificationManager);
+
+    void setLifecycleManager(LifecycleManager lifecycleManager);
 }

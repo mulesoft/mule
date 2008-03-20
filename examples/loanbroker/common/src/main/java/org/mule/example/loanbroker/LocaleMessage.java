@@ -20,7 +20,7 @@ public class LocaleMessage extends MessageFactory
 
     public static String receivedRequest(String[] params)
     {
-        return getString(BUNDLE_PATH, 1, StringMessageUtils.toString(params));
+        return getString(BUNDLE_PATH, 1, params);
     }
 
     public static String receivedQuote(String[] params)

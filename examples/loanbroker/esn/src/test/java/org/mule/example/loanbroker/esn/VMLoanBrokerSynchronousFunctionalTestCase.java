@@ -17,13 +17,13 @@ import org.mule.model.seda.SedaModel;
 
 public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBrokerTestCase
 {
-    // @Override
+    @Override
     protected String getConfigResources()
     {
         return "loan-broker-sync-config.xml, loan-broker-vm-endpoints-config.xml";
     }
 
-    // @Override
+    @Override
     protected int getNumberOfRequests()
     {
         return 1000;

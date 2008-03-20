@@ -37,10 +37,7 @@ public class MuleConfigurationConfigurator extends MuleConfiguration implements 
         configuration.setDefaultRemoteSync(isDefaultRemoteSync());
         configuration.setClusterId(getClusterId());
         configuration.setDomainId(getDomainId());
-        configuration.setId(getId());
-        
-        configuration.setDefaultConnectionStrategy(getDefaultConnectionStrategy());
-        
+        configuration.setId(getId());        
         return configuration;
     }
 

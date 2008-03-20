@@ -6,5 +6,5 @@
 #	at org.apache.cxf.aegis.type.DefaultTypeMappingRegistry.<init>(DefaultTypeMappingRegistry.java:142)
 #	at org.apache.cxf.aegis.databinding.AegisDatabinding.<init>(AegisDatabinding.java:98)
 #	at org.mule.transport.cxf.CxfMessageReceiver.doInitialise(CxfMessageReceiver.java:103)
-org.mule.example.echo.CxfEchoTestCase
+# org.mule.example.echo.CxfEchoTestCase
 

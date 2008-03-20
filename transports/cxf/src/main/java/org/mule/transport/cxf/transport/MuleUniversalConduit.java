@@ -28,13 +28,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.cxf.binding.soap.SoapConstants;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -180,45 +177,17 @@ public class MuleUniversalConduit extends AbstractConduit
             {
                 IOUtils.copy(cached.getInputStream(), out);
             }
-
-            @SuppressWarnings("unchecked")
-            public Map getHeaders(MuleEvent event)
-            {
-                Map<String, Object> headers = new HashMap<String, Object>();
-                headers.put(HttpConstants.HEADER_CONTENT_TYPE, m.get(Message.CONTENT_TYPE));
-                headers.put(SoapConstants.SOAP_ACTION, (String) m.get(SoapConstants.SOAP_ACTION));
-
-                // TODO copy m.get(Message.PROTOCOL_HEADERS);
-
-                MuleMessage msg = event.getMessage();
-                for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
-                {
-                    String headerName = (String) iterator.next();
-                    Object headerValue = msg.getStringProperty(headerName, null);
-
-                    // let us filter only MULE properties except MULE_USER,
-                    // Content-Type and Content-Lenght; all other properties are
-                    // allowed through including custom headers
-                    if ((!headerName.startsWith(MuleProperties.PROPERTY_PREFIX) || (MuleProperties.MULE_USER_PROPERTY.compareTo(headerName) == 0))
-                        && (!HttpConstants.HEADER_CONTENT_TYPE.equalsIgnoreCase(headerName))
-                        && (!HttpConstants.HEADER_CONTENT_LENGTH.equalsIgnoreCase(headerName)))
-                    {
-                        headers.put(headerName, headerValue);
-                    }
-                }
-
-                return headers;
-            }
         };
 
         // We can create a generic StreamMessageAdapter here as the underlying
         // transport will create one specific to the transport
-        DefaultMessageAdapter sp = new DefaultMessageAdapter(handler);
+        DefaultMessageAdapter req = new DefaultMessageAdapter(handler);
         String method = (String) m.get(Message.HTTP_REQUEST_METHOD);
         if (method == null) method = HttpConstants.METHOD_POST;
 
-        sp.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
-
+        req.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
+        req.setProperty(HttpConstants.HEADER_CONTENT_TYPE, m.get(Message.CONTENT_TYPE));
+        
         // set all properties on the message adapter
         MuleEvent event = RequestContext.getEvent();
         if (event != null)
@@ -227,10 +196,17 @@ public class MuleUniversalConduit extends AbstractConduit
             for (Iterator i = msg.getPropertyNames().iterator(); i.hasNext();)
             {
                 String propertyName = (String) i.next();
-                sp.setProperty(propertyName, msg.getProperty(propertyName));
+                
+             // But, don't copy mule message properties that should be on message but not on soap request
+                // (MULE-2721)
+                // Also see AxisMessageDispatcher.setCustomProperties()
+                if (!(propertyName.startsWith(MuleProperties.PROPERTY_PREFIX)))
+                {
+                    req.setProperty(propertyName, msg.getProperty(propertyName));
+                }
             }
         }
-
+     
         MuleMessage result = null;
 
         String uri = setupURL(m);
@@ -240,13 +216,13 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             OutboundEndpoint ep = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
 
-            result = sendStream(sp, ep);
+            result = sendStream(req, ep);
 
             // If we have a result, send it back to CXF
             if (result != null)
             {
                 Message inMessage = new MessageImpl();
-                String contentType = sp.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+                String contentType = req.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
 
                 inMessage.put(Message.ENCODING, result.getEncoding());
                 inMessage.put(Message.CONTENT_TYPE, contentType);
@@ -270,6 +246,8 @@ public class MuleUniversalConduit extends AbstractConduit
         }
     }
 
+
+    
     protected MuleMessage sendStream(MessageAdapter sa, OutboundEndpoint ep) throws MuleException
     {
         MuleEventContext eventContext = RequestContext.getEventContext();

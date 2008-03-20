@@ -362,12 +362,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     
     public void testMuleConfiguration()
     {
-        // TODO MULE-3005
-        // assertEquals("serverId", muleContext.getId());
-        // assertEquals("clusterId", muleContext.getClusterId());
-        // assertEquals("domainId", muleContext.getDomain());
-        // assertTrue(muleContext.getConfiguration().getWorkingDirectory().endsWith("/mule2/customDir"));
-        assertEquals("US-ASCII", muleContext.getConfiguration().getDefaultEncoding());
         assertTrue(muleContext.getConfiguration().isDefaultRemoteSync());
         assertTrue(muleContext.getConfiguration().isDefaultSynchronousEndpoints());
     }

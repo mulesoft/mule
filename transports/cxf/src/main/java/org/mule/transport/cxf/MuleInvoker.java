@@ -19,6 +19,7 @@ import org.mule.api.service.ServiceException;
 import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Fault;
@@ -35,20 +36,26 @@ public class MuleInvoker implements Invoker
 {
     private final CxfMessageReceiver receiver;
     private final boolean synchronous;
-
-    public MuleInvoker(CxfMessageReceiver receiver, boolean synchronous)
+    private Class<?> targetClass;
+    
+    public MuleInvoker(CxfMessageReceiver receiver, Class<?> targetClass, boolean synchronous)
     {
         this.receiver = receiver;
+        this.targetClass = targetClass;
         this.synchronous = synchronous;
     }
 
     public Object invoke(Exchange exchange, Object o)
     {
         BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
-        MethodDispatcher md = (MethodDispatcher) exchange.get(Service.class).get(
-            MethodDispatcher.class.getName());
+        Service svc = exchange.get(Service.class);
+        MethodDispatcher md = (MethodDispatcher) svc.get(MethodDispatcher.class.getName());
         Method m = md.getMethod(bop);
-
+        if (targetClass != null)
+        {
+            m = matchMethod(m, targetClass);
+        }
+        
         MuleMessage message = null;
         try
         {
@@ -59,8 +66,33 @@ public class MuleInvoker implements Invoker
             {
                 messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m);
             }
+            
+            DefaultMuleMessage muleReq = new DefaultMuleMessage(messageAdapter);
+            String replyTo = (String) exchange.getInMessage().get(MuleProperties.MULE_REPLY_TO_PROPERTY);
+            if (replyTo != null)
+            {
+                muleReq.setReplyTo(replyTo);
+            }
+            
+            String corId = (String) exchange.getInMessage().get(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+            if (corId != null)
+            {
+                muleReq.setCorrelationId(corId);
+            }
 
-            message = receiver.routeMessage(new DefaultMuleMessage(messageAdapter), synchronous);
+            String corGroupSize = (String) exchange.getInMessage().get(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
+            if (corGroupSize != null)
+            {
+                muleReq.setCorrelationGroupSize(Integer.valueOf(corGroupSize));
+            }
+
+            String corSeq = (String) exchange.getInMessage().get(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
+            if (corSeq != null)
+            {
+                muleReq.setCorrelationSequence(Integer.valueOf(corSeq));
+            }
+            
+            message = receiver.routeMessage(muleReq, synchronous);
         }
         catch (MuleException e)
         {
@@ -103,5 +135,64 @@ public class MuleInvoker implements Invoker
     public InboundEndpoint getEndpoint()
     {
         return receiver.getEndpoint();
+    }
+
+    /**
+     * Returns a Method that has the same declaring class as the class of
+     * targetObject to avoid the IllegalArgumentException when invoking the
+     * method on the target object. The methodToMatch will be returned if the
+     * targetObject doesn't have a similar method.
+     * 
+     * @param methodToMatch The method to be used when finding a matching method
+     *            in targetObject
+     * @param targetObject The object to search in for the method.
+     * @return The methodToMatch if no such method exist in the class of
+     *         targetObject; otherwise, a method from the class of targetObject
+     *         matching the matchToMethod method.
+     */
+    private static Method matchMethod(Method methodToMatch, Class<?> targetClass) {
+        Class<?>[] interfaces = targetClass.getInterfaces();
+        for (int i = 0; i < interfaces.length; i++) {
+            Method m = getMostSpecificMethod(methodToMatch, interfaces[i]);
+            if (!methodToMatch.equals(m)) {
+                return m;
+            }
+        }
+        return methodToMatch;
+    }
+
+    /**
+     * Return whether the given object is a J2SE dynamic proxy.
+     * 
+     * @param object the object to check
+     * @see java.lang.reflect.Proxy#isProxyClass
+     */
+    public static boolean isJdkDynamicProxy(Object object) {
+        return object != null && Proxy.isProxyClass(object.getClass());
+    }
+
+    /**
+     * Given a method, which may come from an interface, and a targetClass used
+     * in the current AOP invocation, find the most specific method if there is
+     * one. E.g. the method may be IFoo.bar() and the target class may be
+     * DefaultFoo. In this case, the method may be DefaultFoo.bar(). This
+     * enables attributes on that method to be found.
+     * 
+     * @param method method to be invoked, which may come from an interface
+     * @param targetClass target class for the curren invocation. May be
+     *            <code>null</code> or may not even implement the method.
+     * @return the more specific method, or the original method if the
+     *         targetClass doesn't specialize it or implement it or is null
+     */
+    public static Method getMostSpecificMethod(Method method, Class<?> targetClass) {
+        if (method != null && targetClass != null) {
+            try {
+                method = targetClass.getMethod(method.getName(), method.getParameterTypes());
+            } catch (NoSuchMethodException ex) {
+                // Perhaps the target class doesn't implement this method:
+                // that's fine, just use the original method
+            }
+        }
+        return method;
     }
 }

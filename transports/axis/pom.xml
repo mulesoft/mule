@@ -66,9 +66,11 @@
             <version>1.4</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Use the latest version of WSDL4J as it is compatible with CXF -->
         <dependency>
-            <groupId>axis</groupId>
-            <artifactId>axis-wsdl4j</artifactId>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+            <version>1.6.1</version>
         </dependency>
         <!-- needed by the Axis Service component -->
         <dependency>
@@ -123,7 +125,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-xfire</artifactId>
+            <artifactId>mule-transport-cxf</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>

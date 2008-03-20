@@ -52,7 +52,7 @@ public class MuleHeadersOutInterceptor extends BaseMuleHeaderInterceptor
         }
 
         SoapMessage message = (SoapMessage) m;
-        MuleEvent event = (MuleEvent) message.get(MULE_EVENT_PROPERTY);
+        MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT_PROPERTY);
 
         if (event == null)
         {
@@ -70,7 +70,7 @@ public class MuleHeadersOutInterceptor extends BaseMuleHeaderInterceptor
 
         Element mule_header = owner_doc.createElementNS(MULE_NS_URI, QUALIFIED_MULE_HEADER);
         // setup mule: namespace prefix declaration so that we can use it.
-        mule_header.setAttributeNS(XML_NS_URI, MULE_XMLNS, MULE_NS_URI);
+        mule_header.setAttribute("xmlns:mule", MULE_NS_URI);
 
         if (muleHeaders.getCorrelationId() != null)
         {

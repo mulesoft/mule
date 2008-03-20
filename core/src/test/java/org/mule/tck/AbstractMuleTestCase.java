@@ -17,6 +17,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -357,7 +358,9 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             List builders = new ArrayList();
             builders.add(new SimpleConfigurationBuilder(getStartUpProperties()));
             builders.add(getBuilder());
-            context = muleContextFactory.createMuleContext(builders, new DefaultMuleContextBuilder());
+            MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
+            contextBuilder.setWorkListener(new TestingWorkListener());
+            context = muleContextFactory.createMuleContext(builders, contextBuilder);
         }
         return context;
     }

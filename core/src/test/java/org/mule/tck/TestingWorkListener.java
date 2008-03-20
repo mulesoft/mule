@@ -10,7 +10,7 @@
 
 package org.mule.tck;
 
-import org.mule.api.context.DefaultWorkListener;
+import org.mule.work.DefaultWorkListener;
 
 import javax.resource.spi.work.WorkEvent;
 

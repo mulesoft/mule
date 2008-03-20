@@ -9,7 +9,7 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <environment-property name="test.endpoint" value="tcp://localhost:45441"/>
-    <configuration serverId="server id" defaultRemoteSync="false"/>
+
     <tcp:connector name="tcpConnector" clientSoTimeout="60000" serverSoTimeout="60000">
         <tcp:length-protocol payloadOnly="true"/>
     </tcp:connector>

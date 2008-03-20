@@ -23,7 +23,7 @@ public class AxisExceptionTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "axis-using-xfire-config.xml";
+        return "axis-using-cxf-config.xml";
     }
 
     public void testSuccessCall() throws Exception

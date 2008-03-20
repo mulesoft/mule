@@ -21,7 +21,7 @@
         </spring:constructor-arg>
     </spring:bean>
 
-    <configuration serverId="testServer" defaultSynchronousEndpoints="false"/>
+    <configuration defaultSynchronousEndpoints="false"/>
 
     <model name="test">
         <service name="BridgeUMO">

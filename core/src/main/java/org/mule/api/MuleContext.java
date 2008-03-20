@@ -20,12 +20,14 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
+import org.mule.api.transport.ConnectionStrategy;
 import org.mule.config.MuleConfiguration;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.util.queue.QueueManager;
 
+import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
 
 public interface MuleContext extends Lifecycle
@@ -167,6 +169,10 @@ public interface MuleContext extends Lifecycle
      */
     void setWorkManager(WorkManager workManager);
 
+    WorkListener getWorkListener();
+
+    void setWorkListener(WorkListener workListener);
+    
     /**
      * Sets the queue manager used by mule for queuing events. This is used for
      * service queues
@@ -209,6 +215,8 @@ public interface MuleContext extends Lifecycle
     ThreadingProfile getDefaultComponentThreadingProfile();
 
     ThreadingProfile getDefaultThreadingProfile();
+
+    ConnectionStrategy getDefaultConnectionStrategy();
 
     // TODO This should ideally only be available via an Admin interface
     void addRegistry(Registry registry);

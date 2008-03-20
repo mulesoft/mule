@@ -131,6 +131,7 @@ public class StockQuote implements Serializable
         this.date = date;
     }
 
+    @Override
     public String toString()
     {
         return LocaleMessage.getStockQuoteMessage(symbol, name, date, last, change, open, high,

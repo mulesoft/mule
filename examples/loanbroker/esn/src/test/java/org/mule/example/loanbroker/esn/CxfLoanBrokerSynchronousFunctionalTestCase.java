@@ -12,11 +12,19 @@ package org.mule.example.loanbroker.esn;
 
 import org.mule.example.loanbroker.tests.AbstractLoanBrokerTestCase;
 
-public class XFireLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBrokerTestCase
+public class CxfLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBrokerTestCase
 {
-    // @Override
+    
+    @Override
+    public void testSingleLoanRequest() throws Exception
+    {
+        // TODO Auto-generated method stub
+        super.testSingleLoanRequest();
+    }
+
+    @Override
     protected String getConfigResources()
     {
-        return "loan-broker-sync-config.xml, loan-broker-xfire-endpoints-config.xml";
+        return "loan-broker-sync-config.xml, loan-broker-cxf-endpoints-config.xml";
     }
 }

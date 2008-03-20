@@ -104,11 +104,12 @@ public interface MuleProperties
     String OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE = "_defaultMessageRequesterThreadingProfile";
     String OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE = "_defaultMessageReceiverThreadingProfile";
     String OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE = "_defaultComponentThreadingProfile";
-
-    // Not currently used as these are attributes of MuleContext
-    String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
-    String OBJECT_WORK_MANAGER = "_muleWorkManager";
+    String OBJECT_DEFAULT_CONNECTION_STRATEGY = "_defaultConnectionStrategy";
     String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
+
+    // Not currently used as these need to be instance variables of the MuleContext.
+    String OBJECT_WORK_MANAGER = "_muleWorkManager";
+    String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
 
     /**
     * Specifies whether mule should process messages sysnchonously, i.e. that a

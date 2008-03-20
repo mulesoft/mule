@@ -20,9 +20,9 @@ import org.mule.transport.NullPayload;
 import org.mule.util.ExceptionHolder;
 import org.mule.util.StringMessageUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-
 import java.beans.ExceptionListener;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.lang.time.StopWatch;
 
@@ -34,7 +34,7 @@ import org.apache.commons.lang.time.StopWatch;
  */
 public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoanBrokerTestCase
 {
-    // @Override
+    @Override
     protected int getNumberOfRequests()
     {
         return 100;
@@ -51,6 +51,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
         return 50;
     }
 
+    @Override
     public void testSingleLoanRequest() throws Exception
     {
         MuleClient client = new MuleClient();
@@ -69,6 +70,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
         assertTrue(quote.getInterestRate() > 0);
     }
 
+    @Override
     public void testLotsOfLoanRequests() throws Exception
     {
         final MuleClient client = new MuleClient();
