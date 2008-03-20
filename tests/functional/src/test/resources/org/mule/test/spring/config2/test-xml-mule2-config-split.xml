@@ -36,7 +36,8 @@
                 </mule:inbound>
 
                 <mule:pooled-component class="org.mule.tck.testmodels.fruit.Apple">
-                    <mule:pooling-profile exhaustedAction="WHEN_EXHAUSTED_WAIT" initialisationPolicy="INITIALISE_ALL"/>
+                    <mule:pooling-profile maxActive="9" maxIdle="6" maxWait="4002" 
+                        exhaustedAction="WHEN_EXHAUSTED_FAIL" initialisationPolicy="INITIALISE_ALL"/>
                 </mule:pooled-component>
 
                 <mule:outbound>

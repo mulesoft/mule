@@ -14,9 +14,7 @@
     <name>Mule Tests</name>
 
     <modules>
-        <!-- commented out because the build fails due to errors inside Maven
-        <module>archetypes</module> -->
-        <module>external</module>
+        <module>archetypes</module>
         <module>functional</module>
         <module>integration</module>
     </modules>

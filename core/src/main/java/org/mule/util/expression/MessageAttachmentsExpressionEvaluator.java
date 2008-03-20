@@ -16,8 +16,6 @@ import org.mule.config.i18n.CoreMessages;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Looks up the attachment(s) on the message using the expression given. The expression can contain a comma-separated list

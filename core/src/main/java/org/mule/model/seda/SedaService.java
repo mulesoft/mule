@@ -16,7 +16,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
@@ -88,7 +87,6 @@ public class SedaService extends AbstractService implements Work, WorkListener
      */
     protected synchronized void doInitialise() throws InitialisationException
     {
-        MuleConfiguration config = muleContext.getConfiguration();
         if (threadingProfile == null)
         {
             // TODO MULE-2102 This should be configured in the default template.
@@ -223,7 +221,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
             {
                 logger.debug(this + " : got proxy for " + event.getId() + " = " + component);
             }
-            result = (MuleMessage) component.onCall(event);
+            result = component.onCall(event);
             // TODO MULE-3113
             // 1) Invoke component.onCall(event)
             // 2) Forward result to outbound routers ideally via a SEDA queue (MULE-3077)

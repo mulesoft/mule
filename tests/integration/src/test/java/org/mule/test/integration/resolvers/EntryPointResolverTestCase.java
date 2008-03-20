@@ -10,8 +10,6 @@
 
 package org.mule.test.integration.resolvers;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCase
 {

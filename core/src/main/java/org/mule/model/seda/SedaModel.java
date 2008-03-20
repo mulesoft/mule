@@ -10,7 +10,6 @@
 
 package org.mule.model.seda;
 
-import org.mule.RegistryContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.PoolingProfile;

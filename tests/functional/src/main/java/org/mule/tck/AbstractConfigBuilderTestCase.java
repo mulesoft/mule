@@ -17,7 +17,7 @@ import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.model.Model;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.NestedRouter;
@@ -26,6 +26,8 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
+import org.mule.component.PooledJavaComponent;
+import org.mule.config.PoolingProfile;
 import org.mule.model.seda.SedaService;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -67,11 +69,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(c);
         assertNotNull(c.getExceptionListener());
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
-        //TODO RM* Move to the endpoint
-//        assertNotNull(c.getConnectionStrategy());
-//        assertTrue(c.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-//        assertEquals(4, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getRetryCount());
-//        assertEquals(3000, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getFrequency());
     }
 
     // @Override
@@ -133,13 +130,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     // @Override
     public void testModelConfig() throws Exception
     {
-        super.testModelConfig();
-
-        Model model = muleContext.getRegistry().lookupModel("main");
-        super.testModelConfig();
-        // MULE-1995 Components are no longer registered with the model.
-//        assertTrue(model.isComponentRegistered("appleComponent"));
-//        assertTrue(model.isComponentRegistered("appleComponent2"));
+        super.testModelConfig();        
+        assertNotNull(muleContext.getRegistry().lookupService("appleComponent"));
+        assertNotNull(muleContext.getRegistry().lookupService("appleComponent2"));
     }
 
     public void testOutboundRouterConfig2()
@@ -266,8 +259,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(defaultThreadTTL, tp.getThreadTTL());
     }
 
-//    public void testPoolingConfig()
-//    {
+    public void testPoolingConfig()
+    {
 //        //TODO RM* test config
 //        PoolingProfile pp = RegistryContext.getConfiguration().getPoolingProfile();
 //        assertEquals(10, pp.getMaxActive());
@@ -278,16 +271,15 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertTrue(pp.getPoolFactory() instanceof CommonsPoolFactory);
 
         // test per-descriptor overrides
-//        MuleDescriptor descriptor = (MuleDescriptor) muleContext.getRegistry().lookupService(
-//                "appleComponent2");
-//        PoolingProfile pp = descriptor.getPoolingProfile();
-//
-//        assertEquals(9, pp.getMaxActive());
-//        assertEquals(6, pp.getMaxIdle());
-//        assertEquals(4002, pp.getMaxWait());
-//        assertEquals(ObjectPool.WHEN_EXHAUSTED_FAIL, pp.getExhaustedAction());
-//        assertEquals(PoolingProfile.INITIALISE_ALL, pp.getInitialisationPolicy());
-//    }
+        Service service = muleContext.getRegistry().lookupService("appleComponent2");
+        PoolingProfile pp = ((PooledJavaComponent)service.getComponent()).getPoolingProfile();
+
+        assertEquals(9, pp.getMaxActive());
+        assertEquals(6, pp.getMaxIdle());
+        assertEquals(4002, pp.getMaxWait());
+        assertEquals(PoolingProfile.WHEN_EXHAUSTED_FAIL, pp.getExhaustedAction());
+        assertEquals(PoolingProfile.INITIALISE_ALL, pp.getInitialisationPolicy());
+    }
 //
 //    public void testQueueProfileConfig()
 //    {
@@ -322,25 +314,23 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals("Prop1", inEndpoint.getProperties().get("testEndpointProperty"));
     }
 
-// TODO MULE-2185 Transaction config needs some work
-//    public void testTransactionConfig() throws Exception
-//    {
-//        // test transaction config
-//        UMODescriptor descriptor = muleContext.getRegistry().lookupService("appleComponent2");
-//        Endpoint inEndpoint = descriptor.getInboundRouter().getEndpoint("transactedInboundEndpoint");
-//        assertNotNull(inEndpoint);
-//        assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
-//
-//        Endpoint outEndpoint = (Endpoint) ((OutboundRouter) descriptor.getOutboundRouter()
-//                .getRouters()
-//                .get(0)).getEndpoints().get(0);
-//
-//        assertNotNull(outEndpoint);
-//        assertNotNull(inEndpoint.getTransactionConfig());
+    public void testTransactionConfig() throws Exception
+    {
+        // test transaction config
+        Service apple = muleContext.getRegistry().lookupService("appleComponent2");
+        InboundEndpoint inEndpoint = apple.getInboundRouter().getEndpoint("transactedInboundEndpoint");
+        assertNotNull(inEndpoint);
+        assertEquals(1, apple.getOutboundRouter().getRouters().size());
+        assertNotNull(inEndpoint.getTransactionConfig());
+     // TODO MULE-2185 Transaction config needs some work
 //        assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, inEndpoint.getTransactionConfig().getAction());
 //        assertTrue(inEndpoint.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
 //        assertNull(inEndpoint.getTransactionConfig().getConstraint());
-//    }
+
+        OutboundRouter outRouter = (OutboundRouter) apple.getOutboundRouter().getRouters().get(0);
+        OutboundEndpoint outEndpoint = (OutboundEndpoint) outRouter.getEndpoints().get(0);
+        assertNotNull(outEndpoint);
+    }
 
     public void testEnvironmentProperties()
     {

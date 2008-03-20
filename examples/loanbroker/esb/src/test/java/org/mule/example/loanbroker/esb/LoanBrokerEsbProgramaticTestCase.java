@@ -23,7 +23,6 @@ public class LoanBrokerEsbProgramaticTestCase extends AbstractLoanBrokerTestCase
     @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        // TODO Auto-generated method stub
         return new LoanBrokerEsbConfigurationBuilder();
     }
 }

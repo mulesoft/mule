@@ -9,7 +9,6 @@
  */
 package org.mule.config.spring.parsers.generic;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.util.SpringXMLUtils;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;

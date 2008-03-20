@@ -45,7 +45,6 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
 {
 
     private boolean started = false;
-    private boolean disposed = false;
 
     public SimpleCallableJavaComponent()
     {

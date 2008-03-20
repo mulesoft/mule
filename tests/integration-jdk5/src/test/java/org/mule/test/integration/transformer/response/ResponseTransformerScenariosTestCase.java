@@ -26,7 +26,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     private static String CUSTOM_RESPONSE = " customResponse";
 
-    //@Override
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/transformer/response/response-transformer-scenarios.xml";

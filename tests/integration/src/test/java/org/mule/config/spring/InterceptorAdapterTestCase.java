@@ -10,9 +10,8 @@
 
 package org.mule.config.spring;
 
-import org.mule.module.client.MuleClient;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 public class InterceptorAdapterTestCase extends FunctionalTestCase

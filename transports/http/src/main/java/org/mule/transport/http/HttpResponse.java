@@ -12,13 +12,11 @@ package org.mule.transport.http;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transport.NullPayload;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,18 +41,14 @@ public class HttpResponse
 {
 
     public static final String DEFAULT_CONTENT_CHARSET = "ISO-8859-1";
-    private static final int DEFAULT_BUFFER_SIZE = 8192;
 
     private HttpVersion ver = HttpVersion.HTTP_1_1;
     private int statusCode = HttpStatus.SC_OK;
     private String phrase = HttpStatus.getStatusText(HttpStatus.SC_OK);
     private HeaderGroup headers = new HeaderGroup();
-    private InputStream entity = null;
     private boolean keepAlive = false;
     private boolean disableKeepAlive = false;
     private String fallbackCharset = DEFAULT_CONTENT_CHARSET;
-    private MuleMessage message;
-    private MuleEventContext event;
     private OutputHandler outputHandler;
 
     public HttpResponse()
@@ -94,7 +88,6 @@ public class HttpResponse
                     in = new ContentLengthInputStream(in, len);
                 }
             }
-            this.entity = in;
         }
     }
 

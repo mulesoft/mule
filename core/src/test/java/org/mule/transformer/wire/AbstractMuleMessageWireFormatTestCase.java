@@ -48,7 +48,7 @@ public abstract class AbstractMuleMessageWireFormatTestCase extends AbstractWire
 
         try
         {
-            Object outObject = readWrite(inOrange);
+            readWrite(inOrange);
             fail("Expected exception: MuleMessageWireFormat does not support other types");
         }
         catch (Exception e)

@@ -148,8 +148,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        OutboundEndpoint endpoint1 = (OutboundEndpoint) getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
-        OutboundEndpoint endpoint2 = (OutboundEndpoint) getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.addEndpoint(endpoint1);

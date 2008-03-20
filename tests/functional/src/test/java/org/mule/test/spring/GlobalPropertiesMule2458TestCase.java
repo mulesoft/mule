@@ -30,7 +30,8 @@ public class GlobalPropertiesMule2458TestCase extends FunctionalTestCase
         assertNotNull(ep);
         assertEquals("local", ep.getProperties().get("local"));
         assertEquals("global", ep.getProperties().get("global"));
-        assertEquals(2, ep.getProperties().size());
+        assertEquals("local", ep.getProperties().get("override-me"));
+        assertEquals(3, ep.getProperties().size());
     }
 
 }

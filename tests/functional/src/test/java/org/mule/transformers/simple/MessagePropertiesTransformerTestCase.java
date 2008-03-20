@@ -60,7 +60,6 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message");
         msg.setProperty("addedProperty", "originalValue");
-        MuleEventContext ctx = getTestEventContext(msg);
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
@@ -77,7 +76,6 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message");
         msg.setProperty("badProperty", "badValue");
-        MuleEventContext ctx = getTestEventContext(msg);
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());

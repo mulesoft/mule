@@ -9,18 +9,7 @@
  */
 package org.mule.module.scripting.expression;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.MessageAdapter;
-import org.mule.module.scripting.component.Scriptable;
-import org.mule.util.expression.ExpressionEvaluator;
-
-import java.util.Map;
-import java.util.WeakHashMap;
-
-import javax.script.Bindings;
-import javax.script.ScriptException;
+import org.mule.api.MuleMessage;
 
 /**
  * An {@link org.mule.util.expression.ExpressionEvaluator} that allows the user to define Groovy expressions to extract

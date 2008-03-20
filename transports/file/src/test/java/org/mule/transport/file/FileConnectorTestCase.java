@@ -10,10 +10,8 @@
 
 package org.mule.transport.file;
 
-import org.mule.RegistryContext;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.file.FileConnector;
 import org.mule.util.FileUtils;
 
 import java.io.File;

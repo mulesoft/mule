@@ -153,9 +153,9 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         assertEquals(0, component.lifecycleAdapterPool.getNumActive());
         borrowed = component.borrowComponentLifecycleAdaptor();
         assertNotNull(borrowed);
-        borrowed = component.borrowComponentLifecycleAdaptor();;
+        borrowed = component.borrowComponentLifecycleAdaptor();
         assertNotNull(borrowed);
-        borrowed = component.borrowComponentLifecycleAdaptor();;
+        borrowed = component.borrowComponentLifecycleAdaptor();
         assertNotNull(borrowed);
         assertEquals(3, component.lifecycleAdapterPool.getNumActive());
 

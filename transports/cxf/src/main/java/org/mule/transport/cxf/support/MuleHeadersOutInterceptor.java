@@ -10,7 +10,6 @@
 
 package org.mule.transport.cxf.support;
 
-import static javax.xml.XMLConstants.XML_NS_URI;
 import static org.mule.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
 import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;

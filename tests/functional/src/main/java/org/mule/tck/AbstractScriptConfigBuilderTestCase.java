@@ -37,6 +37,7 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestInboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.transformer.TransformerUtils;
+import org.mule.transport.SimpleRetryConnectionStrategy;
 
 import java.util.List;
 import java.util.Map;
@@ -83,12 +84,12 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(filter);
         assertEquals("foo=bar", filter.getExpression());
 
-        //ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpoint("testEPWithCS");
-        //assertNotNull(ep);
-        //assertNotNull(ep.getConnectionStrategy());
-        //assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-        //assertEquals(4, ((SimpleRetryConnectionStrategy) ep.getConnectionStrategy()).getRetryCount());
-        //assertEquals(3000, ((SimpleRetryConnectionStrategy) ep.getConnectionStrategy()).getRetryFrequency());
+        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("testEPWithCS");
+        assertNotNull(ep);
+        assertNotNull(ep.getConnectionStrategy());
+        assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
+        assertEquals(4, ((SimpleRetryConnectionStrategy) ep.getConnectionStrategy()).getRetryCount());
+        assertEquals(3000, ((SimpleRetryConnectionStrategy) ep.getConnectionStrategy()).getRetryFrequency());
     }
 
     public void testEndpointConfig() throws MuleException
@@ -316,18 +317,4 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals("AppleResponseQueue", ep.getEndpointURI().getAddress());
         assertTrue(ep instanceof InboundEndpoint);
     }
-
-    /* moved to ManagementStartupTestCase in integration
-
-    public void _testAgentConfiguration() throws MuleException
-    {
-        JmxAgent agent = (JmxAgent)muleContext.getRegistry().lookupAgent("jmxAgent");
-        assertNotNull(agent);
-        //TODO RM* Add this back in. Currently failing because of a JMX issue where the AllStatistics MBean is registered twice
-//        assertNotNull(agent.getConnectorServerUrl());
-//        assertEquals("service:jmx:rmi:///jndi/rmi://localhost:1099/server", agent.getConnectorServerUrl());
-//        assertNotNull(agent.getConnectorServerProperties());
-//        assertEquals("true", agent.getConnectorServerProperties().get("jmx.remote.jndi.rebind"));
-    }
-    */
 }

@@ -38,7 +38,6 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReceiveException;
 import org.mule.config.DefaultMuleConfiguration;
-import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;

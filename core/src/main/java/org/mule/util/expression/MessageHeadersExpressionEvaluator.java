@@ -11,7 +11,6 @@
 package org.mule.util.expression;
 
 import org.mule.api.transport.MessageAdapter;
-import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.HashMap;

@@ -197,7 +197,6 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
      */
     public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec activationSpec)
     {
-
         if (activationSpec.getClass().equals(MuleActivationSpec.class))
         {
             MuleActivationSpec muleActivationSpec = (MuleActivationSpec) activationSpec;

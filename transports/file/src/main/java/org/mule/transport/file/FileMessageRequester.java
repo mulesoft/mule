@@ -104,9 +104,6 @@ public class FileMessageRequester extends AbstractMessageRequester
                 }
 
                 // Don't we need to try to obtain a file lock as we do with receiver
-
-                FileConnector fc = ((FileConnector) connector);
-
                 String sourceFileOriginalName = result.getName();
 
                 // This isn't nice but is needed as MessageAdaptor is required to
@@ -118,14 +115,14 @@ public class FileMessageRequester extends AbstractMessageRequester
 
                 // set up destination file
                 File destinationFile = null;
-                String movDir = fc.getMoveToDirectory();
+                String movDir = connector.getMoveToDirectory();
                 if (movDir != null)
                 {
                     String destinationFileName = sourceFileOriginalName;
-                    String moveToPattern = fc.getMoveToPattern();
+                    String moveToPattern = connector.getMoveToPattern();
                     if (moveToPattern != null)
                     {
-                        destinationFileName = ((FileConnector) connector).getFilenameParser().getFilename(
+                        destinationFileName = connector.getFilenameParser().getFilename(
                             fileParserMsgAdaptor, moveToPattern);
                     }
                     // don't use new File() directly, see MULE-1112
@@ -135,9 +132,9 @@ public class FileMessageRequester extends AbstractMessageRequester
                 MessageAdapter msgAdapter = null;
                 try
                 {
-                    if (fc.isStreaming())
+                    if (connector.isStreaming())
                     {
-                        msgAdapter = connector.getMessageAdapter(new ReceiverFileInputStream(result, fc.isAutoDelete(),
+                        msgAdapter = connector.getMessageAdapter(new ReceiverFileInputStream(result, connector.isAutoDelete(),
                             destinationFile));
                     }
                     else
@@ -154,7 +151,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                 }
                 msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
-                if (!fc.isStreaming())
+                if (!connector.isStreaming())
                 {
                     moveOrDelete(result, destinationFile);
                     return new DefaultMuleMessage(msgAdapter);
@@ -182,7 +179,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                     destinationFile.getAbsolutePath()));
             }
         }
-        if (((FileConnector) connector).isAutoDelete())
+        if (connector.isAutoDelete())
         {
             // no moveTo directory
             if (destinationFile == null)

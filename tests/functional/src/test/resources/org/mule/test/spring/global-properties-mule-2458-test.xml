@@ -8,6 +8,7 @@
 
     <endpoint name="foo" address="test://foo">
         <property key="global" value="global"/>
+        <property key="override-me" value="global"/>
     </endpoint>
 
     <model name="model">
@@ -15,6 +16,7 @@
             <inbound>
                 <inbound-endpoint ref="foo">
                     <property key="local" value="local"/>
+                    <property key="override-me" value="local"/>
                 </inbound-endpoint>
             </inbound>
             <null-component/>

@@ -137,7 +137,7 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
 
         try
         {
-            Object result = transformer.transform(message);
+            transformer.transform(message);
             fail("Not all headers present, the transform should have failed");
         }
         catch (TransformerException e)

@@ -61,6 +61,9 @@
                 <entry key="testGlobal" value="value1"/>
             </mule:properties>
         </mule:endpoint>
+        <mule:endpoint name="testEPWithCS" address="test://test.queue2">
+            <mule:retry-connection-strategy retryCount="4" retryFrequency="3000"/>
+        </mule:endpoint>
 
     <mule:endpoint name="endpointWithProps" address="test://endpointWithProps">
     	<mule:properties>

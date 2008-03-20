@@ -25,14 +25,17 @@
                     <property key="testEndpointProperty" value="Prop1"/>
                 </inbound-endpoint>
             </inbound>
-            <component class="org.mule.tck.testmodels.fruit.Apple"/>
+            <pooled-component class="org.mule.tck.testmodels.fruit.Apple">
+                <pooling-profile maxActive="9" maxIdle="6" maxWait="4002" 
+                    exhaustedAction="WHEN_EXHAUSTED_FAIL" initialisationPolicy="INITIALISE_ALL"/>
+            </pooled-component>
             <outbound>
                 <filtering-router>
                     <outbound-endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"/>
                 </filtering-router>
             </outbound>
             <component-threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
-            <!--<pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/>-->
+<!--            <pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/>-->
             <!--<queue-profile maxOutstandingMessages="102"/>-->
         </service>
     </model>

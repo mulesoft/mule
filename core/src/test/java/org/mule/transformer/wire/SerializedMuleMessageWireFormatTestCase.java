@@ -11,11 +11,8 @@
 package org.mule.transformer.wire;
 
 import org.mule.api.transformer.wire.WireFormat;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.simple.ByteArrayToMuleMessage;
 import org.mule.transformer.simple.MuleMessageToByteArray;
-
-import java.util.Properties;
 
 public class SerializedMuleMessageWireFormatTestCase extends AbstractMuleMessageWireFormatTestCase
 {

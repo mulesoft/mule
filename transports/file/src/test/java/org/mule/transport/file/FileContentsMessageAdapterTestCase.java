@@ -10,11 +10,9 @@
 
 package org.mule.transport.file;
 
-import org.mule.RegistryContext;
 import org.mule.api.MessagingException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
-import org.mule.transport.file.FileContentsMessageAdapter;
 import org.mule.util.FileUtils;
 
 import java.io.File;

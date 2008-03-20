@@ -13,14 +13,11 @@ package org.mule.transport.cxf.support;
 import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
 
 import org.mule.api.MuleEvent;
-import org.mule.transport.http.HttpConstants;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.MessageSenderInterceptor.MessageSenderEndingInterceptor;
 import org.apache.cxf.message.Message;

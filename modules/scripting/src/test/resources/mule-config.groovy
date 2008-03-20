@@ -38,6 +38,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.transport.SingleAttemptConnectionStrategy;
+import org.mule.transport.SimpleRetryConnectionStrategy;
 
 // Set up defaults / system objects
 QueueManager queueManager = new TransactionalQueueManager();
@@ -122,6 +123,14 @@ epBuilder= new EndpointURIEndpointBuilder("test://orangeQ", muleContext)
 epBuilder.name = "orangeEndpoint"
 epBuilder.setProperty("testGlobal", "value1")
 muleContext.registry.registerEndpointBuilder("orangeEndpoint", epBuilder);
+
+epBuilder = new EndpointURIEndpointBuilder("test://test.queue2", muleContext);
+epBuilder.name = "testEPWithCS";
+connectionStrategy = new SimpleRetryConnectionStrategy();
+connectionStrategy.retryCount = 4
+connectionStrategy.retryFrequency = 3000;
+epBuilder.connectionStrategy = connectionStrategy;
+muleContext.registry.registerEndpointBuilder("testEPWithCS", epBuilder);
 
 // Concrete Endpoints
 epBuilder= new EndpointURIEndpointBuilder("test://AppleResponseQueue", muleContext)

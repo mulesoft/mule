@@ -23,7 +23,7 @@ public class ReplyToTestCase extends FunctionalTestCase
 {
     static final long RECEIVE_DELAY = 3000;
     
-    // @Override
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/usecases/replyto.xml";

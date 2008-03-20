@@ -21,22 +21,25 @@ import org.mule.util.expression.ExpressionRuntimeException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
- * This transformer will evaluate one or more expressions on the current message and return the results as an Array. If only one
- * expression is defined it will return the object returned from the expression.
- * You can use expressions to extract -
- * - headers (single, map or list)
- * - attachments (single, map or list)
- * - payload
- * - xpath
- * - groovy
- * - bean
+ * This transformer will evaluate one or more expressions on the current message and return the 
+ * results as an Array. If only one expression is defined it will return the object returned from 
+ * the expression.
+ * <p/>
+ * You can use expressions to extract
+ * <ul>
+ * <li>headers (single, map or list)</li>
+ * <li>attachments (single, map or list)</li>
+ * <li>payload</li>
+ * <li>xpath</li>
+ * <li>groovy</li>
+ * <li>bean</li>
+ * </ul>
  * and more.
- *
- * This transformer provides a very powerful way to pull different bits of information from the message and pass
- * them to the service.
+ * <p/>
+ * This transformer provides a very powerful way to pull different bits of information from the 
+ * message and pass them to the service.
  */
 public class ExpressionTransformer extends AbstractMessageAwareTransformer
 {

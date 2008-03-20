@@ -11,7 +11,6 @@
 package org.mule.config.spring.parsers.specific.tls;
 
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 public class ProtocolHandlerDefinitionParser extends ParentDefinitionParser
 {

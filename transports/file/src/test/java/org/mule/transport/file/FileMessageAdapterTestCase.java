@@ -11,7 +11,6 @@
 package org.mule.transport.file;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.RegistryContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageAdapter;
