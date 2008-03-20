@@ -13,6 +13,7 @@ package org.mule.tck;
 import org.mule.DefaultExceptionStrategy;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
+import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -354,7 +355,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         //Test that the proxy object was created and set on the service object
         Service orange = muleContext.getRegistry().lookupService("orangeComponent");
         assertNotNull(orange);
-        NestedRouter r = (NestedRouter) orange.getNestedRouter().getRouters().get(0);
+        assertTrue(orange.getComponent() instanceof JavaComponent);
+        NestedRouter r = (NestedRouter) ((JavaComponent) orange.getComponent()).getNestedRouter().getRouters().get(0);
         assertNotNull(r);
 
         //TODO Grab an instance of the service object itself and test that the proxy has been injected

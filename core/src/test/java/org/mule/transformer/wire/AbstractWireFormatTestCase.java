@@ -11,7 +11,6 @@
 package org.mule.transformer.wire;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.tck.AbstractMuleTestCase;
@@ -25,7 +24,22 @@ import java.util.Properties;
 public abstract class AbstractWireFormatTestCase extends AbstractMuleTestCase
 {
 
-    public void testWriteReadPayload() throws MuleException
+    public void testWriteReadMessage() throws Exception
+    {
+        // Create message to send over wire
+        Properties messageProerties = new Properties();
+        messageProerties.put("key1", "val1");
+        MuleMessage inMessage = new DefaultMuleMessage("testMessage", messageProerties);
+
+        Object outMessage = readWrite(inMessage);
+
+        // NOTE: Since we are not using SerializedMuleMessageWireFormat we only get
+        // the payload back and not the MuleMessage.
+        assertTrue(outMessage instanceof String);
+        assertEquals("testMessage", outMessage);
+    }
+
+    public void testWriteReadPayload() throws Exception
     {
         // Create orange to send over the wire
         Properties messageProerties = new Properties();
@@ -42,25 +56,10 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleTestCase
         assertEquals("val1", ((Orange) outObject).getMapProperties().get("key1"));
     }
 
-    public void testWriteReadMessage() throws MuleException
-    {
-        // Create message to send over wire
-        Properties messageProerties = new Properties();
-        messageProerties.put("key1", "val1");
-        MuleMessage inMessage = new DefaultMuleMessage("testMessage", messageProerties);
-
-        Object outMessage = readWrite(inMessage);
-
-        // Test deserialized message
-        assertTrue(outMessage instanceof MuleMessage);
-        assertEquals("testMessage", ((MuleMessage) outMessage).getPayload());
-        assertEquals("val1", ((MuleMessage) outMessage).getProperty("key1"));
-    }
-
-    private Object readWrite(Object inObject) throws MuleException
+    protected Object readWrite(Object inObject) throws Exception
     {
         // Serialize
-        WireFormat wireFormat = new SerializationWireFormat();
+        WireFormat wireFormat = getWireFormat();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         wireFormat.write(out, inObject, "UTF-8");
 

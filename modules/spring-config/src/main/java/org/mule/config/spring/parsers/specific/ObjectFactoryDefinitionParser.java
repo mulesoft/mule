@@ -12,7 +12,7 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.util.object.AbstractObjectFactory;
+import org.mule.object.AbstractObjectFactory;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.w3c.dom.Element;

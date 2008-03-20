@@ -11,6 +11,7 @@
 package org.mule.transport.soap.xfire;
 
 import org.mule.api.MuleException;
+import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
@@ -83,7 +84,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 // we have to retrieve the implementation classname and create a
                 // class for it
                 WebServiceAnnotation webServiceAnnotation = 
-                    wa.getWebServiceAnnotation(service.getComponentFactory().getObjectClass());
+                    wa.getWebServiceAnnotation(((JavaComponent) service.getComponent()).getObjectType());
                 namespace = webServiceAnnotation.getTargetNamespace();
             }
 
@@ -120,7 +121,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
             if (serviceInterfaces == null)
             {
-                exposedInterface = service.getComponentFactory().getObjectClass();
+                exposedInterface = ((JavaComponent) service.getComponent()).getObjectType();
             }
             else
             {

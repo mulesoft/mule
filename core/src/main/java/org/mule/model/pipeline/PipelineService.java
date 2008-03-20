@@ -11,14 +11,13 @@
 package org.mule.model.pipeline;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.component.Component;
 import org.mule.api.transport.DispatchException;
+import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.direct.DirectService;
 
@@ -29,48 +28,16 @@ public class PipelineService extends DirectService
      */
     private static final long serialVersionUID = -2788210157354765190L;
 
-    private Callable callable;
-
     public PipelineService()
     {
         super();
-    }
-
-    protected void doInitialise() throws InitialisationException
-    {
-
-        super.doInitialise();
-        Object component = null;
-        try
-        {
-            component = getOrCreateService();
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-        if (component instanceof Callable)
-        {
-            callable = (Callable) component;
-        }
-        else
-        {
-            throw new InitialisationException(
-                CoreMessages.objectNotOfCorrectType(component.getClass(), Callable.class), this);
-        }
-
-        if (component instanceof Initialisable)
-        {
-            ((Initialisable) component).initialise();
-        }
-
     }
 
     protected MuleMessage doSend(MuleEvent event) throws MuleException
     {
         try
         {
-            Object result = callable.onCall(RequestContext.getEventContext());
+            Object result = component.onCall(event);
             MuleMessage returnMessage = null;
             if (result instanceof MuleMessage)
             {
@@ -89,8 +56,8 @@ public class PipelineService extends DirectService
                 // }
                 if (outboundRouter.hasEndpoints())
                 {
-                    MuleMessage outboundReturnMessage = outboundRouter.route(returnMessage,
-                        event.getSession(), event.isSynchronous());
+                    MuleMessage outboundReturnMessage = outboundRouter.route(returnMessage, event.getSession(),
+                        event.isSynchronous());
                     if (outboundReturnMessage != null)
                     {
                         returnMessage = outboundReturnMessage;
@@ -98,8 +65,7 @@ public class PipelineService extends DirectService
                 }
                 else
                 {
-                    logger.debug("Outbound router on service '" + name
-                                 + "' doesn't have any endpoints configured.");
+                    logger.debug("Outbound router on service '" + name + "' doesn't have any endpoints configured.");
                 }
             }
 
@@ -116,15 +82,15 @@ public class PipelineService extends DirectService
         sendEvent(event);
     }
 
-    protected void doDispose()
+    // @Override
+    public void setComponent(Component component)
     {
-        try
+        if (!(component instanceof SimpleCallableJavaComponent))
         {
-            componentFactory.release(callable);
+            throw new MuleRuntimeException(CoreMessages.objectNotOfCorrectType(component.getClass(),
+                SimpleCallableJavaComponent.class));
         }
-        catch (Exception e)
-        {
-            logger.warn(e);
-        }
+        super.setComponent(component);
     }
+
 }

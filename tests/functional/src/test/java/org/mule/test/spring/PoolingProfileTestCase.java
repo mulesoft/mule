@@ -11,9 +11,9 @@
 package org.mule.test.spring;
 
 import org.mule.api.service.Service;
+import org.mule.component.PooledJavaComponent;
 import org.mule.config.PoolingProfile;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.util.object.PooledObjectFactory;
 
 public class PoolingProfileTestCase  extends FunctionalTestCase
 {
@@ -54,8 +54,9 @@ public class PoolingProfileTestCase  extends FunctionalTestCase
     {
         Service c = muleContext.getRegistry().lookupService(service);
         assertNotNull(service, c);
-        PooledObjectFactory of = (PooledObjectFactory)c.getComponentFactory();
-        PoolingProfile profile = of.getPoolingProfile();
+        assertTrue(c.getComponent() instanceof PooledJavaComponent);
+        PooledJavaComponent pjc = (PooledJavaComponent)c.getComponent();
+        PoolingProfile profile = pjc.getPoolingProfile();
         assertNotNull(profile);
         assertEquals("exhausted:", exhausted, profile.getExhaustedAction());
         assertEquals("initialisation:", initialisation, profile.getInitialisationPolicy());

@@ -27,12 +27,12 @@
             <inbound>
                 <inbound-endpoint address="vm://groovy.1"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.module.scripting.component.ScriptMessageBuilder">
+            <pooled-component>
+                <prototype-object class="org.mule.module.scripting.component.ScriptMessageBuilder">
                     <property key="scriptEngineName" value="groovy"/>
                     <property key="scriptText" value-ref="scriptText1"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
             <outbound>
                 <filtering-router>
                     <outbound-endpoint address="vm://groovy.2"/>
@@ -45,24 +45,24 @@
             <inbound>
                 <inbound-endpoint address="vm://groovy.2"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.module.scripting.component.ScriptComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.module.scripting.component.ScriptComponent">
                     <property key="scriptEngineName" value="groovy"/>
                     <property key="scriptText" value-ref="scriptText2"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </service>
 
         <service name="GroovyUMO3">
             <inbound>
                 <inbound-endpoint address="vm://groovy.3"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.module.scripting.component.ScriptComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.module.scripting.component.ScriptComponent">
                     <property key="scriptEngineName" value="groovy"/>
                     <property key="scriptText" value-ref="scriptText3"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </service>
 
     </model>

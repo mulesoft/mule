@@ -19,10 +19,10 @@ import org.mule.tck.testmodels.mule.TestSedaService;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpsConnector;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
@@ -34,7 +34,7 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
     public void testSend() throws Exception
     {
         final TestSedaService testSedaService = (TestSedaService) muleContext.getRegistry().lookupService("testComponent");
-        FunctionalTestComponent testComponent = (FunctionalTestComponent) testSedaService.getOrCreateService();
+        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(testSedaService);
         assertNotNull(testComponent);
 
         final AtomicBoolean callbackMade = new AtomicBoolean(false);

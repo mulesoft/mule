@@ -25,21 +25,8 @@ import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transport.SingleAttemptConnectionStrategy;
 import org.mule.util.ObjectNameHelper;
 
-import java.util.Random;
-
 public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
 {
-
-    // @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(new Random().nextBoolean());
-        muleContext.getConfiguration().setDefaultRemoteSync(new Random().nextBoolean());
-        muleContext.getConfiguration().setDefaultSynchronousEventTimeout(new Random().nextInt());
-        muleContext.getConfiguration().setDefaultEncoding("US-ASCII");
-    }
-
     public void testBuildInboundEndpoint() throws MuleException
     {
         String uri = "test://address";

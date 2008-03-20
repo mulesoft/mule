@@ -30,7 +30,6 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     public void testClientSendDirect() throws Exception
     {
         MuleClient client = new MuleClient();
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         MuleMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
         assertNotNull(message);
@@ -40,7 +39,6 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     public void testClientDispatchDirect() throws Exception
     {
         MuleClient client = new MuleClient();
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message", null);
     }
@@ -48,8 +46,6 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     public void testClientSend() throws Exception
     {
         MuleClient client = new MuleClient();
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
-        muleContext.getConfiguration().setDefaultRemoteSync(true);
 
         MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
         assertNotNull(message);
@@ -59,8 +55,6 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     public void testClientMultiSend() throws Exception
     {
         MuleClient client = new MuleClient();
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
-        muleContext.getConfiguration().setDefaultRemoteSync(true);
 
         for (int i = 0; i < INTERATIONS; i++)
         {
@@ -73,7 +67,6 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     public void testClientMultiDispatch() throws Exception
     {
         MuleClient client = new MuleClient();
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(false);
 
         int i = 0;
         // to init
@@ -91,7 +84,6 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     public void testClientDispatchAndReceiveOnReplyTo() throws Exception
     {
         MuleClient client = new MuleClient();
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(false);
 
         Map props = new HashMap();
         props.put(JmsConstants.JMS_REPLY_TO, "replyTo.queue");

@@ -35,15 +35,16 @@ import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.wire.WireFormat;
+import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.model.seda.SedaService;
 import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
+import org.mule.object.PrototypeObjectFactory;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
 import org.mule.util.MapUtils;
-import org.mule.util.object.PrototypeObjectFactory;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
@@ -272,7 +273,8 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             props.put("wireFormat", wireFormat);
             props.put("encoding", encoding);
             props.put("synchronousEventTimeout", new Integer(eventTimeout));
-            service.setComponentFactory(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props));
+            service.setComponent(new SimpleCallableJavaComponent(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props)));
+
 
             service.setMuleContext(managementContext);
             service.getInboundRouter().addEndpoint(endpoint);

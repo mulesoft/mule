@@ -1184,7 +1184,7 @@
         </xsd:sequence>
     </xsd:complexType>
 
-    <xsd:element name="component" type="pojoComponentType" substitutionGroup="abstract-component">
+    <xsd:element name="component" type="defaultJavaComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
                 A simple POJO (Plain Old Java Object) component
@@ -1193,11 +1193,12 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="pojoComponentType">
+    <xsd:complexType name="defaultJavaComponentType">
         <xsd:complexContent>
             <xsd:extension base="abstractComponentType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-object-factory" minOccurs="0"/>
+                    <xsd:element ref="abstract-lifecycle-adapter-factory" minOccurs="0"/>
                     <xsd:element name="binding" type="pojoBindingType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -1219,6 +1220,31 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <xsd:element name="pooled-component" type="pooledJavaComponentType" substitutionGroup="abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                A pooled POJO (Plain Old Java Object) component
+                that will be invoked by Mule when a message is received.
+                The instance can be specified via a factory, or via a class.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="pooledJavaComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="defaultJavaComponentType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-pooling-profile" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>Characteristics of the object pool</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    
 
     <xsd:complexType name="pojoBindingType">
         <xsd:sequence>
@@ -3073,6 +3099,37 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!--==============================================================-->
+    <!--  Lifecycle Adapters                                            -->
+    <!--==============================================================-->
+
+    <xsd:element name="abstract-lifecycle-adapter-factory" abstract="true" type="abstractLifecycleAdapterFactory"/>
+    <xsd:complexType name="abstractLifecycleAdapterFactory">
+        <xsd:annotation>
+            <xsd:documentation>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:complexType>
+    <xsd:complexType name="customLifecycleAdapterFactory">
+        <xsd:complexContent>
+            <xsd:extension base="abstractLifecycleAdapterFactory">
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An implementation of the LifecycleAdapter interface.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:element name="custom-lifecycle-adapter-factory" type="customLifecycleAdapterFactory"
+                 substitutionGroup="abstract-lifecycle-adapter-factory">
+        <xsd:annotation>
+            <xsd:documentation>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <!--==============================================================-->
     <!--  Object Factories                                            -->
@@ -3132,26 +3189,6 @@
     <xsd:complexType name="prototypeObjectFactoryType">
         <xsd:complexContent>
             <xsd:extension base="abstractObjectFactoryType">
-                <xsd:attribute name="class" type="substitutableClass">
-                    <xsd:annotation>
-                        <xsd:documentation>Class name</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="pooled-object" type="pooledObjectFactoryType" substitutionGroup="abstract-object-factory"/>
-    <xsd:complexType name="pooledObjectFactoryType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractObjectFactoryType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-pooling-profile" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>Characteristics of the object pool</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>Class name</xsd:documentation>

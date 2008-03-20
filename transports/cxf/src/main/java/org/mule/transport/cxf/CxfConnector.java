@@ -19,15 +19,16 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.component.DefaultJavaComponent;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
+import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.cxf.transport.MuleUniversalTransport;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -180,11 +181,8 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         
         CxfServiceComponent svcComponent = new CxfServiceComponent((CxfMessageReceiver)receiver);
         svcComponent.setBus(bus);
-        
-        SingletonObjectFactory of = new SingletonObjectFactory(svcComponent);
-        of.setService(c);
-        of.initialise();
-        c.setComponentFactory(of);
+
+        c.setComponent(new DefaultJavaComponent(new SingletonObjectFactory(svcComponent)));
         
         // No determine if the endpointUri requires a new connector to be
         // registed in the case of http we only need to register the new

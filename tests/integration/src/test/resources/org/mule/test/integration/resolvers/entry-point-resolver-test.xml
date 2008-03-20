@@ -10,21 +10,7 @@
 
     <spring:bean name="target" class="org.mule.test.integration.resolvers.Target"/>
 
-    <model name="LegacyModel">
-        <!-- these should be over-ridden by the legacy support on the service below -->
-        <method-entry-point-resolver>
-            <include-entry-point method="methodString"/>
-        </method-entry-point-resolver>
-        <service name="Legacy">
-           <inbound>
-                <vm:inbound-endpoint path="legacy"/>
-            </inbound>
-            <component>
-                <legacy-entry-point-resolver-set/>
-                <spring-object bean="target"/>
-            </component>
-        </service>
-    </model>
+
 
     <model name="ArrayModel">
         <array-entry-point-resolver/>
@@ -38,91 +24,5 @@
         </service>
     </model>
 
-    <model name="MultipleModel">
-
-        <service name="Callable">
-            <inbound>
-                <vm:inbound-endpoint path="callable"/>
-            </inbound>
-            <component>
-                <callable-entry-point-resolver/>
-                <spring-object bean="target"/>
-            </component>
-        </service>
-
-        <service name="Custom">
-            <inbound>
-                <vm:inbound-endpoint path="custom"/>
-            </inbound>
-            <component>
-                <custom-entry-point-resolver class="org.mule.test.integration.resolvers.CustomEntryPointResolver"/>
-                <spring-object bean="target"/>
-            </component>
-        </service>
-        
-        <service name="Method">
-            <inbound>
-                <vm:inbound-endpoint path="method"/>
-            </inbound>
-            <component>
-                <method-entry-point-resolver>
-                    <include-entry-point method="methodString"/>
-                    <include-entry-point method="methodInteger"/>
-                </method-entry-point-resolver>
-                <spring-object bean="target"/>
-            </component>
-        </service>
-
-        <!-- this lets us simulate the no-args-component -->
-        <service name="NoArguments">
-            <inbound>
-                <vm:inbound-endpoint path="no-arguments"/>
-            </inbound>
-            <component>
-                <no-arguments-entry-point-resolver/>
-                <spring-object bean="target"/>
-            </component>
-        </service>
-
-        <service name="Property">
-            <inbound>
-                <vm:inbound-endpoint path="property"/>
-            </inbound>
-            <component>
-                <property-entry-point-resolver property="propertyName"/>
-                <spring-object bean="target"/>
-            </component>
-        </service>
-
-        <service name="Reflection">
-            <inbound>
-                <vm:inbound-endpoint path="reflection"/>
-            </inbound>
-            <component>
-                <reflection-entry-point-resolver>
-                    <exclude-entry-point method="methodInteger"/>
-                </reflection-entry-point-resolver>
-                <spring-object bean="target"/>
-            </component>
-        </service>
-
-        <service name="Ordered">
-            <inbound>
-                <vm:inbound-endpoint path="ordered"/>
-            </inbound>
-            <component>
-                <entry-point-resolver-set>
-                    <method-entry-point-resolver>
-                        <include-entry-point method="methodInteger"/>
-                    </method-entry-point-resolver>
-                    <reflection-entry-point-resolver>
-                        <exclude-entry-point method="methodInteger"/>
-                    </reflection-entry-point-resolver>
-                </entry-point-resolver-set>
-                <spring-object bean="target"/>
-            </component>
-        </service>
-
-    </model>
 
 </mule>

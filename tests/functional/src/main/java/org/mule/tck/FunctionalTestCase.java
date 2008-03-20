@@ -10,9 +10,11 @@
 
 package org.mule.tck;
 
+import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
+import org.mule.component.AbstractJavaComponent;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.functional.FunctionalTestComponent;
 
@@ -51,16 +53,29 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
 
     protected abstract String getConfigResources();
     
-    protected Object getComponent(String componentName) throws Exception
+    protected Object getComponent(String serviceName) throws Exception
     {
-        Service c = muleContext.getRegistry().lookupService(componentName);
-        if (c != null)
+        Service service = muleContext.getRegistry().lookupService(serviceName);
+        if (service != null)
         {
-            return c.getComponentFactory().getInstance();
+            return getComponent(service);
         }
         else
         {
-            throw new RegistrationException("Service " + componentName + " not found in Registry");
+            throw new RegistrationException("Service " + serviceName + " not found in Registry");
+        }
+    }
+    
+    protected Object getComponent(Service service) throws Exception
+    {
+        if (service.getComponent() instanceof JavaComponent)
+        {
+            return ((AbstractJavaComponent) service.getComponent()).getObjectFactory().getInstance();
+        }
+        else
+        {
+            fail("Componnent is not a JavaComponent and therefore has no component object instance");
+            return null;
         }
     }
 }

@@ -11,8 +11,9 @@
 package org.mule.model.seda;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.component.DefaultJavaComponent;
+import org.mule.object.PrototypeObjectFactory;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.object.PrototypeObjectFactory;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
@@ -41,18 +42,18 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
 
     public void testSedaModelEventTimeoutDefault() throws Exception
     {
-        SedaService component = new SedaService();
-        component.setName("test");
-        component.setComponentFactory(new PrototypeObjectFactory(Object.class));
-        component.setModel(new SedaModel());
-        component.setMuleContext(muleContext);
-        component.getModel().setMuleContext(muleContext);
+        SedaService service = new SedaService();
+        service.setName("test");
+        service.setComponent(new DefaultJavaComponent(new PrototypeObjectFactory(Object.class)));
+        service.setModel(new SedaModel());
+        service.setMuleContext(muleContext);
+        service.getModel().setMuleContext(muleContext);
 
-        component.getModel().initialise();
-        component.initialise();
+        service.getModel().initialise();
+        service.initialise();
 
-        assertNotNull(component.getQueueTimeout());
-        assertTrue(component.getQueueTimeout().intValue() != 0);
+        assertNotNull(service.getQueueTimeout());
+        assertTrue(service.getQueueTimeout().intValue() != 0);
     }
 
     public void testSpiWorkThrowableHandling() throws Exception
@@ -61,12 +62,12 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
         {
             // getTestComponent() currently already returns a SedaService, but
             // here we are safe-guarding for any future changes
-            SedaService component = new SedaService();
-            component.setName("test");
-            component.setComponentFactory(new PrototypeObjectFactory(Object.class));
-            component.setModel(new SedaModel());
+            SedaService service = new SedaService();
+            service.setName("test");
+            service.setComponent(new DefaultJavaComponent(new PrototypeObjectFactory(Object.class)));
+            service.setModel(new SedaModel());
 
-            component.handleWorkException(getTestWorkEvent(), "workRejected");
+            service.handleWorkException(getTestWorkEvent(), "workRejected");
         }
         catch (MuleRuntimeException mrex)
         {

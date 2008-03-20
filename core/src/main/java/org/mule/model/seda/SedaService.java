@@ -12,20 +12,16 @@ package org.mule.model.seda;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.FailedToQueueEventException;
-import org.mule.RegistryContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.component.Component;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.service.ServiceException;
-import org.mule.config.MuleConfiguration;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -157,21 +153,12 @@ public class SedaService extends AbstractService implements Work, WorkListener
             }
         }
         workManager.dispose();
-        if (componentFactory instanceof Stoppable)
-        {
-            ((Stoppable) componentFactory).stop();
-        }
     }
 
     protected void doStart() throws MuleException
     {
         try
         {
-            //serviceFactory.initialise();
-            if (componentFactory instanceof Startable)
-            {
-                ((Startable) componentFactory).start();
-            }
             workManager.start();
             workManager.scheduleWork(this, WorkManager.INDEFINITE, null, this);
         }
@@ -189,8 +176,6 @@ public class SedaService extends AbstractService implements Work, WorkListener
         {
             workManager.dispose();
         }
-
-        componentFactory.dispose();
     }
 
     protected void doDispatch(MuleEvent event) throws MuleException
@@ -203,7 +188,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
         if (logger.isDebugEnabled())
         {
             logger.debug("Service: " + name + " has received asynchronous event on: "
-                            + event.getEndpoint().getEndpointURI());
+                         + event.getEndpoint().getEndpointURI());
         }
 
         // Block until we can queue the next event
@@ -217,10 +202,8 @@ public class SedaService extends AbstractService implements Work, WorkListener
         }
         catch (Exception e)
         {
-            FailedToQueueEventException e1 = 
-                new FailedToQueueEventException(
-                    CoreMessages.interruptedQueuingEventFor(this.getName()), 
-                    event.getMessage(), this, e);
+            FailedToQueueEventException e1 = new FailedToQueueEventException(
+                CoreMessages.interruptedQueuingEventFor(this.getName()), event.getMessage(), this, e);
             handleException(e1);
         }
 
@@ -233,14 +216,8 @@ public class SedaService extends AbstractService implements Work, WorkListener
     protected MuleMessage doSend(MuleEvent event) throws MuleException
     {
         MuleMessage result = null;
-        Object pojoService = null;
-        Component component = null;
         try
         {
-            pojoService = getOrCreateService();
-            component = createComponentProxy(pojoService);
-            //proxy.start();
-
             if (logger.isDebugEnabled())
             {
                 logger.debug(this + " : got proxy for " + event.getId() + " = " + component);
@@ -254,18 +231,6 @@ public class SedaService extends AbstractService implements Work, WorkListener
         catch (Exception e)
         {
             throw new ServiceException(event.getMessage(), this, e);
-        }
-        finally
-        {
-            try
-            {
-                componentFactory.release(pojoService);
-            }
-            catch (Exception e)
-            {
-                // noinspection ThrowFromFinallyBlock
-                throw new ServiceException(event.getMessage(), this, e);
-            }
         }
         return result;
     }
@@ -289,8 +254,6 @@ public class SedaService extends AbstractService implements Work, WorkListener
     public void run()
     {
         DefaultMuleEvent event = null;
-        Object pojoService = null;
-        Component component = null;
         QueueSession queueSession = muleContext.getQueueManager().getQueueSession();
 
         while (!stopped.get())
@@ -324,31 +287,14 @@ public class SedaService extends AbstractService implements Work, WorkListener
                         logger.debug("Service: " + name + " dequeued event on: "
                                         + event.getEndpoint().getEndpointURI());
                     }
-
-                    pojoService = getOrCreateService();
-                    component = createComponentProxy(pojoService);
-                    //proxy.start();
-                    component.setEvent(event);
-                    workManager.scheduleWork(component, WorkManager.INDEFINITE, null, this);
+                    workManager.scheduleWork(component.getWorker(event), WorkManager.INDEFINITE, null, this);
                 }
             }
             catch (Exception e)
             {
-                if(isStopped() || isStopping())
+                if (isStopped() || isStopping())
                 {
                     break;
-                }
-                try
-                {
-                    if (componentFactory != null)
-                    {
-                        componentFactory.release(pojoService);
-                    }
-                }
-                catch (Exception e2)
-                {
-                    // TODO MULE-863: If this is an error, do something about it
-                    logger.warn(e2);
                 }
 
                 if (e instanceof InterruptedException)

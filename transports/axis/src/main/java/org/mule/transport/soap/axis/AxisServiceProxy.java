@@ -15,6 +15,7 @@ import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.component.JavaComponent;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
@@ -131,7 +132,7 @@ public class AxisServiceProxy
         AxisServiceProxy.properties.set(properties);
     }
 
-    public static Class[] getInterfacesForComponent(Service component)
+    public static Class[] getInterfacesForComponent(Service service)
         throws MuleException, ClassNotFoundException
     {
         Class[] interfaces;
@@ -145,14 +146,24 @@ public class AxisServiceProxy
         if (ifaces == null || ifaces.size() == 0)
         {
             final Class implementationClass;
-            try
+
+            if (service.getComponent() instanceof JavaComponent)
             {
-                implementationClass = component.getComponentFactory().getObjectClass();
+                try
+                {
+                    implementationClass = ((JavaComponent) service.getComponent()).getObjectType();
+                }
+                catch (Exception e)
+                {
+                    throw new ClassNotFoundException("Unable to retrieve class from service factory", e);
+                }
             }
-            catch (Exception e)
+            else
             {
-                throw new ClassNotFoundException("Unable to retrieve class from service factory", e);
+                throw new ClassNotFoundException("Unable to retrieve class from service factory");
             }
+            
+
             // get all implemented interfaces from superclasses as well
             final List intfList = ClassUtils.getAllInterfaces(implementationClass);
             interfaces = (Class[])intfList.toArray(new Class[intfList.size()]);

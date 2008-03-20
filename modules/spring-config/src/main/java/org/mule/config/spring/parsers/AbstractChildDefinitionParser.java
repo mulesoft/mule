@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.util.StringUtils;
 
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -58,13 +59,25 @@ public abstract class AbstractChildDefinitionParser
 
     protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
-        // legacy handling of orphan beans - avoid setting parent
-        if (null != getPropertyName(element))
-        {
-            assembler.insertBeanInTarget(getPropertyName(element));
-        }
-
         super.postProcess(context, assembler, element);
+
+        // legacy handling of orphan beans - avoid setting parent
+        String propertyName = getPropertyName(element);
+        if (null != propertyName)
+        {
+            // If this is a singleton we need to inject it into parent using a
+            // RuntimeBeanReference so that the bean does not get created twice, once
+            // with a name and once as an (inner bean).
+            if (!assembler.getBean().getBeanDefinition().isSingleton())
+            {
+                assembler.insertBeanInTarget(propertyName);
+            }
+            else
+            {
+                assembler.getTarget().getPropertyValues().addPropertyValue(propertyName,
+                    new RuntimeBeanReference(element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME)));
+            }
+        }
     }
 
     public String getBeanName(Element e)

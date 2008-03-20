@@ -15,14 +15,15 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
+import org.mule.component.DefaultJavaComponent;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.model.seda.SedaService;
+import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.util.concurrent.Latch;
-import org.mule.util.object.SingletonObjectFactory;
 
 import java.io.File;
 
@@ -152,7 +153,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         });
 
         component.initialise();
-        s.setComponentFactory(new SingletonObjectFactory(component));
+        s.setComponent(new DefaultJavaComponent(new SingletonObjectFactory(component)));
         s.setModel(muleContext.getRegistry().lookupSystemModel());
         muleContext.getRegistry().registerService(s);
         s.start();

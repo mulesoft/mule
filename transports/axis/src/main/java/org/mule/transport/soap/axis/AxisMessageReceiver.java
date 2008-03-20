@@ -11,12 +11,15 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleException;
+import org.mule.api.component.Component;
+import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.soap.NamedParameter;
@@ -312,7 +315,12 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         soapService.setName(serviceName);
 
         // Add initialisation callback for the Axis service
-        service.addInitialisationCallback(new AxisInitialisationCallback(soapService));
+        Component component = service.getComponent();
+        if (component instanceof JavaComponent)
+        {
+            ((AbstractJavaComponent) component).getObjectFactory().addObjectInitialisationCallback(
+                new AxisInitialisationCallback(soapService));
+        }
 
         if (uri.getScheme().equalsIgnoreCase("servlet"))
         {

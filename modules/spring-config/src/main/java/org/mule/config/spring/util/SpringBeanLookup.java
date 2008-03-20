@@ -13,7 +13,7 @@ package org.mule.config.spring.util;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.util.object.ObjectFactory;
+import org.mule.object.AbstractObjectFactory;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -49,7 +49,7 @@ import org.springframework.context.ApplicationContextAware;
  *
  *   <spring:bean id="myFactoryBean" class="com.foo.BarFactory" factory-method="getNewBar"/>
  */
-public class SpringBeanLookup implements ObjectFactory, ApplicationContextAware
+public class SpringBeanLookup extends AbstractObjectFactory implements ApplicationContextAware
 {
     private ApplicationContext applicationContext;
     private String bean;
@@ -62,7 +62,8 @@ public class SpringBeanLookup implements ObjectFactory, ApplicationContextAware
         }
         if (applicationContext == null)
         {
-            throw new InitialisationException(MessageFactory.createStaticMessage("ApplicationContext has not been injected."), this);
+            throw new InitialisationException(
+                MessageFactory.createStaticMessage("ApplicationContext has not been injected."), this);
         }
         return LifecycleTransitionResult.OK;
     }
@@ -79,12 +80,9 @@ public class SpringBeanLookup implements ObjectFactory, ApplicationContextAware
 
     public Object getInstance() throws Exception
     {
-        return applicationContext.getBean(bean);
-    }
-
-    public void release(Object object)
-    {
-        // Not implemented for Spring Beans
+        Object instance = applicationContext.getBean(bean);
+        fireInitialisationCallbacks(instance);
+        return instance;
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
@@ -100,5 +98,11 @@ public class SpringBeanLookup implements ObjectFactory, ApplicationContextAware
     public void setBean(String bean)
     {
         this.bean = bean;
+    }
+    
+    // @Override
+    public boolean isSingleton()
+    {
+        return applicationContext.isSingleton(bean);
     }
 }

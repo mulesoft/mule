@@ -53,7 +53,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
 
         Service c = muleContext.getRegistry().lookupService("testComponent2");
         assertTrue("Service should be a TestSedaService", c instanceof TestSedaService);
-        Object ftc = ((TestSedaService) c).getOrCreateService();
+        Object ftc = getComponent(c);
         assertNotNull("Functional Test Service not found in the model.", ftc);
         assertTrue("Service should be a FunctionalTestComponent", ftc instanceof FunctionalTestComponent);
 

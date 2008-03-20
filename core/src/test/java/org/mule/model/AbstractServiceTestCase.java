@@ -8,7 +8,6 @@
  * LICENSE.txt file.
  */
 
-
 package org.mule.model;
 
 import org.mule.api.MuleException;
@@ -28,13 +27,9 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
             service.start();
             fail("Exception expected: Cannot start an uninitialised service");
         }
-        catch (MuleException e)
+        catch (Exception e)
         {
-            // expected 
-        }
-        catch (NullPointerException npe)
-        {
-            // TODO MULE-2843
+            // expected
         }
 
         service.initialise();
@@ -49,6 +44,7 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         {
             // expected
         }
+        service.dispose();
 
     }
 
@@ -71,6 +67,8 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         assertTrue(service.isPaused());
         service.pause();
         assertTrue(service.isPaused());
+        service.dispose();
+
     }
 
     public void testResume() throws MuleException
@@ -95,6 +93,8 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         assertFalse(service.isPaused());
         service.resume();
         assertFalse(service.isPaused());
+        service.dispose();
+
     }
 
     public void testStop() throws MuleException
@@ -110,7 +110,7 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         }
         catch (MuleException e)
         {
-            // expected 
+            // expected
         }
 
         service.initialise();
@@ -124,6 +124,7 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         assertFalse(service.isStarted());
         service.stop();
         assertFalse(service.isStarted());
+        service.dispose();
 
     }
 

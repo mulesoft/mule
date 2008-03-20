@@ -15,7 +15,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
-import org.mule.service.AbstractService;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.StringMessageUtils;
@@ -140,7 +139,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             // connector.getJmsSupport().send(replyToProducer, replyToMessage,
             // replyToDestination);
             logger.info("Reply Message sent to: " + replyToDestination);
-            ((AbstractService)event.getService()).getStatistics().incSentReplyToEvent();
+            event.getService().getComponent().getStatistics().incSentReplyToEvent();
         }
         catch (Exception e)
         {

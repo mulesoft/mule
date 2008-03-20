@@ -145,7 +145,9 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals("JcaService#" + endpointFactory.hashCode(), service.getName());
         assertNotNull(service);
         assertTrue(service instanceof JcaService);
-        assertNotNull(((JcaService) service).workManager);
+        assertNotNull(service.getComponent());
+        assertTrue(service.getComponent() instanceof JcaComponent);
+        assertNotNull(((JcaComponent) service.getComponent()).workManager);
         testJcaService(service);
 
         testEndpoint(service);
@@ -155,7 +157,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(endpoint, endpoint2);
 
         // Check service implementation
-        assertEquals(endpointFactory, service.getComponentFactory().getInstance());
+        assertEquals(endpointFactory, ((JcaComponent) service.getComponent()).messageEndpointFactory);
     }
 
     public void testendpointActivationOK() throws Exception
@@ -177,7 +179,10 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals("JcaService#" + endpointFactory.hashCode(), service.getName());
         testJcaService(service);
         testEndpoint(service);
-        assertEquals(endpointFactory, service.getComponentFactory().getInstance());
+        
+        assertTrue(service.getComponent() instanceof JcaComponent);
+        
+        assertEquals(endpointFactory, ((JcaComponent) service.getComponent()).messageEndpointFactory);
 
         // Additional activation with same endpointFactory does not increase size of
         // endpoint cache.

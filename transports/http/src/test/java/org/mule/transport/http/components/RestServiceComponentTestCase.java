@@ -9,11 +9,10 @@
  */
 package org.mule.transport.http.components;
 
+import org.mule.api.component.Component;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.http.components.RestServiceWrapper;
-import org.mule.api.service.Service;
 
 public class RestServiceComponentTestCase extends FunctionalTestCase
 {
@@ -29,10 +28,9 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
     public void testResetServiceNamespaceHandler() throws Exception
     {
 
-        Service service = muleContext.getRegistry().lookupService(SERVICE_NAME);
-        Object object = service.getComponentFactory().getInstance();
-        assertEquals(object.getClass().getName(), RestServiceWrapper.class.getName());
-        RestServiceWrapper restServiceWrapper = (RestServiceWrapper) object;
+        Component component = muleContext.getRegistry().lookupService(SERVICE_NAME).getComponent();
+        assertTrue(component instanceof RestServiceWrapper);
+        RestServiceWrapper restServiceWrapper = (RestServiceWrapper) component;
         assertEquals(restServiceWrapper.getServiceUrl(), SERVICE_URL);
         assertEquals(restServiceWrapper.getHttpMethod(), "POST");
         assertEquals(restServiceWrapper.isUrlFromMessage(), true);

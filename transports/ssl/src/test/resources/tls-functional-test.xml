@@ -27,45 +27,45 @@
             <inbound>
                 <tls:inbound-endpoint ref="sendEndpoint"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
                         <spring:entry key="eventCallback">
                             <spring:bean class="org.mule.tck.functional.CounterCallback"/>
                         </spring:entry>
                     </properties>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </custom-service>
 
         <custom-service name="testComponent2" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <tls:inbound-endpoint ref="sendManyEndpoint"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
                         <spring:entry key="eventCallback">
                             <spring:bean class="org.mule.tck.functional.CounterCallback"/>
                         </spring:entry>
                     </properties>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </custom-service>
 
         <custom-service name="testComponent3" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <inbound-endpoint ref="asyncEndpoint"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
                         <spring:entry key="eventCallback">
                             <spring:bean class="org.mule.tck.functional.ResponseWriterCallback"/>
                         </spring:entry>
                     </properties>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </custom-service>
 
     </model>

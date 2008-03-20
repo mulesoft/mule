@@ -11,11 +11,10 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.LifecycleAdapter;
-import org.mule.api.lifecycle.LifecycleAdapterFactory;
+import org.mule.api.component.JavaComponent;
+import org.mule.api.component.LifecycleAdapter;
+import org.mule.api.component.LifecycleAdapterFactory;
 import org.mule.api.model.EntryPointResolverSet;
-import org.mule.api.service.Service;
-
 
 public class TestDefaultLifecycleAdapterFactory implements LifecycleAdapterFactory
 {
@@ -30,9 +29,8 @@ public class TestDefaultLifecycleAdapterFactory implements LifecycleAdapterFacto
      * @see org.mule.api.lifecycle.LifecycleAdapterFactory#create(java.lang.Object,
      *      org.mule.api.UMODescriptor, org.mule.api.model.EntryPointResolver)
      */
-    public LifecycleAdapter create(Object pojoService,
-                                      Service service,
-                                      EntryPointResolverSet resolver) throws MuleException
+    public LifecycleAdapter create(Object pojoService, JavaComponent service, EntryPointResolverSet resolver)
+        throws MuleException
     {
         return new TestDefaultLifecycleAdapter(pojoService, service, resolver);
     }

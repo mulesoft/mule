@@ -72,8 +72,6 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
 
     protected void doSetUp() throws Exception
     {
-        // Make sure we are running synchronously
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
         SedaModel model = new SedaModel();
         model.setName("main");
         model.getPoolingProfile().setInitialisationPolicy(

@@ -2,6 +2,3 @@
 # Test cases listed in this file are not run.
 #
 
-# MULE-2881
-org.mule.transformers.xml.wire.XStreamWireFormatTestCase
-

@@ -12,6 +12,7 @@ package org.mule.context;
 
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.WorkManager;
@@ -26,7 +27,7 @@ import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.config.MuleConfiguration;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ExceptionNotification;
@@ -55,12 +56,14 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Implementation of {@link MuleContextBuilder} that uses {@link DefaultMuleContext}
  * as the default {@link MuleContext} implementation and builds it with defaults
- * values for {@link MuleConfiguration}, {@link LifecycleManager},
- * {@link WorkManager} and {@link ServerNotificationManager}.
+ * values for {@link MuleConfiguration}, {@link LifecycleManager}, {@link WorkManager}, 
+ * {@link WorkListener} and {@link ServerNotificationManager}.
  */
 public class DefaultMuleContextBuilder implements MuleContextBuilder
 {
     protected static final Log logger = LogFactory.getLog(DefaultMuleContextBuilder.class);
+    
+    protected MuleConfiguration config;
 
     protected LifecycleManager lifecycleManager;
 
@@ -76,13 +79,19 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     public MuleContext buildMuleContext()
     {
         logger.debug("Building new DefaultMuleContext instance with MuleContextBuilder: " + this);
-        MuleContext muleContext = new DefaultMuleContext(getLifecycleManager());
-        muleContext.setWorkManager(getWorkManager());
-        muleContext.setWorkListener(getWorkListener());
-        muleContext.setNotificationManager(getNotificationManager());
+        MuleContext muleContext = new DefaultMuleContext(getMuleConfiguration(),
+                                                         getWorkManager(),
+                                                         getWorkListener(),
+                                                         getLifecycleManager(),
+                                                         getNotificationManager());
         return muleContext;
     }
 
+    public void setMuleConfiguration(MuleConfiguration config)
+    {
+        this.config = config;
+    }
+    
     public void setWorkManager(WorkManager workManager)
     {
         this.workManager = workManager;
@@ -101,6 +110,18 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     public void setLifecycleManager(LifecycleManager lifecycleManager)
     {
         this.lifecycleManager = lifecycleManager;
+    }
+    
+    protected MuleConfiguration getMuleConfiguration()
+    {
+        if (config != null)
+        {
+            return config;
+        }
+        else
+        {
+            return new DefaultMuleConfiguration();
+        }
     }
 
     protected LifecycleManager getLifecycleManager()
@@ -177,8 +198,11 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     public String toString()
     {
-        return ClassUtils.getClassName(getClass()) + "{lifecycleManager=" 
-               + lifecycleManager + ", workManager=" + workManager
-               + ", notificationManager=" + notificationManager + "}";
+        return ClassUtils.getClassName(getClass()) + 
+            "{muleConfiguration=" + config +
+            ", lifecycleManager=" + lifecycleManager + 
+            ", workManager=" + workManager + 
+            ", workListener=" + workListener + 
+            ", notificationManager=" + notificationManager + "}";
     }
 }

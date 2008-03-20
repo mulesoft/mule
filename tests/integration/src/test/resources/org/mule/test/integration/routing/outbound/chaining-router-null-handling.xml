@@ -59,46 +59,47 @@
             <inbound>
                 <inbound-endpoint address="vm://component1"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="appendComponentName" value="true"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </service>
 
         <service name="component1Fail">
             <inbound>
                 <inbound-endpoint address="vm://component1Fail"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="throwException" value="true"/>
                     <property key="appendComponentName" value="true"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </service>
 
         <service name="component2Pass">
             <inbound>
                 <inbound-endpoint address="vm://component2Pass"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="appendComponentName" value="true"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
+
         </service>
 
         <service name="component2Fail">
             <inbound>
                 <inbound-endpoint address="vm://component2Fail"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="throwException" value="true"/>
                     <property key="appendComponentName" value="true"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </service>
     </model>
 </mule>

@@ -14,24 +14,21 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
+import org.mule.api.component.Component;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
-import org.mule.api.routing.NestedRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
-import org.mule.util.object.ObjectFactory;
 
 import java.beans.ExceptionListener;
 import java.io.Serializable;
 
 /**
- * <code>Service</code> is the interal repesentation of a Mule Managed
- * service. It is responsible for managing the interaction of events to and from
- * the service as well as managing pooled resources.
+ * <code>Service</code> is the interal repesentation of a Mule Managed service. It
+ * is responsible for managing the interaction of events to and from the service as
+ * well as managing pooled resources.
  */
 
 public interface Service extends Serializable, Lifecycle, MuleContextAware, NamedObject
@@ -90,20 +87,10 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
     ExceptionListener getExceptionListener();
 
     /**
-     * @return Factory which creates or returns an instance of the actual service component.
-     */
-    ObjectFactory getComponentFactory();
-
-    /**
-     * Factory which creates an instance of the actual service object.
-     */
-    void setComponentFactory(ObjectFactory factory);
-
-    /**
-     * Inbound Routers control how events are received by a service. If no router
-     * is set. A default will be used that uses the inboundProvider set on his
+     * Inbound Routers control how events are received by a service. If no router is
+     * set. A default will be used that uses the inboundProvider set on his
      * descriptor.
-     *
+     * 
      * @return the inbound router for this service. This will always return a valid
      *         router.
      * @see InboundRouterCollection
@@ -119,8 +106,6 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
      * @see OutboundRouterCollection
      */
     OutboundRouterCollection getOutboundRouter();
-
-    NestedRouterCollection getNestedRouter();
 
     /**
      * Response Routers control how events are returned in a request/response call.
@@ -144,26 +129,21 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
     /**
      * Returns the name of the model that this descriptor is registered with.
      * @return the name of the model that this descriptor is registered with or null
-     * if this descriptor has not been registered with a model yet
+     *         if this descriptor has not been registered with a model yet
      */
     Model getModel();
 
     /**
      * The exception strategy to use to handle exceptions in the Mule UMO.
-     *
+     * 
      * @param listener the exception strategy to use. If none has been set or
      *            argument is null a default
      */
     void setExceptionListener(ExceptionListener listener);
 
     /**
-     * @param Factory which creates an instance of the actual service object.
-     */
-    //void setServiceFactory(ObjectFactory serviceFactory);
-
-    /**
-     * Inbound Routers control how events are received by a service. If no router
-     * is set. A default will be used that uses the inboundProvider set on his
+     * Inbound Routers control how events are received by a service. If no router is
+     * set. A default will be used that uses the inboundProvider set on his
      * descriptor.
      *
      * @param router the inbound router for this service
@@ -180,8 +160,6 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
      * @see OutboundRouterCollection
      */
     void setOutboundRouter(OutboundRouterCollection router);
-
-    void setNestedRouter(NestedRouterCollection router);
 
     /**
      * Response Routers control how events are returned in a request/response call.
@@ -212,25 +190,19 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
     void setModel(Model model);
 
     /**
-     * Register a custom initialiser
+     * Returns the Component that is a invoked by a {@link Service} for each incoming
+     * {@link MuleEvent} routed on by the {@link InboundRouterCollection}.
+     * 
+     * @return
      */
-    void addInitialisationCallback(InitialisationCallback callback);
+    Component getComponent();
 
     /**
-     * A descriptor can have a custom entrypoint resolver for its own object.
-     * By default this is null. When set this resolver will override the resolver on the model
-     *
-     * @return Null is a resolver set has not been set otherwise the resolver to use
-     *         on this service
+     * Sets the Component that is a invoked by a {@link Service} for each incoming
+     * {@link MuleEvent} routed on by the {@link InboundRouterCollection}.
+     * 
+     * @param component
      */
-    EntryPointResolverSet getEntryPointResolverSet();
+    void setComponent(Component component);
 
-    /**
-     * A descriptor can have a custom entrypoint resolver for its own object.
-     * By default this is null. When set this resolver will override the resolver on the model
-     *
-     * @param resolverSet theresolver set to use when resolving entry points
-     *                    on this service
-     */
-    void setEntryPointResolverSet(EntryPointResolverSet resolverSet);
 }

@@ -12,7 +12,6 @@ package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.beans.ChildBean;
 import org.mule.config.spring.parsers.beans.OrphanBean;
-import org.mule.util.object.ObjectFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -47,18 +46,19 @@ public class MapMule2478TestCase extends AbstractNamespaceTestCase
         assertEquals("list2", ((List) map.get("list")).get(0));
     }
 
-    public void testFactory() throws Exception
-    {
-        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
-        ObjectFactory factory = (ObjectFactory) orphan.getObject();
-        assertNotNull(factory);
-        Object product = factory.getInstance();
-        assertNotNull(product);
-        assertTrue(product instanceof ChildBean);
-        ChildBean child3 = (ChildBean) product;
-        assertEquals("string3", child3.getString());
-        assertNotNull(child3.getList());
-        assertEquals("list3", child3.getList().get(0));
-    }
+// TODO ComplexComponentDefinitionParser is not longer used, is there any way to rewrite/reuse the "factory" element for testing?
+//    public void testFactory() throws Exception
+//    {
+//        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
+//        ObjectFactory factory = (ObjectFactory) orphan.getObject();
+//        assertNotNull(factory);
+//        Object product = factory.getInstance();
+//        assertNotNull(product);
+//        assertTrue(product instanceof ChildBean);
+//        ChildBean child3 = (ChildBean) product;
+//        assertEquals("string3", child3.getString());
+//        assertNotNull(child3.getList());
+//        assertEquals("list3", child3.getList().get(0));
+//    }
 
 }

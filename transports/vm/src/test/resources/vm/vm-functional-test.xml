@@ -18,9 +18,9 @@
             </inbound>
 
             <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="Polo"/>
-                </pooled-object>
+                </singleton-object>
             </component>
 
             <outbound>

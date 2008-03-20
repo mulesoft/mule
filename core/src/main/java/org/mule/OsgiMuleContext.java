@@ -9,12 +9,17 @@
  */
 package org.mule;
 
+import org.mule.api.config.MuleConfiguration;
+import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryBroker;
+import org.mule.context.notification.ServerNotificationManager;
 import org.mule.registry.MuleOsgiRegistryHelper;
 import org.mule.registry.OsgiRegistryBroker;
+
+import javax.resource.spi.work.WorkListener;
 
 import org.osgi.framework.BundleContext;
 
@@ -22,16 +27,25 @@ public class OsgiMuleContext extends DefaultMuleContext
 {
     private BundleContext bundleContext;
 
-    public OsgiMuleContext(LifecycleManager lifecycleManager, BundleContext bundleContext)
+    public OsgiMuleContext(MuleConfiguration config,
+                           WorkManager workManager, 
+                           WorkListener workListener, 
+                           LifecycleManager lifecycleManager, 
+                           ServerNotificationManager notificationManager,
+                           BundleContext bundleContext)
     {
-        super(lifecycleManager);
+        super(config, workManager, workListener, lifecycleManager, notificationManager);
         this.bundleContext = bundleContext;
     }
 
     // Make inherited constructor invisible.
-    private OsgiMuleContext(LifecycleManager lifecycleManager)
+    private OsgiMuleContext(MuleConfiguration config,
+                           WorkManager workManager, 
+                           WorkListener workListener, 
+                           LifecycleManager lifecycleManager, 
+                           ServerNotificationManager notificationManager)
     {
-        super(lifecycleManager);
+        super(config, workManager, workListener, lifecycleManager, notificationManager);
         throw new IllegalArgumentException("Missing BundleContext");
     }
 

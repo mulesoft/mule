@@ -23,7 +23,9 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -35,9 +37,11 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReceiveException;
-import org.mule.config.MuleConfiguration;
+import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
@@ -58,6 +62,7 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -223,8 +228,12 @@ public class MuleClient implements Disposable
         if (muleContext == null)
         {
             logger.info("No existing ManagementContext found, creating a new Mule instance");
-            muleContext = muleContextFactory.createMuleContext();
-            muleContext.getConfiguration().setClientMode(true);
+
+            MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
+            DefaultMuleConfiguration config = new DefaultMuleConfiguration();
+            config.setClientMode(true);
+            contextBuilder.setMuleConfiguration(config);
+            muleContext = muleContextFactory.createMuleContext(contextBuilder);
         }
         else
         {

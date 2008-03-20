@@ -15,11 +15,11 @@
             <inbound>
                 <inbound-endpoint address="vm://component.in"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="throwException" value="true"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://component.out"/>

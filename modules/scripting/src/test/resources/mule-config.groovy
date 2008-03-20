@@ -12,7 +12,7 @@ import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory
 import org.mule.tck.testmodels.mule.TestEntryPointResolverSet
-import org.mule.util.object.SingletonObjectFactory
+import org.mule.object.SingletonObjectFactory
 import org.mule.routing.filters.PayloadTypeFilter
 import org.mule.routing.ForwardingCatchAllStrategy
 import org.mule.tck.testmodels.mule.TestResponseAggregator
@@ -22,6 +22,7 @@ import org.mule.api.endpoint.InboundEndpoint
 import org.mule.api.endpoint.OutboundEndpoint
 import org.mule.api.model.Model
 import org.mule.api.service.Service
+import org.mule.component.DefaultJavaComponent
 import org.mule.model.seda.SedaService
 import org.mule.routing.inbound.DefaultInboundRouterCollection
 import org.mule.routing.nested.DefaultNestedRouterCollection
@@ -145,7 +146,7 @@ muleContext.registry.registerModel(model)
 Service service = new SedaService();
 service.model = model
 service.name = "orangeComponent"
-service.componentFactory = new SingletonObjectFactory(Orange.class.name);
+service.component = new DefaultJavaComponent(new SingletonObjectFactory(Orange.class.name))
 epBuilder= new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpointBuilder("orangeEndpoint"))
 epBuilder.muleContext = muleContext
 epBuilder.setProperty("testLocal", "value1")
@@ -171,7 +172,7 @@ nr.endpoint = createOutboundEndpoint("test://do.polish", null)
 nr.setInterface(FruitCleaner.class);
 nr.method = "polish"
 nestedRouter.addRouter(nr);
-service.nestedRouter = nestedRouter
+service.component.nestedRouter = nestedRouter
 
 //Outbound Router
 outboundRouter = new OutboundPassThroughRouter()

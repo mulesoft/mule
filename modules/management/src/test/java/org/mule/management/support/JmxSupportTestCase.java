@@ -9,6 +9,8 @@
  */
 package org.mule.management.support;
 
+import org.mule.api.context.MuleContextBuilder;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.module.management.agent.JmxAgent;
 import org.mule.module.management.mbean.StatisticsService;
@@ -21,9 +23,18 @@ import javax.management.ObjectName;
 
 public class JmxSupportTestCase extends AbstractMuleJmxTestCase
 {
-    
     private final String MANAGER_ID = "Test_Instance";
     private final String TEST_DOMAIN = JmxModernSupport.DEFAULT_JMX_DOMAIN_PREFIX + "." + MANAGER_ID;
+
+    //@Override
+    protected void configureMuleContext(MuleContextBuilder contextBuilder)
+    {
+        super.configureMuleContext(contextBuilder);
+
+        DefaultMuleConfiguration config = new DefaultMuleConfiguration();
+        config.setId(MANAGER_ID);
+        contextBuilder.setMuleConfiguration(config);
+    }
 
     public void testClashingDomains() throws Exception
     {
@@ -31,7 +42,6 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         ObjectName name = ObjectName.getInstance(TEST_DOMAIN + ":name=TestDuplicates");
         mBeanServer.registerMBean(new StatisticsService(), name);
 
-        muleContext.getConfiguration().setId(MANAGER_ID);
         JmxAgent agent = new JmxAgent();
         agent.setMuleContext(muleContext);
         agent.initialise();
@@ -60,7 +70,6 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         assertEquals("Wrong number of domains created.",
                      numOriginalDomains + 2, mBeanServer.getDomains().length);
 
-        muleContext.getConfiguration().setId(MANAGER_ID);
         JmxAgent agent = new JmxAgent();
         agent.setMuleContext(muleContext);
         agent.initialise();
@@ -76,22 +85,6 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         assertTrue("Should have contained an original suffixed domain.", domains.contains(TEST_DOMAIN + ".1"));
         assertTrue("Should have contained a new domain.", domains.contains(TEST_DOMAIN + ".2"));
     }
-
-    public void testDomainNoManagerIdAndJmxAgentMustFail() throws Exception
-    {
-        JmxAgent jmxAgent = new JmxAgent();
-        muleContext.getRegistry().registerAgent(jmxAgent);
-        try
-        {
-            muleContext.getConfiguration().setId(null);
-            fail("Should have failed.");
-        }
-        catch (Exception e)
-        {
-            // this form makes code coverage happier
-            assertTrue(true);
-        }
-    }
     
     protected void doTearDown() throws Exception
     {
@@ -99,5 +92,4 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         unregisterMBeansByMask(TEST_DOMAIN + ":name=TestDuplicates");
         super.doTearDown();
     }
-
 }

@@ -20,11 +20,13 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.component.DefaultJavaComponent;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
+import org.mule.object.SingletonObjectFactory;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.http.servlet.ServletConnector;
 import org.mule.transport.service.TransportFactory;
@@ -35,7 +37,6 @@ import org.mule.transport.soap.axis.extensions.WSDDJavaMuleProvider;
 import org.mule.transport.soap.axis.i18n.AxisMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
-import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -446,15 +447,12 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
             c = new SedaService();
             c.setName(AXIS_SERVICE_PROPERTY + getName());
             c.setModel(muleContext.getRegistry().lookupSystemModel());
-            //muleContext.getRegistry().registerComponent(c);
-            //c.setMuleContext(muleContext);
-            //c.initialise();
 
             Map props = new HashMap();
             props.put(AXIS, axis);
             SingletonObjectFactory of = new SingletonObjectFactory(AxisServiceComponent.class, props);
             of.initialise();
-            c.setComponentFactory(of);
+            c.setComponent(new DefaultJavaComponent(of));
         }
         return c;
     }

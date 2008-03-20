@@ -11,13 +11,13 @@
 package org.mule.transport.http.components;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEventContext;
+import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.filter.Filter;
+import org.mule.component.AbstractComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.RegExFilter;
@@ -40,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
  * can be configured with a service URL plus a number of properties that allow you to
  * configure the parameters and error conditions on the service.
  */
-public class RestServiceWrapper implements Callable, Initialisable
+public class RestServiceWrapper extends AbstractComponent
 {
 
     public static final String REST_SERVICE_URL = "rest.service.url";
@@ -89,10 +89,11 @@ public class RestServiceWrapper implements Callable, Initialisable
     }
 
     /**
-     * Required params that are pulled from the message. If these params don't exist the call will fail
-     * Note that you can use {@link org.mule.util.expression.ExpressionEvaluator} expressions
-     * such as xpath, header, xquery, etc
-     *
+     * Required params that are pulled from the message. If these params don't exist
+     * the call will fail Note that you can use
+     * {@link org.mule.util.expression.ExpressionEvaluator} expressions such as
+     * xpath, header, xquery, etc
+     * 
      * @param requiredParams
      */
     public void setRequiredParams(Map requiredParams)
@@ -101,10 +102,10 @@ public class RestServiceWrapper implements Callable, Initialisable
     }
 
     /**
-     * Optional params that are pulled from the message. If these params don't exist execution will continue.
-     * Note that you can use {@link ExpressionEvaluator} expressions
-     * such as xpath, header, xquery, etc
-     *
+     * Optional params that are pulled from the message. If these params don't exist
+     * execution will continue. Note that you can use {@link ExpressionEvaluator}
+     * expressions such as xpath, header, xquery, etc
+     * 
      * @param requiredParams
      */
     public Map getOptionalParams()
@@ -157,7 +158,7 @@ public class RestServiceWrapper implements Callable, Initialisable
         this.errorExpression = errorExpression;
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         if (serviceUrl == null && !urlFromMessage)
         {
@@ -188,58 +189,69 @@ public class RestServiceWrapper implements Callable, Initialisable
                 errorFilter = new RegExFilter(errorExpression);
             }
         }
-        return LifecycleTransitionResult.OK;
     }
 
-    public Object onCall(MuleEventContext eventContext) throws Exception
+    public MuleMessage doOnCall(MuleEvent event)
     {
         String tempUrl;
-        Object request = eventContext.transformMessage();
-        Object requestBody;
-        if (urlFromMessage)
+        MuleMessage result = null;
+        try
         {
-            tempUrl = eventContext.getMessage().getStringProperty(REST_SERVICE_URL, null);
-            if (tempUrl == null)
+
+            Object request = event.transformMessage();
+            Object requestBody;
+            if (urlFromMessage)
             {
-                throw new IllegalArgumentException(
-                        CoreMessages.propertyIsNotSetOnEvent(REST_SERVICE_URL).toString());
+                tempUrl = event.getMessage().getStringProperty(REST_SERVICE_URL, null);
+                if (tempUrl == null)
+                {
+                    throw new IllegalArgumentException(CoreMessages.propertyIsNotSetOnEvent(REST_SERVICE_URL)
+                        .toString());
+                }
             }
+            else
+            {
+                tempUrl = serviceUrl;
+            }
+            StringBuffer urlBuffer = new StringBuffer(tempUrl);
+
+            if (GET.equalsIgnoreCase(this.httpMethod))
+            {
+                requestBody = NullPayload.getInstance();
+
+                setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, null);
+                setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, null);
+            }
+            else
+            // if post
+            {
+                StringBuffer requestBodyBuffer = new StringBuffer();
+                event.getMessage().setProperty(CONTENT_TYPE, CONTENT_TYPE_VALUE);
+                setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, requestBodyBuffer);
+                setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, requestBodyBuffer);
+                requestBody = requestBodyBuffer.toString();
+            }
+
+            tempUrl = urlBuffer.toString();
+            logger.info("Invoking REST service: " + tempUrl);
+
+            event.getMessage().setProperty(HTTP_METHOD, httpMethod);
+
+            result = RequestContext.getEventContext().sendEvent(
+                new DefaultMuleMessage(requestBody, event.getMessage()), tempUrl);
+            if (isErrorPayload(result))
+            {
+                handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), result),
+                    result);
+            }
+
         }
-        else
+        catch (Exception e)
         {
-            tempUrl = serviceUrl;
-        }
-        StringBuffer urlBuffer = new StringBuffer(tempUrl);
-
-        if (GET.equalsIgnoreCase(this.httpMethod))
-        {
-            requestBody = NullPayload.getInstance();
-
-            setRESTParams(urlBuffer, eventContext.getMessage(), request, requiredParams, false, null);
-            setRESTParams(urlBuffer, eventContext.getMessage(), request, optionalParams, true, null);
-        }
-        else //if post
-        {
-            StringBuffer requestBodyBuffer = new StringBuffer();
-            eventContext.getMessage().setProperty(CONTENT_TYPE, CONTENT_TYPE_VALUE);
-            setRESTParams(urlBuffer, eventContext.getMessage(), request, requiredParams, false, requestBodyBuffer);
-            setRESTParams(urlBuffer, eventContext.getMessage(), request, optionalParams, true, requestBodyBuffer);
-            requestBody = requestBodyBuffer.toString();
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
-        tempUrl = urlBuffer.toString();
-        logger.info("Invoking REST service: " + tempUrl);
-
-        eventContext.getMessage().setProperty(HTTP_METHOD, httpMethod);
-
-        MuleMessage result = eventContext.sendEvent(new DefaultMuleMessage(requestBody, eventContext.getMessage()),
-                                                   tempUrl);
-
-        if (isErrorPayload(result))
-        {
-            handleException(
-                    new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), result), result);
-        }
         return result;
     }
 
@@ -269,9 +281,16 @@ public class RestServiceWrapper implements Callable, Initialisable
         return sep;
     }
 
-    //if requestBodyBuffer is null, it means that the request is a GET, otherwise it is a POST and  
-    //requestBodyBuffer must contain the body of the http method at the end of this function call
-    private void setRESTParams(StringBuffer url, MuleMessage msg, Object body, Map args, boolean optional, StringBuffer requestBodyBuffer)
+    // if requestBodyBuffer is null, it means that the request is a GET, otherwise it
+    // is a POST and
+    // requestBodyBuffer must contain the body of the http method at the end of this
+    // function call
+    private void setRESTParams(StringBuffer url,
+                               MuleMessage msg,
+                               Object body,
+                               Map args,
+                               boolean optional,
+                               StringBuffer requestBodyBuffer)
     {
         String sep;
 
@@ -298,7 +317,7 @@ public class RestServiceWrapper implements Callable, Initialisable
                     throw new IllegalArgumentException(CoreMessages.propertyIsNotSetOnEvent(exp).toString());
                 }
             }
-            else if (requestBodyBuffer != null) //implies this is a POST
+            else if (requestBodyBuffer != null) // implies this is a POST
             {
                 requestBodyBuffer.append(sep);
                 requestBodyBuffer.append(name).append('=').append(value);
@@ -321,11 +340,13 @@ public class RestServiceWrapper implements Callable, Initialisable
                 {
                     if (requestBodyBuffer != null)
                     {
-                        requestBodyBuffer.append(sep).append(payloadParameterNames.get(i)).append('=').append(requestArray[i].toString());
+                        requestBodyBuffer.append(sep).append(payloadParameterNames.get(i)).append('=').append(
+                            requestArray[i].toString());
                     }
                     else
                     {
-                        url.append(sep).append(payloadParameterNames.get(i)).append('=').append(requestArray[i].toString());
+                        url.append(sep).append(payloadParameterNames.get(i)).append('=').append(
+                            requestArray[i].toString());
                     }
 
                     sep = updateSeparator(sep);
@@ -358,4 +379,34 @@ public class RestServiceWrapper implements Callable, Initialisable
         throw e;
     }
 
+    // @Override
+    protected void doOnEvent(MuleEvent event)
+    {
+        try
+        {
+            onCall(event);
+        }
+        catch (MuleException e)
+        {
+            logger.error(e);
+        }
+    }
+
+    // @Override
+    protected void doDispose()
+    {
+        // no-op
+    }
+
+    // @Override
+    protected void doStart() throws MuleException
+    {
+        // no-op
+    }
+
+    // @Override
+    protected void doStop() throws MuleException
+    {
+        // no-op
+    }
 }

@@ -21,11 +21,8 @@ import javax.management.ObjectName;
 
 public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
-
     public void testUndeploy() throws Exception
     {
-        final String configId = "ConnectorServiceTest";
-        muleContext.getConfiguration().setId(configId);
         final Connector connector = new TestConnector();
         connector.setName("TEST_CONNECTOR");
         final JmxAgent jmxAgent = new JmxAgent();

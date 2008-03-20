@@ -25,12 +25,16 @@ public class OsgiMuleContextBuilder extends DefaultMuleContextBuilder
         this.bundleContext = bundleContext;
     }
     
+    //@Override
     public MuleContext buildMuleContext()
     {
         logger.debug("Building new OsgiMuleContext with BundleContext = " + bundleContext);
-        MuleContext muleContext = new OsgiMuleContext(getLifecycleManager(), bundleContext);
-        muleContext.setWorkManager(getWorkManager());
-        muleContext.setNotificationManager(getNotificationManager());
+        MuleContext muleContext = new OsgiMuleContext(getMuleConfiguration(),
+                                                      getWorkManager(),
+                                                      getWorkListener(),
+                                                      getLifecycleManager(),
+                                                      getNotificationManager(),
+                                                      bundleContext);
         return muleContext;
     }
 }

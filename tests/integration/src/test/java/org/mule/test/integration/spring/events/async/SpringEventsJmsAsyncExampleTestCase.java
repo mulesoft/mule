@@ -56,7 +56,6 @@ public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
         };
         subscriptionBean.setEventCallback(callback);
 
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
         MuleClient client = new MuleClient();
         Order order = new Order("Sausage and Mash");
         client.send("jms://orders.queue", order, null);

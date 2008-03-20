@@ -31,8 +31,8 @@
             <inbound>
                 <axis:inbound-endpoint address="jms://mycomponent2"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.testmodels.services.TestServiceComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.testmodels.services.TestServiceComponent">
                     <properties>
                         <spring:entry key="serviceInterfaces">
                             <spring:list>
@@ -41,8 +41,8 @@
                             </spring:list>
                         </spring:entry>
                     </properties>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </service>
 
         <service name="mycomponent3">

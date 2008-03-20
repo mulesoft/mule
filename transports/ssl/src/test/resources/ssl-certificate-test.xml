@@ -24,13 +24,13 @@
             <inbound>
                 <ssl:inbound-endpoint ref="in"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
                         <spring:entry key="eventCallback" value-ref="certificates"/>
                     </properties>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </custom-service>
 
     </model>

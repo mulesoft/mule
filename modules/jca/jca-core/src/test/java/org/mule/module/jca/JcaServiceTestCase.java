@@ -14,9 +14,16 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
-import org.mule.component.simple.EchoComponent;
+import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.object.SingletonObjectFactory;
+
+import java.lang.reflect.Method;
+
+import javax.resource.ResourceException;
+import javax.resource.spi.UnavailableException;
+import javax.resource.spi.endpoint.MessageEndpoint;
+import javax.resource.spi.endpoint.MessageEndpointFactory;
+import javax.transaction.xa.XAResource;
 
 public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceTestCase
 {
@@ -37,10 +44,11 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
 
         // Create, register, initialise and start JcaService
         String name = "JcaService#";
-        service = new JcaService(new DelegateWorkManager(workManager));
+        service = new JcaService();
         service.setName(name);
         service.setModel(jcaModel);
-        service.setComponentFactory(new SingletonObjectFactory(new EchoComponent()));
+        service.setComponent(new JcaComponent(new TestMessageEndpointFactory(), new DefaultEntryPointResolverSet(),
+            service, workManager));
         muleContext.getRegistry().registerService(service);
 
         assertNotNull(service);
@@ -105,6 +113,44 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
         {
             // expected
         }
+    }
+    
+    class TestMessageEndpointFactory implements MessageEndpointFactory
+    {
+
+        public MessageEndpoint createEndpoint(XAResource xaResource) throws UnavailableException
+        {
+            return null;
+        }
+
+        public boolean isDeliveryTransacted(Method method) throws NoSuchMethodException
+        {
+            return false;
+        }
+
+    }
+
+    class TestMessageEndoint implements MessageEndpoint
+    {
+
+        public void afterDelivery() throws ResourceException
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void beforeDelivery(Method method) throws NoSuchMethodException, ResourceException
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void release()
+        {
+            // TODO Auto-generated method stub
+
+        }
+
     }
 
 }

@@ -1,15 +1,32 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextAware;
-import org.mule.config.MuleConfiguration;
+import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.i18n.MessageFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.SmartFactoryBean;
 
-public class MuleConfigurationConfigurator extends MuleConfiguration implements MuleContextAware, SmartFactoryBean
+/**
+ * This class is a "SmartFactoryBean" which allows a few XML attributes to be set on the 
+ * otherwise read-only MuleConfiguration.  It looks up the MuleConfiguration from the 
+ * MuleContext and does some class-casting to be able to modify it.  Note that this will
+ * only work if the MuleContext has not yet been started, otherwise the modifications 
+ * will be ignored (and warnings logged).
+ */
+public class MuleConfigurationConfigurator implements MuleContextAware, SmartFactoryBean
 {
-    
     private MuleContext muleContext;
+    
+    // We instantiate DefaultMuleConfiguration to make sure we get the default values for 
+    // any properties not set by the user.
+    private DefaultMuleConfiguration config = new DefaultMuleConfiguration();
+
+    protected transient Log logger = LogFactory.getLog(MuleConfigurationConfigurator.class);
 
     public void setMuleContext(MuleContext context)
     {
@@ -29,16 +46,18 @@ public class MuleConfigurationConfigurator extends MuleConfiguration implements 
     public Object getObject() throws Exception
     {
         MuleConfiguration configuration = muleContext.getConfiguration();
-        configuration.setDefaultSynchronousEndpoints(isDefaultSynchronousEndpoints());
-        configuration.setWorkingDirectory(getWorkingDirectory());
-        configuration.setDefaultSynchronousEventTimeout(getDefaultSynchronousEventTimeout());
-        configuration.setDefaultEncoding(getDefaultEncoding());
-        configuration.setDefaultTransactionTimeout(getDefaultTransactionTimeout());
-        configuration.setDefaultRemoteSync(isDefaultRemoteSync());
-        configuration.setClusterId(getClusterId());
-        configuration.setDomainId(getDomainId());
-        configuration.setId(getId());        
-        return configuration;
+        if (configuration instanceof DefaultMuleConfiguration)
+        {
+            ((DefaultMuleConfiguration) configuration).setDefaultSynchronousEndpoints(config.isDefaultSynchronousEndpoints());
+            ((DefaultMuleConfiguration) configuration).setDefaultSynchronousEventTimeout(config.getDefaultSynchronousEventTimeout());
+            ((DefaultMuleConfiguration) configuration).setDefaultRemoteSync(config.isDefaultRemoteSync());
+            ((DefaultMuleConfiguration) configuration).setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
+            return configuration;
+        }
+        else
+        {
+            throw new ConfigurationException(MessageFactory.createStaticMessage("Unable to set properties on read-only MuleConfiguration: " + configuration.getClass()));
+        }
     }
 
     public Class getObjectType()
@@ -51,4 +70,23 @@ public class MuleConfigurationConfigurator extends MuleConfiguration implements 
         return true;
     }
 
+    public void setDefaultSynchronousEndpoints(boolean synchronous)
+    {
+        config.setDefaultSynchronousEndpoints(synchronous);
+    }
+    
+    public void setDefaultSynchronousEventTimeout(int synchronousEventTimeout)
+    {
+        config.setDefaultSynchronousEventTimeout(synchronousEventTimeout);
+    }
+    
+    public void setDefaultRemoteSync(boolean remoteSync)
+    {
+        config.setDefaultRemoteSync(remoteSync);
+    }
+    
+    public void setDefaultTransactionTimeout(int defaultTransactionTimeout)
+    {
+        config.setDefaultTransactionTimeout(defaultTransactionTimeout);
+    }
 }

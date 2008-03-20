@@ -17,11 +17,11 @@
             <inbound>
                 <inbound-endpoint address="http://localhost:60211/mycomponent1" synchronous="true"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="mycomponent1"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
 
         </service>
 
@@ -30,11 +30,11 @@
                 <inbound-endpoint address="http://localhost:60211/mycomponent2" synchronous="true"/>
             </inbound>
 
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="mycomponent2"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </service>
 
     </model>

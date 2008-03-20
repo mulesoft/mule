@@ -11,9 +11,9 @@
 package org.mule.api.model;
 
 import org.mule.api.NamedObject;
+import org.mule.api.component.LifecycleAdapterFactory;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.LifecycleAdapterFactory;
 
 import java.beans.ExceptionListener;
 
@@ -57,7 +57,7 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject
      *
      * @return Returns the lifecycleAdapterFactory used by this Model.
      * @see LifecycleAdapterFactory
-     * @see org.mule.api.lifecycle.LifecycleAdapter
+     * @see org.mule.api.component.LifecycleAdapter
      */
     LifecycleAdapterFactory getLifecycleAdapterFactory();
 
@@ -67,7 +67,7 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject
      * @param lifecycleAdapterFactory The lifecycleAdapterFactory to set on this
      *                                model.
      * @see LifecycleAdapterFactory
-     * @see org.mule.api.lifecycle.LifecycleAdapter
+     * @see org.mule.api.component.LifecycleAdapter
      */
     void setLifecycleAdapterFactory(LifecycleAdapterFactory lifecycleAdapterFactory);
 

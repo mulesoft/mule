@@ -32,15 +32,15 @@
             <inbound>
                 <tcp:inbound-endpoint ref="asyncClientEndpoint1"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
                         <spring:entry key="eventCallback">
                             <spring:bean class="org.mule.tck.functional.ResponseWriterCallback"/>
                         </spring:entry>
                     </properties>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </service>
 
         <!-- this doesn't work because, in essence, the existing socket is opened in the wrong
@@ -49,9 +49,7 @@
             <inbound>
                 <tcp:inbound-endpoint ref="asyncClientEndpoint2"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
+            <pooled-component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <outbound>
                 <outbound-pass-through-router>
                     <tcp:outbound-endpoint ref="asyncClientEndpoint2"/>

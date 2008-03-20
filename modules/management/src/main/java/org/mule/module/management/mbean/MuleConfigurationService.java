@@ -10,13 +10,13 @@
 
 package org.mule.module.management.mbean;
 
-import org.mule.config.MuleConfiguration;
+import org.mule.api.config.MuleConfiguration;
 
 /**
  * <code>MuleConfigurationService</code> exposes the MuleConfiguration settings as
  * a management service
  * 
- * TODO I'm not sure this is relevant anymore since the MuleConfiguration should
+ * TODO MULE-3110 I'm not sure this is relevant anymore since the MuleConfiguration should
  * be immutable after startup.
  */
 public class MuleConfigurationService implements MuleConfigurationServiceMBean
@@ -33,51 +33,50 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         return muleConfiguration.isDefaultSynchronousEndpoints();
     }
 
-    public void setSynchronous(boolean synchronous)
-    {
-        muleConfiguration.setDefaultSynchronousEndpoints(synchronous);
-    }
+//    public void setSynchronous(boolean synchronous)
+//    {
+//        muleConfiguration.setDefaultSynchronousEndpoints(synchronous);
+//    }
 
     public int getSynchronousEventTimeout()
     {
         return muleConfiguration.getDefaultSynchronousEventTimeout();
     }
 
-    public void setSynchronousEventTimeout(int synchronousEventTimeout)
-    {
-        muleConfiguration.setDefaultSynchronousEventTimeout(synchronousEventTimeout);
-    }
+//    public void setSynchronousEventTimeout(int synchronousEventTimeout)
+//    {
+//        muleConfiguration.setDefaultSynchronousEventTimeout(synchronousEventTimeout);
+//    }
 
     public boolean isRemoteSync()
     {
         return muleConfiguration.isDefaultRemoteSync();
     }
 
-    public void setRemoteSync(boolean remoteSync)
-    {
-        muleConfiguration.setDefaultRemoteSync(remoteSync);
-    }
-
+//    public void setRemoteSync(boolean remoteSync)
+//    {
+//        muleConfiguration.setDefaultRemoteSync(remoteSync);
+//    }
 
     public String getWorkingDirectory()
     {
         return muleConfiguration.getWorkingDirectory();
     }
 
-    public void setWorkingDirectory(String workingDirectory)
-    {
-        muleConfiguration.setWorkingDirectory(workingDirectory);
-    }
+//    public void setWorkingDirectory(String workingDirectory)
+//    {
+//        muleConfiguration.setWorkingDirectory(workingDirectory);
+//    }
 
     public int getTransactionTimeout()
     {
         return muleConfiguration.getDefaultTransactionTimeout();
     }
 
-    public void setTransactionTimeout(int transactionTimeout)
-    {
-        muleConfiguration.setDefaultTransactionTimeout(transactionTimeout);
-    }
+//    public void setTransactionTimeout(int transactionTimeout)
+//    {
+//        muleConfiguration.setDefaultTransactionTimeout(transactionTimeout);
+//    }
 
     public boolean isClientMode()
     {
@@ -90,8 +89,8 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         return muleConfiguration.getDefaultEncoding();
     }
 
-    public void setEncoding(String encoding)
-    {
-        muleConfiguration.setDefaultEncoding(encoding);
-    }
+//    public void setEncoding(String encoding)
+//    {
+//        muleConfiguration.setDefaultEncoding(encoding);
+//    }
 }

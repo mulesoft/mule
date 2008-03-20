@@ -12,15 +12,18 @@ package org.mule;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
-import org.mule.config.MuleConfiguration;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.context.notification.ServerNotificationManager;
 import org.mule.model.seda.SedaModel;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -28,6 +31,8 @@ import org.mule.tck.testmodels.fruit.Banana;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import javax.resource.spi.work.WorkListener;
 
 public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 {
@@ -198,7 +203,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertEquals(DefaultMuleContext.class, muleContext.getClass());
         assertTrue(muleContext.isInitialised());
         assertNotNull(muleContext.getConfiguration());
-        assertEquals(MuleConfiguration.class, muleContext.getConfiguration().getClass());
+        assertEquals(DefaultMuleConfiguration.class, muleContext.getConfiguration().getClass());
         assertNotNull(muleContext.getLifecycleManager().getClass());
         assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[0]);
         assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[1]);
@@ -274,25 +279,30 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 
     static class TestMuleContextBuilder extends DefaultMuleContextBuilder
     {
-
         public MuleContext buildMuleContext()
         {
-            MuleContext muleContext = new TestMuleContext(getLifecycleManager());
-            muleContext.setWorkManager(getWorkManager());
-            muleContext.setNotificationManager(getNotificationManager());
+            MuleContext muleContext = new TestMuleContext(getMuleConfiguration(),
+                                                             getWorkManager(),
+                                                             getWorkListener(),
+                                                             getLifecycleManager(),
+                                                             getNotificationManager());
             return muleContext;
         }
     }
 
     static class TestMuleContext extends DefaultMuleContext
     {
-        public TestMuleContext(LifecycleManager lifecycleManager)
+        public TestMuleContext(MuleConfiguration config,
+                                  WorkManager workManager, 
+                                  WorkListener workListener, 
+                                  LifecycleManager lifecycleManager, 
+                                  ServerNotificationManager notificationManager)
         {
-            super(lifecycleManager);
+            super(config, workManager, workListener, lifecycleManager, notificationManager);
         }
     }
 
-    static class TestMuleConfiguration extends MuleConfiguration
+    static class TestMuleConfiguration extends DefaultMuleConfiguration
     {
         // just a skeleton
     }

@@ -17,11 +17,11 @@
             <inbound>
                 <vm:inbound-endpoint path="s-in" synchronous="true"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="Polo"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </service>
     </model>
 

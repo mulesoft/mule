@@ -45,8 +45,8 @@
                     synchronous="true" />
             </inbound>
 
-            <component>
-                <pooled-object
+            <pooled-component>
+                <prototype-object
                     class="org.mule.module.spring.remoting.SpringRemoteInvokerComponent">
                     <properties>
 
@@ -71,8 +71,8 @@
                             i.e. registerTraceInterceptor and remoteInvocationExecutor
                         -->
                     </properties>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
 
         </service>
     </model>

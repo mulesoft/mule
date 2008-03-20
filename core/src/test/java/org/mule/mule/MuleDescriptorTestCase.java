@@ -10,14 +10,16 @@
 
 package org.mule.mule;
 
+import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.component.AbstractJavaComponent;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.model.seda.SedaService;
+import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.util.object.SingletonObjectFactory;
 
 public class MuleDescriptorTestCase extends AbstractMuleTestCase
 {
@@ -38,12 +40,12 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
         // assertEquals(2, descriptor.getInitialisationPolicy());
 
         //assertNull("Factory should be null but is " + service.getServiceFactory(), service.getServiceFactory());
-        assertNotNull(service.getComponentFactory());
-        assertEquals(SingletonObjectFactory.class, service.getComponentFactory().getClass());
-        service.getComponentFactory().initialise();
-        assertTrue(service.getComponentFactory().getInstance() instanceof PassThroughComponent);
+        assertNotNull(service.getComponent());
+        assertTrue(service.getComponent() instanceof JavaComponent);
+        assertEquals(SingletonObjectFactory.class, ((AbstractJavaComponent) service.getComponent()).getObjectFactory().getClass());
+        assertTrue(((JavaComponent) service.getComponent()).getObjectType().equals(PassThroughComponent.class));
         assertNull(service.getName());
-        //assertEquals(0, service.getProperties().size());
+        // assertEquals(0, service.getProperties().size());
     }
 
     // These validations seems a bit silly, IMHO.

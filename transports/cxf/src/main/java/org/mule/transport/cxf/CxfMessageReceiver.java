@@ -11,6 +11,7 @@
 package org.mule.transport.cxf;
 
 import org.mule.api.MuleException;
+import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.CreateException;
@@ -118,7 +119,14 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                 throw new CreateException(CxfMessages.invalidFrontend(frontend), this);
             }
 
-            sfb.setServiceBean(service.getComponentFactory().getInstance());
+            if (!(service.getComponent() instanceof JavaComponent))
+            {
+                throw new InitialisationException(CxfMessages.javaComponentRequiredForInboundEndpoint(), this);
+            }
+            else
+            {
+                sfb.setServiceBean(((JavaComponent) service.getComponent()).getObjectFactory().getInstance());
+            }
 
             // The binding - i.e. SOAP, XML, HTTP Binding, etc
             if (bindingId != null)
@@ -268,7 +276,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            return service.getComponentFactory().getObjectClass();
+            return ((JavaComponent) service.getComponent()).getObjectType();
         }
         catch (Exception e)
         {

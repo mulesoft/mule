@@ -21,12 +21,8 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
-import org.mule.api.model.EntryPointResolver;
-import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
 import org.mule.api.model.ModelException;
 import org.mule.api.routing.InboundRouterCollection;
@@ -34,17 +30,15 @@ import org.mule.api.routing.NestedRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
-import org.mule.api.service.ServiceAware;
 import org.mule.api.service.ServiceException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.component.JavaComponent;
+import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ServiceNotification;
 import org.mule.management.stats.ServiceStatistics;
-import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.routing.nested.DefaultNestedRouterCollection;
@@ -53,12 +47,9 @@ import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.response.DefaultResponseRouterCollection;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.concurrent.WaitableBoolean;
-import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.SingletonObjectFactory;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -107,8 +98,6 @@ public abstract class AbstractService implements Service
 
     protected MuleContext muleContext;
 
-    protected EntryPointResolverSet entryPointResolverSet;
-
     /**
      * The initial states that the service can be started in
      */
@@ -120,12 +109,6 @@ public abstract class AbstractService implements Service
      * The exception strategy used by the service.
      */
     protected ExceptionListener exceptionListener;
-
-    /**
-     * Factory which creates an instance of the actual service object.
-     * By default a singleton object factory with the {@link PassThroughComponent} is used
-     */
-    protected ObjectFactory componentFactory = new SingletonObjectFactory(PassThroughComponent.class);
 
     /**
      * The service's name
@@ -146,12 +129,19 @@ public abstract class AbstractService implements Service
      */
     protected String initialState = INITIAL_STATE_STARTED;
 
-    protected List initialisationCallbacks = new ArrayList();
-
     /**
      * Indicates whether a service has passed its initial startup state.
      */
     private AtomicBoolean beyondInitialState = new AtomicBoolean(false);
+
+    // Default component to use if one is not configured.
+    // TODO MULE-3113 This should not really be needed as to implement bridging we should
+    // should just increment a 'bridged' counter and sent the event straight to
+    // outbound router collection. Currently it's the Component that routes events
+    // onto the outbound router collection so this default implementation is needed.
+    // It would be beneficial to differenciate between component invocations and
+    // events that are bridged but currently everything is an invocation.
+    protected Component component = new SimpleCallableJavaComponent(new PassThroughComponent());
 
     /**
      * For Spring only
@@ -174,9 +164,14 @@ public abstract class AbstractService implements Service
     {
         if (initialised.get())
         {
-            throw new InitialisationException(
-                    CoreMessages.objectAlreadyInitialised("Service '" + name + "'"), this);
+            throw new InitialisationException(CoreMessages.objectAlreadyInitialised("Service '" + name + "'"), this);
         }
+        // Ensure Component has service instance and is initialised. If the component
+        // was configured with spring and is therefore in the registry it will get
+        // started automatically, if it was set on the service directly then it won't
+        // be started automatically. So to be sure we start it here.
+        component.setService(this);
+        component.initialise();
 
         if (inboundRouter == null)
         {
@@ -196,10 +191,6 @@ public abstract class AbstractService implements Service
         {
             responseRouter = new DefaultResponseRouterCollection();
         }
-        if (nestedRouter == null)
-        {
-            nestedRouter = new DefaultNestedRouterCollection();
-        }
 
         if (exceptionListener == null)
         {
@@ -209,25 +200,21 @@ public abstract class AbstractService implements Service
             ((Initialisable) exceptionListener).initialise();
         }
 
-        return LifecycleTransitionResult.initialiseAll(componentFactory.initialise(), new LifecycleTransitionResult.Closure()
-        {
-            public LifecycleTransitionResult doContinue() throws InitialisationException
-            {
-                doInitialise();
+        doInitialise();
 
-                // initialise statistics
-                stats = createStatistics();
+        // initialise statistics
+        stats = createStatistics();
 
-                stats.setEnabled(muleContext.getStatistics().isEnabled());
-                muleContext.getStatistics().add(stats);
-                stats.setOutboundRouterStat(outboundRouter.getStatistics());
-                stats.setInboundRouterStat(inboundRouter.getStatistics());
+        stats.setEnabled(muleContext.getStatistics().isEnabled());
+        muleContext.getStatistics().add(stats);
+        stats.setOutboundRouterStat(outboundRouter.getStatistics());
+        stats.setInboundRouterStat(inboundRouter.getStatistics());
+        stats.setComponentStat(component.getStatistics());
 
-                initialised.set(true);
-                fireComponentNotification(ServiceNotification.SERVICE_INITIALISED);
+        initialised.set(true);
+        fireComponentNotification(ServiceNotification.SERVICE_INITIALISED);
 
-                return LifecycleTransitionResult.OK;
-            }});
+        return LifecycleTransitionResult.OK;
     }
 
     protected ServiceStatistics createStatistics()
@@ -264,10 +251,11 @@ public abstract class AbstractService implements Service
 
             // Unregister Listeners for the service
             unregisterListeners();
+            
+            component.stop();
 
             doStop();
             stopped.set(true);
-            initialised.set(false);
             fireComponentNotification(ServiceNotification.SERVICE_STOPPED);
             logger.info("Mule Service " + name + " has been stopped successfully");
         }
@@ -277,6 +265,13 @@ public abstract class AbstractService implements Service
     public LifecycleTransitionResult start() throws MuleException
     {
         LifecycleTransitionResult status = LifecycleTransitionResult.OK;
+
+        // TODO If Service is uninitialised when start is called should we initialise
+        // or throw an exception?
+        if (!initialised.get())
+        {
+            throw new IllegalStateException("Cannot start an unitialised service.");
+        }
         if (isStarted())
         {
             logger.info("Service is already started: " + name);
@@ -314,6 +309,13 @@ public abstract class AbstractService implements Service
      */
     protected LifecycleTransitionResult start(boolean startPaused) throws MuleException
     {
+
+        // Ensure Component is started. If component was configured with spring and
+        // is therefore in the registry it will get started automatically, if it was
+        // set on the service directly then it won't be started automatically. So to
+        // be sure we start it here.
+        component.start();
+
         // Create the receivers for the service but do not start them yet.
         registerListeners();
 
@@ -419,6 +421,8 @@ public abstract class AbstractService implements Service
             logger.error("Failed to stop service: " + name, e);
         }
         doDispose();
+        component.dispose();
+        initialised.set(false);
         fireComponentNotification(ServiceNotification.SERVICE_DISPOSED);
         muleContext.getStatistics().remove(stats);
     }
@@ -776,58 +780,9 @@ public abstract class AbstractService implements Service
         this.muleContext = context;
     }
 
-    protected Component createComponentProxy(Object pojo) throws MuleException
-    {
-        Component proxy = new JavaComponent(pojo, this, muleContext);
-        proxy.setStatistics(getStatistics());
-        return proxy;
-    }
-
-    protected Object getOrCreateService() throws MuleException
-    {
-        if (componentFactory == null)
-        {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Service " + name + " has not been initialized properly, no serviceFactory."), this);
-        }
-
-        Object component;
-        try
-        {
-            component = componentFactory.getInstance();
-            if (component instanceof ServiceAware)
-            {
-                ((ServiceAware) component).setService(this);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new LifecycleException(MessageFactory.createStaticMessage("Unable to create instance of POJO service"), e, this);
-        }
-
-        // Call any custom initialisers
-        fireInitialisationCallbacks(component);
-
-        return component;
-    }
-
-    public void fireInitialisationCallbacks(Object component) throws InitialisationException
-    {
-        InitialisationCallback callback;
-        for (Iterator iterator = initialisationCallbacks.iterator(); iterator.hasNext();)
-        {
-            callback = (InitialisationCallback) iterator.next();
-            callback.initialise(component);
-        }
-    }
-
-    public void addInitialisationCallback(InitialisationCallback callback)
-    {
-        initialisationCallbacks.add(callback);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////////////////////
     // Getters and Setters
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////////////////////
 
     public Model getModel()
     {
@@ -837,16 +792,6 @@ public abstract class AbstractService implements Service
     public void setModel(Model model)
     {
         this.model = model;
-    }
-
-    public ObjectFactory getComponentFactory()
-    {
-        return componentFactory;
-    }
-
-    public void setComponentFactory(ObjectFactory componentFactory)
-    {
-        this.componentFactory = componentFactory;
     }
 
     public ExceptionListener getExceptionListener()
@@ -867,16 +812,6 @@ public abstract class AbstractService implements Service
     public void setInboundRouter(InboundRouterCollection inboundRouter)
     {
         this.inboundRouter = inboundRouter;
-    }
-
-    public NestedRouterCollection getNestedRouter()
-    {
-        return nestedRouter;
-    }
-
-    public void setNestedRouter(NestedRouterCollection nestedRouter)
-    {
-        this.nestedRouter = nestedRouter;
     }
 
     public OutboundRouterCollection getOutboundRouter()
@@ -914,45 +849,15 @@ public abstract class AbstractService implements Service
         this.name = name;
     }
 
-    /**
-     * A descriptor can have a custom entrypoint resolver for its own object.
-     * By default this is null. When set this resolver will override the resolver on the model
-     *
-     * @return Null is a resolver set has not been set otherwise the resolver to use
-     *         on this service
-     */
-    public EntryPointResolverSet getEntryPointResolverSet()
+    public Component getComponent()
     {
-        return entryPointResolverSet;
+        return component;
     }
 
-    /**
-     * A descriptor can have a custom entrypoint resolver for its own object.
-     * By default this is null. When set this resolver will override the resolver on the model
-     *
-     * @param resolverSet theresolver set to use when resolving entry points
-     *                    on this service
-     */
-    public void setEntryPointResolverSet(EntryPointResolverSet resolverSet)
+    public void setComponent(Component component)
     {
-        this.entryPointResolverSet = resolverSet;
-    }
-
-    /**
-     * Allow for incremental addition of resolvers
-     *
-     * @param entryPointResolvers Resolvers to add
-     */
-    public void setEntryPointResolvers(Collection entryPointResolvers)
-    {
-        if (null == entryPointResolverSet)
-        {
-            entryPointResolverSet = new DefaultEntryPointResolverSet();
-        }
-        for (Iterator resolvers = entryPointResolvers.iterator(); resolvers.hasNext();)
-        {
-            entryPointResolverSet.addEntryPointResolver((EntryPointResolver) resolvers.next());
-        }
+        this.component = component;
+        this.component.setService(this);
     }
 
 }

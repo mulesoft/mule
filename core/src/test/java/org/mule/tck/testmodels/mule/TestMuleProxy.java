@@ -11,29 +11,23 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleException;
-import org.mule.api.MuleContext;
-import org.mule.api.service.Service;
-import org.mule.component.JavaComponent;
+import org.mule.api.object.ObjectFactory;
+import org.mule.component.DefaultJavaComponent;
 
 /**
  * Makes the underlying POJO service object available for unit testing.
  */
-public class TestMuleProxy extends JavaComponent
+public class TestMuleProxy extends DefaultJavaComponent
 {
-    private Object pojoService;
-    
-    public TestMuleProxy(Object pojoService, Service service, MuleContext muleContext)
-        throws MuleException
+
+    public TestMuleProxy(ObjectFactory objectFactory) throws MuleException
     {
-        super(pojoService, service, muleContext);
-        this.pojoService = pojoService;
+        super(objectFactory);
     }
 
     /** Returns the underlying POJO service object for unit testing. */
     public Object getPojoService() throws Exception
     {
-        return pojoService;
+        return objectFactory.getInstance();
     }
 }
-
-

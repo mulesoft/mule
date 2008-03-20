@@ -15,9 +15,11 @@
         <parsers-test:mapped-child name="child2" string="string2">
             <parsers-test:list-entry>list2</parsers-test:list-entry>
         </parsers-test:mapped-child>
+        <!-- // TODO ComplexComponentDefinitionParser is not longer used, is there any way to rewrite/reuse the "factory" element for testing?
         <parsers-test:factory name="child3" string="string3">
             <parsers-test:list-entry>list3</parsers-test:list-entry>
         </parsers-test:factory>
+        -->
     </parsers-test:orphan>
 
 </beans>

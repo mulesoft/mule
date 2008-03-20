@@ -12,15 +12,15 @@ package org.mule.model;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.component.LifecycleAdapterFactory;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleAdapterFactory;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
+import org.mule.component.DefaultLifecycleAdapterFactory;
 import org.mule.context.notification.ModelNotification;
-import org.mule.lifecycle.DefaultLifecycleAdapterFactory;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.service.DefaultServiceExceptionStrategy;

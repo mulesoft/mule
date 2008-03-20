@@ -12,6 +12,8 @@ package org.mule;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.agent.Agent;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
@@ -31,7 +33,8 @@ import org.mule.api.registry.RegistryBroker;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.api.transport.ConnectionStrategy;
-import org.mule.config.MuleConfiguration;
+import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -39,9 +42,19 @@ import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
+import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.queue.QueueManager;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.jar.Manifest;
 
 import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
@@ -76,15 +89,22 @@ public class DefaultMuleContext implements MuleContext
 
     protected ServerNotificationManager notificationManager;
 
-    private MuleConfiguration config = new MuleConfiguration();
+    private MuleConfiguration config;
     
-    public DefaultMuleContext(LifecycleManager lifecycleManager)
+    /** the date in milliseconds from when the server was started */
+    private long startDate;
+
+    public DefaultMuleContext(MuleConfiguration config,
+                              WorkManager workManager, 
+                              WorkListener workListener, 
+                              LifecycleManager lifecycleManager, 
+                              ServerNotificationManager notificationManager)
     {
-        if (lifecycleManager == null)
-        {
-            throw new NullPointerException(CoreMessages.objectIsNull("lifecycleManager").getMessage());
-        }
+        this.config = config;
+        this.workManager = workManager;
+        this.workListener = workListener;
         this.lifecycleManager = lifecycleManager;
+        this.notificationManager = notificationManager;
     }
 
     protected RegistryBroker createRegistryBroker()
@@ -157,10 +177,13 @@ public class DefaultMuleContext implements MuleContext
 
             if (logger.isInfoEnabled())
             {
-                logger.info(getConfiguration().getStartSplash());
+                logger.info(getStartSplash());
             }
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
         }
+
+        startDate = System.currentTimeMillis();
+        
         return LifecycleTransitionResult.OK;
     }
 
@@ -216,9 +239,9 @@ public class DefaultMuleContext implements MuleContext
 
         notificationManager.fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_DISPOSED));
 
-        if ((getConfiguration().getStartDate() > 0) && logger.isInfoEnabled())
+        if ((getStartDate() > 0) && logger.isInfoEnabled())
         {
-            logger.info(getConfiguration().getEndSplash());
+            logger.info(getEndSplash());
         }
         //lifecycleManager.reset();
     }
@@ -292,12 +315,6 @@ public class DefaultMuleContext implements MuleContext
     public AllStatistics getStatistics()
     {
         return stats;
-    }
-
-    /** Sets statistics on this instance */
-    public void setStatistics(AllStatistics stat)
-    {
-        this.stats = stat;
     }
 
     public void registerListener(ServerNotificationListener l) throws NotificationException
@@ -398,48 +415,16 @@ public class DefaultMuleContext implements MuleContext
      *
      * @return a workManager instance used by the current MuleManager
      * @see org.mule.api.config.ThreadingProfile
-     * @see MuleConfiguration
+     * @see DefaultMuleConfiguration
      */
     public WorkManager getWorkManager()
     {
         return workManager;
     }
 
-    /**
-     * Obtains a workManager instance that can be used to schedule work in a
-     * thread pool. This will be used primarially by UMOAgents wanting to
-     * schedule work. This work Manager must <b>never</b> be used by provider
-     * implementations as they have their own workManager accible on the
-     * connector.
-     * <p/>
-     * If a workManager has not been set by the time the
-     * <code>initialise()</code> method has been called a default
-     * <code>MuleWorkManager</code> will be created using the
-     * <i>DefaultThreadingProfile</i> on the <code>MuleConfiguration</code>
-     * object.
-     *
-     * @param workManager the workManager instance used by the current
-     *                    MuleManager
-     * @throws IllegalStateException if the workManager has already been set.
-     * @see org.mule.api.config.ThreadingProfile
-     * @see MuleConfiguration
-     * @see org.mule.work.MuleWorkManager
-     */
-    public void setWorkManager(WorkManager workManager)
-    {
-        checkLifecycleForPropertySet("workManager", Initialisable.PHASE_NAME);
-        this.workManager = workManager;
-    }
-
     public WorkListener getWorkListener()
     {
         return workListener;
-    }
-
-    public void setWorkListener(WorkListener workListener)
-    {
-        checkLifecycleForPropertySet("workListener", Initialisable.PHASE_NAME);
-        this.workListener = workListener;
     }
 
     public QueueManager getQueueManager()
@@ -475,11 +460,6 @@ public class DefaultMuleContext implements MuleContext
     public ServerNotificationManager getNotificationManager()
     {
         return notificationManager;
-    }
-
-    public void setNotificationManager(ServerNotificationManager notificationManager)
-    {
-        this.notificationManager = notificationManager;
     }
 
     /**
@@ -558,11 +538,6 @@ public class DefaultMuleContext implements MuleContext
         }
     }
 
-    public void setLifecycleManager(LifecycleManager lifecycleManager)
-    {
-        this.lifecycleManager = lifecycleManager;
-    }
-
     public MuleRegistry getRegistry()
     {
         return muleRegistryHelper;
@@ -627,5 +602,101 @@ public class DefaultMuleContext implements MuleContext
     public void addRegistry(Registry registry)
     {
         registryBroker.addRegistry(registry);
+    }
+
+    /**
+     * Returns the long date when the server was started
+     *
+     * @return the long date when the server was started
+     */
+    public long getStartDate()
+    {
+        return startDate;
+    }
+
+    /**
+     * Returns a formatted string that is a summary of the configuration of the
+     * server. This is the brock of information that gets displayed when the server
+     * starts
+     *
+     * @return a string summary of the server information
+     */
+    public String getStartSplash()
+    {
+        String notset = CoreMessages.notSet().getMessage();
+
+        // Mule Version, Timestamp, and Server ID
+        List message = new ArrayList();
+        Manifest mf = MuleManifest.getManifest();
+        Map att = mf.getMainAttributes();
+        if (att.values().size() > 0)
+        {
+            message.add(StringUtils.defaultString(MuleManifest.getProductDescription(), notset));
+            message.add(CoreMessages.version().getMessage() + " Build: "
+                    + StringUtils.defaultString(MuleManifest.getBuildNumber(), notset));
+
+            message.add(StringUtils.defaultString(MuleManifest.getVendorName(), notset));
+            message.add(StringUtils.defaultString(MuleManifest.getProductMoreInfo(), notset));
+        }
+        else
+        {
+            message.add(CoreMessages.versionNotSet().getMessage());
+        }
+        message.add(" ");
+        message.add(CoreMessages.serverStartedAt(startDate).getMessage());
+        message.add("Server ID: " + getConfiguration().getId());
+
+        // JDK, OS, and Host
+        message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info")
+                + ")");
+        String patch = System.getProperty("sun.os.patch.level", null);
+        message.add("OS: " + System.getProperty("os.name")
+                + (patch != null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : "") + " ("
+                + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
+        try
+        {
+            InetAddress host = InetAddress.getLocalHost();
+            message.add("Host: " + host.getHostName() + " (" + host.getHostAddress() + ")");
+        }
+        catch (UnknownHostException e)
+        {
+            // ignore
+        }
+
+        // Mule Agents
+        message.add(" ");
+        //List agents
+        Collection agents = RegistryContext.getRegistry().lookupObjects(Agent.class);
+        if (agents.size() == 0)
+        {
+            message.add(CoreMessages.agentsRunning().getMessage() + " "
+                    + CoreMessages.none().getMessage());
+        }
+        else
+        {
+            message.add(CoreMessages.agentsRunning().getMessage());
+            Agent umoAgent;
+            for (Iterator iterator = agents.iterator(); iterator.hasNext();)
+            {
+                umoAgent = (Agent) iterator.next();
+                message.add("  " + umoAgent.getDescription());
+            }
+        }
+        return StringMessageUtils.getBoilerPlate(message, '*', 70);
+    }
+
+    public String getEndSplash()
+    {
+        List message = new ArrayList(2);
+        long currentTime = System.currentTimeMillis();
+        message.add(CoreMessages.shutdownNormally(new Date()).getMessage());
+        long duration = 10;
+        if (startDate > 0)
+        {
+            duration = currentTime - startDate;
+        }
+        message.add(CoreMessages.serverWasUpForDuration(duration).getMessage());
+
+        return StringMessageUtils.getBoilerPlate(message, '*', 78);
     }
 }

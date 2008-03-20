@@ -81,7 +81,7 @@ public class MuleShutdownHook extends Thread
         MuleContext context = MuleServer.getMuleContext();
         if(context!=null)
         {
-            msgs.add(CoreMessages.serverStartedAt(context.getConfiguration().getStartDate()));
+            msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
         }
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
 
@@ -107,7 +107,7 @@ public class MuleShutdownHook extends Thread
 
         if(context!=null)
         {
-            msgs.add(CoreMessages.serverStartedAt(context.getConfiguration().getStartDate()));
+            msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
         }
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 86);

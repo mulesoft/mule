@@ -9,6 +9,8 @@
  */
 package org.mule.config;
 
+import org.mule.api.config.MuleConfiguration;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

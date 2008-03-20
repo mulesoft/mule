@@ -102,8 +102,8 @@
                 </inbound-endpoint>
             </inbound>
             
-            <component>
-                <pooled-object class="org.mule.example.errorhandler.ErrorManager">
+            <pooled-component>
+                <prototype-object class="org.mule.example.errorhandler.ErrorManager">
                     <properties>
                         <spring:entry key="handlers">
                             <spring:list>
@@ -113,8 +113,8 @@
                             </spring:list>
                         </spring:entry>
                     </properties>
-                 </pooled-object>
-            </component>
+                 </prototype-object>
+            </pooled-component>
 
             <outbound>
                 <custom-catch-all-strategy class="org.mule.routing.LoggingCatchAllStrategy"/>

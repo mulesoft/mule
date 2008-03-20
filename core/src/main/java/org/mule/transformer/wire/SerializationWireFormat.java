@@ -22,10 +22,6 @@ public class SerializationWireFormat extends TransformerPairWireFormat
     public SerializationWireFormat()
     {
         setInboundTransformer(new ByteArrayToSerializable());
-        // TODO This is currently needed as a workaround for MULE-2881, this needs to
-        // be removed is this is not the solution to MULE-2881
-        SerializableToByteArray transformer = new SerializableToByteArray();
-        transformer.setAcceptUMOMessage(true);
-        setOutboundTransformer(transformer);
+        setOutboundTransformer(new SerializableToByteArray());
     }
 }

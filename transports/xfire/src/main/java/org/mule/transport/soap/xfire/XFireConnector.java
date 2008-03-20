@@ -22,11 +22,13 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.component.DefaultJavaComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
+import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.transport.AbstractConnectable;
 import org.mule.transport.AbstractConnector;
@@ -39,7 +41,6 @@ import org.mule.transport.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
-import org.mule.util.object.SingletonObjectFactory;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -376,9 +377,8 @@ public class XFireConnector extends AbstractConnector
         // Inject the Service because XFireServiceComponent is ServiceAware.
         // TODO Is this really necessary?  The only thing the Service is needed for is to get the
         // threading profile.
-        of.setService(c);
         of.initialise();
-        c.setComponentFactory(of);
+        c.setComponent(new DefaultJavaComponent(of));
         
         String serviceName = receiver.getService().getName();
 

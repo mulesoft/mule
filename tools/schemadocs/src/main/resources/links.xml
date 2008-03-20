@@ -103,6 +103,7 @@
     <link><item>mule:append-string-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:encrypt-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:decrypt-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:expression-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:encryption-security-filter</item><page>Additional+Configuration</page></link>
     
     <link><item>mule:inbound-endpoint</item><page>Configuring+Endpoints</page></link>

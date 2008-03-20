@@ -13,7 +13,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transport.file.FileConnector;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -46,8 +45,7 @@ public class FileComparatorTestCase extends FunctionalTestCase
             }
         };
 
-        ((FunctionalTestComponent) muleContext.getRegistry().lookupService(COMPONENT_NAME).getComponentFactory().getInstance()).
-                setEventCallback(callback);
+        ((FunctionalTestComponent) getComponent(COMPONENT_NAME)).setEventCallback(callback);
 
         muleContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).stop();
         File f1 = FileUtils.newFile(PATH + FILE_NAMES[0]);

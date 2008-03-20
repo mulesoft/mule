@@ -12,7 +12,7 @@ package org.mule;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.config.MuleConfiguration;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.lifecycle.GenericLifecycleManager;
@@ -34,7 +34,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
 
         // Assert
         assertNotNull(muleContext);
-        assertEquals(MuleConfiguration.class, muleContext.getConfiguration().getClass());
+        assertEquals(DefaultMuleConfiguration.class, muleContext.getConfiguration().getClass());
         assertEquals(GenericLifecycleManager.class, muleContext.getLifecycleManager().getClass());
         assertEquals(MuleContextInitialisePhase.class, muleContext.getLifecycleManager()
             .getLifecycles()
@@ -55,6 +55,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
     {
         // Build
         DefaultMuleContextBuilder builder = new DefaultMuleContextBuilder();
+        builder.setMuleConfiguration(new MyMuleConfiguration());
         builder.setLifecycleManager(new MyLifeCycleManager());
         builder.setNotificationManager(new MyServerNotificationManager());
         builder.setWorkManager(new MyWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, "test"));
@@ -62,7 +63,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
 
         // Assert
         assertNotNull(muleContext);
-        //assertEquals(MyMuleConfiguration.class, muleContext.getConfiguration().getClass());
+        assertEquals(MyMuleConfiguration.class, muleContext.getConfiguration().getClass());
         assertEquals(MyLifeCycleManager.class, muleContext.getLifecycleManager().getClass());
         assertEquals(MyServerNotificationManager.class, muleContext.getNotificationManager().getClass());
         assertEquals(MyWorkManager.class, muleContext.getWorkManager().getClass());
@@ -80,7 +81,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
     {
     }
 
-    static class MyMuleConfiguration extends MuleConfiguration
+    static class MyMuleConfiguration extends DefaultMuleConfiguration
     {
     }
 

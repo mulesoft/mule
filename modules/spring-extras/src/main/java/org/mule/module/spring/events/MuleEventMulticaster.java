@@ -39,15 +39,16 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
+import org.mule.component.DefaultJavaComponent;
 import org.mule.config.QueueProfile;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.module.spring.i18n.SpringMessages;
+import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
-import org.mule.util.object.SingletonObjectFactory;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
@@ -622,7 +623,7 @@ public class MuleEventMulticaster
             s.setQueueProfile(new QueueProfile());
             s.getInboundRouter().addEndpoint(
                 muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(newEndpoint));
-            s.setComponentFactory(new SingletonObjectFactory(listener));
+            s.setComponent(new DefaultJavaComponent(new SingletonObjectFactory(listener)));
             muleContext.getRegistry().registerService(s);
             return true;
         }
@@ -722,7 +723,7 @@ public class MuleEventMulticaster
                 messageRouter.addEndpoint(endpoint);
             }
         }
-        service.setComponentFactory(new SingletonObjectFactory(this));
+        service.setComponent(new DefaultJavaComponent(new SingletonObjectFactory(this)));
         return service;
     }
 

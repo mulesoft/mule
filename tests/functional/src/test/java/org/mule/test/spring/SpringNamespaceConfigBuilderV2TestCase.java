@@ -92,7 +92,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     {
         Service c = muleContext.getRegistry().lookupService("testPropertiesComponent");
         assertNotNull(c);
-        Object obj = c.getComponentFactory().getInstance();
+        Object obj = getComponent(c);
         assertNotNull(obj);
         assertTrue(obj instanceof Apple);
         assertTrue(((Apple) obj).isBitten()); 

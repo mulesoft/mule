@@ -29,7 +29,7 @@ import javax.management.ObjectInstance;
  * This base test case will create a new <code>MBean Server</code> if necessary,
  * and will clean up any registered MBeans in its <code>tearDown()</code> method.
  */
-public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
+public abstract class AbstractMuleJmxTestCase extends AbstractMuleTestCase
 {
     protected MBeanServer mBeanServer;
     protected JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();

@@ -25,6 +25,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.object.ObjectFactory;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
@@ -34,10 +35,12 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
+import org.mule.component.DefaultJavaComponent;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
+import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestAgent;
@@ -45,8 +48,6 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
-import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.SingletonObjectFactory;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -271,10 +272,20 @@ public final class MuleTestUtils
         return getTestEvent(data, getTestService(context), context);
     }
 
+    public static MuleEvent getTestInboundEvent(Object data, MuleContext context) throws Exception
+    {
+        return getTestInboundEvent(data, getTestService(context), context);
+    }
+
     /** Supply service but no endpoint */
     public static MuleEvent getTestEvent(Object data, Service service, MuleContext context) throws Exception
     {
         return getTestEvent(data, service, getTestOutboundEndpoint("test1", context), context);
+    }
+
+    public static MuleEvent getTestInboundEvent(Object data, Service service, MuleContext context) throws Exception
+    {
+        return getTestEvent(data, service, getTestInboundEndpoint("test1", context), context);
     }
 
     /** Supply endpoint but no service */
@@ -354,7 +365,7 @@ public final class MuleTestUtils
         c.setName(name);
         ObjectFactory of = new SingletonObjectFactory(clazz, props);
         of.initialise();
-        c.setComponentFactory(of);
+        c.setComponent(new DefaultJavaComponent(of));
         c.setModel(model);
         if (initialize)
         {

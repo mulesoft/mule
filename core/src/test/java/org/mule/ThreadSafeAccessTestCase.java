@@ -10,20 +10,15 @@
 
 package org.mule;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.ThreadSafeAccess;
-import org.mule.model.direct.DirectService;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.MuleTestUtils;
 import org.mule.transport.DefaultMessageAdapter;
 
 import java.util.Map;
 
-public class ThreadSafeAccessTestCase extends AbstractMuleTestCase
+public class ThreadSafeAccessTestCase extends AbstractThreadSafeAccessTestCase
 {
-    protected void doSetUp() throws Exception
+    public void testConfig() 
     {
-        muleContext.getConfiguration().setFailOnMessageScribbling(true);
+        assertTrue(muleContext.getConfiguration().isFailOnMessageScribbling());
     }
 
     public void testMessage() throws InterruptedException
@@ -46,94 +41,4 @@ public class ThreadSafeAccessTestCase extends AbstractMuleTestCase
         newCopy(dummyEvent());
         resetAccessControl(dummyEvent());
     }
-
-    public void testDisable() throws InterruptedException
-    {
-        try
-        {
-            muleContext.getConfiguration().setFailOnMessageScribbling(false);
-            ThreadSafeAccess target = new DefaultMessageAdapter(new Object());
-            newThread(target, false, new boolean[]{true, true, false, true});
-            newThread(target, false, new boolean[]{false});
-            newThread(target, false, new boolean[]{true});
-        }
-        finally
-        {
-            muleContext.getConfiguration().setFailOnMessageScribbling(true);
-        }
-    }
-
-    protected ThreadSafeAccess dummyEvent() throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null);
-        return new DefaultMuleEvent(message,
-                MuleTestUtils.getTestInboundEndpoint("test", muleContext),
-                new DefaultMuleSession(new DirectService(), muleContext), false);
-    }
-
-    protected void resetAccessControl(ThreadSafeAccess target) throws InterruptedException
-    {
-        target.assertAccess(true);
-        newThread(target, true, new boolean[]{true});
-        target.resetAccessControl();
-        newThread(target, false, new boolean[]{true});
-    }
-
-    protected void basicPattern(ThreadSafeAccess target) throws InterruptedException
-    {
-        newThread(target, false, new boolean[]{true, true, false, true});
-        newThread(target, false, new boolean[]{false});
-        newThread(target, true, new boolean[]{true});
-    }
-
-    protected void newCopy(ThreadSafeAccess target) throws InterruptedException
-    {
-        basicPattern(target);
-        basicPattern(target.newThreadCopy());
-    }
-
-    protected void newThread(ThreadSafeAccess target, boolean error, boolean[] pattern) throws InterruptedException
-    {
-        Caller caller = new Caller(target, pattern);
-        Thread thread =  new Thread(caller);
-        thread.start();
-        thread.join();
-        assertEquals(error, caller.isError());
-    }
-
-    protected static class Caller implements Runnable
-    {
-
-        private boolean isError = false;
-        private ThreadSafeAccess target;
-        private boolean[] write;
-
-        public Caller(ThreadSafeAccess target, boolean[] write)
-        {
-            this.target = target;
-            this.write = write;
-        }
-
-        public void run()
-        {
-            try
-            {
-                for (int i = 0; i < write.length; i++)
-                {
-                    target.assertAccess(write[i]);
-                }
-            }
-            catch (IllegalStateException e)
-            {
-                isError = true;
-            }
-        }
-
-        public boolean isError()
-        {
-            return isError;
-        }
-
-    }
-
 }

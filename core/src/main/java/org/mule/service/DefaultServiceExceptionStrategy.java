@@ -16,7 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
-import org.mule.lifecycle.DefaultLifecycleAdapter;
+import org.mule.component.DefaultLifecycleAdapter;
 import org.mule.management.stats.ServiceStatistics;
 
 /**

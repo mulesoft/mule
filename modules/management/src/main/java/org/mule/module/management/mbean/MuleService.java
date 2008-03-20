@@ -89,7 +89,7 @@ public class MuleService implements MuleServiceMBean
     {
         if (!isStopped())
         {
-            return new Date(muleContext.getConfiguration().getStartDate());
+            return new Date(muleContext.getStartDate());
         }
         else
         {

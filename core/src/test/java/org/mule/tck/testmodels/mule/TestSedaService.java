@@ -10,7 +10,6 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleException;
 import org.mule.model.seda.SedaService;
 
 
@@ -22,11 +21,5 @@ public class TestSedaService extends SedaService
     public TestSedaService()
     {
         super();
-    }
-
-    //@Override
-    public Object getOrCreateService() throws MuleException
-    {
-        return super.getOrCreateService();
     }
 }

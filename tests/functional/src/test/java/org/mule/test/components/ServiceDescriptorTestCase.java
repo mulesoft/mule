@@ -25,7 +25,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
     {
         Service c = muleContext.getRegistry().lookupService("orange1");
         
-        Object service =  c.getComponentFactory().getInstance();
+        Object service =  getComponent(c);
         assertTrue("Service should be an Orange", service instanceof Orange);
         // Default values
         assertEquals(new Integer(10), ((Orange) service).getSegments());
@@ -36,13 +36,13 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
         Service c = muleContext.getRegistry().lookupService("orange2");
 
         // Create an orange
-        Object service =  c.getComponentFactory().getInstance();
+        Object service =  getComponent(c);
         assertTrue("Service should be an Orange", service instanceof Orange);
         assertEquals(new Integer(8), ((Orange) service).getSegments());
         assertEquals("Florida Sunny", ((Orange) service).getBrand());
 
         // Create another orange
-        service =  c.getComponentFactory().getInstance();
+        service =  getComponent(c);
         assertTrue("Service should be an Orange", service instanceof Orange);
         assertEquals(new Integer(8), ((Orange) service).getSegments());
         assertEquals("Florida Sunny", ((Orange) service).getBrand());
@@ -51,7 +51,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
     public void testSingletonObjectFactory() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("orange3");
-        Object service =  c.getComponentFactory().getInstance();
+        Object service =  getComponent(c);
         assertTrue("Service should be an Orange", service instanceof Orange);
         // Default values
         assertEquals(new Integer(10), ((Orange) service).getSegments());
@@ -60,7 +60,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
     public void testSpringSingleton() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("orange4");
-        Object service =  c.getComponentFactory().getInstance();
+        Object service =  getComponent(c);
         assertTrue("Service should be an Orange", service instanceof Orange);
         // Default values
         assertEquals(new Integer(10), ((Orange) service).getSegments());
@@ -69,7 +69,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
     public void testSpringFactoryBean() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("orange5");
-        Object service =  c.getComponentFactory().getInstance();
+        Object service =  getComponent(c);
         assertNotNull(service);
         assertTrue("Service should be an Orange but is: " + service.getClass(), service instanceof Orange);
         assertEquals(new Integer(8), ((Orange) service).getSegments());
@@ -79,7 +79,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
     public void testPojoAsFactoryBean() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("orange6");
-        Object service =  c.getComponentFactory().getInstance();
+        Object service =  getComponent(c);
         assertNotNull(service);
         assertTrue("Service should be an Orange but is: " + service.getClass(), service instanceof Orange);
         assertEquals("Florida Sunny", ((Orange) service).getBrand());

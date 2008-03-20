@@ -22,15 +22,16 @@ import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
+import org.mule.component.DefaultJavaComponent;
 import org.mule.context.notification.TransactionNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
+import org.mule.object.PrototypeObjectFactory;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.functional.EventCallback;
 import org.mule.transaction.MuleTransactionConfig;
-import org.mule.util.object.PrototypeObjectFactory;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -105,7 +106,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         Service service = new SedaService();
         service.setExceptionListener(new DefaultExceptionStrategy());
         service.setName("testComponent");
-        service.setComponentFactory(new PrototypeObjectFactory(JdbcFunctionalTestComponent.class));
+        service.setComponent(new DefaultJavaComponent(new PrototypeObjectFactory(JdbcFunctionalTestComponent.class)));
 
         TransactionFactory tf = getTransactionFactory();
         TransactionConfig txConfig = new MuleTransactionConfig();

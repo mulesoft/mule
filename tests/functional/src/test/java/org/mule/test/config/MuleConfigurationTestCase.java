@@ -10,7 +10,10 @@
 
 package org.mule.test.config;
 
-import org.mule.config.MuleConfiguration;
+import org.mule.api.config.MuleConfiguration;
+import org.mule.api.context.MuleContextBuilder;
+import org.mule.config.DefaultMuleConfiguration;
+import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -23,16 +26,14 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
     
     public void testConfigureProgramatically() throws Exception
     {
-        muleContext = new DefaultMuleContextFactory().createMuleContext();
-        
-        MuleConfiguration config = muleContext.getConfiguration();
+        DefaultMuleConfiguration config = new DefaultMuleConfiguration();
         config.setDefaultEncoding("UTF-16");
         config.setDefaultSynchronousEndpoints(true);
         config.setSystemModelType("direct");
         config.setDefaultSynchronousEventTimeout(30000);
         config.setDefaultTransactionTimeout(60000);
         config.setDefaultRemoteSync(true);
-        config.setWorkingDirectory("/tmp");
+        config.setWorkingDirectory("/some/directory");
         config.setClientMode(true);
         config.setFailOnMessageScribbling(false);
         config.setId("MY_SERVER");
@@ -43,6 +44,10 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         config.setEnableStreaming(false);
         config.setAssertMessageAccess(false);
         config.setAutoWrapMessageAwareTransform(false);
+        
+        MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
+        contextBuilder.setMuleConfiguration(config);
+        muleContext = new DefaultMuleContextFactory().createMuleContext(contextBuilder);
         
         muleContext.start();
         
@@ -57,7 +62,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "timeout.synchronous", "30000");
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "timeout.transaction", "60000");
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "remoteSync", "true");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "workingDirectory", "/tmp");
+        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "workingDirectory", "/some/directory");
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "clientMode", "true");
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages", "true");
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "serverId", "MY_SERVER");
@@ -84,7 +89,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         assertEquals(30000, config.getDefaultSynchronousEventTimeout());
         assertEquals(60000, config.getDefaultTransactionTimeout());
         assertTrue(config.isDefaultRemoteSync());
-        assertEquals("/tmp", config.getWorkingDirectory());
+        assertEquals("/some/directory", config.getWorkingDirectory());
         assertTrue(config.isClientMode());
         assertFalse(config.isFailOnMessageScribbling());
         assertEquals("MY_SERVER", config.getId());

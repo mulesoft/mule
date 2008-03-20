@@ -11,6 +11,9 @@ package org.mule.config.spring.handlers;
 
 import org.mule.DefaultExceptionStrategy;
 import org.mule.api.config.MuleProperties;
+import org.mule.component.DefaultJavaComponent;
+import org.mule.component.PooledJavaComponent;
+import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.component.simple.EchoComponent;
 import org.mule.component.simple.LogComponent;
 import org.mule.component.simple.NullComponent;
@@ -31,7 +34,7 @@ import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
-import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
@@ -46,7 +49,7 @@ import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
-import org.mule.config.spring.parsers.specific.SimplePojoServiceDefinitionParser;
+import org.mule.config.spring.parsers.specific.SimpleComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
@@ -67,6 +70,8 @@ import org.mule.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
+import org.mule.object.PrototypeObjectFactory;
+import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -135,9 +140,6 @@ import org.mule.transport.SimpleRetryConnectionStrategy;
 import org.mule.util.expression.FunctionExpressionEvaluator;
 import org.mule.util.expression.MapPayloadExpressionEvaluator;
 import org.mule.util.expression.MessageHeadersExpressionEvaluator;
-import org.mule.util.object.PooledObjectFactory;
-import org.mule.util.object.PrototypeObjectFactory;
-import org.mule.util.object.SingletonObjectFactory;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -233,8 +235,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         // Models
         registerBeanDefinitionParser("model", new ModelDefinitionParser());
         registerBeanDefinitionParser("seda-model", new InheritDefinitionParser(new OrphanDefinitionParser(SedaModel.class, true), new NamedDefinitionParser()));
-//        registerBeanDefinitionParser("model-seda-optimised", new OrphanDefinitionParser(OptimisedSedaModel.class, true));
-//        registerBeanDefinitionParser("model-pipeline", new OrphanDefinitionParser(PipelineModel.class, true));
+        // registerBeanDefinitionParser("model-pipeline", new OrphanDefinitionParser(PipelineModel.class, true));
 
         registerBeanDefinitionParser("entry-point-resolver-set", new ChildDefinitionParser("entryPointResolverSet", DefaultEntryPointResolverSet.class));
         registerBeanDefinitionParser("legacy-entry-point-resolver-set", new ChildDefinitionParser("entryPointResolverSet", LegacyEntryPointResolverSet.class));
@@ -250,29 +251,35 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("include-entry-point", new ParentDefinitionParser());
         registerMuleBeanDefinitionParser("exclude-entry-point", new ParentDefinitionParser()).addAlias("method", "ignoredMethod");
         registerMuleBeanDefinitionParser("exclude-object-methods", new IgnoreObjectMethodsDefinitionParser());
-
+ 
         // Services
         registerBeanDefinitionParser("seda-service", new ServiceDefinitionParser(SedaService.class));
         registerBeanDefinitionParser("service", new ServiceDefinitionParser(SedaService.class));
         registerBeanDefinitionParser("custom-service", new ServiceDefinitionParser());
 
-        // Pojo Components
-        registerBeanDefinitionParser("component", new ComponentDefinitionParser());
+        // Components
+        registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaComponent.class));
+        registerBeanDefinitionParser("pooled-component", new ComponentDelegatingDefinitionParser(PooledJavaComponent.class));
+
         registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("nestedRouter.routers", DefaultNestedRouter.class)).addCollection("nestedRouter.routers");
 
-        // Other Components
-        registerBeanDefinitionParser("bridge-component", new SimplePojoServiceDefinitionParser(PassThroughComponent.class));
-        registerBeanDefinitionParser("pass-through-component", new SimplePojoServiceDefinitionParser(PassThroughComponent.class));
-        registerBeanDefinitionParser("log-component", new SimplePojoServiceDefinitionParser(LogComponent.class));
-        registerBeanDefinitionParser("echo-component", new SimplePojoServiceDefinitionParser(EchoComponent.class));
-        registerBeanDefinitionParser("null-component", new SimplePojoServiceDefinitionParser(NullComponent.class));
+        // Simple Components
+        registerBeanDefinitionParser("bridge-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, PassThroughComponent.class));
+        registerBeanDefinitionParser("pass-through-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, PassThroughComponent.class));
+        registerBeanDefinitionParser("log-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, LogComponent.class));
+        registerBeanDefinitionParser("null-component",new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, NullComponent.class));
+        
+        // We need to use DefaultJavaComponent for the echo comonent because some tests invoke EchoComponent with method name and therefore we need an entry point resolver
+        registerBeanDefinitionParser("echo-component", new SimpleComponentDefinitionParser(DefaultJavaComponent.class, EchoComponent.class));
 
         // Object Factories
-        registerBeanDefinitionParser("singleton-object", new ObjectFactoryDefinitionParser(SingletonObjectFactory.class));
-        registerBeanDefinitionParser("prototype-object", new ObjectFactoryDefinitionParser(PrototypeObjectFactory.class));
-        registerBeanDefinitionParser("pooled-object", new ObjectFactoryDefinitionParser(PooledObjectFactory.class));
-        registerBeanDefinitionParser("spring-object", new ObjectFactoryDefinitionParser(SpringBeanLookup.class));
+        registerBeanDefinitionParser("singleton-object", new ObjectFactoryDefinitionParser(SingletonObjectFactory.class, "objectFactory"));
+        registerBeanDefinitionParser("prototype-object", new ObjectFactoryDefinitionParser(PrototypeObjectFactory.class, "objectFactory"));
+        registerBeanDefinitionParser("spring-object", new ObjectFactoryDefinitionParser(SpringBeanLookup.class, "objectFactory"));
 
+        // Life-cycle Adapters Factories
+        registerBeanDefinitionParser("custom-lifecycle-adapter-factory", new ChildDefinitionParser("lifecycleAdapterFactory"));
+        
         //Routers
         registerBeanDefinitionParser("inbound", new ChildDefinitionParser("inboundRouter", DefaultInboundRouterCollection.class));
         registerBeanDefinitionParser("outbound", new ChildDefinitionParser("outboundRouter", DefaultOutboundRouterCollection.class));

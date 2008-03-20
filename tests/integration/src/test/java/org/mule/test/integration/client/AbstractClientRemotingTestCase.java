@@ -18,15 +18,13 @@ import org.mule.tck.FunctionalTestCase;
 
 public abstract class AbstractClientRemotingTestCase extends FunctionalTestCase
 {
-
     public abstract String getRemoteEndpointUri();
 
     public void testClientSendToRemoteComponent() throws Exception
     {
         // Will connect to the server using remote endpoint
         MuleClient client = new MuleClient();
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
-
+ 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getRemoteEndpointUri());
         MuleMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test Client Send message", null);
         assertNotNull(message);
@@ -37,8 +35,7 @@ public abstract class AbstractClientRemotingTestCase extends FunctionalTestCase
     {
         // Will connect to the server using tcp://localhost:60504
         MuleClient client = new MuleClient();
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
-
+ 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getRemoteEndpointUri());
         MuleMessage message = dispatcher.sendRemote("vm://remote.endpoint?connector=vmRemoteConnector", "foo",
                 null);
@@ -56,7 +53,6 @@ public abstract class AbstractClientRemotingTestCase extends FunctionalTestCase
         String remoteEndpoint = "vm://remote.queue?connector=vmRemoteQueueConnector";
         // Will connect to the server using The Server endpoint
         MuleClient client = new MuleClient();
-        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getRemoteEndpointUri());
         // Doubling timeout see MULE-3000

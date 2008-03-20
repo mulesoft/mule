@@ -9,6 +9,7 @@
  */
 package org.mule.api;
 
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
@@ -21,7 +22,6 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.transport.ConnectionStrategy;
-import org.mule.config.MuleConfiguration;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
@@ -49,11 +49,8 @@ public interface MuleContext extends Lifecycle
      */
     TransactionManager getTransactionManager();
 
-
     ServerNotificationManager getNotificationManager();
 
-    void setNotificationManager(ServerNotificationManager notificationManager); //throws RegistrationException;
-    
     /**
      * Determines if the server has been started
      *
@@ -157,22 +154,8 @@ public interface MuleContext extends Lifecycle
      */
     WorkManager getWorkManager();
 
-    /**
-     * Sets a workManager instance that can be used to schedule work in a thread
-     * pool. This will be used primarially by UMOAgents wanting to schedule
-     * work. This work Manager must <b>never</b> be used by provider
-     * implementations as they have their own workManager accible on the
-     * connector.
-     *
-     * @param workManager the workManager instance used by the current
-     *                    MuleManager
-     */
-    void setWorkManager(WorkManager workManager);
-
     WorkListener getWorkListener();
 
-    void setWorkListener(WorkListener workListener);
-    
     /**
      * Sets the queue manager used by mule for queuing events. This is used for
      * service queues
@@ -194,12 +177,8 @@ public interface MuleContext extends Lifecycle
 
     public AllStatistics getStatistics();
 
-    public void setStatistics(AllStatistics stats);
-
     LifecycleManager getLifecycleManager();
 
-    void setLifecycleManager(LifecycleManager lifecycleManager);
-    
     MuleRegistry getRegistry();
     
     void applyLifecycle(Object object) throws MuleException;
@@ -220,4 +199,9 @@ public interface MuleContext extends Lifecycle
 
     // TODO This should ideally only be available via an Admin interface
     void addRegistry(Registry registry);
+
+    /**
+     * Returns the date when the server was started.
+     */
+    long getStartDate();
 }

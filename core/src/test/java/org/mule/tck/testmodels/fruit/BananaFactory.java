@@ -10,9 +10,10 @@
 
 package org.mule.tck.testmodels.fruit;
 
+import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
-import org.mule.util.object.ObjectFactory;
+import org.mule.api.object.ObjectFactory;
 
 /**
  * <code>BananaFactory</code> is a test factory that creates Bananas
@@ -33,14 +34,19 @@ public class BananaFactory implements ObjectFactory
     {
         return new Banana();
     }
-    
-    public void release(Object object)
-    {
-        throw new UnsupportedOperationException();
-    }
-    
+
     public Class getObjectClass()
     {
         return Banana.class;
+    }
+
+    public void addObjectInitialisationCallback(InitialisationCallback callback)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean isSingleton()
+    {
+        return false;
     }
 }

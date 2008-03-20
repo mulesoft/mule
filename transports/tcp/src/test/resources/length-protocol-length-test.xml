@@ -29,11 +29,11 @@
                 <!-- legacy style -->
                 <inbound-endpoint ref="length"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+            <pooled-component>
+                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="addReceived" value="false"/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
         </service>
     </model>
 

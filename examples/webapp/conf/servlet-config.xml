@@ -28,11 +28,11 @@
             <inbound>
                 <inbound-endpoint transformer-refs="HttpRequestToParameter2" address="servlet://restPUTTest"/>
             </inbound>
-            <component>
-                <pooled-object class="org.mule.example.rest.RestTester">
+            <pooled-component>
+                <prototype-object class="org.mule.example.rest.RestTester">
                     <property key="prefix" value="Received "/>
-                </pooled-object>
-            </component>
+                </prototype-object>
+            </pooled-component>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="restFileEndpoint"/>

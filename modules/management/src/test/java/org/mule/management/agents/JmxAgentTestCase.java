@@ -10,6 +10,8 @@
 
 package org.mule.management.agents;
 
+import org.mule.api.context.MuleContextBuilder;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.module.management.agent.JmxAgent;
 import org.mule.module.management.agent.RmiRegistryAgent;
@@ -35,6 +37,16 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     private JMXServiceURL serviceUrl;
     private JmxAgent jmxAgent;
 
+    //@Override
+    protected void configureMuleContext(MuleContextBuilder contextBuilder)
+    {
+        super.configureMuleContext(contextBuilder);
+
+        DefaultMuleConfiguration config = new DefaultMuleConfiguration();
+        config.setId(DOMAIN);
+        contextBuilder.setMuleConfiguration(config);
+    }
+
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -42,7 +54,6 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerAgent(new RmiRegistryAgent());
         jmxAgent = new JmxAgent();
         jmxAgent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
-        muleContext.getConfiguration().setId(DOMAIN);
     }
 
     protected void doTearDown()

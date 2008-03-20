@@ -25,9 +25,6 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.ComplexComponentDefinitionParser;
-import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
-import org.mule.config.spring.parsers.specific.SimplePojoServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
@@ -78,10 +75,11 @@ public class ParsersTestNamespaceHandler extends AbstractMuleNamespaceHandler
         // simpler list element parser doesn't support dynamic attribute
 //        registerBeanDefinitionParser("list-element-test-3", new AllAttributeChildDefinitionParser(new ChildListEntryDefinitionParser("kids")));
 
-        registerBeanDefinitionParser("factory",
-                new ComplexComponentDefinitionParser(
-                        new SimplePojoServiceDefinitionParser(ChildBean.class, "object"),
-                        (ChildDefinitionParser) new ChildDefinitionParser("child", ChildBean.class).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring")));
+        // TODO ComplexComponentDefinitionParser is not longer used, is there any way to rewrite/reuse the "factory" element for testing?
+//         registerBeanDefinitionParser("factory",
+//                new ComplexComponentDefinitionParser(
+//                        new SimpleComponentDefinitionParser(ChildBean.class),
+//                        (ChildDefinitionParser) new ChildDefinitionParser("child", ChildBean.class).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring")));
 
         registerMuleBeanDefinitionParser("complex-endpoint",
                 new TransportGlobalEndpointDefinitionParser(

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -7,38 +8,43 @@
 
     <model name="main">
         <service name="default">
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <pooling-profile />
-                </pooled-object>
-            </component>
+            <pooled-component>
+                <prototype-object
+                    class="org.mule.tck.functional.FunctionalTestComponent" />
+                <pooling-profile />
+            </pooled-component>
         </service>
 
         <service name="fail_all">
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <pooling-profile exhaustedAction="WHEN_EXHAUSTED_FAIL" initialisationPolicy="INITIALISE_ALL"
-                        maxActive="1" maxIdle="2" maxWait="3" />
-                </pooled-object>
-            </component>
+            <pooled-component>
+                <prototype-object
+                    class="org.mule.tck.functional.FunctionalTestComponent" />
+                <pooling-profile exhaustedAction="WHEN_EXHAUSTED_FAIL"
+                    initialisationPolicy="INITIALISE_ALL" maxActive="1"
+                    maxIdle="2" maxWait="3" />
+            </pooled-component>
         </service>
 
         <service name="grow_one">
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <pooling-profile exhaustedAction="WHEN_EXHAUSTED_GROW" initialisationPolicy="INITIALISE_ONE"
-                        maxActive="2" maxIdle="3" maxWait="4" />
-                </pooled-object>
-            </component>
+            <pooled-component>
+                <prototype-object
+                    class="org.mule.tck.functional.FunctionalTestComponent">
+                </prototype-object>
+                <pooling-profile exhaustedAction="WHEN_EXHAUSTED_GROW"
+                    initialisationPolicy="INITIALISE_ONE" maxActive="2"
+                    maxIdle="3" maxWait="4" />
+            </pooled-component>
         </service>
 
         <service name="wait_none">
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <pooling-profile exhaustedAction="WHEN_EXHAUSTED_WAIT" initialisationPolicy="INITIALISE_NONE"
-                        maxActive="3" maxIdle="4" maxWait="5" />
-                </pooled-object>
-            </component>
+            <pooled-component>
+                <prototype-object
+                    class="org.mule.tck.functional.FunctionalTestComponent">
+                </prototype-object>
+                <pooling-profile exhaustedAction="WHEN_EXHAUSTED_WAIT"
+                    initialisationPolicy="INITIALISE_NONE" maxActive="3"
+                    maxIdle="4" maxWait="5" />
+            </pooled-component>
         </service>
     </model>
 </mule>

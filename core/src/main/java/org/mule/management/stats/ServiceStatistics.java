@@ -23,28 +23,21 @@ public class ServiceStatistics implements Statistics
     private static final long serialVersionUID = -2086999226732861674L;
 
     private String name;
-    private long totalExecTime = 0;
     private long receivedEventSync = 0;
     private long receivedEventASync = 0;
     private long queuedEvent = 0;
     private long maxQueuedEvent = 0;
     private long averageQueueSize = 0;
     private long totalQueuedEvent = 0;
-    private long sentEventSync = 0;
-    private long sentReplyToEvent = 0;
-    private long sentEventASync = 0;
-    private long executedEvent = 0;
     private long executionError = 0;
     private long fatalError = 0;
-    private long minExecutionTime = 0;
-    private long maxExecutionTime = 0;
-    private long averageExecutionTime = 0;
-    private boolean enabled = false;
 
     private int threadPoolSize = 0;
     private long samplePeriod = 0;
-
+    private boolean enabled = false;
+    
     private RouterStatistics inboundRouterStat = null;
+    private ComponentStatistics componentStat = null;
     private RouterStatistics outboundRouterStat = null;
 
     public ServiceStatistics(String name)
@@ -85,6 +78,10 @@ public class ServiceStatistics implements Statistics
         {
             inboundRouterStat.setEnabled(b);
         }
+        if (componentStat != null)
+        {
+            componentStat.setEnabled(b);
+        }
         if (outboundRouterStat != null)
         {
             outboundRouterStat.setEnabled(b);
@@ -111,20 +108,7 @@ public class ServiceStatistics implements Statistics
         fatalError++;
     }
 
-    public synchronized void incSentEventSync()
-    {
-        sentEventSync++;
-    }
 
-    public synchronized void incSentEventASync()
-    {
-        sentEventASync++;
-    }
-
-    public synchronized void incSentReplyToEvent()
-    {
-        sentReplyToEvent++;
-    }
 
     public synchronized void incQueuedEvent()
     {
@@ -144,26 +128,9 @@ public class ServiceStatistics implements Statistics
         queuedEvent--;
     }
 
-    public synchronized void addExecutionTime(long time)
-    {
-        executedEvent++;
-
-        totalExecTime += (time == 0 ? 1 : time);
-
-        if (minExecutionTime == 0 || time < minExecutionTime)
-        {
-            minExecutionTime = time;
-        }
-        if (maxExecutionTime == 0 || time > maxExecutionTime)
-        {
-            maxExecutionTime = time;
-        }
-        averageExecutionTime = Math.round(totalExecTime / executedEvent);
-    }
-
     public long getAverageExecutionTime()
     {
-        return averageExecutionTime;
+        return componentStat.getAverageExecutionTime();
     }
 
     public long getAverageQueueSize()
@@ -176,9 +143,13 @@ public class ServiceStatistics implements Statistics
         return maxQueuedEvent;
     }
 
+    /**
+     * @deprecated
+     * @return
+     */
     public long getMaxExecutionTime()
     {
-        return maxExecutionTime;
+        return componentStat.getMaxExecutionTime();
     }
 
     public long getFatalErrors()
@@ -186,14 +157,22 @@ public class ServiceStatistics implements Statistics
         return fatalError;
     }
 
+    /**
+     * @deprecated
+     * @return
+     */
     public long getMinExecutionTime()
     {
-        return minExecutionTime;
+        return componentStat.getMinExecutionTime();
     }
 
+    /**
+     * @deprecated
+     * @return
+     */
     public long getTotalExecutionTime()
     {
-        return totalExecTime;
+        return componentStat.getTotalExecutionTime();
     }
 
     public long getQueuedEvents()
@@ -213,17 +192,17 @@ public class ServiceStatistics implements Statistics
 
     public long getReplyToEventsSent()
     {
-        return sentReplyToEvent;
+        return componentStat.getReplyToEventsSent();
     }
 
     public long getSyncEventsSent()
     {
-        return sentEventSync;
+        return componentStat.getSyncEventsSent();
     }
 
     public long getAsyncEventsSent()
     {
-        return sentEventASync;
+        return componentStat.getAsyncEventsSent();
     }
 
     public long getTotalEventsSent()
@@ -238,7 +217,7 @@ public class ServiceStatistics implements Statistics
 
     public long getExecutedEvents()
     {
-        return executedEvent;
+        return componentStat.getExecutedEvents();
     }
 
     public long getExecutionErrors()
@@ -271,8 +250,6 @@ public class ServiceStatistics implements Statistics
 
     public synchronized void clear()
     {
-
-        totalExecTime = 0;
         receivedEventSync = 0;
         receivedEventASync = 0;
         queuedEvent = 0;
@@ -280,16 +257,8 @@ public class ServiceStatistics implements Statistics
         totalQueuedEvent = 0;
         averageQueueSize = 0;
 
-        sentEventSync = 0;
-        sentEventASync = 0;
-        sentReplyToEvent = 0;
-
-        executedEvent = 0;
         executionError = 0;
         fatalError = 0;
-
-        minExecutionTime = 0;
-        maxExecutionTime = 0;
 
         if (getInboundRouterStat() != null)
         {
@@ -336,6 +305,23 @@ public class ServiceStatistics implements Statistics
     {
         this.outboundRouterStat = outboundRouterStat;
         this.outboundRouterStat.setEnabled(enabled);
+    }
+    
+    /**
+     * @return Returns the outboundRouterStat.
+     */
+    public ComponentStatistics getComponentStat()
+    {
+        return componentStat;
+    }
+
+    /**
+     * @param outboundRouterStat The outboundRouterStat to set.
+     */
+    public void setComponentStat(ComponentStatistics componentStat)
+    {
+        this.componentStat = componentStat;
+        this.componentStat.setEnabled(enabled);
     }
 
     public int getThreadPoolSize()

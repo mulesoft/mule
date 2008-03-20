@@ -12,6 +12,7 @@ package org.mule.tck;
 
 import org.mule.AbstractExceptionListener;
 import org.mule.api.MuleException;
+import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
@@ -210,8 +211,11 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     {
         // test outbound message router
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
-        assertNotNull(service.getNestedRouter());
-        NestedRouterCollection router = service.getNestedRouter();
+        assertNotNull(service.getComponent());
+        assertTrue(service.getComponent() instanceof JavaComponent);
+        NestedRouterCollection router = ((JavaComponent) service.getComponent()).getNestedRouter();
+        assertNotNull(router);
+
         assertEquals(2, router.getRouters().size());
         // check first Router
         NestedRouter route1 = (NestedRouter) router.getRouters().get(0);

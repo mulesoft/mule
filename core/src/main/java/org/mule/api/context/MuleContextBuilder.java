@@ -11,6 +11,7 @@
 package org.mule.api.context;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.context.notification.ServerNotificationManager;
 
@@ -38,4 +39,6 @@ public interface MuleContextBuilder
     void setNotificationManager(ServerNotificationManager notificationManager);
 
     void setLifecycleManager(LifecycleManager lifecycleManager);
+    
+    void setMuleConfiguration(MuleConfiguration muleConfiguration);
 }

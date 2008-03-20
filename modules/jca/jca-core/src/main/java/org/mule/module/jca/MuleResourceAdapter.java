@@ -13,15 +13,17 @@ package org.mule.module.jca;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
+import org.mule.config.DefaultMuleConfiguration;
+import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.util.ClassUtils;
-import org.mule.util.object.SingletonObjectFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -82,14 +84,12 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     {
         this.bootstrapContext = bootstrapContext;
 
-        muleContext.getConfiguration().setSystemModelType(JcaModel.JCA_MODEL_TYPE);
-        
         if (info.getConfigurations() != null)
         {
-            ConfigurationBuilder builder = null;
+            ConfigurationBuilder configBuilder = null;
             try
             {
-                builder = (ConfigurationBuilder) ClassUtils.instanciateClass(info.getConfigurationBuilder(),
+                configBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(info.getConfigurationBuilder(),
                     new Object[]{info.getConfigurations()});
             }
             catch (Exception e)
@@ -101,7 +101,12 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             try
             {
                 logger.info("Initializing Mule...");
-                muleContext = new DefaultMuleContextFactory().createMuleContext(builder);
+
+                MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
+                DefaultMuleConfiguration config = new DefaultMuleConfiguration();
+                config.setSystemModelType(JcaModel.JCA_MODEL_TYPE);
+                contextBuilder.setMuleConfiguration(config);
+                muleContext = new DefaultMuleContextFactory().createMuleContext(configBuilder, contextBuilder);
             }
             catch (MuleException e)
             {
@@ -272,14 +277,15 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                                               InboundEndpoint endpoint) throws MuleException
     {
         String name = "JcaService#" + endpointFactory.hashCode();
-        Service service = new JcaService(new DelegateWorkManager(bootstrapContext.getWorkManager()));
+        Service service = new JcaService();
         service.setName(name);
         service.getInboundRouter().addEndpoint(endpoint);
 
         // Set endpointFactory rather than endpoint here, so we can obtain a
         // new endpoint instance from factory for each incoming message in
         // JcaComponet as reccomended by JCA specification
-        service.setComponentFactory(new SingletonObjectFactory(endpointFactory));
+        service.setComponent(new JcaComponent(endpointFactory, model.getEntryPointResolverSet(), service,
+            new DelegateWorkManager(bootstrapContext.getWorkManager())));
         service.setModel(model);
         muleContext.getRegistry().registerService(service);
         return service;

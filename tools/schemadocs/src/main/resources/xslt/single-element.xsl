@@ -4,7 +4,7 @@
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
         >
 
-    <!-- $Id: single-doc-html.xsl 11208 2008-03-06 14:23:59Z acooke $ -->
+    <!-- $Id$ -->
 
     <!-- this generates html documentation for a particular, named element
          using the information within a single schema.

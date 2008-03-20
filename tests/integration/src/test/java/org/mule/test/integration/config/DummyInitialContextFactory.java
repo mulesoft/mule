@@ -11,8 +11,10 @@
 package org.mule.test.integration.config;
 
 import org.mule.MuleServer;
+import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
+import org.mule.api.object.ObjectFactory;
 import org.mule.api.service.Service;
 import org.mule.component.simple.EchoComponent;
 import org.mule.jndi.SimpleContext;
@@ -20,7 +22,6 @@ import org.mule.module.management.agent.Log4jAgent;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transport.vm.VMConnector;
-import org.mule.util.object.ObjectFactory;
 
 /**
  * A dummy property factory for creating a Jndi context
@@ -57,5 +58,15 @@ public class DummyInitialContextFactory implements ObjectFactory
     public Class getObjectClass()
     {
         throw new UnsupportedOperationException();
+    }
+
+    public void addObjectInitialisationCallback(InitialisationCallback callback)
+    {
+        throw new UnsupportedOperationException();        
+    }
+
+    public boolean isSingleton()
+    {
+        return false;
     }
 }

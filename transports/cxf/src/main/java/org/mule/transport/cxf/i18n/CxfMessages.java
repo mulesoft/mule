@@ -77,6 +77,11 @@ public class CxfMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH,21);
     }
+    
+    public static Message javaComponentRequiredForInboundEndpoint()
+    {
+        return createMessage(BUNDLE_PATH,22);
+    }
 }
 
 
