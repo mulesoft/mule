@@ -54,7 +54,7 @@
             </description>
             <config-property-name>ConfigurationBuilder</config-property-name>
             <config-property-type>java.lang.String</config-property-type>
-            <config-property-value>org.mule.config.builders.MuleXmlConfigurationBuilder</config-property-value>
+            <config-property-value>org.mule.config.spring.SpringXmlConfigurationBuilder</config-property-value>
         </config-property>
         <config-property>
             <description>The default user name that will be used to log on to the Mule server.</description>

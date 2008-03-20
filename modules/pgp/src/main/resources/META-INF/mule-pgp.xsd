@@ -53,6 +53,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:encryptionStrategyType">
                 <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="credentialsAccessor-ref" type="xsd:NMTOKEN"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

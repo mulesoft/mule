@@ -47,11 +47,6 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # Mule 2.0.x failures
 ##########################################################################
 
-# MULE-3107
-# Throws "Specification not exhausted: class org.mule.context.notification.ManagerNotification: 108"
-# I don't understand what this is trying to test for exactly
-org.mule.context.notification.ServerNotificationManagerTestCase
-
 # MULE-2736
 # Hangs for a long, long time
 org.mule.test.integration.transaction.XAJdbcMule1479TestCase
@@ -111,3 +106,6 @@ org.mule.test.integration.client.MuleClientRemotingJmsTestCase
 
 # This works, but it requires tools.jar on the classpath which we currently don't require:
 org.mule.test.integration.client.MuleClientWSDLExternalTestCase
+
+# Some initial work on MULE-2499
+org.mule.test.integration.streaming.StreamClosingTestCase

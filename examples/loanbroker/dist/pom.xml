@@ -22,12 +22,6 @@
         <module>esb</module>
         <module>esn</module>
         <module>bpm</module>
-        <!--
-        <module>bpel</module>
-        <module>rules</module>
-        <module>spaces</module>
-        <module>benchmark</module>
-        -->
     </modules>
 
     <dependencies>
@@ -90,5 +84,17 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <encoding>ISO-8859-1</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>

@@ -10,8 +10,11 @@
 
 package org.mule.module.pgp;
 
+import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
+import org.mule.api.security.CredentialsAccessor;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.AbstractNamedEncryptionStrategy;
@@ -38,13 +41,28 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     protected static final Log logger = LogFactory.getLog(KeyBasedEncryptionStrategy.class);
 
     private PGPKeyRing keyManager;
+    private CredentialsAccessor credentialsAccessor;
 
     public byte[] encrypt(byte[] data, Object cryptInfo) throws CryptoFailureException
     {
         try
         {
-            PGPCryptInfo pgpCryptInfo = (PGPCryptInfo)cryptInfo;
-            KeyBundle publicKey = pgpCryptInfo.getKeyBundle();
+        	PGPCryptInfo pgpCryptInfo;
+            KeyBundle publicKey;
+            
+            if (cryptInfo == null)
+            {
+                MuleEvent event = RequestContext.getEvent();
+                publicKey = keyManager.getKeyBundle((String)credentialsAccessor.getCredentials(
+                    event));
+                
+                pgpCryptInfo = new PGPCryptInfo(publicKey, false);
+            }
+            else
+            {
+                pgpCryptInfo = (PGPCryptInfo)cryptInfo;
+                publicKey = pgpCryptInfo.getKeyBundle();
+            }
 
             LiteralMessageBuilder lmb = LiteralMessageBuilder.getInstance("OpenPGP");
 
@@ -127,4 +145,12 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     {
         this.keyManager = keyManager;
     }
+
+	public CredentialsAccessor getCredentialsAccessor() {
+		return credentialsAccessor;
+	}
+
+	public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor) {
+		this.credentialsAccessor = credentialsAccessor;
+	}
 }

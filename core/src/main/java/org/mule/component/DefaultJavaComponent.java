@@ -136,7 +136,7 @@ public class DefaultJavaComponent extends AbstractJavaComponent
 
     protected void returnComponentLifecycleAdaptor(LifecycleAdapter lifecycleAdapter) throws Exception
     {
-        if (singletonComponentLifecycleAdapter == null)
+        if (singletonComponentLifecycleAdapter == null && lifecycleAdapter != null)
         {
             lifecycleAdapter.stop();
             lifecycleAdapter.dispose();
