@@ -14,9 +14,22 @@
     <name>Mule Tests</name>
 
     <modules>
-        <module>archetypes</module>
+        <!-- commented out because the build fails due to errors inside Maven
+        <module>archetypes</module> -->
+        <module>external</module>
         <module>functional</module>
         <module>integration</module>
-        <module>external</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>jdk15</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <modules>
+                <module>integration-jdk5</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

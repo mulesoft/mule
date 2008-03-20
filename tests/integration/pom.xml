@@ -6,7 +6,6 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <relativePath>../pom.xml</relativePath>
         <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-tests-integration</artifactId>
