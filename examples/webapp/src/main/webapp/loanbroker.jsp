@@ -1,6 +1,6 @@
 <%@ page import="org.mule.example.loanbroker.esn.LoanBrokerApp,
                  org.mule.example.loanbroker.messages.Customer,
-                 org.mule.eexampleloanbroker.messages.CustomerQuoteRequest,
+                 org.mule.example.loanbroker.messages.CustomerQuoteRequest,
                  org.mule.module.client.MuleClient,
                  org.mule.api.MuleMessage,
                  java.util.Iterator,

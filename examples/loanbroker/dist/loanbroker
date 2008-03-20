@@ -47,7 +47,9 @@ then
     fi
     if [ -z "$MISSING_LIB" ]
     then
-        exec "$MULE_BASE/bin/mule" -main org.mule.example.loanbroker.esb.LoanBrokerApp
+        # MULE_HOME_UNIX must be set. This is a workaround for windows but since the config relies
+        # on it we need to implement it here, too
+        exec "$MULE_BASE/bin/mule" -main org.mule.example.loanbroker.esb.LoanBrokerApp -M-Dmule.home.unix="$MULE_HOME"
     fi
 elif [ 2 = $i ]
 then

@@ -25,7 +25,7 @@ public class LocaleMessage extends MessageFactory
 
     public static String receivedQuote(String[] params)
     {
-        return getString(BUNDLE_PATH, 2, StringMessageUtils.toString(params));
+        return getString(BUNDLE_PATH, 2, params);
     }
 
     public static String receivedRate(LoanQuote quote)

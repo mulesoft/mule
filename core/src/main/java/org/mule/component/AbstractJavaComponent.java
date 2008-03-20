@@ -78,7 +78,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         }
     }
 
-    protected Object doOnCall(MuleEvent event)
+    protected MuleMessage doOnCall(MuleEvent event)
     {
         MuleMessage returnMessage = null;
         try
@@ -87,6 +87,9 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
             event = OptimizedRequestContext.unsafeSetEvent(event);
             Object replyTo = event.getMessage().getReplyTo();
             ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), endpoint);
+
+            // TODO Move stats up into AbstractComponent once routing has been moved
+            // to service.
 
             // stats
             long startTime = 0;
@@ -102,6 +105,10 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
             {
                 statistics.addExecutionTime(System.currentTimeMillis() - startTime);
             }
+
+            // TODO MULE-3113 Service should do onward routing, response-routers and
+            // reply-to
+
             // this is the request event
             // event = RequestContext.getEvent();
             if (event.isStopFurtherProcessing())
@@ -195,6 +202,9 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
             Object replyTo = event.getMessage().getReplyTo();
             ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), endpoint);
 
+            // TODO Move stats up into AbstractComponent once routing has been moved
+            // to service.
+
             // do stats
             long startTime = 0;
             if (statistics.isEnabled())
@@ -208,6 +218,10 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
             {
                 statistics.addExecutionTime(System.currentTimeMillis() - startTime);
             }
+           
+            // TODO MULE-3113 Service should do onward routing, response-routers and
+            // reply-to
+                       
             // processResponse(result, replyTo, replyToHandler);
             event = RequestContext.getEvent();
             if (result != null && !event.isStopFurtherProcessing())

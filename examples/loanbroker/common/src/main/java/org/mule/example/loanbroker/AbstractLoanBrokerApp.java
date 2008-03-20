@@ -191,7 +191,6 @@ public abstract class AbstractLoanBrokerApp
             System.out.println(LocaleMessage.sentAsync());
             // let the request catch up
             Thread.sleep(1500);
-            System.out.println(LocaleMessage.requestResponse(client.request("CustomerResponses", 500).getPayload()));
         }
         else
         {
@@ -212,7 +211,6 @@ public abstract class AbstractLoanBrokerApp
         for (int i = 0; i < number; i++)
         {
             client.dispatch(endpoint, createRequest(), null);
-            System.out.println(LocaleMessage.requestResponse(client.request("CustomerResponses", 1000).getPayload()));
         }
     }
 
@@ -235,7 +233,7 @@ public abstract class AbstractLoanBrokerApp
         }
         return results;
     }
-    
+
     protected void sendRandomRequests(int number, boolean synchronous) throws Exception
     {
         if (synchronous)

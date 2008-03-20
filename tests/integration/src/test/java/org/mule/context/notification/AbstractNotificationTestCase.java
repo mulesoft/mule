@@ -43,8 +43,8 @@ public abstract class AbstractNotificationTestCase extends FunctionalTestCase
 
     protected void suitePostTearDown() throws Exception
     {
-        // Need to explicitly dispose manager here, because default now is not to dispose it
-        disposeManager();
+        // Need to explicitly dispose manager here to get disposal notifications
+        muleContext.dispose();
         // allow shutdown to complete (or get concurrent mod errors and/or miss notifications)
         Thread.sleep(2000L);
         logNotifications();

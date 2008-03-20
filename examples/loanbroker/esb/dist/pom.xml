@@ -189,11 +189,6 @@
             <version>${muleVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-xfire</artifactId>
-            <version>${muleVersion}</version>
-        </dependency>
-        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${muleVersion}</version>

@@ -8,6 +8,10 @@ goto :eof
 :continue
 if "%MULE_BASE%" == "" SET MULE_BASE=%MULE_HOME%
 
+REM Translate MULE_HOME to unix notation. That's used to create a system property
+REM mule.home.unix below which is used to configure openejb
+set MULE_HOME_UNIX = "%MULE_HOME:\=/%"
+
 REM This extends the classpath to include the configuration directory
 REM Any changes to the files in .\conf will take precedence over those deployed to %MULE_HOME%\lib\user
 SET MULE_LIB=.\conf
@@ -49,6 +53,6 @@ ECHO   2. Loan Broker ESN
 ECHO   3. Loan Broker BPM
 SET /P Choice=Select the one you wish to execute and press Enter...
 
-IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -main org.mule.example.loanbroker.esb.LoanBrokerApp
+IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -main org.mule.example.loanbroker.esb.LoanBrokerApp -M-Dmule.home.unix="%MULE_HOME_UNIX%"
 IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -main org.mule.example.loanbroker.esn.LoanBrokerApp
 IF '%Choice%'=='3' call "%MULE_BASE%\bin\mule.bat" -main org.mule.example.loanbroker.bpm.LoanBrokerApp

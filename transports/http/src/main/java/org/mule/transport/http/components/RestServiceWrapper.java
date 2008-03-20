@@ -191,7 +191,7 @@ public class RestServiceWrapper extends AbstractComponent
         }
     }
 
-    public Object doOnCall(MuleEvent event)
+    public MuleMessage doOnCall(MuleEvent event)
     {
         String tempUrl;
         MuleMessage result = null;

@@ -15,6 +15,7 @@ import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolverSet;
@@ -60,12 +61,7 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
         return messageEndpointFactory.createEndpoint(null);
     }
 
-    public Object onCall(MuleEvent event) throws MuleException
-    {
-        throw new UnsupportedOperationException("onCall()");
-    }
-
-    public void doOnEvent(MuleEvent event)
+    public MuleMessage doOnCall(MuleEvent event)
     {
         try
         {
@@ -75,6 +71,7 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
         {
             logger.error(CoreMessages.failedToInvoke("UMO Service: " + service.getName()));
         }
+        return null;
     }
 
     public Class getObjectType()

@@ -22,6 +22,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.ServiceException;
+import org.mule.component.AbstractComponent;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -223,6 +224,11 @@ public class SedaService extends AbstractService implements Work, WorkListener
                 logger.debug(this + " : got proxy for " + event.getId() + " = " + component);
             }
             result = (MuleMessage) component.onCall(event);
+            // TODO MULE-3113
+            // 1) Invoke component.onCall(event)
+            // 2) Forward result to outbound routers ideally via a SEDA queue (MULE-3077)
+            // 3) Process response router
+            // 4) Process async reply-to
         }
         catch (MuleException e)
         {
@@ -287,7 +293,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
                         logger.debug("Service: " + name + " dequeued event on: "
                                         + event.getEndpoint().getEndpointURI());
                     }
-                    workManager.scheduleWork(component.getWorker(event), WorkManager.INDEFINITE, null, this);
+                    workManager.scheduleWork(new ComponentStageWorker(event), WorkManager.INDEFINITE, null, this);
                 }
             }
             catch (Exception e)
@@ -469,5 +475,29 @@ public class SedaService extends AbstractService implements Work, WorkListener
     public void setWorkManager(WorkManager workManager)
     {
         this.workManager = workManager;
+    }
+
+    private class ComponentStageWorker implements Work
+    {
+        private MuleEvent event;
+
+        public ComponentStageWorker(MuleEvent event)
+        {
+            this.event = event;
+        }
+
+        public void run()
+        {
+            ((AbstractComponent) component).onEvent(event);
+            // TODO MULE-3113
+            // 1) Invoke component.onCall(event)
+            // 2) Forward result to outbound routers ideally via a SEDA queue (MULE-3077)
+            // 3) Process async reply-to
+        }
+
+        public void release()
+        {
+            // no-op
+        }
     }
 }

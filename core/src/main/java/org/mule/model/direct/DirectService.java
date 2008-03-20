@@ -52,7 +52,7 @@ public class DirectService extends AbstractService
 
     protected void doDispatch(MuleEvent event) throws MuleException
     {
-        component.onEvent(event);
+        component.onCall(event);
     }
 
 }
