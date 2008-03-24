@@ -12,6 +12,7 @@ package org.mule.module.scripting.builders;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.config.ConfigResource;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.config.builders.i18n.BuildersMessages;
@@ -76,6 +77,11 @@ public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBui
         }
     }
 
+    protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception 
+    {
+        // nothing to do
+    }
+    
     protected void populateBindings(Bindings bindings)
     {
         bindings.put("muleContext", muleContext);

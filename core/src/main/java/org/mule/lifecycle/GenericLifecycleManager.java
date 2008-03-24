@@ -9,14 +9,15 @@
  */
 package org.mule.lifecycle;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.util.StringMessageUtils;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -53,7 +54,6 @@ public class GenericLifecycleManager implements LifecycleManager
             LifecyclePhase phase = (LifecyclePhase) iterator.next();
             registerLifecycle(phase);
         }
-
     }
 
     public void registerLifecycle(LifecyclePhase lci)
@@ -62,6 +62,9 @@ public class GenericLifecycleManager implements LifecycleManager
         lifecycles.add(lci);
     }
 
+    /**
+     * Applies lifecycle phase to all objects in the Registry.
+     */
     public void firePhase(MuleContext muleContext, String phase) throws MuleException
     {
         if (currentPhase.equalsIgnoreCase(phase))
@@ -69,22 +72,31 @@ public class GenericLifecycleManager implements LifecycleManager
             logger.debug("Already in lifecycle phase: " + phase);
             return;
         }
-        Integer phaseIndex = (Integer) index.get(phase);
-        if (phaseIndex == null)
+
+        LifecyclePhase li = lookupPhase(phase);
+        if (!li.isPhaseSupported(currentPhase))
         {
-            throw new IllegalArgumentException("No lifeccycle phase registered with name: " + phase);
+            throw new IllegalStateException("Lifecycle phase: " + phase + " does not support current phase: "
+                                            + currentPhase + ". Phases supported are: " + StringMessageUtils.toString(li.getSupportedPhases()));
         }
+        
         try
         {
             setExecutingPhase(phase);
-            LifecyclePhase li = (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
-            li.fireLifecycle(muleContext, currentPhase);
+            li.applyLifecycle(muleContext.getRegistry().lookupObjects(Object.class), currentPhase);
             setCurrentPhase(li);
         }
         finally
         {
             setExecutingPhase(null);
         }
+    }
+
+    public LifecyclePhase applyPhase(Collection objects, String phase) throws MuleException
+    {
+        LifecyclePhase li = lookupPhase(phase);
+        li.applyLifecycle(objects, currentPhase);
+        return li;
     }
 
     public String getCurrentPhase()
@@ -126,7 +138,7 @@ public class GenericLifecycleManager implements LifecycleManager
         return completedPhases.contains(phaseName);
     }
 
-    public void applyLifecycle(MuleContext muleContext, Object object) throws MuleException
+    public void applyCompletedPhases(Object object) throws MuleException
     {
         logger.debug("applying lifecycle to " + object);
         LifecyclePhase lcp;
@@ -196,5 +208,15 @@ public class GenericLifecycleManager implements LifecycleManager
                         + name + ". Phases supported are: " + StringMessageUtils.toString(phase.getSupportedPhases()));
             }
         }
+    }
+
+    protected LifecyclePhase lookupPhase(String phase) throws IllegalArgumentException
+    {
+        Integer phaseIndex = (Integer) index.get(phase);
+        if (phaseIndex == null)
+        {
+            throw new IllegalArgumentException("No lifecycle phase registered with name: " + phase);
+        }
+        return (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
     }
 }

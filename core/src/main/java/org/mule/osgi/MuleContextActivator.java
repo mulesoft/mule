@@ -33,8 +33,7 @@ public class MuleContextActivator implements BundleActivator
     public void start(BundleContext bc) throws Exception 
     {
         muleContext = new DefaultMuleContextFactory().createMuleContext(new OsgiMuleContextBuilder(bc));
-        // TODO Get MuleStartupTestCase.testProgrammaticDefaultsThenStartThenSpringXml() working before we can enable this.
-        //muleContext.start();
+        muleContext.start();
 
         Dictionary headers = bc.getBundle().getHeaders();
         Hashtable osgiProps = new Hashtable();

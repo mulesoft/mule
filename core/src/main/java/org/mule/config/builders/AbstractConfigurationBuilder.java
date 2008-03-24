@@ -13,6 +13,7 @@ package org.mule.config.builders;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.config.i18n.CoreMessages;
 
 import org.apache.commons.logging.Log;
@@ -36,6 +37,7 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
         try
         {
             doConfigure(muleContext);
+            applyLifecycle(muleContext.getLifecycleManager());
             configured = true;
         }
         catch (Exception e)
@@ -47,6 +49,8 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
 
     protected abstract void doConfigure(MuleContext muleContext) throws Exception;
 
+    protected abstract void applyLifecycle(LifecycleManager lifecycleManager) throws Exception;
+    
     public boolean isConfigured()
     {
         return configured;

@@ -543,15 +543,6 @@ public class DefaultMuleContext implements MuleContext
         return muleRegistryHelper;
     }
 
-    /**
-     * Apply current phase of the LifecycleManager.  Note: this is NOT the same lifecycle manager
-     * as the one in the Registry.
-     */
-    public void applyLifecycle(Object object) throws MuleException
-    {
-        lifecycleManager.applyLifecycle(this, object);
-    }
-
     public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
     {
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE);
@@ -599,9 +590,15 @@ public class DefaultMuleContext implements MuleContext
     }
 
     // TODO This should ideally only be available via an Admin interface
-    public void addRegistry(Registry registry)
+    public void addRegistry(long id, Registry registry)
     {
-        registryBroker.addRegistry(registry);
+        registryBroker.addRegistry(id, registry);
+    }
+
+    // TODO This should ideally only be available via an Admin interface
+    public void removeRegistry(long id)
+    {
+        registryBroker.removeRegistry(id);
     }
 
     /**

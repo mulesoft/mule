@@ -9,16 +9,17 @@
  */
 package org.mule.lifecycle;
 
-import org.mule.api.MuleContext;
+import org.mule.MuleServer;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
-import org.mule.util.StringMessageUtils;
+import org.mule.util.CollectionUtils;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -26,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.functors.InstanceofPredicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -65,24 +67,11 @@ public class DefaultLifecyclePhase implements LifecyclePhase
         this.oppositeLifecyclePhase = oppositeLifecyclePhase;
     }
 
-    public void fireLifecycle(MuleContext muleContext, String currentPhase) throws MuleException
+    public void applyLifecycle(Collection objects, String currentPhase) throws MuleException
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Attempting to fire lifecycle phase: " + getName());
-        }
-        if (currentPhase.equals(name))
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Not firing, already in lifecycle phase: " + getName());
-            }
-            return;
-        }
-        if (!isPhaseSupported(currentPhase))
-        {
-            throw new IllegalStateException("Lifecycle phase: " + name + " does not support current phase: "
-                                            + currentPhase + ". Phases supported are: " + StringMessageUtils.toString(supportedPhases));
+            logger.debug("Attempting to apply lifecycle phase: " + getName());
         }
 
         // overlapping interfaces can cause duplicates
@@ -92,10 +81,11 @@ public class DefaultLifecyclePhase implements LifecyclePhase
         {
             LifecycleObject lo = (LifecycleObject) iterator.next();
             // list so that ordering is preserved on retry
-            List targets = new LinkedList(muleContext.getRegistry().lookupObjects(lo.getType()));
+            //List targets = new LinkedList(MuleServer.getMuleContext().getRegistry().lookupObjects(lo.getType()));
+            List targets = new LinkedList(CollectionUtils.select(objects, new InstanceofPredicate(lo.getType())));
             if (targets.size() > 0)
             {
-                lo.firePreNotification(muleContext);
+                lo.firePreNotification(MuleServer.getMuleContext());
 
                 for (int retryCount = 0; retryCount < RETRY_MAX && targets.size() > 0; ++retryCount)
                 {
@@ -131,10 +121,8 @@ public class DefaultLifecyclePhase implements LifecyclePhase
                         }
                     }
                 }
-
-                lo.firePostNotification(muleContext);
+                lo.firePostNotification(MuleServer.getMuleContext());
             }
-
         }
     }
 

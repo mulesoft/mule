@@ -5,6 +5,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.config.ChainedThreadingProfile;
@@ -80,4 +81,9 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         systemModel.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
         registry.registerModel(systemModel);
     }
+    
+    protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception
+    {
+        // nothing to do
+    }    
 }

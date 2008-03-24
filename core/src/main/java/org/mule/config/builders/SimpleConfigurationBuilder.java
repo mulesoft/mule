@@ -3,6 +3,7 @@ package org.mule.config.builders;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.registry.Registry;
 
 import java.util.Map;
@@ -32,4 +33,8 @@ public class SimpleConfigurationBuilder extends AbstractConfigurationBuilder
         }
     }
 
+    protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception
+    {
+        // nothing to do
+    }    
 }

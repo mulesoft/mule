@@ -12,6 +12,8 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.lifecycle.Startable;
 import org.mule.api.registry.Registry;
 import org.mule.config.ConfigResource;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
@@ -30,6 +32,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     /** Prepend "default-mule-config.xml" to the list of config resources. */
     private boolean useDefaultConfigResource = true;
 
+    private Registry registry;
+    
     public SpringXmlConfigurationBuilder(String[] configResources) throws ConfigurationException
     {
         super(configResources);
@@ -68,11 +72,20 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     
     protected void createSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext) throws Exception
     {
-        Registry reg = new SpringRegistry(applicationContext);
+        registry = new SpringRegistry(applicationContext);
         // Note: The SpringRegistry must be created before applicationContext.refresh() gets called because
         // some beans may try to look up other beans via the Registry during preInstantiateSingletons().
-        muleContext.addRegistry(reg);
-        reg.initialise();
+        muleContext.addRegistry(1, registry);
+        registry.initialise();
+    }
+    
+    protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception
+    {
+        // If the MuleContext is started, start all objects in the new Registry.
+        if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME))
+        {
+            lifecycleManager.applyPhase(registry.lookupObjects(Object.class), Startable.PHASE_NAME);
+        }
     }
     
     public boolean isUseDefaultConfigResource()

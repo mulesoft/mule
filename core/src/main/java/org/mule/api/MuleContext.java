@@ -181,8 +181,6 @@ public interface MuleContext extends Lifecycle
 
     MuleRegistry getRegistry();
     
-    void applyLifecycle(Object object) throws MuleException;
-    
     MuleConfiguration getConfiguration();
 
     ThreadingProfile getDefaultMessageDispatcherThreadingProfile();
@@ -198,7 +196,10 @@ public interface MuleContext extends Lifecycle
     ConnectionStrategy getDefaultConnectionStrategy();
 
     // TODO This should ideally only be available via an Admin interface
-    void addRegistry(Registry registry);
+    void addRegistry(long id, Registry registry);
+
+    // TODO This should ideally only be available via an Admin interface
+    void removeRegistry(long id);
 
     /**
      * Returns the date when the server was started.

@@ -163,7 +163,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
         if (null != endpoint)
         {
-            MuleServer.getMuleContext().applyLifecycle(endpoint);
+            MuleServer.getMuleContext().getLifecycleManager().applyCompletedPhases(endpoint);
         }
         return endpoint;
     }

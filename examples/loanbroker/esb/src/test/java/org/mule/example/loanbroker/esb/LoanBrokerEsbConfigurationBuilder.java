@@ -13,6 +13,7 @@ package org.mule.example.loanbroker.esb;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.routing.InboundRouterCollection;
@@ -290,6 +291,10 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         bank4ServiceInbound.addEndpoint(bank4In.buildInboundEndpoint());
         bank4Service.setInboundRouter(bank4ServiceInbound);
         registry.registerService(bank4Service);
+    }
 
+    protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception 
+    {
+        // nothing to do
     }
 }

@@ -9,11 +9,13 @@
  */
 package org.mule.lifecycle.phases;
 
+import org.mule.MuleServer;
 import org.mule.api.MuleException;
-import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.lifecycle.DefaultLifecyclePhase;
+
+import java.util.Collection;
 
 /**
  * Objects are disposed of via the Registry since the Registry manages the creation/initialisation of the objects
@@ -28,12 +30,9 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
         super(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME);
     }
 
-    public void fireLifecycle(MuleContext muleContext, String currentPhase) throws MuleException
-    {
-        //Delegate this to the Registry
-        if (muleContext.getRegistry() != null)
-        {
-            muleContext.getRegistry().dispose();
-        }
-    }
+//    public void applyLifecycle(Collection objects, String currentPhase) throws MuleException
+//    {        
+//        //Delegate this to the Registry
+//        MuleServer.getMuleContext().getRegistry().dispose();
+//    }
 }

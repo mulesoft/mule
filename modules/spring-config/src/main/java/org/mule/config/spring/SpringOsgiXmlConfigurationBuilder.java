@@ -11,6 +11,7 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
+import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.registry.Registry;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 
@@ -40,7 +41,12 @@ public class SpringOsgiXmlConfigurationBuilder extends AbstractConfigurationBuil
         Registry reg = new SpringRegistry(applicationContext);
         // Note: The SpringRegistry must be created before applicationContext.refresh() gets called because
         // some beans may try to look up other beans via the Registry during preInstantiateSingletons().
-        muleContext.addRegistry(reg);
+        muleContext.addRegistry(1, reg);
         reg.initialise();
     }    
+
+    protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception 
+    {
+        // nothing to do
+    }
 }

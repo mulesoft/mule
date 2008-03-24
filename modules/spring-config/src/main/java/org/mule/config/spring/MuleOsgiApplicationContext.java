@@ -12,6 +12,8 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transport.Connector;
 import org.mule.config.factories.HostNameFactory;
 import org.mule.config.spring.editors.ConnectorPropertyEditor;
@@ -92,18 +94,40 @@ public class MuleOsgiApplicationContext extends OsgiBundleXmlApplicationContext
     protected void finishRefresh()
     {
         super.finishRefresh();
-        
-        // TODO The MuleContext should have already been started by the Mule Core bundle.
-        if (!muleContext.isStarted())
+
+        // If the MuleContext is started, start all objects in the ApplicationContext.
+        if (muleContext.getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME))
         {
             try
             {
-                muleContext.start();
+                Map allBeans = getBeansOfType(Object.class);
+                if (allBeans != null && allBeans.size() > 0)
+                {
+                    muleContext.getLifecycleManager().applyPhase(allBeans.values(), Startable.PHASE_NAME);
+                }
             }
             catch (MuleException e)
             {
-                throw new RuntimeException("Unable to start MuleContext", e);
+                logger.error("Unable to start objects in ApplicationContext: " + e.getMessage(), e);
             }
         }
+    }
+
+    //@Override
+    protected void doClose()
+    {
+        try
+        {
+            Map allBeans = getBeansOfType(Object.class);
+            if (allBeans != null && allBeans.size() > 0)
+            {
+                muleContext.getLifecycleManager().applyPhase(allBeans.values(), Stoppable.PHASE_NAME);
+            }
+        }
+        catch (MuleException e)
+        {
+            logger.error("Unable to stop objects in ApplicationContext: " + e.getMessage(), e);
+        }
+        super.doClose();
     }
 }

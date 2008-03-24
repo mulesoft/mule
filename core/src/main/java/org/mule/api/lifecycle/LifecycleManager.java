@@ -9,9 +9,10 @@
  */
 package org.mule.api.lifecycle;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -27,8 +28,16 @@ public interface LifecycleManager
 
     void registerLifecycle(LifecyclePhase lci);
 
+    /**
+     * Applies lifecycle phase to all objects in the Registry.
+     */
     void firePhase(MuleContext muleContext, String phase) throws MuleException;
 
+    /**
+     * Applies lifecycle phase to a collection of objects.
+     */
+    LifecyclePhase applyPhase(Collection objects, String phase) throws MuleException;
+    
     String getCurrentPhase();
 
     String getExecutingPhase();
@@ -37,7 +46,10 @@ public interface LifecycleManager
 
     boolean isPhaseComplete(String phaseName);
 
-    void applyLifecycle(MuleContext muleContext, Object object) throws MuleException;
+    /**
+     * Successively applies all completed lifecycle phase to an object.
+     */
+    void applyCompletedPhases(Object object) throws MuleException;
 
     void checkPhase(String name) throws IllegalStateException;
 }

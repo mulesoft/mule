@@ -4,10 +4,8 @@ package org.mule;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.service.Service;
-import org.mule.config.spring.SpringOsgiXmlConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.context.OsgiMuleContextBuilder;
 
 import junit.framework.TestCase;
 
@@ -164,41 +162,41 @@ public class MuleStartupTestCase extends TestCase
         assertTrue("Service not started", verifyStarted());
     }
 
-    public void testSpringXmlDefaultsThenSpringXml() throws Exception
+//    public void testSpringXmlDefaultsThenSpringXml() throws Exception
+//    {
+//        // Start up Mule core with defaults
+//        SpringXmlConfigurationBuilder builder1 = new SpringXmlConfigurationBuilder(
+//            SpringXmlConfigurationBuilder.MULE_DEFAULTS_CONFIG);
+//        builder1.setUseDefaultConfigResource(false);
+//        muleContext = new DefaultMuleContextFactory().createMuleContext(builder1);
+//
+//        // Start up user config
+//        SpringXmlConfigurationBuilder builder2 = new SpringXmlConfigurationBuilder(USER_CONFIG);
+//        builder2.setUseDefaultConfigResource(false);
+//        builder2.configure(muleContext);
+//        muleContext.start();
+//
+//        assertTrue("Default configuration not found in registry", verifyDefaultConfig());
+//        assertTrue("User configuration not found in registry", verifyUserConfig());
+//        assertTrue("Service not started", verifyStarted());
+//    }
+
+    public void testProgrammaticDefaultsThenStartThenSpringXml() throws Exception
     {
         // Start up Mule core with defaults
-        SpringXmlConfigurationBuilder builder1 = new SpringXmlConfigurationBuilder(
-            SpringXmlConfigurationBuilder.MULE_DEFAULTS_CONFIG);
-        builder1.setUseDefaultConfigResource(false);
-        muleContext = new DefaultMuleContextFactory().createMuleContext(builder1);
+        muleContext = new DefaultMuleContextFactory().createMuleContext();
+        muleContext.start();
 
         // Start up user config
         SpringXmlConfigurationBuilder builder2 = new SpringXmlConfigurationBuilder(USER_CONFIG);
         builder2.setUseDefaultConfigResource(false);
         builder2.configure(muleContext);
-        muleContext.start();
 
         assertTrue("Default configuration not found in registry", verifyDefaultConfig());
         assertTrue("User configuration not found in registry", verifyUserConfig());
         assertTrue("Service not started", verifyStarted());
     }
 
-//    public void testProgrammaticDefaultsThenStartThenSpringXml() throws Exception
-//    {
-//        // Start up Mule core with defaults
-//        muleContext = new DefaultMuleContextFactory().createMuleContext();
-//        muleContext.start();
-//
-//        // Start up user config
-//        SpringXmlConfigurationBuilder builder2 = new SpringXmlConfigurationBuilder(USER_CONFIG);
-//        builder2.setUseDefaultConfigResource(false);
-//        builder2.configure(muleContext);
-//
-//        assertTrue("Default configuration not found in registry", verifyDefaultConfig());
-//        assertTrue("User configuration not found in registry", verifyUserConfig());
-//        assertTrue("Service not started", verifyStarted());
-//    }
-//
 //    public void testSpringXmlDefaultsThenStartThenSpringXml() throws Exception
 //    {
 //        // Start up Mule core with defaults
@@ -239,5 +237,4 @@ public class MuleStartupTestCase extends TestCase
 //        assertTrue("User configuration not found in registry", verifyUserConfig());
 //        assertTrue("Service not started", verifyStarted());
 //    }
-
 }
