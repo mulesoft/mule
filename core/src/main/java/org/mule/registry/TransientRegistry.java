@@ -14,9 +14,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
 import org.mule.api.registry.ObjectProcessor;
@@ -24,17 +24,15 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.lifecycle.GenericLifecycleManager;
-import org.mule.lifecycle.phases.TransientRegistryDisposePhase;
-import org.mule.lifecycle.phases.TransientRegistryInitialisePhase;
 import org.mule.util.ClassUtils;
+import org.mule.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.collections.functors.InstanceofPredicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,26 +42,12 @@ public class TransientRegistry extends AbstractRegistry
     protected transient final Log logger = LogFactory.getLog(TransientRegistry.class);
     public static final String REGISTRY_ID = "org.mule.Registry.Transient";
 
-    /** Map of Maps registry */
     private Map registry = new HashMap(8);
 
     public TransientRegistry()
     {
         super(REGISTRY_ID);
-        getObjectTypeMap(ObjectProcessor.class).put("_mulePropertyExtractorProcessor",
-                new ExpressionEvaluatorProcessor());
-    }
-
-    protected LifecycleManager createLifecycleManager()
-    {
-        GenericLifecycleManager lcm = new GenericLifecycleManager();
-        LifecyclePhase initPhase = new TransientRegistryInitialisePhase();
-        //initPhase.setRegistryScope(Registry.SCOPE_IMMEDIATE);
-        lcm.registerLifecycle(initPhase);
-        LifecyclePhase disposePhase = new TransientRegistryDisposePhase();
-        //disposePhase.setRegistryScope(Registry.SCOPE_IMMEDIATE);
-        lcm.registerLifecycle(disposePhase);
-        return lcm;
+        registry.put("_mulePropertyExtractorProcessor", new ExpressionEvaluatorProcessor());
     }
 
     //@java.lang.Override
@@ -86,12 +70,31 @@ public class TransientRegistry extends AbstractRegistry
             //setDefaultScope(oldScope);
         }
 
+        Collection allObjects = lookupObjects(Object.class);
+        Object obj;
+        for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
+        {
+            obj = iterator.next();
+            if (obj instanceof Initialisable)
+            {
+                ((Initialisable) obj).initialise();
+            }        
+        }
     }
 
     //@Override
     protected void doDispose()
     {
-        // empty
+        Collection allObjects = lookupObjects(Object.class);
+        Object obj;
+        for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
+        {
+            obj = iterator.next();
+            if (obj instanceof Disposable)
+            {
+                ((Disposable) obj).dispose();
+            }        
+        }
     }
 
     protected void applyProcessors(Map objects)
@@ -129,63 +132,12 @@ public class TransientRegistry extends AbstractRegistry
 
     public Object lookupObject(String key)
     {
-        Object o = null;
-        if (key != null)
-        {
-            Map map;
-            for (Iterator it = registry.values().iterator(); it.hasNext();)
-            {
-                map = (Map) it.next();
-                o = map.get(key);
-                if (o != null)
-                {
-                    return o;
-                }
-            }
-        }
-        return o;
+        return registry.get(key);
     }
 
     public Collection lookupObjects(Class returntype)
     {
-        Map map = (Map) registry.get(returntype);
-        if (map != null)
-        {
-            return map.values();
-        }
-        else
-        {
-            return new ArrayList(0);
-        }
-    }
-
-    protected Map getObjectTypeMap(Object o)
-    {
-        if (o == null)
-        {
-            o = Object.class;
-        }
-
-        Object key;
-        if (o instanceof Class)
-        {
-            key = o;
-        }
-        else if (o instanceof String)
-        {
-            key = o;
-        }
-        else
-        {
-            key = o.getClass();
-        }
-        Map objects = (Map) registry.get(key);
-        if (objects == null)
-        {
-            objects = new HashMap(8);
-            registry.put(key, objects);
-        }
-        return objects;
+        return CollectionUtils.select(registry.values(), new InstanceofPredicate(returntype));
     }
 
     protected Object applyProcessors(Object object)
@@ -224,53 +176,45 @@ public class TransientRegistry extends AbstractRegistry
     public void registerObject(String key, Object object, Object metadata) throws RegistrationException
     {
         logger.debug("registering object");
-        if (isInitialised() || isInitialising())
+        if (MuleServer.getMuleContext().isInitialised() || MuleServer.getMuleContext().isInitialising())
         {
             logger.debug("applying processors");
             object = applyProcessors(object);
         }
 
-        Map objectMap = getObjectTypeMap(metadata);
-        if (objectMap != null)
+        if (registry.containsKey(key))
         {
-            if (objectMap.containsKey(key))
+            // registry.put(key, value) would overwrite a previous entity with the same name.  Is this really what we want?
+            // Not sure whether to throw an exception or log a warning here.
+            //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
+            logger.warn("TransientRegistry already contains an object named '" + key + "'.  The previous object will be overwritten.");
+        }
+        registry.put(key, object);
+        try
+        {
+            MuleContext mc = MuleServer.getMuleContext();
+            logger.debug("context: " + mc);
+            if (mc != null)
             {
-                // objectMap.put(key, value) would overwrite a previous entity with the same name.  Is this really what we want?
-                // Not sure whether to throw an exception or log a warning here.
-                //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
-                logger.warn("TransientRegistry already contains an object named '" + key + "'.  The previous object will be overwritten.");
+                logger.debug("applying lifecycle");
+                mc.getLifecycleManager().applyCompletedPhases(object);
             }
-            objectMap.put(key, object);
-            try
+            else
             {
-                MuleContext mc = MuleServer.getMuleContext();
-                logger.debug("context: " + mc);
-                if (mc != null)
-                {
-                    logger.debug("applying lifecycle");
-                    mc.applyLifecycle(object);
-                }
-                else
-                {
-                    throw new RegistrationException("Unable to register object (\""
-                            + key + ":" + ClassUtils.getSimpleName(object.getClass())
-                            + "\") because MuleContext has not yet been created.");
-                }
-            }
-            catch (MuleException e)
-            {
-                throw new RegistrationException(e);
+                throw new RegistrationException("Unable to register object (\""
+                        + key + ":" + ClassUtils.getSimpleName(object.getClass())
+                        + "\") because MuleContext has not yet been created.");
             }
         }
-        else
+        catch (MuleException e)
         {
-            throw new RegistrationException("No object map exists for type " + metadata);
+            throw new RegistrationException(e);
         }
     }
 
     public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
-        Object obj = getObjectTypeMap(metadata).remove(key);
+        Object obj = registry.remove(key);
         if (obj instanceof Stoppable)
         {
             try
