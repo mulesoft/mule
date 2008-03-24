@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.config.spring.MuleOsgiApplicationContext;
 import org.mule.config.spring.SpringRegistry;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
@@ -25,17 +26,31 @@ public class MuleContextLoaderListener extends ContextLoaderListener
     protected DelegatedExecutionOsgiBundleApplicationContext createApplicationContext(BundleContext bundleContext,
                                                                                       String[] locations)
     {        
-        // Look up MuleContext from the OSGi ServiceRegistry.
-        ServiceReference muleContextRef = bundleContext.getServiceReference(MuleContext.class.getName());
-        MuleContext muleContext = (MuleContext) bundleContext.getService(muleContextRef);
+        MuleContext muleContext = lookupMuleContext();
         
         DelegatedExecutionOsgiBundleApplicationContext sdoac = new MuleOsgiApplicationContext(locations, muleContext, bundleContext);
         postProcessContext(sdoac);
         
         // Note: The SpringRegistry must be created before applicationContext.refresh() gets called because
         // some beans may try to look up other beans via the Registry during preInstantiateSingletons().
-        muleContext.addRegistry(new SpringRegistry(sdoac));
+        muleContext.addRegistry(bundleId, new SpringRegistry(sdoac));
 
         return sdoac;
+    }
+
+    //@Override
+    protected void maybeCloseApplicationContextFor(Bundle bundle)
+    {
+        super.maybeCloseApplicationContextFor(bundle);
+        MuleContext muleContext = lookupMuleContext();
+        // Remove the SpringRegistry for this ApplicationContext from the RegistryBroker.
+        muleContext.removeRegistry(bundleId);
+    }
+
+    /** Look up MuleContext from the OSGi ServiceRegistry. */
+    protected MuleContext lookupMuleContext()
+    {
+        ServiceReference muleContextRef = context.getServiceReference(MuleContext.class.getName());
+        return (MuleContext) context.getService(muleContextRef);
     }
 }

@@ -31,12 +31,13 @@ public class OsgiRegistryBroker extends AbstractRegistryBroker
         registries.open();
     }
 
-    public void addRegistry(Registry registry)
+    public void addRegistry(long id, Registry registry)
     {
+        // TODO Set ID as an attribute.
         bundleContext.registerService(Registry.class.getName(), registry, null);
     }
 
-    public void removeRegistry(Registry registry)
+    public void removeRegistry(long id)
     {
         // TODO Unregister registry
     }

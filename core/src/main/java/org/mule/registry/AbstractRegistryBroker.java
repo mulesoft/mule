@@ -21,7 +21,6 @@ import org.mule.api.registry.RegistryBroker;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractRegistryBroker implements RegistryBroker
@@ -29,7 +28,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
         // We start off with the TransientRegistry by default.
-        addRegistry(new TransientRegistry());
+        addRegistry(-1, new TransientRegistry());
         
         Iterator it = getRegistries().iterator(); 
         while (it.hasNext())
@@ -63,7 +62,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         return false;
     }
 
-    abstract protected List/*<Registry>*/ getRegistries();
+    abstract protected Collection/*<Registry>*/ getRegistries();
     
     ////////////////////////////////////////////////////////////////////////////////
     // Delegating methods
