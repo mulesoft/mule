@@ -11,6 +11,7 @@
 package org.mule.api.context.notification;
 
 import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
 
@@ -80,7 +81,8 @@ public abstract class ServerNotification extends EventObject
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
         this.resourceIdentifier = resourceIdentifier;
-        if (MuleServer.getMuleContext().getRegistry() != null && null != message)
+        MuleContext mc = MuleServer.getMuleContext();
+        if (mc != null && message != null)
         {
             serverId = message.toString();
         }

@@ -19,6 +19,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
@@ -46,6 +47,7 @@ import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.MessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
@@ -565,8 +567,12 @@ public abstract class AbstractConnector
     {
         if (receiverWorkManager.get() == null)
         {
-            WorkManager newWorkManager = this.getReceiverThreadingProfile().createWorkManager(
-                getName() + ".receiver");
+            ThreadingProfile tp = getReceiverThreadingProfile();
+            if (tp == null)
+            {
+                throw new ConfigurationException(MessageFactory.createStaticMessage("No ReceiverThreadingProfile has been configured"));
+            }
+            WorkManager newWorkManager = tp.createWorkManager(getName() + ".receiver");
 
             if (receiverWorkManager.compareAndSet(null, newWorkManager))
             {
