@@ -57,7 +57,8 @@
 -start boot/osgi/device/device_all-2.0.0.jar
 -start boot/osgi/useradmin/useradmin_all-2.0.0.jar
 -start boot/osgi/bundlerepository/bundlerepository_all-2.0.0.jar
--start boot/osgi/consoletty/consoletty-2.0.0.jar
+# Don't start KF console in the foreground
+#-start boot/osgi/consoletty/consoletty-2.0.0.jar
 -start boot/osgi/consoletelnet/consoletelnet-2.0.1.jar
 -start boot/osgi/frameworkcommands/frameworkcommands-2.0.0.jar
 -start boot/osgi/logcommands/logcommands-2.0.0.jar
