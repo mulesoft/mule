@@ -5,13 +5,13 @@
     <parent>
         <groupId>org.mule.tools</groupId>
         <artifactId>mule-tools</artifactId>
-        <version>2.1.0-M1</version>
+        <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <packaging>maven-plugin</packaging>
     <name>Mule Project Archetype</name>
     <!-- Do not specify group here, otherwise deployment will break -->
     <artifactId>mule-project-archetype</artifactId>
-    <version>2.1.0-M1</version>
+    <version>2.1.0-M2-SNAPSHOT</version>
     <description>An architype for creating Mule projects. This can handle the subtle configuration differences between a
         stand-alone prject, a Mule module being hosted on MuleForge and a Mule example.
     </description>
