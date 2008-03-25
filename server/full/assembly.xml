@@ -4,10 +4,7 @@ Assembly descriptor for the full Mule distribution.
 <assembly>
   <id>full</id>
   <formats>
-<!-- TODO UNCOMMENT THIS!!!
-Disable temporarily to speed up build cycle during development
     <format>zip</format>
--->
     <format>tar.gz</format>
   </formats>
 
