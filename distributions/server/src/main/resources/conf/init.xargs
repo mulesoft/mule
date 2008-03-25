@@ -123,4 +123,4 @@
 #############################################################
 -initlevel 10
 # Install but don't start the examples
--install user/mule-example-hello.jar
+-install user/mule-example-echo.jar-install user/mule-example-hello.jar

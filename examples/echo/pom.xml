@@ -6,9 +6,10 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-examples</artifactId>
- <version>2.1.0-M1-SNAPSHOT</version>
+        <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-echo</artifactId>
+    <packaging>bundle</packaging>
     <name>Echo Example</name>
     <description>Is a simple component example that demonstrates how to expose a component over multiple transports (soap and stream).</description>
 
@@ -51,6 +52,7 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
