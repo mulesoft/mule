@@ -19,12 +19,12 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.GenericLifecycleManager;
 import org.mule.registry.AbstractRegistry;
+import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;
 
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -67,7 +67,8 @@ public class SpringRegistry extends AbstractRegistry
 
     protected void doDispose()
     {
-        if (applicationContext instanceof ConfigurableApplicationContext)
+        if (applicationContext instanceof ConfigurableApplicationContext
+            && ((ConfigurableApplicationContext) applicationContext).isActive())
         {
             ((ConfigurableApplicationContext) applicationContext).close();
         }
@@ -97,7 +98,7 @@ public class SpringRegistry extends AbstractRegistry
         {
             return applicationContext.getBean(key);
         }
-        catch (NoSuchBeanDefinitionException e)
+        catch (Exception e)
         {
             logger.debug(e);
             return null;
@@ -106,13 +107,21 @@ public class SpringRegistry extends AbstractRegistry
 
     public Collection lookupObjects(Class type)
     {
-        Map map = applicationContext.getBeansOfType(type);
-        // MULE-2762
-        //if (logger.isDebugEnabled())
-        //{
-        //    MapUtils.debugPrint(System.out, "Beans of type " + type, map);
-        //}
-        return map.values();
+        try
+        {
+            Map map = applicationContext.getBeansOfType(type);
+            // MULE-2762
+            //if (logger.isDebugEnabled())
+            //{
+            //    MapUtils.debugPrint(System.out, "Beans of type " + type, map);
+            //}
+            return map.values();
+        }
+        catch (Exception e)
+        {
+            logger.debug(e);
+            return CollectionUtils.EMPTY_COLLECTION;
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
