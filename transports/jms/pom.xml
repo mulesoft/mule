@@ -8,7 +8,7 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-jms</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>JMS Transport</name>
     <description>A Mule transport for Jms Connectivity.</description>
 
@@ -165,23 +165,4 @@
             <groupId>org.apache.geronimo.specs</groupId>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <Export-Package>org.mule.transport.jms.*</Export-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

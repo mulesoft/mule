@@ -9,7 +9,7 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-scripting</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>JSR-223 Scripting</name>
     <description>Support for Scripting Mule Services and embedding Mule inside scripts</description>
 
@@ -220,27 +220,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <!-- TODO This module needs reorganization in order to properly export its packages. -->
-                                <Export-Package>
-                                    org.mule.components.script.*,
-                                    org.mule.transformer.script.*
-                                </Export-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
