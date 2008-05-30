@@ -19,7 +19,9 @@ import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;
+import org.tanukisoftware.wrapper.WrapperSimpleApp;
 
 /**
  * Determine which is the main class to run and delegate control to the Java Service
@@ -31,12 +33,14 @@ import org.tanukisoftware.wrapper.WrapperManager;
  */
 public class MuleBootstrap
 {
-    private static final String MULE_MODULE_BOOT_POM_FILE_PATH = "META-INF/maven/org.mule.module/mule-module-boot/pom.properties";
-
-    public static final String CLI_OPTIONS[][] = {
-            {"nogui", "false", "Suppress graphical console"},
-            {"version", "false", "Show product and version information"}
-    };
+     private static final String MULE_MODULE_BOOT_POM_FILE_PATH = "META-INF/maven/org.mule.module/mule-module-boot/pom.properties";
+ 
+     public static final String CLI_OPTIONS[][] = {
+            {"main", "true", "Main Class"},
+            {"osgi", "false", "Run in an OSGi framework"},
+             {"nogui", "false", "Suppress graphical console"},
+             {"version", "false", "Show product and version information"}
+     };
 
     public static void main(String[] args) throws Exception
     {
@@ -51,34 +55,37 @@ public class MuleBootstrap
             prepareBootstrapPhase();
             WrapperManager.start(new VersionWrapper(), remainingArgs);
         }
-//        else if (commandLine.hasOption("osgi"))
-        else
+        else if (commandLine.hasOption("osgi"))
         {
-            prepareBootstrapPhase();
+            prepareBootstrapPhase(false);
             boolean startGui = !commandLine.hasOption("nogui");
             System.out.println("Starting the OSGi Framework...");
             WrapperManager.start(new KnopflerfishFrameworkWrapper(startGui), remainingArgs);
         }
-        // TODO Should we support running outside of an OSGi framework anymore?
-//        else if (mainClassName == null || mainClassName.equals(MuleServerWrapper.class.getName()))
-//        {
-//            prepareBootstrapPhase();
-//            System.out.println("Starting the Mule Server...");
-//            WrapperManager.start(new MuleServerWrapper(), remainingArgs);
-//        }
-//        else
-//        {
-//            // Add the main class name as the first argument to the Wrapper.
-//            String[] appArgs = new String[remainingArgs.length + 1];
-//            appArgs[0] = mainClassName;
-//            System.arraycopy(remainingArgs, 0, appArgs, 1, remainingArgs.length);
-//            prepareBootstrapPhase();
-//            System.out.println("Starting class " + mainClassName + "...");
-//            WrapperSimpleApp.main(appArgs);
-//        }
+        else if (mainClassName == null || mainClassName.equals(MuleServerWrapper.class.getName()))
+        {
+            prepareBootstrapPhase();
+            System.out.println("Starting the Mule Server...");
+            WrapperManager.start(new MuleServerWrapper(), remainingArgs);
+        }
+        else
+        {
+            // Add the main class name as the first argument to the Wrapper.
+            String[] appArgs = new String[remainingArgs.length + 1];
+            appArgs[0] = mainClassName;
+            System.arraycopy(remainingArgs, 0, appArgs, 1, remainingArgs.length);
+            prepareBootstrapPhase();
+            System.out.println("Starting class " + mainClassName + "...");
+            WrapperSimpleApp.main(appArgs);
+        }
     }
     
     private static void prepareBootstrapPhase() throws Exception
+    {
+        prepareBootstrapPhase(true);
+    }
+    
+    private static void prepareBootstrapPhase(boolean setupClassLoader) throws Exception
     {
         File muleHome = lookupMuleHome();
         File muleBase = lookupMuleBase();
@@ -88,13 +95,19 @@ public class MuleBootstrap
             muleBase = muleHome;
         }
 
-        //MuleBootstrapUtils.addLocalJarFilesToClasspath(muleHome, muleBase);
+        if (setupClassLoader)
+        {
+            MuleBootstrapUtils.addLocalJarFilesToClasspath(muleHome, muleBase);
+        }
         
         setSystemMuleVersion();
         requestLicenseAcceptance();        
 
         // TODO Make this work with OSGi Framework
-        //MuleBootstrapUtils.addExternalJarFilesToClasspath(muleHome, null);
+        if (setupClassLoader)
+        {
+            MuleBootstrapUtils.addExternalJarFilesToClasspath(muleHome, null);
+        }
     }
     
     private static File lookupMuleHome() throws Exception
