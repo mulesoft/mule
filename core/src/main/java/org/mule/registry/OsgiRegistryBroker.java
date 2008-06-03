@@ -13,7 +13,7 @@ package org.mule.registry;
 import org.mule.api.registry.Registry;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
@@ -42,7 +42,7 @@ public class OsgiRegistryBroker extends AbstractRegistryBroker
         // TODO Unregister registry
     }
 
-    protected List/*<Registry>*/ getRegistries()
+    protected Collection/*<Registry>*/ getRegistries()
     {
         Object[] services = registries.getServices();
         int servicesCount = services.length;
@@ -53,4 +53,4 @@ public class OsgiRegistryBroker extends AbstractRegistryBroker
         }
         return list;
     }
-    }
+}

@@ -23,12 +23,12 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
     
     public void addRegistry(long id, Registry registry)
     {
-        registries.put(id, registry);
+        registries.put(new Long(id), registry);
     }
 
     public void removeRegistry(long id)
     {
-        registries.remove(id);
+        registries.remove(new Long(id));
     }
 
     protected Collection/*<Registry>*/ getRegistries()

@@ -59,7 +59,7 @@
             <artifactId>spring-context</artifactId>
         </dependency>
 
-        <!-- Unit tests -->        
+        <!-- Unit tests -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
@@ -84,9 +84,7 @@
                 <module>echo</module>
                 <module>loanbroker</module>
                 <module>stockquote</module>
-                <!-- Not resolving Jetty dependency for some reason
                 <module>webapp</module>
-                -->
             </modules>
         </profile>
     </profiles>
