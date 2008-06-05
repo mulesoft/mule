@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Iterator;
 
 import org.springframework.core.Conventions;
 import org.springframework.util.StringUtils;
@@ -84,6 +85,19 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
     public String getAttributeMapping(String alias)
     {
         return getAttributeMapping(alias, alias);
+    }
+
+    public String getAttributeAlias(String name)
+    {
+        for (Iterator iterator = nameMappings.entrySet().iterator(); iterator.hasNext();)
+        {
+            Map.Entry entry = (Map.Entry)iterator.next();
+            if(entry.getValue().equals(name))
+            {
+                return entry.getKey().toString();
+            }
+        }
+        return name;
     }
 
     public String getAttributeMapping(String alias, String deflt)

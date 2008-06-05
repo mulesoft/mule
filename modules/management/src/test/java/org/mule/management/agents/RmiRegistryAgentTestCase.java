@@ -10,7 +10,6 @@
 
 package org.mule.management.agents;
 
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.module.management.agent.RmiRegistryAgent;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -46,8 +45,7 @@ public class RmiRegistryAgentTestCase extends AbstractMuleTestCase
     {
         RmiRegistryAgent agent = new RmiRegistryAgent();
         agent.initialise();
-        LifecycleTransitionResult result = agent.start();
-        assertEquals(result, LifecycleTransitionResult.OK);
+        agent.start();
     }
 
 }

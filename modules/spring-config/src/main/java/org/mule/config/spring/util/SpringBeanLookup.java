@@ -11,7 +11,6 @@
 package org.mule.config.spring.util;
 
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.object.AbstractObjectFactory;
 
@@ -54,7 +53,7 @@ public class SpringBeanLookup extends AbstractObjectFactory implements Applicati
     private ApplicationContext applicationContext;
     private String bean;
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (bean == null)
         {
@@ -65,7 +64,6 @@ public class SpringBeanLookup extends AbstractObjectFactory implements Applicati
             throw new InitialisationException(
                 MessageFactory.createStaticMessage("ApplicationContext has not been injected."), this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()

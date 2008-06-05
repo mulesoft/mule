@@ -40,7 +40,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunction
         assertEquals(TEST_VALUES[0], resultMap.get("DATA"));
     }
 
-    public void testSelectOnOutboundByPropertyExtractor() throws Exception
+    public void testSelectOnOutboundByExpression() throws Exception
     {
         MuleClient client = new MuleClient();
         MyMessage payload = new MyMessage(2);

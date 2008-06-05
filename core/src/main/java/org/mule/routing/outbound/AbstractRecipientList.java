@@ -46,9 +46,16 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
     private final ConcurrentMap recipientCache = new ConcurrentHashMap();
 
+    private Boolean synchronous;
+
     public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
     {
+        if(this.synchronous!=null)
+        {
+            synchronous = this.synchronous.booleanValue();
+        }
+
         List recipients = this.getRecipients(message);
         List results = new ArrayList();
 
@@ -179,11 +186,21 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         return endpoint;
     }
 
-    protected abstract List getRecipients(MuleMessage message);
+    public Boolean getSynchronous()
+    {
+        return synchronous;
+    }
+
+    public void setSynchronous(Boolean synchronous)
+    {
+        this.synchronous = synchronous;
+    }
 
     public boolean isDynamicEndpoints()
     {
         return true;
     }
+
+    protected abstract List getRecipients(MuleMessage message);
 
 }

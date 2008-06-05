@@ -15,7 +15,6 @@ import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.util.StringUtils;
 
 import java.rmi.server.RMIClientSocketFactory;
@@ -73,15 +72,15 @@ public class DefaultJmxSupportAgent extends AbstractAgent
     }
 
     /** {@inheritDoc} */
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
 
     /** {@inheritDoc} */
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
 
     /**
@@ -106,7 +105,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
      *          if a fatal error occurs
      *          causing the Mule instance to shutdown
      */
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         try
         {
@@ -165,8 +164,6 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         {
             throw new InitialisationException(e, this);
         }
-
-        return LifecycleTransitionResult.OK;
     }
 
     public JmxAgent createJmxAgent()
@@ -353,4 +350,5 @@ public class DefaultJmxSupportAgent extends AbstractAgent
     {
         this.credentials = credentials;
     }
+
 }

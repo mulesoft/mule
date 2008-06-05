@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ObjectProcessor;
 import org.mule.api.registry.Registry;
@@ -93,7 +92,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     }
 
     /** {@inheritDoc} */
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         Enumeration e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
         while (e.hasMoreElements())
@@ -110,7 +109,6 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 throw new InitialisationException(e1, this);
             }
         }
-        return LifecycleTransitionResult.OK;
     }
 
     protected void process(Properties props) throws NoSuchMethodException, IllegalAccessException, MuleException, InvocationTargetException, ClassNotFoundException, InstantiationException

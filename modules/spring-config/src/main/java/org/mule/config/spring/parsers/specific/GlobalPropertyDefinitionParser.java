@@ -16,12 +16,12 @@ import org.springframework.util.SystemPropertyUtils;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class EnvironmentPropertyDefinitionParser extends MuleOrphanDefinitionParser
+public class GlobalPropertyDefinitionParser extends MuleOrphanDefinitionParser
 {
     private final String VALUE_ATTR = "value";
     private final String NAME_ATTR = "name";
 
-    public EnvironmentPropertyDefinitionParser()
+    public GlobalPropertyDefinitionParser()
     {
         super(true);
         addIgnored(NAME_ATTR);

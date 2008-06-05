@@ -8,18 +8,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.client;
+package org.mule.api.context.notification;
 
-public class MuleCxfSoapClientTestCase extends MuleAxisSoapClientTestCase
+
+/**
+ * <code>RoutingNotificationListener</code> is an observer interface that objects
+ * can use to receive notifications about routing events such as async-reply misses.
+ */
+public interface RoutingNotificationListener extends ServerNotificationListener
 {
-    public String getSoapProvider()
-    {
-        return "cxf";
-    }
-
-    // TODO fix: xfire doesn't currently support overloaded methods
-    public void testRequestResponseComplex2() throws Exception
-    {
-        // no op
-    }
+    // no methods
 }

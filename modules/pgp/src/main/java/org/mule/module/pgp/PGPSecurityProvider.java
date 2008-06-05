@@ -11,11 +11,10 @@
 package org.mule.module.pgp;
 
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
-import org.mule.api.security.SecurityException;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.security.SecurityContextFactory;
+import org.mule.api.security.SecurityException;
 import org.mule.api.security.SecurityProvider;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
@@ -124,12 +123,7 @@ public class PGPSecurityProvider implements SecurityProvider
         return factory.create(auth);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.lifecycle.Initialisable#initialise()
-     */
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         try
         {
@@ -142,7 +136,6 @@ public class PGPSecurityProvider implements SecurityProvider
         {
             throw new InitialisationException(CoreMessages.failedToCreate("PGPProvider"), e, this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public PGPKeyRing getKeyManager()

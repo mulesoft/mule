@@ -52,8 +52,6 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         
         assertTrue(c.getDataSource() instanceof TestDataSource);
         
-//        assertEquals(2,c.getPropertyExtractors().size());
-//        assertTrue(c.getPropertyExtractors().iterator().next() instanceof PropertyExtractor);
         assertNotNull(c.getQueries());
         assertEquals(3, c.getQueries().size());
         

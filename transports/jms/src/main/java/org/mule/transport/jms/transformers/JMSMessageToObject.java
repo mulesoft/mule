@@ -15,6 +15,11 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.util.ClassUtils;
 
 import javax.jms.Message;
+import javax.jms.TextMessage;
+import javax.jms.ObjectMessage;
+import javax.jms.BytesMessage;
+import javax.jms.MapMessage;
+import javax.jms.StreamMessage;
 
 /**
  * <code>JMSMessageToObject</code> Will convert a <code>javax.jms.Message</code>
@@ -39,6 +44,11 @@ public class JMSMessageToObject extends AbstractJmsTransformer
     {
         super();
         registerSourceType(Message.class);
+        registerSourceType(TextMessage.class);
+        registerSourceType(ObjectMessage.class);
+        registerSourceType(BytesMessage.class);
+        registerSourceType(MapMessage.class);
+        registerSourceType(StreamMessage.class);
     }
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException

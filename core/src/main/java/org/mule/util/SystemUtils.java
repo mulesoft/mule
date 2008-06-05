@@ -158,9 +158,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("IBM") != -1;
     }
 
-    /** 
-     * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0 
-     */
+    // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
     private static CommandLine parseCommandLine(String args[], String opts[][]) throws DefaultMuleException
     {
         Options options = new Options();
@@ -191,9 +189,8 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      * Returns the value corresponding to the given option from the command line, for
      * example if the options are "-config mule-config.xml"
      * getCommandLineOption("config") would return "mule-config.xml"
-     * 
-     * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0
      */
+    // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
     public static String getCommandLineOption(String option, String args[], String opts[][])
         throws DefaultMuleException
     {
@@ -205,9 +202,8 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      * Checks whether a command line option is set. This is useful for command line
      * options that don't have an argument, like "-cluster", which means that this
      * Mule instance is part of a cluster.
-     * 
-     * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0
      */
+    // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
     public static boolean hasCommandLineOption(String option, String args[], String opts[][])
         throws DefaultMuleException
     {
@@ -219,9 +215,8 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      * Returns a Map of all options in the command line. The Map is keyed off the
      * option name. The value will be whatever is present on the command line.
      * Options that don't have an argument will have the String "true".
-     * 
-     * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0
      */
+    // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
     public static Map getCommandLineOptions(String args[], String opts[][]) throws DefaultMuleException
     {
         CommandLine line = parseCommandLine(args, opts);

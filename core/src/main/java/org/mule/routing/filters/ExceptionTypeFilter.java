@@ -12,6 +12,7 @@ package org.mule.routing.filters;
 
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
+import org.mule.util.ClassUtils;
 
 /**
  * A filter that accepts messages that have an exception payload. An Exception type
@@ -24,6 +25,12 @@ public class ExceptionTypeFilter extends PayloadTypeFilter
     public ExceptionTypeFilter()
     {
         super();
+    }
+
+
+    public ExceptionTypeFilter(String expectedType) throws ClassNotFoundException
+    {
+        this(ClassUtils.loadClass(expectedType, ExceptionTypeFilter.class));
     }
 
     public ExceptionTypeFilter(Class expectedType)

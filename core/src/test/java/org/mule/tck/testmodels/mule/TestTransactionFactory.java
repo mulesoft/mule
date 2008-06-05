@@ -18,7 +18,7 @@ import org.mule.api.transaction.TransactionFactory;
 import com.mockobjects.dynamic.Mock;
 
 /**
- * <code>TestTransactionFactory</code> TODO
+ * <code>TestTransactionFactory</code> creates a {@link org.mule.tck.testmodels.mule.TestTransaction}
  * 
  */
 
@@ -30,7 +30,7 @@ public class TestTransactionFactory implements TransactionFactory
 
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
-        return (Transaction) new Mock(Transaction.class).proxy();
+        return new TestTransaction();
     }
 
     public boolean isTransacted()

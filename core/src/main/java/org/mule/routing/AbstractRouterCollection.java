@@ -55,9 +55,9 @@ public abstract class AbstractRouterCollection implements RouterCollection, Init
         statistics = new RouterStatistics(type);
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        return LifecycleTransitionResult.initialiseAll(routers.iterator());
+        LifecycleTransitionResult.initialiseAll(routers.iterator());
     }
 
     public void dispose()

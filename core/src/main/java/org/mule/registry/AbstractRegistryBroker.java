@@ -13,7 +13,6 @@ package org.mule.registry;
 import org.mule.MuleServer;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryBroker;
@@ -25,7 +24,7 @@ import java.util.Map;
 
 public abstract class AbstractRegistryBroker implements RegistryBroker
 {
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         // We start off with the TransientRegistry by default.
         addRegistry(-1, new TransientRegistry());
@@ -35,7 +34,6 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         {
             ((Registry) it.next()).initialise();
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()

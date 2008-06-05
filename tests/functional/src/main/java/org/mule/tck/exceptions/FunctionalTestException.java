@@ -14,9 +14,11 @@ import org.mule.api.DefaultMuleException;
 
 public class FunctionalTestException extends DefaultMuleException
 {
+    public static final String EXCEPTION_MESSAGE = "Functional Test Service Exception";
+
     public FunctionalTestException()
     {
-        super("Functional Test Service Exception");
+        super(EXCEPTION_MESSAGE);
     }
 }
 

@@ -10,13 +10,20 @@
 package org.mule.transformer;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.DiscoverableTransformer;
+import org.mule.api.transformer.Transformer;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.FruitBowl;
+import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.testmodels.fruit.Fruit;
+import org.mule.tck.testmodels.fruit.BloodOrange;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.SerializableToByteArray;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Iterator;
 
 public class TransformerWeightingTestCase extends AbstractMuleTestCase
 {
@@ -140,8 +147,48 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
 
     }
 
-    private class DummyTransformer extends AbstractTransformer
+    public void testPriorityMatching() throws Exception
     {
+        DummyTransformer t1 = new DummyTransformer();
+        t1.setName("--t1");
+        t1.registerSourceType(Orange.class);
+        t1.setReturnClass(Fruit.class);
+        muleContext.getRegistry().registerTransformer(t1);
+
+        DummyTransformer t2 = new DummyTransformer();
+        t2.setName("--t2");
+        t2.registerSourceType(Object.class);
+        t2.setReturnClass(Fruit.class);
+        muleContext.getRegistry().registerTransformer(t2);
+
+        List trans = muleContext.getRegistry().lookupTransformers(BloodOrange.class, Fruit.class);
+        assertEquals(2, trans.size());
+        for (Iterator iterator = trans.iterator(); iterator.hasNext();)
+        {
+            Transformer transformer = (Transformer) iterator.next();
+            assertTrue(transformer.getName().startsWith("--"));
+        }
+
+        Transformer result = muleContext.getRegistry().lookupTransformer(BloodOrange.class, Fruit.class);
+        assertNotNull(result);
+        assertEquals("--t1", result.getName());
+    }
+
+    private class DummyTransformer extends AbstractTransformer implements DiscoverableTransformer
+    {
+        private int weighting;
+
+        public int getPriorityWeighting()
+        {
+            return weighting;
+        }
+
+
+        public void setPriorityWeighting(int weighting)
+        {
+            this.weighting = weighting;
+        }
+
         protected Object doTransform(Object src, String encoding) throws TransformerException
         {
             return src;

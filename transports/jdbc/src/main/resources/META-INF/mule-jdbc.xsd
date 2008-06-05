@@ -24,16 +24,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <!--<xsd:complexType name="extractorsType">-->
-        <!--<xsd:choice minOccurs="0" maxOccurs="unbounded">-->
-            <!--<xsd:element ref="mule:abstract-property-extractor"/>-->
-        <!--</xsd:choice>-->
-    <!--</xsd:complexType>-->
-
-    <!--<xsd:element name="now-property-extractor"-->
-                 <!--type="mule:abstractPropertyExtractorType"-->
-                 <!--substitutionGroup="mule:abstract-property-extractor"/>-->
-
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>

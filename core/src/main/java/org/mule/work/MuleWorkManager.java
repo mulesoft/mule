@@ -28,7 +28,6 @@
 package org.mule.work;
 
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.work.WorkExecutor;
@@ -99,13 +98,12 @@ public class MuleWorkManager implements WorkManager
         this.name = name;
     }
 
-    public synchronized LifecycleTransitionResult start() throws MuleException
+    public synchronized void start() throws MuleException
     {
         if (workExecutorService == null)
         {
             workExecutorService = threadingProfile.createPool(name);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public synchronized void dispose()

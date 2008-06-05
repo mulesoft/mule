@@ -13,7 +13,6 @@ package org.mule.transformer;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
@@ -292,14 +291,14 @@ public abstract class AbstractTransformer implements Transformer
     protected abstract Object doTransform(Object src, String encoding) throws TransformerException;
 
     /**
-     * Template method were deriving classes can do any initialisation after the
+     * Template method where deriving classes can do any initialisation after the
      * properties have been set on this transformer
      *
      * @throws InitialisationException
      */
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        return LifecycleTransitionResult.OK;
+        // do nothing, subclasses may override
     }
 
     protected String generateTransformerName()

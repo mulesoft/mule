@@ -65,7 +65,7 @@ Assembly descriptor for the full Mule distribution.
           <include>mule-*-src.zip</include>
       </includes>
     </fileSet>
-    
+
     <!--
     ============================
         Examples
@@ -292,7 +292,6 @@ Assembly descriptor for the full Mule distribution.
       ============================
           Mule Tools: Visualizer
       ============================
-      -->
 
       <fileSet>
           <directory>../../../tools/visualizer/win32</directory>
@@ -317,6 +316,7 @@ Assembly descriptor for the full Mule distribution.
               <include>visualizer.groovy</include>
           </includes>
       </fileSet>
+      -->
 
   </fileSets>
 
@@ -398,8 +398,6 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring-config</include>
         <include>org.mule.modules:mule-module-spring-extras</include>
-        <!-- MULE-2917 -->
-        <!-- include>org.mule.modules:mule-module-wssecurity</include -->
         <include>org.mule.modules:mule-module-xml</include>
         <!-- Tools -->
         <include>org.mule.tools:mule-tools-visualizer</include>

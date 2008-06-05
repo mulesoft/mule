@@ -16,7 +16,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.ResponseRouter;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.routing.Router;
@@ -47,14 +46,13 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
     }
 
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (timeout == -1) // undefined
         {
             setTimeout(muleContext.getConfiguration().getDefaultSynchronousEventTimeout());
         }
         super.initialise();
-        return LifecycleTransitionResult.OK;
     }
 
     public void route(MuleEvent event) throws RoutingException

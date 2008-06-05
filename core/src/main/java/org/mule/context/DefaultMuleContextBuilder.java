@@ -23,6 +23,7 @@ import org.mule.api.context.notification.ManagementNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.RegistryNotificationListener;
+import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
@@ -35,6 +36,7 @@ import org.mule.context.notification.ManagementNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.RegistryNotification;
+import org.mule.context.notification.RoutingNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.context.notification.ServiceNotification;
@@ -177,6 +179,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
             notificationManager.addInterfaceToType(MuleContextNotificationListener.class,
                 MuleContextNotification.class);
             notificationManager.addInterfaceToType(ModelNotificationListener.class, ModelNotification.class);
+            notificationManager.addInterfaceToType(RoutingNotificationListener.class, RoutingNotification.class);
             notificationManager.addInterfaceToType(ServiceNotificationListener.class,
                 ServiceNotification.class);
             notificationManager.addInterfaceToType(SecurityNotificationListener.class,

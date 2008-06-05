@@ -51,12 +51,7 @@
         You can define a stack of interceptors that will be executed in sequence.
         You can then configure the stack on your components.
     -->
-    <!-- TODO: MULE-2285 - How does this work in 2.0?
-    <interceptor-stack name="default">
-        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
-        <interceptor className="org.mule.interceptors.TimerInterceptor"/>
-    </interceptor-stack>
-    -->
+
     <!--
         The Mule model initialises and manages your UMO components
     -->
@@ -86,13 +81,6 @@
                 </filtering-router>
             </outbound>
 
-            <!--
-            Here we tell this component to use the interceptor stack defined above
-            -->
-            <!-- TODO: MULE-2285 - How does this work in 2.0?
-            <interceptor name="default"/>
-            -->
-            
             <!-- Route unexpected errors to separate error handler -->
             <default-service-exception-strategy>
                 <vm:outbound-endpoint path="systemErrorHandler"/>
@@ -113,9 +101,6 @@
                 </outbound-pass-through-router>
             </outbound>
 
-            <!-- TODO: MULE-2285 - How does this work in 2.0?                
-            <interceptor name="default"/>
-            -->
         </service>
         
         <!-- This error handler returns user error messages to caller. Errors could also be routed elsewhere,

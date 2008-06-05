@@ -10,12 +10,12 @@
 
 package org.mule.model;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.component.LifecycleAdapterFactory;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
@@ -147,12 +147,11 @@ public abstract class AbstractModel implements Model
      *
      * @throws MuleException if a Service fails tcomponent
      */
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPING));
         started.set(false);
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPED));
-        return LifecycleTransitionResult.OK;
     }
 
     /**
@@ -160,7 +159,7 @@ public abstract class AbstractModel implements Model
      *
      * @throws MuleException if any of the components fail to start
      */
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
         if (!initialised.get())
         {
@@ -177,10 +176,9 @@ public abstract class AbstractModel implements Model
         {
             logger.debug("Model already started");
         }
-        return LifecycleTransitionResult.OK;
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (!initialised.get())
         {
@@ -192,7 +190,6 @@ public abstract class AbstractModel implements Model
         {
             logger.debug("Model already initialised");
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public ExceptionListener getExceptionListener()
@@ -211,7 +208,7 @@ public abstract class AbstractModel implements Model
         {
             muleContext.fireNotification(notification);
         }
-        else if (logger.isDebugEnabled())
+        else if (logger.isWarnEnabled())
         {
             logger.debug("MuleContext is not yet available for firing notifications, ignoring event: " + notification);
         }
@@ -220,6 +217,12 @@ public abstract class AbstractModel implements Model
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+        //Because we allow a default Exception strategy for the model we need to inject the
+        //muleContext when we get it
+        if(exceptionListener instanceof MuleContextAware)
+        {
+            ((MuleContextAware)exceptionListener).setMuleContext(muleContext);
+        }
     }
 
 }

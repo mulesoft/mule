@@ -21,9 +21,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * @deprecated Mule 2.x will use the OSGi Service Registry for locating services
- */
+// TODO This will eventually use the OSGi Service Registry for locating services
 // @ThreadSafe
 public class SpiUtils
 {

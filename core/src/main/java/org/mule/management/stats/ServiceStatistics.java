@@ -29,6 +29,9 @@ public class ServiceStatistics implements Statistics
     private long maxQueuedEvent = 0;
     private long averageQueueSize = 0;
     private long totalQueuedEvent = 0;
+    private long sentEventSync = 0;
+    private long sentReplyToEvent = 0;
+    private long sentEventASync = 0;
     private long executionError = 0;
     private long fatalError = 0;
 
@@ -108,7 +111,20 @@ public class ServiceStatistics implements Statistics
         fatalError++;
     }
 
+    public synchronized void incSentEventSync()
+    {
+        sentEventSync++;
+    }
 
+    public synchronized void incSentEventASync()
+    {
+        sentEventASync++;
+    }
+
+    public synchronized void incSentReplyToEvent()
+    {
+        sentReplyToEvent++;
+    }
 
     public synchronized void incQueuedEvent()
     {
@@ -192,17 +208,17 @@ public class ServiceStatistics implements Statistics
 
     public long getReplyToEventsSent()
     {
-        return componentStat.getReplyToEventsSent();
+        return sentReplyToEvent;
     }
 
     public long getSyncEventsSent()
     {
-        return componentStat.getSyncEventsSent();
+        return sentEventSync;
     }
 
     public long getAsyncEventsSent()
     {
-        return componentStat.getAsyncEventsSent();
+        return sentEventASync;
     }
 
     public long getTotalEventsSent()
@@ -256,6 +272,10 @@ public class ServiceStatistics implements Statistics
         maxQueuedEvent = 0;
         totalQueuedEvent = 0;
         averageQueueSize = 0;
+
+        sentEventSync = 0;
+        sentEventASync = 0;
+        sentReplyToEvent = 0;
 
         executionError = 0;
         fatalError = 0;

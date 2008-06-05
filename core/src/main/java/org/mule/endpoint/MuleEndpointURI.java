@@ -16,14 +16,13 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.service.TransportServiceDescriptor;
+import org.mule.util.ClassUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
-import org.mule.util.ClassUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -151,7 +150,7 @@ public class MuleEndpointURI implements EndpointURI
     }
 
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         try
         {
@@ -170,7 +169,6 @@ public class MuleEndpointURI implements EndpointURI
         {
             throw new InitialisationException(e, this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     private String retrieveSchemeMetaInfo(String url)

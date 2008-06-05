@@ -13,7 +13,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecyclePhase;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.util.StringMessageUtils;
 
@@ -141,6 +140,7 @@ public class GenericLifecycleManager implements LifecycleManager
     public void applyCompletedPhases(Object object) throws MuleException
     {
         logger.debug("applying lifecycle to " + object);
+        
         LifecyclePhase lcp;
         String phase;
         Integer phaseIndex;
@@ -149,24 +149,24 @@ public class GenericLifecycleManager implements LifecycleManager
             phase = (String) iterator.next();
             phaseIndex = (Integer) index.get(phase);
             lcp = (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
-            logger.debug("phase: " + lcp);
-            LifecycleTransitionResult result = lcp.applyLifecycle(object);
-            if (! LifecycleTransitionResult.isOk(result))
+            
+            if (logger.isDebugEnabled())
             {
-                throw result.nestedRetryLifecycleException();
+                logger.debug("phase: " + lcp);
             }
+            lcp.applyLifecycle(object);
         }
         //If we're currently in a phase, fire that too
         if (getExecutingPhase() != null)
         {
             phaseIndex = (Integer) index.get(getExecutingPhase());
             lcp = (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
-            logger.debug("and executing: " + lcp);
-            LifecycleTransitionResult result = lcp.applyLifecycle(object);
-            if (! LifecycleTransitionResult.isOk(result))
+            
+            if (logger.isDebugEnabled())
             {
-                throw result.nestedRetryLifecycleException();
+                logger.debug("and executing: " + lcp);
             }
+            lcp.applyLifecycle(object);
         }
     }
 

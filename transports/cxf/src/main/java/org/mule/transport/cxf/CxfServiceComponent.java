@@ -21,7 +21,6 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.cxf.transport.MuleUniversalDestination;
@@ -345,23 +344,22 @@ public class CxfServiceComponent implements Callable, Lifecycle
         }
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (bus == null)
         {
             throw new InitialisationException(MessageFactory.createStaticMessage("No Cxf bus instance, this component has not been initialized properly."), this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
     
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
 
     public void dispose()

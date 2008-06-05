@@ -86,10 +86,6 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
         ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("testEPWithCS");
         assertNotNull(ep);
-        assertNotNull(ep.getConnectionStrategy());
-        assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-        assertEquals(4, ((SimpleRetryConnectionStrategy) ep.getConnectionStrategy()).getRetryCount());
-        assertEquals(3000, ((SimpleRetryConnectionStrategy) ep.getConnectionStrategy()).getRetryFrequency());
     }
 
     public void testEndpointConfig() throws MuleException

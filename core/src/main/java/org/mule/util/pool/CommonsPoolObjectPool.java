@@ -13,7 +13,6 @@ package org.mule.util.pool;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.object.ObjectFactory;
 import org.mule.config.PoolingProfile;
 import org.mule.config.i18n.MessageFactory;
@@ -65,7 +64,7 @@ public class CommonsPoolObjectPool implements ObjectPool, Initialisable, Disposa
         this.poolingProfile = poolingProfile;
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         GenericObjectPool.Config config = new GenericObjectPool.Config();
 
@@ -87,8 +86,6 @@ public class CommonsPoolObjectPool implements ObjectPool, Initialisable, Disposa
         {
             throw new InitialisationException(e, this);
         }
-
-        return LifecycleTransitionResult.OK;
     }
 
     /**

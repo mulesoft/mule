@@ -13,7 +13,6 @@ package org.mule.test.integration.config;
 import org.mule.MuleServer;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.service.Service;
 import org.mule.component.simple.EchoComponent;
@@ -40,9 +39,9 @@ public class DummyInitialContextFactory implements ObjectFactory
         return c;
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        return LifecycleTransitionResult.OK;
+        // do nothing
     }
 
     public void dispose()

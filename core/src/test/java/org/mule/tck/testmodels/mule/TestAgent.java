@@ -13,7 +13,9 @@ package org.mule.tck.testmodels.mule;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Mock agent
@@ -38,19 +40,19 @@ public class TestAgent implements Agent
         return "Test JMX Agent";
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
 
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
 
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
 
     public void dispose()
@@ -66,6 +68,11 @@ public class TestAgent implements Agent
     public void unregistered()
     {
         // nothing to do
+    }
+
+    public List getDependentAgents()
+    {
+        return Collections.EMPTY_LIST;
     }
 
     public String getFrobbit()

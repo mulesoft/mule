@@ -47,6 +47,8 @@ public interface PropertyConfiguration
 
     String getAttributeMapping(String alias);
 
+    String getAttributeAlias(String name);
+
     boolean isCollection(String propertyName);
 
     boolean isIgnored(String propertyName);

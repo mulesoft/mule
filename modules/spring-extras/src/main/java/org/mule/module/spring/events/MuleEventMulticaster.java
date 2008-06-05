@@ -31,7 +31,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.filter.ObjectFilter;
@@ -179,7 +178,7 @@ public class MuleEventMulticaster
         this.muleContext = context;
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (asynchronous)
         {
@@ -196,7 +195,6 @@ public class MuleEventMulticaster
                 asyncPool = null;
             }
         }
-        return LifecycleTransitionResult.OK;
     }
 
     /**

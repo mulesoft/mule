@@ -34,13 +34,6 @@
             <property name="maxRedelivery" value="2"/>
         </properties>
         <threading-profile maxThreadsActive="2" maxThreadsIdle="2" threadTTL="60000" poolExhaustedAction="WAIT"/>
-        <connection-strategy className="org.mule.transport.SimpleRetryConnectionStrategy">
-            <properties>
-                <property name="retryCount" value="4"/>
-                <property name="frequency" value="10000"/>
-                <property name="doThreading" value="false"/>
-            </properties>
-        </connection-strategy>
     </connector>
 
 
@@ -55,13 +48,6 @@
             <property name="maxRedelivery" value="2"/>
         </properties>
         <threading-profile maxThreadsActive="5" maxThreadsIdle="5" threadTTL="60000" poolExhaustedAction="WAIT"/>
-        <connection-strategy className="org.mule.transport.SimpleRetryConnectionStrategy">
-            <properties>
-                <property name="retryCount" value="4"/>
-                <property name="frequency" value="10000"/>
-                <property name="doThreading" value="false"/>
-            </properties>
-        </connection-strategy>
     </connector>
 
     <connector name="clientConnector" className="org.mule.transport.jms.JmsConnector">

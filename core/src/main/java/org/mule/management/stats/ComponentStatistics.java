@@ -25,9 +25,6 @@ public class ComponentStatistics implements Statistics
      */
     private static final long serialVersionUID = -2086999226732861674L;
 
-    private long sentEventSync = 0;
-    private long sentEventASync = 0;
-    private long sentReplyToEvent = 0;
     private long minExecutionTime = 0;
     private long maxExecutionTime = 0;
     private long averageExecutionTime = 0;
@@ -37,9 +34,6 @@ public class ComponentStatistics implements Statistics
 
     public void clear()
     {
-        sentEventSync = 0;
-        sentEventASync = 0;
-        sentReplyToEvent = 0;
         minExecutionTime = 0;
         maxExecutionTime = 0;
         executedEvent = 0;
@@ -66,16 +60,6 @@ public class ComponentStatistics implements Statistics
         this.enabled = b;
     }
 
-    public long getSyncEventsSent()
-    {
-        return sentEventSync;
-    }
-
-    public long getAsyncEventsSent()
-    {
-        return sentEventASync;
-    }
-
     public long getMaxExecutionTime()
     {
         return maxExecutionTime;
@@ -94,31 +78,6 @@ public class ComponentStatistics implements Statistics
     public long getExecutedEvents()
     {
         return executedEvent;
-    }
-
-    public long getTotalEventsSent()
-    {
-        return getSyncEventsSent() + getAsyncEventsSent();
-    }
-
-    public long getReplyToEventsSent()
-    {
-        return sentReplyToEvent;
-    }
-
-    public synchronized void incSentEventSync()
-    {
-        sentEventSync++;
-    }
-
-    public synchronized void incSentEventASync()
-    {
-        sentEventASync++;
-    }
-
-    public synchronized void incSentReplyToEvent()
-    {
-        sentReplyToEvent++;
     }
 
     public synchronized void addExecutionTime(long time)

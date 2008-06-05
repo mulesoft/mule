@@ -12,7 +12,7 @@ package org.mule.transport.email;
 
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.user.UserManager;
-import com.icegreen.greenmail.util.Servers;
+import com.icegreen.greenmail.util.GreenMail;
 
 import java.net.Socket;
 import java.util.Properties;
@@ -74,7 +74,7 @@ public class GreenMailUtilities
         throw new RuntimeException("Server failed to start within " + (count * wait) + "ms");
     }
 
-    public static void robustStartup(Servers servers, String host, int port, int startMax, int testMax, long wait)
+    public static void robustStartup(GreenMail servers, String host, int port, int startMax, int testMax, long wait)
             throws InterruptedException
     {
         for (int start = 0; start < startMax; ++start)

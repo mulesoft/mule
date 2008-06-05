@@ -26,7 +26,6 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.SecurityException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -142,7 +141,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
      * @throws org.mule.api.lifecycle.RecoverableException
      *          if an error occurs that can be recovered from
      */
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         listener = new DefaultInternalMessageListener();
         endpointUri = endpoint.getEndpointURI();
@@ -158,7 +157,6 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
 
         connectionStrategy = this.endpoint.getConnectionStrategy();
         doInitialise();
-        return LifecycleTransitionResult.OK;
     }
 
     /*
@@ -484,7 +482,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
         return endpoint.getEndpointURI().toString();
     }
 
-    public final LifecycleTransitionResult start() throws MuleException
+    public final void start() throws MuleException
     {
         if (stopped.compareAndSet(true, false))
         {
@@ -494,10 +492,9 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
             }
             doStart();
         }
-        return LifecycleTransitionResult.OK;
     }
 
-    public final LifecycleTransitionResult stop()
+    public final void stop()
     {
         try
         {
@@ -525,7 +522,6 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
             }
 
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public final boolean isConnected()

@@ -25,7 +25,7 @@ public class RollbackRoutingExceptionStrategy extends DefaultExceptionStrategy
     {
         logger.debug("handleRoutingException: endpoint=" + endpoint + " message=" + message);
         defaultHandler(t);
-        markTransactionForRollback();
+        handleTransaction(t);
         routeException(message, endpoint, t);
     }
 

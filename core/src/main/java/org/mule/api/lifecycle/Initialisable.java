@@ -16,7 +16,6 @@ package org.mule.api.lifecycle;
  */
 public interface Initialisable
 {
-
     static final String PHASE_NAME = "initialise";
 
     /**
@@ -31,6 +30,5 @@ public interface Initialisable
      * @throws RecoverableException if an error occurs that can be recovered from
      * @return Status of transition
      */
-    LifecycleTransitionResult initialise() throws InitialisationException;
-
+    void initialise() throws InitialisationException;
 }

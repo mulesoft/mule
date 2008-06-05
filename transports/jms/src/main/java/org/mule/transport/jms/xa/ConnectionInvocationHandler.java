@@ -46,12 +46,6 @@ public class ConnectionInvocationHandler implements InvocationHandler
         return xaConnection;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
-     *      java.lang.reflect.Method, java.lang.Object[])
-     */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
         if (ConnectionFactoryWrapper.logger.isDebugEnabled())
@@ -61,20 +55,23 @@ public class ConnectionInvocationHandler implements InvocationHandler
         if (method.getName().equals("createSession"))
         {
             XASession xas = ((XAConnection) xaConnection).createXASession();
-            return Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[]{Session.class, XaTransaction.MuleXaObject.class},
-                                          new SessionInvocationHandler(xas));
+            return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), 
+                new Class[]{Session.class, XaTransaction.MuleXaObject.class},
+                new SessionInvocationHandler(xas));
         }
         else if (method.getName().equals("createQueueSession"))
         {
             XAQueueSession xaqs = ((XAQueueConnection) xaConnection).createXAQueueSession();
-            return Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                          new Class[]{QueueSession.class, XaTransaction.MuleXaObject.class}, new SessionInvocationHandler(xaqs));
+            return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+                new Class[]{QueueSession.class, XaTransaction.MuleXaObject.class}, 
+                new SessionInvocationHandler(xaqs));
         }
         else if (method.getName().equals("createTopicSession"))
         {
             XATopicSession xats = ((XATopicConnection) xaConnection).createXATopicSession();
-            return Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                          new Class[]{TopicSession.class, XaTransaction.MuleXaObject.class}, new SessionInvocationHandler(xats));
+            return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+                new Class[]{TopicSession.class, XaTransaction.MuleXaObject.class}, 
+                new SessionInvocationHandler(xats));
         }
         else
         {

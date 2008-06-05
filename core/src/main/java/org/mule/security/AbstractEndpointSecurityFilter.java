@@ -18,7 +18,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.CredentialsAccessor;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.api.security.EncryptionStrategyNotFoundException;
@@ -63,7 +62,7 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
         this.muleContext = context;
     }
 
-    public final LifecycleTransitionResult initialise() throws InitialisationException
+    public final void initialise() throws InitialisationException
     {
         if (securityManager == null)
         {
@@ -96,9 +95,6 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
             }
             securityManager = localManager;
         }
-
-        // further functionality moved to lazy initialisation
-        return LifecycleTransitionResult.OK;
     }
 
     protected final synchronized void lazyInit() throws InitialisationException

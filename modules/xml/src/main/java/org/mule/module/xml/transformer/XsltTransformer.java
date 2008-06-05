@@ -13,7 +13,6 @@ package org.mule.module.xml.transformer;
 import org.mule.RequestContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -119,10 +118,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
     }
 
-    /**
-     *
-     */
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         try
         {
@@ -132,7 +128,6 @@ public class XsltTransformer extends AbstractXmlTransformer
         {
             throw new InitialisationException(te, this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     /**

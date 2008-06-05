@@ -22,7 +22,6 @@ import org.mule.api.interceptor.Invocation;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.EntryPointResolverSet;
@@ -107,33 +106,24 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
      * implement the mule {@link Startable} interface. NOT: It is up to component
      * implementations to ensure their implementation of start() is thread-safe.
      */
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
         if (isStartable)
         {
             try
             {
-                return LifecycleTransitionResult.startOrStopAll(((Startable) componentObject).start(),
-                    new LifecycleTransitionResult.Closure()
-                    {
-                        public LifecycleTransitionResult doContinue()
-                        {
-                            started = true;
-                            return LifecycleTransitionResult.OK;
-                        }
-                    });
+                ((Startable) componentObject).start();                
+                started = true;
             }
             catch (Exception e)
             {
                 throw new DefaultMuleException(CoreMessages.failedToStart("UMO Service: "
                                                                           + component.getService().getName()), e);
             }
-
         }
         else
         {
             started = true;
-            return LifecycleTransitionResult.OK;
         }
     }
 
@@ -142,21 +132,14 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
      * implement the mule {@link Stoppable} interface. NOT: It is up to component
      * implementations to ensure their implementation of stop() is thread-safe.
      */
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
         if (isStoppable)
         {
             try
             {
-                return LifecycleTransitionResult.startOrStopAll(((Stoppable) componentObject).stop(),
-                    new LifecycleTransitionResult.Closure()
-                    {
-                        public LifecycleTransitionResult doContinue()
-                        {
-                            started = false;
-                            return LifecycleTransitionResult.OK;
-                        }
-                    });
+                ((Stoppable) componentObject).stop();
+                started = false;
             }
             catch (Exception e)
             {
@@ -167,7 +150,6 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         else
         {
             started = false;
-            return LifecycleTransitionResult.OK;
         }
     }
 
@@ -258,16 +240,17 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
 
     /**
      * Propagates initialise() life-cycle to component object implementations if they
-     * implement the mule {@link Initialisable} interface. NOT: It is up to component
-     * implementations to ensure their implementation of initialise() is thread-safe.
+     * implement the mule {@link Initialisable} interface.
+     * <p/> 
+     * <b>NOTE:</b> It is up to component implementations to ensure their implementation of 
+     * <code>initialise()</code> is thread-safe.
      */
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (Initialisable.class.isInstance(componentObject))
         {
             ((Initialisable) componentObject).initialise();
         }
-        return LifecycleTransitionResult.OK;
     }
 
     protected void configureNestedRouter() throws MuleException

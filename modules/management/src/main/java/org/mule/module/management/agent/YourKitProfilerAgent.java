@@ -12,11 +12,10 @@ package org.mule.module.management.agent;
 
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.management.i18n.ManagementMessages;
 import org.mule.module.management.mbean.YourKitProfilerService;
@@ -25,6 +24,7 @@ import org.mule.module.management.support.JmxSupport;
 import org.mule.module.management.support.JmxSupportFactory;
 import org.mule.util.ClassUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.management.InstanceNotFoundException;
@@ -86,18 +86,18 @@ public class YourKitProfilerAgent implements Agent
         return "Profiler JMX Agent";
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.lifecycle.Initialisable#initialise()
-     */
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public List getDependentAgents()
+    {
+        return Collections.EMPTY_LIST;
+    }
+
+    public void initialise() throws InitialisationException
     {
         if(!isApiAvailable())
         {
             logger.warn("Cannot find YourKit API. Profiler JMX Agent will be unregistered.");
             unregisterMeQuietly();
-            return LifecycleTransitionResult.OK;
+            return;
         }
 
         final List servers = MBeanServerFactory.findMBeanServer(null);
@@ -121,7 +121,6 @@ public class YourKitProfilerAgent implements Agent
         {
             throw new InitialisationException(CoreMessages.failedToStart(this.getName()), e, this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     /**
@@ -168,24 +167,14 @@ public class YourKitProfilerAgent implements Agent
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.lifecycle.Startable#start()
-     */
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.lifecycle.Stoppable#stop()
-     */
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
 
     /*

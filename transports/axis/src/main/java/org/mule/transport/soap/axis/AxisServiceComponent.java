@@ -12,9 +12,9 @@ package org.mule.transport.soap.axis;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointException;
@@ -22,7 +22,6 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -135,13 +134,12 @@ public class AxisServiceComponent implements Initialisable, Callable
         return new DefaultMuleMessage(response);
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (axis == null)
         {
             throw new InitialisationException(MessageFactory.createStaticMessage("No Axis instance, this component has not been initialized properly."), this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public void doGet(MuleEventContext context, WriterMessageAdapter response)

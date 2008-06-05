@@ -10,30 +10,20 @@
 
 package org.mule.component;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.OptimizedRequestContext;
-import org.mule.RequestContext;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.component.LifecycleAdapterFactory;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.routing.NestedRouterCollection;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.message.DefaultExceptionPayload;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.routing.nested.DefaultNestedRouterCollection;
-import org.mule.transport.NullPayload;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -78,188 +68,9 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         }
     }
 
-    protected MuleMessage doOnCall(MuleEvent event)
+    protected MuleMessage doOnCall(MuleEvent event) throws Exception
     {
-        MuleMessage returnMessage = null;
-        try
-        {
-            InboundEndpoint endpoint = (InboundEndpoint) event.getEndpoint();
-            event = OptimizedRequestContext.unsafeSetEvent(event);
-            Object replyTo = event.getMessage().getReplyTo();
-            ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), endpoint);
-
-            // TODO Move stats up into AbstractComponent once routing has been moved
-            // to service.
-
-            // stats
-            long startTime = 0;
-            if (statistics.isEnabled())
-            {
-                startTime = System.currentTimeMillis();
-            }
-
-            returnMessage = invokeComponentInstance(event);
-
-            // stats
-            if (statistics.isEnabled())
-            {
-                statistics.addExecutionTime(System.currentTimeMillis() - startTime);
-            }
-
-            // TODO MULE-3113 Service should do onward routing, response-routers and
-            // reply-to
-
-            // this is the request event
-            // event = RequestContext.getEvent();
-            if (event.isStopFurtherProcessing())
-            {
-                logger.debug("MuleEvent stop further processing has been set, no outbound routing will be performed.");
-            }
-            if (returnMessage != null && !event.isStopFurtherProcessing())
-            {
-                if (service.getOutboundRouter().hasEndpoints())
-                {
-                    MuleMessage outboundReturnMessage = service.getOutboundRouter().route(returnMessage,
-                        event.getSession(), event.isSynchronous());
-                    if (outboundReturnMessage != null)
-                    {
-                        returnMessage = outboundReturnMessage;
-                    }
-                }
-                else
-                {
-                    logger.debug("Outbound router on service '" + service.getName()
-                                 + "' doesn't have any endpoints configured.");
-                }
-            }
-
-            // Process Response Router
-            // TODO Alan C. - responseRouter is initialized to empty (no
-            // endpoints) in Mule 2.x, this line can be part of a solution
-            // if (returnMessage != null && service.getResponseRouter() != null
-            // && !service.getResponseRouter().getEndpoints().isEmpty())
-            if (returnMessage != null && service.getResponseRouter() != null)
-            {
-                logger.debug("Waiting for response router message");
-                returnMessage = service.getResponseRouter().getResponse(returnMessage);
-            }
-
-            // process replyTo if there is one
-            if (returnMessage != null && replyToHandler != null)
-            {
-                String requestor = (String) returnMessage.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-                if ((requestor != null && !requestor.equals(service.getName())) || requestor == null)
-                {
-                    replyToHandler.processReplyTo(event, returnMessage, replyTo);
-                }
-            }
-
-            // stats
-            if (statistics.isEnabled())
-            {
-                statistics.incSentEventSync();
-            }
-        }
-        catch (Exception e)
-        {
-            event.getSession().setValid(false);
-            if (e instanceof MessagingException)
-            {
-                handleException(e);
-            }
-            else
-            {
-                handleException(new MessagingException(CoreMessages.eventProcessingFailedFor(service.getName()),
-                    event.getMessage(), e));
-            }
-
-            if (returnMessage == null)
-            {
-                // important that we pull event from request context here as it may
-                // have been modified
-                // (necessary to avoid scribbling between thrreads)
-                returnMessage = new DefaultMuleMessage(NullPayload.getInstance(), RequestContext.getEvent()
-                    .getMessage());
-            }
-            ExceptionPayload exceptionPayload = returnMessage.getExceptionPayload();
-            if (exceptionPayload == null)
-            {
-                exceptionPayload = new DefaultExceptionPayload(e);
-            }
-            returnMessage.setExceptionPayload(exceptionPayload);
-        }
-        return returnMessage;
-
-    }
-
-    protected void doOnEvent(MuleEvent event)
-    {
-        try
-        {
-            InboundEndpoint endpoint = (InboundEndpoint) event.getEndpoint();
-            // dispatch the next receiver
-            event = OptimizedRequestContext.criticalSetEvent(event);
-            Object replyTo = event.getMessage().getReplyTo();
-            ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), endpoint);
-
-            // TODO Move stats up into AbstractComponent once routing has been moved
-            // to service.
-
-            // do stats
-            long startTime = 0;
-            if (statistics.isEnabled())
-            {
-                startTime = System.currentTimeMillis();
-            }
-
-            MuleMessage result = invokeComponentInstance(event);
-
-            if (statistics.isEnabled())
-            {
-                statistics.addExecutionTime(System.currentTimeMillis() - startTime);
-            }
-           
-            // TODO MULE-3113 Service should do onward routing, response-routers and
-            // reply-to
-                       
-            // processResponse(result, replyTo, replyToHandler);
-            event = RequestContext.getEvent();
-            if (result != null && !event.isStopFurtherProcessing())
-            {
-                if (service.getOutboundRouter().hasEndpoints())
-                {
-                    service.getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
-                }
-            }
-
-            // process replyTo if there is one
-            if (result != null && replyToHandler != null)
-            {
-                String requestor = (String) result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-                if ((requestor != null && !requestor.equals(service.getName())) || requestor == null)
-                {
-                    replyToHandler.processReplyTo(event, result, replyTo);
-                }
-            }
-
-            if (statistics.isEnabled())
-            {
-                statistics.incSentEventASync();
-            }
-        }
-        catch (Exception e)
-        {
-            event.getSession().setValid(false);
-            if (e instanceof MessagingException)
-            {
-                handleException(e);
-            }
-            else
-            {
-                handleException(new MessagingException(CoreMessages.eventProcessingFailedFor(service.getName()),
-                    event.getMessage(), e));
-            }
-        }
+        return invokeComponentInstance(event);
     }
 
     protected MuleMessage invokeComponentInstance(MuleEvent event) throws Exception
@@ -336,12 +147,6 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         {
             entryPointResolverSet = service.getModel().getEntryPointResolverSet();
         }
-    }
-
-    // @Override
-    protected void doStop() throws MuleException
-    {
-        // TODO no-op
     }
 
     // @Override

@@ -20,7 +20,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceAware;
@@ -172,7 +171,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
         this.service = service;
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (service != null)
         {        
@@ -236,6 +235,5 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
             // We're already in lazy init and the service is still not set, so throw an exception.
             throw new InitialisationException(MessageFactory.createStaticMessage("Service not set, this service has not been initialized properly."), this);                        
         }
-        return LifecycleTransitionResult.OK;
     }
 }

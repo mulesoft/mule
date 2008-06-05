@@ -31,6 +31,8 @@ import org.mule.transport.AbstractMessageReceiver;
 public class TestConnector extends AbstractConnector
 {
 
+    public static final String TEST = "test";
+
     private String someProperty;
 
     public TestConnector()
@@ -77,7 +79,7 @@ public class TestConnector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "test";
+        return TEST;
     }
 
     public MessageAdapter getMessageAdapter(Object message) throws MessagingException

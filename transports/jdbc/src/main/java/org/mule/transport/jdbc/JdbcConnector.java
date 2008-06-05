@@ -60,8 +60,6 @@ public class JdbcConnector extends AbstractConnector
     private ResultSetHandler resultSetHandler;
     private QueryRunner queryRunner;
     
-    //protected Set propertyExtractors = new HashSet();
-
     protected void doInitialise() throws InitialisationException
     {
         if (dataSource == null)

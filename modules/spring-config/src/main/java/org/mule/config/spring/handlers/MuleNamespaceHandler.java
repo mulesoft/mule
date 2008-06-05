@@ -38,8 +38,9 @@ import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionPars
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
-import org.mule.config.spring.parsers.specific.EnvironmentPropertyDefinitionParser;
+import org.mule.config.spring.parsers.specific.ExceptionTXFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.GlobalPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
 import org.mule.config.spring.parsers.specific.ModelDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
@@ -72,11 +73,12 @@ import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
-import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
+import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.ExceptionTypeFilter;
+import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.RegExFilter;
@@ -106,6 +108,7 @@ import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.routing.outbound.TemplateEndpointRouter;
 import org.mule.routing.response.DefaultResponseRouterCollection;
+import org.mule.routing.response.SimpleCollectionResponseAggregator;
 import org.mule.routing.response.SingleResponseRouter;
 import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
@@ -137,9 +140,6 @@ import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.transport.SimpleRetryConnectionStrategy;
-import org.mule.util.expression.FunctionExpressionEvaluator;
-import org.mule.util.expression.MapPayloadExpressionEvaluator;
-import org.mule.util.expression.MessageHeadersExpressionEvaluator;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -155,17 +155,17 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         //Common elements
         registerBeanDefinitionParser("configuration", new ConfigurationDefinitionParser());
-        registerBeanDefinitionParser("environment-property", new EnvironmentPropertyDefinitionParser());
+        registerBeanDefinitionParser("global-property", new GlobalPropertyDefinitionParser());
         registerBeanDefinitionParser("default-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE));
         registerBeanDefinitionParser("default-dispatcher-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
         registerBeanDefinitionParser("default-receiver-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
         registerBeanDefinitionParser("default-component-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE));
-        registerBeanDefinitionParser("default-dispatcher-connection-strategy", new ConnectionStrategyDefinitionParser());
-        registerBeanDefinitionParser("default-receiver-connection-strategy", new ConnectionStrategyDefinitionParser());
-        //registerBeanDefinitionParser("mule-configuration", new MuleContextDefinitionParser());
         registerBeanDefinitionParser("component-threading-profile", new ThreadingProfileDefinitionParser("threadingProfile", MuleProperties.OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE));
         registerBeanDefinitionParser("custom-exception-strategy", new ChildDefinitionParser("exceptionListener", null));
         registerBeanDefinitionParser("default-service-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultServiceExceptionStrategy.class));
+        registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));
+        registerBeanDefinitionParser("rollback-transaction", new ExceptionTXFilterDefinitionParser("rollbackTxFilter"));
+
         registerBeanDefinitionParser("default-connector-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultExceptionStrategy.class));
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
         registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
@@ -177,15 +177,13 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //Connector elements
         registerBeanDefinitionParser("dispatcher-threading-profile", new ThreadingProfileDefinitionParser("dispatcherThreadingProfile", MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
         registerBeanDefinitionParser("receiver-threading-profile", new ThreadingProfileDefinitionParser("receiverThreadingProfile", MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
-        registerBeanDefinitionParser("dispatcher-connection-strategy", new ConnectionStrategyDefinitionParser("dispatcherConnectionStrategy"));
-        registerBeanDefinitionParser("receiver-connection-straqtegy", new ConnectionStrategyDefinitionParser("receiverConnectionStrategy"));
         registerBeanDefinitionParser("service-overrides", new ServiceOverridesDefinitionParser());
         registerBeanDefinitionParser("custom-connector", new MuleOrphanDefinitionParser(true));
 
         //Transformer elements
         registerBeanDefinitionParser("transformers", new ParentDefinitionParser());
-        registerMuleBeanDefinitionParser("response-transformers", new ParentDefinitionParser());
 
+        registerMuleBeanDefinitionParser("response-transformers", new ParentDefinitionParser());
         registerBeanDefinitionParser("transformer", new TransformerRefDefinitionParser());
 
         registerBeanDefinitionParser("custom-transformer", new TransformerDefinitionParser());
@@ -235,7 +233,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         // Models
         registerBeanDefinitionParser("model", new ModelDefinitionParser());
         registerBeanDefinitionParser("seda-model", new InheritDefinitionParser(new OrphanDefinitionParser(SedaModel.class, true), new NamedDefinitionParser()));
-        // registerBeanDefinitionParser("model-pipeline", new OrphanDefinitionParser(PipelineModel.class, true));
 
         registerBeanDefinitionParser("entry-point-resolver-set", new ChildDefinitionParser("entryPointResolverSet", DefaultEntryPointResolverSet.class));
         registerBeanDefinitionParser("legacy-entry-point-resolver-set", new ChildDefinitionParser("entryPointResolverSet", LegacyEntryPointResolverSet.class));
@@ -315,13 +312,11 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //Response Routers
         registerBeanDefinitionParser("custom-async-reply-router", new RouterDefinitionParser(null));
         registerBeanDefinitionParser("single-async-reply-router", new RouterDefinitionParser(SingleResponseRouter.class));
+        registerBeanDefinitionParser("collection-async-reply-router", new RouterDefinitionParser(SimpleCollectionResponseAggregator.class));
 
-        //Property Extractors
-        registerBeanDefinitionParser("function-property-extractor", new ChildDefinitionParser("propertyExtractor", FunctionExpressionEvaluator.class));
-        registerBeanDefinitionParser("correlation-property-extractor", new ChildDefinitionParser("propertyExtractor", CorrelationPropertiesExpressionEvaluator.class));
-        registerBeanDefinitionParser("custom-property-extractor", new ChildDefinitionParser("propertyExtractor"));
-        registerBeanDefinitionParser("map-property-extractor", new ChildDefinitionParser("propertyExtractor", MapPayloadExpressionEvaluator.class));
-        registerBeanDefinitionParser("message-property-extractor", new ChildDefinitionParser("propertyExtractor", MessageHeadersExpressionEvaluator.class));
+        //Message Info Mappings
+        registerBeanDefinitionParser("expression-message-info-mapping", new ChildDefinitionParser("messageInfoMapping", ExpressionMessageInfoMapping.class));
+        registerBeanDefinitionParser("custom-message-info-mapping", new ChildDefinitionParser("messageInfoMapping"));
 
         //Catch all Strategies
         registerBeanDefinitionParser("logging-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", LoggingCatchAllStrategy.class));
@@ -340,10 +335,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("payload-type-filter", new FilterDefinitionParser(PayloadTypeFilter.class));
         registerBeanDefinitionParser("wildcard-filter", new FilterDefinitionParser(WildcardFilter.class));
         registerBeanDefinitionParser("equals-filter", new FilterDefinitionParser(EqualsFilter.class));
+        registerBeanDefinitionParser("expression-filter", new FilterDefinitionParser(ExpressionFilter.class));
         registerBeanDefinitionParser("custom-filter", new FilterDefinitionParser());
-
-        //Retry strategies
-        registerBeanDefinitionParser("retry-connection-strategy", new ChildDefinitionParser("connectionStrategy", SimpleRetryConnectionStrategy.class));
 
         //Utils / Standard Types
         registerMuleBeanDefinitionParser("properties", new ChildMapDefinitionParser("properties")).addCollection("properties");

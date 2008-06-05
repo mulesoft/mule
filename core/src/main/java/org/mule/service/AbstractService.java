@@ -11,18 +11,17 @@
 package org.mule.service;
 
 import org.mule.OptimizedRequestContext;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.Component;
-import org.mule.api.context.MuleContextAware;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.Model;
 import org.mule.api.model.ModelException;
 import org.mule.api.routing.InboundRouterCollection;
@@ -33,6 +32,7 @@ import org.mule.api.service.Service;
 import org.mule.api.service.ServiceException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
@@ -160,7 +160,7 @@ public abstract class AbstractService implements Service
      *          if the service fails
      *          to initialise
      */
-    public final synchronized LifecycleTransitionResult initialise() throws InitialisationException
+    public final synchronized void initialise() throws InitialisationException
     {
         if (initialised.get())
         {
@@ -194,10 +194,12 @@ public abstract class AbstractService implements Service
 
         if (exceptionListener == null)
         {
-            // TODO MULE-2102 This should be configured in the default template.
-            exceptionListener = new DefaultServiceExceptionStrategy(this);
-            ((MuleContextAware) exceptionListener).setMuleContext(muleContext);
-            ((Initialisable) exceptionListener).initialise();
+            //By default us the model Exception Listener
+            exceptionListener = getModel().getExceptionListener();
+//            // TODO MULE-2102 This should be configured in the default template.
+//            exceptionListener = new DefaultServiceExceptionStrategy(this);
+//            ((MuleContextAware) exceptionListener).setMuleContext(muleContext);
+//            ((Initialisable) exceptionListener).initialise();
         }
 
         doInitialise();
@@ -213,8 +215,6 @@ public abstract class AbstractService implements Service
 
         initialised.set(true);
         fireComponentNotification(ServiceNotification.SERVICE_INITIALISED);
-
-        return LifecycleTransitionResult.OK;
     }
 
     protected ServiceStatistics createStatistics()
@@ -241,7 +241,7 @@ public abstract class AbstractService implements Service
         }
     }
 
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
         if (!stopped.get())
         {
@@ -259,13 +259,10 @@ public abstract class AbstractService implements Service
             fireComponentNotification(ServiceNotification.SERVICE_STOPPED);
             logger.info("Mule Service " + name + " has been stopped successfully");
         }
-        return LifecycleTransitionResult.OK;
     }
 
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
-        LifecycleTransitionResult status = LifecycleTransitionResult.OK;
-
         // TODO If Service is uninitialised when start is called should we initialise
         // or throw an exception?
         if (!initialised.get())
@@ -288,17 +285,16 @@ public abstract class AbstractService implements Service
             }
             else if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_PAUSED))
             {
-                status = start(/*startPaused*/true);
+                start(/*startPaused*/true);
                 logger.info("Service " + name + " has been started and paused (initial state = 'paused')");
             }
             else
             {
-                status = start(/*startPaused*/false);
+                start(/*startPaused*/false);
                 logger.info("Service " + name + " has been started successfully");
             }
             beyondInitialState.set(true);
         }
-        return status;
     }
 
     /**
@@ -307,7 +303,7 @@ public abstract class AbstractService implements Service
      * @param startPaused - Start service in a "paused" state (messages are
      *                    received but not processed).
      */
-    protected LifecycleTransitionResult start(boolean startPaused) throws MuleException
+    protected void start(boolean startPaused) throws MuleException
     {
 
         // Ensure Component is started. If component was configured with spring and
@@ -344,7 +340,7 @@ public abstract class AbstractService implements Service
         // gets routed to the service before it is started,
         // org.mule.model.AbstractComponent.dispatchEvent() will throw a
         // ServiceException with message COMPONENT_X_IS_STOPPED (see MULE-526).
-        return startListeners();
+        startListeners();
     }
 
     /**
@@ -562,13 +558,6 @@ public abstract class AbstractService implements Service
 
     protected void handleException(Exception e)
     {
-        if (exceptionListener instanceof DefaultServiceExceptionStrategy)
-        {
-            if (((DefaultServiceExceptionStrategy) exceptionListener).getService() == null)
-            {
-                ((DefaultServiceExceptionStrategy) exceptionListener).setService(this);
-            }
-        }
         exceptionListener.exceptionThrown(e);
     }
 
@@ -654,7 +643,7 @@ public abstract class AbstractService implements Service
         }
     }
 
-    protected LifecycleTransitionResult startListeners() throws MuleException
+    protected void startListeners() throws MuleException
     {
         InboundEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
@@ -667,19 +656,13 @@ public abstract class AbstractService implements Service
             if (receiver != null && endpoint.getConnector().isStarted()
                     && endpoint.getInitialState().equals(ImmutableEndpoint.INITIAL_STATE_STARTED))
             {
-                LifecycleTransitionResult result = receiver.start();
-                if (! result.isOk())
-                {
-                    throw (InitialisationException) new InitialisationException(CoreMessages.nestedRetry(), receiver)
-                            .initCause(result.getThrowable());
-                }
+                receiver.start();
             }
         }
-        return LifecycleTransitionResult.OK;
     }
 
     // This is not called by anything?!
-    protected LifecycleTransitionResult stopListeners() throws MuleException
+    protected void stopListeners() throws MuleException
     {
         InboundEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
@@ -691,15 +674,9 @@ public abstract class AbstractService implements Service
                     endpoint);
             if (receiver != null)
             {
-                LifecycleTransitionResult result = receiver.stop();
-                if (! result.isOk())
-                {
-                    throw (InitialisationException) new InitialisationException(CoreMessages.nestedRetry(), receiver)
-                            .initCause(result.getThrowable());
-                }
+                receiver.stop();
             }
         }
-        return LifecycleTransitionResult.OK;
     }
 
     protected void connectListeners() throws MuleException
@@ -858,6 +835,85 @@ public abstract class AbstractService implements Service
     {
         this.component = component;
         this.component.setService(this);
+    }
+
+    protected void processReplyTo(MuleEvent event, MuleMessage result, ReplyToHandler replyToHandler, Object replyTo)
+        throws MuleException
+    {
+        if (result != null && replyToHandler != null)
+        {
+            String requestor = (String) result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
+            if ((requestor != null && !requestor.equals(getName())) || requestor == null)
+            {
+                replyToHandler.processReplyTo(event, result, replyTo);
+            }
+        }
+    }
+
+    protected ReplyToHandler getReplyToHandler(MuleMessage message, InboundEndpoint endpoint)
+    {
+        Object replyTo = message.getReplyTo();
+        ReplyToHandler replyToHandler = null;
+        if (replyTo != null)
+        {
+            replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler();
+            // Use the response transformer for the event if one is set
+            if (endpoint.getResponseTransformers() != null)
+            {
+                replyToHandler.setTransformers(endpoint.getResponseTransformers());
+            }
+        }
+        return replyToHandler;
+    }
+
+    protected void dispatchToOutboundRouter(MuleEvent event, MuleMessage result) throws MessagingException
+    {
+        if (event.isStopFurtherProcessing())
+        {
+            logger.debug("MuleEvent stop further processing has been set, no outbound routing will be performed.");
+        }
+        if (result != null && !event.isStopFurtherProcessing())
+        {
+            if (getOutboundRouter().hasEndpoints())
+            {
+                getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
+            }
+        }
+    }
+
+    protected MuleMessage sendToOutboundRouter(MuleEvent event, MuleMessage result) throws MessagingException
+    {
+        if (event.isStopFurtherProcessing())
+        {
+            logger.debug("MuleEvent stop further processing has been set, no outbound routing will be performed.");
+        }
+        if (result != null && !event.isStopFurtherProcessing())
+        {
+            if (getOutboundRouter().hasEndpoints())
+            {
+                MuleMessage outboundReturnMessage = getOutboundRouter().route(result, event.getSession(),
+                    event.isSynchronous());
+                if (outboundReturnMessage != null)
+                {
+                    result = outboundReturnMessage;
+                }
+            }
+            else
+            {
+                logger.debug("Outbound router on service '" + getName() + "' doesn't have any endpoints configured.");
+            }
+        }
+        return result;
+    }
+
+    protected MuleMessage processAsyncReplyRouter(MuleMessage result) throws MuleException
+    {
+        if (result != null && getResponseRouter() != null)
+        {
+            logger.debug("Waiting for response router message");
+            result = getResponseRouter().getResponse(result);
+        }
+        return result;
     }
 
 }

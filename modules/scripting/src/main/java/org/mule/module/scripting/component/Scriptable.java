@@ -12,7 +12,6 @@ package org.mule.module.scripting.component;
 
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.IOUtils;
 
@@ -52,7 +51,7 @@ public class Scriptable implements Initialisable
     private ScriptEngine scriptEngine;
     private String scriptEngineName;
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (scriptEngine == null)
         {
@@ -125,7 +124,6 @@ public class Scriptable implements Initialisable
                 throw new InitialisationException(e, this);
             }
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public ScriptEngine getScriptEngine()

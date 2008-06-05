@@ -29,7 +29,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.service.Service;
@@ -325,12 +324,7 @@ public abstract class AbstractConnector
         name = newName;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.transport.UMOConnector#create(java.util.HashMap)
-     */
-    public final synchronized LifecycleTransitionResult initialise() throws InitialisationException
+    public final synchronized void initialise() throws InitialisationException
     {
         if (initialised.get())
         {
@@ -374,16 +368,9 @@ public abstract class AbstractConnector
         }
 
         initialised.set(true);
-
-        return LifecycleTransitionResult.OK;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.transport.Connector#start()
-     */
-    public final synchronized LifecycleTransitionResult start() throws MuleException
+    public final synchronized void start() throws MuleException
     {
         this.checkDisposed();
 
@@ -406,7 +393,7 @@ public abstract class AbstractConnector
                 // Connectors should have a single reconnection thread, unlike per receiver/dispatcher
                 connectionStrategy.connect(this);
                 // Only start once we are connected
-                return LifecycleTransitionResult.OK;
+                return;
             }
 
             if (logger.isInfoEnabled())
@@ -442,7 +429,6 @@ public abstract class AbstractConnector
                 logger.info("Started: " + this);
             }
         }
-        return LifecycleTransitionResult.OK;
     }
 
     /*
@@ -455,16 +441,11 @@ public abstract class AbstractConnector
         return started.get();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.transport.Connector#stop()
-     */
-    public final synchronized LifecycleTransitionResult stop() throws MuleException
+    public final synchronized void stop() throws MuleException
     {
         if (this.isDisposed())
         {
-            return LifecycleTransitionResult.OK;
+            return;
         }
 
         if (this.isStarted())
@@ -521,7 +502,6 @@ public abstract class AbstractConnector
         {
             logger.info("Stopped: " + this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     /*

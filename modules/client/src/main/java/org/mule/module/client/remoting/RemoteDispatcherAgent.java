@@ -14,7 +14,6 @@ import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.config.i18n.CoreMessages;
@@ -58,14 +57,14 @@ public class RemoteDispatcherAgent extends AbstractAgent
         return getName() + ": accepting connections on " + endpoint.getEndpointURI().getAddress();
     }
 
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
 
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
 
     public void dispose()
@@ -83,7 +82,7 @@ public class RemoteDispatcherAgent extends AbstractAgent
         // nothing to do (yet?)
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (endpoint == null)
         {
@@ -120,7 +119,6 @@ public class RemoteDispatcherAgent extends AbstractAgent
         {
             throw new InitialisationException(e, this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public String toString()

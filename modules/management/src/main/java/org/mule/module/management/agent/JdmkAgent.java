@@ -13,7 +13,6 @@ package org.mule.module.management.agent;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
@@ -69,7 +68,7 @@ public class JdmkAgent extends AbstractAgent
         return "Jdmk Http adaptor: " + jmxAdaptorUrl;
     }
 
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
         try
         {
@@ -89,14 +88,13 @@ public class JdmkAgent extends AbstractAgent
         {
             // ignore
         }
-        return LifecycleTransitionResult.OK;
     }
 
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
         if (mBeanServer == null)
         {
-            return LifecycleTransitionResult.OK;
+            return;
         }
         
         try
@@ -117,7 +115,6 @@ public class JdmkAgent extends AbstractAgent
         {
             // ignore
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()
@@ -142,7 +139,7 @@ public class JdmkAgent extends AbstractAgent
         // nothing to do
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         try
         {
@@ -167,7 +164,6 @@ public class JdmkAgent extends AbstractAgent
         {
             throw new InitialisationException(CoreMessages.failedToStart("Jdmk Agent"), e, this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     /**

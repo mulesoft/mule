@@ -12,7 +12,6 @@ package org.mule.routing;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.Router;
 import org.mule.management.stats.RouterStatistics;
 
@@ -28,10 +27,9 @@ public abstract class AbstractRouter implements Router, MuleContextAware
 
     protected MuleContext muleContext;
 
-    // default impl does nothing
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        return LifecycleTransitionResult.OK;
+        // default impl does nothing
     }
 
     public void dispose()

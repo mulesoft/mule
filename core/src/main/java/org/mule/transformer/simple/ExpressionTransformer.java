@@ -11,7 +11,6 @@ package org.mule.transformer.simple;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -70,7 +69,7 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
      *
      */
     //@Override
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if(arguments==null || arguments.size()==0)
         {
@@ -89,7 +88,6 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
                 throw new InitialisationException(e, this);
             }
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException

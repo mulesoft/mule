@@ -15,7 +15,6 @@ import org.mule.api.component.Component;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.routing.NestedRouterCollection;
@@ -124,9 +123,9 @@ public class PooledJavaComponent extends AbstractJavaComponent
             return LifecycleAdapter.class;
         }
 
-        public LifecycleTransitionResult initialise() throws InitialisationException
+        public void initialise() throws InitialisationException
         {
-            return objectFactory.initialise();
+            objectFactory.initialise();
         }
 
         public void dispose()
@@ -137,7 +136,6 @@ public class PooledJavaComponent extends AbstractJavaComponent
         public void addObjectInitialisationCallback(InitialisationCallback callback)
         {
             objectFactory.addObjectInitialisationCallback(callback);
-
         }
 
         public boolean isSingleton()

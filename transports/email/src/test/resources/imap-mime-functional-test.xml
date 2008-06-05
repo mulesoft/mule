@@ -21,9 +21,7 @@
         <service name="relay">
             <inbound>
                 <imap:inbound-endpoint user="bob" password="password" host="localhost" port="65443"
-                                       transformer-refs="noActionTransformer">
-                    <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
-                </imap:inbound-endpoint>
+                                       transformer-refs="noActionTransformer"/>
             </inbound>
             <outbound>
                 <outbound-pass-through-router>

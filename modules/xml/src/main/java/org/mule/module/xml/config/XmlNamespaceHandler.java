@@ -48,9 +48,6 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("xml-to-object-transformer", new MuleOrphanDefinitionParser(XmlToObject.class, false));
         registerBeanDefinitionParser("xml-prettyprinter-transformer", new TransformerDefinitionParser(XmlPrettyPrinter.class));
         registerBeanDefinitionParser("xslt-transformer", new XsltTransformerDefinitionParser());
-        registerBeanDefinitionParser("jxpath-property-extractor", new ChildDefinitionParser("propertyExtractor", JXPathExpressionEvaluator.class));
-        registerBeanDefinitionParser("xpath-property-extractor", new ChildDefinitionParser("propertyExtractor", XPathExpressionEvaluator.class));
-        registerBeanDefinitionParser("bean-property-extractor", new ChildDefinitionParser("propertyExtractor", BeanPayloadExpressionEvaluator.class));
         registerBeanDefinitionParser("namespace", new ChildMapEntryDefinitionParser("namespaces", "prefix", "uri"));
         registerBeanDefinitionParser("context-property", new ChildMapEntryDefinitionParser("contextProperties", "key", "value"));
         registerBeanDefinitionParser("xslt-text", new XsltTextDefinitionParser("xslt", String.class));

@@ -109,8 +109,6 @@
     <link><item>mule:inbound-endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:outbound-endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:endpoint</item><page>Configuring+Endpoints</page></link>
-    <link><item>mule:retry-connection-strategy</item><page>Configuring+Endpoints</page></link>
-    <link><item>mule:custom-connection-strategy</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:transformers</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:response-transformers</item><page>Configuring+Endpoints</page></link>
 

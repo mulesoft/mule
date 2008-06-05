@@ -13,7 +13,6 @@ package org.mule.config.spring.factories;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 import org.apache.commons.logging.Log;
@@ -49,9 +48,9 @@ public abstract class AbstractEndpointFactoryBean extends EndpointURIEndpointBui
         return true;
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        return LifecycleTransitionResult.OK;
+        // subclasses may override this method
     }
 
     protected abstract Object doGetObject() throws Exception;

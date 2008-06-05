@@ -12,7 +12,6 @@ package org.mule.transformer.encryption;
 
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -117,7 +116,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
      * 
      * @throws org.mule.api.lifecycle.InitialisationException
      */
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (strategyName != null)
         {
@@ -137,7 +136,6 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
         {
             throw new InitialisationException(CoreMessages.encryptionStrategyNotSet(), this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public EncryptionStrategy getStrategy()

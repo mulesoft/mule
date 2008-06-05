@@ -10,12 +10,11 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 
 import java.util.HashMap;
 
@@ -124,16 +123,14 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
         return state;
     }
 
-    public LifecycleTransitionResult start()
+    public void start()
     {
         state = "started";
-        return LifecycleTransitionResult.OK;
     }
 
-    public LifecycleTransitionResult stop()
+    public void stop()
     {
         state = "stopped";
-        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()

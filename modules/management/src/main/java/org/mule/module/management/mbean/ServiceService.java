@@ -12,7 +12,6 @@ package org.mule.module.management.mbean;
 
 import org.mule.MuleServer;
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.service.Service;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.model.seda.SedaService;
@@ -104,9 +103,9 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
         return getComponent().isStopped();
     }
 
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
-        return getComponent().stop();
+        getComponent().stop();
     }
 
     public void forceStop() throws MuleException
@@ -124,9 +123,9 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
         getComponent().dispose();
     }
 
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
-        return getComponent().start();
+        getComponent().start();
     }
 
     /*

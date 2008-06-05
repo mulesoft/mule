@@ -13,9 +13,9 @@
                                    maxThreadsIdle="3" poolExhaustedAction="WAIT" threadTTL="60001"/>
     </configuration>
 
-    <environment-property name="doCompression" value="true"/>
-    <environment-property name="beanProperty1" value="this was set from the manager properties!"/>
-    <environment-property name="OS_Version" value="not found"/>
+    <global-property name="doCompression" value="true"/>
+    <global-property name="beanProperty1" value="this was set from the manager properties!"/>
+    <global-property name="OS_Version" value="not found"/>
 
 
     <!-- TODO ConnectionStrategies on endpoints -->
@@ -59,9 +59,7 @@
         <property key="beanProperty2" value="12"/>
         <property key="containerProperty" value="myString"/>
     </endpoint>
-    <endpoint name="testEPWithCS" address="test://test.queue2">
-        <retry-connection-strategy retryCount="4" retryFrequency="3000"/>
-    </endpoint>
+    <endpoint name="testEPWithCS" address="test://test.queue2"/>
     
     <endpoint name="endpointWithProps" address="test://endpointWithProps">
     	<properties>
@@ -126,7 +124,6 @@
     </spring:bean>
     
     <model name="main">
-
         <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
             <outbound-endpoint address=" test://component.exceptions "/>
         </custom-exception-strategy>
@@ -135,7 +132,6 @@
 
         <service name="orangeComponent">
             <inbound>
-
                 <forwarding-catch-all-strategy>
                     <outbound-endpoint address="test://catch.all"/>
                 </forwarding-catch-all-strategy>

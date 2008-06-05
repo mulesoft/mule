@@ -12,13 +12,12 @@ package org.mule.tck.functional;
 
 import org.mule.MuleServer;
 import org.mule.RequestContext;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
-import org.mule.api.DefaultMuleException;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.util.NumberUtils;
@@ -66,13 +65,12 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      */
     private List messageHistory;
 
-    public LifecycleTransitionResult initialise()
+    public void initialise()
     {
         if (enableMessageHistory)
         {
             messageHistory = new CopyOnWriteArrayList();
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()

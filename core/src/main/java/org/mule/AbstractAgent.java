@@ -13,7 +13,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implements common methods for all Agents. Importantly, the Management context is made available to Agents that
@@ -46,11 +48,16 @@ public abstract class AbstractAgent implements Agent, MuleContextAware
         return name;
     }
 
+    public List getDependentAgents()
+    {
+        return Collections.EMPTY_LIST;
+    }
+
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
-    public abstract LifecycleTransitionResult initialise() throws InitialisationException;
+    public abstract void initialise() throws InitialisationException;
 
 }

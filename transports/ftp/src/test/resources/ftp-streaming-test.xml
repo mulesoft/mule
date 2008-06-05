@@ -22,24 +22,18 @@
 
         <service name="bridge">
             <inbound>
-                <inbound-endpoint address="tcp://localhost:60196">
-                    <retry-connection-strategy retryCount="3" retryFrequency="2000"/>
-                </inbound-endpoint>
+                <inbound-endpoint address="tcp://localhost:60196"/>
             </inbound>
             <outbound>
                 <outbound-pass-through-router>
-                    <ftp:outbound-endpoint user="anonymous" password="email" host="localhost" port="60197">
-                        <retry-connection-strategy retryCount="3" retryFrequency="2000"/>
-                    </ftp:outbound-endpoint>
+                    <ftp:outbound-endpoint user="anonymous" password="email" host="localhost" port="60197"/>
                 </outbound-pass-through-router>
             </outbound>
         </service>
 
         <service name="testComponent">
             <inbound>
-                <ftp:inbound-endpoint address="ftp://anonymous:email@localhost:60197">
-                    <retry-connection-strategy retryCount="3" retryFrequency="2000"/>
-                </ftp:inbound-endpoint>
+                <ftp:inbound-endpoint address="ftp://anonymous:email@localhost:60197"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>

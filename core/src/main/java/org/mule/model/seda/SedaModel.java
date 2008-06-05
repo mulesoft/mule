@@ -11,7 +11,6 @@
 package org.mule.model.seda;
 
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.model.AbstractModel;
@@ -62,7 +61,7 @@ public class SedaModel extends AbstractModel
     }
 
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         queueTimeout = muleContext.getConfiguration().getDefaultSynchronousEventTimeout();
         if (queueProfile==null)
@@ -73,7 +72,7 @@ public class SedaModel extends AbstractModel
         {
             poolingProfile = new PoolingProfile();
         }
-        return super.initialise();
+        super.initialise();
     }
 
     public int getQueueTimeout()

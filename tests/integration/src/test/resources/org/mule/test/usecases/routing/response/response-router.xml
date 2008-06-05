@@ -60,7 +60,7 @@
             </outbound>
             <async-reply>
                 <inbound-endpoint address="vm://W10Response"/>
-                <custom-async-reply-router class="org.mule.test.usecases.service.DummyResponseAggregator"/>
+                <single-async-reply-router/>
             </async-reply>
         </service>
 

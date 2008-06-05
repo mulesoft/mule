@@ -12,9 +12,11 @@ package org.mule.module.pgp;
 
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.IOUtils;
+
+import cryptix.pki.ExtendedKeyStore;
+import cryptix.pki.KeyBundle;
 
 import java.io.InputStream;
 import java.security.Principal;
@@ -22,8 +24,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import cryptix.pki.ExtendedKeyStore;
-import cryptix.pki.KeyBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -112,7 +112,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         return (KeyBundle) principalsKeyBundleMap.get(principalId);
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         try
         {
@@ -129,7 +129,6 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
             logger.error("errore in inizializzazione:" + e.getMessage(), e);
             throw new InitialisationException(CoreMessages.failedToCreate("PGPKeyRingImpl"), e, this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     private void readPublicKeyRing() throws Exception

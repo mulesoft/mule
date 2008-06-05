@@ -15,13 +15,13 @@ import org.mule.MuleServer;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -82,31 +82,33 @@ public class ConfigScannerAgent extends AbstractAgent
         return getName() + " scanning for files in " + configDirName;
     }
 
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
         scannerThread = new ScannerThread();
         scannerThread.start();
-        return LifecycleTransitionResult.OK;
     }
 
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
-        return LifecycleTransitionResult.OK;
+        // do nothing
     }
 
     public void dispose()
     {
+        // do nothing
     }
 
     public void registered()
     {
+        // do nothing
     }
 
     public void unregistered()
     {
+        // do nothing
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (configDirName == null)
         {
@@ -122,7 +124,11 @@ public class ConfigScannerAgent extends AbstractAgent
         {
             throw new InitialisationException(ioe, this);
         }
-        return LifecycleTransitionResult.OK;
+    }
+
+    public List getDependentAgents()
+    {
+        return Collections.EMPTY_LIST;
     }
 
     public String toString()

@@ -7,8 +7,5 @@
 
 org.mule.test.firewall.FirewallTestCase
 
-# MULE-3115
-#org.mule.config.spring.parsers.MapMule2478TestCase
-
 # I don't see what my changes have to do with this failure.
 org.mule.test.spring.NestExampleTestCase

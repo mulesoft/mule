@@ -83,6 +83,11 @@ public class TempWrapperPropertyConfiguration implements PropertyConfiguration
         return extra.getAttributeMapping(alias, delegate.getAttributeMapping(alias));
     }
 
+    public String getAttributeAlias(String mapping)
+    {
+        return extra.getAttributeMapping(mapping, delegate.getAttributeAlias(mapping));
+    }
+
     public boolean isCollection(String propertyName)
     {
         return extra.isCollection(propertyName) || delegate.isCollection(propertyName);

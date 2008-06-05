@@ -17,11 +17,12 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
-import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
+import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
@@ -31,7 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -56,7 +56,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
     protected int enableCorrelation = ENABLE_CORRELATION_IF_NOT_SET;
 
-    protected ExpressionEvaluator propertyExtractor = new CorrelationPropertiesExpressionEvaluator();
+    protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
 
     protected TransactionConfig transactionConfig;
 
@@ -193,12 +193,11 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
 
             String correlation;
-            Object o = propertyExtractor.evaluate(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
+            correlation = messageInfoMapping.getCorrelationId(message);
             if (logger.isDebugEnabled())
             {
-                logger.debug("Extracted correlation Id as: " + o);
+                logger.debug("Extracted correlation Id as: " + correlation);
             }
-            correlation = o.toString();
 
             if (logger.isDebugEnabled())
             {
@@ -293,28 +292,14 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
     }
 
-    public ExpressionEvaluator getPropertyExtractor()
+    public MessageInfoMapping getMessageInfoMapping()
     {
-        return propertyExtractor;
+        return messageInfoMapping;
     }
 
-    public void setPropertyExtractor(ExpressionEvaluator propertyExtractor)
+    public void setMessageInfoMapping(MessageInfoMapping messageInfoMapping)
     {
-        this.propertyExtractor = propertyExtractor;
-    }
-
-    public void setPropertyExtractorAsString(String className)
-    {
-        try
-        {
-            this.propertyExtractor = (ExpressionEvaluator) ClassUtils.instanciateClass(className, null,
-                getClass());
-        }
-        catch (Exception ex)
-        {
-            throw (IllegalArgumentException) new IllegalArgumentException(
-                "Couldn't instanciate property extractor class " + className).initCause(ex);
-        }
+        this.messageInfoMapping = messageInfoMapping;
     }
 
     public TransactionConfig getTransactionConfig()

@@ -23,18 +23,6 @@
         </dependency>
 
         <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>2.7.0</version>
-        </dependency>
-
-        <!-- dependency>
-            <groupId>org.apache.myfaces.maven</groupId>
-            <artifactId>wagon-maven-plugin</artifactId>
-            <version>1.0.6</version>
-        </dependency -->
-
-        <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
@@ -176,11 +164,6 @@
             <artifactId>mule-module-ognl</artifactId>
             <version>${version}</version>
         </dependency>
-        <!-- dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-osgi</artifactId>
-            <version>${version}</version>
-        </dependency -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-pgp</artifactId>
@@ -201,11 +184,6 @@
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
         </dependency>
-        <!-- dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-wssecurity</artifactId>
-            <version>${version}</version>
-        </dependency -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
@@ -250,25 +228,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
-                    <!-- this is not needed if we write directly to an html directory -->
-                    <!-- plugin>
-                        <groupId>org.apache.myfaces.maven</groupId>
-                        <artifactId>wagon-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>process-classes</phase>
-                                <configuration>
-                                    <id>mule-wiki</id>
-                                    <inputDirectory>target/normalized</inputDirectory>
-                                    <url>scp://mule.mulesource.org/opt/j2ee/domains/mulesource.org/mule/ROOT/webapps/atlassian-confluence/data/data-2.3.3/script/xsd-doc/</url>
-                                </configuration>
-                                <goals>
-                                    <goal>deploy</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin -->
                 </plugins>
             </build>
         </profile>

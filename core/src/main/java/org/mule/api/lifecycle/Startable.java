@@ -11,6 +11,7 @@
 package org.mule.api.lifecycle;
 
 import org.mule.api.MuleException;
+import org.mule.api.component.LifecycleAdapter;
 
 /**
  * <code>Startable</code> provides an object with a {@link #start()} method
@@ -21,9 +22,7 @@ import org.mule.api.MuleException;
  */
 public interface Startable
 {
-
     static final String PHASE_NAME = "start";
 
-    LifecycleTransitionResult start() throws MuleException;
-
+    void start() throws MuleException;
 }

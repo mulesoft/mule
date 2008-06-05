@@ -13,14 +13,10 @@ package org.mule.module.pgp;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.CredentialsAccessor;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.AbstractNamedEncryptionStrategy;
-
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
 
 import cryptix.message.EncryptedMessage;
 import cryptix.message.EncryptedMessageBuilder;
@@ -30,6 +26,10 @@ import cryptix.message.MessageFactory;
 import cryptix.message.SignedMessageBuilder;
 import cryptix.openpgp.PGPArmouredMessage;
 import cryptix.pki.KeyBundle;
+
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -121,7 +121,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         return data;
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         try
         {
@@ -133,7 +133,6 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             throw new InitialisationException(
                 CoreMessages.failedToCreate("KeyBasedEncryptionStrategy"), e, this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public PGPKeyRing getKeyManager()

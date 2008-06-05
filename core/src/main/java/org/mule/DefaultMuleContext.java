@@ -23,7 +23,6 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.MuleRegistry;
@@ -117,7 +116,7 @@ public class DefaultMuleContext implements MuleContext
         return new MuleRegistryHelper(registry);
     }
     
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
 
@@ -153,11 +152,9 @@ public class DefaultMuleContext implements MuleContext
         {
             throw new InitialisationException(e, this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
-
-    public synchronized LifecycleTransitionResult start() throws MuleException
+    public synchronized void start() throws MuleException
     {
         lifecycleManager.checkPhase(Startable.PHASE_NAME);
         if (!isStarted())
@@ -183,8 +180,6 @@ public class DefaultMuleContext implements MuleContext
         }
 
         startDate = System.currentTimeMillis();
-        
-        return LifecycleTransitionResult.OK;
     }
 
     /**
@@ -194,13 +189,12 @@ public class DefaultMuleContext implements MuleContext
      * @throws MuleException if either any of the sessions or connectors fail to
      *                      stop
      */
-    public synchronized LifecycleTransitionResult stop() throws MuleException
+    public synchronized void stop() throws MuleException
     {
         lifecycleManager.checkPhase(Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPING));
         lifecycleManager.firePhase(this, Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPED));
-        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()

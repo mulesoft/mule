@@ -12,7 +12,6 @@ package org.mule.tck.testmodels.fruit;
 
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.object.ObjectFactory;
 
 /**
@@ -20,9 +19,9 @@ import org.mule.api.object.ObjectFactory;
  */
 public class BananaFactory implements ObjectFactory
 {
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        return LifecycleTransitionResult.OK;
+        // nothing to do
     }
     
     public void dispose()

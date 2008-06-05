@@ -11,7 +11,6 @@
 package org.mule.registry;
 
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.config.i18n.CoreMessages;
@@ -59,7 +58,7 @@ public abstract class AbstractRegistry implements Registry
 
     abstract protected void doDispose();
 
-    public final LifecycleTransitionResult initialise() throws InitialisationException
+    public final void initialise() throws InitialisationException
     {
         if (id == null)
         {
@@ -78,7 +77,6 @@ public abstract class AbstractRegistry implements Registry
         {
             throw new InitialisationException(e, this);
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public Object lookupObject(Class type) throws RegistrationException

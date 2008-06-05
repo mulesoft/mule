@@ -19,7 +19,7 @@
     <!--==============================================================-->
 
     <!-- This defines the structure in abstract terms (except for a few simple/unique things like
-         environment properties).  We then provide some implementations below.  Other modules
+         global properties).  We then provide some implementations below.  Other modules
          can provide other implementations. -->
 
     <xsd:element name="mule" type="muleType">
@@ -76,10 +76,10 @@
 
     <xsd:group name="muleRootElements">
         <xsd:choice>
-            <xsd:element name="environment-property" type="environmentPropertyType">
+            <xsd:element name="global-property" type="globalPropertyType">
                 <xsd:annotation>
                     <xsd:documentation>
-                        An environment property is a named string.
+                        An global property is a named string.
                         It can be used inserted in most attribute values using the ${...} syntax.
                         So the attribute value "${foo}" would be replaced by the value associated with
                         the property named "foo".
@@ -254,7 +254,7 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:complexType name="environmentPropertyType">
+    <xsd:complexType name="globalPropertyType">
         <xsd:attribute name="name" type="substitutableName" use="required">
             <xsd:annotation>
                 <xsd:documentation>
@@ -399,13 +399,6 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element name="default-connection-strategy" type="connectionStrategyType" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        The default connection strategy, used if no more specific configuration is given.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="defaultSynchronousEndpoints" type="substitutableBoolean" default="false">
             <xsd:annotation>
@@ -509,27 +502,12 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="event">
+        <xsd:attribute name="event" type="notificationTypes">
             <xsd:annotation>
                 <xsd:documentation>
                     The notification event to deliver.
                 </xsd:documentation>
             </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="MANAGER"/>
-                    <xsd:enumeration value="MODEL"/>
-                    <xsd:enumeration value="SERVICE"/>
-                    <xsd:enumeration value="SECURITY"/>
-                    <xsd:enumeration value="MANAGEMENT"/>
-                    <xsd:enumeration value="CONNECTION"/>
-                    <xsd:enumeration value="REGISTRY"/>
-                    <xsd:enumeration value="CUSTOM"/>
-                    <xsd:enumeration value="MESSAGE"/>
-                    <xsd:enumeration value="EXCEPTION"/>
-                    <xsd:enumeration value="TRANSACTION"/>
-                </xsd:restriction>
-            </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="interface-class" type="substitutableClass">
             <xsd:annotation>
@@ -538,27 +516,12 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="interface">
+        <xsd:attribute name="interface" type="notificationTypes">
             <xsd:annotation>
                 <xsd:documentation>
                     The interface that will receive the notification event.
                 </xsd:documentation>
             </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="MANAGER"/>
-                    <xsd:enumeration value="MODEL"/>
-                    <xsd:enumeration value="SERVICE"/>
-                    <xsd:enumeration value="SECURITY"/>
-                    <xsd:enumeration value="MANAGEMENT"/>
-                    <xsd:enumeration value="CONNECTION"/>
-                    <xsd:enumeration value="REGISTRY"/>
-                    <xsd:enumeration value="CUSTOM"/>
-                    <xsd:enumeration value="MESSAGE"/>
-                    <xsd:enumeration value="EXCEPTION"/>
-                    <xsd:enumeration value="TRANSACTION"/>
-                </xsd:restriction>
-            </xsd:simpleType>
         </xsd:attribute>
     </xsd:complexType>
 
@@ -571,26 +534,12 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="event">
+        <xsd:attribute name="event" type="notificationTypes">
             <xsd:annotation>
                 <xsd:documentation>
                     The event to not deliver.
                 </xsd:documentation>
             </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="MANAGER"/>
-                    <xsd:enumeration value="MODEL"/>
-                    <xsd:enumeration value="SERVICE"/>
-                    <xsd:enumeration value="SECURITY"/>
-                    <xsd:enumeration value="MANAGEMENT"/>
-                    <xsd:enumeration value="CONNECTION"/>
-                    <xsd:enumeration value="REGISTRY"/>
-                    <xsd:enumeration value="CUSTOM"/>
-                    <xsd:enumeration value="EXCEPTION"/>
-                    <xsd:enumeration value="TRANSACTION"/>
-                </xsd:restriction>
-            </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="interface-class" type="substitutableClass">
             <xsd:annotation>
@@ -599,30 +548,37 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="interface">
+        <xsd:attribute name="interface" type="notificationTypes">
             <xsd:annotation>
                 <xsd:documentation>
                     The interface that will no longer receive an event.
                 </xsd:documentation>
             </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="MANAGER"/>
-                    <xsd:enumeration value="MODEL"/>
-                    <xsd:enumeration value="SERVICE"/>
-                    <xsd:enumeration value="SECURITY"/>
-                    <xsd:enumeration value="MANAGEMENT"/>
-                    <xsd:enumeration value="CONNECTION"/>
-                    <xsd:enumeration value="REGISTRY"/>
-                    <xsd:enumeration value="CUSTOM"/>
-                    <xsd:enumeration value="EXCEPTION"/>
-                    <xsd:enumeration value="TRANSACTION"/>
-                </xsd:restriction>
-            </xsd:simpleType>
         </xsd:attribute>
     </xsd:complexType>
 
 
+    <xsd:simpleType name="notificationTypes">
+        <xsd:annotation>
+            <xsd:documentation>
+                The interface that will no longer receive an event.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="MANAGER"/>
+            <xsd:enumeration value="MODEL"/>
+            <xsd:enumeration value="SERVICE"/>
+            <xsd:enumeration value="SECURITY"/>
+            <xsd:enumeration value="MESSAGE"/>
+            <xsd:enumeration value="MANAGEMENT"/>
+            <xsd:enumeration value="CONNECTION"/>
+            <xsd:enumeration value="REGISTRY"/>
+            <xsd:enumeration value="CUSTOM"/>
+            <xsd:enumeration value="EXCEPTION"/>
+            <xsd:enumeration value="TRANSACTION"/>
+            <xsd:enumeration value="ROUTING"/>
+        </xsd:restriction>
+    </xsd:simpleType>
     <!--==============================================================-->
     <!-- Models                                                       -->
     <!--==============================================================-->
@@ -1079,7 +1035,46 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractExceptionStrategyType"/>
+
+    <xsd:complexType name="abstractExceptionStrategyType">
+        <xsd:sequence>
+            <xsd:element name="commit-transaction" type="exceptionPatternType" maxOccurs="1" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>Defines when a current transaction gets rolled-back depending on the name of the
+                        exception caught. Users can set a comma delimited list of wildcard patterns that wil be matched
+                        angainst the fully qualified classname of the current exception. Patterns defined for this
+                        element will leave the current transaction (if any) untouched and llow it to be committed.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="rollback-transaction" type="exceptionPatternType" maxOccurs="1" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>Defines when a current transaction gets rolled-back depending on the name of the
+                        exception caught. Users can set a comma delimited list of wildcard patterns that wil be matched
+                        angainst the fully qualified classname of the current exception. Patterns defined for this
+                        element will rollback the current transaction (if any).
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="enableNotifications" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>Determines whether ExceptionNotifications wil be fired from this strategy when an
+                    exception occurs.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="exceptionPatternType">
+        <xsd:attribute name="exception-pattern" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>A comma-separate list of wildcard expressions that will be matched against the
+                    fully qualified cassname of the current exception received by the ExceptionStrategy.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
 
     <xsd:complexType name="asyncReplyCollectionType">
         <xsd:sequence>
@@ -1087,10 +1082,18 @@
             <xsd:element ref="abstract-async-reply-router" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
-        <xsd:attribute name="timeout" type="xsd:int">
+        <xsd:attribute name="timeout" type="substitutableInt">
             <xsd:annotation>
                 <xsd:documentation>
                     The timeout (ms) to wait for a reply.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="failOnTimeout" type="substitutableBoolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    If the router times out before all expected events have been received should an exception be thrown
+                    or should the current events be returned for processing. The default is false.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1122,7 +1125,7 @@
                     <xsd:element ref="abstract-component-threading-profile" minOccurs="0"/>
                     <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
                 </xsd:sequence>
-                <xsd:attribute name="queueTimeout" type="xsd:integer">
+                <xsd:attribute name="queueTimeout" type="substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
                             The timeout used when taking messages from the SEDA queue.
@@ -1220,7 +1223,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="pooled-component" type="pooledJavaComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
@@ -1243,14 +1246,13 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
-    
+
 
     <xsd:complexType name="pojoBindingType">
         <xsd:sequence>
             <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
-        <xsd:attribute name="interface" use="required">
+        <xsd:attribute name="interface" use="required" type="substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
                     The interface to be injected.
@@ -1595,7 +1597,6 @@
                 <xsd:element ref="abstract-transaction" minOccurs="0"/>
                 <xsd:element ref="abstract-filter" minOccurs="0"/>
                 <xsd:element ref="abstract-security-filter" minOccurs="0"/>
-                <xsd:element ref="abstract-connection-strategy" minOccurs="0"/>
                 <xsd:group ref="propertiesGroup"/>
             </xsd:sequence>
         </xsd:sequence>
@@ -1610,16 +1611,6 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractSecurityFilterType"/>
-
-    <xsd:element name="abstract-connection-strategy" abstract="true" type="abstractConnectionStrategyType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for connection strategy elements.
-                Connection strategies control how the underlying transport handles connection errors.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractConnectionStrategyType"/>
 
     <xsd:attributeGroup name="defaultEndpointAttributes">
         <xsd:attributeGroup ref="restrictedEndpointAttributes"/>
@@ -1854,6 +1845,68 @@
             <xsd:extension base="patternFilterType"/>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="expression-filter" type="expressionFilterType" substitutionGroup="abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                A filter that can evaluate a range of expressions. It supports some base expression types
+                such as 'header', 'payload' (payload type), 'regex' and 'wildcard'.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="expressionFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractFilterType">
+                <xsd:attribute name="evaluator" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>The expression evaluator to use. The expression filter supports some types
+                            such as header, payload, exception, wildcard and regex, that are in-built filters not
+                            registered with the ExpressionEvaluatorManager. All others are registered with the
+                            ExpressionEvaluatorManager. Where XPath, bean and ongl are used, the expression should be a
+                            boolean expression.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="substitutableName">
+                            <xsd:enumeration value="header"/>
+                            <xsd:enumeration value="payload-type"/>
+                            <xsd:enumeration value="exception-type"/>
+                            <xsd:enumeration value="wildcard"/>
+                            <xsd:enumeration value="regex"/>
+                            <xsd:enumeration value="ognl"/>
+                            <xsd:enumeration value="xpath"/>
+                            <xsd:enumeration value="jxpath"/>
+                            <xsd:enumeration value="bean"/>
+                            <xsd:enumeration value="custom"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="expression" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>The expression that will be evaluated. This should always be a boolean
+                            expression.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="customEvaluator" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>Must be set if the evaluator is set to 'custom'. Also the custom evaluator
+                            must be registered with the ExpressionEvaluatorManager if it is to be used here.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="nullReturnsTrue" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>If the specified expression returns null should the filter return true or
+                            false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
     <xsd:element name="regex-filter" type="patternFilterType" substitutionGroup="abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
@@ -2277,7 +2330,8 @@
     <xsd:element name="expression-transformer" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that evaluates one or more expressions on the current event
+                A transformer that evaluates one or more expressions on the current event. Each expression equates to a
+                parameter in the return message. The return message for 2 or more expressions will be an Object[].
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -2286,29 +2340,14 @@
                     <xsd:sequence minOccurs="1" maxOccurs="unbounded">
                         <xsd:element name="return-argument">
                             <xsd:complexType>
-                                <xsd:attribute name="evaluator" use="optional">
-                                    <xsd:simpleType>
-                                        <xsd:restriction base="xsd:NMTOKEN">
-                                            <xsd:enumeration value="groovy"/>
-                                            <xsd:enumeration value="header"/>
-                                            <xsd:enumeration value="headers"/>
-                                            <xsd:enumeration value="headers-list"/>
-                                            <xsd:enumeration value="attachment"/>
-                                            <xsd:enumeration value="attachments"/>
-                                            <xsd:enumeration value="attachments-list"/>
-                                            <xsd:enumeration value="payload"/>
-                                            <xsd:enumeration value="xpath"/>
-                                            <xsd:enumeration value="jxpath"/>
-                                            <xsd:enumeration value="bean"/>
-                                            <xsd:enumeration value="ognl"/>
-                                            <xsd:enumeration value="function"/>
-                                            <xsd:enumeration value="custom"/>
-                                        </xsd:restriction>
-                                    </xsd:simpleType>
+                                <xsd:attributeGroup ref="expressionAttributes"/>
+                                <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
+                                    <xsd:annotation>
+                                        <xsd:documentation>An optional expression means that if the expression evaluates
+                                            to null, it will continue to the next expression without error.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
                                 </xsd:attribute>
-                                <xsd:attribute name="expression" type="xsd:string" use="required"/>
-                                <xsd:attribute name="custom-evaluator" type="xsd:string" use="optional"/>
-                                <xsd:attribute name="optional" type="xsd:boolean" use="optional"/>
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:sequence>
@@ -2316,6 +2355,52 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
+
+    <xsd:attributeGroup name="expressionAttributes">
+        <xsd:attribute name="evaluator" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>The expression evaluator to use. Expression Evaluators must be registered with the
+                    ExpressionEvaluatrManager before thay can be used. Using the custom evaluator allows the developer
+                    to define their on in the 'custom-evaluator' attribute. Note that some evaluators such as xpath,
+                    groovy and bean are loaded from other mule modules (xml and scripting respectively), these modules
+                    wll need to be on your classpath before the evaluator can be used.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="substitutableName">
+                    <xsd:enumeration value="groovy"/>
+                    <xsd:enumeration value="header"/>
+                    <xsd:enumeration value="headers"/>
+                    <xsd:enumeration value="headers-list"/>
+                    <xsd:enumeration value="attachment"/>
+                    <xsd:enumeration value="attachments"/>
+                    <xsd:enumeration value="attachments-list"/>
+                    <xsd:enumeration value="payload"/>
+                    <xsd:enumeration value="xpath"/>
+                    <xsd:enumeration value="jxpath"/>
+                    <xsd:enumeration value="bean"/>
+                    <xsd:enumeration value="ognl"/>
+                    <xsd:enumeration value="function"/>
+                    <xsd:enumeration value="custom"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="expression" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>The expression to evaluate. The syntax of this will change depeneding on the
+                    evaluator being used.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="custom-evaluator" type="substitutableName" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>The name of the custom evaluator to use. This attribute is only used when the
+                    evaluator attribute is set to 'custom'. Users can plug in their own expression evaluators by
+                    registering them with the ExpressionEvaluatorManager.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 
     <!--==============================================================-->
     <!--   Shared elements                                             -->
@@ -2670,69 +2755,6 @@
     </xsd:complexType>
 
 
-    <!-- ConnectionStrategy implementations -->
-
-    <xsd:complexType name="connectionStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractConnectionStrategyType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="retry-connection-strategy" type="retryConnectionStrategyType"
-                 substitutionGroup="abstract-connection-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                Retry making a connection on failure.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="retryConnectionStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="connectionStrategyType">
-                <xsd:attribute name="retryFrequency" type="substitutableLong">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            How often to retry (pause time in ms).
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="retryCount" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Maximum number of retries.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="custom-connection-strategy" type="customConnectionStrategyType"
-                 substitutionGroup="abstract-connection-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                A user-defined connection strategy.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customConnectionStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="connectionStrategyType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A class that implements the ConnectionStrategy interface.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-
     <!-- Custom connector element -->
 
     <xsd:element name="custom-connector" type="customConnectorType" substitutionGroup="abstract-connector">
@@ -2772,14 +2794,14 @@
             <xsd:extension base="abstractInboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-filter" minOccurs="0"/>
-                    <xsd:element ref="abstract-property-extractor" minOccurs="0"/>
+                    <!-- TODO this doesn't make sense here, need to re-visit <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>-->
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-property-extractor" abstract="true" type="abstractPropertyExtractorType"/>
-    <xsd:complexType name="abstractPropertyExtractorType"/>
+    <xsd:element name="abstract-message-info-mapping" abstract="true" type="abstractMessageInfoMappingType"/>
+    <xsd:complexType name="abstractMessageInfoMappingType"/>
 
     <xsd:element name="idempotent-receiver-router" type="filteredInboundRouterType"
                  substitutionGroup="abstract-inbound-router"/>
@@ -2850,13 +2872,29 @@
     <!-- ResponseRouters -->
 
     <xsd:element name="single-async-reply-router" type="asyncReplyRouterType"
-                 substitutionGroup="abstract-async-reply-router"/>
+                 substitutionGroup="abstract-async-reply-router">
+        <xsd:annotation>
+            <xsd:documentation>Configures a Single Response Router. This will return the first event it receives on a
+                reply endpoint and will discard the rest.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="collection-async-reply-router" type="asyncReplyRouterType"
+                 substitutionGroup="abstract-async-reply-router">
+        <xsd:annotation>
+            <xsd:documentation>Configures a Collection Response Router. This will return a MuleMEssageCollection message
+                type that will contain all events recieved for the current correlation.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:complexType name="asyncReplyRouterType">
         <xsd:complexContent>
             <xsd:extension base="abstractAsyncReplyRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-property-extractor" minOccurs="0"/>
+                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -2887,7 +2925,7 @@
                     <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="reply-to" type="replyToType" minOccurs="0"/>
                     <xsd:element ref="abstract-transaction" minOccurs="0"/>
-                    <xsd:element ref="abstract-property-extractor" minOccurs="0"/>
+                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
                     <xsd:simpleType>
@@ -2966,6 +3004,7 @@
                 </xsd:sequence>
                 <xsd:attribute name="recipientsProperty" type="xsd:string"/>
                 <xsd:attribute name="recipientsDelimiter" type="xsd:string"/>
+                <xsd:attribute name="synchronous" type="xsd:boolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -3032,73 +3071,50 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- Message Info Mappers -->
 
-    <!-- property extractors -->
-
-    <xsd:element name="map-property-extractor" type="abstractPropertyExtractorType"
-                 substitutionGroup="abstract-property-extractor">
+    <xsd:element name="expression-message-info-mapping" type="expressionMessageInfoMappingType"
+                 substitutionGroup="abstract-message-info-mapping">
         <xsd:annotation>
             <xsd:documentation>
-                If the message payload is a map then the property is extracted from the
-                map using the property name as key.
+                Allows expressions to be configured to extract the message information.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="message-property-extractor" type="abstractPropertyExtractorType"
-                 substitutionGroup="abstract-property-extractor">
-        <xsd:annotation>
-            <xsd:documentation>
-                The property is extracted from the message headers using the header property
-                name as key. The special value "payload" retrieves the message payload.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="correlation-property-extractor" type="abstractPropertyExtractorType"
-                 substitutionGroup="abstract-property-extractor">
-        <xsd:annotation>
-            <xsd:documentation>
-                A special extractor, this returns the correlation ID for various standard cases.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="function-property-extractor" type="abstractPropertyExtractorType"
-                 substitutionGroup="abstract-property-extractor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Rather than extract a value from the message, this supports the following
-                functions: "now", "date", "uuid", "hostname" and "ip".
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="custom-property-extractor" type="customPropertyExtractorType"
-                 substitutionGroup="abstract-property-extractor">
-        <xsd:annotation>
-            <xsd:documentation>
-                This allows an arbitrary class to be used as a property extractor.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customPropertyExtractorType">
+    <xsd:complexType name="expressionMessageInfoMappingType">
         <xsd:complexContent>
-            <xsd:extension base="abstractPropertyExtractorType">
+            <xsd:extension base="abstractMessageInfoMappingType">
+                <xsd:attribute name="messageIdExpression" type="xsd:string" use="required"/>
+                <xsd:attribute name="correlationIdExpression" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-message-info-mapping" type="customMessageInfoMappingType"
+                 substitutionGroup="abstract-message-info-mapping">
+        <xsd:annotation>
+            <xsd:documentation>
+                This allows configuraton of a custom implementation of MessageInfoMapping
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customMessageInfoMappingType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageInfoMappingType">
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            An implementation of the PropertyExtractor interface.
+                            An implementation of the MessageInfoMapping interface.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
     <!--==============================================================-->
     <!--  Lifecycle Adapters                                            -->
     <!--==============================================================-->

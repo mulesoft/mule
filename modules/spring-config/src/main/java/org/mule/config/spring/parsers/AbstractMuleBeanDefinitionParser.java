@@ -344,13 +344,14 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      */
     protected Class getBeanClassFromAttribute(Element element)
     {
-        String className = element.getAttribute(ATTRIBUTE_CLASS);
+        String att= beanPropertyConfiguration.getAttributeAlias(ATTRIBUTE_CLASS);
+        String className = element.getAttribute(att);
         Class clazz = null;
         if (org.mule.util.StringUtils.isNotBlank(className))
         {
             try
             {
-                element.removeAttribute(ATTRIBUTE_CLASS);
+                element.removeAttribute(att);
                 //RM* Todo probably need to use OSGi Loader here
                 clazz = ClassUtils.loadClass(className, getClass());
             }

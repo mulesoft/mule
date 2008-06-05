@@ -17,6 +17,10 @@ import org.mule.api.service.Service;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.util.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Is a base tast case for tests that initialise Mule using a configuration file. The
@@ -77,5 +81,15 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
             fail("Componnent is not a JavaComponent and therefore has no component object instance");
             return null;
         }
+    }
+
+    protected String loadResourceAsString(String name) throws IOException
+    {
+        return IOUtils.getResourceAsString(name, getClass());
+    }
+
+    protected InputStream loadResource(String name) throws IOException
+    {
+        return IOUtils.getResourceAsStream(name, getClass());
     }
 }

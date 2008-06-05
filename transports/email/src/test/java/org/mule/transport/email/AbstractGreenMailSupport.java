@@ -10,17 +10,17 @@
 
 package org.mule.transport.email;
 
-import com.icegreen.greenmail.util.Servers;
-import com.icegreen.greenmail.util.ServerSetup;
-import com.icegreen.greenmail.user.UserManager;
 import com.icegreen.greenmail.user.GreenMailUser;
+import com.icegreen.greenmail.user.UserManager;
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
 
 import java.util.Properties;
 
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.InternetAddress;
-import javax.mail.Session;
 import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +39,7 @@ public abstract class AbstractGreenMailSupport
     public static final long STARTUP_PERIOD_MS = 100;
 
     protected final Log logger = LogFactory.getLog(this.getClass());
-    private Servers servers;
+    private GreenMail servers;
 
     protected void createUserAndStoreEmail(String email, String user, String password, Object message) throws Exception
     {
@@ -74,7 +74,7 @@ public abstract class AbstractGreenMailSupport
     protected void startServers() throws Exception
     {
         logger.info("Starting mail servers");
-        servers = new Servers(getSetups());
+        servers = new GreenMail(getSetups());
         servers.start();
         Thread.sleep(STARTUP_PERIOD_MS);
     }
@@ -108,7 +108,7 @@ public abstract class AbstractGreenMailSupport
         }
     }
 
-    protected Servers getServers()
+    protected GreenMail getServers()
     {
         return servers;
     }

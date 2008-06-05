@@ -17,7 +17,7 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 
-public class JXPathPropertyExtractorTestCase extends AbstractMuleTestCase
+public class JXPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
 
     public void testWithExpressions()

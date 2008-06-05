@@ -47,6 +47,7 @@ public abstract class ServerNotification extends EventObject
     public static final int REGISTRY_EVENT_ACTION_START_RANGE = 1000;
     public static final int EXCEPTION_EVENT_ACTION_START_RANGE = 1100;
     public static final int TRANSACTION_EVENT_ACTION_START_RANGE = 1200;
+    public static final int ROUTING_EVENT_ACTION_START_RANGE = 1300;
     public static final int CUSTOM_EVENT_ACTION_START_RANGE = 100000;
 
     public static final int NULL_ACTION = 0;

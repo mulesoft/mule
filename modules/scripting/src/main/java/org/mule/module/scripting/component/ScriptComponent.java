@@ -13,7 +13,6 @@ package org.mule.module.scripting.component;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.util.MuleLogger;
 
 import javax.script.Bindings;
@@ -26,15 +25,11 @@ public class ScriptComponent extends Scriptable implements Callable
 {
     private Bindings bindings;
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    // @Override
+    public void initialise() throws InitialisationException
     {
-        return LifecycleTransitionResult.initialiseAll(super.initialise(), new LifecycleTransitionResult.Closure()
-        {
-            public LifecycleTransitionResult doContinue()
-            {
-                bindings = getScriptEngine().createBindings();
-                return LifecycleTransitionResult.OK;
-            }});
+        super.initialise();
+        bindings = getScriptEngine().createBindings();
     }
 
     public Object onCall(MuleEventContext eventContext) throws Exception

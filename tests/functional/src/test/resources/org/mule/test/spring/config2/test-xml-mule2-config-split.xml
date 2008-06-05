@@ -9,11 +9,8 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <mule:mule>
-
         <mule:model name="main" inherit="true">
-
-            <mule:service name="appleComponent2">
-                                                               
+            <mule:service name="appleComponent2">                
                 <mule:inbound>
                     <mule:inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
                     <mule:inbound-endpoint name="transactedInboundEndpoint" address="test://endpoint.in2">
@@ -62,12 +59,8 @@
             </outbound-router -->
 
                 <mule:component-threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
-                <mule:queue-profile maxOutstandingMessages="102"/>
-
+                <mule:queue-profile maxOutstandingMessages="102" persistent="true"/>
             </mule:service>
-
         </mule:model>
-
     </mule:mule>
-
 </beans>

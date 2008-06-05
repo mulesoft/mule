@@ -11,22 +11,30 @@
 package org.mule.model.seda;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.FailedToQueueEventException;
+import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.ServiceException;
-import org.mule.component.AbstractComponent;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.management.stats.ServiceStatistics;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.service.AbstractService;
+import org.mule.transport.NullPayload;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
@@ -221,20 +229,43 @@ public class SedaService extends AbstractService implements Work, WorkListener
             {
                 logger.debug(this + " : got proxy for " + event.getId() + " = " + component);
             }
+            Object replyTo = event.getMessage().getReplyTo();
+            ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), (InboundEndpoint) event.getEndpoint());
             result = component.onCall(event);
-            // TODO MULE-3113
-            // 1) Invoke component.onCall(event)
-            // 2) Forward result to outbound routers ideally via a SEDA queue (MULE-3077)
-            // 3) Process response router
-            // 4) Process async reply-to
-        }
-        catch (MuleException e)
-        {
-            throw e;
+            result = sendToOutboundRouter(event, result);
+            result = processAsyncReplyRouter(result);
+            processReplyTo(event, result, replyToHandler, replyTo);
+            // stats
+            if (stats.isEnabled())
+            {
+                stats.incSentEventSync();
+            }
         }
         catch (Exception e)
         {
-            throw new ServiceException(event.getMessage(), this, e);
+            event.getSession().setValid(false);
+            if (e instanceof MessagingException)
+            {
+                handleException(e);
+            }
+            else
+            {
+                handleException(new MessagingException(CoreMessages.eventProcessingFailedFor(getName()),
+                    event.getMessage(), e));
+            }
+            if (result == null)
+            {
+                // important that we pull event from request context here as it may
+                // have been modified
+                // (necessary to avoid scribbling between threads)
+                result = new DefaultMuleMessage(NullPayload.getInstance(), RequestContext.getEvent().getMessage());
+            }
+            ExceptionPayload exceptionPayload = result.getExceptionPayload();
+            if (exceptionPayload == null)
+            {
+                exceptionPayload = new DefaultExceptionPayload(e);
+            }
+            result.setExceptionPayload(exceptionPayload);
         }
         return result;
     }
@@ -475,6 +506,13 @@ public class SedaService extends AbstractService implements Work, WorkListener
         this.workManager = workManager;
     }
 
+    protected void dispatchToOutboundRouter(MuleEvent event, MuleMessage result) throws MessagingException
+    {
+        super.dispatchToOutboundRouter(event, result);
+        // TODO MULE-3077 SedaService should use a SEDA queue to dispatch to outbound
+        // routers
+    }
+
     private class ComponentStageWorker implements Work
     {
         private MuleEvent event;
@@ -486,11 +524,29 @@ public class SedaService extends AbstractService implements Work, WorkListener
 
         public void run()
         {
-            ((AbstractComponent) component).onEvent(event);
-            // TODO MULE-3113
-            // 1) Invoke component.onCall(event)
-            // 2) Forward result to outbound routers ideally via a SEDA queue (MULE-3077)
-            // 3) Process async reply-to
+            try
+            {
+                event = OptimizedRequestContext.criticalSetEvent(event);
+                Object replyTo = event.getMessage().getReplyTo();
+                ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(),
+                    (InboundEndpoint) event.getEndpoint());
+                MuleMessage result = component.onCall(event);
+                dispatchToOutboundRouter(event, result);
+                processReplyTo(event, result, replyToHandler, replyTo);
+            }
+            catch (Exception e)
+            {
+                event.getSession().setValid(false);
+                if (e instanceof MessagingException)
+                {
+                    handleException(e);
+                }
+                else
+                {
+                    handleException(new MessagingException(CoreMessages.eventProcessingFailedFor(getName()),
+                        event.getMessage(), e));
+                }
+            }
         }
 
         public void release()

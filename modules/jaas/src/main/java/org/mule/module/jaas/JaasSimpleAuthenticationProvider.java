@@ -11,7 +11,6 @@
 package org.mule.module.jaas;
 
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.security.SecurityContextFactory;
@@ -264,7 +263,7 @@ public class JaasSimpleAuthenticationProvider implements SecurityProvider
      *
      * @throws InitialisationException
      */
-    public final LifecycleTransitionResult initialise() throws InitialisationException
+    public final void initialise() throws InitialisationException
     {
         // configure jaas from properties passed to the provider from the Mule XML
         // configuration file
@@ -320,8 +319,6 @@ public class JaasSimpleAuthenticationProvider implements SecurityProvider
         {
             throw new InitialisationException(CoreMessages.failedToCreate("JaasProvider"), e, this);
         }
-
-        return LifecycleTransitionResult.OK;
     }
 
     /**

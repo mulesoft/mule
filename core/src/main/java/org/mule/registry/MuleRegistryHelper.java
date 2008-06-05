@@ -19,7 +19,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.Model;
 import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.registry.MuleRegistry;
@@ -77,9 +76,9 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         this.registry = registry;
     }
     
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        return LifecycleTransitionResult.OK;
+        // no-op
     }
 
     public void dispose()

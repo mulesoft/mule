@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+    <vm:connector name="vm" queueEvents="true"/>
+
+    <model name="CollationError">
+        <service name="Distributor">
+            <inbound>
+                <inbound-endpoint address="vm://distributor.queue"/>
+            </inbound>
+            <echo-component/>
+            <outbound>
+                <static-recipient-list-router synchronous="false">
+                    <reply-to address="vm://Aggregator.queue"/>
+                    <recipients>
+                        <spring:value>vm://quoteprovider1.queue</spring:value>
+                        <spring:value>vm://quoteprovider2.queue</spring:value>
+                        <spring:value>vm://quoteprovider3.queue</spring:value>
+                    </recipients>
+                </static-recipient-list-router>
+            </outbound>
+            <async-reply timeout="3000" failOnTimeout="false">
+                <inbound-endpoint address="vm://Aggregator.queue"/>
+                <collection-async-reply-router/>
+            </async-reply>
+        </service>
+
+        <service name="QuoteProviderOne">
+            <inbound>
+                <inbound-endpoint address="vm://quoteprovider1.queue"/>
+            </inbound>
+            <test:component appendString=" Received"/>
+        </service>
+
+        <!-- This is a quotation system -->
+        <service name="QuoteProviderTwo">
+            <inbound>
+                <inbound-endpoint address="vm://quoteprovider2.queue"/>
+            </inbound>
+            <test:component appendString=" Received"/>
+
+        </service>
+
+        <!-- this will cause a response timeout -->
+        <service name="QuoteProviderThree">
+            <inbound>
+                <inbound-endpoint address="vm://quoteprovider3.queue"/>
+            </inbound>
+            <test:component waitTime="4000" appendString=" Received Late!"/>
+        </service>
+    </model>
+</mule>

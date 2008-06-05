@@ -12,7 +12,6 @@ package org.mule.transaction.lookup;
 
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.JndiContextHelper;
@@ -112,7 +111,7 @@ public class GenericTransactionManagerLookupFactory implements TransactionManage
      *          if a fatal error occurs
      *          causing the Mule instance to shutdown
      */
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (txManager == null && StringUtils.isEmpty(StringUtils.trim(jndiName)))
         {
@@ -131,6 +130,5 @@ public class GenericTransactionManagerLookupFactory implements TransactionManage
             throw new InitialisationException(CoreMessages.failedToCreate("Jndi context"),
                     e, this);
         }
-        return LifecycleTransitionResult.OK;
     }
 }

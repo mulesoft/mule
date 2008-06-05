@@ -19,6 +19,9 @@ public class TestNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerConnectorDefinitionParser(TestConnector.class);
+        registerBeanDefinitionParser("component", new TestComponentDefinitionParser());
+        //This is handled by the TestComponentDefinitionParser
+        registerIgnoredElement("return-data");
     }
 
 }

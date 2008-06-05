@@ -19,5 +19,5 @@ public interface Stoppable
 {
     public static final String PHASE_NAME = "stop";
     
-    LifecycleTransitionResult stop() throws MuleException;
+    void stop() throws MuleException;
 }

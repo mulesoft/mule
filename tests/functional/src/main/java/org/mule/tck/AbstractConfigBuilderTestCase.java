@@ -28,6 +28,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.PooledJavaComponent;
 import org.mule.config.PoolingProfile;
+import org.mule.config.QueueProfile;
 import org.mule.model.seda.SedaService;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -280,9 +281,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(PoolingProfile.WHEN_EXHAUSTED_FAIL, pp.getExhaustedAction());
         assertEquals(PoolingProfile.INITIALISE_ALL, pp.getInitialisationPolicy());
     }
-//
-//    public void testQueueProfileConfig()
-//    {
+
+    public void testQueueProfileConfig()
+    {
 //        // test config
 //        //TODO RM*
 //        QueueProfile qp = RegistryContext.getConfiguration().getQueueProfile();
@@ -290,18 +291,17 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertTrue(qp.isPersistent());
 
         // test inherit
-//        MuleDescriptor descriptor = (MuleDescriptor) muleContext.getRegistry().lookupService(
-//                "orangeComponent");
-//        QueueProfile qp = descriptor.getQueueProfile();
-//        assertEquals(100, qp.getMaxOutstandingMessages());
-//        assertTrue(qp.isPersistent());
-//
-//        // test override
+        Service service = muleContext.getRegistry().lookupService("appleComponent2");
+        QueueProfile qp = ((SedaService)service).getQueueProfile();
+        assertEquals(102, qp.getMaxOutstandingMessages());
+        assertTrue(qp.isPersistent());
+
+        // test override
 //        descriptor = (MuleDescriptor)muleContext.getModel().getDescriptor("appleComponent2");
 //        qp = descriptor.getQueueProfile();
 //        assertEquals(102, qp.getMaxOutstandingMessages());
 //        assertFalse(qp.isPersistent());
-//    }
+    }
 
     public void testEndpointProperties() throws Exception
     {

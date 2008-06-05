@@ -13,7 +13,6 @@ package org.mule.transport.http.transformers;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.MuleManifest;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -55,7 +54,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
 
 
     //@Override
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
 
@@ -70,7 +69,6 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             server = MuleManifest.getProductName() + "/"
                      + MuleManifest.getProductVersion();
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public Object transform(MuleMessage msg, String outputEncoding) throws TransformerException

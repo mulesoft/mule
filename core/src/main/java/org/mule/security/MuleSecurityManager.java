@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
@@ -52,15 +52,15 @@ public class MuleSecurityManager implements SecurityManager
 
     public MuleSecurityManager()
     {
-        // for debug
+        super();
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         List all = new LinkedList(providers.values());
         // ordering: appends
         all.addAll(cryptoStrategies.values());
-        return LifecycleTransitionResult.initialiseAll(all.iterator());
+        LifecycleTransitionResult.initialiseAll(all.iterator());
     }
 
     public Authentication authenticate(Authentication authentication)

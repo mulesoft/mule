@@ -19,9 +19,6 @@ org.mule.test.integration.VisualizerServiceTestCase
 
 org.mule.test.integration.transaction.OutboundTransactionsTestCase
 
-# These tests work when run from the IDE (IntelliJ)
-org.mule.test.usecases.dlq.DLQExceptionHandlerTestCase
-
 # MULE-2258: fails on the build server
 org.mule.test.usecases.sync.TcpToFileTestCase
 

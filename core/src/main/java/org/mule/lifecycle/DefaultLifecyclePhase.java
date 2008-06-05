@@ -13,13 +13,14 @@ import org.mule.MuleServer;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -47,9 +48,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultLifecyclePhase implements LifecyclePhase
 {
-
     protected transient final Log logger = LogFactory.getLog(DefaultLifecyclePhase.class);
-    public static final int RETRY_MAX = 3;
     private Class lifecycleClass;
     private Method lifecycleMethod;
     private Set orderedLifecycleObjects = new LinkedHashSet(6);
@@ -80,47 +79,58 @@ public class DefaultLifecyclePhase implements LifecyclePhase
         for (Iterator iterator = orderedLifecycleObjects.iterator(); iterator.hasNext();)
         {
             LifecycleObject lo = (LifecycleObject) iterator.next();
+            
+            // TODO dol: the following is incorrect as we explicitly order the elements from the registry
             // list so that ordering is preserved on retry
             //List targets = new LinkedList(MuleServer.getMuleContext().getRegistry().lookupObjects(lo.getType()));
             List targets = new LinkedList(CollectionUtils.select(objects, new InstanceofPredicate(lo.getType())));
-            if (targets.size() > 0)
+            if (targets.size() == 0)
             {
-                lo.firePreNotification(MuleServer.getMuleContext());
-
-                for (int retryCount = 0; retryCount < RETRY_MAX && targets.size() > 0; ++retryCount)
+                continue;
+            }
+            
+            // TODO MULE-3180: get the comparator from somewhere (the registry?) and only do the comparison here
+            if (lo.getType().getName().indexOf("Agent") > -1)
+            {
+                Collections.sort(targets, new Comparator()
                 {
-                    for (Iterator target = targets.iterator(); target.hasNext();)
+                    public int compare(Object o1, Object o2)
                     {
-                        Object o = target.next();
-                        if (duplicates.contains(o))
+                        String name1 = o1.getClass().getName();
+                        String name2 = o2.getClass().getName();
+                        if (name1.indexOf("RmiRegistryAgent") > -1)
                         {
-                            target.remove();
+                            return -1;
                         }
-                        else
+                        else if (name2.indexOf("RmiRegistryAgent") > -1)
                         {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug("lifecycle phase: " + getName() + " for object: " + o);
-                            }
-                            LifecycleTransitionResult result = applyLifecycle(o);
-                            if (result.isOk())
-                            {
-                                target.remove();
-                                duplicates.add(o);
-                            }
-                            else if (retryCount + 1 == RETRY_MAX)
-                            {
-                                throw (LifecycleException)
-                                        new LifecycleException(CoreMessages.exceededRetry(getName(), o), o)
-                                                .initCause(result.getThrowable());
-                            }
-                            else
-                            {
-                                logger.debug("Retry requested for " + o);
-                            }
+                            return 1;
                         }
-                    }
+                        return 0;
+                    }                    
+                });
+            }
+            
+            lo.firePreNotification(MuleServer.getMuleContext());
+
+            for (Iterator target = targets.iterator(); target.hasNext();)
+            {
+                Object o = target.next();
+                if (duplicates.contains(o))
+                {
+                    target.remove();
                 }
+                else
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("lifecycle phase: " + getName() + " for object: " + o);
+                    }
+                    this.applyLifecycle(o);
+                    target.remove();
+                    duplicates.add(o);
+                }
+                
                 lo.firePostNotification(MuleServer.getMuleContext());
             }
         }
@@ -229,31 +239,23 @@ public class DefaultLifecyclePhase implements LifecyclePhase
         }
     }
 
-    public LifecycleTransitionResult applyLifecycle(Object o) throws LifecycleException
+    public void applyLifecycle(Object o) throws LifecycleException
     {
         if (o == null)
         {
-            return LifecycleTransitionResult.OK;
+            return;
         }
         if (ignoreType(o.getClass()))
         {
-            return LifecycleTransitionResult.OK;
+            return;
         }
         if (!getLifecycleClass().isAssignableFrom(o.getClass()))
         {
-            return LifecycleTransitionResult.OK;
+            return;
         }
         try
         {
-            Object result = lifecycleMethod.invoke(o, ClassUtils.NO_ARGS);
-            if (null == result)
-            {
-                return LifecycleTransitionResult.OK;
-            }
-            else
-            {
-                return (LifecycleTransitionResult) result;
-            }
+            lifecycleMethod.invoke(o, ClassUtils.NO_ARGS);
         }
         catch (Exception e)
         {

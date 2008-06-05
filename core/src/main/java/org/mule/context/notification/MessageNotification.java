@@ -70,11 +70,14 @@ public class MessageNotification extends ServerNotification
 
     protected String getPayloadToString()
     {
-        if (source instanceof Connectable)
+        try
         {
-            return ((Connectable) source).getConnectionDescription();
+            return ((MuleMessage)source).getPayloadAsString();
         }
-        return source.toString();
+        catch (Exception e)
+        {
+            return source.toString();
+        }
     }
 
     public String toString()

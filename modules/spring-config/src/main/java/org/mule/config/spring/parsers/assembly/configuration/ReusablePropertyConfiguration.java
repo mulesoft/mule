@@ -91,6 +91,11 @@ public class ReusablePropertyConfiguration implements PropertyConfiguration
         return delegate.getAttributeMapping(alias);
     }
 
+    public String getAttributeAlias(String mapping)
+    {
+        return delegate.getAttributeAlias(mapping);
+    }
+
     public boolean isCollection(String propertyName)
     {
         return delegate.isCollection(propertyName);

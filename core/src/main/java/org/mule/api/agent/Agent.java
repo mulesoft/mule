@@ -13,6 +13,8 @@ package org.mule.api.agent;
 import org.mule.api.NamedObject;
 import org.mule.api.lifecycle.Lifecycle;
 
+import java.util.List;
+
 /**
  * <code>Agent</code> is a server plugin that can be initialised, started and
  * destroyed along with the UMOManager itself. Agents can initialise or bind to
@@ -30,4 +32,11 @@ public interface Agent extends Lifecycle, NamedObject
     void registered();
 
     void unregistered();
+    
+    /**
+     * @return List of Class objects (agent classes) that this Agent requires to be
+     *          started before it can start itself. Implementation of this class <b>must not</b>
+     *          return <code>null</code>.
+     */
+    List/*<Class<? extends Agent>>*/ getDependentAgents();
 }

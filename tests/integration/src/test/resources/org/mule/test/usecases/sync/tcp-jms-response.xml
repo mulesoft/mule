@@ -34,7 +34,7 @@
             </outbound>
             <async-reply>
                 <inbound-endpoint address="jms://queue_out" />
-                <custom-async-reply-router class="org.mule.test.usecases.service.DummyResponseAggregator" />
+                <single-async-reply-router/>
             </async-reply>
         </service>
 

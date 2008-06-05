@@ -7,9 +7,95 @@
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
-                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
 
     <xsd:element name="connector" type="mule:connectorType" substitutionGroup="mule:abstract-connector"/>
+
+    <xsd:element name="component" type="testComponentType" substitutionGroup="mule:abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                A component that can be used for testing event flows. It is a configurable
+                component. The return data for the component can be set so that users can 'simulate a call to
+                a real service.
+                This component can also track invocation history and fire notifications when events are received.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="testComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractComponentType">
+                <xsd:sequence>
+                    <xsd:element name="return-data" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>Defines the data to retrn from the service once invoked. This can be
+                                located in a file
+                                (loaded using the 'file' attribute or the return data can be embeddded directly in the
+                                xml file)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType mixed="true">
+                            <xsd:attribute name="file" type="xsd:string">
+                                <xsd:annotation>
+                                    <xsd:documentation>The location of a file to load as testdata. The file can point to
+                                        a resource on the classpath or on disk.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="throwException" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>Will Cause the component to throw an exception before any processing takes
+                            place.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="exceptionToThrow" type="mule:substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>A fully qualified classname of the exception objct to throw. Used in
+                            conjunction with
+                            'throwException'. If this is not specified a FunctionalTestException will be thrown by
+                            default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enableMessageHistory" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>Every messages that is received by the test component is stored and can be
+                            retrieved. If the developer does not want this imformation stored it can be turned off. A
+                            scenario where you may want to turn this feature off is when running millions of messages
+                            through the component would probably cause an OOM eventually)
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enableNotifications" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>Determines if a FunctionalTestNotification is fired when an event is received
+                            by the component. Test cases can register to receive these notifications and make assertions
+                            on the current event.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="appendString" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>A string value that will get appened to every message payload that passes
+                            through the component. Note that by setting this property you implicitly select that the
+                            message payload will be converted to a String and that a string payload will be returned.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="waitTime" type="mule:substitutableLong">
+                    <xsd:annotation>
+                        <xsd:documentation>A time in milliseconds to wait before returning a result. All processing
+                            happens in the component before the waiting happens.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>

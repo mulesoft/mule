@@ -12,6 +12,7 @@ package org.mule.routing.filters;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
+import org.mule.util.ClassUtils;
 
 /**
  * <code>PayloadTypeFilter</code> filters based on the type of the object received.
@@ -24,6 +25,11 @@ public class PayloadTypeFilter implements Filter
     public PayloadTypeFilter()
     {
         super();
+    }
+
+    public PayloadTypeFilter(String expectedType) throws ClassNotFoundException
+    {
+        this(ClassUtils.loadClass(expectedType, PayloadTypeFilter.class));
     }
 
     public PayloadTypeFilter(Class expectedType)

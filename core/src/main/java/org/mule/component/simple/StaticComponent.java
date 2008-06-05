@@ -14,7 +14,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -32,7 +31,7 @@ public class StaticComponent implements Callable, Initialisable
     private String prefix;
     private String postfix;
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (dataFile != null)
         {
@@ -45,7 +44,6 @@ public class StaticComponent implements Callable, Initialisable
                 throw new InitialisationException(e, this);
             }
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public Object getData()

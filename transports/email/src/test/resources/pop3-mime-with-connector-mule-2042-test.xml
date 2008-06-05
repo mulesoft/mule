@@ -21,9 +21,7 @@
         <service name="relay">
             <inbound>
                 <pop3:inbound-endpoint user="bob" password="password" host="localhost" port="65445"
-                                       transformer-refs="noActionTransformer" connector-ref="pop3Connector">
-                    <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
-                </pop3:inbound-endpoint>
+                                       transformer-refs="noActionTransformer" connector-ref="pop3Connector"/>
             </inbound>
             <outbound>
                 <outbound-pass-through-router>

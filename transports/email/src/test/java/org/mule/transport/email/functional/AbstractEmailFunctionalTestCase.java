@@ -17,8 +17,8 @@ import org.mule.transport.email.GreenMailUtilities;
 import org.mule.transport.email.ImapConnector;
 import org.mule.transport.email.Pop3Connector;
 
+import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
-import com.icegreen.greenmail.util.Servers;
 
 import java.io.IOException;
 
@@ -43,7 +43,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
     private boolean isMimeMessage;
     private int port;
     private String configFile;
-    private Servers server;
+    private GreenMail server;
     private String email;
     private String user;
     private String message;
@@ -157,7 +157,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
     {
         logger.debug("starting server on port " + port);
         ServerSetup setup = new ServerSetup(port, null, protocol);
-        server = new Servers(setup);
+        server = new GreenMail(setup);
         server.start();
         if (protocol.startsWith(Pop3Connector.POP3) || protocol.startsWith(ImapConnector.IMAP))
         {

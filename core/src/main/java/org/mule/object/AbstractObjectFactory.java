@@ -12,7 +12,6 @@ package org.mule.object;
 
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.object.ObjectFactory;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.BeanUtils;
@@ -69,7 +68,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory
         this.properties = properties;
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (objectClass == null && objectClassName == null)
         {
@@ -88,7 +87,6 @@ public abstract class AbstractObjectFactory implements ObjectFactory
                 throw new InitialisationException(e, this);
             }
         }
-        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()

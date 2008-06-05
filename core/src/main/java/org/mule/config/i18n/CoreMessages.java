@@ -1073,11 +1073,6 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 261);
     }
 
-    public static Message exceededRetry(Object phase, Object component)
-    {
-        return factory.createMessage(BUNDLE_PATH, 262, phase, component);
-    }
-
     public static Message expressionEvaluatorReturnedNull(String name, String expr)
     {
         return factory.createMessage(BUNDLE_PATH, 263, name, expr);

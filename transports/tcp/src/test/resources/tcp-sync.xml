@@ -8,8 +8,8 @@
        http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <environment-property name="test.endpoint" value="tcp://localhost:45441"/>
-
+    <global-property name="test.endpoint" value="tcp://localhost:45441"/>
+    
     <tcp:connector name="tcpConnector" clientSoTimeout="60000" serverSoTimeout="60000">
         <tcp:length-protocol payloadOnly="true"/>
     </tcp:connector>

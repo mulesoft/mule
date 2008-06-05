@@ -12,7 +12,7 @@
 
 
     <!-- model-inherited name="main" -->
-    <model name="main" inherit="true">
+    <model name="main" inherit="true">        
         <service name="appleComponent2">
             <inbound>
                 <inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
@@ -36,7 +36,7 @@
             </outbound>
             <component-threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
 <!--            <pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/>-->
-            <!--<queue-profile maxOutstandingMessages="102"/>-->
+            <queue-profile maxOutstandingMessages="102" persistent="true"/>
         </service>
     </model>
 </mule>

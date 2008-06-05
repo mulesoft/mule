@@ -46,8 +46,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
     {
         try
         {
-            String correlationId = (String)propertyExtractor.evaluate(
-                MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
+            String correlationId = messageInfoMapping.getCorrelationId(message);
             initialise(message);
 
             OutboundEndpoint endpoint;

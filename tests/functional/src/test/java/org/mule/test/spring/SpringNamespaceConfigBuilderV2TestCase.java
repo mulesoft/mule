@@ -19,7 +19,7 @@ import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
+import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.tck.AbstractConfigBuilderTestCase;
@@ -60,9 +60,9 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         return new SpringXmlConfigurationBuilder(getConfigResources());
     }
 
-    public void testPropertyExtractorConfig() throws Exception
+    public void testMessageInfoMappingConfig() throws Exception
     {
-        Service d = muleContext.getRegistry().lookupService("propertyExtractorTestComponent");
+        Service d = muleContext.getRegistry().lookupService("msgInfoMappingTestComponent");
         assertNotNull(d);
         OutboundRouterCollection router = d.getOutboundRouter();
         assertNotNull(router);
@@ -71,12 +71,12 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertEquals(1, routers.size());
         AbstractOutboundRouter theRouter = (AbstractOutboundRouter)routers.get(0);
         // the one we put in the config
-        assertTrue(theRouter.getPropertyExtractor() instanceof CorrelationPropertiesExpressionEvaluator);
+        assertTrue(theRouter.getMessageInfoMapping() instanceof ExpressionMessageInfoMapping);
     }
 
-    public void testPropertyExtractorResponseRouterConfig() throws Exception
+    public void testMessageInfoMappingResponseRouterConfig() throws Exception
     {
-        Service d = muleContext.getRegistry().lookupService("propertyExtractorResponseRouterTestComponent");
+        Service d = muleContext.getRegistry().lookupService("msgInfoMappingResponseRouterTestComponent");
         assertNotNull(d);
         ResponseRouterCollection router = d.getResponseRouter();
         assertNotNull(router);
@@ -85,7 +85,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertEquals(1, routers.size());
         AbstractResponseRouter theRouter = (AbstractResponseRouter)routers.get(0);
         // the one we put in the config
-        assertTrue(theRouter.getPropertyExtractor() instanceof FunctionExpressionEvaluator);
+        assertTrue(theRouter.getMessageInfoMapping() instanceof ExpressionMessageInfoMapping);
     }
 
     public void testPropertyTypesConfig() throws Exception

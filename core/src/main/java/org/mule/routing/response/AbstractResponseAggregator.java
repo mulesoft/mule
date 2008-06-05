@@ -12,9 +12,11 @@ package org.mule.routing.response;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.context.notification.RoutingNotification;
 import org.mule.routing.inbound.AbstractEventAggregator;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.util.MapUtils;
@@ -23,6 +25,8 @@ import org.mule.util.concurrent.Latch;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for implementing
@@ -36,6 +40,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 {
 
+    public static final int MAX_PROCESSED_GROUPS = 50000;
     /**
      * A map of EventGroup objects. These represent one or more messages to be
      * agregated, keyed by message id. There will be one response message for every
@@ -54,6 +59,22 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      */
     protected final ConcurrentMap responseMessages = new ConcurrentHashMap();
 
+    protected final BoundedFifoBuffer processedGroups = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
+
+    private int timeout = -1; // undefined
+
+    private boolean failOnTimeout = true;
+
+    //@Override
+    public void initialise() throws InitialisationException
+    {
+        if (timeout == -1) // undefined
+        {
+            setTimeout(muleContext.getConfiguration().getDefaultSynchronousEventTimeout());
+        }
+        super.initialise();
+    }
+
     public void process(MuleEvent event) throws RoutingException
     {
         // the correlationId of the event's message
@@ -61,7 +82,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         if (groupId == null || groupId.equals("-1"))
         {
             throw new RoutingException(CoreMessages.noCorrelationId(), event.getMessage(), event
-                .getEndpoint());
+                    .getEndpoint());
         }
 
         // indicates interleaved EventGroup removal (very rare)
@@ -83,6 +104,20 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                 }
             }
 
+            if (isGroupAlreadyProcessed(groupId))
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("An event was received for an event group that has already been processed, " +
+                            "this is probably because the async-reply timed out. Correlation Id is: " + groupId +
+                            ". Dropping event");
+                }
+                //Fire a notification to say we received this message
+                muleContext.fireNotification(new RoutingNotification(event.getMessage(),
+                        event.getEndpoint().getEndpointURI().toString(),
+                        RoutingNotification.MISSED_ASYNC_REPLY));
+                return;
+            }
             // check for an existing group first
             EventGroup group = this.getEventGroup(groupId);
 
@@ -125,14 +160,14 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                     // add the new response message so that it can be collected by
                     // the response Thread
                     MuleMessage previousResult = (MuleMessage) responseMessages.putIfAbsent(groupId,
-                        returnMessage);
+                            returnMessage);
                     if (previousResult != null)
                     {
                         // this would indicate that we need a better way to prevent
                         // continued aggregation for a group that is currently being
                         // processed. Can this actually happen?
                         throw new IllegalStateException(
-                            "Detected duplicate aggregation result message with id: " + groupId);
+                                "Detected duplicate aggregation result message with id: " + groupId);
                     }
 
                     // will get/create a latch for the response Message ID and
@@ -201,12 +236,28 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     protected void removeEventGroup(EventGroup group)
     {
         eventGroups.remove(group.getGroupId());
+        addProcessedGroup(group.getGroupId());
     }
+
+    protected void addProcessedGroup(Object id)
+    {
+        if (processedGroups.isFull())
+        {
+            processedGroups.remove();
+        }
+        processedGroups.add(id);
+    }
+
+    protected boolean isGroupAlreadyProcessed(Object id)
+    {
+        return processedGroups.contains(id);
+    }
+
 
     /**
      * This method is called by the responding callee thread and should return the
      * aggregated response message
-     * 
+     *
      * @param message
      * @return
      * @throws RoutingException
@@ -226,7 +277,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             if (logger.isDebugEnabled())
             {
                 logger.debug("Got response but no one is waiting for it yet. Creating latch for "
-                                + responseId + " in " + this);
+                        + responseId + " in " + this);
             }
 
             l = new Latch();
@@ -288,14 +339,39 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
         if (!resultAvailable)
         {
-            if (logger.isTraceEnabled())
+            if (isFailOnTimeout())
             {
-                logger.trace("Current responses are: \n" + MapUtils.toString(responseMessages, true));
+                if (logger.isTraceEnabled())
+                {
+                    logger.trace("Current responses are: \n" + MapUtils.toString(responseMessages, true));
+                }
+                muleContext.fireNotification(new RoutingNotification(message, null,
+                        RoutingNotification.ASYNC_REPLY_TIMEOUT));
+                
+                throw new ResponseTimeoutException(
+                        CoreMessages.responseTimedOutWaitingForId(
+                                this.getTimeout(), responseId), message, null);
             }
-
-            throw new ResponseTimeoutException(
-                CoreMessages.responseTimedOutWaitingForId(
-                    this.getTimeout(), responseId), message, null);
+            else
+            {
+                EventGroup group = this.getEventGroup(responseId);
+                if (group == null)
+                {
+                    //Unlikely this will ever happen
+                    if (logger.isTraceEnabled())
+                    {
+                        logger.trace("There is no current event Group. Current responses are: \n" + MapUtils.toString(responseMessages, true));
+                    }
+                    return null;
+                }
+                else
+                {
+                    this.removeEventGroup(group);
+                    // create the response message
+                    MuleMessage msg = this.aggregateEvents(group);
+                    return msg;
+                }
+            }
         }
 
         if (result == null)
@@ -311,6 +387,27 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         }
 
         return result;
+    }
+
+
+    public boolean isFailOnTimeout()
+    {
+        return failOnTimeout;
+    }
+
+    public void setFailOnTimeout(boolean failOnTimeout)
+    {
+        this.failOnTimeout = failOnTimeout;
+    }
+
+    public int getTimeout()
+    {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout)
+    {
+        this.timeout = timeout;
     }
 
     /**

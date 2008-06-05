@@ -13,8 +13,8 @@ package org.mule.test.usecases.routing.response;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.routing.response.SingleResponseRouter;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.test.usecases.service.DummyResponseAggregator;
 
 import java.util.Map;
 
@@ -55,7 +55,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
     /**
      * This class opens up the access to responseEvents map for testing
      */
-    private static final class RelaxedResponseAggregator extends DummyResponseAggregator
+    private static final class RelaxedResponseAggregator extends SingleResponseRouter
     {
         public Map getResponseEvents()
         {

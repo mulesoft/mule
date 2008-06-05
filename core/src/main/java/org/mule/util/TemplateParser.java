@@ -29,6 +29,7 @@ public final class TemplateParser
 {
     public static final String ANT_TEMPLATE_STYLE = "ant";
     public static final String SQUARE_TEMPLATE_STYLE = "square";
+    public static final String CURLY_TEMPLATE_STYLE = "curly";
 
     /**
      * logger used by this class
@@ -51,6 +52,11 @@ public final class TemplateParser
         return new TemplateParser(SQUARE_TEMPLATE_STYLE);
     }
 
+    public static TemplateParser createCurlyBracesStyleParser()
+    {
+        return new TemplateParser(CURLY_TEMPLATE_STYLE);
+    }
+
     private TemplateParser(String style)
     {
         if (ANT_TEMPLATE_STYLE.equals(style))
@@ -62,6 +68,12 @@ public final class TemplateParser
         else if (SQUARE_TEMPLATE_STYLE.equals(style))
         {
             pattern = Pattern.compile("\\[[^\\]]+\\]");
+            pre = 1;
+            post = 1;
+        }
+        else if (CURLY_TEMPLATE_STYLE.equals(style))
+        {
+            pattern = Pattern.compile("\\{[^\\}]+\\}");
             pre = 1;
             post = 1;
         }

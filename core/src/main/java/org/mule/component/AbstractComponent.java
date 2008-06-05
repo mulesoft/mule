@@ -10,6 +10,7 @@
 
 package org.mule.component;
 
+import org.mule.OptimizedRequestContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -18,14 +19,11 @@ import org.mule.api.component.Component;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceException;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.transport.AbstractConnector;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -56,10 +54,16 @@ public abstract class AbstractComponent implements Component
 
     public MuleMessage onCall(MuleEvent event) throws MuleException
     {
+        // Ensure we have event in ThreadLocal
+        OptimizedRequestContext.unsafeSetEvent(event);
+
         if (logger.isTraceEnabled())
         {
-            logger.trace(this.getClass().getName() + ": sync call for Mule Component " + service.getName());
+            logger.trace("Invoking " + this.getClass().getName() + "component for service " + service.getName());
         }
+
+        // Do some checks: i) check component is not disposed, ii) that it is started
+        // and iii) that the event's endpoint is an inbound endpoint.
         checkDisposed();
         if (!(event.getEndpoint() instanceof InboundEndpoint))
         {
@@ -70,9 +74,27 @@ public abstract class AbstractComponent implements Component
         {
             throw new DefaultMuleException(CoreMessages.componentIsStopped(service.getName()));
         }
+
+        // Invoke component implementation and gather statistics
         try
         {
-            return doOnCall(event);
+            long startTime = 0;
+            if (statistics.isEnabled())
+            {
+                startTime = System.currentTimeMillis();
+            }
+
+            MuleMessage result = doOnCall(event);
+
+            if (statistics.isEnabled())
+            {
+                statistics.addExecutionTime(System.currentTimeMillis() - startTime);
+            }
+            return result;
+        }
+        catch (MuleException me)
+        {
+            throw me;
         }
         catch (Exception e)
         {
@@ -80,67 +102,11 @@ public abstract class AbstractComponent implements Component
         }
     }
 
-    public void onEvent(MuleEvent event)
-    {
-        if (logger.isTraceEnabled())
-        {
-            logger.trace(this.getClass().getName() + ": async call for Mule Component " + service.getName());
-        }
-        try
-        {
-            checkDisposed();
-            if (!(event.getEndpoint() instanceof InboundEndpoint))
-            {
-                throw new IllegalStateException(
-                    "Unable to process outbound event, components only process incoming events.");
-            }
-            if (stopping.get() || !started.get())
-            {
-                throw new DefaultMuleException(CoreMessages.componentIsStopped(service.getName()));
-            }
-            doOnEvent(event);
-        }
-        catch (Exception e)
-        {
-            logger.error(new ServiceException(CoreMessages.failedToInvoke(this.toString()), event.getMessage(),
-                service, e));
-        }
-    }
-
-    protected abstract MuleMessage doOnCall(MuleEvent event);
-
-    protected abstract void doOnEvent(MuleEvent event);
-
-    /**
-     * When an exception occurs this method can be called to invoke the configured
-     * UMOExceptionStrategy on the UMO
-     * 
-     * @param exception If the UMOExceptionStrategy implementation fails
-     */
-    public void handleException(Exception exception)
-    {
-        service.getExceptionListener().exceptionThrown(exception);
-    }
+    protected abstract MuleMessage doOnCall(MuleEvent event) throws Exception;
 
     public String toString()
     {
-        return "proxy for: " + service.toString();
-    }
-
-    protected ReplyToHandler getReplyToHandler(MuleMessage message, InboundEndpoint endpoint)
-    {
-        Object replyTo = message.getReplyTo();
-        ReplyToHandler replyToHandler = null;
-        if (replyTo != null)
-        {
-            replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler();
-            // Use the response transformer for the event if one is set
-            if (endpoint.getResponseTransformers() != null)
-            {
-                replyToHandler.setTransformers(endpoint.getResponseTransformers());
-            }
-        }
-        return replyToHandler;
+        return this.getClass().getName() + " component for: " + service.toString();
     }
 
     public void release()
@@ -163,7 +129,7 @@ public abstract class AbstractComponent implements Component
         return service;
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (!initialised.get())
         {
@@ -180,10 +146,12 @@ public abstract class AbstractComponent implements Component
             doInitialise();
             initialised.set(true);
         }
-        return LifecycleTransitionResult.OK;
     }
 
-    protected abstract void doInitialise() throws InitialisationException;
+    protected void doInitialise() throws InitialisationException
+    {
+        // Default implementation is no-op
+    }
 
     public void dispose()
     {
@@ -215,9 +183,12 @@ public abstract class AbstractComponent implements Component
         }
     }
 
-    protected abstract void doDispose();
+    protected void doDispose()
+    {
+        // Default implementation is no-op
+    }
 
-    public LifecycleTransitionResult stop() throws MuleException
+    public void stop() throws MuleException
     {
         // If component is already disposed then ignore, don't fails, as stop() might
         // get called by service after spring has called disposed etc.
@@ -232,12 +203,14 @@ public abstract class AbstractComponent implements Component
             started.set(false);
             stopping.set(false);
         }
-        return LifecycleTransitionResult.OK;
     }
 
-    protected abstract void doStart() throws MuleException;
+    protected void doStart() throws MuleException
+    {
+        // Default implementation is no-op
+    }
 
-    public LifecycleTransitionResult start() throws MuleException
+    public void start() throws MuleException
     {
         checkDisposed();
         if (!started.get())
@@ -249,10 +222,12 @@ public abstract class AbstractComponent implements Component
             doStart();
             started.set(true);
         }
-        return LifecycleTransitionResult.OK;
     }
 
-    protected abstract void doStop() throws MuleException;
+    protected void doStop() throws MuleException
+    {
+        // Default implementation is no-op
+    }
 
     protected void checkDisposed() throws DisposeException
     {

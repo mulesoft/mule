@@ -13,8 +13,8 @@ package org.mule.transport.email.connectors;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.email.GreenMailUtilities;
 
+import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
-import com.icegreen.greenmail.util.Servers;
 
 import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
@@ -45,7 +45,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     private static final AtomicInteger nameCount = new AtomicInteger(0);
 
     private MimeMessage message;
-    private Servers servers;
+    private GreenMail servers;
     private boolean initialEmail = false;
     private String protocol;
     private int port;
@@ -81,7 +81,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     
     private void startServers() throws Exception
     {
-        servers = new Servers(getSetups());
+        servers = new GreenMail(getSetups());
         GreenMailUtilities.robustStartup(servers, LOCALHOST, port, START_ATTEMPTS, TEST_ATTEMPTS, STARTUP_PERIOD_MS);
         if (initialEmail)
         {
@@ -102,7 +102,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         }
     }
 
-    protected Servers getServers()
+    protected GreenMail getServers()
     {
         return servers;
     }

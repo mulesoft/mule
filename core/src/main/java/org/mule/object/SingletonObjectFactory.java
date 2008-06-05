@@ -11,7 +11,6 @@
 package org.mule.object;
 
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.MessageFactory;
 
 import java.util.Map;
@@ -59,7 +58,7 @@ public class SingletonObjectFactory extends AbstractObjectFactory
     }
 
     // @Override
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         super.initialise();
         if (instance == null)
@@ -73,7 +72,6 @@ public class SingletonObjectFactory extends AbstractObjectFactory
                 throw new InitialisationException(e, this);
             }
         }
-        return LifecycleTransitionResult.OK;
     }
 
     // @Override

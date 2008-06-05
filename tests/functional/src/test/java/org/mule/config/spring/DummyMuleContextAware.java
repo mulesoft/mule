@@ -14,7 +14,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 
@@ -73,9 +72,9 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
         // empty
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        return LifecycleTransitionResult.OK;
+        // empty
     }
 
     public void setName(String name)

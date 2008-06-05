@@ -12,7 +12,7 @@
         <spring:alias name="bean" alias="poot"/>
     </spring:beans>
 
-    <environment-property name="property" value="value"/>
+    <global-property name="property" value="value"/>
     
     <endpoint name="endpoint" address="test://${property}"/>
 
