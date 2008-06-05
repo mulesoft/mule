@@ -15,53 +15,166 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 
-import java.util.Arrays;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Collections;
 
 public class TransformerChainingTestCase extends AbstractMuleTestCase
 {
+    public void testSingleChainedTransformer() throws Exception
+    {
+        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+        assertNotNull(validTransformer);
+        
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        Transformer messageTransformer = new TransformerCollection(new Transformer[]{ validTransformer });
+        message.applyTransformers(Collections.singletonList(messageTransformer));
 
-    public Transformer getTransformer() throws Exception
+        Object transformedMessage = message.getPayload();
+        assertNotNull(transformedMessage);
+        assertEquals(new Integer(1), transformedMessage);       
+    }
+
+    public void testTwoChainedTransformers() throws Exception
+    {
+        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+        assertNotNull(validTransformer);
+        
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        Transformer messageTransformer = new TransformerCollection(
+            new Transformer[]{ validTransformer, validTransformer });
+        message.applyTransformers(Collections.singletonList(messageTransformer));
+
+        Object transformedMessage = message.getPayload();
+        assertNotNull(transformedMessage);
+        assertEquals(new Integer(2), transformedMessage);       
+    }
+
+    public void testThreeChainedTransformers() throws Exception
+    {
+        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+        assertNotNull(validTransformer);
+        
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        Transformer messageTransformer = new TransformerCollection(
+            new Transformer[]{ validTransformer, validTransformer, validTransformer });
+        message.applyTransformers(Collections.singletonList(messageTransformer));
+
+        Object transformedMessage = message.getPayload();
+        assertNotNull(transformedMessage);
+        assertEquals(new Integer(3), transformedMessage);       
+    }
+
+    public void testIgnoreBadInputDoesNotBreakChainWithTransformationOrderInvalidValid() throws Exception
+    {
+        AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
+        assertNotNull(invalidTransformer);
+        invalidTransformer.setIgnoreBadInput(true);
+        
+        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+        assertNotNull(validTransformer);
+        
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        Transformer messageTransformer = new TransformerCollection(new Transformer[]{invalidTransformer, validTransformer});
+        message.applyTransformers(Collections.singletonList(messageTransformer));
+
+        Object transformedMessage = message.getPayload();
+        assertNotNull(transformedMessage);
+        assertEquals(new Integer(1), transformedMessage);
+    }
+
+    public void testIgnoreBadInputBreaksChainWithTransformationOrderInvalidValid() throws Exception
+    {
+        AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
+        assertNotNull(invalidTransformer);
+        invalidTransformer.setIgnoreBadInput(false);
+        
+        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+        assertNotNull(validTransformer);
+        
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        Transformer messageTransformer = new TransformerCollection(new Transformer[]{invalidTransformer, validTransformer});
+        
+        try
+        {
+            message.applyTransformers(Collections.singletonList(messageTransformer));
+            fail("Transformer chain is expected to fail because of invalid transformer within chain.");
+        }
+        catch (TransformerException tfe)
+        {
+            ; // ignore
+        }
+    }
+
+    public void testIgnoreBadInputDoesNotBreakChainWithTransformationOrderValidInvalid() throws Exception
+    {
+        AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
+        assertNotNull(invalidTransformer);
+        invalidTransformer.setIgnoreBadInput(true);
+        
+        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+        assertNotNull(validTransformer);
+        
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        Transformer messageTransformer = new TransformerCollection(new Transformer[]{validTransformer, invalidTransformer});
+        message.applyTransformers(Collections.singletonList(messageTransformer));
+
+        Object transformedMessage = message.getPayload();
+        assertNotNull(transformedMessage);
+        assertEquals(new Integer(1), transformedMessage);
+    }
+
+    public void testIgnoreBadInputBreaksChainWithTransformationOrderValidInvalid() throws Exception
+    {
+        AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
+        assertNotNull(invalidTransformer);
+        invalidTransformer.setIgnoreBadInput(false);
+        
+        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
+        assertNotNull(validTransformer);
+        
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        Transformer messageTransformer = new TransformerCollection(new Transformer[]{validTransformer, invalidTransformer});
+        
+        try
+        {
+            message.applyTransformers(Collections.singletonList(messageTransformer));
+            fail("Transformer chain is expected to fail because of invalid transformer within chain.");
+        }
+        catch (TransformerException tfe)
+        {
+            assertNotNull(tfe);
+        }
+    }
+
+    private Transformer getInvalidTransformer() throws Exception
     {
         AbstractTransformer transformer = new AbstractTransformer()
         {
             protected Object doTransform(final Object src, final String encoding) throws TransformerException
             {
-                return src;
+                throw new RuntimeException("This transformer must not perform any transformations.");
             }
         };
-        transformer.setName("root");
-        transformer.setReturnClass(this.getClass());
-        transformer.registerSourceType(String.class);
-        transformer.initialise();
 
+        // Use this class as a bogus source type to enforce a simple invalid transformer
+        transformer.registerSourceType(this.getClass());
+        
         return transformer;
     }
-
-    public void testIgnoreBadInputDoesNotBreakChain() throws Exception
+    
+    private Transformer getIncreaseByOneTransformer() throws Exception
     {
-        // Grrrr....
-        AbstractTransformer transformer = (AbstractTransformer) this.getTransformer();
-        assertNotNull(transformer);
-        transformer.setIgnoreBadInput(true);
-        final AtomicBoolean nextCalled = new AtomicBoolean(false);
-        final Object marker = new Object();
-        Transformer transformer2 = new AbstractTransformer()
+        AbstractTransformer transformer = new AbstractTransformer()
         {
             protected Object doTransform(Object src, String encoding) throws TransformerException
             {
-                nextCalled.set(true);
-                return marker;
+                return new Integer(((Integer) src).intValue() + 1);
             }
         };
-        DefaultMuleMessage message = new DefaultMuleMessage(this);
-        message.applyTransformers(Arrays.asList(new Transformer[]{transformer, transformer2}));
-
-        Object result = message.getPayload();
-        assertNotNull(result);
-        assertSame(marker, result);
-        assertTrue("Next transformer not called.", nextCalled.get());
+        
+        transformer.registerSourceType(Integer.class);
+        transformer.setReturnClass(Integer.class);
+        
+        return transformer;
     }
-
+    
 }

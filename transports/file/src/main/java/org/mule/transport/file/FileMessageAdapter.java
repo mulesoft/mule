@@ -14,19 +14,16 @@ import org.mule.api.MessagingException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMessageAdapter;
-import org.mule.transport.file.i18n.FileMessages;
-import org.mule.util.ObjectUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * <code>FileMessageAdapter</code> provides a wrapper for a file reference. Users
  * can obtain the contents of the message through the payload property and can get
- * the filename and directory in the properties using FileConnector.PROPERTY_FILENAME and
- * FileConnector.PROPERTY_DIRECTORY.
+ * the filename and directory in the properties using FileConnector.PROPERTY_FILENAME
+ * and FileConnector.PROPERTY_DIRECTORY.<br>
+ * This message adaptor supports both InputStream and File payload types.
  */
 public class FileMessageAdapter extends AbstractMessageAdapter
 {
@@ -34,7 +31,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
     private static final long serialVersionUID = 4127485947547548996L;
 
     protected File file = null;
-    protected InputStream payload;
+    protected InputStream fileInputStream;
 
     public FileMessageAdapter(Object message) throws MessagingException
     {
@@ -58,25 +55,21 @@ public class FileMessageAdapter extends AbstractMessageAdapter
     {
         super(template);
         file = template.file;
-        payload = template.payload;
+        fileInputStream = template.fileInputStream;
     }
 
     public Object getPayload()
     {
-        return payload;
+        if (fileInputStream != null)
+        {
+            return fileInputStream;
+        }
+        return file;
     }
 
     protected void setFileMessage(File message) throws MessagingException
     {
-        try
-        {
-            this.file = message;
-            this.payload = new FileInputStream(message);
-        }
-        catch (IOException ex)
-        {
-            throw new MessagingException(FileMessages.fileDoesNotExist(ObjectUtils.toString(message, "null")), ex);
-        }
+        this.file = message;
         setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file.getName());
         setProperty(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
     }
@@ -84,7 +77,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
     protected void setStreamMessage(ReceiverFileInputStream message) throws MessagingException
     {
         this.file = message.getCurrentFile();
-        this.payload = message;
+        this.fileInputStream = message;
         setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file.getName());
         setProperty(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
     }

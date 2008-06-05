@@ -1,29 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
-       xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.0"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.0"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.mulesource.org/schema/mule/quartz/2.0 http://www.mulesource.org/schema/mule/quartz/2.0/mule-quartz.xsd">
 
     <vm:connector name="vmQueueConnector" queueEvents="true"/>
 
-    <quartz:endpoint name="schedulerEndpoint" address="quartz:/myService"
-                     repeatInterval="1000"/>
+    <quartz:endpoint name="schedulerEndpoint1" jobName="myService1" repeatInterval="1000">
+        <quartz:custom-job-from-message evaluator="header" expression="jobConfig"/>
+    </quartz:endpoint>
+
+    <quartz:endpoint name="schedulerEndpoint2" jobName="myService2" repeatInterval="1000">
+        <quartz:custom-job-from-message evaluator="payload" expression=""/>
+    </quartz:endpoint>
 
     <model name="quartz-dispatcher">
-        <service name="quartzSchedulingService">
+        <service name="quartzSchedulingService1">
             <inbound>
-                <inbound-endpoint address="vm://quartz.scheduler"/>
+                <inbound-endpoint address="vm://quartz.scheduler1"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="schedulerEndpoint"/>
+                    <outbound-endpoint ref="schedulerEndpoint1"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="quartzSchedulingService2">
+            <inbound>
+                <inbound-endpoint address="vm://quartz.scheduler2"/>
+                <forwarding-router/>
+            </inbound>
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint ref="schedulerEndpoint2"/>
                 </outbound-pass-through-router>
             </outbound>
         </service>
@@ -32,7 +51,7 @@
             <inbound>
                 <inbound-endpoint address="vm://quartz.in"/>
             </inbound>
-            <component class="org.mule.transport.quartz.TestComponent2"/>
+            <test:component/>
         </service>
     </model>
 </mule>

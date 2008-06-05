@@ -11,6 +11,8 @@
 package org.mule.transport.quartz;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.functional.FunctionalTestComponent2;
+import org.mule.tck.functional.CountdownCallback;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -19,24 +21,27 @@ public class QuartzFunctionalLegacyTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        //We need to reset the counter since we use this service for schema test
-        //and legacy config test. Its a bit crude...
-        TestComponent1.resetCounter();
         return "quartz-functional-legacy-test.xml";
     }
 
     public void testMuleReceiverJob() throws Exception
     {
-        CountDownLatch counter = TestComponent1.QUARTZ_COUNTER;
-        assertEquals(4, counter.getCount());
+        FunctionalTestComponent2 component = (FunctionalTestComponent2) getComponent("quartzService1");
+        assertNotNull(component);
+        CountdownCallback count1 = new CountdownCallback(4);
+        component.setEventCallback(count1);
+
+        component = (FunctionalTestComponent2) getComponent("quartzService2");
+        assertNotNull(component);
+        CountdownCallback count2 = new CountdownCallback(2);
+        component.setEventCallback(count2);
+
 
         // we wait up to 60 seconds here which is WAY too long for three ticks with 1
         // second interval, but it seems that "sometimes" it takes a very long time
         // for Quartz go kick in. Once it starts ticking everything is fine.
-        if (!counter.await(60, TimeUnit.SECONDS))
-        {
-            fail("CountDown timed out: expected 0, value is: " + counter.getCount());
-        }
+        assertTrue("Count 1 timed out: expected 0, value is: " + count1.getCount(), count1.await(60000));
+        assertTrue("Count 2 timed out: expected 0, value is: " + count2.getCount(), count2.await(5000));
     }
 
 }

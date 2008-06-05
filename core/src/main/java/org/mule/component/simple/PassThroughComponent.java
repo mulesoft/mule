@@ -10,19 +10,23 @@
 
 package org.mule.component.simple;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.component.AbstractComponent;
 
 /**
- * <code>PassThroughComponent</code> will simply return the payload back as the result.
- * This typically you don't need to specify this, since it is used by default.
+ * <code>PassThroughComponent</code> will simply return the payload back as the
+ * result. This typically you don't need to specify this, since it is used by
+ * default.
  */
-public class PassThroughComponent implements Callable
+public class PassThroughComponent extends AbstractComponent
 {
 
-    public Object onCall(MuleEventContext context) throws Exception
+    // @Override
+    protected MuleMessage doOnCall(MuleEvent event) throws Exception
     {
-        return context.transformMessage();
+        event.transformMessage();
+        return event.getMessage();
     }
 
 }

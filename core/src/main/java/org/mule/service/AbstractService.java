@@ -141,7 +141,7 @@ public abstract class AbstractService implements Service
     // onto the outbound router collection so this default implementation is needed.
     // It would be beneficial to differenciate between component invocations and
     // events that are bridged but currently everything is an invocation.
-    protected Component component = new SimpleCallableJavaComponent(new PassThroughComponent());
+    protected Component component = new PassThroughComponent();
 
     /**
      * For Spring only

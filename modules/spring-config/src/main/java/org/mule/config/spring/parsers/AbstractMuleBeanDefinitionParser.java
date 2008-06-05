@@ -11,13 +11,13 @@ package org.mule.config.spring.parsers;
 
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.util.ClassUtils;
 import org.mule.util.XMLUtils;
 
@@ -50,7 +50,7 @@ import org.w3c.dom.NamedNodeMap;
  * Alternatively, a property can be explicitly registered as a bean reference via registerBeanReference()
  *
  * <p>For example,
- * <code> &lt;bpm:connector bpms-ref=&quot;testBpms&quot;/&lt; </code>
+ * <code> &lt;bpm:connector bpms-ref=&quot;testBpms&quot;/&gt;</code>
  * will automatically set a property "bpms" on the connector to reference a bean named "testBpms"
  * </p></li>
  *

@@ -6,30 +6,43 @@
 
 <hibernate-configuration>
   <session-factory>
-    <!-- JDBC connection properties -->
+    <!-- hibernate dialect -->
+    <property name="hibernate.dialect">org.hibernate.dialect.DerbyDialect</property>
+
+    <!-- JDBC connection properties (begin) -->
     <property name="hibernate.connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
     <!-- the ${hibernate.dbURL} property is set from the test case as a system property -->
     <property name="hibernate.connection.url">${hibernate.dbURL}</property>
-
-    <!-- These properties may depend on your database -->
-    <property name="hibernate.dialect">org.hibernate.dialect.DerbyDialect</property>
-    <property name="hibernate.query.substitutions">true 1, false 0</property>
-    <property name="hibernate.jdbc.batch_size">0</property>
-
+    <!-- JDBC connection properties (end) -->
+    
+    <property name="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</property>
+    
     <!-- Create/update the database tables automatically when the JVM starts up -->
     <property name="hibernate.hbm2ddl.auto">update</property>
 
-    <!-- EhCache is no longer the default cache provider as of Hibernate 3.2 
-        Refer to http://www.hibernate.org/hib_docs/v3/reference/en/html/performance.html
-        for Hibernate's different cache providers. -->
-    <property name="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</property>
+    <!-- JBoss transaction manager lookup (begin) ===
+    <property name="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</property>
+    ==== JBoss transaction manager lookup (end) -->
 
-    <!-- C3P0 (connection pooling) properties -->
-    <property name="hibernate.c3p0.min_size">1</property>
-    <property name="hibernate.c3p0.max_size">3</property>
+    <!-- DataSource properties (begin) ===
+    <property name="hibernate.connection.datasource">java:/JbpmDS</property>
+    ==== DataSource properties (end) -->
+    
+    <!-- JTA transaction properties (begin) ===
+    <property name="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</property>
+    <property name="jta.UserTransaction">java:comp/UserTransaction</property>
+    ==== JTA transaction properties (end) -->
 
-    <!-- Write SQL statements to log -->
-    <property name="hibernate.show_sql">false</property>
+    <!-- CMT transaction properties (begin) ===
+    <property name="hibernate.transaction.factory_class">org.hibernate.transaction.CMTTransactionFactory</property>
+    <property name="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</property>
+    ==== CMT transaction properties (end) -->
+
+    <!-- logging properties (begin) ===
+    <property name="hibernate.show_sql">true</property>
+    <property name="hibernate.format_sql">true</property>
+    <property name="hibernate.use_sql_comments">true</property>
+    ==== logging properties (end) -->
 
     <!-- ############################################ -->
     <!-- # mapping files with external dependencies # -->
@@ -39,20 +52,26 @@
     <!-- 'bsh-{version}.jar'.                         -->
     <!-- uncomment this if you don't have bsh on your -->
     <!-- classpath.  you won't be able to use the     -->
-    <!-- script element in process definition files
+    <!-- script element in process definition files   -->
     <mapping resource="org/jbpm/graph/action/Script.hbm.xml"/>
-    -->
 
     <!-- following mapping files have a dependendy on  -->
-    <!-- 'jbpm-identity-{version}.jar', mapping files  -->
+    <!-- 'jbpm-identity.jar', mapping files            -->
     <!-- of the pluggable jbpm identity component.     -->
-    <!-- comment out the following 3 lines if you don't-->
-    <!-- want to use the default jBPM identity mgmgt   -->
-    <!-- component
+    <!-- Uncomment the following 3 lines if you        -->
+    <!-- want to use the jBPM identity mgmgt           -->
+    <!-- component.                                    -->
+    <!-- identity mappings (begin) -->
     <mapping resource="org/jbpm/identity/User.hbm.xml"/>
     <mapping resource="org/jbpm/identity/Group.hbm.xml"/>
     <mapping resource="org/jbpm/identity/Membership.hbm.xml"/>
-    -->
+    <!-- identity mappings (end) -->
+    
+    <!-- following mapping files have a dependendy on  -->
+    <!-- the JCR API                                   -->
+    <!-- jcr mappings (begin) ===
+    <mapping resource="org/jbpm/context/exe/variableinstance/JcrNodeInstance.hbm.xml"/>
+    ==== jcr mappings (end) -->
 
     <!-- ###################### -->
     <!-- # jbpm mapping files # -->
@@ -60,7 +79,7 @@
 
     <!-- hql queries and type defs -->
     <mapping resource="org/jbpm/db/hibernate.queries.hbm.xml" />
-
+    
     <!-- graph.def mapping files -->
     <mapping resource="org/jbpm/graph/def/ProcessDefinition.hbm.xml"/>
     <mapping resource="org/jbpm/graph/def/Node.hbm.xml"/>
@@ -112,7 +131,7 @@
 
     <!-- module.exe mapping files -->
     <mapping resource="org/jbpm/module/exe/ModuleInstance.hbm.xml"/>
-
+        
     <!-- context.exe mapping files -->
     <mapping resource="org/jbpm/context/exe/ContextInstance.hbm.xml"/>
     <mapping resource="org/jbpm/context/exe/TokenVariableMap.hbm.xml"/>
@@ -126,22 +145,17 @@
     <mapping resource="org/jbpm/context/exe/variableinstance/NullInstance.hbm.xml"/>
     <mapping resource="org/jbpm/context/exe/variableinstance/StringInstance.hbm.xml"/>
 
-    <!-- msg.db mapping files -->
-    <mapping resource="org/jbpm/msg/Message.hbm.xml"/>
-    <mapping resource="org/jbpm/msg/db/TextMessage.hbm.xml"/>
-    <mapping resource="org/jbpm/command/ExecuteActionCommand.hbm.xml"/>
-    <mapping resource="org/jbpm/command/ExecuteNodeCommand.hbm.xml"/>
-    <mapping resource="org/jbpm/command/SignalCommand.hbm.xml"/>
-    <mapping resource="org/jbpm/command/TaskInstanceEndCommand.hbm.xml"/>
+    <!-- job mapping files -->
+    <mapping resource="org/jbpm/job/Job.hbm.xml"/>
+    <mapping resource="org/jbpm/job/Timer.hbm.xml"/>
+    <mapping resource="org/jbpm/job/ExecuteNodeJob.hbm.xml"/>
+    <mapping resource="org/jbpm/job/ExecuteActionJob.hbm.xml"/>
 
     <!-- taskmgmt.exe mapping files -->
     <mapping resource="org/jbpm/taskmgmt/exe/TaskMgmtInstance.hbm.xml"/>
     <mapping resource="org/jbpm/taskmgmt/exe/TaskInstance.hbm.xml"/>
     <mapping resource="org/jbpm/taskmgmt/exe/PooledActor.hbm.xml"/>
     <mapping resource="org/jbpm/taskmgmt/exe/SwimlaneInstance.hbm.xml"/>
-
-    <!-- scheduler.exe mapping files -->
-    <mapping resource="org/jbpm/scheduler/exe/Timer.hbm.xml"/>
 
     <!-- logging mapping files -->
     <mapping resource="org/jbpm/logging/log/ProcessLog.hbm.xml"/>

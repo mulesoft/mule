@@ -13,14 +13,23 @@ package org.mule.transport.file;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Map;
+
+import org.apache.commons.collections.map.HashedMap;
 
 public abstract class AbstractFileMoveDeleteTestCase extends AbstractFileFunctionalTestCase
 {
 
-    protected File configureConnector(File inFile, boolean stream, boolean move, boolean delete)
+    protected File configureConnector(File inFile, boolean stream, boolean move, boolean delete, Class messageAdaptor)
         throws Exception
     {
         FileConnector fc = new FileConnector();
+        if (messageAdaptor != null)
+        {
+            Map overrides = new HashedMap();
+            overrides.put("message.adapter", messageAdaptor.getName());
+            fc.setServiceOverrides(overrides);
+        }
         fc.setName("moveDeleteConnector");
         File moveToDir = new File(inFile.getParent() + "/moveto/");
         moveToDir.mkdir();

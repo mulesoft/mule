@@ -30,7 +30,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     public void testMoveAndDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();
-        File moveToDir = configureConnector(inFile, true, true, true);
+        File moveToDir = configureConnector(inFile, true, true, true, null);
 
         assertRequested(request(inFile), inFile, true);
         assertFiles(inFile, moveToDir, true, true);
@@ -39,7 +39,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     public void testMoveOnlyStreaming() throws Exception
     {
         File inFile = initForRequest();
-        File moveToDir = configureConnector(inFile, true, true, false);
+        File moveToDir = configureConnector(inFile, true, true, false, null);
 
         assertRequested(request(inFile), inFile, true);
         assertFiles(inFile, moveToDir, true, false);
@@ -48,7 +48,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     public void testDeleteOnlyStreaming() throws Exception
     {
         File inFile = initForRequest();
-        File moveToDir = configureConnector(inFile, true, false, true);
+        File moveToDir = configureConnector(inFile, true, false, true, null);
 
         assertRequested(request(inFile), inFile, true);
         assertFiles(inFile, moveToDir, false, true);
@@ -57,7 +57,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     public void testNoMoveNoDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();
-        File moveToDir = configureConnector(inFile, true, false, false);
+        File moveToDir = configureConnector(inFile, true, false, false, null);
 
         assertRequested(request(inFile), inFile, true);
         assertFiles(inFile, moveToDir, false, false);
@@ -66,7 +66,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     public void testMoveAndDelete() throws Exception
     {
         File inFile = initForRequest();
-        File moveToDir = configureConnector(inFile, false, true, true);
+        File moveToDir = configureConnector(inFile, false, true, true, null);
 
         assertRequested(request(inFile), inFile, false);
         assertFiles(inFile, moveToDir, true, true);
@@ -75,7 +75,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     public void testMoveOnly() throws Exception
     {
         File inFile = initForRequest();
-        File moveToDir = configureConnector(inFile, false, true, false);
+        File moveToDir = configureConnector(inFile, false, true, false, null);
 
         assertRequested(request(inFile), inFile, false);
         assertFiles(inFile, moveToDir, true, false);
@@ -84,7 +84,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     public void testDeleteOnly() throws Exception
     {
         File inFile = initForRequest();
-        File moveToDir = configureConnector(inFile, false, false, true);
+        File moveToDir = configureConnector(inFile, false, false, true, null);
 
         assertRequested(request(inFile), inFile, false);
         assertFiles(inFile, moveToDir, false, true);
@@ -93,9 +93,54 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     public void testNoMoveNoDelete() throws Exception
     {
         File inFile = initForRequest();
-        File moveToDir = configureConnector(inFile, false, false, false);
+        File moveToDir = configureConnector(inFile, false, false, false, null);
 
         assertRequested(request(inFile), inFile, false);
+        assertFiles(inFile, moveToDir, false, false);
+    }
+
+    public void testMoveAndDeleteFilePayload() throws Exception
+    {
+        File inFile = initForRequest();
+
+        File moveToDir = configureConnector(inFile, false, true, false, FileMessageAdapter.class);
+
+        // TODO MULE-3198
+        // assertRequested(request(inFile), inFile, false);
+        // assertFiles(inFile, moveToDir, true, true);
+    }
+
+    public void testMoveOnlyFilePayload() throws Exception
+    {
+        File inFile = initForRequest();
+
+        File moveToDir = configureConnector(inFile, false, true, false, FileMessageAdapter.class);
+
+        // TODO MULE-3198
+        // assertRequested(request(inFile), inFile, false);
+        // assertFiles(inFile, moveToDir, true, false);
+    }
+
+    public void testDeleteOnlyFilePayload() throws Exception
+    {
+        File inFile = initForRequest();
+
+        File moveToDir = configureConnector(inFile, false, false, true, FileMessageAdapter.class);
+
+        // TODO MULE-3198
+        // assertRequested(request(inFile), inFile, false);
+        // assertFiles(inFile, moveToDir, false, true);
+    }
+
+    public void testNoMoveNoDeleteFilePayload() throws Exception
+    {
+        File inFile = initForRequest();
+
+        File moveToDir = configureConnector(inFile, false, false, false, FileMessageAdapter.class);
+
+        // TODO MULE-3198
+        // assertRequested(request(inFile), inFile, false);
+
         assertFiles(inFile, moveToDir, false, false);
     }
 

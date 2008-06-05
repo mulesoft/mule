@@ -34,9 +34,9 @@ import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
+import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
-import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExceptionTXFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
@@ -57,6 +57,7 @@ import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParse
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.EndpointRefParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.context.notification.ListenerSubscriptionPair;
@@ -94,6 +95,7 @@ import org.mule.routing.inbound.IdempotentSecureHashReceiver;
 import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.routing.inbound.MessageChunkingAggregator;
 import org.mule.routing.inbound.SelectiveConsumer;
+import org.mule.routing.inbound.SimpleCollectionAggregator;
 import org.mule.routing.inbound.WireTap;
 import org.mule.routing.nested.DefaultNestedRouter;
 import org.mule.routing.outbound.ChainingRouter;
@@ -129,6 +131,7 @@ import org.mule.transformer.compression.GZipCompressTransformer;
 import org.mule.transformer.compression.GZipUncompressTransformer;
 import org.mule.transformer.encryption.DecryptionTransformer;
 import org.mule.transformer.encryption.EncryptionTransformer;
+import org.mule.transformer.simple.AutoTransformer;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.simple.ByteArrayToSerializable;
@@ -139,7 +142,6 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
-import org.mule.transport.SimpleRetryConnectionStrategy;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -187,6 +189,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("transformer", new TransformerRefDefinitionParser());
 
         registerBeanDefinitionParser("custom-transformer", new TransformerDefinitionParser());
+        registerBeanDefinitionParser("auto-transformer", new TransformerDefinitionParser(AutoTransformer.class));
         registerBeanDefinitionParser("no-action-transformer", new TransformerDefinitionParser(NoActionTransformer.class));
         registerBeanDefinitionParser("message-properties-transformer", new TransformerDefinitionParser(MessagePropertiesTransformer.class));
 
@@ -261,8 +264,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("nestedRouter.routers", DefaultNestedRouter.class)).addCollection("nestedRouter.routers");
 
         // Simple Components
-        registerBeanDefinitionParser("bridge-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, PassThroughComponent.class));
-        registerBeanDefinitionParser("pass-through-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, PassThroughComponent.class));
+        registerBeanDefinitionParser("bridge-component", new ComponentDefinitionParser(PassThroughComponent.class));
+        registerBeanDefinitionParser("pass-through-component", new ComponentDefinitionParser(PassThroughComponent.class));
         registerBeanDefinitionParser("log-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, LogComponent.class));
         registerBeanDefinitionParser("null-component",new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, NullComponent.class));
         
@@ -289,7 +292,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("idempotent-secure-hash-receiver-router", new RouterDefinitionParser(IdempotentSecureHashReceiver.class));
         registerBeanDefinitionParser("selective-consumer-router", new RouterDefinitionParser(SelectiveConsumer.class));
         registerBeanDefinitionParser("wire-tap-router", new RouterDefinitionParser(WireTap.class));
-        registerBeanDefinitionParser("correlation-aggregator-router", new RouterDefinitionParser());
+        registerBeanDefinitionParser("custom-correlation-aggregator-router", new RouterDefinitionParser());
+        registerBeanDefinitionParser("collection-aggregator-router", new RouterDefinitionParser(SimpleCollectionAggregator.class));
         registerBeanDefinitionParser("message-chunking-aggregator-router", new RouterDefinitionParser(MessageChunkingAggregator.class));
         registerBeanDefinitionParser("correlation-resequencer-router", new RouterDefinitionParser(CorrelationEventResequencer.class));
         registerBeanDefinitionParser("custom-inbound-router", new RouterDefinitionParser(null));
@@ -307,7 +311,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("recipients", new ChildListDefinitionParser("recipients"));
         registerBeanDefinitionParser("template-endpoint-router", new RouterDefinitionParser(TemplateEndpointRouter.class));
         registerBeanDefinitionParser("custom-outbound-router", new RouterDefinitionParser(null));
-        registerMuleBeanDefinitionParser("reply-to", new ParentDefinitionParser()).addAlias("address", "replyTo");
+        registerBeanDefinitionParser("reply-to", new EndpointRefParser("replyTo"));
 
         //Response Routers
         registerBeanDefinitionParser("custom-async-reply-router", new RouterDefinitionParser(null));

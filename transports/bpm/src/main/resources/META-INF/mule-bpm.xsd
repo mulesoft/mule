@@ -91,4 +91,30 @@
         <xsd:attribute name="process" type="xsd:string"/>
     </xsd:attributeGroup>
 
+	<!-- 
+	This is merely a shortcut for:
+	     <endpoint-selector-router selectorExpression="header:MULE_BPM_ENDPOINT"> 
+	-->
+    <xsd:element name="outbound-router" type="bpmOutboundRouterType"
+                 substitutionGroup="mule:abstract-outbound-router"/>
+    <xsd:complexType name="bpmOutboundRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:filteringOutboundRouterType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+	<!-- TODO MULE-3205
+    <xsd:element name="component" type="bpmComponentType" substitutionGroup="mule:abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                Used to embed a BPM process inside a Mule config.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="bpmComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:defaultComponentType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+	-->
 </xsd:schema>

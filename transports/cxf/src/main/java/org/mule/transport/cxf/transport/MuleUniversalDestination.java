@@ -1,19 +1,29 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 
 package org.mule.transport.cxf.transport;
 
+import org.mule.transport.cxf.support.DelegatingOutputStream;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.logging.Logger;
 
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
-import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public class MuleUniversalDestination extends AbstractDestination
@@ -27,27 +37,14 @@ public class MuleUniversalDestination extends AbstractDestination
                                     EndpointReferenceType ref,
                                     EndpointInfo ei)
     {
-        super(ref, ei);
+        super(ref, ei); 
         this.transport = transport;
-
-        // String uri = getAddress().getAddress().getValue().toString();
-
-        // TODO - support decoupled endpoints
-        // Endpoint ep;
-        // try {
-        // System.out.println("creating endpoint " + uri);
-        // ep = MuleEndpoint.getOrCreateEndpointForUri("cxf:" + uri,
-        // Endpoint.ENDPOINT_TYPE_RECEIVER);
-        // } catch (MuleException e) {
-        // throw new RuntimeException(e);
-        // }
-        // ep.setConnector(transport.getConnector());
     }
 
     @Override
     protected Conduit getInbuiltBackChannel(Message inMessage)
     {
-        return new ResponseConduit(null, (MessageObserver) inMessage.get(RESPONSE_OBSERVER));
+        return new ResponseConduit(null);
     }
 
     @Override
@@ -86,28 +83,21 @@ public class MuleUniversalDestination extends AbstractDestination
     public class ResponseConduit extends AbstractConduit
     {
 
-        private MessageObserver observer;
-
-        public ResponseConduit(EndpointReferenceType arg0, MessageObserver observer)
+        public ResponseConduit(EndpointReferenceType arg0)
         {
             super(arg0);
-            this.observer = observer;
         }
 
-        public void prepare(Message message) throws IOException
-        {
-            CachedOutputStream stream = new CachedOutputStream();
-            message.setContent(OutputStream.class, stream);
-            // keep it around in case someone wants to replace the OutputStream along
-            // the way
-            message.setContent(CachedOutputStream.class, stream);
+        public void prepare(Message message) throws IOException {
+            // set an outputstream which will be used for things like attachment headers.
+            // we'll stream the body later on down the line via the OutputHandler in CxfServiceComponent
+            message.setContent(OutputStream.class, new DelegatingOutputStream(new ByteArrayOutputStream()));
         }
 
         @Override
         public void close(Message message) throws IOException
         {
             message.getContent(OutputStream.class).close();
-            observer.onMessage(message);
         }
 
         @Override

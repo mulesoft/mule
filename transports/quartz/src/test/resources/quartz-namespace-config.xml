@@ -42,4 +42,40 @@
         </quartz:factory-properties>
     </quartz:connector>
 
+    <endpoint name="scheduledDispatchEndpoint" address="vm://bar"/>
+    
+
+    <quartz:endpoint name="qEP1" cronExpression="3 * * * *" jobName="job" connector-ref="quartzConnector1">
+        <quartz:event-generator-job >
+            <quartz:payload>foo</quartz:payload>
+        </quartz:event-generator-job>
+    </quartz:endpoint>
+
+    <quartz:endpoint name="qEP2" repeatCount="10" repeatInterval="1000" jobName="job" connector-ref="quartzConnector1">
+        <quartz:event-generator-job groupName="fooGroup" jobGroupName="fooJobGroup">
+            <quartz:payload file="payload-data.txt"/>
+        </quartz:event-generator-job>
+    </quartz:endpoint>
+
+    <quartz:endpoint name="qEP3" repeatCount="10" repeatInterval="1000" jobName="job" connector-ref="quartzConnector1">
+        <quartz:custom-job-from-message evaluator="header" expression="jobConfig"/>
+    </quartz:endpoint>
+
+    <quartz:endpoint name="qEP4" repeatCount="10" repeatInterval="1000" jobName="job" connector-ref="quartzConnector1">
+        <quartz:custom-job job-ref="custJob"/>
+    </quartz:endpoint>
+
+    <quartz:endpoint name="qEP5" repeatCount="10" repeatInterval="1000" jobName="job" connector-ref="quartzConnector1">
+        <quartz:endpoint-polling-job>
+            <quartz:job-endpoint address="vm://foo" timeout="4000"/>
+        </quartz:endpoint-polling-job>
+    </quartz:endpoint>
+
+    <quartz:endpoint name="qEP6" repeatCount="10" repeatInterval="1000" jobName="job" connector-ref="quartzConnector1">
+        <quartz:scheduled-dispatch-job>
+            <quartz:job-endpoint ref="scheduledDispatchEndpoint"/>
+        </quartz:scheduled-dispatch-job>
+    </quartz:endpoint>
+
+    <spring:bean name="custJob" class="org.mule.transport.quartz.jobs.EventGeneratorJob"/>
 </mule>

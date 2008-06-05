@@ -11,6 +11,7 @@
 package org.mule.transport.vm;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.util.queue.Queue;
@@ -79,6 +80,13 @@ public class VMMessageRequester extends AbstractMessageRequester
                 }
                 if (message != null)
                 {
+                    //The message will contain old thread information, we need to reset it
+                    if(message instanceof ThreadSafeAccess)
+                    {
+                        //TODO: would it be ok just to reset access control here? i.e.
+                        ((ThreadSafeAccess)message).resetAccessControl();
+//                        message = (MuleMessage)((ThreadSafeAccess)message).newThreadCopy();
+                    }
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Message received: " + message);

@@ -56,8 +56,8 @@
 	         wsdlPort="SoapPort" 
 	         wsdlLocation="classpath:/wsdl/hello_world.wsdl" 
 	         operation="greetMe"/>
-	     </outbound-pass-through-router>
-	   </outbound>
+	    </outbound-pass-through-router>
+	  </outbound>
     </service>
   </model>
 </mule>

@@ -20,6 +20,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.routing.AggregationException;
+import org.mule.routing.EventCorrelatorCallback;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -39,10 +40,15 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
         SimpleEventAggregator router = new SimpleEventAggregator(3);
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
+        router.setMuleContext(muleContext);
+        router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A");
         MuleMessage message2 = new DefaultMuleMessage("test event B");
         MuleMessage message3 = new DefaultMuleMessage("test event C");
+        message1.setCorrelationId(message1.getUniqueId());
+        message2.setCorrelationId(message1.getUniqueId());
+        message3.setCorrelationId(message1.getUniqueId());
 
         ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider");
         MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session, false);
@@ -63,48 +69,59 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
 
     public static class SimpleEventAggregator extends AbstractEventAggregator
     {
-        private final int eventThreshold;
-        private int eventCount = 0;
+        protected final int eventThreshold;
+        protected int eventCount = 0;
 
         public SimpleEventAggregator(int eventThreshold)
         {
             this.eventThreshold = eventThreshold;
         }
 
-        protected boolean shouldAggregateEvents(EventGroup events)
+        protected EventCorrelatorCallback getCorrelatorCallback()
         {
-            eventCount++;
-            if (eventCount == eventThreshold)
+            return new EventCorrelatorCallback()
             {
-                eventCount = 0;
-                return true;
-            }
-            return false;
-        }
-
-        protected MuleMessage aggregateEvents(EventGroup events) throws AggregationException
-        {
-            if (events.size() != this.eventThreshold)
-            {
-                throw new IllegalStateException("eventThreshold not yet reached?");
-            }
-
-            StringBuffer newPayload = new StringBuffer(80);
-
-            for (Iterator iterator = events.iterator(); iterator.hasNext();)
-            {
-                MuleEvent event = (MuleEvent)iterator.next();
-                try
+                public boolean shouldAggregateEvents(EventGroup events)
                 {
-                    newPayload.append(event.getMessageAsString()).append(" ");
+                    eventCount++;
+                    if (eventCount == eventThreshold)
+                    {
+                        eventCount = 0;
+                        return true;
+                    }
+                    return false;
                 }
-                catch (MuleException e)
-                {
-                    throw new AggregationException(events, event.getEndpoint(), e);
-                }
-            }
 
-            return new DefaultMuleMessage(newPayload.toString(), (Map)null);
+                public EventGroup createEventGroup(MuleEvent event, Object groupId)
+                {
+                    return new EventGroup(groupId, eventThreshold);
+                }
+
+                public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
+                {
+                    if (events.size() != eventThreshold)
+                    {
+                        throw new IllegalStateException("eventThreshold not yet reached?");
+                    }
+
+                    StringBuffer newPayload = new StringBuffer(80);
+
+                    for (Iterator iterator = events.iterator(); iterator.hasNext();)
+                    {
+                        MuleEvent event = (MuleEvent) iterator.next();
+                        try
+                        {
+                            newPayload.append(event.getMessageAsString()).append(" ");
+                        }
+                        catch (MuleException e)
+                        {
+                            throw new AggregationException(events, event.getEndpoint(), e);
+                        }
+                    }
+
+                    return new DefaultMuleMessage(newPayload.toString(), (Map) null);
+                }
+            };
         }
     }
 }

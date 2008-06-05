@@ -31,5 +31,23 @@
     <file:connector name="thirdConnector">
         <file:expression-filename-parser/>
     </file:connector>
+    
+    <endpoint name="ep1" address="test://ep1">
+        <file:file-to-byte-array-transformer ignoreBadInput="true" name="test1" returnClass="java.lang.Object"/>
+    </endpoint>
 
+    <endpoint name="ep2" address="test://ep2">
+        <file:file-to-string-transformer ignoreBadInput="true" name="test2" returnClass="java.lang.Object"/>
+    </endpoint>
+    
+
+    <model>
+        <service name="Test" initialState="stopped">
+            <inbound>
+                <file:inbound-endpoint path="./target" connector-ref="secondConnector">
+                    <file:filename-regex-filter pattern="(^SemDirector_Report-\d)(.*)(tab$)" caseSensitive="false"/>
+                </file:inbound-endpoint>
+            </inbound>
+        </service>
+    </model>
 </mule>

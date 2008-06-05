@@ -10,6 +10,8 @@
 
 package org.mule.test.integration.resolvers;
 
+import java.util.HashMap;
+import java.util.Map;
 
 public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCase
 {
@@ -19,52 +21,90 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
         return "org/mule/test/integration/resolvers/entry-point-resolver-test.xml";
     }
 
-    public void testArrayEntryPointResolver() throws Exception
+    public void testArrayEntryPointResolverOnModel() throws Exception
     {
         doTest("array", new String[]{"hello", "world"}, "array");
     }
 
-//    public void testCallableEntryPointResolver() throws Exception
-//    {
-//        doTest("callable", new Object(), "callable");
-//    }
-//
-//    public void testCustomEntryPointResolver() throws Exception
-//    {
-//        doTest("custom", new Object(), "custom");
-//    }
-//
-//    public void testMethodEntryPointResolver() throws Exception
-//    {
-//        doTest("method", new String(), "methodString");
-//        doTest("method", new Integer(0), "methodInteger");
-//    }
-//
-//    public void testNoArgumentsEntryPointResolver() throws Exception
-//    {
-//        doTest("no-arguments", new String(), "noArguments");
-//    }
-//
-//    public void testPropertyEntryPointResolver() throws Exception
-//    {
-//        Map properties = new HashMap();
-//        properties.put("propertyName", "property");
-//        doTest("property", new Object(), "property", properties);
-//    }
-//
-//    public void testReflectionEntryPointResolver() throws Exception
-//    {
-//        doTest("reflection", new Integer(0), "reflection");
-//    }
-//
-//    public void testLegacyEntryPointResolvers() throws Exception
-//    {
-//        doTest("legacy", "hello world", "callable");
-//    }
-//
-//    public void testOrderedEntryPointResolvers() throws Exception
-//    {
-//        doTest("ordered", new Integer(0), "methodInteger");
-//    }
+    public void testArrayEntryPointResolverOnComponent() throws Exception
+    {
+        doTest("array2", new String[]{"hello", "world"}, "array");
+    }
+
+    public void testCallableEntryPointResolverOnModel() throws Exception
+    {
+        doTest("callable", new Object(), "callable");
+    }
+
+    public void testCallableEntryPointResolverOnComponent() throws Exception
+    {
+        doTest("callable2", new Object(), "callable");
+    }
+
+    public void testCustomEntryPointResolverOnModel() throws Exception
+    {
+        doTest("custom", new Object(), "custom");
+    }
+
+    public void testCustomEntryPointResolverOnComponent() throws Exception
+    {
+        doTest("custom2", new Object(), "custom");
+    }
+
+    public void testMethodEntryPointResolverOnModel() throws Exception
+    {
+        doTest("method", new String(), "methodString");
+        doTest("method", new Integer(0), "methodInteger");
+    }
+
+    public void testMethodEntryPointResolverOnComponent() throws Exception
+    {
+        doTest("method2", new String(), "methodString");
+        doTest("method2", new Integer(0), "methodInteger");
+    }
+
+    public void testNoArgumentsEntryPointResolverOnModel() throws Exception
+    {
+        doTest("no-arguments", new String(), "noArguments");
+    }
+
+    public void testNoArgumentsEntryPointResolverOnComponent() throws Exception
+    {
+        doTest("no-arguments2", new String(), "noArguments");
+    }
+
+    public void testPropertyEntryPointResolverOnModel() throws Exception
+    {
+        Map properties = new HashMap();
+        properties.put("propertyName", "property");
+        doTest("property", new Object(), "property", properties);
+    }
+
+    public void testPropertyEntryPointResolverOnComponent() throws Exception
+    {
+        Map properties = new HashMap();
+        properties.put("propertyName", "property");
+        doTest("property2", new Object(), "property", properties);
+    }
+
+    public void testReflectionEntryPointResolverOnModel() throws Exception
+    {
+        doTest("reflection", new Object[]{new Integer(0), new String("String")}, "reflection");
+    }
+
+    public void testReflectionEntryPointResolverOnComponent() throws Exception
+    {
+        doTest("reflection2", new Object[]{new Integer(0), new String("String")}, "reflection");
+    }
+
+    public void testLegacyEntryPointResolversOnModel() throws Exception
+    {
+        doTest("legacy", "hello world", "callable");
+    }
+
+    public void testLegacyEntryPointResolversOnComponent() throws Exception
+    {
+        doTest("legacy2", "hello world", "callable");
+    }
 
 }

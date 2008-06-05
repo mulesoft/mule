@@ -68,8 +68,14 @@ public class CxfMessageAdapter extends AbstractMessageAdapter
                 return new Object[0];
             }
         }
-
-        return objs.toArray();
+        if (objs.size() == 1 && objs.get(0) != null)
+        {
+            return objs.get(0);
+        }
+        else
+        {
+            return objs.toArray();
+        }
     }
 
     public void addAttachment(String name, DataHandler dataHandler) throws Exception

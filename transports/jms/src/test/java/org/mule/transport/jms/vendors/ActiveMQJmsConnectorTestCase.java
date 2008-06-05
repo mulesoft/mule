@@ -58,8 +58,8 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertNull(c.getUsername());
         assertNull(c.getPassword());
 
-        assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler() instanceof DefaultRedeliveryHandler);
+        assertNotNull(c.getRedeliveryHandlerFactory());
+        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof DefaultRedeliveryHandler);
         
         assertFalse(c.isDurable());
         assertFalse(c.isNoLocal());
@@ -85,8 +85,8 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertNull(c.getUsername());
         assertNull(c.getPassword());
 
-        assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler() instanceof TestRedeliveryHandler);
+        assertNotNull(c.getRedeliveryHandlerFactory());
+        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof TestRedeliveryHandler);
 
         assertEquals("myClient", c.getClientId());
         assertTrue(c.isDurable());

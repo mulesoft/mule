@@ -22,7 +22,9 @@ public class BeanPropertyExtractorTestCase extends AbstractXmlPropertyExtractorT
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.property", "${bean:childBean.value}");
+        p.setProperty("selector.expression", "childBean.value");
+        p.setProperty("selector.evaluator", "bean");
+
         return p;
     }
 

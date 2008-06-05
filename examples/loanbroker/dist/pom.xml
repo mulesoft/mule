@@ -57,9 +57,18 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
+        <!-- for apache-activemq-4.1.0-incubator -->
+        <repository>
+            <id>apache-incubating</id>
+            <name>Apache incubating repository</name>
+            <url>http://people.apache.org/repo/m2-incubating-repository</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
         <!--
             This is actually from cxf's pom an shouldn't be necessary here.
-            -->
+        -->
         <repository>
             <id>java.net</id>
             <name>Java.net Repository</name>

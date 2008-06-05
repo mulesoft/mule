@@ -1,0 +1,26 @@
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+    xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"    
+    xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+    http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+    http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
+    
+    <custom-transformer class="org.mule.tck.functional.StringAppendTestTransformer" name="StringAppendTestTransformer" />
+    
+    <model name="model">
+        
+        <service name="CXFService">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:4444/services/CXFService" frontend="simple" bindingUri=""
+                                      transformer-refs="StringAppendTestTransformer" />
+            </inbound>
+            <echo-component/>
+        </service>
+            
+    </model>
+    
+</mule>

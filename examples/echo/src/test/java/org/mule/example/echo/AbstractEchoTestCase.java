@@ -64,7 +64,7 @@ public abstract class AbstractEchoTestCase extends FunctionalTestCase
     public void testGetEcho() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("http.method", "GET");
         MuleMessage result = client.send("http://localhost:65081/services/EchoUMO?method=echo", "hello", props);
         assertNotNull(result);

@@ -87,14 +87,15 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType">
+            <xsd:extension base="mule:abstractInboundEndpointType">
                 <xsd:sequence>
                     <xsd:group ref="inboundPropertyElements"/>
                     <xsd:group ref="generalPropertyElements"/>
-                    <xsd:group ref="mule:propertiesGroup"/>
+                    <xsd:group ref="mule:defaultEndpointElements"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="inboundPropertyAttributes"/>
                 <xsd:attributeGroup ref="generalPropertyAttributes"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -102,12 +103,13 @@
     <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:outboundEndpointType">
+            <xsd:extension base="mule:abstractOutboundEndpointType">
                 <xsd:sequence>
                     <xsd:group ref="generalPropertyElements"/>
-                    <xsd:group ref="mule:propertiesGroup"/>
+                    <xsd:group ref="mule:defaultEndpointElements"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="generalPropertyAttributes"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -115,14 +117,15 @@
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:globalEndpointType">
+            <xsd:extension base="mule:abstractGlobalEndpointType">
                 <xsd:sequence>
                     <xsd:group ref="inboundPropertyElements"/>
                     <xsd:group ref="generalPropertyElements"/>
-                    <xsd:group ref="mule:propertiesGroup"/>
+                    <xsd:group ref="mule:defaultEndpointElements"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="inboundPropertyAttributes"/>
                 <xsd:attributeGroup ref="generalPropertyAttributes"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

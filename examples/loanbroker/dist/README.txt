@@ -7,7 +7,7 @@ Enterprise Integration Patterns book.
 There are several variations of the same application which illustrate different 
 architectural styles and Mule constructs.
 
-For more information, refer to http://www.muledocs.org/Loan+Broker+Example
+For more information, refer to http://www.muledocs.org/Examples
 
 +----------------------+
 | Building the example |

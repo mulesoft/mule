@@ -19,7 +19,7 @@ import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.quartz.i18n.QuartzMessages;
-import org.mule.transport.quartz.jobs.MuleReceiverJob;
+import org.mule.transport.quartz.config.JobConfig;
 
 import java.util.Date;
 
@@ -61,22 +61,27 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
         {
             Scheduler scheduler = connector.getQuartzScheduler();
 
+            JobConfig jobConfig = (JobConfig)endpoint.getProperty(QuartzConnector.PROPERTY_JOB_CONFIG);
+            if(jobConfig==null)
+            {
+                throw new IllegalArgumentException(CoreMessages.objectIsNull(QuartzConnector.PROPERTY_JOB_CONFIG).getMessage());
+            }
             JobDetail jobDetail = new JobDetail();
-            jobDetail.setName(endpoint.getEndpointURI().toString());
-            jobDetail.setJobClass(MuleReceiverJob.class);
+            jobDetail.setName(endpoint.getEndpointURI().getAddress());
+            jobDetail.setJobClass(jobConfig.getJobClass());
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put(QUARTZ_RECEIVER_PROPERTY, this.getReceiverKey());
             jobDataMap.put(QUARTZ_CONNECTOR_PROPERTY, this.connector.getName());
             jobDataMap.putAll(endpoint.getProperties());
             jobDetail.setJobDataMap(jobDataMap);
 
-            Trigger trigger = null;
-            String cronExpression = jobDataMap.getString(QuartzConnector.PROPERTY_CRON_EXPRESSION);
-            String repeatInterval = jobDataMap.getString(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
-            String repeatCount = jobDataMap.getString(QuartzConnector.PROPERTY_REPEAT_COUNT);
-            String startDelay = jobDataMap.getString(QuartzConnector.PROPERTY_START_DELAY);
-            String groupName = jobDataMap.getString(QuartzConnector.PROPERTY_GROUP_NAME);
-            String jobGroupName = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_GROUP_NAME);
+            Trigger trigger;
+            String cronExpression = (String)endpoint.getProperty(QuartzConnector.PROPERTY_CRON_EXPRESSION);
+            String repeatInterval = (String)endpoint.getProperty(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
+            String repeatCount = (String)endpoint.getProperty(QuartzConnector.PROPERTY_REPEAT_COUNT);
+            String startDelay = (String)endpoint.getProperty(QuartzConnector.PROPERTY_START_DELAY);
+            String groupName = jobConfig.getGroupName();
+            String jobGroupName = jobConfig.getJobGroupName();
 
             if (groupName == null)
             {
@@ -120,9 +125,9 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
                 start += Long.parseLong(startDelay);
             }
             trigger.setStartTime(new Date(start));
-            trigger.setName(endpoint.getEndpointURI().toString());
+            trigger.setName(endpoint.getEndpointURI().getAddress());
             trigger.setGroup(groupName);
-            trigger.setJobName(endpoint.getEndpointURI().toString());
+            trigger.setJobName(endpoint.getEndpointURI().getAddress());
             trigger.setJobGroup(jobGroupName);
 
             // We need to handle cases when the job has already been
@@ -134,6 +139,8 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             catch (ObjectAlreadyExistsException oaee)
             {
                 // Do anything here?
+                logger.warn("A quartz Job with name: " + endpoint.getEndpointURI().getAddress() +
+                        " has already been registered. Cannot register again");
             }
 
             scheduler.start();

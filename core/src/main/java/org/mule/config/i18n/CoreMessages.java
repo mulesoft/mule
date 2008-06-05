@@ -1082,4 +1082,19 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 264, property, expr);
     }
+
+    public static Message expressionMalformed(String expr, String eval)
+    {
+        return factory.createMessage(BUNDLE_PATH, 265, expr, eval);
+    }
+
+    public static Message correlationTimedOut(Object groupId)
+    {
+        return factory.createMessage(BUNDLE_PATH, 266, groupId);
+    }
+
+    public static Message transformerInvalidReturnType(Class clazz, String transformerName)
+    {
+        return factory.createMessage(BUNDLE_PATH, 267, clazz, transformerName);
+    }
 }

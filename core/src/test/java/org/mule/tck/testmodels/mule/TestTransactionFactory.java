@@ -15,8 +15,6 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transaction.TransactionFactory;
 
-import com.mockobjects.dynamic.Mock;
-
 /**
  * <code>TestTransactionFactory</code> creates a {@link org.mule.tck.testmodels.mule.TestTransaction}
  * 

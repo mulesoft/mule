@@ -11,8 +11,9 @@
 package org.mule.example.loanbroker.routers;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.routing.RoutingException;
 import org.mule.routing.AggregationException;
+import org.mule.routing.CollectionCorrelatorCallback;
+import org.mule.routing.EventCorrelatorCallback;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.routing.response.ResponseCorrelationAggregator;
 
@@ -22,26 +23,23 @@ import org.mule.routing.response.ResponseCorrelationAggregator;
  */
 public class BankQuotesResponseAggregator extends ResponseCorrelationAggregator
 {
-    /**
-     * This method is invoked if the shouldAggregate method is called and returns
-     * true. Once this method returns an aggregated message the event group is
-     * removed from the router
-     * 
-     * @param events the event group for this request
-     * @return an aggregated message
-     * @throws org.mule.api.routing.RoutingException if the aggregation fails. in
-     *             this scenario the whole event group is removed and passed to the
-     *             exception handler for this componenet
-     */
-    protected MuleMessage aggregateEvents(EventGroup events) throws RoutingException
+    //@Override
+    protected EventCorrelatorCallback getCorrelatorCallback()
     {
-        try
+        return new CollectionCorrelatorCallback()
         {
-            return BankQuotesAggregationLogic.aggregateEvents(events);
-        }
-        catch (Exception e)
-        {
-            throw new AggregationException(events, null, e);
-        }
+
+            public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
+            {
+                try
+                {
+                    return BankQuotesAggregationLogic.aggregateEvents(events);
+                }
+                catch (Exception e)
+                {
+                    throw new AggregationException(events, null, e);
+                }
+            }
+        };
     }
 }

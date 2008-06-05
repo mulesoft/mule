@@ -13,6 +13,16 @@
     <packaging>jar</packaging>
     <name>Test for Mule Transport Archetype</name>
 
+    <!-- the following properties are needed by the groovy script that we inherit from our parent pom -->
+    <properties>
+        <!-- this is the name of the directory that's crated by the archetype -->
+        <outputDir>mule-transport-foo</outputDir>
+        <!-- this is the groupId:artifactId of the archetype that we want to invoke -->
+        <archetype>org.mule.tools:mule-transport-archetype</archetype>
+        <!-- this string will be appended to the archetype's commandline -->
+        <archetypeParams>-DtransportId=foo</archetypeParams>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.tools</groupId>
@@ -36,35 +46,12 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo.groovy</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <!--
-                                Fork Maven from within the current Maven run to generate
-                                a new transport using the mule-transport-archetype
-                            -->
-                            <workingDirectory>${project.build.directory}</workingDirectory>
-                            <executable>mvn</executable>
-                            <arguments>
-                                <argument>org.mule.tools:mule-transport-archetype:create</argument>
-                                <argument>-DtransportId=foo</argument>
-                                <argument>-DmuleVersion=${version}</argument>
-                                <argument>-Dinteractive=false</argument>
-                            </arguments>
-                            <!--
-                                Add the generated sources to the test source paths
-                            -->
-                            <testSourceRoot>${project.build.directory}/mule-transport-foo/src/main/java</testSourceRoot>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>build-helper-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

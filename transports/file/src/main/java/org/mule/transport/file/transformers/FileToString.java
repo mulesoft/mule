@@ -11,8 +11,10 @@
 package org.mule.transport.file.transformers;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.util.IOUtils;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -24,6 +26,7 @@ public class FileToString extends FileToByteArray
     public FileToString()
     {
         registerSourceType(File.class);
+        registerSourceType(InputStream.class);
         registerSourceType(byte[].class);
         setReturnClass(String.class);
     }
@@ -41,7 +44,11 @@ public class FileToString extends FileToByteArray
     {
         byte[] bytes;
 
-        if (src instanceof byte[])
+        if (src instanceof InputStream)
+        {
+            bytes = IOUtils.toByteArray((InputStream) src);
+        }
+        else if (src instanceof byte[])
         {
             bytes = (byte[])src;
         }

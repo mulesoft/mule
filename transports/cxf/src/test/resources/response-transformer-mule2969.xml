@@ -1,0 +1,42 @@
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+    xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+    http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
+    
+    <custom-transformer class="org.mule.tck.functional.StringAppendTestTransformer" name="StringAppendTestTransformer" />
+    
+    <model name="model">
+        
+        <service name="CXFService">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:4444/services/CXFService" remoteSync="true"
+                    responseTransformer-refs="StringAppendTestTransformer" frontend="simple" >
+                </cxf:inbound-endpoint>
+            </inbound>
+            <echo-component />
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://echo" />
+                    <reply-to address="vm://reply" />
+                </outbound-pass-through-router>
+            </outbound>
+            <async-reply>
+                <inbound-endpoint address="vm://reply"/>
+                <single-async-reply-router/>
+            </async-reply>
+        </service>
+        
+        <service name="EchoService">
+            <inbound>
+                <inbound-endpoint address="vm://echo" />
+            </inbound>
+            <echo-component />
+        </service>
+        
+    </model>
+    
+</mule>

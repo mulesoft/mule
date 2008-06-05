@@ -37,7 +37,6 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestInboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.transformer.TransformerUtils;
-import org.mule.transport.SimpleRetryConnectionStrategy;
 
 import java.util.List;
 import java.util.Map;

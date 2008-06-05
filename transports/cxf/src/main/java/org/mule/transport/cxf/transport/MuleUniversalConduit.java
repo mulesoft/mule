@@ -1,3 +1,12 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 
 package org.mule.transport.cxf.transport;
 
@@ -13,29 +22,30 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.cxf.CxfConnector;
-import org.mule.transport.http.HttpConnector;
+import org.mule.transport.cxf.CxfConstants;
+import org.mule.transport.cxf.support.DelegatingOutputStream;
+import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.transport.http.HttpConstants;
 
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.util.Iterator;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.Destination;
@@ -117,23 +127,85 @@ public class MuleUniversalConduit extends AbstractConduit
      */
     public void prepare(final Message message) throws IOException
     {
-        final MuleUniversalConduit conduit = this;
-
-        // Cache the message that CXF writes. We'll actually send the message
-        // via the OutputHandler down below...
-        CachedOutputStream out = new CachedOutputStream()
+        // save in a separate place in case we need to resend the request
+        final ByteArrayOutputStream cache = new ByteArrayOutputStream();
+        final DelegatingOutputStream delegating = new DelegatingOutputStream(cache);
+        message.setContent(OutputStream.class, delegating);
+        
+        AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM)
         {
-            @Override
-            public void close() throws IOException
+            public void handleMessage(Message m) throws Fault
             {
-                super.close();
-
-                // delegate to the onClose message for readability...
-                conduit.onClose(message);
+                try
+                {
+                    dispatchMuleMessage(m);
+                }
+                catch (IOException e)
+                {
+                    throw new Fault(e);
+                }
+            }
+        };
+        i.getAfter().add(MuleProtocolHeadersOutInterceptor.class.getName());
+        message.getInterceptorChain().add(i);
+        
+        OutputHandler handler = new OutputHandler()
+        {
+            public void write(MuleEvent event, OutputStream out) throws IOException
+            {
+                out.write(cache.toByteArray());
+                
+                delegating.setOutputStream(out);
+                
+                // resume writing!
+                message.getInterceptorChain().doIntercept(message);
             }
         };
 
-        message.setContent(OutputStream.class, out);
+        // We can create a generic StreamMessageAdapter here as the underlying
+        // transport will create one specific to the transport
+        DefaultMessageAdapter req = new DefaultMessageAdapter(handler);
+        message.getExchange().put(CxfConstants.MULE_MESSAGE, req);
+    }
+    
+    protected void dispatchMuleMessage(Message m) throws IOException {
+        String uri = setupURL(m);
+
+        LOGGER.info("Sending message to " + uri);
+        try
+        {
+            OutboundEndpoint ep = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+
+            MessageAdapter req = (MessageAdapter) m.getExchange().get(CxfConstants.MULE_MESSAGE);
+            
+            MuleMessage result = sendStream(req, ep);
+
+            // If we have a result, send it back to CXF
+            if (result != null)
+            {
+                Message inMessage = new MessageImpl();
+                String contentType = req.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+
+                inMessage.put(Message.ENCODING, result.getEncoding());
+                inMessage.put(Message.CONTENT_TYPE, contentType);
+                inMessage.setContent(InputStream.class, result.getPayload(InputStream.class));
+                // inMessage.setContent(InputStream.class,
+                // result.getPayload(InputStream.class));
+                inMessage.setExchange(m.getExchange());
+                getMessageObserver().onMessage(inMessage);
+            }
+        }
+        catch (Exception e)
+        {
+            if (e instanceof IOException)
+            {
+                throw (IOException) e;
+            }
+
+            IOException ex = new IOException("Could not send message to Mule.");
+            ex.initCause(e);
+            throw ex;
+        }
     }
 
     private String setupURL(Message message) throws MalformedURLException
@@ -169,84 +241,7 @@ public class MuleUniversalConduit extends AbstractConduit
     @SuppressWarnings("unchecked")
     public void onClose(final Message m) throws IOException
     {
-        final CachedOutputStream cached = (CachedOutputStream) m.getContent(OutputStream.class);
-
-        OutputHandler handler = new OutputHandler()
-        {
-            public void write(MuleEvent event, OutputStream out) throws IOException
-            {
-                IOUtils.copy(cached.getInputStream(), out);
-            }
-        };
-
-        // We can create a generic StreamMessageAdapter here as the underlying
-        // transport will create one specific to the transport
-        DefaultMessageAdapter req = new DefaultMessageAdapter(handler);
-        String method = (String) m.get(Message.HTTP_REQUEST_METHOD);
-        if (method == null) method = HttpConstants.METHOD_POST;
-
-        req.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
-        req.setProperty(HttpConstants.HEADER_CONTENT_TYPE, m.get(Message.CONTENT_TYPE));
-        
-        // set all properties on the message adapter
-        MuleEvent event = RequestContext.getEvent();
-        if (event != null)
-        {
-            MuleMessage msg = event.getMessage();
-            for (Iterator i = msg.getPropertyNames().iterator(); i.hasNext();)
-            {
-                String propertyName = (String) i.next();
-                
-             // But, don't copy mule message properties that should be on message but not on soap request
-                // (MULE-2721)
-                // Also see AxisMessageDispatcher.setCustomProperties()
-                if (!(propertyName.startsWith(MuleProperties.PROPERTY_PREFIX)))
-                {
-                    req.setProperty(propertyName, msg.getProperty(propertyName));
-                }
-            }
-        }
-     
-        MuleMessage result = null;
-
-        String uri = setupURL(m);
-
-        LOGGER.info("Sending message to " + uri);
-        try
-        {
-            OutboundEndpoint ep = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
-
-            result = sendStream(req, ep);
-
-            // If we have a result, send it back to CXF
-            if (result != null)
-            {
-                Message inMessage = new MessageImpl();
-                String contentType = req.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
-
-                inMessage.put(Message.ENCODING, result.getEncoding());
-                inMessage.put(Message.CONTENT_TYPE, contentType);
-                inMessage.setContent(InputStream.class, new ByteArrayInputStream(result.getPayloadAsBytes()));
-                // inMessage.setContent(InputStream.class,
-                // result.getPayload(InputStream.class));
-                inMessage.setExchange(m.getExchange());
-                getMessageObserver().onMessage(inMessage);
-            }
-        }
-        catch (Exception e)
-        {
-            if (e instanceof IOException)
-            {
-                throw (IOException) e;
-            }
-
-            IOException ex = new IOException("Could not send message to Mule.");
-            ex.initCause(e);
-            throw ex;
-        }
     }
-
-
     
     protected MuleMessage sendStream(MessageAdapter sa, OutboundEndpoint ep) throws MuleException
     {

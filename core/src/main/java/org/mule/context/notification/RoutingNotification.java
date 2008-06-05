@@ -12,7 +12,6 @@ package org.mule.context.notification;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.transport.Connectable;
 
 /**
  * Is fired by routers.  Currently only Async-Reply routers use this when an event is received for an
@@ -26,10 +25,12 @@ public class RoutingNotification extends ServerNotification
     private static final long serialVersionUID = -6455441938378523145L;
     public static final int MISSED_ASYNC_REPLY = ROUTING_EVENT_ACTION_START_RANGE + 1;
     public static final int ASYNC_REPLY_TIMEOUT = ROUTING_EVENT_ACTION_START_RANGE + 2;
+    public static final int CORRELATION_TIMEOUT = ROUTING_EVENT_ACTION_START_RANGE + 3;
 
     static {
         registerAction("missed async reply", MISSED_ASYNC_REPLY);
         registerAction("async reply timeout", ASYNC_REPLY_TIMEOUT);
+        registerAction("correlation timeout", CORRELATION_TIMEOUT);
     }
 
     public RoutingNotification(MuleMessage resource, String identifier, int action)

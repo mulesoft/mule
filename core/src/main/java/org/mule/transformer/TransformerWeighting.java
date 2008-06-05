@@ -130,7 +130,7 @@ public class TransformerWeighting implements Comparable
         if (weighting.getInputWeighting() == getInputWeighting() &&
                 weighting.getOutputWeighting() == getOutputWeighting())
         {
-            //We only check the weighting if we have an excat match
+            //We only check the weighting if we have an exact match
             //These transformers should always implement DiscoverableTransformer, but jic we check here
             if (weighting.getTransformer() instanceof DiscoverableTransformer
                     && this.getTransformer() instanceof DiscoverableTransformer)

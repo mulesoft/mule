@@ -27,31 +27,30 @@ import java.util.List;
 
 /**
  * <code>EndpointSelector</code> selects the outgoing endpoint based on a
- * message property ("endpoint" by default).  It will first try to match the
+ * an expression evaluator  ("header:endpoint" by default).  It will first try to match the
  * endpoint by name and then by address.
+ * The endpoints to use can be set on the router itself or be global endpoint definitions.
  * <pre>
  *
- * &lt;outbound-router&gt;
- *      &lt;router className="org.mule.routing.outbound.EndpointSelector"&gt;
+ * &lt;outbound&gt;
+ *      &lt;endpoint-selector-router evaluator="xpath" expression="/MSG/HEADER/NEXT-ADDRESS"&gt;
  *          &lt;endpoint name="dest1" address="jms://queue1" /&gt;
  *          &lt;endpoint name="dest2" address="jms://queue2" /&gt;
  *          &lt;endpoint name="dest3" address="jms://queue3" /&gt;
- *          &lt;properties&gt;
- *              &lt;property name="selector" value="endpoint" /&gt;
- *          &lt;/properties&gt;
- *      &lt;/router&gt;
- * &lt;/outbound-router&gt;
+ *      &lt;/endpoint-selector-router&gt;
+ * &lt;/outbound&gt;
  *
  * </pre>
  */
 public class EndpointSelector extends FilteringOutboundRouter implements MuleContextAware
 {
-    public static final String DEFAULT_SELECTOR_PROPERTY = "endpoint";
-    public static final String DEFAULT_SELECTOR_EXPRESSION = "header:endpoint";
+    public static final String DEFAULT_SELECTOR_EVALUATOR = "header";
+    public static final String DEFAULT_SELECTOR_EXPRESSION = "endpoint";
 
-    private String selectorExpression = DEFAULT_SELECTOR_EXPRESSION;
-
-
+    private String expression = DEFAULT_SELECTOR_EXPRESSION;
+    private String evaluator = DEFAULT_SELECTOR_EVALUATOR;
+    private String customEvaluator;
+    private String fullExpression;
 
     public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
@@ -59,18 +58,18 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
         List endpoints;
         String endpointName;
 
-        String prop = getSelectorExpression();
+        String prop = getFullExpression();
         if(!ExpressionEvaluatorManager.isValidExpression(prop))
         {
             throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.expressionInvalidForProperty("selectorExpression", prop), message, null);
+                    CoreMessages.expressionInvalidForProperty("expression", prop), message, null);
         }
 
         Object property = ExpressionEvaluatorManager.evaluate(prop, message);
         if(property ==null)
         {
             throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.propertyIsNotSetOnEvent(getSelectorExpression()), message, null);
+                    CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), message, null);
         }
 
         if (property instanceof String)
@@ -85,7 +84,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
         else
         {
             throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSupportedType(
-                    getSelectorExpression(), new Class[]{String.class, List.class}, property.getClass()), message, null);
+                    getFullExpression(), new Class[]{String.class, List.class}, property.getClass()), message, null);
         }
 
         MuleMessage result = null;
@@ -96,7 +95,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
             if(StringUtils.isEmpty(endpointName))
             {
                 throw new CouldNotRouteOutboundMessageException(
-                        CoreMessages.objectIsNull("Endpoint Name: " + getSelectorExpression()), message, null);
+                        CoreMessages.objectIsNull("Endpoint Name: " + getFullExpression()), message, null);
             }
             OutboundEndpoint ep = null;
             try
@@ -150,13 +149,47 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
         return getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
     }
 
-    public String getSelectorExpression()
+    public String getFullExpression()
     {
-        return selectorExpression;
+        if(fullExpression==null)
+        {
+            if(evaluator.equalsIgnoreCase("custom"))
+            {
+                evaluator = customEvaluator;
+            }
+                fullExpression = evaluator + ":" + expression;
+            logger.debug("Full expression for EndpointSelector is: " + fullExpression);
+        }
+        return fullExpression;
     }
 
-    public void setSelectorExpression(String selectorExpression)
+    public String getExpression()
     {
-        this.selectorExpression = selectorExpression;
+        return expression;
+    }
+
+    public void setExpression(String expression)
+    {
+        this.expression = expression;
+    }
+
+    public String getCustomEvaluator()
+    {
+        return customEvaluator;
+    }
+
+    public void setCustomEvaluator(String customEvaluator)
+    {
+        this.customEvaluator = customEvaluator;
+    }
+
+    public String getEvaluator()
+    {
+        return evaluator;
+    }
+
+    public void setEvaluator(String evaluator)
+    {
+        this.evaluator = evaluator;
     }
 }

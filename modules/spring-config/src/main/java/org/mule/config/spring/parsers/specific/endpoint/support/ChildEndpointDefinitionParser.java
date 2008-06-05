@@ -22,13 +22,13 @@ import org.w3c.dom.Element;
 
 /**
  * A parser for "embedded" endpoints - ie inbound, outbound and response endpoints.
- * Because we have automatic String -> MuleEnpointURI conversin via property editors
+ * Because we have automatic String -> MuleEnpointURI conversion via property editors
  * this can be used in a variety of ways.  It should work directly with a simple String
  * address attribute or, in combination with a child element (handled by
  * {@link ChildAddressDefinitionParser},
  * or embedded in
  * {@link AddressedEndpointDefinitionParser}
- * for a more compact single-eleent approach.
+ * for a more compact single-element approach.
  *
  * <p>This class does support references to other endpoints.</p>
  * TODO - check that references are global!

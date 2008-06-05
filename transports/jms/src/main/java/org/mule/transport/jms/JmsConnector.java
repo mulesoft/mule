@@ -111,7 +111,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     private JmsTopicResolver topicResolver;
 
-    private RedeliveryHandler redeliveryHandler;
+    private RedeliveryHandlerFactory redeliveryHandlerFactory;
 
     ////////////////////////////////////////////////////////////////////////
     // Methods
@@ -143,9 +143,9 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         {
             topicResolver = new DefaultJmsTopicResolver(this);
         }
-        if (redeliveryHandler == null)
+        if (redeliveryHandlerFactory == null)
         {
-            redeliveryHandler = new DefaultRedeliveryHandler();
+            redeliveryHandlerFactory = new DefaultRedeliveryHandlerFactory();
         }
 
         try
@@ -391,6 +391,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             }
             catch (TransactionException e)
             {
+                closeQuietly(session);
                 throw new RuntimeException("Could not bind session to current transaction", e);
             }
         }
@@ -857,35 +858,40 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         this.connectionFactory = connectionFactory;
     }
-
-    public RedeliveryHandler getRedeliveryHandler()
+    
+    public RedeliveryHandlerFactory getRedeliveryHandlerFactory()
     {
-        return redeliveryHandler;
+        return redeliveryHandlerFactory;
     }
-
-    public void setRedeliveryHandler(RedeliveryHandler redeliveryHandler)
+    
+    public void setRedeliveryHandlerFactory(RedeliveryHandlerFactory redeliveryHandlerFactory)
     {
-        this.redeliveryHandler = redeliveryHandler;
+        this.redeliveryHandlerFactory = redeliveryHandlerFactory;
     }
 
     /**
-    * Sets <code>honorQosHeaders</code> property, which determines whether <code>JmsMessageDispatcher</code>
-    * should honor incoming message's QoS headers (JMSPriority, JMSDeliveryMode).
-    * @param honorQosHeaders <code>true</code> if <code>JmsMessageDispatcher</code> should honor incoming
-    * message's QoS headers; otherwise <code>false</code> Default is <code>false</code>, meaning that
-    * connector settings will override message headers.
-    */
+     * Sets the <code>honorQosHeaders</code> property, which determines whether
+     * {@link JmsMessageDispatcher} should honor incoming message's QoS headers
+     * (JMSPriority, JMSDeliveryMode).
+     * 
+     * @param honorQosHeaders <code>true</code> if {@link JmsMessageDispatcher}
+     *            should honor incoming message's QoS headers; otherwise
+     *            <code>false</code> Default is <code>false</code>, meaning that
+     *            connector settings will override message headers.
+     */
    public void setHonorQosHeaders(boolean honorQosHeaders)
    {
        this.honorQosHeaders = honorQosHeaders;
    }
 
    /**
-    * Gets the value of <code>honorQosHeaders</code> property.
-    * @return <code>true</code> if <code>JmsMessageDispatcher</code> should honor incoming
-    * message's QoS headers; otherwise <code>false</code> Default is <code>false</code>, meaning that
-    * connector settings will override message headers.
-    */
+     * Gets the value of <code>honorQosHeaders</code> property.
+     * 
+     * @return <code>true</code> if <code>JmsMessageDispatcher</code> should
+     *         honor incoming message's QoS headers; otherwise <code>false</code>
+     *         Default is <code>false</code>, meaning that connector settings will
+     *         override message headers.
+     */
    public boolean isHonorQosHeaders()
    {
        return honorQosHeaders;

@@ -12,12 +12,11 @@
 package org.mule.transport.${TransportName.toLowerCase()};
 
 import com.mockobjects.dynamic.Mock;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.${TransportName.toLowerCase()}.${TransportName}MessageReceiver;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.api.service.Service;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageReceiver;
 
 

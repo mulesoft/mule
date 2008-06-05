@@ -43,16 +43,16 @@ outbound.transformer=org.mule.transport.${TransportNameLower}.transformers.$outb
 
 #Defines the way in which endpoints for your transport will be constructed
 #Options are (but you can write your own) -
-#org.mule.impl.endpoint.ResourceEndpointBuilder i.e. vm://my.queue
-#org.mule.impl.endpoint.UrlEndpointBuilder i.e. axis:http://localhost:1234/context/Service?params
-#org.mule.impl.endpoint.SocketEndpointBuilder i.e. udp://localhost:2222
+#org.mule.endpoint.ResourceEndpointBuilder i.e. vm://my.queue
+#org.mule.endpoint.UrlEndpointBuilder i.e. axis:http://localhost:1234/context/Service?params
+#org.mule.endpoint.SocketEndpointBuilder i.e. udp://localhost:2222
 
 #if($endpointBuilder == "r")
-endpoint.builder=org.mule.impl.endpoint.ResourceEndpointURIBuilder
+endpoint.builder=org.mule.endpoint.ResourceEndpointURIBuilder
 #elseif($endpointBuilder == "u")
-endpoint.builder=org.mule.impl.endpoint.UrlEndpointURIBuilder
+endpoint.builder=org.mule.endpoint.UrlEndpointURIBuilder
 #elseif($endpointBuilder == "s")
-endpoint.builder=org.mule.impl.endpoint.SocketEndpointURIBuilder
+endpoint.builder=org.mule.endpoint.SocketEndpointURIBuilder
 #else
 endpoint.builder=org.mule.transport.${TransportNameLower}.${TransportName}EndpointURIBuilder
 #end

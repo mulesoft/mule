@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transport.Connectable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

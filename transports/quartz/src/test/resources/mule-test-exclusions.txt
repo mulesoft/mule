@@ -3,8 +3,8 @@
 org.mule.transport.quartz.QuartzFunctionalLegacyTestCase
 
 # MULE-1925
-org.mule.transport.quartz.QuartzFunctionalTestCase
+#org.mule.transport.quartz.QuartzFunctionalTestCase
 
 # MULE-2688
-org.mule.transport.quartz.QuartzReceiveAndDispatchJobTestCase
-org.mule.transport.quartz.QuartzReceiveAndDispatchUsingDelegatingJobTestCase
+#org.mule.transport.quartz.QuartzReceiveAndDispatchJobTestCase
+#org.mule.transport.quartz.QuartzCustomJobFromMessageTestCase

@@ -9,11 +9,8 @@
  */
 package org.mule.routing.response;
 
-import org.mule.DefaultMessageCollection;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.routing.RoutingException;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.CollectionCorrelatorCallback;
+import org.mule.routing.EventCorrelatorCallback;
 
 /**
  * A simple aggregator that will keep collecting events until a timeout is reached.  It will then return
@@ -23,24 +20,8 @@ import org.mule.routing.inbound.EventGroup;
  */
 public class SimpleCollectionResponseAggregator extends ResponseCorrelationAggregator
 {
-    //@Override
-    public void initialise() throws InitialisationException
+    protected EventCorrelatorCallback getCorrelatorCallback()
     {
-        super.initialise();
-//        if(isFailOnTimeout())
-//        {
-//            logger.warn("FailOnTimeout cannot be set for the SimpleCollectionResponseAggregator.  Defaulting to false");
-//            setFailOnTimeout(false);
-//        }
-    }
-
-    /**
-     * @see org.mule.routing.inbound.AbstractEventAggregator#aggregateEvents(org.mule.routing.inbound.EventGroup)
-     */
-    protected MuleMessage aggregateEvents(EventGroup events) throws RoutingException
-    {
-        DefaultMessageCollection message = new DefaultMessageCollection();
-        message.addMessages(events.toArray());
-        return message;
+        return new CollectionCorrelatorCallback();
     }
 }

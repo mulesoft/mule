@@ -58,7 +58,7 @@
     </spring:bean>
 
     <!-- jBPM Configuration -->
-    <spring:bean id="jbpmConfig" class="org.springmodules.workflow.jbpm31.LocalJbpmConfigurationFactoryBeanWorkaround">
+    <spring:bean id="jbpmConfig" class="org.springmodules.workflow.jbpm31.LocalJbpmConfigurationFactoryBean">
         <spring:property name="sessionFactory">
             <spring:ref local="jbpmSessionFactory"/>
         </spring:property>

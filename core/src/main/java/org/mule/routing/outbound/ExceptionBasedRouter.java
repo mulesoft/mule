@@ -92,8 +92,12 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
                     }
                     catch (MuleException e)
                     {
-                        logger.warn("Failed to send to endpoint: " + endpoint.getEndpointURI().toString()
-                                    + ". Error was: " + ExceptionHelper.getRootException(e) + ". Trying next endpoint");
+                        if(logger.isWarnEnabled())
+                        {
+                            Throwable t = ExceptionHelper.getRootException(e);
+                            logger.warn("Failed to send to endpoint: " + endpoint.getEndpointURI().toString()
+                                    + ". Error was: " + t + ". Trying next endpoint", t);
+                        }
                     }
                 }
                 else

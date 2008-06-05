@@ -22,7 +22,7 @@ import java.net.URL;
  */
 public class ConfigResource
 {
-    private String resourceName;
+    protected String resourceName;
     private URL url;
     private InputStream inputStream;
 

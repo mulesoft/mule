@@ -23,6 +23,7 @@ import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.NoActionTransformer;
 import org.mule.util.concurrent.Latch;
 
 import java.io.File;
@@ -36,9 +37,9 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, true, true, true);
+        File moveToDir = configureConnector(inFile, true, true, true, null);
 
-        assertRecevied(configureService(inFile, true));
+        assertRecevied(configureService(inFile, true, false));
 
         assertFiles(inFile, moveToDir, true, true);
     }
@@ -47,9 +48,9 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, true, true, false);
+        File moveToDir = configureConnector(inFile, true, true, false, null);
 
-        assertRecevied(configureService(inFile, true));
+        assertRecevied(configureService(inFile, true, false));
 
         assertFiles(inFile, moveToDir, true, false);
     }
@@ -58,9 +59,9 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, true, false, true);
+        File moveToDir = configureConnector(inFile, true, false, true, null);
 
-        assertRecevied(configureService(inFile, true));
+        assertRecevied(configureService(inFile, true, false));
 
         assertFiles(inFile, moveToDir, false, true);
     }
@@ -69,9 +70,9 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, true, false, false);
+        File moveToDir = configureConnector(inFile, true, false, false, null);
 
-        assertRecevied(configureService(inFile, true));
+        assertRecevied(configureService(inFile, true, false));
 
         assertFiles(inFile, moveToDir, false, false);
     }
@@ -80,8 +81,8 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, false, true, true);
-        assertRecevied(configureService(inFile, false));
+        File moveToDir = configureConnector(inFile, false, true, true, null);
+        assertRecevied(configureService(inFile, false, false));
 
         assertFiles(inFile, moveToDir, true, true);
     }
@@ -90,9 +91,9 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, false, true, false);
+        File moveToDir = configureConnector(inFile, false, true, false, null);
 
-        assertRecevied(configureService(inFile, false));
+        assertRecevied(configureService(inFile, false, false));
 
         assertFiles(inFile, moveToDir, true, false);
     }
@@ -101,9 +102,9 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, false, false, true);
+        File moveToDir = configureConnector(inFile, false, false, true, null);
 
-        assertRecevied(configureService(inFile, false));
+        assertRecevied(configureService(inFile, false, false));
 
         assertFiles(inFile, moveToDir, false, true);
     }
@@ -112,31 +113,94 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, false, false, false);
+        File moveToDir = configureConnector(inFile, false, false, false, null);
 
-        assertRecevied(configureService(inFile, false));
+        assertRecevied(configureService(inFile, false, false));
 
         assertFiles(inFile, moveToDir, false, false);
     }
 
-    protected Latch configureService(File inFile, boolean streaming) throws Exception
+    public void testMoveAndDeleteFilePayload() throws Exception
+    {
+        File inFile = initForRequest();
+
+        File moveToDir = configureConnector(inFile, false, true, false, FileMessageAdapter.class);
+
+        // TODO MULE-3198
+        // assertRecevied(configureService(inFile, false, true));
+        // assertFiles(inFile, moveToDir, true, true);
+    }
+
+    public void testMoveOnlyFilePayload() throws Exception
+    {
+        File inFile = initForRequest();
+
+        File moveToDir = configureConnector(inFile, false, true, false, FileMessageAdapter.class);
+
+        // TODO MULE-3198
+        // assertRecevied(configureService(inFile, false, true));
+        // assertFiles(inFile, moveToDir, true, false);
+    }
+
+    public void testDeleteOnlyFilePayload() throws Exception
+    {
+        File inFile = initForRequest();
+
+        File moveToDir = configureConnector(inFile, false, false, true, FileMessageAdapter.class);
+
+        // TODO MULE-3198
+        // assertRecevied(configureService(inFile, false, true));
+        // assertFiles(inFile, moveToDir, false, true);
+    }
+
+    public void testNoMoveNoDeleteFilePayload() throws Exception
+    {
+        File inFile = initForRequest();
+
+        File moveToDir = configureConnector(inFile, false, false, false, FileMessageAdapter.class);
+
+        // TODO MULE-3198
+        // assertRecevied(configureService(inFile, false, true));
+
+        assertFiles(inFile, moveToDir, false, false);
+    }
+
+    protected Latch configureService(File inFile, boolean streaming, boolean filePayload) throws Exception
     {
 
         Service s = new SedaService();
         s.setName("moveDeleteBridgeService");
         String url = fileToUrl(inFile.getParentFile()) + "?connector=moveDeleteConnector";
-        org.mule.api.transformer.Transformer transformer;
+        org.mule.api.transformer.Transformer transformer = null;
         if (streaming)
         {
-            transformer = new FileMessageAdaptorAssertingTransformer(FileMessageAdapter.class);
+            if (filePayload)
+            {
+                fail("Inconsistant test case: streaming and file payload are not compatible");
+            }
+            else
+            {
+                transformer = new FileMessageAdaptorAssertingTransformer(FileMessageAdapter.class,
+                    ReceiverFileInputStream.class);
+            }
         }
         else
         {
-            transformer = new FileMessageAdaptorAssertingTransformer(FileContentsMessageAdapter.class);
-
+            if (filePayload)
+            {
+                transformer = new FileMessageAdaptorAssertingTransformer(FileMessageAdapter.class, File.class);
+            }
+            else
+            {
+                transformer = new FileMessageAdaptorAssertingTransformer(FileContentsMessageAdapter.class, byte[].class);
+            }
         }
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(url), muleContext);
         endpointBuilder.addTransformer(transformer);
+        if (filePayload)
+        {
+            endpointBuilder.addTransformer(new NoActionTransformer());
+        }
         endpointBuilder.setSynchronous(true);
         s.getInboundRouter().addEndpoint(
             muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder));
@@ -168,15 +232,18 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     private class FileMessageAdaptorAssertingTransformer extends AbstractMessageAwareTransformer
     {
         private Class expectedMessageAdaptor;
+        private Class expectedPayload;
 
-        public FileMessageAdaptorAssertingTransformer(Class expectedMessageAdaptor)
+        public FileMessageAdaptorAssertingTransformer(Class expectedMessageAdaptor, Class expectedPayload)
         {
             this.expectedMessageAdaptor = expectedMessageAdaptor;
+            this.expectedPayload = expectedPayload;
         }
 
         public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
         {
             assertEquals(expectedMessageAdaptor, message.getAdapter().getClass());
+            assertEquals(expectedPayload, message.getAdapter().getPayload().getClass());
 
             // If we are streaming, copy/delete shouldn't have happened yet
             if (expectedMessageAdaptor.equals(FileMessageAdapter.class))

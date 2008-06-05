@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;

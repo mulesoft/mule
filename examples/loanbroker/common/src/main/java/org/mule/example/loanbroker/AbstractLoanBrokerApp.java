@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public abstract class AbstractLoanBrokerApp
 {
-    private List customers = new ArrayList();
+    private List<Customer> customers = new ArrayList<Customer>();
     private MuleClient client = null;
     private String config;
 
@@ -136,7 +136,7 @@ public abstract class AbstractLoanBrokerApp
     public CustomerQuoteRequest createRequest()
     {
         int index = new Double(Math.random() * 10).intValue();
-        Customer c = (Customer)customers.get(index);
+        Customer c = customers.get(index);
 
         return new CustomerQuoteRequest(c, getRandomAmount(), getRandomDuration());
     }

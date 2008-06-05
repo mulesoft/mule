@@ -13,6 +13,7 @@ package org.mule.transport.bpm;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.client.MuleClient;
@@ -50,28 +51,38 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
      */
     protected boolean allowGlobalDispatcher = false;
 
-    public static final String PROPERTY_ENDPOINT = "endpoint";
-    public static final String PROPERTY_PROCESS_TYPE = "processType";
-    public static final String PROPERTY_PROCESS_ID = "processId";
-    public static final String PROPERTY_ACTION = "action";
-    public static final String PROPERTY_TRANSITION = "transition";
-    public static final String PROPERTY_PROCESS_STARTED = "started";
+    public static final String BPM_PROPERTY_PREFIX = "BPM_";
+    
+    public static final String PROPERTY_ENDPOINT = 
+        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "ENDPOINT";
+    public static final String PROPERTY_PROCESS_TYPE = 
+        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "PROCESS_TYPE";
+    public static final String PROPERTY_PROCESS_ID = 
+        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "PROCESS_ID";
+    public static final String PROPERTY_ACTION = 
+        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "ACTION";
+    public static final String PROPERTY_TRANSITION = 
+        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "TRANSITION";
+    public static final String PROPERTY_PROCESS_STARTED = 
+        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "STARTED";
+    
     public static final String ACTION_START = "start";
     public static final String ACTION_ADVANCE = "advance";
     public static final String ACTION_UPDATE = "update";
     public static final String ACTION_ABORT = "abort";
+    
     public static final String PROCESS_VARIABLE_INCOMING = "incoming";
     public static final String PROCESS_VARIABLE_INCOMING_SOURCE = "incomingSource";
     public static final String PROCESS_VARIABLE_DATA = "data";
 
-    public static final String BPM = "bpm";
-    public static final String GLOBAL_RECEIVER = BPM + "://*";
+    public static final String PROTOCOL = "bpm";
+    public static final String GLOBAL_RECEIVER = PROTOCOL + "://*";
 
     private MuleClient muleClient = null;
 
     public String getProtocol()
     {
-        return BPM;
+        return PROTOCOL;
     }
 
     protected void doInitialise() throws InitialisationException

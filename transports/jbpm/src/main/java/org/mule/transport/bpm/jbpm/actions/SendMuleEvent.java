@@ -84,7 +84,7 @@ public class SendMuleEvent extends LoggingActionHandler
                 if (tokens.length > 1)
                 {
                     JXPathContext context = JXPathContext.newContext(payloadObject);
-                    payloadObject = context.getValue(tokens[1]);
+                    payloadObject = context.getValue(tokens[1].replaceAll("\\.", "/"));
                 }
             }
         }

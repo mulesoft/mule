@@ -11,6 +11,7 @@ package org.mule.lifecycle;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.ServerNotification;
+import org.mule.util.ClassUtils;
 
 public class LifecycleObject
 {
@@ -69,4 +70,11 @@ public class LifecycleObject
             context.fireNotification(postNotification);
         }
     }
+
+    // @Override
+    public String toString()
+    {
+        return super.toString() + " (" + ClassUtils.getSimpleName(type) + ")";
+    }
+        
 }

@@ -18,7 +18,6 @@ import org.mule.model.AbstractModel;
 /**
  * A mule service service model that uses Seda principals to achieve high
  * throughput by Quing events for compoonents and processing them concurrently.
- * 
  */
 public class SedaModel extends AbstractModel
 {
@@ -26,16 +25,6 @@ public class SedaModel extends AbstractModel
      * The time out used for taking from the Seda Queue.
      */
     private int queueTimeout;
-
-    /**
-     * Whether components in this model should be pooled or not.
-     */
-    private boolean enablePooling = true;
-
-    /**
-     * Whether to create a new service for every request.
-     */
-    protected boolean componentPerRequest = false;
 
     /**
      * the pooling configuration used when initialising the service described by
@@ -48,7 +37,6 @@ public class SedaModel extends AbstractModel
      */
     protected QueueProfile queueProfile;
 
-
     /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model
@@ -60,15 +48,14 @@ public class SedaModel extends AbstractModel
         return "seda";
     }
 
-
     public void initialise() throws InitialisationException
     {
         queueTimeout = muleContext.getConfiguration().getDefaultSynchronousEventTimeout();
-        if (queueProfile==null)
+        if (queueProfile == null)
         {
             queueProfile = new QueueProfile();
         }
-        if (poolingProfile==null)
+        if (poolingProfile == null)
         {
             poolingProfile = new PoolingProfile();
         }
@@ -84,27 +71,6 @@ public class SedaModel extends AbstractModel
     {
         this.queueTimeout = queueTimeout;
     }
-
-    public boolean isEnablePooling()
-    {
-        return enablePooling;
-    }
-
-    public void setEnablePooling(boolean enablePooling)
-    {
-        this.enablePooling = enablePooling;
-    }
-
-    public boolean isComponentPerRequest()
-    {
-        return componentPerRequest;
-    }
-
-    public void setComponentPerRequest(boolean componentPerRequest)
-    {
-        this.componentPerRequest = componentPerRequest;
-    }
-
 
     public PoolingProfile getPoolingProfile()
     {

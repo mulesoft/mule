@@ -13,9 +13,10 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.TemplateParser;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 
 /**
  * Provides universal access for evaluating expressions embedded in Mule configurations, such  as Xml, Java,
@@ -30,19 +31,19 @@ public class ExpressionEvaluatorManager
 
     private static TemplateParser parser = TemplateParser.createAntStyleParser();
 
-    private static Map evaluator = new HashMap(8);
+    private static ConcurrentMap evaluators = new ConcurrentHashMap(8);
 
     public static void registerEvaluator(ExpressionEvaluator extractor)
     {
-        if(extractor ==null)
+        if (extractor == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("extractor").getMessage());
         }
-        if(evaluator.containsKey(extractor.getName()))
+        Object previous = evaluators.putIfAbsent(extractor.getName(), extractor);
+        if (previous != null)
         {
             throw new IllegalArgumentException(CoreMessages.objectAlreadyExists(extractor.getName()).getMessage());
         }
-        evaluator.put(extractor.getName(), extractor);
     }
 
     /**
@@ -52,23 +53,22 @@ public class ExpressionEvaluatorManager
      */
     public static boolean isEvaluatorRegistered(String name)
     {
-        return evaluator.get(name)!=null;
+        return evaluators.containsKey(name);
     }
 
     /**
      * Removes the evaluator with the given name
      * @param name the name of the evaluator to remove
-     * @return
      */
     public static ExpressionEvaluator unregisterEvaluator(String name)
     {
-        if(name==null)
+        if (name==null)
         {
             return null;
         }
         
-        ExpressionEvaluator evaluator = (ExpressionEvaluator) ExpressionEvaluatorManager.evaluator.remove(name);
-        if(evaluator instanceof Disposable)
+        ExpressionEvaluator evaluator = (ExpressionEvaluator) ExpressionEvaluatorManager.evaluators.remove(name);
+        if (evaluator instanceof Disposable)
         {
             ((Disposable) evaluator).dispose();
         }
@@ -118,6 +118,36 @@ public class ExpressionEvaluatorManager
      * method should be used since it will iterate through all expressions in a string.
      *
      * @param expression a single expression i.e. xpath://foo
+     * @param evaluator the evaluator to use when executing the expression
+     * @param object The object (usually {@link org.mule.api.MuleMessage}) to evaluate the expression on.
+     * It is unlikely that users will want to change this execpt maybe to use "["  instead.
+     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
+     * null.
+     * @return the result of the evaluation
+     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
+     * 'failIfNull is set to true.
+     */
+    public static Object evaluate(String expression, String evaluator, Object object, boolean failIfNull) throws ExpressionRuntimeException
+    {
+        ExpressionEvaluator extractor = (ExpressionEvaluator) evaluators.get(evaluator);
+        if (extractor == null)
+        {
+            throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator).getMessage());
+        }
+        Object result = extractor.evaluate(expression, object);
+        if (result == null && failIfNull)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(evaluator, expression));
+        }
+        return result;
+    }
+    /**
+     * Evaluates the given expression.  The expression should be a single expression definition with or without
+     * enclosing braces. i.e. "mule:serviceName" and "${mule:serviceName}" are both valid. For situations where
+     * one or more expressions need to be parsed within a single text, the {@link #parse(String, Object, boolean)}
+     * method should be used since it will iterate through all expressions in a string.
+     *
+     * @param expression a single expression i.e. xpath://foo
      * @param object The object (usually {@link org.mule.api.MuleMessage}) to evaluate the expression on.
      * @param expressionPrefix the expression prefix to use. The default is "${" but any character is valid.
      * It is unlikely that users will want to change this execpt maybe to use "["  instead.
@@ -131,16 +161,16 @@ public class ExpressionEvaluatorManager
     {
         String name;
 
-        if(expression==null)
+        if (expression == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
         }
-        if(expression.startsWith(expressionPrefix))
+        if (expression.startsWith(expressionPrefix))
         {
             expression = expression.substring(2, expression.length()-1);
         }
         int i = expression.indexOf(":");
-        if(i>-1)
+        if (i >- 1)
         {
             name = expression.substring(0, i);
             expression = expression.substring(i+1);
@@ -150,17 +180,9 @@ public class ExpressionEvaluatorManager
             name = expression;
             expression = null;
         }
-        ExpressionEvaluator extractor = (ExpressionEvaluator) evaluator.get(name);
-        if(extractor==null)
-        {
-            throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(name).getMessage());
-        }
-        Object result = extractor.evaluate(expression, object);
-        if(result==null && failIfNull)
-        {
-            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(name, expression));
-        }
-        return result;
+        return evaluate(expression, name, object, failIfNull);
+
+
     }
 
     /**
@@ -206,7 +228,7 @@ public class ExpressionEvaluatorManager
      */
     public static synchronized void clearEvaluators()
     {
-        for (Iterator iterator = evaluator.values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = evaluators.values().iterator(); iterator.hasNext();)
         {
             ExpressionEvaluator evaluator = (ExpressionEvaluator)iterator.next();
             if(evaluator instanceof Disposable)
@@ -214,7 +236,7 @@ public class ExpressionEvaluatorManager
                 ((Disposable) evaluator).dispose();
             }
         }
-        evaluator.clear();
+        evaluators.clear();
     }
 
     /**

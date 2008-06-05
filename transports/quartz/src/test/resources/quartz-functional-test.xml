@@ -1,37 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.0"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.0"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+      xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
                http://www.mulesource.org/schema/mule/quartz/2.0 http://www.mulesource.org/schema/mule/quartz/2.0/mule-quartz.xsd">
 
     <quartz:connector name="quartzConnectorDefaults"/>
 
-    <quartz:endpoint name="quartz.in.1" address="quartz:/myService1"
-                     repeatInterval="1000" repeatCount="3" payload="quartz test"/>
+    <quartz:endpoint name="quartz.in.1" jobName="myService1"
+                     repeatInterval="1000" repeatCount="3">
+        <quartz:event-generator-job>
+            <quartz:payload>foo</quartz:payload>
+        </quartz:event-generator-job>
+    </quartz:endpoint>
 
-    <quartz:endpoint name="quartz.in.2" address="quartz:/myService2"
-                     repeatInterval="1000" repeatCount="1"/>
+    <quartz:endpoint name="quartz.in.2" jobName="myService2"
+                     repeatInterval="1000" repeatCount="1">
+        <quartz:event-generator-job/>
+    </quartz:endpoint>
 
     <model name="quartz">
-        <pooling-profile maxActive="1" exhaustedAction="WAIT"/>
+        <!--<pooling-profile maxActive="1" exhaustedAction="WAIT"/>-->
 
         <service name="quartzService1">
             <inbound>
                 <inbound-endpoint ref="quartz.in.1"/>
             </inbound>
-            <component class="org.mule.transport.quartz.TestComponent1"/>
+            <test:component/>
         </service>
 
         <service name="quartzService2">
             <inbound>
                 <inbound-endpoint ref="quartz.in.2"/>
             </inbound>
-            <component class="org.mule.transport.quartz.TestComponent1"/>
+            <test:component/>
         </service>
     </model>
-    
+
 </mule>

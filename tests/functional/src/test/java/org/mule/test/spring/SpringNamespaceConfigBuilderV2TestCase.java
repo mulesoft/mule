@@ -25,7 +25,6 @@ import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.util.expression.FunctionExpressionEvaluator;
 
 import java.util.List;
 

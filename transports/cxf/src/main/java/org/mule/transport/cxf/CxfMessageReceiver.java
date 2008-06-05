@@ -24,11 +24,13 @@ import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.cxf.i18n.CxfMessages;
 import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
+import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.transport.cxf.support.ProviderService;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +39,6 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Server;
@@ -72,14 +73,14 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            
             Map endpointProps = getEndpoint().getProperties();
             String wsdlUrl = (String) endpointProps.get(CxfConstants.WSDL_LOCATION);
-            String databinding = (String) endpointProps.get(CxfConstants.DATA_BINDING);
             String bindingId = (String) endpointProps.get(CxfConstants.BINDING_ID);
             String frontend = (String) endpointProps.get(CxfConstants.FRONTEND);
             String bridge = (String) endpointProps.get(CxfConstants.BRIDGE);
             String serviceClassName = (String) endpointProps.get(CxfConstants.SERVICE_CLASS);
+            String mtomEnabled = (String) endpointProps.get(CxfConstants.MTOM_ENABLED);
+            List<DataBinding> databinding = (List<DataBinding>) endpointProps.get(CxfConstants.DATA_BINDING);
             List<AbstractFeature> features = (List<AbstractFeature>) endpointProps.get(CxfConstants.FEATURES);
             
             Class<?> svcCls = null;
@@ -118,6 +119,12 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             {
                 throw new CreateException(CxfMessages.invalidFrontend(frontend), this);
             }
+            
+            if (databinding != null && databinding.size() > 0)
+            {
+                // TODO: find a way to make this not a list
+                sfb.setDataBinding(databinding.get(0));
+            }
 
             if (!(service.getComponent() instanceof JavaComponent))
             {
@@ -138,24 +145,40 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                 sfb.setFeatures(features);
             }
             
+            if (mtomEnabled != null)
+            {
+                Map<String, Object> properties = sfb.getProperties();
+                if (properties == null)
+                {
+                    properties = new HashMap<String, Object>();
+                    sfb.setProperties(properties);
+                }
+                properties.put("mtom-enabled", mtomEnabled);
+            }
+            
             sfb.setInInterceptors((List<Interceptor>) endpointProps.get("inInterceptors"));
             sfb.setInFaultInterceptors((List<Interceptor>) endpointProps.get("inFaultInterceptors"));
             sfb.setOutInterceptors((List<Interceptor>) endpointProps.get("outInterceptors"));
             sfb.setOutFaultInterceptors((List<Interceptor>) endpointProps.get("outFaultInterceptors"));
 
-            if (sfb.getInInterceptors() == null) {
+            if (sfb.getInInterceptors() == null)
+            {
                 sfb.setInInterceptors(new ArrayList<Interceptor>());
             }
             
             sfb.getInInterceptors().add(new MuleHeadersInInterceptor());
             
-            // Aegis, JAXB, other?
-            if (databinding != null)
+            if (sfb.getOutInterceptors() == null)
             {
-                Class<?> c = ClassLoaderUtils.loadClass(databinding, getClass());
-                sfb.setDataBinding((DataBinding) c.newInstance());
+                sfb.setOutInterceptors(new ArrayList<Interceptor>());
             }
-
+            sfb.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
+            
+            if (sfb.getOutFaultInterceptors() == null)
+            {
+                sfb.setOutFaultInterceptors(new ArrayList<Interceptor>());
+            }
+            sfb.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
             sfb.setServiceClass(svcCls);
             sfb.setAddress(getAddressWithoutQuery());
 
@@ -192,6 +215,8 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             Bus bus = connector.getCxfBus();
             sfb.setBus(bus);
 
+            initializeServerFactory(sfb);
+            
             Configurer configurer = bus.getExtension(Configurer.class);
             if (null != configurer)
             {
@@ -214,6 +239,15 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         {
             throw new InitialisationException(e, this);
         }
+    }
+
+    /**
+     * If any custom initialization logic needs to be done, it can
+     * be done by overriding this method.
+     * @param sfb
+     */
+    protected void initializeServerFactory(ServerFactoryBean sfb)
+    {
     }
 
     private String getAddressWithoutQuery()

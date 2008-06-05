@@ -244,6 +244,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
                 else
                 {
                     staticLogger.debug("Timeout");
+                    JdbcUtils.rollbackAndClose(con);
                     return null;
                 }
             }

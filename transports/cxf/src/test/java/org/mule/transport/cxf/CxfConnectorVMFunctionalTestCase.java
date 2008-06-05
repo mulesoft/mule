@@ -16,10 +16,10 @@ public class CxfConnectorVMFunctionalTestCase extends AbstractSoapResourceEndpoi
 {
 
     @Override
-    public void testSendAndReceiveComplex() throws Throwable
+    public void testRequest() throws Throwable
     {
         // TODO Auto-generated method stub
-        super.testSendAndReceiveComplex();
+        super.testRequest();
     }
 
     public String getConfigResources()

@@ -25,8 +25,8 @@
                             recoverJmsConnections="false"
                             eagerConsumer="false"
                             specification="1.1"
-                            redeliveryHandler-ref="redeliveryHandler"/>
+                            redeliveryHandlerFactory-ref="redeliveryHandlerFactory"/>
 
-     <spring:bean name="redeliveryHandler" class="org.mule.transport.jms.test.TestRedeliveryHandler"/>
+     <spring:bean name="redeliveryHandlerFactory" class="org.mule.transport.jms.test.TestRedeliveryHandlerFactory"/>
 
 </mule>

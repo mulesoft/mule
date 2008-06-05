@@ -44,17 +44,4 @@ public class BankQuotesInboundAggregator extends CorrelationAggregator
         }
     }
 
-    /**
-     * Determines if the event group is ready to be aggregated; this is entirely up
-     * to the application. It could be determined by volume, last modified time or
-     * some other criteria based on the last event received.
-     * 
-     * @param events event group to examine
-     * @return true if the events are ready to be aggregated
-     */
-    protected boolean shouldAggregateEvents(EventGroup events)
-    {
-        return super.shouldAggregateEvents(events);
-    }
-
 }

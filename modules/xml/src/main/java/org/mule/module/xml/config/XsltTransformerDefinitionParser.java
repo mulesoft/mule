@@ -10,14 +10,14 @@
 
 package org.mule.module.xml.config;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.module.xml.transformer.XsltTransformer;
 
-public class XsltTransformerDefinitionParser extends MuleOrphanDefinitionParser
+public class XsltTransformerDefinitionParser extends TransformerDefinitionParser
 {
     public XsltTransformerDefinitionParser()
     {
-        super(XsltTransformer.class, false);
+        super(XsltTransformer.class);
         addAlias("transformerFactoryClass", "xslTransformerFactory");
     }
 

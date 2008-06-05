@@ -14,8 +14,9 @@ import org.mule.api.MuleMessage;
 
 import java.util.Map;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.jbpm.graph.exe.Token;
-import org.jbpm.msg.Message;
+import org.jbpm.job.Job;
 
 /**
  * jBPM has built-in support for messaging via the org.jbpm.msg.MessageService interface, 
@@ -54,9 +55,9 @@ public class MuleMessageService implements org.jbpm.msg.MessageService
         return proxy.generateMessage(endpoint, payloadObject, messageProperties, synchronous);
     }
 
-    public void send(Message message)
+    public void send(Job job) 
     {
-        // no-op
+        throw new NotImplementedException("MULE-1219");
     }
 
     public void suspendMessages(Token token)

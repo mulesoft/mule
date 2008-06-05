@@ -153,6 +153,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     /** {@inheritDoc} */
     public void addProperties(Map props)
     {
+        addProperties(props, properties.getDefaultScope());
         assertAccess(WRITE);
         if (props != null)
         {
@@ -167,6 +168,22 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
         }
     }
 
+    /** {@inheritDoc} */
+    public void addProperties(Map props, PropertyScope scope)
+    {
+        assertAccess(WRITE);
+        if (props != null)
+        {
+            synchronized (props)
+            {
+                for (Iterator iter = props.entrySet().iterator(); iter.hasNext();)
+                {
+                    Map.Entry entry = (Map.Entry) iter.next();
+                    setProperty((String) entry.getKey(), entry.getValue(), scope);
+                }
+            }
+        }
+    }
     /**
      * A convenience method for extending classes to Set inbound scoped properties on the message
      * properties that arrive on the inbound message should be set as inbound-scoped properties. These are
@@ -485,7 +502,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     public void assertAccess(boolean write)
     {
         MuleContext mc = MuleServer.getMuleContext();
-        if (mc == null || mc.getConfiguration().isAssertMessageAccess())
+        if (mc != null || mc.getConfiguration().isAssertMessageAccess())
         {
             initAccessControl();
             setOwner();
@@ -512,8 +529,8 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
         // code - more than one thread is attempting to change the contents of a message.
         //
         // Having said that, you can disable these exceptions by defining
-        // MuleProperties.MULE_THREAD_UNSAFE_MESSAGES_PROPERTY (org.mule.disable.threadsafemessages)
-        // (ie by adding -Dorg.mule.disable.threadsafemessages=true to the java command line).
+        // MuleProperties.MULE_THREAD_UNSAFE_MESSAGES_PROPERTY (mule.disable.threadsafemessages)
+        // (ie by adding -Dmule.disable.threadsafemessages=true to the java command line).
         //
         // To remove the underlying cause, however, you probably need to do one of:
         //
@@ -587,11 +604,14 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     /** {@inheritDoc} */
     public synchronized void resetAccessControl()
     {
-        MuleContext mc = MuleServer.getMuleContext();
-        if (mc == null || mc.getConfiguration().isAssertMessageAccess())
+         // just reset the internal state here as this method is explicitly intended not to
+        // be used from the outside
+        if (ownerThread != null)
         {
-            assertAccess(WRITE);
             ownerThread.set(null);
+        }
+        if (mutable != null)
+        {
             mutable.set(true);
         }
     }

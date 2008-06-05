@@ -10,7 +10,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.routing.inbound.CorrelationAggregator;
+import org.mule.routing.inbound.AbstractEventAggregator;
 
 /**
  * Generic router definition parser for parsing all Router elements.
@@ -29,7 +29,7 @@ public class RouterDefinitionParser extends ChildDefinitionParser
     // specifically for subclasses of CorrelationAggregator (requires a "class=..." in the config)
     public RouterDefinitionParser()
     {
-        super(ROUTER, null, CorrelationAggregator.class, true);
+        super(ROUTER, null, AbstractEventAggregator.class, true);
         standardOptions();
     }
 

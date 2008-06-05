@@ -37,7 +37,7 @@ public class ManagementNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("jmx-log4j", new AgentDefinitionParser(Log4jAgent.class));
         registerBeanDefinitionParser("jmx-mx4j-adaptor", new AgentDefinitionParser(Mx4jAgent.class));
         registerBeanDefinitionParser("jmx-notifications", new AgentDefinitionParser(JmxServerNotificationAgent.class));
-        registerBeanDefinitionParser("jmx-default-config", new AgentDefinitionParser(DefaultJmxSupportAgent.class));
+        registerMuleBeanDefinitionParser("jmx-default-config", new AgentDefinitionParser(DefaultJmxSupportAgent.class)).addAlias("registerMx4jAdapter", "loadMx4jAgent");
         registerBeanDefinitionParser("level-mapping", new ChildMapEntryDefinitionParser("levelMappings", "severity", "eventId"));
 
         // these two are identical?

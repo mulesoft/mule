@@ -11,7 +11,9 @@
 package org.mule.routing.inbound;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessageCollection;
 import org.mule.util.ClassUtils;
+import org.mule.DefaultMessageCollection;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -279,6 +281,17 @@ public class EventGroup implements Comparable, Serializable
         buf.append('}');
 
         return buf.toString();
+    }
+
+    public MuleMessageCollection toMessageCollection()
+    {
+        MuleMessageCollection col = new DefaultMessageCollection();
+        for (Iterator iterator = events.iterator(); iterator.hasNext();)
+        {
+            MuleEvent event = (MuleEvent) iterator.next();
+            col.addMessage(event.getMessage());
+        }
+        return col;
     }
 
 }

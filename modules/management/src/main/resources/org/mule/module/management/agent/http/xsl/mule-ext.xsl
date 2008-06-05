@@ -35,20 +35,7 @@
          <xsl:when test="function-available('muleserver:getMuleContext')">
             <xsl:variable name="mulecontext" select="muleserver:getMuleContext()"/>
             <xsl:variable name="configuration" select="mulecontext:getConfiguration($mulecontext)"/>
-            <xsl:value-of select="configuration:getEncoding($configuration)"/>
-         </xsl:when>
-         <xsl:otherwise>
-            <xsl:message>No configuration available</xsl:message>
-         </xsl:otherwise>
-      </xsl:choose>
-   </xsl:template>
-
-   <xsl:template name="osEncoding">
-      <xsl:choose>
-         <xsl:when test="function-available('muleserver:getMuleContext')">
-            <xsl:variable name="mulecontext" select="muleserver:getMuleContext()"/>
-            <xsl:variable name="configuration" select="mulecontext:getConfiguration($mulecontext)"/>
-            <xsl:value-of select="configuration:getDefaultOSEncoding($configuration)"/>
+            <xsl:value-of select="configuration:getDefaultEncoding($configuration)"/>
          </xsl:when>
          <xsl:otherwise>
             <xsl:message>No configuration available</xsl:message>

@@ -9,9 +9,16 @@
  */
 package org.mule.transport.file;
 
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.routing.filter.Filter;
+import org.mule.api.service.Service;
+import org.mule.api.transformer.Transformer;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.file.FileConnector;
-import org.mule.transport.file.FilenameParser;
+import org.mule.transport.file.filters.FilenameRegexFilter;
+import org.mule.transport.file.transformers.FileToByteArray;
+import org.mule.transport.file.transformers.FileToString;
+
+import java.util.List;
 
 public class FileNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -73,4 +80,31 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    public void testTransformersOnEndpoints() throws Exception
+    {
+        Object transformer1 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ep1").getTransformers().get(0);
+        assertNotNull(transformer1);
+        assertEquals(FileToByteArray.class, transformer1.getClass());
+
+        Object transformer2 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ep2").getTransformers().get(0);
+        assertNotNull(transformer2);
+        assertEquals(FileToString.class, transformer2.getClass());
+    }
+    
+    public void testFileFilter() throws Exception
+    {
+        Service service = muleContext.getRegistry().lookupService("Test");
+        assertNotNull(service);
+        List endpoints = service.getInboundRouter().getEndpoints();
+        assertEquals(1, endpoints.size());
+
+        InboundEndpoint endpoint = (InboundEndpoint) endpoints.get(0);
+        Filter filter = endpoint.getFilter();
+        assertNotNull(filter);
+
+        assertTrue(filter instanceof FilenameRegexFilter);
+        final FilenameRegexFilter f = (FilenameRegexFilter) filter;
+        assertEquals(false, f.isCaseSensitive());
+        assertEquals("(^SemDirector_Report-\\d)(.*)(tab$)", f.getPattern());
+    }
 }

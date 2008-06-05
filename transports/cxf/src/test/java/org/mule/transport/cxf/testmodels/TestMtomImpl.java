@@ -1,0 +1,49 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.transport.cxf.testmodels;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+import javax.jws.WebService;
+import javax.xml.ws.Holder;
+
+import org.apache.cxf.mime.TestMtom;
+
+@WebService(serviceName = "TestMtomService", 
+        portName = "TestMtomPort", 
+        targetNamespace = "http://cxf.apache.org/mime", 
+        endpointInterface = "org.apache.cxf.mime.TestMtom",
+        wsdlLocation = "testutils/mtom_xop.wsdl")
+        
+public class TestMtomImpl implements TestMtom {
+
+    public void testXop(Holder<String> name, Holder<DataHandler> attachinfo) {
+        // TODO Auto-generated method stub
+        name.value = "return detail + " + name.value;
+        
+        try
+        {
+            InputStream inputStream = attachinfo.value.getInputStream();
+            while (inputStream.read() != -1);
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        attachinfo.value = new DataHandler(new FileDataSource("src/test/resources/mtom-conf.xml"));
+    }
+
+}

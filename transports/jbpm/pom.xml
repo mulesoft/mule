@@ -24,43 +24,14 @@
         <!-- jBPM --> 
         <dependency>
             <groupId>org.jbpm</groupId>
-            <artifactId>jbpm</artifactId>
-            <version>3.1.4</version>
-        </dependency>
-        <!-- Only needed for scripting in jPDL -->
-        <dependency>
-            <groupId>bsh</groupId>
-            <artifactId>bsh</artifactId>
-            <version>1.3.0</version>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Only needed for Spring-based configuration -->
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring-extras</artifactId>
-            <version>${version}</version>
-            <!-- TODO Change this back to scope=test once 
-                LocalJbpmConfigurationFactoryBeanWorkaround 
-                is no longer needed in src/main/java -->
-            <!-- <scope>test</scope> -->
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-orm</artifactId>
-        </dependency>
-        <!-- This is the same as spring-modules-jbpm31 but we override the pom in our local 
-            dependencies repo because the one from Spring includes the kitchen sink. -->
-        <dependency>
-            <groupId>org.springmodules</groupId>
-            <artifactId>spring-modules-jbpm31-nodeps</artifactId>
-            <version>0.8a</version>
-        </dependency>
-
-        <!-- Hibernate --> 
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate</artifactId>
+            <artifactId>jbpm-jpdl</artifactId>
+            <version>3.2.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Use the combined cglib-nodep instead of separate cglib and asm dependencies -->
         <dependency>
@@ -68,11 +39,37 @@
             <artifactId>cglib-nodep</artifactId>
             <version>2.1_3</version>
         </dependency>
-        <!-- Used to pool connections in Hibernate -->
         <dependency>
-            <groupId>c3p0</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>0.9.0.4</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.jcr</groupId>
+            <artifactId>jcr</artifactId>
+            <version>1.0</version>
+        </dependency>        
+
+        <!-- Only needed for Spring-based configuration -->
+        <dependency>
+            <groupId>org.springmodules</groupId>
+            <artifactId>spring-modules-jbpm31</artifactId>
+            <version>0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+
+        <!-- Hibernate --> 
+        <dependency>
+            <groupId>bsh</groupId>
+            <artifactId>bsh</artifactId>
+            <version>1.3.0</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Needed for org.mule.transport.bpm.jbpm.actions.SendMuleEvent -->

@@ -7,8 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.lifecycle.phases;
 
+import org.mule.agent.AgentSorter;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.Initialisable;
@@ -20,16 +22,20 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.DefaultLifecyclePhase;
+import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
- * The Start phase for the Management context LifecycleManager. Calling {@link org.mule.api.UMOManagementContext#start()}
- * with initiate this phase via the {@link org.mule.api.lifecycle.LifecycleManager}.
- * This phase controls the order in which objects should be started.
- *
+ * The Start phase for the Management context LifecycleManager. Calling
+ * {@link org.mule.api.UMOManagementContext#start()} with initiate this phase via the
+ * {@link org.mule.api.lifecycle.LifecycleManager}. This phase controls the order in
+ * which objects should be started.
+ * 
  * @see org.mule.api.UMOManagementContext
  * @see org.mule.api.lifecycle.LifecycleManager
  * @see org.mule.api.lifecycle.Startable
@@ -60,7 +66,6 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
         }
         startOrderedObjects.add(new NotificationLifecycleObject(Service.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
-
 
         setIgnoredObjectTypes(ignorredObjects);
         setOrderedLifecycleObjects(startOrderedObjects);

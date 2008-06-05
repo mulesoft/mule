@@ -14,6 +14,7 @@ import org.mule.api.agent.Agent;
 import org.mule.module.management.agent.JmxAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.agent.Log4jAgent;
+import org.mule.module.management.agent.Mx4jAgent;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.Collection;
@@ -44,7 +45,7 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
         String domainName = jmxAgent.getJmxSupportFactory().getJmxSupport().getDomainName(muleContext);
         Collection beans = mBeanServer.queryMBeans(ObjectName.getInstance(domainName + ":*"), null);
         String message = domainName + ": " + beans.toString();
-        assertEquals(message, 6, beans.size());
+        assertEquals(message, 7, beans.size());
 
         agent = muleContext.getRegistry().lookupAgent("jmx-log4j");
         assertNotNull(agent);
@@ -54,6 +55,12 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
         assertNotNull(agent);
         assertEquals(JmxServerNotificationAgent.class, agent.getClass());
 
+
+        agent = muleContext.getRegistry().lookupAgent("jmx-mx4j-adaptor");
+        assertNotNull(agent);
+        assertEquals(Mx4jAgent.class, agent.getClass());
+
+        
         agent = muleContext.getRegistry().lookupAgent("jmx-default-config");
         // see TODO in agent
 //        assertNull(agent);

@@ -14,8 +14,8 @@ package org.mule.transport.http.config;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -43,9 +43,9 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("requiredParameter", new ChildMapEntryDefinitionParser("requiredParams"));
         registerBeanDefinitionParser("optionalParameter", new ChildMapEntryDefinitionParser("optionalParams"));
         
-        registerBeanDefinitionParser("http-client-response-to-object-transformer", new MuleOrphanDefinitionParser(HttpClientMethodResponseToObject.class, false));
-        registerBeanDefinitionParser("http-response-to-string-transformer", new MuleOrphanDefinitionParser(HttpResponseToString.class, false));
-        registerBeanDefinitionParser("object-to-http-client-request-transformer", new MuleOrphanDefinitionParser(ObjectToHttpClientMethodRequest.class, false));
-        registerBeanDefinitionParser("message-to-http-response-transformer", new MuleOrphanDefinitionParser(MuleMessageToHttpResponse.class, false));
+        registerBeanDefinitionParser("http-client-response-to-object-transformer", new TransformerDefinitionParser(HttpClientMethodResponseToObject.class));
+        registerBeanDefinitionParser("http-response-to-string-transformer", new TransformerDefinitionParser(HttpResponseToString.class));
+        registerBeanDefinitionParser("object-to-http-client-request-transformer", new TransformerDefinitionParser(ObjectToHttpClientMethodRequest.class));
+        registerBeanDefinitionParser("message-to-http-response-transformer", new TransformerDefinitionParser(MuleMessageToHttpResponse.class));
     }
 }

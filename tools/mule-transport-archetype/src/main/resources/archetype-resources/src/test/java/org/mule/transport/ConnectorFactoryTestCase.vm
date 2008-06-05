@@ -11,9 +11,8 @@
 #set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1)}")
 package org.mule.transport.${TransportName.toLowerCase()};
 
-import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.api.endpoint.ImmutableEndpoint;
 
 
 public class ${TransportName}ConnectorFactoryTestCase extends AbstractMuleTestCase

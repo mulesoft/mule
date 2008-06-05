@@ -10,10 +10,8 @@
 
 package org.mule.example.loanbroker.bpm;
 
-import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.example.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase;
 import org.mule.transport.bpm.BPMS;
 import org.mule.transport.bpm.ProcessConnector;
@@ -25,6 +23,12 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
     /** For unit tests, we assume a virgin database, therefore the process ID is assumed to be = 1 */
     public static final long PROCESS_ID = 1;
 
+    public JBpmFunctionalTestCase()
+    {
+        super();
+        setDisposeManagerPerSuite(true);        
+    }
+    
     @Override
     protected void suitePreSetUp() throws Exception
     {
@@ -37,11 +41,6 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
     }
 
     @Override
-    protected ConfigurationBuilder getBuilder() throws Exception 
-    {
-        return new SpringXmlConfigurationBuilder(getConfigResources());
-    }
-    
     protected String getConfigResources()
     {
         return "loan-broker-bpm-mule-config.xml";
@@ -49,7 +48,7 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
 
     @Override
     public void testSingleLoanRequest() throws Exception
-    {
+    {        
         super.testSingleLoanRequest();
         
         ProcessConnector connector =

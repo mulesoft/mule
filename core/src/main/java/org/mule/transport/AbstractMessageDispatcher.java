@@ -166,14 +166,15 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                     component, MessageNotification.MESSAGE_SENT));
             }
 
+            //TODO: This chunk can be removed since there is no need to remove any properites since they are now scoped
             // Once a dispatcher has done its work we need to remove this property
             // so that it is not propagated to the next request
-            if (result != null
-                    && result.getPropertyNames().contains(MuleProperties.MULE_REMOTE_SYNC_PROPERTY))
-            {
+//            if (result != null
+//                    && result.getPropertyNames().contains(MuleProperties.MULE_REMOTE_SYNC_PROPERTY))
+            //{
 //                result = RequestContext.safeMessageCopy(result);
-                result.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
-            }
+            //    result.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+            //}
             return result;
         }
         catch (DispatchException e)

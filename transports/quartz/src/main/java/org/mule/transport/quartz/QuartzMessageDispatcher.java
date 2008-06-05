@@ -11,14 +11,18 @@
 package org.mule.transport.quartz;
 
 import org.mule.RegistryContext;
+import org.mule.util.ClassUtils;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.quartz.i18n.QuartzMessages;
-import org.mule.transport.quartz.jobs.DelegatingJob;
-import org.mule.util.ClassUtils;
+import org.mule.transport.quartz.jobs.CustomJob;
+import org.mule.transport.quartz.jobs.CustomJobConfig;
+import org.mule.transport.quartz.jobs.CustomJobFromMessageConfig;
+import org.mule.transport.quartz.config.JobConfig;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -51,9 +55,15 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispatch(MuleEvent event) throws Exception
     {
+        JobConfig jobConfig = (JobConfig)endpoint.getProperty(QuartzConnector.PROPERTY_JOB_CONFIG);
+        if(jobConfig==null)
+        {
+            throw new IllegalArgumentException(CoreMessages.objectIsNull(QuartzConnector.PROPERTY_JOB_CONFIG).getMessage());
+        }
+
         JobDetail jobDetail = new JobDetail();
         // make the job name unique per endpoint (MULE-753)
-        jobDetail.setName(event.getEndpoint().getEndpointURI().toString() + "-" + event.getId());
+        jobDetail.setName(event.getEndpoint().getEndpointURI().getAddress() + "-" + event.getId());
 
         JobDataMap jobDataMap = new JobDataMap();
         MuleMessage msg = event.getMessage();
@@ -64,73 +74,43 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         }
         jobDetail.setJobDataMap(jobDataMap);
 
-        Job job;
+        Job job = null;
         // work out what we're actually calling
         Object payload = event.transformMessage();
 
-        String jobClass = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_CLASS);
-        // If the payload is a Job instance, then we are going to save it in
-        // the jobDataMap under the key "jobObject". The actual Job that will 
-        // execute will be the DelegatingJob
-        if (payload instanceof Job)
+        if(jobConfig instanceof CustomJobConfig)
         {
-            job = (Job)payload;
-            jobDataMap.put(QuartzConnector.PROPERTY_JOB_OBJECT, job);
-            jobDetail.setJobClass(DelegatingJob.class);
+            job = ((CustomJobConfig)jobConfig).getJob();
         }
-        // If the payload is not a Job instance, but the jobClass has been set
-        // on the Message under the property "jobClass", then set the execution 
-        // Job to be that class.
-        else if (jobClass != null)
+        else if(jobConfig instanceof CustomJobFromMessageConfig)
         {
-            jobDetail.setJobClass(ClassUtils.loadClass(jobClass, getClass()));
-        }
-        // Otherwise, we have to find the job some other way
-        else
-        {
-            // See if the Message has the job stored under "jobObject"
-            Object tempJob = jobDataMap.get(QuartzConnector.PROPERTY_JOB_OBJECT);
-            if (tempJob == null)
-            {
-                // See if the Message has the job stored under "jobRef"
-                tempJob = jobDataMap.get(QuartzConnector.PROPERTY_JOB_REF);
-                if (tempJob == null)
-                {
-                    // Now we'll give up
-                    throw new DispatchException(QuartzMessages.invalidPayloadType(), 
-                        event.getMessage(), event.getEndpoint());
-                }
-                else
-                {
-                    tempJob = RegistryContext.getRegistry().lookupObject((String) tempJob);
-                    if (!(tempJob instanceof Job))
-                    {
-                        throw new DispatchException(QuartzMessages.invalidJobObject(), 
-                            event.getMessage(), event.getEndpoint());
-                    }
-                }
-            }
-            else if (!(tempJob instanceof Job))
-            {
-                throw new DispatchException(QuartzMessages.invalidJobObject(), 
-                    event.getMessage(), event.getEndpoint());
-            }
-            // If we have a job at this point, then the execution Job
-            // will be the DelegatingJob
-            jobDetail.setJobClass(DelegatingJob.class);
+            job = ((CustomJobFromMessageConfig)jobConfig).getJob(msg);
+            //rewrite the jobConfig to the real Jobconfig on the message
+            jobConfig = ((CustomJobFromMessageConfig)jobConfig).getJobConfig(msg);
         }
 
-        // The payload will be ignored by the DelegatingJob - don't know why
+        jobDataMap.put(QuartzConnector.PROPERTY_JOB_CONFIG, jobConfig);        
+        jobDetail.setJobClass(jobConfig.getJobClass());
+        // If there has been a job created or found then we default to a customJob configuration
+        if (job!=null )
+        {
+            jobDataMap.put(QuartzConnector.PROPERTY_JOB_OBJECT, job);
+            jobDetail.setJobClass(CustomJob.class);
+        }
+
+       
+        // The payload will be ignored by the CustomJob - don't know why
         // we need it here
+        //RM: The custom job may want the message and the Job type may not be delegating job
         jobDataMap.put(QuartzConnector.PROPERTY_PAYLOAD, payload);
 
-        Trigger trigger = null;
+        Trigger trigger;
         String cronExpression = jobDataMap.getString(QuartzConnector.PROPERTY_CRON_EXPRESSION);
         String repeatInterval = jobDataMap.getString(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
         String repeatCount = jobDataMap.getString(QuartzConnector.PROPERTY_REPEAT_COUNT);
         String startDelay = jobDataMap.getString(QuartzConnector.PROPERTY_START_DELAY);
-        String groupName = jobDataMap.getString(QuartzConnector.PROPERTY_GROUP_NAME);
-        String jobGroupName = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_GROUP_NAME);
+        String groupName = jobConfig.getGroupName();
+        String jobGroupName = jobConfig.getJobGroupName();
 
         if (groupName == null)
         {
@@ -181,6 +161,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
         Scheduler scheduler = ((QuartzConnector)this.getConnector()).getQuartzScheduler();
         scheduler.scheduleJob(jobDetail, trigger);
+       // scheduler.start();
     }
 
     protected MuleMessage doSend(MuleEvent event) throws Exception

@@ -36,8 +36,8 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
      *            no data becomes available before the timeout elapses, null will be
      *            returned
      * @return the result of the request wrapped in a MuleMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
+     *         returned if no data was available
+     * @throws Exception if the call to the underlying protocol causes an exception
      */
     public final MuleMessage request(long timeout) throws Exception
     {

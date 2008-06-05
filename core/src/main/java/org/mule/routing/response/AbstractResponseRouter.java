@@ -11,15 +11,10 @@
 package org.mule.routing.response;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.ResponseRouter;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.MuleMessageInfoMapping;
-import org.mule.util.ClassUtils;
-import org.mule.util.expression.ExpressionEvaluator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

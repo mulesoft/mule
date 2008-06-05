@@ -12,21 +12,14 @@
 
     <endpoint name="restFileEndpoint" address="file://./.mule/restFile"/>
 
-    <!-- workaround for http://mule.mulesource.org/jira/browse/MULE-1827 -->
-    <!-- does this work?  it's not named or applied anwhere!
-         see hello-http-config.xml for a more likely correct use -->
-    <message-properties-transformer>
-        <add-message-property key="Content-Type" value="text/plain"/>
-    </message-properties-transformer>
-
-    <!-- avoid name clash when used with hello-http-config.xml -->
-    <custom-transformer name="HttpRequestToParameter2" class="org.mule.transport.http.servlet.HttpRequestToParameter"/>
-
     <model name="samples">
 
         <service name="restTest">
             <inbound>
-                <inbound-endpoint transformer-refs="HttpRequestToParameter2" address="servlet://restPUTTest"/>
+                <!-- transformers are already defined in hello-http-config.xml -->
+                <inbound-endpoint transformer-refs="HttpRequestToParameter" 
+                                  address="servlet://restPUTTest"
+                                  responseTransformer-refs="PlainTextResponseTransformer"/>
             </inbound>
             <pooled-component>
                 <prototype-object class="org.mule.example.rest.RestTester">

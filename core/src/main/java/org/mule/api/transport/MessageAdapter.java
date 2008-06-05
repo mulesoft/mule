@@ -33,6 +33,14 @@ public interface MessageAdapter extends Serializable
     void addProperties(Map properties);
 
     /**
+     * Adds a map of properties to be associated with this message
+     *
+     * @param properties the properties add to this message
+     * @param scope the scope in which the proeprties should be added
+     */
+    void addProperties(Map properties, PropertyScope scope);
+
+    /**
      * Removes all properties on this message
      */
     void clearProperties();

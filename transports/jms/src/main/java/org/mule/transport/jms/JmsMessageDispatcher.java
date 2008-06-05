@@ -198,7 +198,14 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 // Are we going to wait for a return event ?
                 if (remoteSync)
                 {
-                    consumer = connector.getJmsSupport().createConsumer(session, replyTo, topic);
+                    try
+                    {
+                        consumer = connector.getJmsSupport().createConsumer(session, replyTo, topic);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.warn(e);
+                    }
                 }
             }
 

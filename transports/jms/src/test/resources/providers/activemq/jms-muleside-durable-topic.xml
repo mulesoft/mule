@@ -10,8 +10,8 @@
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
     <jms:activemq-connector name="jmsConnector" specification="1.1"/>
-    <jms:activemq-connector name="jmsConnectorC1" specification="1.1" durable="true" clientId="C1"/>
-    <jms:activemq-connector name="jmsConnectorC2" specification="1.1" durable="true" clientId="C2"/>
+    <jms:activemq-connector name="jmsConnectorC1" specification="1.1" durable="true" clientId="C1" />
+    <jms:activemq-connector name="jmsConnectorC2" specification="1.1" durable="true" clientId="C2" />
 
     <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
 

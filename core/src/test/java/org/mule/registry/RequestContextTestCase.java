@@ -13,9 +13,9 @@ package org.mule.registry;
 import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
@@ -103,132 +103,132 @@ public class RequestContextTestCase extends AbstractMuleTestCase
 
         public Credentials getCredentials()
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public byte[] getMessageAsBytes() throws MuleException
         {
-            return new byte[0];  //To change body of implemented methods use File | Settings | File Templates.
+            return new byte[0];  
         }
 
         public Object transformMessage() throws TransformerException
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public Object transformMessage(Class outputType) throws TransformerException
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public byte[] transformMessageToBytes() throws TransformerException
         {
-            return new byte[0];  //To change body of implemented methods use File | Settings | File Templates.
+            return new byte[0];  
         }
 
         public String transformMessageToString() throws TransformerException
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public String getMessageAsString() throws MuleException
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public String getTransformedMessageAsString(String encoding) throws TransformerException
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public String getMessageAsString(String encoding) throws MuleException
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public String getId()
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public Object getProperty(String name, boolean exhaustiveSearch)
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public Object getProperty(String name, Object defaultValue, boolean exhaustiveSearch)
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public ImmutableEndpoint getEndpoint()
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public MuleSession getSession()
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public Service getService()
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public boolean isStopFurtherProcessing()
         {
-            return false;  //To change body of implemented methods use File | Settings | File Templates.
+            return false;  
         }
 
         public void setStopFurtherProcessing(boolean stopFurtherProcessing)
         {
-            //To change body of implemented methods use File | Settings | File Templates.
+            // no action
         }
 
         public boolean isSynchronous()
         {
-            return false;  //To change body of implemented methods use File | Settings | File Templates.
+            return false;  
         }
 
         public void setSynchronous(boolean value)
         {
-            //To change body of implemented methods use File | Settings | File Templates.
+            // no action
         }
 
         public int getTimeout()
         {
-            return 0;  //To change body of implemented methods use File | Settings | File Templates.
+            return 0;  
         }
 
         public void setTimeout(int timeout)
         {
-            //To change body of implemented methods use File | Settings | File Templates.
+            // no action
         }
 
         public OutputStream getOutputStream()
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public String getEncoding()
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public MuleContext getMuleContext()
         {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;  
         }
 
         public void assertAccess(boolean write)
         {
-            //To change body of implemented methods use File | Settings | File Templates.
+            // no action
         }
 
         public void resetAccessControl()
         {
-            //To change body of implemented methods use File | Settings | File Templates.
+            // no action
         }
 
         public ThreadSafeAccess newThreadCopy()

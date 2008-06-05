@@ -12,14 +12,14 @@ package org.mule.transport.quartz;
 
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.functional.FunctionalTestComponent2;
+import org.mule.tck.functional.CountdownCallback;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class QuartzDispatchJobTestCase extends FunctionalTestCase
 {
-    protected static CountDownLatch countDown;
-
     protected String getConfigResources()
     {
         return "quartz-dispatch.xml";
@@ -27,8 +27,12 @@ public class QuartzDispatchJobTestCase extends FunctionalTestCase
 
     public void testMuleClientDispatchJob() throws Exception
     {
-        countDown = new CountDownLatch(3);
+        FunctionalTestComponent2 component = (FunctionalTestComponent2)getComponent("scheduledService");
+        assertNotNull(component);
+        CountdownCallback count = new CountdownCallback(3);
+        component.setEventCallback(count);
+
         new MuleClient().send("vm://quartz.scheduler", "quartz test", null);
-        assertTrue(countDown.await(5000, TimeUnit.MILLISECONDS));
+        assertTrue(count.await(5000));
     }
 }

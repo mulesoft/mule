@@ -24,5 +24,207 @@
         </service>
     </model>
 
-
+    <model name="ArrayModel2">
+        <callable-entry-point-resolver/>
+        <service name="Array2">
+            <inbound>
+                <vm:inbound-endpoint path="array2"/>
+            </inbound>
+            <component>
+                <array-entry-point-resolver/>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="CallableModel">
+        <callable-entry-point-resolver/>
+        <service name="Callable">
+            <inbound>
+                <vm:inbound-endpoint path="callable"/>
+            </inbound>
+            <component>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="CallableModel2">
+        <method-entry-point-resolver>
+            <include-entry-point method="methodString" />
+            <include-entry-point method="methodInteger" />
+        </method-entry-point-resolver>
+        <service name="Callable2">
+            <inbound>
+                <vm:inbound-endpoint path="callable2"/>
+            </inbound>
+            <component>
+                <callable-entry-point-resolver/>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="CustomModel">
+        <custom-entry-point-resolver class="org.mule.test.integration.resolvers.CustomEntryPointResolver"/>
+        <service name="Custom">
+            <inbound>
+                <vm:inbound-endpoint path="custom"/>
+            </inbound>
+            <component>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="CustomModel2">
+        <method-entry-point-resolver>
+            <include-entry-point method="methodString" />
+            <include-entry-point method="methodInteger" />
+        </method-entry-point-resolver>
+        <service name="Custom2">
+            <inbound>
+                <vm:inbound-endpoint path="custom2"/>
+            </inbound>
+            <component>
+                <custom-entry-point-resolver class="org.mule.test.integration.resolvers.CustomEntryPointResolver"/>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="MethodModel">
+        <method-entry-point-resolver>
+            <include-entry-point method="methodString" />
+            <include-entry-point method="methodInteger" />
+        </method-entry-point-resolver>
+        <service name="Method">
+            <inbound>
+                <vm:inbound-endpoint path="method"/>
+            </inbound>
+            <component>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="MethodModel2">
+        <no-arguments-entry-point-resolver/>
+        <service name="Method2">
+            <inbound>
+                <vm:inbound-endpoint path="method2"/>
+            </inbound>
+            <component>
+                <method-entry-point-resolver>
+                    <include-entry-point method="methodString" />
+                    <include-entry-point method="methodInteger" />
+                </method-entry-point-resolver>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="NoArgsModel">
+        <no-arguments-entry-point-resolver/>
+        <service name="NoArgs">
+            <inbound>
+                <vm:inbound-endpoint path="no-arguments"/>
+            </inbound>
+            <component>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="NoArgsModel2">
+        <property-entry-point-resolver property="propertyName"/>
+        <service name="NoArgs2">
+            <inbound>
+                <vm:inbound-endpoint path="no-arguments2"/>
+            </inbound>
+            <component>
+                <no-arguments-entry-point-resolver/>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="PropertyModel">
+        <property-entry-point-resolver property="propertyName"/>
+        <service name="Property">
+            <inbound>
+                <vm:inbound-endpoint path="property"/>
+            </inbound>
+            <component>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="PropertyModel2">
+        <method-entry-point-resolver>
+            <include-entry-point method="methodString" />
+            <include-entry-point method="methodInteger" />
+        </method-entry-point-resolver>
+        <service name="Property2">
+            <inbound>
+                <vm:inbound-endpoint path="property2"/>
+            </inbound>
+            <component>
+                <property-entry-point-resolver property="propertyName"/>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="ReflectionModel">
+        <reflection-entry-point-resolver/>
+        <service name="Reflection">
+            <inbound>
+                <vm:inbound-endpoint path="reflection"/>
+            </inbound>
+            <component>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="ReflectionModel2">
+        <legacy-entry-point-resolver-set/>
+        <service name="Reflection2">
+            <inbound>
+                <vm:inbound-endpoint path="reflection2"/>
+            </inbound>
+            <component>
+                <reflection-entry-point-resolver/>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="LegacyModel">
+        <legacy-entry-point-resolver-set/>
+        <service name="Legacy">
+            <inbound>
+                <vm:inbound-endpoint path="legacy"/>
+            </inbound>
+            <component>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+    
+    <model name="LegacyModel2">
+        <no-arguments-entry-point-resolver/>        
+        <service name="Legacy2">
+            <inbound>
+                <vm:inbound-endpoint path="legacy2"/>
+            </inbound>
+            <component>
+                <legacy-entry-point-resolver-set/>
+                <spring-object bean="target"/>
+            </component>
+        </service>
+    </model>
+        
 </mule>

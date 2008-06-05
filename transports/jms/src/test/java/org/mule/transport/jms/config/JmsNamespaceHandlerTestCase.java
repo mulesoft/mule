@@ -17,6 +17,7 @@ import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transport.jms.DefaultRedeliveryHandler;
+import org.mule.transport.jms.DefaultRedeliveryHandlerFactory;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.filters.JmsPropertyFilter;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
@@ -52,8 +53,9 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertNull(c.getUsername());
         assertNull(c.getPassword());
 
-        assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler() instanceof DefaultRedeliveryHandler);
+        assertNotNull(c.getRedeliveryHandlerFactory());
+        assertTrue(c.getRedeliveryHandlerFactory() instanceof DefaultRedeliveryHandlerFactory);
+        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof DefaultRedeliveryHandler);
         
         assertNull(c.getClientId());
         assertFalse(c.isDurable());
@@ -77,8 +79,8 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("myuser", c.getUsername());
         assertEquals("mypass", c.getPassword());
 
-        assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler() instanceof TestRedeliveryHandler);
+        assertNotNull(c.getRedeliveryHandlerFactory());
+        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof TestRedeliveryHandler);
         
         assertEquals("myClient", c.getClientId());
         assertTrue(c.isDurable());
@@ -114,8 +116,8 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.getConnectionFactory() instanceof TestConnectionFactory);
         assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
 
-        assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler() instanceof TestRedeliveryHandler);
+        assertNotNull(c.getRedeliveryHandlerFactory());
+        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof TestRedeliveryHandler);
 
         assertEquals("myClient", c.getClientId());
         assertTrue(c.isDurable());

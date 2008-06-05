@@ -16,6 +16,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +54,7 @@ public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator
     {
         if (message instanceof MuleMessage)
         {
-            if (expression == null)
+            if (StringUtils.isEmpty(expression))
             {
                 return ((MuleMessage) message).getPayload();
             }

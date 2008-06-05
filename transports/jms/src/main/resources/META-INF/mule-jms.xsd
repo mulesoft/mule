@@ -34,7 +34,7 @@
     </xsd:element>
 
     <xsd:attributeGroup name="jmsConnectorAttributes">
-        <xsd:attribute name="redeliveryHandler-ref" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="redeliveryHandlerFactory-ref" type="xsd:NMTOKEN"/>
         <xsd:attribute name="acknowledgementMode" default="AUTO_ACKNOWLEDGE">
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
@@ -164,7 +164,7 @@
                     <xsd:element name="selector" type="jmsSelectorFilter" minOccurs="0"/>
                 </xsd:choice>
                 <xsd:element ref="mule:abstract-security-filter" minOccurs="0"/>
-                <xsd:element ref="mule:properties" minOccurs="0"/>
+                <xsd:group ref="mule:propertiesGroup"/>
             </xsd:sequence>
         </xsd:sequence>
     </xsd:group>

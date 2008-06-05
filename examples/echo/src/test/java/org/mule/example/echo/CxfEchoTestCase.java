@@ -30,7 +30,7 @@ public class CxfEchoTestCase extends AbstractEchoTestCase
         // http://host/service/OPERATION/PARAM_NAME/PARAM_VALUE
         
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("http.method", "GET");
         MuleMessage result = client.send("http://localhost:65082/services/EchoUMO/echo/text/hello", "", props);
         assertNotNull(result);

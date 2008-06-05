@@ -27,17 +27,17 @@ import java.util.Set;
  * properties on the current message. Users can set a {@link List} of
  * 'deleteProperties' names to remove from the message and can also set a {@link Map}
  * of 'addProperties' that will be added to the message and possibly overwrite
- * existing properties with the same name.
- * <p/>
- * If {@link #overwrite} is set to <code>false</code>, and a property exists on
- * the message (even if the value is <code>null</code>, it will be left intact.
- * The transformer then acts as a more gentle 'enricher'. The default setting is
- * <code>true</code>.
+ * existing properties with the same name. <p/> If {@link #overwrite} is set to
+ * <code>false</code>, and a property exists on the message (even if the value is
+ * <code>null</code>, it will be left intact. The transformer then acts as a more
+ * gentle 'enricher'. The default setting is <code>true</code>.
  */
 public class MessagePropertiesTransformer extends AbstractMessageAwareTransformer
 {
     private List deleteProperties = null;
     private Map addProperties = null;
+    /** the properties map containing rename mappings for message properties */
+    private Map renameProperties;
     private boolean overwrite = true;
 
     public MessagePropertiesTransformer()
@@ -49,7 +49,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     // @Override
     public Object clone() throws CloneNotSupportedException
     {
-        MessagePropertiesTransformer clone = (MessagePropertiesTransformer) super.clone();
+        MessagePropertiesTransformer clone = (MessagePropertiesTransformer)super.clone();
 
         if (deleteProperties != null)
         {
@@ -61,6 +61,10 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
             clone.setAddProperties(new HashMap(addProperties));
         }
 
+        if (renameProperties != null)
+        {
+            clone.setRenameProperties(new HashMap(renameProperties));
+        }
         return clone;
     }
 
@@ -79,7 +83,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
             final Set propertyNames = message.getPropertyNames();
             for (Iterator iterator = addProperties.entrySet().iterator(); iterator.hasNext();)
             {
-                Map.Entry entry = (Map.Entry) iterator.next();
+                Map.Entry entry = (Map.Entry)iterator.next();
                 if (entry.getKey() == null)
                 {
                     logger.error("Setting Null property keys is not supported, this entry is being ignored");
@@ -107,8 +111,8 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                             if (logger.isDebugEnabled())
                             {
                                 logger.debug(MessageFormat.format(
-                                        "Message already contains the property and overwrite is false, skipping: key={0}, value={1}",
-                                        new Object[]{key, value}));
+                                    "Message already contains the property and overwrite is false, skipping: key={0}, value={1}",
+                                    new Object[]{key, value}));
                             }
                         }
                     }
@@ -116,6 +120,47 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
             }
         }
 
+        /* perform renaming transformation */
+        if (this.renameProperties != null && this.renameProperties.size() > 0)
+        {
+            final Set propertyNames = message.getPropertyNames();
+            for (Iterator iterator = this.renameProperties.entrySet().iterator(); iterator.hasNext();)
+            {
+                Map.Entry entry = (Map.Entry)iterator.next();
+
+                if (entry.getKey() == null)
+                {
+                    logger.error("Setting Null property keys is not supported, this entry is being ignored");
+                }
+                else
+                {
+                    final String key = entry.getKey().toString();
+                    final String value = (String)entry.getValue();
+
+                    if (value == null)
+                    {
+                        logger.error("Setting Null property values for renameProperties is not supported, this entry is being ignored");
+                    }
+                    else
+                    {
+
+                        /* log transformation */
+                        if (logger.isDebugEnabled() && !propertyNames.contains(key))
+                        {
+                            logger.debug("renaming message property " + key + " to " + value);
+                        }
+
+                        /*
+                         * store current value of the property. then remove key and
+                         * store value under new key
+                         */
+                        Object propValue = message.getProperty(key);
+                        message.removeProperty(key);
+                        message.setProperty(value, propValue);
+                    }
+                }
+            }
+        }
         return message;
     }
 
@@ -137,6 +182,22 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     public void setAddProperties(Map addProperties)
     {
         this.addProperties = addProperties;
+    }
+
+    /**
+     * @return the renameProperties
+     */
+    public Map getRenameProperties()
+    {
+        return this.renameProperties;
+    }
+
+    /**
+     * @param renameProperties the renameProperties to set
+     */
+    public void setRenameProperties(Map renameProperties)
+    {
+        this.renameProperties = renameProperties;
     }
 
     public boolean isOverwrite()

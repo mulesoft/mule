@@ -18,6 +18,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -134,6 +135,21 @@ public class DefaultLifecyclePhase implements LifecyclePhase
                 lo.firePostNotification(MuleServer.getMuleContext());
             }
         }
+    }
+
+    /**
+     * Subclasses can override this method to order <code>objects</code> before
+     * the lifecycle method is applied to them.
+     * 
+     * This method does not apply any special ordering to <code>objects</code>.
+     * 
+     * @param objects
+     * @param lo
+     * @return List with ordered objects
+     */
+    protected List sortLifecycleInstances(Collection objects, LifecycleObject lo)
+    {
+        return new ArrayList(objects);
     }
 
     public void addOrderedLifecycleObject(LifecycleObject lco)

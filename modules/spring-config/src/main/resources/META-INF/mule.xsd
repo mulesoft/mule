@@ -981,6 +981,14 @@
         <xsd:complexContent>
             <xsd:extension base="abstractServiceType">
                 <xsd:sequence>
+                    <xsd:element name="description" type="descriptionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                This can hold any kind of documentation consistent with the overall XML format).
+                                It is intended to be "human readable" only and is not used by the system.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element name="inbound" type="inboundCollectionType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -1700,11 +1708,20 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:complexType name="replyToType">
-        <xsd:attribute name="address" type="xsd:string" use="required">
+    <xsd:complexType name="endpointRefType">
+        <xsd:attribute name="address" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The destination address for a reply message.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="ref" type="xsd:NMTOKEN">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The reference name of a global endpoint to use. If this EndpointRef will be associated to a message
+                    such as a Reply-To address, this endpoint ref has to be available on the remote Mule instance that reads the
+                    Reply-To address.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1842,7 +1859,7 @@
     </xsd:element>
     <xsd:complexType name="wildcardFilterType">
         <xsd:complexContent>
-            <xsd:extension base="patternFilterType"/>
+            <xsd:extension base="caseSensitivePatternFilterType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -2061,6 +2078,16 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="auto-transformer" type="abstractTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that uses the transform discovery mechanism to convert the message payload. This
+                transformer works much better when transforming custom object types rather that java types since there
+                is less chance for ambiguity.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="custom-transformer" type="customTransformerType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
@@ -2357,7 +2384,7 @@
     </xsd:element>
 
     <xsd:attributeGroup name="expressionAttributes">
-        <xsd:attribute name="evaluator" use="optional">
+        <xsd:attribute name="evaluator" use="required">
             <xsd:annotation>
                 <xsd:documentation>The expression evaluator to use. Expression Evaluators must be registered with the
                     ExpressionEvaluatrManager before thay can be used. Using the custom evaluator allows the developer
@@ -2819,10 +2846,13 @@
 
     <xsd:element name="forwarding-router" type="selectiveConsumerRouterType"
                  substitutionGroup="abstract-inbound-router"/>
+
     <xsd:element name="selective-consumer-router" type="selectiveConsumerRouterType"
                  substitutionGroup="abstract-inbound-router"/>
-    <xsd:element name="correlation-resequencer-router" type="selectiveConsumerRouterType"
+
+    <xsd:element name="correlation-resequencer-router" type="baseAggregatorRouterType"
                  substitutionGroup="abstract-inbound-router"/>
+
     <xsd:complexType name="selectiveConsumerRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
@@ -2839,7 +2869,7 @@
                  substitutionGroup="abstract-inbound-router"/>
     <xsd:complexType name="messageChunkingAggregatorRouterType">
         <xsd:complexContent>
-            <xsd:extension base="filteredInboundRouterType">
+            <xsd:extension base="baseAggregatorRouterType">
                 <xsd:attribute name="correlationExpression" type="xsd:string"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -2855,8 +2885,12 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="collection-aggregator-router" type="baseAggregatorRouterType"
+                 substitutionGroup="abstract-inbound-router"/>
+
     <xsd:element name="custom-inbound-router" type="customInboundRouterType"
                  substitutionGroup="abstract-inbound-router"/>
+
     <xsd:complexType name="customInboundRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
@@ -2865,6 +2899,14 @@
                     <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="baseAggregatorRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="filteredInboundRouterType">
+                <xsd:attribute name="timeout" type="substitutableInt"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2923,7 +2965,7 @@
             <xsd:extension base="abstractOutboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="reply-to" type="replyToType" minOccurs="0"/>
+                    <xsd:element name="reply-to" type="endpointRefType" minOccurs="0"/>
                     <xsd:element ref="abstract-transaction" minOccurs="0"/>
                     <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>
                 </xsd:sequence>
@@ -2967,7 +3009,7 @@
     <xsd:complexType name="endpointSelectorRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
-                <xsd:attribute name="selectorExpression" type="xsd:string" use="required"/>
+                <xsd:attributeGroup ref="expressionAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -3004,6 +3046,17 @@
                 </xsd:sequence>
                 <xsd:attribute name="recipientsProperty" type="xsd:string"/>
                 <xsd:attribute name="recipientsDelimiter" type="xsd:string"/>
+                <xsd:attribute name="synchronous" type="xsd:boolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="recipient-list-router" type="recipientListRouterType"
+                 substitutionGroup="abstract-outbound-router"/>
+    <xsd:complexType name="recipientListRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="filteringOutboundRouterType">
+                <xsd:attributeGroup ref="expressionAttributes"/>
                 <xsd:attribute name="synchronous" type="xsd:boolean"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -3718,6 +3771,12 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:complexType name="dataReferenceType" mixed="true">
+        <xsd:attribute name="file" type="xsd:string"/>
+        <xsd:attribute name="ref" type="xsd:string"/>
+        <!--I don't like this flag, may be we could use content-type mappings... -->
+        <xsd:attribute name="binary" type="substitutableBoolean"/>
+    </xsd:complexType>
 
     <!-- these cannot be references (unless we use qualified attribute names, which are ugly),
          but serve as templates to cut+paste in individual transports

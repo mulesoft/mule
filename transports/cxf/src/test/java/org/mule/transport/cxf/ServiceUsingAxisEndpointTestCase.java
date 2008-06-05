@@ -48,9 +48,8 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
         assertNotNull(reply.getPayload());
 
         Document document = DocumentHelper.parseText(reply.getPayloadAsString());
-        List nodes;
-
-        nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
+        
+        List nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
         assertEquals(((Element) nodes.get(0)).attribute("name").getStringValue(), "XfireService");
     }
 

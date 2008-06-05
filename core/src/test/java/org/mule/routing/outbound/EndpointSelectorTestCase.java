@@ -26,24 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Sample config:
- * 
- * <pre>
- * &lt;outbound-router&gt;
- *      &lt;router className=&quot;org.mule.routing.outbound.EndpointSelector&quot;&gt;
- *          &lt;endpoint name=&quot;dest1&quot; address=&quot;jms://queue1&quot; /&gt;
- *          &lt;endpoint name=&quot;dest2&quot; address=&quot;jms://queue2&quot; /&gt;
- *          &lt;endpoint name=&quot;dest3&quot; address=&quot;jms://queue3&quot; /&gt;
- *          &lt;properties&gt;
- *              &lt;property name=&quot;selector&quot; value=&quot;endpoint&quot; /&gt;
- *          &lt;/properties&gt;
- *      &lt;/router&gt;
- * &lt;/outbound-router&gt;
- * </pre>
- * 
- * </pre>
- */
 public class EndpointSelectorTestCase extends AbstractMuleTestCase
 {
     Mock session;
@@ -74,7 +56,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     {
         Map props = new HashMap();
         props.put("apple", "red");
-        props.put(router.DEFAULT_SELECTOR_PROPERTY, "dest3");
+        props.put(router.DEFAULT_SELECTOR_EXPRESSION, "dest3");
         props.put("banana", "yellow");
         MuleMessage message = new DefaultMuleMessage("test event", props);
 
@@ -88,7 +70,8 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     {
         // The "wayOut" property will determine which endpoint the message gets sent
         // to.
-        router.setSelectorExpression("header:wayOut");
+        router.setExpression("wayOut");
+        router.setEvaluator("header");
 
         Map props = new HashMap();
         props.put("apple", "red");
@@ -105,7 +88,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     public void testSelectEndpointNoMatch() throws Exception
     {
         Map props = new HashMap();
-        props.put(router.DEFAULT_SELECTOR_PROPERTY, "dest5");
+        props.put(router.DEFAULT_SELECTOR_EXPRESSION, "dest5");
 
         try
         {

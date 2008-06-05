@@ -13,8 +13,8 @@
     </spring:bean>
 
     <spring:bean name="connectionFactory" class="org.mule.transport.jms.test.TestConnectionFactory"/>
-
-    <spring:bean name="redeliveryHandler" class="org.mule.transport.jms.test.TestRedeliveryHandler"/>
+    
+    <spring:bean name="redeliveryHandlerFactory" class="org.mule.transport.jms.test.TestRedeliveryHandlerFactory"/>
     
     <!-- Default config -->
     <jms:connector name="jmsConnectorDefaults" connectionFactory-ref="connectionFactory"/>
@@ -32,7 +32,7 @@
                    specification="1.1"
                    numberOfConcurrentTransactedReceivers="7"
                    connectionFactory-ref="connectionFactory"
-                   redeliveryHandler-ref="redeliveryHandler"
+                   redeliveryHandlerFactory-ref="redeliveryHandlerFactory"
                    username="myuser"
                    password="mypass"/>
 
@@ -53,7 +53,7 @@
                     eagerConsumer="false"
                     specification="1.1"
                     connectionFactory-ref="connectionFactory"
-                    redeliveryHandler-ref="redeliveryHandler"/>
+                    redeliveryHandlerFactory-ref="redeliveryHandlerFactory"/>
 
     <jms:endpoint name="endpoint1" queue="blah" connector-ref="jmsConnectorDefaults">
         <jms:selector expression="foo"/>

@@ -16,7 +16,7 @@ import org.mule.tck.FunctionalTestCase;
 
 public class NestedRouterTestCase extends FunctionalTestCase
 {
-    private static final int RECEIVE_TIMEOUT = 5000;
+    private static final int RECEIVE_TIMEOUT = 7000;
 
     private static final int number = 0xC0DE;
 

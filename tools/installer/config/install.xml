@@ -100,8 +100,6 @@
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/launcher" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/mule" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/setup_local_instance.sh" stage="never"/>
-            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/visualizer" stage="never"/>
-            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/visualizer.groovy" stage="never"/>
         </pack>
         <pack name="Configuration Files" required="yes">
             <description>The configuration files for Mule</description>

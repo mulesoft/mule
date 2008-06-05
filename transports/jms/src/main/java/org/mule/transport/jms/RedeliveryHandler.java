@@ -18,7 +18,7 @@ import javax.jms.Message;
 /**
  * <code>RedeliveryHandler</code> is used to control how redelivered messages are
  * processed by a connector. Typically, a messsage will be re-tried once or twice
- * before throwing an exception. Then the ExceptionStrategy on the connector can be
+ * before throwing an exception. Then the exception strategy on the connector can be
  * used to forward the message to a JMS queue or log the failure.
  */
 public interface RedeliveryHandler
@@ -33,10 +33,10 @@ public interface RedeliveryHandler
     public void setConnector(JmsConnector connector);
 
     /**
-     * process the redelivered message. If the Jms receiver should process the
+     * Process the redelivered message. If the JMS receiver should process the
      * message, it should be returned. Otherwise the connector should throw a
-     * <code>MessageRedeliveredException</code> to indicate that the message should
-     * be handled by the connector Exception Handler.
+     * {@link MessageRedeliveredException} to indicate that the message should be
+     * handled by the connector's exception handler.
      * 
      * @param message
      * @throws JMSException if properties cannot be read from the JMSMessage
@@ -47,4 +47,5 @@ public interface RedeliveryHandler
      */
     public void handleRedelivery(Message message)
         throws JMSException, MessageRedeliveredException, MessagingException;
+
 }

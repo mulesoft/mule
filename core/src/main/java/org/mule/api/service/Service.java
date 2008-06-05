@@ -26,7 +26,7 @@ import java.beans.ExceptionListener;
 import java.io.Serializable;
 
 /**
- * <code>Service</code> is the interal repesentation of a Mule Managed service. It
+ * <code>Service</code> is the internal representation of a Mule Managed service. It
  * is responsible for managing the interaction of events to and from the service as
  * well as managing pooled resources.
  */
@@ -34,7 +34,7 @@ import java.io.Serializable;
 public interface Service extends Serializable, Lifecycle, MuleContextAware, NamedObject
 {
     /**
-     * Makes an asynhronous event call to the service.
+     * Makes an asynchronous event call to the service.
      * 
      * @param event the event to consume
      * @throws MuleException if the event fails to be processed
@@ -42,7 +42,7 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
     void dispatchEvent(MuleEvent event) throws MuleException;
 
     /**
-     * Makes a synhronous event call to the service. This event will be consumed by
+     * Makes a synchronous event call to the service. This event will be consumed by
      * the service and a result returned.
      * 
      * @param event the event to consume
@@ -54,7 +54,7 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
     /**
      * Determines whether this service has been started
      * 
-     * @return true is the service is started andready to receive events
+     * @return true is the service is started and ready to receive events
      */
     boolean isStarted();
 
@@ -109,7 +109,7 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
 
     /**
      * Response Routers control how events are returned in a request/response call.
-     * It cn be use to aggregate response events before returning, thus acting as a
+     * It can be use to aggregate response events before returning, thus acting as a
      * Join in a forked process. This can be used to make request/response calls a
      * lot more efficient as independent tasks can be forked, execute concurrently
      * and then join before the request completes
@@ -163,7 +163,7 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
 
     /**
      * Response Routers control how events are returned in a request/response call.
-     * It cn be use to aggregate response events before returning, thus acting as a
+     * It can be use to aggregate response events before returning, thus acting as a
      * Join in a forked process. This can be used to make request/response calls a
      * lot more efficient as independent tasks can be forked, execute concurrently
      * and then join before the request completes

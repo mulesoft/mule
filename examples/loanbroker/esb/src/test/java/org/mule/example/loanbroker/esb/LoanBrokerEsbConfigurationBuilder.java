@@ -51,6 +51,7 @@ import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuilder implements ConfigurationBuilder
@@ -69,7 +70,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         ejbConnector.setName("ejbConnector");
         ejbConnector.setSecurityPolicy("security.policy");
         ejbConnector.setJndiInitialFactory("org.openejb.client.LocalInitialContextFactory");
-        Map jndiProviderProperties = new HashMap();
+        Map<String, String> jndiProviderProperties = new HashMap<String, String>();
         jndiProviderProperties.put("openejb.base", "${openejb.base}");
         jndiProviderProperties.put("openejb.configuration", "${openejb.configuration}");
         jndiProviderProperties.put("logging.conf", "${logging.conf}");
@@ -191,7 +192,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         EndpointBuilder eb2 = (EndpointBuilder) CreditAgency.clone();
         eb2.addTransformer(LoanQuoteRequestToCreditProfileArgs);
         eb2.setRemoteSync(true);
-        java.util.List responseTransformers = new ArrayList();
+        List<Transformer> responseTransformers = new ArrayList<Transformer>();
         responseTransformers.add(CreditProfileXmlToCreditProfile);
         eb2.setResponseTransformers(responseTransformers);
         creditAgencyGatewayServiceOutboundRouter.addEndpoint(eb2.buildOutboundEndpoint());

@@ -45,6 +45,20 @@ public class TransportGlobalEndpointDefinitionParser extends AddressedEndpointDe
                 requiredAddressAttributes, requiredProperties);
     }
 
+    /**
+     * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
+     * @param isMeta Whether transport is "meta" or not (eg cxf)
+     * @param requiredAddressAttributes A list of attribute names that are required if "address"
+     * isn't present
+     * @param requiredProperties A list of property names that are required if "address" isn't present
+     */
+    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class clazz,
+                                                   String[] requiredAddressAttributes, String[] requiredProperties)
+    {
+        super(metaOrProtocol, isMeta, new OrphanEndpointDefinitionParser(clazz),
+                requiredAddressAttributes, requiredProperties);
+    }
+
     public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
                                                    String[] endpointAttributes,
                                                    String[][] requiredAddressAttributes,

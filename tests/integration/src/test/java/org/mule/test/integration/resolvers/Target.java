@@ -56,7 +56,7 @@ public class Target implements Callable
         return "property";
     }
 
-    public String reflection(Integer integer)
+    public String reflection(Integer integer, String string)
     {
         return "reflection";
     }

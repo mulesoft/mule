@@ -323,6 +323,10 @@ public final class DefaultMuleSession implements MuleSession
 
                 MuleMessage response = ((OutboundEndpoint) event.getEndpoint()).send(event);
                 // See MULE-2692
+                //RM* This actually performs the function of adding properties from the request to the response
+                // message I think this could be done without the performance hit.
+                //Or we could provide a way to set the request message as the OriginalAdapter on the message
+                //And provide access to the request properties that way
                 response = OptimizedRequestContext.unsafeRewriteEvent(response);
                 processResponse(response);
                 return response;

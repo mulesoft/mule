@@ -212,6 +212,7 @@ public class JdbcConnector extends AbstractConnector
             }
             catch (TransactionException e)
             {
+                JdbcUtils.close(con);
                 throw new RuntimeException("Could not bind connection to current transaction", e);
             }
         }

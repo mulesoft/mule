@@ -27,9 +27,11 @@
 
         <service name="FolderTO">
             <inbound>
-                <file:inbound-endpoint ref="get" transformer-refs="FileToByteArray"
+                <file:inbound-endpoint ref="get"
                     comparator="org.mule.transport.file.comparator.OlderFirstComparator"
-                    reverseOrder="true"/>
+                    reverseOrder="true">
+                    <file:file-to-byte-array-transformer/>
+                </file:inbound-endpoint>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>

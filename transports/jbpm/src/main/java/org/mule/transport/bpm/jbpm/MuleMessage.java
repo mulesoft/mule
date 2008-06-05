@@ -10,9 +10,20 @@
 
 package org.mule.transport.bpm.jbpm;
 
-import org.jbpm.msg.Message;
+import org.apache.commons.lang.NotImplementedException;
+import org.jbpm.JbpmContext;
+import org.jbpm.job.Job;
 
-public class MuleMessage extends Message
+
+/**
+ * This is an unfinished work, see MULE-1219
+ */
+public class MuleMessage extends Job
 {
     private static final long serialVersionUID = 1L;
+
+    public boolean execute(JbpmContext jbpmContext) throws Exception
+    {
+        throw new NotImplementedException("MULE-1219");
+    }
 }

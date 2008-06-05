@@ -10,16 +10,17 @@
 
 package org.mule.transport.cxf.support;
 
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
-
-import org.mule.api.MuleEvent;
+import org.mule.api.transport.MessageAdapter;
+import org.mule.transport.cxf.CxfConstants;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.MessageSenderInterceptor.MessageSenderEndingInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -30,25 +31,50 @@ public class MuleProtocolHeadersOutInterceptor
 
     public MuleProtocolHeadersOutInterceptor()
     {
-        super(Phase.PREPARE_SEND_ENDING);
-        getBefore().add(MessageSenderEndingInterceptor.class.getName());
+        super(Phase.PRE_STREAM);
+        getAfter().add(AttachmentOutInterceptor.class.getName());
     }
 
     public void handleMessage(Message message) throws Fault
     {
-        MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT_PROPERTY);
+        MessageAdapter muleMsg = (MessageAdapter) message.getExchange().get(CxfConstants.MULE_MESSAGE);
 
-        if (event == null)
+        if (muleMsg == null)
         {
             return;
         }
+        extractAndSet(message, muleMsg, Message.CONTENT_TYPE, HttpConstants.HEADER_CONTENT_TYPE);
+
+        String method = (String) message.get(Message.HTTP_REQUEST_METHOD);
+        if (method == null) method = HttpConstants.METHOD_POST;
         
-        Map<String, List<String>> reqHeaders = CastUtils.cast((Map<?,?>)message.get(Message.PROTOCOL_HEADERS));
-        if (reqHeaders != null) {
-            for (Map.Entry<String, List<String>> e : reqHeaders.entrySet()) {
-                event.getMessage().setProperty(e.getKey(), format(e.getValue()));
+        muleMsg.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
+        
+        Map<String, List<String>> reqHeaders = CastUtils.cast((Map<?, ?>) message.get(Message.PROTOCOL_HEADERS));
+        if (reqHeaders != null)
+        {
+            for (Map.Entry<String, List<String>> e : reqHeaders.entrySet())
+            {
+                String key = e.getKey();
+                String val = format(e.getValue());
+                
+                muleMsg.setProperty(key, val);
             }
         }   
+        
+        if (!Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE)))
+        {
+            message.getInterceptorChain().pause();
+        }
+    }
+
+    private void extractAndSet(Message message, MessageAdapter muleMsg, String cxfHeader, String muleHeader)
+    {
+        String ct = (String) message.get(cxfHeader);
+        if (ct != null)
+        {
+            muleMsg.setProperty(muleHeader, ct);
+        }
     }
 
     private String format(List<String> value)

@@ -10,7 +10,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.routing.inbound.CorrelationAggregator;
+import org.mule.routing.inbound.AbstractEventAggregator;
 
 /**
  * Binding definition parser for parsing all binding elements configured as part of the service.
@@ -27,7 +27,7 @@ public class BindingDefinitionParser extends ChildDefinitionParser
     // specifically for subclasses of CorrelationAggregator (requires a "class=..." in the config)
     public BindingDefinitionParser(String setterMethod)
     {
-        super(setterMethod, null, CorrelationAggregator.class, true);
+        super(setterMethod, null, AbstractEventAggregator.class, true);
         standardOptions();
     }
 

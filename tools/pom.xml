@@ -15,7 +15,6 @@
     <description>Tools for building and working with Mule projects.</description>
 
     <modules>
-        <!--  <module>visualizer</module> -->
         <module>bobberplus</module>
         <module>mule-transport-archetype</module>
         <module>mule-project-archetype</module>

@@ -85,35 +85,29 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     protected void doTestMessageEqualsPayload(Object message, Object payload) throws Exception
     {
 
-        // FileMessageAdaptor can be created from either an ReceiverFileInputStream
-        // or File, so need to compare bytes
-
-        byte[] messageBytes = null;
-        byte[] payloadBytes = null;
-
         if (message instanceof File)
         {
             File file = (File) message;
-            FileInputStream payloadFis = (FileInputStream) payload;
-            messageBytes = new byte[(int) file.length()];
-            payloadBytes = new byte[payloadFis.available()];
-            new FileInputStream((File) message).read(messageBytes);
-            ((FileInputStream) payload).read(payloadBytes);
+            assertTrue(payload instanceof File);
+            assertEquals(file, payload);
         }
         else if (message instanceof FileInputStream)
         {
+            byte[] messageBytes = null;
+            byte[] payloadBytes = null;
+
             FileInputStream fis = (FileInputStream) message;
             FileInputStream payloadFis = (FileInputStream) payload;
             messageBytes = new byte[fis.available()];
             payloadBytes = new byte[payloadFis.available()];
             fis.read(messageBytes);
             payloadFis.read(payloadBytes);
+            assertTrue(Arrays.equals(messageBytes, payloadBytes));
         }
         else
         {
             fail("FileMessageAdaptor supports File or FileInputStream");
         }
-        assertTrue(Arrays.equals(messageBytes, payloadBytes));
 
     }
 }

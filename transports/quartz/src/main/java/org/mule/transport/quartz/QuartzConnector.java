@@ -23,8 +23,8 @@ import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
- * Creates a connection to a Quartz sheduler. This allows events to be sheduled at
- * specific times, with repeated occurences.
+ * Creates a connection to a Quartz scheduler. This allows events to be scheduled at
+ * specific times, with repeated occurrences.
  */
 public class QuartzConnector extends AbstractConnector
 {
@@ -36,16 +36,10 @@ public class QuartzConnector extends AbstractConnector
     public static final String PROPERTY_REPEAT_COUNT = "repeatCount";
     public static final String PROPERTY_START_DELAY = "startDelay";
     public static final String PROPERTY_PAYLOAD = "payload";
-    public static final String PROPERTY_JOB_DISPATCH_ENDPOINT = "jobDispatchEndpoint";
-    public static final String PROPERTY_JOB_RECEIVE_ENDPOINT = "jobReceiveEndpoint";
-    public static final String PROPERTY_JOB_RECEIVE_TIMEOUT = "jobReceiveTimeout";
-    /** deprecated: use PROPERTY_PAYLOAD_REFERENCE */
-    public static final String PROPERTY_PAYLOAD_CLASS_NAME = "payloadClassName";
-    public static final String PROPERTY_PAYLOAD_REFERENCE = "payloadRef";
-    public static final String PROPERTY_GROUP_NAME = "groupName";
-    public static final String PROPERTY_JOB_GROUP_NAME = "jobGroupName";
+
+    public static final String PROPERTY_JOB_CONFIG = "jobConfig";
+
     public static final String PROPERTY_JOB_REF = "jobRef";
-    public static final String PROPERTY_JOB_CLASS = "jobClass";
     public static final String PROPERTY_JOB_OBJECT = "jobObject";
 
     public static final String DEFAULT_GROUP_NAME = "mule";

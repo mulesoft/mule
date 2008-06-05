@@ -23,15 +23,14 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.MuleMessageInfoMapping;
-import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
-import org.mule.util.expression.ExpressionEvaluator;
 
 import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

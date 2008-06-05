@@ -40,6 +40,8 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
         MuleClient client = new MuleClient();
         client.dispatch("in", getMatchMessage(), null);
         MuleMessage message = client.request("vm://match1?connector=queue", WAIT_PERIOD);
+        //TODO MULE-2620 Bean Evaluator tests return null here. but only on the build machine.
+        //Extending the WAIT_PERIOD didn't seem to affect it
         assertNotNull(message);
         assertFalse(message.getPayload() instanceof NullPayload);
         if(!matchSingle)

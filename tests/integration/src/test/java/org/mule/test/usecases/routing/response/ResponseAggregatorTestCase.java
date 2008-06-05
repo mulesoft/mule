@@ -44,6 +44,8 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
         final String id = message.getUniqueId();
         message.setCorrelationId(id);
         message.setCorrelationGroupSize(1);
+        aggregator.setMuleContext(muleContext);
+        aggregator.initialise();
         aggregator.process(event);
 
         aggregator.getResponse(message);
@@ -59,7 +61,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
     {
         public Map getResponseEvents()
         {
-            return this.responseMessages;
+            return this.getEventCorrelator().getResponseMessages();
         }
     }
 }

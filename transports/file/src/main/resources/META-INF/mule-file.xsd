@@ -96,6 +96,9 @@
     <xsd:element name="filename-wildcard-filter" type="mule:wildcardFilterType"
                  substitutionGroup="mule:abstract-filter"/>
 
+    <xsd:element name="filename-regex-filter" type="mule:wildcardFilterType"
+                 substitutionGroup="mule:abstract-filter"/>
+
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>

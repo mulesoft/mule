@@ -64,5 +64,54 @@
         </mxml:xslt-text>
         <mxml:context-property key="bar" value="${header:foo}"/>
     </mxml:xslt-transformer>
+        
+    <!-- Check transformer elements canbe embedded in endpoint config -->    
+    <endpoint name="ep1" address="vm://1">
+        <mxml:dom-to-xml-transformer/>
+    </endpoint>
+
+    <endpoint name="ep2" address="vm://2">
+        <mxml:jxpath-extractor-transformer expression="/expression" singleResult="false"/>
+    </endpoint>
+    
+    <endpoint name="ep3" address="vm://3">
+        <mxml:object-to-xml-transformer  acceptUMOMessage="true"/>
+    </endpoint>
+    
+    <endpoint name="ep4" address="vm://4">
+        <mxml:xml-to-dom-transformer/>
+    </endpoint>
+
+    <endpoint name="ep5" address="vm://5">
+        <mxml:xml-to-object-transformer/>
+    </endpoint>
+    
+    <endpoint name="ep6" address="vm://6">
+        <mxml:xslt-transformer
+            ignoreBadInput="true"
+            returnClass="java.lang.Object"
+            name="xslt2"
+            outputEncoding="foo"
+            maxActiveTransformers="10"
+            maxIdleTransformers="10"
+            transformerFactoryClass="org.mule.module.xml.config.CustomXsltTransformerFactory"
+            xsl-file="file">
+            <mxml:xslt-text>
+                <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                    <!-- test for this string in test -->
+                    <!-- Whenever you match any node or any attribute -->
+                    <xsl:template match="node()|@*">
+                        <!-- Copy the current node -->
+                        <xsl:copy>
+                            <!-- Including any attributes it has and any child nodes -->
+                            <xsl:apply-templates select="@*|node()"/>
+                        </xsl:copy>
+                    </xsl:template>
+                </xsl:stylesheet>
+            </mxml:xslt-text>
+            <mxml:context-property key="bar" value="${header:foo}"/>
+        </mxml:xslt-transformer>
+    </endpoint>
+    
 
 </mule>

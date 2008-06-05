@@ -274,7 +274,7 @@ public class MuleClient implements Disposable
      */
     public void dispatch(String url, MuleMessage message) throws MuleException
     {
-        MuleEvent event = getEvent(message, url, false, false);
+        MuleEvent event = getEvent(message, url, false);
         try
         {
             event.getSession().dispatchEvent(event);
@@ -645,7 +645,7 @@ public class MuleClient implements Disposable
      */
     public MuleMessage send(String url, MuleMessage message, int timeout) throws MuleException
     {
-        MuleEvent event = getEvent(message, url, true, false);
+        MuleEvent event = getEvent(message, url, true);
         event.setTimeout(timeout);
 
         try
@@ -743,11 +743,10 @@ public class MuleClient implements Disposable
      * @param message the event payload
      * @param uri the destination endpointUri
      * @param synchronous whether the event will be synchronously processed
-     * @param streaming
      * @return the MuleEvent
      * @throws MuleException
      */
-    protected MuleEvent getEvent(MuleMessage message, String uri, boolean synchronous, boolean streaming)
+    protected MuleEvent getEvent(MuleMessage message, String uri, boolean synchronous)
         throws MuleException
     {
         ImmutableEndpoint endpoint = getOutboundEndpoint(uri);
@@ -873,7 +872,7 @@ public class MuleClient implements Disposable
         }
         messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
-        MuleEvent event = getEvent(message, url, true, false);
+        MuleEvent event = getEvent(message, url, true);
         try
         {
             event.getSession().sendEvent(event);

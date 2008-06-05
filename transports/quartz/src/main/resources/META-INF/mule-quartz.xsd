@@ -53,6 +53,21 @@
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-job" minOccurs="1" maxOccurs="1" />
+                </xsd:sequence>
+                <xsd:attributeGroup ref="addressAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:inboundEndpointType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-job" minOccurs="1" maxOccurs="1" />
+                </xsd:sequence>
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -62,13 +77,97 @@
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-job" minOccurs="1" maxOccurs="1" />
+                </xsd:sequence>
                 <xsd:attributeGroup ref="addressAttributes"/>
+            </xsd:extension>
+
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-job" abstract="true" type="abstractJobType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for quartz jobs that can be set on the endpoint.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="event-generator-job" type="eventGenerateJobType" substitutionGroup="abstract-job"/>
+    <xsd:complexType name="eventGenerateJobType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractJobType">
+                <xsd:sequence>
+                    <xsd:element name="payload" type="mule:dataReferenceType" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="endpoint-polling-job" type="endpointPollingJobType" substitutionGroup="abstract-job"/>
+    <xsd:complexType name="endpointPollingJobType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractJobType">
+                <xsd:sequence  minOccurs="1" maxOccurs="1">
+                    <xsd:element name="job-endpoint" type="endpointRefType"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="scheduled-dispatch-job" type="scheduledDispatchJobType" substitutionGroup="abstract-job"/>
+    <xsd:complexType name="scheduledDispatchJobType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractJobType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element name="job-endpoint" type="endpointRefType"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-job" type="customJobType" substitutionGroup="abstract-job"/>
+    <xsd:complexType name="customJobType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractJobType">
+                <xsd:attribute name="job-ref" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-job-from-message" type="customFromMessageJobType" substitutionGroup="abstract-job"/>
+    <xsd:complexType name="customFromMessageJobType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractJobType">
+                <xsd:attributeGroup ref="mule:expressionAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="abstractJobType">
+        <xsd:annotation>
+            <xsd:documentation>The base element type for all quartz jobs</xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="groupName" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The group name of the scheduled job
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="jobGroupName" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The job group name of the scheduled job.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+
     <xsd:attributeGroup name="addressAttributes">
-        <xsd:attribute name="path" type="xsd:string">
+        <xsd:attribute name="jobName" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                 </xsd:documentation>
@@ -104,72 +203,12 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="payload" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="jobDispatchEndpoint" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="jobReceiveEndpoint" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="jobReceiveTimeout" type="mule:substitutableLong">
-            <xsd:annotation>
-                <xsd:documentation>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <!-- deprecated, don't expose here -->
-        <!-- xsd:attribute name="payloadClassName" type="xsd:string"/ -->
-        <!-- this is a runtime lookup - probably shouldn't be "-ref", at least until we have decent tests etc -->
-        <xsd:attribute name="payloadRef" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="groupName" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The group name of the scheduled job
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="jobGroupName" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The job group name of the scheduled job.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <!-- this is a runtime lookup - probably shouldn't be "-ref", at least until we have decent tests etc -->
-        <xsd:attribute name="jobRef" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="jobClass" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="jobObject" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
     </xsd:attributeGroup>
+
+    <xsd:complexType name="endpointRefType">
+            <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
+            <xsd:attribute name="address" type="xsd:string"/>
+            <xsd:attribute name="timeout" type="mule:substitutableInt"/>
+    </xsd:complexType>
 
 </xsd:schema>

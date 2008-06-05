@@ -26,5 +26,21 @@
                     sendTcpNoDelay="true"
                     validateConnections="false"
     />
+    
+    <endpoint name="ep1" address="test://ep1">
+        <http:http-client-response-to-object-transformer ignoreBadInput="true" name="test1" returnClass="java.lang.Object"/>
+    </endpoint>
+    
+    <endpoint name="ep2" address="test://ep2">
+        <http:http-response-to-string-transformer ignoreBadInput="true" name="test2" returnClass="java.lang.Object"/>
+    </endpoint>
 
+    <endpoint name="ep3" address="test://ep3">
+        <http:message-to-http-response-transformer ignoreBadInput="true" name="test3" returnClass="java.lang.Object"/>
+    </endpoint>
+
+    <endpoint name="ep4" address="test://ep4">
+        <http:object-to-http-client-request-transformer ignoreBadInput="true" name="test4" returnClass="java.lang.Object"/>
+    </endpoint>
+    
 </mule>

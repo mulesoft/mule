@@ -36,6 +36,12 @@ public class MessagePropertiesContext implements Serializable
 
     private PropertyScope defaultScope = PropertyScope.OUTBOUND;
 
+    /**
+     * if a property is not available in any ther scope, should we check the registry.
+     * Note there will be performance implementations is this is enabled
+     */
+    private boolean fallbackToRegistry = false;
+
     public MessagePropertiesContext()
     {
         keySet = new TreeSet();
@@ -56,12 +62,6 @@ public class MessagePropertiesContext implements Serializable
         this.defaultScope = defaultScope;
     }
 
-    /**
-     * if a property is not available in any ther scope, should we check the registry.
-     * Note there will be performance implementations is this is enabled
-     */
-    private boolean fallbackToRegistry = false;
-
     protected Map getScopedProperties(PropertyScope scope)
     {
         Map map = (Map) scopedMap.get(scope);
@@ -79,6 +79,11 @@ public class MessagePropertiesContext implements Serializable
             getScopedProperties(PropertyScope.INVOCATION).putAll(properties);
             keySet.addAll(properties.keySet());
         }
+    }
+
+    public PropertyScope getDefaultScope()
+    {
+        return defaultScope;
     }
 
     void addInboundProperties(Map properties)

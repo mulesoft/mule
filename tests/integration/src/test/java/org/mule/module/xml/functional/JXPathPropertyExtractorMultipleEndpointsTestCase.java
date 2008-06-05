@@ -24,7 +24,9 @@ public class JXPathPropertyExtractorMultipleEndpointsTestCase extends AbstractXm
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.property", "${jxpath:/endpoints/endpoint}");
+        p.setProperty("selector.expression", "/endpoints/endpoint");
+        p.setProperty("selector.evaluator", "jxpath");
+
         return p;
     }
 

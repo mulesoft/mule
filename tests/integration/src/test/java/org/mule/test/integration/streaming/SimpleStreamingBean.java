@@ -7,21 +7,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.integration.streaming;
 
-import org.mule.util.IOUtils;
+package org.mule.test.integration.streaming;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * A simple bridge service for testing entry point resolution
  */
 public class SimpleStreamingBean
 {
-    public void doit(InputStream in, OutputStream out) throws IOException
+    public InputStream doit(InputStream in) throws IOException
     {
-        IOUtils.copy(in, out);
+        return in;
     }
 }

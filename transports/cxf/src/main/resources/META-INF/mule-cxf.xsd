@@ -29,11 +29,10 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractInboundEndpointType">
+            <xsd:extension base="mule:inboundEndpointType">
                 <xsd:group ref="endpointElements"/>
                 <xsd:attributeGroup ref="inboundEndpointAttributes"/>
                 <xsd:attributeGroup ref="commonEndpointAttributes"/>
-                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -42,11 +41,10 @@
     
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractOutboundEndpointType">
+            <xsd:extension base="mule:outboundEndpointType">
                 <xsd:group ref="endpointElements"/>
                 <xsd:attributeGroup ref="outboundEndpointAttributes"/>
                 <xsd:attributeGroup ref="commonEndpointAttributes"/>
-                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -55,17 +53,17 @@
     
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractGlobalEndpointType">
+            <xsd:extension base="mule:globalEndpointType">
                 <xsd:group ref="endpointElements"/>
                 <xsd:attributeGroup ref="inboundEndpointAttributes"/>
                 <xsd:attributeGroup ref="outboundEndpointAttributes"/>
                 <xsd:attributeGroup ref="commonEndpointAttributes"/>
-                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
         
     <xsd:attributeGroup name="commonEndpointAttributes">
+        <xsd:attribute name="mtomEnabled" type="xsd:boolean"/>
         <xsd:attribute name="wsdlLocation" type="xsd:string"/>
     </xsd:attributeGroup>
     
@@ -80,6 +78,7 @@
     
     <xsd:group name="endpointElements">
         <xsd:sequence>
+            <xsd:element name="databinding" type="databindingType" minOccurs="0"/>
             <xsd:element ref="features" minOccurs="0"/>
             <xsd:element name="inInterceptors" type="interceptors" minOccurs="0"/>
             <xsd:element name="inFaultInterceptors" type="interceptors" minOccurs="0"/>
@@ -93,6 +92,12 @@
         <xsd:attribute name="clientClass" type="xsd:string"/>
         <xsd:attribute name="operation" type="xsd:string"/>
     </xsd:attributeGroup>
+    
+    <xsd:complexType name="databindingType">
+        <xsd:sequence>
+            <xsd:any minOccurs="0" maxOccurs="1" namespace="##any" processContents="lax"/>
+        </xsd:sequence>
+    </xsd:complexType>
     
     <xsd:complexType name="schemasType">
         <xsd:sequence>
@@ -113,5 +118,12 @@
             <xsd:any minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
+    
+    <xsd:complexType name="propertiesType">
+        <xsd:sequence>
+            <xsd:element ref="beans:entry" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
 
 </xsd:schema>

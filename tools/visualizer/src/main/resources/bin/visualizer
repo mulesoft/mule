@@ -1,3 +1,0 @@
-#! /bin/sh
-
-$MULE_HOME/bin/launcher $MULE_HOME/bin/visualizer.groovy $*

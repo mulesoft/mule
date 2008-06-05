@@ -16,10 +16,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
+import org.mule.routing.MuleMessageInfoMapping;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,6 +42,8 @@ public class SelectiveConsumer extends AbstractRouter implements InboundRouter
 
     private volatile Filter filter;
     private volatile boolean transformFirst = true;
+
+    private MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
 
     public boolean isMatch(MuleEvent event) throws MessagingException
     {
@@ -111,5 +115,15 @@ public class SelectiveConsumer extends AbstractRouter implements InboundRouter
     public void setTransformFirst(boolean transformFirst)
     {
         this.transformFirst = transformFirst;
+    }
+
+    public MessageInfoMapping getMessageInfoMapping()
+    {
+        return messageInfoMapping;
+    }
+
+    public void setMessageInfoMapping(MessageInfoMapping messageInfoMapping)
+    {
+        this.messageInfoMapping = messageInfoMapping;
     }
 }

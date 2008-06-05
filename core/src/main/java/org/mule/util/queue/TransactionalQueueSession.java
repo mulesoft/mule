@@ -138,9 +138,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                     Object id = queue.peek();
                     if (id != null)
                     {
-                        Object item = queueManager.doLoad(queue, id);
-                        queueManager.doRemove(queue, id);
-                        return item;
+                        return queueManager.doLoad(queue, id);
                     }
                     return null;
                 }

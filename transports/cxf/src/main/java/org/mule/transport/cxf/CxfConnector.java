@@ -36,6 +36,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.transport.ConduitInitiatorManager;
@@ -89,6 +90,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         {
             bus = new SpringBusFactory().createBus();
         }
+        BusFactory.setDefaultBus(null);
 
         MuleUniversalTransport transport = new MuleUniversalTransport(this);
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
@@ -168,22 +170,21 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
     }
 
     @SuppressWarnings("unchecked")
-    protected void registerReceiverWithMuleService(MessageReceiver receiver, EndpointURI ep)
-        throws MuleException
+    protected void registerReceiverWithMuleService(MessageReceiver receiver, EndpointURI ep) throws MuleException
     {
         CxfMessageReceiver cxfReceiver = (CxfMessageReceiver) receiver;
         Server server = cxfReceiver.getServer();
 
         // TODO MULE-2228 Simplify this API
         SedaService c = new SedaService();
-        c.setName(CXF_SERVICE_COMPONENT_NAME + server.getEndpoint().getService().getName() + c.hashCode());            
+        c.setName(CXF_SERVICE_COMPONENT_NAME + server.getEndpoint().getService().getName() + c.hashCode());
         c.setModel(muleContext.getRegistry().lookupSystemModel());
-        
-        CxfServiceComponent svcComponent = new CxfServiceComponent((CxfMessageReceiver)receiver);
+
+        CxfServiceComponent svcComponent = new CxfServiceComponent((CxfMessageReceiver) receiver);
         svcComponent.setBus(bus);
 
         c.setComponent(new DefaultJavaComponent(new SingletonObjectFactory(svcComponent)));
-        
+
         // No determine if the endpointUri requires a new connector to be
         // registed in the case of http we only need to register the new
         // endpointUri if the port is different
@@ -204,42 +205,19 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
 
         QName serviceName = server.getEndpoint().getEndpointInfo().getName();
 
+        // The 'serviceEndpoint' is the outer protocol endpoint e.g. http if the
+        // configured endpoint uri is 'cxf:http://'
         EndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
         serviceEndpointbuilder.setSynchronous(sync);
         serviceEndpointbuilder.setName(ep.getScheme() + ":" + serviceName.getLocalPart());
-        // Set the transformers on the endpoint too
-        serviceEndpointbuilder.setTransformers(receiver.getEndpoint().getTransformers().isEmpty() ? null
-                                                                                                  : receiver.getEndpoint().getTransformers());
-        serviceEndpointbuilder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers().isEmpty() ? null
-                                                                                                                 : receiver.getEndpoint().getResponseTransformers());
-        // set the filter on the axis endpoint on the real receiver endpoint
-        serviceEndpointbuilder.setFilter(receiver.getEndpoint().getFilter());
-        // set the Security filter on the axis endpoint on the real receiver
-        // endpoint
-        serviceEndpointbuilder.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
 
-        // TODO Do we really need to modify the existing receiver endpoint? What happnes if we don't security,
-        // filters and transformers will get invoked twice?
-        EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint(),
-            muleContext);
-        // Remove the Axis filter now
-        receiverEndpointBuilder.setFilter(null);
-        // Remove the Axis Receiver Security filter now
-        receiverEndpointBuilder.setSecurityFilter(null);
+        // The outer 'serviceEndpoint' is not be configured with the transformers,
+        // filters or security filter configured in configuration.
 
-        InboundEndpoint serviceEndpoint = muleContext.getRegistry()
-            .lookupEndpointFactory()
-            .getInboundEndpoint(serviceEndpointbuilder);
-
-        InboundEndpoint receiverEndpoint = muleContext.getRegistry()
-            .lookupEndpointFactory()
-            .getInboundEndpoint(receiverEndpointBuilder);
-
-        receiver.setEndpoint(receiverEndpoint);
-        
         c.setInboundRouter(new DefaultInboundRouterCollection());
-        c.getInboundRouter().addEndpoint(serviceEndpoint);
-        
+        c.getInboundRouter().addEndpoint(
+            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(serviceEndpointbuilder));
+
         services.add(c);
     }
 

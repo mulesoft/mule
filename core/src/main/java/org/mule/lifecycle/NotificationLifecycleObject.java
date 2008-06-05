@@ -83,7 +83,7 @@ public class NotificationLifecycleObject extends LifecycleObject
         this.preNotificationName = preNotificationName;
     }
 
-    //@java.lang.Override
+    //@Override
     public void firePreNotification(MuleContext context)
     {
         if(getPreNotificationName()!=null)
@@ -94,7 +94,7 @@ public class NotificationLifecycleObject extends LifecycleObject
 
     }
 
-    //@java.lang.Override
+    //@Override
     public void firePostNotification(MuleContext context)
     {
         if(getPostNotificationName()!=null)

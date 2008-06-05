@@ -80,6 +80,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
             final Throwable t = ex.getCause();
             assertNotNull("Cause should've been filled in.", t);
             assertTrue(t instanceof Fault);
+            t.printStackTrace();
         }
     }
 

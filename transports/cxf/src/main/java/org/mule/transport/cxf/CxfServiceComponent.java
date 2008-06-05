@@ -11,18 +11,23 @@
 package org.mule.transport.cxf;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointNotFoundException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.message.DefaultExceptionPayload;
+import org.mule.transport.cxf.support.DelegatingOutputStream;
 import org.mule.transport.cxf.transport.MuleUniversalDestination;
 import org.mule.transport.cxf.transport.MuleUniversalTransport;
 import org.mule.transport.http.HttpConnector;
@@ -34,6 +39,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 
 import javax.xml.stream.XMLStreamReader;
@@ -43,6 +49,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -145,7 +152,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
             
             uri = uriBase + req;
         }
-        
+       
         ctxUri = eventContext.getEndpointURI().getPath();
         
         EndpointInfo ei = receiver.getServer().getEndpoint().getEndpointInfo();
@@ -192,9 +199,15 @@ public class CxfServiceComponent implements Callable, Lifecycle
     {
         try
         {
-            MessageImpl m = new MessageImpl();
-            MuleMessage muleMsg = ctx.getMessage();
+            final MessageImpl m = new MessageImpl();
+            final MuleMessage muleMsg = ctx.getMessage();
             String method = (String) muleMsg.getProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+            
+            String ct = (String) muleMsg.getProperty(HttpConstants.HEADER_CONTENT_TYPE);
+            if (ct != null) {
+                m.put(Message.CONTENT_TYPE, ct);
+            }
+            
             String path = (String) muleMsg.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
             if (path == null) 
             {
@@ -247,26 +260,59 @@ public class CxfServiceComponent implements Callable, Lifecycle
             }
 
             // Set up a listener for the response
-            ResponseListener obs = new ResponseListener();
-            m.put(MuleUniversalDestination.RESPONSE_OBSERVER, obs);
-
             m.put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
+            m.put(MuleProperties.MULE_EVENT_PROPERTY, RequestContext.getEvent());
             m.setDestination(d);
-            d.getMessageObserver().onMessage(m);
-
-            // TODO: Make this streaming...
-            Object result = obs.getCachedStream().getInputStream();
-
-            // Handle a fault if there is one.
-            Message resMsg = obs.getMessage();
-            Exception ex = resMsg.getContent(Exception.class);
-            if (ex != null)
+            
+            OutputHandler outputHandler = new OutputHandler() 
             {
-                ExceptionPayload exceptionPayload = new DefaultExceptionPayload(new Exception(result.toString()));
-                ctx.getMessage().setExceptionPayload(exceptionPayload);
+                public void write(MuleEvent event, OutputStream out) throws IOException
+                {
+                    Message outFaultMessage = m.getExchange().getOutFaultMessage();
+                    Message outMessage = m.getExchange().getOutMessage();
+                    
+                    Message contentMsg = null;
+                    if (outFaultMessage != null) 
+                    {
+                        contentMsg = outFaultMessage;
+                    } 
+                    else if (outMessage != null) 
+                    {
+                        contentMsg = outMessage;
+                    }
+                    
+                    DelegatingOutputStream delegate = (DelegatingOutputStream) contentMsg.getContent(OutputStream.class);
+                    out.write(((ByteArrayOutputStream) delegate.getOutputStream()).toByteArray());
+                    delegate.setOutputStream(out);
+                    
+                    contentMsg.getInterceptorChain().resume();
+                    
+                    out.flush();
+                }
+                
+            };
+            DefaultMuleMessage responseMsg = new DefaultMuleMessage(outputHandler);
+            
+            ExchangeImpl exchange = new ExchangeImpl();
+            exchange.setInMessage(m);
+            exchange.put(CxfConstants.MULE_MESSAGE, responseMsg);
+            
+            // invoke the actual web service up until right before we serialize the respones
+            d.getMessageObserver().onMessage(m);
+            
+            // Handle a fault if there is one.
+            Message faultMsg = m.getExchange().getOutFaultMessage();
+            if (faultMsg != null)
+            {
+                Exception ex = faultMsg.getContent(Exception.class);
+                if (ex != null)
+                {
+                    ExceptionPayload exceptionPayload = new DefaultExceptionPayload(new Exception(""));
+                    ctx.getMessage().setExceptionPayload(exceptionPayload);
+                }
             }
-
-            return result;
+            
+            return responseMsg;
         }
         catch (MuleException e)
         {

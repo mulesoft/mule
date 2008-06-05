@@ -24,7 +24,9 @@ public class JXPathPropertyExtractorTestCase extends AbstractXmlPropertyExtracto
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
-        p.setProperty("selector.property", "${jxpath:/endpoint}");
+        p.setProperty("selector.expression", "/endpoint");
+        p.setProperty("selector.evaluator", "jxpath");
+
         return p;
     }
 

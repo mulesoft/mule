@@ -16,6 +16,8 @@ import org.mule.api.ThreadSafeAccess;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.IOUtils;
 
+import java.io.FileInputStream;
+
 /**
  * <code>FileContentsMessageAdapter</code> provides a wrapper for file data. Users
  * can obtain the contents of the message through the payload property and can get
@@ -46,14 +48,18 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
 
     public Object getPayload()
     {
-        if(contents==null)
+        if (contents == null)
         {
             synchronized (this)
             {
                 try
                 {
-                    contents = IOUtils.toByteArray(payload);
-                    payload.close();
+                    if (fileInputStream == null)
+                    {
+                        fileInputStream = new FileInputStream(file);
+                    }
+                    contents = IOUtils.toByteArray(fileInputStream);
+                    fileInputStream.close();
                 }
                 catch (Exception noPayloadException)
                 {
@@ -63,7 +69,7 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
         }
         return contents;
     }
-    
+
     public ThreadSafeAccess newThreadCopy()
     {
         return new FileContentsMessageAdapter(this);

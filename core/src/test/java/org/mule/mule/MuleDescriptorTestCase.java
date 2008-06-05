@@ -10,13 +10,10 @@
 
 package org.mule.mule;
 
-import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
-import org.mule.component.AbstractJavaComponent;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.model.seda.SedaService;
-import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
@@ -41,10 +38,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
         //assertNull("Factory should be null but is " + service.getServiceFactory(), service.getServiceFactory());
         assertNotNull(service.getComponent());
-        assertTrue(service.getComponent() instanceof JavaComponent);
-        assertEquals(SingletonObjectFactory.class, ((AbstractJavaComponent) service.getComponent()).getObjectFactory().getClass());
-        assertTrue(((JavaComponent) service.getComponent()).getObjectType().equals(PassThroughComponent.class));
-        assertNull(service.getName());
+        assertTrue(service.getComponent() instanceof PassThroughComponent);
         // assertEquals(0, service.getProperties().size());
     }
 
