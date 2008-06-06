@@ -11,36 +11,27 @@
 package org.mule.module.scripting.transformer;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.scripting.component.Scriptable;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-import javax.script.Bindings;
-import javax.script.CompiledScript;
-import javax.script.ScriptEngine;
 import javax.script.ScriptException;
+import javax.script.Bindings;
 
 /**
  * Runs a script to perform transformation on an object.
  */
 public class ScriptTransformer extends AbstractMessageAwareTransformer
 {
-    protected final Scriptable scriptable = new Scriptable();
-
-    public ScriptTransformer()
-    {
-        super();
-    }
+    private Scriptable script;
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        Bindings bindings = this.getScriptEngine().createBindings();
-        this.populateBindings(bindings, message);
-
+        Bindings bindings = script.getScriptEngine().createBindings();
+        script.populateBindings(bindings, message);
         try
         {
-            return scriptable.runScript(bindings);
+            return script.runScript(bindings);
         }
         catch (ScriptException e)
         {
@@ -48,74 +39,13 @@ public class ScriptTransformer extends AbstractMessageAwareTransformer
         }
     }
 
-    protected void populateBindings(Bindings namespace, MuleMessage message)
+    public Scriptable getScript()
     {
-        namespace.put("message", message);
-        namespace.put("src", message.getPayload());
-        namespace.put("transformerNamespace", namespace);
-        namespace.put("log", logger);
+        return script;
     }
 
-    /**
-     * Template method were deriving classes can do any initialisation after the
-     * properties have been set on this transformer
-     * 
-     * @throws org.mule.api.lifecycle.InitialisationException
-     */
-    public void initialise() throws InitialisationException
+    public void setScript(Scriptable script)
     {
-        super.initialise();
-        scriptable.initialise();
+        this.script = script;
     }
-
-    public ScriptEngine getScriptEngine()
-    {
-        return scriptable.getScriptEngine();
-    }
-
-    public void setScriptEngine(ScriptEngine scriptEngine)
-    {
-        scriptable.setScriptEngine(scriptEngine);
-    }
-
-    public CompiledScript getCompiledScript()
-    {
-        return scriptable.getCompiledScript();
-    }
-
-    public void setCompiledScript(CompiledScript compiledScript)
-    {
-        scriptable.setCompiledScript(compiledScript);
-    }
-
-    public String getScriptText()
-    {
-        return scriptable.getScriptText();
-    }
-
-    public void setScriptText(String scriptText)
-    {
-        scriptable.setScriptText(scriptText);
-    }
-
-    public String getScriptFile()
-    {
-        return scriptable.getScriptFile();
-    }
-
-    public void setScriptFile(String scriptFile)
-    {
-        scriptable.setScriptFile(scriptFile);
-    }
-
-    public void setScriptEngineName(String scriptEngineName)
-    {
-        scriptable.setScriptEngineName(scriptEngineName);
-    }
-
-    public String getScriptEngineName()
-    {
-        return scriptable.getScriptEngineName();
-    }
-
 }

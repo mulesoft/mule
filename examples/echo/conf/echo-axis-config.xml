@@ -4,11 +4,13 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:soap="http://www.mulesource.org/schema/mule/soap/2.0"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/soap/2.0 http://www.mulesource.org/schema/mule/soap/2.0/mule-soap.xsd
-       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <description>
         This config is identical to echo-config.xml but exposes the EchoUMO as a SOAP web service.
@@ -24,11 +26,11 @@
     <model name="echoSample">
         <service name="EchoUMO">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:65081/services">
+                <axis:inbound-endpoint address="http://localhost:65081/services">
                     <soap:http-to-soap-request-transformer/>
-                </inbound-endpoint>
+                </axis:inbound-endpoint>
                 <axis:inbound-endpoint address="http://localhost:65082/services"/>
-                <inbound-endpoint address="vm://echo" />
+                <vm:inbound-endpoint path="echo" />
             </inbound>
             <echo-component/>
         </service>

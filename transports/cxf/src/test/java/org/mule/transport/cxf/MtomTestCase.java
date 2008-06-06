@@ -19,14 +19,11 @@ import java.net.URL;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.mime.TestMtom;

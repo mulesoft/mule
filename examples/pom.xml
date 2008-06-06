@@ -18,7 +18,6 @@
         <module>all-examples</module>
         <module>errorhandler</module>
         <module>hello</module>
-        <module>scripting</module>
     </modules>
 
     <build>
@@ -80,11 +79,13 @@
                 <jdk>1.5</jdk>
             </activation>
             <modules>
-                <!-- all these examples depend on the cxf transport wich is JDK5 -->
+                <!-- All these examples depend on the CXF transport which is JDK5 -->
                 <module>echo</module>
                 <module>loanbroker</module>
                 <module>stockquote</module>
                 <module>webapp</module>
+                <!-- Uses a Groovy script with JDK 5 syntax -->
+                <module>scripting</module>
             </modules>
         </profile>
     </profiles>

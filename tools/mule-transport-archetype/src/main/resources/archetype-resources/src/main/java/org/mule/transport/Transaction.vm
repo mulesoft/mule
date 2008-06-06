@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: Transaction.vm 10621 2008-01-30 12:15:16Z dirk.olmes $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -13,7 +13,7 @@ package org.mule.transport.${TransportNameLower};
 import org.mule.config.i18n.Message;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
-import org.mule.api.TransactionException;
+import org.mule.api.transaction.TransactionException;
 
 
 /**

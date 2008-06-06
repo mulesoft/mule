@@ -12,6 +12,7 @@ package org.mule.test.config;
 
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.config.DefaultMuleConfiguration;
@@ -22,13 +23,27 @@ import junit.framework.TestCase;
 
 public class MuleConfigurationTestCase extends TestCase
 {
+    
+    private boolean failOnMessageScribbling;
+
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        
+        // fiddling with ThreadSafeAccess must not have side effects on later tests. Store
+        // the current state here and restore it in tearDown
+        failOnMessageScribbling = ThreadSafeAccess.AccessControl.isFailOnMessageScribbling();
+    }
+
     @Override
     protected void tearDown() throws Exception
     {
         muleContext = null;
         MuleServer.setMuleContext(null);
-    }
-
+        ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(failOnMessageScribbling);
+    } 
+    
     private MuleContext muleContext;
     
     /** Test for MULE-3092 */
@@ -43,14 +58,14 @@ public class MuleConfigurationTestCase extends TestCase
         config.setDefaultRemoteSync(true);
         config.setWorkingDirectory("/some/directory");
         config.setClientMode(true);
-        config.setFailOnMessageScribbling(false);
+        ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(false);
         config.setId("MY_SERVER");
         config.setClusterId("MY_CLUSTER");
         config.setDomainId("MY_DOMAIN");
         config.setCacheMessageAsBytes(false);
         config.setCacheMessageOriginalPayload(false);
         config.setEnableStreaming(false);
-        config.setAssertMessageAccess(false);
+        ThreadSafeAccess.AccessControl.setAssertMessageAccess(false);
         config.setAutoWrapMessageAwareTransform(false);
         
         MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
@@ -73,7 +88,14 @@ public class MuleConfigurationTestCase extends TestCase
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "remoteSync", "true");
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "workingDirectory", "/some/directory");
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "clientMode", "true");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages", "true");
+        
+        // this is just to make the test work for now. Since the initialization of the threadsafe
+        // check behaviour in ThreadSafeAccess.AccessControl has already happened at this point in
+        // time (we touched ThreadSafeAccess.AccessControl in setUp) setting the system property 
+        // won't have any effect here
+        // System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages", "true");
+        ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(false);
+        
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "serverId", "MY_SERVER");
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "clusterId", "MY_CLUSTER");
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "domainId", "MY_DOMAIN");
@@ -181,14 +203,14 @@ public class MuleConfigurationTestCase extends TestCase
         assertTrue(config.isDefaultRemoteSync());
         assertEquals("/some/directory", config.getWorkingDirectory());
         assertTrue(config.isClientMode());
-        assertFalse(config.isFailOnMessageScribbling());
+        assertFalse(ThreadSafeAccess.AccessControl.isFailOnMessageScribbling());
         assertEquals("MY_SERVER", config.getId());
         assertEquals("MY_CLUSTER", config.getClusterId());
         assertEquals("MY_DOMAIN", config.getDomainId());
         assertFalse(config.isCacheMessageAsBytes());
         assertFalse(config.isCacheMessageOriginalPayload());
         assertFalse(config.isEnableStreaming());
-        assertFalse(config.isAssertMessageAccess());
+        assertFalse(ThreadSafeAccess.AccessControl.isAssertMessageAccess());
         assertFalse(config.isAutoWrapMessageAwareTransform());
     }
 }

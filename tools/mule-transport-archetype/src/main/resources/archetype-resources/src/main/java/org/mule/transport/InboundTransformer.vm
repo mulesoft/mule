@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: InboundTransformer.vm 10621 2008-01-30 12:15:16Z dirk.olmes $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,14 +10,14 @@
 
 package org.mule.transport.${TransportNameLower}.transformers;
 
-import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.MuleEventContext;
 
 /**
  * <code>${inboundTransformer}</code> TODO Document
  */
-public class ${inboundTransformer} extends AbstractEventAwareTransformer
+public class ${inboundTransformer} extends AbstractMessageAwareTransformer
 {
 
     /* For general guidelines on writing transports see
@@ -42,16 +42,9 @@ public class ${inboundTransformer} extends AbstractEventAwareTransformer
 
     }
 
-    public Object transform(Object src, String encoding, MuleEventContext context) throws TransformerException
+    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        /* IMPLEMENTATION NOTE: If you only have a single source type
-           registered you can cast the 'src' object directly to that type,
-           otherwise you need to check the instance type of 'src' for each
-           registered source type */
-
-        // TODO Transformer the source object here.  You have access to the
-        // Current message (including //headers and attachments from the
-        // context.getMessage())
+        // TODO Transform the payload of message here. See comments in {@link AbstractMessageAwareTransformer}
 
         // Make sure you return a transfromed object that matches the
         // returnClass type

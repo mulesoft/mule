@@ -10,22 +10,17 @@
 
 package org.mule.util.queue;
 
-import org.mule.util.xa.ResourceManagerSystemException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 
 /**
  * A Queue manager is responsible for manageing one or more Queue resources and
  * providing common support fot transactions and persistence
  */
-public interface QueueManager
+public interface QueueManager extends Startable, Stoppable
 {
 
-    void start() throws ResourceManagerSystemException;
-
-    void stop() throws ResourceManagerSystemException;
-
     QueueSession getQueueSession();
-
-    void close();
 
     void setDefaultQueueConfiguration(QueueConfiguration config);
 

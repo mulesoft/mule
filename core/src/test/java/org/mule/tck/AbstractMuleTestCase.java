@@ -11,7 +11,6 @@
 package org.mule.tck;
 
 import org.mule.MuleServer;
-import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -450,20 +449,16 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             {
                 muleContext.dispose();
 
-                if (RegistryContext.getRegistry() != null)
-                {
-                    final String workingDir = muleContext.getConfiguration().getWorkingDirectory();
-                    // do not delete TM recovery object store, everything else is good to go
-                    FileUtils.deleteTree(FileUtils.newFile(workingDir), IGNORED_DOT_MULE_DIRS);
-
-                    RegistryContext.getRegistry().dispose();
-                }
+                final String workingDir = muleContext.getConfiguration().getWorkingDirectory();
+                // do not delete TM recovery object store, everything else is good to
+                // go
+                FileUtils.deleteTree(FileUtils.newFile(workingDir), IGNORED_DOT_MULE_DIRS);
             }
             FileUtils.deleteTree(FileUtils.newFile("./ActiveMQ"));
         }
         finally
         {
-            muleContext = null; 
+            muleContext = null;
             MuleServer.setMuleContext(null);
         }
     }

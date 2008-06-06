@@ -21,6 +21,9 @@ import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 import org.mule.transport.quartz.jobs.ScheduledDispatchJob;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.service.Service;
+import org.mule.api.routing.OutboundRouter;
 
 import org.quartz.impl.StdScheduler;
 
@@ -79,10 +82,11 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testEndpoint1Config() throws Exception
     {
-        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("qEP1");
-        assertNotNull(eb);
+        Service service = muleContext.getRegistry().lookupService("testService1");
+        assertNotNull(service);
 
-        InboundEndpoint ep = eb.buildInboundEndpoint();
+        InboundEndpoint ep = service.getInboundRouter().getEndpoint("qEP1");
+        assertNotNull(ep);
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof EventGeneratorJobConfig);
         EventGeneratorJobConfig config = (EventGeneratorJobConfig)ep.getProperty("jobConfig");
@@ -91,10 +95,10 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testEndpoint2Config() throws Exception
     {
-        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("qEP2");
-        assertNotNull(eb);
+        Service service = muleContext.getRegistry().lookupService("testService2");
+        assertNotNull(service);
 
-        InboundEndpoint ep = eb.buildInboundEndpoint();
+        InboundEndpoint ep = service.getInboundRouter().getEndpoint("qEP2");
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof EventGeneratorJobConfig);
         EventGeneratorJobConfig config = (EventGeneratorJobConfig)ep.getProperty("jobConfig");
@@ -104,10 +108,10 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testEndpoint3Config() throws Exception
     {
-        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("qEP3");
-        assertNotNull(eb);
+        Service service = muleContext.getRegistry().lookupService("testService3");
+        assertNotNull(service);
 
-        InboundEndpoint ep = eb.buildInboundEndpoint();
+        OutboundEndpoint ep = ((OutboundRouter)service.getOutboundRouter().getRouters().get(0)).getEndpoint("qEP3");
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof CustomJobFromMessageConfig);
         CustomJobFromMessageConfig config = (CustomJobFromMessageConfig)ep.getProperty("jobConfig");
@@ -121,10 +125,11 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testEndpoint4Config() throws Exception
     {
-        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("qEP4");
-        assertNotNull(eb);
+        Service service = muleContext.getRegistry().lookupService("testService4");
+        assertNotNull(service);
 
-        InboundEndpoint ep = eb.buildInboundEndpoint();
+        OutboundEndpoint ep = ((OutboundRouter)service.getOutboundRouter().getRouters().get(0)).getEndpoint("qEP4");
+
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof CustomJobConfig);
         CustomJobConfig config = (CustomJobConfig)ep.getProperty("jobConfig");
@@ -133,24 +138,25 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testEndpoint5Config() throws Exception
     {
-        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("qEP5");
-        assertNotNull(eb);
+        Service service = muleContext.getRegistry().lookupService("testService5");
+        assertNotNull(service);
 
-        InboundEndpoint ep = eb.buildInboundEndpoint();
+        InboundEndpoint ep = service.getInboundRouter().getEndpoint("qEP5");
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof EndpointPollingJobConfig);
         EndpointPollingJobConfig config = (EndpointPollingJobConfig)ep.getProperty("jobConfig");
         assertEquals(EndpointPollingJob.class, config.getJobClass());
-        assertEquals("vm://foo", config.getEndpointRef());
+        assertEquals("file:///N/drop-data/in", config.getEndpointRef());
         assertEquals(4000, config.getTimeout());
     }
 
     public void testEndpoint6Config() throws Exception
     {
-        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("qEP6");
-        assertNotNull(eb);
+        Service service = muleContext.getRegistry().lookupService("testService6");
+        assertNotNull(service);
 
-        InboundEndpoint ep = eb.buildInboundEndpoint();
+        OutboundEndpoint ep = ((OutboundRouter)service.getOutboundRouter().getRouters().get(0)).getEndpoint("qEP6");
+        
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof ScheduledDispatchJobConfig);
         ScheduledDispatchJobConfig config = (ScheduledDispatchJobConfig)ep.getProperty("jobConfig");

@@ -19,15 +19,15 @@ public class GroovyMessageBuilderTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "groovy-builder-config.xml";
+        return "groovy-messagebuilder-config.xml";
     }
 
     public void testFunctionBehaviour() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage m = client.send("vm://groovy.1", "Test:", null);
+        MuleMessage m = client.send("groovy1.endpoint", "Test:", null);
         assertNotNull(m);
-        assertEquals("Test: A Received B Received", m.getPayloadAsString());
+        assertEquals("Test: A B Received", m.getPayloadAsString());
     }
 
 }

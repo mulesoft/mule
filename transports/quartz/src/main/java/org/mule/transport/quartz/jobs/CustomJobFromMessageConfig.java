@@ -9,12 +9,12 @@
  */
 package org.mule.transport.quartz.jobs;
 
-import org.mule.transport.quartz.config.JobConfig;
-import org.mule.transport.quartz.config.AbstractJobConfig;
 import org.mule.api.MuleMessage;
-import org.mule.util.expression.ExpressionEvaluatorManager;
-import org.mule.util.ClassUtils;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.quartz.config.AbstractJobConfig;
+import org.mule.transport.quartz.config.JobConfig;
+import org.mule.util.ClassUtils;
+import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -63,7 +63,6 @@ public class CustomJobFromMessageConfig extends AbstractJobConfig
         }
 
         Object result = ExpressionEvaluatorManager.evaluate(expression, evaluator, message, true);
-        Class clazz;
         if (result instanceof Job)
         {
             CustomJobConfig customJob = new CustomJobConfig();

@@ -52,6 +52,11 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         client.dispatch(DEFAULT_INPUT_MULE_QUEUE_NAME, DEFAULT_INPUT_MESSAGE, null);
     }
 
+    protected void dispatchMessage(Object payload) throws Exception
+    {
+        client.dispatch(DEFAULT_INPUT_MULE_QUEUE_NAME, payload, null);
+    }
+
     protected MuleMessage receiveMessage() throws Exception
     {
         MuleMessage result = client.request(DEFAULT_OUTPUT_MULE_QUEUE_NAME, TIMEOUT);

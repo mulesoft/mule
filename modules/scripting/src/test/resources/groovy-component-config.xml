@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+	<vm:connector name= "vmConnector" queueEvents="true"/>
+
+    <script:script name="myScript" engine="groovy">
+        return "$payload Received"
+    </script:script>
+
+    <model>
+        <service name="inlineScript">
+            <inbound>
+                <inbound-endpoint address="vm://in1"/>
+            </inbound>
+            <script:component>
+			    <script:script engine="groovy">
+			        return "$payload Received"
+			    </script:script>
+			</script:component>
+            <outbound>
+            	<outbound-pass-through-router>
+                	<outbound-endpoint address="vm://out1"/>
+            	</outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="fileBasedScript">
+            <inbound>
+                <inbound-endpoint address="vm://in2"/>
+            </inbound>
+            <script:component>
+			    <script:script file="simple-script.groovy"/>
+			</script:component>
+            <outbound>
+            	<outbound-pass-through-router>
+                	<outbound-endpoint address="vm://out2"/>
+            	</outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="referencedScript">
+            <inbound>
+                <inbound-endpoint address="vm://in3"/>
+            </inbound>
+            <script:component script-ref="myScript"/>
+            <outbound>
+            	<outbound-pass-through-router>
+                	<outbound-endpoint address="vm://out3"/>
+            	</outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="scriptVariables">
+            <inbound>
+                <inbound-endpoint address="vm://in4"/>
+            </inbound>
+            <script:component>
+                <script:script engine="groovy">
+                    <property key="prop1" value="Received"/>
+                    <property key="prop2" value="A-OK"/>
+                    <script:text>
+                        return "$payload $prop1 $prop2"
+                    </script:text>
+                </script:script>
+            </script:component>
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://out4"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

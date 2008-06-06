@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: MessageReceiver.vm 11079 2008-02-27 15:52:01Z tcarlson $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -25,6 +25,7 @@ import org.mule.api.transport.Connector;
  * <code>${TransportName}MessageReceiver</code> TODO document
  */
 public class ${TransportName}MessageReceiver extends #if( $isPollingReceiver == "y") AbstractPollingMessageReceiver #else AbstractMessageReceiver #end
+
 {
 
     /* For general guidelines on writing transports see

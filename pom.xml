@@ -58,7 +58,7 @@
 
         <springVersion>2.5.3</springVersion>
         <springOsgiVersion>1.0</springOsgiVersion>
-        <cxfVersion>2.0.4-incubator</cxfVersion>
+        <cxfVersion>2.0.6</cxfVersion>
         <coberturaVersion>2.2</coberturaVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
         <backportUtilConcurrentVersion>3.1</backportUtilConcurrentVersion>
@@ -543,17 +543,17 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jcl104-over-slf4j</artifactId>
-                <version>1.4.3</version>
+                <version>1.5.0</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.4.3</version>
+                <version>1.5.0</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.4.3</version>
+                <version>1.5.0</version>
             </dependency>
             <!-- OSGi Specification -->
             <dependency>
@@ -690,6 +690,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>tanukisoft</groupId>
+                <artifactId>wrapper</artifactId>
+                <version>3.2.3</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     
@@ -747,14 +752,6 @@
             </releases>
         </repository>
         <repository>
-            <id>mule-deps</id>
-            <name>Mule Dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
             <id>apache-snapshots</id>
             <name>Apache Snapshots</name>
             <url>http://people.apache.org/maven-snapshot-repository</url>
@@ -793,6 +790,14 @@
             <id>jboss</id>
             <name>JBoss Repository</name>
             <url>http://repository.jboss.com/maven2</url>
+        </repository>
+        <repository>
+            <id>mule-deps</id>
+            <name>Mule Dependencies</name>
+            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 

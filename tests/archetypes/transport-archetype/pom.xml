@@ -20,7 +20,7 @@
         <!-- this is the groupId:artifactId of the archetype that we want to invoke -->
         <archetype>org.mule.tools:mule-transport-archetype</archetype>
         <!-- this string will be appended to the archetype's commandline -->
-        <archetypeParams>-DtransportId=foo</archetypeParams>
+        <archetypeParams>-DtransportId=foo -DhasCustomSchema=y -DhasDispatcher=y -DhasReceiver=y -DhasTransactions=y -DhasCustomTransactions=y -DinboundTransformer=FooInboundTransformer -DoutboundTransformer=FooOutboundTransformer -DendpointBuilder=c</archetypeParams>
     </properties>
 
     <dependencies>
@@ -48,10 +48,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo.groovy</groupId>
                 <artifactId>groovy-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

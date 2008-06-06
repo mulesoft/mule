@@ -22,4 +22,41 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-exec "$MULE_BASE/bin/mule" -config scripting-config.xml
+JYTHON=jython-2.2.1.jar
+
+if [ -f "$MULE_BASE/lib/user/${JYTHON}" -o -f "$MULE_HOME/lib/user/${JYTHON}" ]; then
+    echo "The Scripting example is available in two flavors:"
+    echo "  1. Groovy"
+    echo "  2. Python"
+    echo "Select the one you wish to execute and press Enter..."
+    read i
+    if [ 1 = $i ]
+    then
+        scriptfile="greedy.groovy"
+    elif [ 2 = $i ]
+    then
+        scriptfile="greedy.py"
+    else
+        break;
+    fi
+
+    echo "Welcome to the JSR 223-powered Change Machine.  This machine will give you" 
+    echo "change for the amount you request.  The amount of change is cumulative, so you" 
+    echo "can keep asking for more and more change until you've had enough."
+    echo "To get started, select a currency:"
+    echo "  1. U.S. Dollars"
+    echo "  2. U.K. Pounds Sterling"
+    read i
+    if [ 1 = $i ]; then
+        currency="USD"
+    elif [ 2 = $i ]; then
+        currency="GBP"
+    else
+        break;
+    fi
+
+    exec "$MULE_BASE/bin/mule" -config "change-machine.xml" -M-Dscriptfile=$scriptfile -M-Dcurrency=$currency
+else
+    echo "This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file."
+fi
+    

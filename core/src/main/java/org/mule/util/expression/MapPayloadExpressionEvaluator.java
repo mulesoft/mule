@@ -20,9 +20,9 @@ import java.util.Map;
  */
 public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
 {
-    public static final String NAME = "map";
+    public static final String NAME = "map-payload";
     
-    public Object evaluate(String name, Object message)
+    public Object evaluate(String expression, Object message)
     {
         Object payload = message;
         if (message instanceof MessageAdapter)
@@ -31,7 +31,7 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
         }
         if (payload instanceof Map)
         {
-            return ((Map) payload).get(name);
+            return ((Map) payload).get(expression);
         }
         return null;
     }

@@ -18,21 +18,54 @@ import org.mule.transaction.constraints.ConstraintFilter;
  */
 public interface TransactionConfig
 {
-    /** Whether there is a transaction available or not, ignore it */
+    /** 
+     * Whether there is a transaction available or not, ignore it 
+     * <p>
+     * J2EE: NotSupported
+     */
     byte ACTION_NONE = 0;
 
-    /** Will ensure that a new transaction is created for each invocation */
+    /** 
+     * Will ensure that a new transaction is created for each invocation 
+     * <p>
+     * J2EE RequiresNew
+     */
     byte ACTION_ALWAYS_BEGIN = 1;
 
-    /** Will begin a new transaction if no transaction is already present */
+    /** 
+     * Will begin a new transaction if no transaction is already present 
+     * <p>
+     * J2EE: Required
+     */
     byte ACTION_BEGIN_OR_JOIN = 2;
 
-    /** There must always be a transaction present for the invocation */
+    /** 
+     * There must always be a transaction present for the invocation 
+     * <p>
+     * J2EE: Mandatory
+     */
     byte ACTION_ALWAYS_JOIN = 3;
 
-    /** If there is a transaction available, then use it, otherwise continue processing */
+    /** 
+     * If there is a transaction available, then use it, otherwise continue processing 
+     * <p>
+     * J2EE: Supports
+     */
     byte ACTION_JOIN_IF_POSSIBLE = 4;
 
+    /**
+     * There must not be a transaction present for the invocation
+     * <p>
+     * J2EE Never
+     */
+    byte ACTION_NEVER = 5;
+
+    /**
+     * Transaction action by default
+     * <p>
+     */
+    byte ACTION_DEFAULT = ACTION_NEVER;
+    
     TransactionFactory getFactory();
 
     void setFactory(TransactionFactory factory);
@@ -50,4 +83,13 @@ public interface TransactionConfig
     void setTimeout(int timeout);
 
     int getTimeout();
+    
+    /**
+     * Processing by TransactionTemplate must be disabled in some cases, like OutboundRouterCollection 
+     * 
+     * @return true, if this Transaction config should be processed by TransactionTemplate 
+     */ 
+    boolean isEnabled(); 
+
+    void setEnabled(boolean enabled);
 }

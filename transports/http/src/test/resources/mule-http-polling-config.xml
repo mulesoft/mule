@@ -4,7 +4,9 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+        xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
     xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
@@ -27,9 +29,7 @@
                     <property key="pollingFrequency" value="30000"/>
                 </http:inbound-endpoint>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
+            <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://toclient"/>
@@ -41,9 +41,7 @@
             <inbound>
                 <inbound-endpoint address="http://localhost:61205" connector-ref="HttpConnector"/>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
+            <test:component/>
         </service>
 
     </model>

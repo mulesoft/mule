@@ -15,6 +15,8 @@ import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -55,6 +57,7 @@ public class FunctionalTestComponent2 implements Callable, Initialisable, Dispos
     private boolean throwException = false;
     private boolean enableMessageHistory = true;
     private boolean enableNotifications = true;
+    private boolean doInboundTransform = true;
     private String appendString;
     private Class exceptionToThrow;
     private long waitTime = 0;
@@ -88,7 +91,28 @@ public class FunctionalTestComponent2 implements Callable, Initialisable, Dispos
         {
             throwException();
         }
-        return process(context.transformMessage(), context);
+        return process(getMessageFromContext(context), context);
+    }
+
+    private Object getMessageFromContext(MuleEventContext context) throws MuleException
+    {
+        if(isDoInboundTransform())
+        {
+            Object o = context.transformMessage();
+            if(getAppendString()!=null && !(o instanceof String))
+            {
+                o = context.transformMessageToString();
+            }
+            return o;
+        }
+        else if(getAppendString()!=null)
+        {
+            return context.getMessageAsString();
+        }
+        else
+        {
+            return context.getMessage().getPayload();
+        }
     }
 
     /**
@@ -159,10 +183,9 @@ public class FunctionalTestComponent2 implements Callable, Initialisable, Dispos
             messageHistory.add(data);
         }
 
-        String contents = data.toString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
                 + context.getService().getName() + ". Content is: "
-                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+                + StringMessageUtils.truncate(data.toString(), 100, true), '*', 80);
 
         logger.info(msg);
 
@@ -187,11 +210,11 @@ public class FunctionalTestComponent2 implements Callable, Initialisable, Dispos
         {
             if (appendString != null)
             {
-                replyMessage = append(contents, context.getMessage());
+                replyMessage = append(data.toString(), context.getMessage());
             }
             else
             {
-                replyMessage = contents;
+                replyMessage = data;
             }
         }
 
@@ -408,5 +431,15 @@ public class FunctionalTestComponent2 implements Callable, Initialisable, Dispos
     public void setWaitTime(long waitTime)
     {
         this.waitTime = waitTime;
+    }
+
+    public boolean isDoInboundTransform()
+    {
+        return doInboundTransform;
+    }
+
+    public void setDoInboundTransform(boolean doInboundTransform)
+    {
+        this.doInboundTransform = doInboundTransform;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: OutboundTransformer.vm 10621 2008-01-30 12:15:16Z dirk.olmes $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -12,7 +12,7 @@ package org.mule.transport.${TransportNameLower}.transformers;
 
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
 
 /**
  * <code>${outboundTransformer}</code> TODO Document
@@ -42,7 +42,7 @@ public class ${outboundTransformer} extends AbstractMessageAwareTransformer
 
     public Object transform(MuleMessage message, String encoding) throws TransformerException
     {
-        // TODO Transformer the message here.  See comments in {@link AbstractMessageAwareTransformer}
+        // TODO Transformer the message here. See comments in {@link AbstractMessageAwareTransformer}
 
         // Make sure you return a transfromed object that matches the
         // returnClass type

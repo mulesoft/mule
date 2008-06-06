@@ -13,8 +13,14 @@ package org.mule.routing.filters;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.ObjectFilter;
+import org.mule.api.transformer.TransformerException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.simple.ByteArrayToObject;
 
 import java.util.regex.Pattern;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>RegExFilter</code> is used to match a String argument against a regular
@@ -23,6 +29,8 @@ import java.util.regex.Pattern;
 
 public class RegExFilter implements Filter, ObjectFilter
 {
+    protected transient Log logger = LogFactory.getLog(getClass());
+
     private Pattern pattern;
 
     public RegExFilter()
@@ -47,6 +55,31 @@ public class RegExFilter implements Filter, ObjectFilter
             return false;
         }
 
+        Object tempObject = object;
+
+        // check whether the payload is a byte[] or a char[]. If it is, then it has
+        // to be transformed otherwise the toString will not represent the true
+        // contents
+        // of the payload for the RegEx filter to use.
+        if (object instanceof byte[])
+        {
+            ByteArrayToObject transformer = new ByteArrayToObject();
+            try
+            {
+                object = transformer.transform(object);
+            }
+            catch (TransformerException e)
+            {
+                logger.warn(CoreMessages.transformFailedBeforeFilter(), e);
+                // revert transformation
+                object = tempObject;
+            }
+        }
+        else if (object instanceof char[])
+        {
+            object = new String((char[]) object);
+        }
+
         return (pattern != null && pattern.matcher(object.toString()).find());
     }
 
@@ -62,7 +95,8 @@ public class RegExFilter implements Filter, ObjectFilter
 
     /**
      * @return
-     * @deprecated Use {@link #getPattern()} This method name was changed to be consistent with other filters
+     * @deprecated Use {@link #getPattern()} This method name was changed to be
+     *             consistent with other filters
      */
     public String getExpression()
     {
@@ -71,7 +105,8 @@ public class RegExFilter implements Filter, ObjectFilter
 
     /**
      * @param
-     * @deprecated Use {@link #getPattern()} This method name was changed to be consistent with other filters
+     * @deprecated Use {@link #getPattern()} This method name was changed to be
+     *             consistent with other filters
      */
     public void setExpression(String expression)
     {

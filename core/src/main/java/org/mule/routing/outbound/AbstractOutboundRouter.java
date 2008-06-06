@@ -223,6 +223,8 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     {
         this.endpoints.clear();
         // this.endpoints = new CopyOnWriteArrayList(endpoints);
+        // Ensure all endpoints are outbound endpoints
+        // This will go when we start dropping support for 1.4 and start using 1.5
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             ImmutableEndpoint umoEndpoint = (ImmutableEndpoint) iterator.next();

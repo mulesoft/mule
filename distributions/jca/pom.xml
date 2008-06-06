@@ -126,16 +126,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>axis</groupId>
             <artifactId>axis-wsdl4j</artifactId>
             <scope>provided</scope>

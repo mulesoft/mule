@@ -12,7 +12,6 @@ package org.mule.transport.file;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
-import org.mule.api.transformer.Transformer;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.file.filters.FilenameRegexFilter;
 import org.mule.transport.file.transformers.FileToByteArray;

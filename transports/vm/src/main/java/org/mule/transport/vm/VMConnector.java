@@ -29,10 +29,8 @@ import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
-import org.mule.util.queue.MemoryPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueueSession;
-import org.mule.util.queue.TransactionalQueueManager;
 
 import java.util.Iterator;
 
@@ -57,8 +55,7 @@ public class VMConnector extends AbstractConnector
         {
             if (queueManager == null)
             {
-                queueManager = new TransactionalQueueManager();
-                queueManager.setPersistenceStrategy(new MemoryPersistenceStrategy());
+                queueManager = getMuleContext().getQueueManager();
             }
             if (queueProfile == null)
             {

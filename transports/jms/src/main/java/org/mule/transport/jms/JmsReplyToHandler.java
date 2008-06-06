@@ -19,11 +19,11 @@ import org.mule.service.AbstractService;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
 
-import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
@@ -33,7 +33,13 @@ import javax.jms.Topic;
 
 /**
  * <code>JmsReplyToHandler</code> will process a JMS replyTo or hand off to the
- * default replyTo handler if the replyTo is a URL
+ * default replyTo handler if the replyTo is a URL.
+ * The purpose of this class is to send a result on a ReplyTo destination if one
+ * has been set.
+ * Note that the {@link JmsMessageDispatcher} also contains logic for handling ReplyTo. However,
+ * the dispatcher is responsible attaching the replyTo information to the message and also
+ * receiving on the same replyTo if 'remoteSync' is set. The {@link JmsMessageDispatcher} never
+ * writes to the 'replyTo' destination.
  */
 public class JmsReplyToHandler extends DefaultReplyToHandler
 {
@@ -117,9 +123,6 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 long ttl = Message.DEFAULT_TIME_TO_LIVE;
                 int priority = Message.DEFAULT_PRIORITY;
 
-                // TODO this first assignment is ignored anyway, review and remove if need to
-                boolean persistent = Message.DEFAULT_DELIVERY_MODE == DeliveryMode.PERSISTENT;
-
                 if (ttlString != null)
                 {
                     ttl = Long.parseLong(ttlString);
@@ -128,8 +131,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 {
                     priority = Integer.parseInt(priorityString);
                 }
-                // TODO StringUtils.notBlank() would be more robust here
-                persistent = persistentDeliveryString != null
+                boolean persistent = StringUtils.isNotBlank(persistentDeliveryString)
                                 ? Boolean.valueOf(persistentDeliveryString).booleanValue()
                                 : connector.isPersistentDelivery();
 
@@ -137,8 +139,6 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                     topic);
             }
 
-            // connector.getJmsSupport().send(replyToProducer, replyToMessage,
-            // replyToDestination);
             logger.info("Reply Message sent to: " + replyToDestination);
             ((AbstractService) event.getService()).getStatistics().incSentReplyToEvent();
         }

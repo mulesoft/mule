@@ -4,7 +4,9 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:jetty="http://www.mulesource.org/schema/mule/jetty/2.0"
+        xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
     xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
@@ -20,7 +22,8 @@
             <inbound>
                 <inbound-endpoint ref="serverEndpoint"/>
             </inbound>
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <test:component appendString=" Received"/>
+            <!--<component class="org.mule.tck.functional.FunctionalTestComponent"/>-->
         </service>
     </model>
 

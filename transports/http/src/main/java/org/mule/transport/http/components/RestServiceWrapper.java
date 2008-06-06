@@ -191,65 +191,56 @@ public class RestServiceWrapper extends AbstractComponent
         }
     }
 
-    public MuleMessage doOnCall(MuleEvent event)
+    public MuleMessage doOnCall(MuleEvent event) throws Exception
     {
         String tempUrl;
         MuleMessage result = null;
-        try
+
+        Object request = event.transformMessage();
+        Object requestBody;
+        if (urlFromMessage)
         {
-
-            Object request = event.transformMessage();
-            Object requestBody;
-            if (urlFromMessage)
+            tempUrl = event.getMessage().getStringProperty(REST_SERVICE_URL, null);
+            if (tempUrl == null)
             {
-                tempUrl = event.getMessage().getStringProperty(REST_SERVICE_URL, null);
-                if (tempUrl == null)
-                {
-                    throw new IllegalArgumentException(CoreMessages.propertyIsNotSetOnEvent(REST_SERVICE_URL)
-                        .toString());
-                }
+                throw new IllegalArgumentException(CoreMessages.propertyIsNotSetOnEvent(REST_SERVICE_URL)
+                    .toString());
             }
-            else
-            {
-                tempUrl = serviceUrl;
-            }
-            StringBuffer urlBuffer = new StringBuffer(tempUrl);
-
-            if (GET.equalsIgnoreCase(this.httpMethod))
-            {
-                requestBody = NullPayload.getInstance();
-
-                setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, null);
-                setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, null);
-            }
-            else
-            // if post
-            {
-                StringBuffer requestBodyBuffer = new StringBuffer();
-                event.getMessage().setProperty(CONTENT_TYPE, CONTENT_TYPE_VALUE);
-                setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, requestBodyBuffer);
-                setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, requestBodyBuffer);
-                requestBody = requestBodyBuffer.toString();
-            }
-
-            tempUrl = urlBuffer.toString();
-            logger.info("Invoking REST service: " + tempUrl);
-
-            event.getMessage().setProperty(HTTP_METHOD, httpMethod);
-
-            result = RequestContext.getEventContext().sendEvent(
-                new DefaultMuleMessage(requestBody, event.getMessage()), tempUrl);
-            if (isErrorPayload(result))
-            {
-                handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), result),
-                    result);
-            }
-
         }
-        catch (Exception e)
+        else
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            tempUrl = serviceUrl;
+        }
+        StringBuffer urlBuffer = new StringBuffer(tempUrl);
+
+        if (GET.equalsIgnoreCase(this.httpMethod))
+        {
+            requestBody = NullPayload.getInstance();
+
+            setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, null);
+            setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, null);
+        }
+        else
+        // if post
+        {
+            StringBuffer requestBodyBuffer = new StringBuffer();
+            event.getMessage().setProperty(CONTENT_TYPE, CONTENT_TYPE_VALUE);
+            setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, requestBodyBuffer);
+            setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, requestBodyBuffer);
+            requestBody = requestBodyBuffer.toString();
+        }
+
+        tempUrl = urlBuffer.toString();
+        logger.info("Invoking REST service: " + tempUrl);
+
+        event.getMessage().setProperty(HTTP_METHOD, httpMethod);
+
+        result = RequestContext.getEventContext().sendEvent(
+            new DefaultMuleMessage(requestBody, event.getMessage()), tempUrl);
+        if (isErrorPayload(result))
+        {
+            handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), result),
+                result);
         }
 
         return result;

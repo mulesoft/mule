@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+      xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.0"
+      xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
+       http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <!--// START SNIPPET: full-config -->
+    <description>
+        Receives a message from another party and returns a result from the service. Additionally the same result will
+        be router via the service outbound routers.
+    </description>
+
+     <vm:connector name="vmConnector" queueEvents="true"/>
+
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
+    <vm:endpoint path="test.header.received" name="receivedEndpoint" synchronous="false"/>
+    <vm:endpoint path="test.header.notreceived" name="notReceivedEndpoint" synchronous="false"/>
+
+    <model>
+        <service name="In-Out_Out-Only-Service">
+            <inbound>
+                <vm:inbound-endpoint ref="inboundEndpoint"/>
+            </inbound>
+            <script:component>
+                <script:script engine="groovy">
+                    if (message.getProperty("foo")!=null)
+                        return "foo header received"
+                    else
+                        return "foo header not received"
+                </script:script>
+            </script:component>
+            <outbound>
+                <filtering-router>
+                    <vm:outbound-endpoint ref="receivedEndpoint"/>
+                    <wildcard-filter pattern="* header received"/>
+                </filtering-router>
+                <filtering-router>
+                    <vm:outbound-endpoint ref="notReceivedEndpoint"/>
+                    <wildcard-filter pattern="* header not received"/>
+                </filtering-router>
+            </outbound>
+        </service>
+    </model>
+    <!--// END SNIPPET: full-config -->
+</mule>

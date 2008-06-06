@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: TransactedMessageReceiver.vm 11079 2008-02-27 15:52:01Z tcarlson $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -14,8 +14,9 @@ import org.mule.config.i18n.Message;
 import org.mule.DefaultMuleMessage;
 import org.mule.transport.ConnectException;
 import org.mule.transport.TransactedPollingMessageReceiver;
+import org.mule.api.MuleMessage;
 import org.mule.api.service.Service;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
@@ -62,7 +63,7 @@ public class ${TransportName}TransactedMessageReceiver extends TransactedPolling
         // Here is how to pass the message to Mule.  Most MessageReceivers
         // will need to do nothing more than this
         MessageAdapter adapter = connector.getMessageAdapter(message);
-        routeMessage(new MuleMessage(adapter), endpoint.isSynchronous());
+        routeMessage(new DefaultMuleMessage(adapter), endpoint.isSynchronous());
     }
 
     public void doConnect() throws ConnectException

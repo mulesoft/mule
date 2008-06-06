@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd">
+
+    <endpoint name="groovy1.endpoint" address="vm://groovy.1"/>
+    <endpoint name="groovy2.endpoint" address="vm://groovy.2"/>
+    <endpoint name="groovy3.endpoint" address="vm://groovy.3"/>
+
+    <script:script name="myScript" engine="groovy">
+        import org.mule.api.MuleMessage
+        import org.mule.DefaultMuleMessage
+
+        MuleMessage result1 = eventContext.sendEvent(message, "groovy2.endpoint")
+        MuleMessage result2 = eventContext.sendEvent(message, "groovy3.endpoint")
+        return "$payload $result1.payload $result2.payload Received"
+    </script:script>
+
+    <model name="main">
+
+        <service name="MessageBuilder">
+            <description>
+                This service used to use the ScriptMessageBuilder which has since been removed.
+            </description>
+            <inbound>
+                <inbound-endpoint ref="groovy1.endpoint"/>
+            </inbound>
+            <script:component script-ref="myScript"/>
+            
+        </service>
+
+        <service name="ScriptA">
+            <inbound>
+                <inbound-endpoint ref="groovy2.endpoint"/>
+            </inbound>
+            <script:component>
+			    <script:script engine="groovy">
+			        return "A"
+			    </script:script>
+            </script:component>
+        </service>
+
+        <service name="ScriptB">
+            <inbound>
+                <inbound-endpoint ref="groovy3.endpoint"/>
+            </inbound>
+            <script:component>
+			    <script:script engine="groovy">
+			        return "B"
+			    </script:script>
+            </script:component>
+        </service>
+    </model>
+</mule>

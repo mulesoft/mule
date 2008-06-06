@@ -10,19 +10,16 @@
 
 package org.mule.transport.quartz;
 
-import org.mule.RegistryContext;
-import org.mule.util.ClassUtils;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transport.DispatchException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.quartz.config.JobConfig;
 import org.mule.transport.quartz.i18n.QuartzMessages;
 import org.mule.transport.quartz.jobs.CustomJob;
 import org.mule.transport.quartz.jobs.CustomJobConfig;
 import org.mule.transport.quartz.jobs.CustomJobFromMessageConfig;
-import org.mule.transport.quartz.config.JobConfig;
 
 import java.util.Date;
 import java.util.Iterator;

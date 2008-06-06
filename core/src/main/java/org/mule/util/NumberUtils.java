@@ -16,6 +16,10 @@ package org.mule.util;
 // @ThreadSafe
 public class NumberUtils extends org.apache.commons.lang.math.NumberUtils
 {
+    public static final int INTEGER_ERROR = -999999999;
+    public static final long LONG_ERROR = -999999999;
+    public static final float FLOAT_ERROR = -999999999;
+    public static final double DOUBLE_ERROR = -999999999;
 
     public static long toLong(Object obj)
     {
@@ -59,4 +63,65 @@ public class NumberUtils extends org.apache.commons.lang.math.NumberUtils
         }
     }
 
+    public static float toFloat(Object obj)
+    {
+        if (obj == null)
+        {
+            throw new IllegalArgumentException("Unable to convert null object to float");
+        }
+        else if (obj instanceof String)
+        {
+            return toFloat((String) obj);
+        }
+        else if (obj instanceof Number)
+        {
+            return ((Number) obj).floatValue();
+        }
+        else
+        {
+            throw new IllegalArgumentException("Unable to convert object of type: "
+                                               + obj.getClass().getName() + " to float.");
+        }
+    }
+
+    public static double toDouble(Object obj)
+    {
+        if (obj == null)
+        {
+            throw new IllegalArgumentException("Unable to convert null object to double");
+        }
+        else if (obj instanceof String)
+        {
+            return toDouble((String) obj);
+        }
+        else if (obj instanceof Number)
+        {
+            return ((Number) obj).doubleValue();
+        }
+        else
+        {
+            throw new IllegalArgumentException("Unable to convert object of type: "
+                                               + obj.getClass().getName() + " to double.");
+        }
+    }
+
+    //@Override
+    public static int toInt(String str) {
+        return toInt(str, INTEGER_ERROR);
+    }
+
+    //@Override
+    public static long toLong(String str) {
+        return toLong(str, LONG_ERROR);
+    }
+
+    //@Override
+    public static float toFloat(String str) {
+        return toFloat(str, FLOAT_ERROR);
+    }
+    
+    //@Override
+    public static double toDouble(String str) {
+        return toDouble(str, DOUBLE_ERROR);
+    }
 }

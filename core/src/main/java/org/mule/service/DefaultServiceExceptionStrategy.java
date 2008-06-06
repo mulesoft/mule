@@ -16,6 +16,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.management.stats.ServiceStatistics;
+import org.mule.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * <code>DefaultServiceExceptionStrategy</code> is the default exception handler
@@ -54,15 +57,15 @@ public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
 
     protected void routeException(MuleMessage message, ImmutableEndpoint failedEndpoint, Throwable t)
     {
-        ImmutableEndpoint ep = getEndpoint(t);
-        if (ep != null)
+        super.routeException(message, failedEndpoint, t);
+        List endpoints = getEndpoints(t);
+        if (CollectionUtils.isNotEmpty(endpoints) && getServiceStatistics() != null)
         {
-            super.routeException(message, failedEndpoint, t);
-//            ServiceStatistics statistics = getServiceStatistics();
-//            if (statistics != null)
-//            {
-//                statistics.getOutboundRouterStat().incrementRoutedMessage(ep);
-//            }
+            ServiceStatistics statistics = getServiceStatistics();
+            for (int i = 0; i < endpoints.size(); i++)
+            {
+                statistics.getOutboundRouterStat().incrementRoutedMessage((ImmutableEndpoint) endpoints.get(i));
+            }
         }
     }
 

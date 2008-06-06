@@ -11,18 +11,26 @@
 package org.mule.module.scripting.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.generic.TextDefinitionParser;
+import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
+import org.mule.module.scripting.component.ScriptComponent;
+import org.mule.module.scripting.transformer.ScriptTransformer;
 
 
 public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
-        registerIgnoredElement("lang");
+        registerBeanDefinitionParser("script", new ScriptDefinitionParser());
+        registerBeanDefinitionParser("text", new TextDefinitionParser("scriptText"));
+        registerBeanDefinitionParser("component", new ComponentDefinitionParser(ScriptComponent.class));
+        registerBeanDefinitionParser("transformer", new TransformerDefinitionParser(ScriptTransformer.class));
 
-        registerBeanDefinitionParser("script", new ScriptDefinitionParser(false));
+        // For Spring-based scripting support
+        registerIgnoredElement("lang");
         registerBeanDefinitionParser("groovy-refreshable", new GroovyRefreshableBeanBuilderParser(false));
     }
-
 }
 
 

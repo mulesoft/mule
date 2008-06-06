@@ -11,21 +11,34 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
     <xsd:import namespace="http://cxf.apache.org/core"
                 schemaLocation="http://cxf.apache.org/schemas/core.xsd"/>
 
+    <xsd:annotation>
+        <xsd:documentation>
+            <p>Apache CXF is an open source services framework. CXF helps you build and develop services
+            using frontend programming APIs, like JAX-WS. These services can speak a variety of protocols such as SOAP,
+            XML/HTTP, RESTful HTTP, or CORBA and work over a variety of transports such as HTTP, JMS or JBI.
+            </p>
+            <p>
+            The Mule CXF Transport is an evolution of Mule's XFire Transport which provides support for the use of web
+            service integration via Apache CXF. The Mule CXF connector also provides support for WS-Security,
+            WS-Addressing and WS-Reliable-Messaging.</p>
+        </xsd:documentation>
+    </xsd:annotation>
+
     <xsd:element name="connector" type="cxfConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="cxfConnectorType">
-      <xsd:complexContent>        
-        <xsd:extension base="mule:connectorType">
-           <xsd:attribute name="defaultFrontend" type="xsd:string" default="jaxws"/>
-           <xsd:attribute name="configurationLocation" type="xsd:string"/>
-        </xsd:extension>
-      </xsd:complexContent>
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <xsd:attribute name="defaultFrontend" type="xsd:string" default="jaxws"/>
+                <xsd:attribute name="configurationLocation" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
-     
+
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
@@ -36,9 +49,10 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
-    
+
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType"
+                 substitutionGroup="mule:abstract-outbound-endpoint"/>
+
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
@@ -50,7 +64,7 @@
     </xsd:complexType>
 
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
-    
+
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
@@ -61,12 +75,12 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-        
+
     <xsd:attributeGroup name="commonEndpointAttributes">
         <xsd:attribute name="mtomEnabled" type="xsd:boolean"/>
         <xsd:attribute name="wsdlLocation" type="xsd:string"/>
     </xsd:attributeGroup>
-    
+
     <xsd:attributeGroup name="inboundEndpointAttributes">
         <xsd:attribute name="bridge" type="xsd:boolean"/>
         <xsd:attribute name="frontend" type="xsd:string"/>
@@ -75,7 +89,7 @@
         <xsd:attribute name="serviceClass" type="xsd:string"/>
         <xsd:attribute name="serviceName" type="xsd:string"/>
     </xsd:attributeGroup>
-    
+
     <xsd:group name="endpointElements">
         <xsd:sequence>
             <xsd:element name="databinding" type="databindingType" minOccurs="0"/>
@@ -86,19 +100,19 @@
             <xsd:element name="outFaultInterceptors" type="interceptors" minOccurs="0"/>
         </xsd:sequence>
     </xsd:group>
-    
+
     <xsd:attributeGroup name="outboundEndpointAttributes">
         <xsd:attribute name="wsdlPort" type="xsd:string"/>
         <xsd:attribute name="clientClass" type="xsd:string"/>
         <xsd:attribute name="operation" type="xsd:string"/>
     </xsd:attributeGroup>
-    
+
     <xsd:complexType name="databindingType">
         <xsd:sequence>
             <xsd:any minOccurs="0" maxOccurs="1" namespace="##any" processContents="lax"/>
         </xsd:sequence>
     </xsd:complexType>
-    
+
     <xsd:complexType name="schemasType">
         <xsd:sequence>
             <xsd:element name="schemaLocation" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
@@ -118,12 +132,12 @@
             <xsd:any minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
-    
+
     <xsd:complexType name="propertiesType">
         <xsd:sequence>
             <xsd:element ref="beans:entry" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
-    
+
 
 </xsd:schema>

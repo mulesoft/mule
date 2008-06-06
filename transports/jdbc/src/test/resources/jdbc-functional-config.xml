@@ -3,7 +3,9 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
       xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd">
@@ -11,14 +13,17 @@
     <model name="test">
         <service name="bridgeB">
             <inbound>
-                <inbound-endpoint address="jdbc://getTest?type=1"/>
+                <jdbc:inbound-endpoint queryKey="getTest?type=1">
+                    <expression-transformer>
+                        <return-argument evaluator="map-payload" expression="data"/>
+                    </expression-transformer>
+                    <append-string-transformer message=" Received"/>
+                </jdbc:inbound-endpoint>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.transport.jdbc.test.JdbcFunctionalTestComponent"/>
-            </component>
+            <test:component/>
             <outbound>
                 <outbound-pass-through-router>
-                    <jdbc:outbound-endpoint address="jdbc://writeTest?type=2" />
+                    <jdbc:outbound-endpoint queryKey="writeTest?type=2" />
                 </outbound-pass-through-router>
             </outbound>
         </service>

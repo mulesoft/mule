@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--// START SNIPPET: full-config -->
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:mulexml="http://www.mulesource.org/schema/mule/xml/2.0"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <!--// START SNIPPET: transformer-config -->
+    <mulexml:xslt-transformer name="xslt">
+        <mulexml:xslt-text>
+            <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                        <xsl:output method="xml"/>
+                        <xsl:param name="title"/>
+                        <xsl:param name="rating"/>
+                        <xsl:template match="catalog">
+                        <xsl:element name="cd-listings">
+                            <xsl:attribute name="title">
+                                <xsl:value-of select="$title"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="rating">
+                                <xsl:value-of select="$rating"/>
+                            </xsl:attribute>
+                            <xsl:apply-templates/>
+                        </xsl:element>
+                        </xsl:template>
+
+                        <xsl:template match="cd">
+                        <xsl:element name="cd-title">
+                            <xsl:value-of select = "title" />
+                        </xsl:element>
+                        </xsl:template>
+                    </xsl:stylesheet>
+        </mulexml:xslt-text>
+
+        <!--// START SNIPPET: transformer-params -->
+        <mulexml:context-property key="title" value="${header:ListTitle}"/>
+        <mulexml:context-property key="rating" value="${header:ListRating}"/>
+        <!--// END SNIPPET: transformer-params -->
+    </mulexml:xslt-transformer>
+    <!--// END SNIPPET: transformer-config -->
+
+    <!--// START SNIPPET: service-config -->
+    <model name="main">
+        <service name="Echo">
+            <inbound>
+                <!-- this endpoint is used by the functional test -->
+                <vm:inbound-endpoint path="test.in" transformer-refs="xslt" synchronous="true"/>
+            </inbound>
+            <echo-component/>
+            <outbound>
+                <outbound-pass-through-router>
+                    <stdio:outbound-endpoint system="OUT"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+    </model>
+    <!--// END SNIPPET: service-config -->
+</mule>

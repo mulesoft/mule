@@ -10,7 +10,6 @@
 package org.mule.transport.quartz.jobs;
 
 import org.mule.transport.quartz.config.AbstractJobConfig;
-import org.mule.api.config.MuleConfiguration;
 
 /**
  * Configuration for the {@link EndpointPollingJob} job.

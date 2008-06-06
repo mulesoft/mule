@@ -39,7 +39,7 @@
             <!-- any number of endpoints can be added to an inbound router -->
             <inbound>
                 <stdio:inbound-endpoint system="IN"/>
-                <vm:inbound-endpoint address="vm://echo"/>
+                <vm:inbound-endpoint path="echo"/>
             </inbound>
 
             <echo-component/>

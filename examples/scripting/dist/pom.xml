@@ -35,6 +35,24 @@
             <artifactId>mule-transport-stdio</artifactId>
             <version>${muleVersion}</version>
         </dependency>
+
+        <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>jython-engine</artifactId>
+            <version>1.0</version>
+            <!-- we use our own retrotranslated version -->
+            <classifier>jdk14</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <!-- This is the actual language implementation -->
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython</artifactId>
+            <version>2.2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
@@ -107,6 +125,16 @@
         </resources>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <encoding>ISO-8859-1</encoding>
+                </configuration>
+            </plugin>
+
             <!-- "mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
                 overwriting the previous one. -->
             <plugin>
@@ -129,6 +157,18 @@
                                     <artifactId>${artifactId}</artifactId>
                                     <version>${version}</version>
                                     <destFileName>${artifactId}.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>javax.script</groupId>
+                                    <artifactId>jython-engine</artifactId>
+                                    <version>1.0</version>
+                                    <!-- we use our own retrotranslated version -->
+                                    <classifier>jdk14</classifier>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.python</groupId>
+                                    <artifactId>jython</artifactId>
+                                    <version>2.2.1</version>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

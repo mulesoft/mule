@@ -11,7 +11,7 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
-                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
 
     <!-- xml filters -->
 
@@ -27,7 +27,7 @@
                 </xsd:sequence>
                 <xsd:attribute name="lenient" type="mule:substitutableBoolean" default="true"/>
                 <xsd:attribute name="expectedValue" type="xsd:string"/>
-           </xsd:extension>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -41,10 +41,10 @@
                 <xsd:sequence>
                     <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="splitExpression" type="xsd:string"/>
+                <xsd:attribute name="splitExpression" type="xsd:string" use="required"/>
                 <xsd:attribute name="externalSchemaLocation" type="xsd:string"/>
                 <xsd:attribute name="validateSchema" type="mule:substitutableBoolean"/>
-           </xsd:extension>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -82,15 +82,21 @@
     <xsd:complexType name="xmlTransformerType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
-                <xsd:attribute name="outputEncoding" type="xsd:string"/>
+                <xsd:attribute name="outputEncoding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>The encoding to use for the resulting XML/Text.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="dom-to-xml-transformer" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="dom-to-output-handler-transformer" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="dom-to-output-handler-transformer" type="xmlTransformerType"
+                 substitutionGroup="mule:abstract-transformer"/>
 
-    <xsd:element name="jxpath-extractor-transformer" type="jxpathExtractorType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="jxpath-extractor-transformer" type="jxpathExtractorType"
+                 substitutionGroup="mule:abstract-transformer"/>
     <xsd:complexType name="jxpathExtractorType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
@@ -110,31 +116,90 @@
     </xsd:complexType>
 
     <xsd:element name="xml-to-dom-transformer" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="xml-to-object-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="xml-to-object-transformer" type="mule:abstractTransformerType"
+                 substitutionGroup="mule:abstract-transformer"/>
 
-    <xsd:element name="xslt-transformer" type="xsltTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="xslt-transformer" type="xsltTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>A transformer used to perform XSLT transforms on the current message payload. Transform
+                objects are pooled for better performance. Transform context properties can be set on the transformer,
+                these can be pulled from the current message using Expression Evaluators. This works in a very similar
+                way to the
+                <a href="http://www.muleforge.org/display/EXTENDEDXML/XQuery" target="_blank">XQuery Transformer</a>
+                on <a href="http://www.muleforge.org" target="_blank">MuleForge</a>.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:complexType name="xsltTransformerType">
         <xsd:complexContent>
             <xsd:extension base="xmlTransformerType">
                 <xsd:sequence>
-                    <xsd:element name="xslt-text" maxOccurs="1" minOccurs="0" type="xsltTextType"/>
-                    <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="xslt-text" maxOccurs="1" minOccurs="0" type="xsltTextType">
+                        <xsd:annotation>
+                            <xsd:documentation>The inline xslt script definition. This is not required if the xslt-file
+                                attribute is set.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>A property that wil be made available to the transform context.
+                                Expression Evaluators can be used to grab these properties from the message at runtime.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="maxIdleTransformers" type="mule:substitutableInt"/>
-                <xsd:attribute name="maxActiveTransformers" type="mule:substitutableInt"/>
-                <xsd:attribute name="xsl-file" type="xsd:string"/>
-                <xsd:attribute name="transformerFactoryClass" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="maxIdleTransformers" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>Transformers are pooled for better throughput since performing and XSL
+                            transformation can be expensive. This controls how many instances will remain idle in the
+                            transformer pool.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="maxActiveTransformers" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>The total number of xslt transforms that will get pooled at any given time.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="xsl-file" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>The full path to the XSL template file to use when performing the transform.
+                            This can be a path on the local file system or on the classpath. This attribute is not
+                            required if the &lt;xslt-text&gt; element has been set.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="uriResolver" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>The URI resolver to use when validating the XSL output. If not set a default
+                            one will be used that checks for resources on the local file system and classpath.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="transformerFactoryClass" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>he fully qualified class name of the <i>javax.xml.TransformerFactory</i>
+                            instance to use. If not specified the default JDK factory
+                            <i>TransformerFactory.newInstance()</i> will be used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="xsltTextType">
         <xsd:sequence maxOccurs="1" minOccurs="1">
-            <xsd:any namespace="http://www.w3.org/1999/XSL/Transform" minOccurs="0" maxOccurs="1" processContents="lax"/>
+            <xsd:any namespace="http://www.w3.org/1999/XSL/Transform" minOccurs="0" maxOccurs="1"
+                     processContents="lax"/>
         </xsd:sequence>
     </xsd:complexType>
 
-    <xsd:element name="xml-prettyprinter-transformer" type="xmlPrettyPrinterType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="xml-prettyprinter-transformer" type="xmlPrettyPrinterType"
+                 substitutionGroup="mule:abstract-transformer"/>
     <xsd:complexType name="xmlPrettyPrinterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">

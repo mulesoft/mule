@@ -1,3 +1,8 @@
+/*
+ * Run an archetype and compile it using maven
+ *
+ * $Id$
+ */
 
 import org.apache.commons.io.FileUtils
 
@@ -17,6 +22,9 @@ if (existingProjectDir.exists())
 {
     FileUtils.forceDelete(existingProjectDir)
 }
+
+// make sure that the output dir is created before the actual Maven run that follows now
+existingProjectDir.mkdirs()
 
 /*
  * run Maven archetype
@@ -40,13 +48,28 @@ if (project.properties.archetypeParams != null)
 }
 cmdline += " -DmuleVersion=" + project.version
 cmdline += " -Dinteractive=false"
+runCommand(cmdline, buildDir)
 
-log.info("***** commandline: '" + cmdline + "'")
+// now that the source is generated, compile it using Maven
+// Do not run "mvn test" here since the generated source is not testable as is
+cmdline = "mvn test-compile"
+runCommand(cmdline, existingProjectDir)
 
-// null means inherit parent's env ...
-def process = cmdline.execute(null, buildDir)
+def runCommand(String commandline, File directory)
+{
+    log.info("***** commandline: '" + commandline + "'")
 
-// consume all output of the forked process. Otherwise it won't run.
-def input = new BufferedReader(new InputStreamReader(process.inputStream))
-input.eachLine { log.info(it) }
-process.waitFor()
+    // null means inherit parent's env ...
+    def process = commandline.execute(null, directory)
+
+    // consume all output of the forked process. Otherwise it may lock up
+    process.in.eachLine { log.info(it) }
+    process.err.eachLine { log.error(it) }
+
+    process.waitFor()
+    def exitCode = process.exitValue()
+    if (exitCode != 0)
+    {
+        fail("command did not execute properly: " + exitCode)
+    }
+}

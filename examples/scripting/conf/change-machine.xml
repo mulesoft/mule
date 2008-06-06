@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.0"
+       xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd
+       http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd">
+
+    <description>
+        This example demonstrates invoking a JSR-223 script as the service component.
+    </description>
+        
+    <stdio:connector name="SystemStreamConnector"
+                     promptMessage="How much more change do you need? (enter an amount such as 2.37)"
+                     messageDelayTime="1000"/>
+
+	<custom-transformer name="StringToNumber" class="org.mule.example.scripting.StringToNumber"/>
+
+	<custom-transformer name="DollarsToCents" class="org.mule.example.scripting.SimpleMathTransformer">
+        <spring:property name="operation" value="multiply"/>
+        <spring:property name="factor" value="100"/>
+    </custom-transformer>
+                	
+    <model name="main">
+        <service name="Accumulator">
+            <inbound>
+                <stdio:inbound-endpoint system="IN" transformer-refs="StringToNumber DollarsToCents"/>
+                <!-- For unit testing -->
+                <inbound-endpoint address="vm://input" transformer-refs="DollarsToCents"/>
+            </inbound>
+            <component>
+                <singleton-object class="org.mule.example.scripting.AccumulatorComponent"/>
+            </component>
+            <outbound>
+                <chaining-router>
+                    <outbound-endpoint address="vm://script"/>
+                    <stdio:outbound-endpoint system="OUT"/>
+                </chaining-router>
+            </outbound>
+        </service>
+
+        <service name="ScriptService">
+            <inbound>
+                <inbound-endpoint address="vm://script"/>
+            </inbound>
+            <script:component>
+                <script:script file="${scriptfile}">
+                    <property key="currency" value="${currency}"/>
+                </script:script>
+            </script:component>
+        </service>
+    </model>
+</mule>

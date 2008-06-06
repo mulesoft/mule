@@ -9,17 +9,16 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.util.ClassUtils;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.w3c.dom.Element;
 
 /**

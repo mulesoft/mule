@@ -10,7 +10,10 @@
 
 package org.mule;
 
+import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transaction.TransactionException;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transaction.MuleTransactionConfig;
 
 public class MuleTransactionConfigTestCase extends AbstractMuleTestCase
@@ -34,4 +37,13 @@ public class MuleTransactionConfigTestCase extends AbstractMuleTestCase
         c.setAction(MuleTransactionConfig.ACTION_NONE);
         assertEquals(MuleTransactionConfig.ACTION_NONE_STRING, c.getActionAsString());
     }
+    
+    public void testTransactionJoinIfPossible() throws TransactionException
+    {      
+        MuleTransactionConfig txConfig = new MuleTransactionConfig();
+        txConfig.setAction(TransactionConfig.ACTION_JOIN_IF_POSSIBLE);
+        txConfig.setFactory(new TestTransactionFactory());
+        assertFalse(txConfig.isTransacted());
+    }
+
 }

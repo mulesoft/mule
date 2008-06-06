@@ -33,7 +33,6 @@ import org.mule.api.service.ServiceException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.ReplyToHandler;
-import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;

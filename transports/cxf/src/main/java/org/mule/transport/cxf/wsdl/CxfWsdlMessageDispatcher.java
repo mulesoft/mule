@@ -19,6 +19,8 @@ import java.io.IOException;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 
 /**
@@ -65,10 +67,8 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
                     
                     try
                     {
-                        DynamicClientFactory cf = DynamicClientFactory.newInstance(bus);
-                        this.client = cf.createClient(wsdlUrl, 
-                           (serviceName == null ? null : QName.valueOf(serviceName)), 
-                           (portName == null ? null : QName.valueOf(portName)));
+                        this.client = createClient(bus, wsdlUrl, serviceName, portName);
+    
                         addMuleInterceptors();
                     }
                     catch (Exception ex)
@@ -87,5 +87,13 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
             disconnect();
             throw ex;
         }
+    }
+
+    protected Client createClient(Bus bus, String wsdlUrl, String serviceName, String portName) throws Exception
+    {
+        DynamicClientFactory cf = DynamicClientFactory.newInstance(bus);
+        return cf.createClient(wsdlUrl, 
+           (serviceName == null ? null : QName.valueOf(serviceName)), 
+           (portName == null ? null : QName.valueOf(portName)));
     }
 }

@@ -10,7 +10,14 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
     
-    <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager"/>
+    <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+                This is the security provider type that is used to configure JAAS related functionality.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
 
     <xsd:complexType name="securityManagerType">
         <xsd:complexContent>
@@ -43,7 +50,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 	
-	<xsd:element name="jaas-security-filter" type="jaasSecurityFilterType" substitutionGroup="mule:abstract-security-filter">
+	<xsd:element name="jaas-security-filter" type="mule:abstractSecurityFilterType" substitutionGroup="mule:abstract-security-filter">
         <xsd:annotation>
             <xsd:documentation>
                 This appears to authenticate users via information in standard HTTP headers.
@@ -53,9 +60,7 @@
 
     <xsd:complexType name="jaasSecurityFilterType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractSecurityFilterType">
-                
-            </xsd:extension>
+            <xsd:extension base="mule:abstractSecurityFilterType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

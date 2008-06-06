@@ -225,6 +225,7 @@
                 <mule:inbound/>
                 <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
                 <mule:async-reply>
+                     <mule:inbound-endpoint address="test://async-reply"/>
                     <mule:single-async-reply-router>
                         <mule:expression-message-info-mapping messageIdExpression="${header:id}"
                                                               correlationIdExpression="${header:correlation}"/>

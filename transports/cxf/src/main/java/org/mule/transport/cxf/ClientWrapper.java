@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -39,10 +40,12 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -104,6 +107,15 @@ public class ClientWrapper
             }
         }
 
+        EndpointImpl ep = (EndpointImpl) client.getEndpoint();
+        
+        Object mtomEnabled = endpoint.getProperty(CxfConstants.MTOM_ENABLED);
+        if (mtomEnabled != null) {
+            HashMap<String, Object> props = new HashMap<String, Object>();
+            props.put(Message.MTOM_ENABLED, mtomEnabled);
+            ep.setProperties(props);
+        }
+        
         addMuleInterceptors();
     }
 

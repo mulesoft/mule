@@ -14,13 +14,15 @@
         This config builds a JAX-WS service with CXF.
         
         We use a "serviceClass" which is a JAX-WS interface we've defined. It allows us
+        to ensure that the WSDL is only generated for the "echo" method (as opposed
+        to all the other methods on the EchoComponent). This keeps our WSDL nice
+        in clean - but it is not required.
 
         To invoke the EchoUMO hit the following URL -
-            http://localhost:65081/services/EchoUMO?method=echo&amp;param=Is there an echo?
-        (remember to replace the '&amp;' with an ampersand)
-
+            http://localhost:65082/services/EchoUMO/echo/text/hello
+        
         To view the WSDL for the EchoUMO service go to -
-            http://localhost:65081/services/EchoUMO?wsdl
+            http://localhost:65082/services/EchoUMO?wsdl
     </description>
 
     <model name="echoSample">

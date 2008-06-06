@@ -157,15 +157,7 @@ public class TransactionTemplate
                         resumeXATransaction(suspendedXATx);
                     }
                 }
-                // we've handled this exception above. just return null now
-                if (exceptionListener != null)
-                {
-                    return null;
-                }
-                else
-                {
-                    throw e;
-                }
+                throw e;
             }
             catch (Error e)
             {

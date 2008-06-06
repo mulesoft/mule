@@ -28,7 +28,6 @@ public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBui
     private Scriptable scriptComponent = new Scriptable();
 
     protected MuleContext muleContext = null;
-    protected boolean initialised = false;
 
     public ScriptConfigurationBuilder(String configResource) throws MuleException
     {
@@ -65,15 +64,16 @@ public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBui
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
         this.muleContext = muleContext;
-        
+            
         for (int i = 0; i < configResources.length; i++)
         {
             ConfigResource configResource = configResources[i];
             scriptComponent.setScriptFile(configResource.getResourceName());
             scriptComponent.initialise();
-            Bindings ns = scriptComponent.getScriptEngine().createBindings();
-            populateBindings(ns);
-            scriptComponent.runScript(ns);
+            // Set up initial script variables.
+            Bindings bindings = scriptComponent.getScriptEngine().createBindings();
+            scriptComponent.populateDefaultBindings(bindings);
+            scriptComponent.runScript(bindings);
         }
     }
 

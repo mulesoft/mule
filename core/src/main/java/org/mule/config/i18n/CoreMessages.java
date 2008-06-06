@@ -300,9 +300,14 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 70, type);
     }
 
-    public static Message routingFailedOnEndpoint(String name, Object endpointURI)
+    public static Message routingFailedOnEndpoint(Service service, ImmutableEndpoint endpoint)
     {
-        return factory.createMessage(BUNDLE_PATH, 72, name, endpointURI);
+        EndpointURI endpointURI = null;
+        if (endpoint != null)
+        {
+            endpointURI = endpoint.getEndpointURI();
+        }
+        return factory.createMessage(BUNDLE_PATH, 72, service.getName(), endpointURI);
     }
 
     public static Message cannotInstanciateFinder(String serviceFinder)

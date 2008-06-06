@@ -42,6 +42,7 @@
         <table class="confluenceTable">
             <tr>
                 <th class="confluenceTh" style="width:20%">Name</th>
+                <th class="confluenceTh">Cardinality</th>
                 <th class="confluenceTh">Description</th>
             </tr>
             <xsl:call-template name="element-children"/>
@@ -243,6 +244,23 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </td>
+            <!-- cardinality i.e. minoccurs/maxoccurs -->
+            <xsl:variable name="min">
+                <xsl:choose>
+                    <xsl:when test="@minOccurs"><xsl:value-of select="@minOccurs"/></xsl:when>
+                    <xsl:otherwise><xsl:text>1</xsl:text></xsl:otherwise>
+                </xsl:choose>
+           </xsl:variable>
+            <xsl:variable name="max">
+                <xsl:choose>
+                    <xsl:when test="@maxOccurs='unbounded'"><xsl:text>*</xsl:text></xsl:when>
+                    <xsl:when test="@maxOccurs"><xsl:value-of select="@maxOccurs"/></xsl:when>
+                    <xsl:otherwise><xsl:text>1</xsl:text></xsl:otherwise>
+                </xsl:choose>
+           </xsl:variable>
+            <td class="confluenceTd">
+                <xsl:value-of select="$min"/>..<xsl:value-of select="$max"/>
+            </td>
             <td class="confluenceTd">
                 <!-- include both ref and element doc -->
                 <xsl:apply-templates select="." mode="elements-doc"/>
@@ -329,6 +347,24 @@
                     </xsl:with-param>
                 </xsl:call-template>
             </td>
+            <!-- cardinality i.e. minoccurs/maxoccurs -->
+            <xsl:variable name="min">
+                <xsl:choose>
+                    <xsl:when test="@minOccurs"><xsl:value-of select="@minOccurs"/></xsl:when>
+                    <xsl:otherwise>1</xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+            <xsl:variable name="max">
+                <xsl:choose>
+                    <xsl:when test="@maxOccurs='unbounded'">*</xsl:when>
+                    <xsl:when test="@maxOccurs"><xsl:value-of select="@maxOccurs"/></xsl:when>
+                    <xsl:otherwise>1</xsl:otherwise>
+                </xsl:choose>
+           </xsl:variable>
+            <td class="confluenceTd">
+                <xsl:value-of select="$min"/>..<xsl:value-of select="$max"/>
+            </td>
+
             <td class="confluenceTd">
                 <xsl:apply-templates select="." mode="elements-doc"/>
             </td>

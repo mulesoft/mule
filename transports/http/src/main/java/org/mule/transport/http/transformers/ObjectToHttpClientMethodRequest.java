@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -64,6 +65,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         registerSourceType(String.class);
         registerSourceType(InputStream.class);
         registerSourceType(OutputHandler.class);
+        registerSourceType(NullPayload.class);
     }
 
     protected int addParameters(String queryString, PostMethod postMethod)
@@ -137,18 +139,20 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             if (HttpConstants.METHOD_GET.equals(method))
             {
                 httpMethod = new GetMethod(uri.toString());
-                String paramName = msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
-                        HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
-                String query = uri.getQuery();
+                String paramName = URLEncoder.encode(msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
+                        HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY), outputEncoding);
+                String paramValue = URLEncoder.encode(src.toString(), outputEncoding);
+                
+                String query = uri.getRawQuery();
                 if (!(src instanceof NullPayload) && !StringUtils.EMPTY.equals(src))
                 {
                     if (query == null)
                     {
-                        query = paramName + "=" + src.toString();
+                        query = paramName + "=" + paramValue;
                     }
                     else
                     {
-                        query += "&" + paramName + "=" + src.toString();
+                        query += "&" + paramName + "=" + paramValue;
                     }
                 }
                 httpMethod.setQueryString(query);

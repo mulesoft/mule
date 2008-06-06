@@ -37,11 +37,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    /**
-     * Thread pool of Connector sessions
-     */
-    protected WorkManager workManager = null;
-
     protected final ImmutableEndpoint endpoint;
     protected final AbstractConnector connector;
 
@@ -78,7 +73,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         {
             try
             {
-                workManager = connector.getDispatcherWorkManager();
+                connector.getDispatcherWorkManager();
             }
             catch (MuleException e)
             {
@@ -153,11 +148,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
                 }
 
                 this.doDispose();
-
-                if (workManager != null)
-                {
-                    workManager.dispose();
-                }
             }
             finally
             {

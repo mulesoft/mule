@@ -8,18 +8,21 @@
                        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-    <vm:connector name="vm" queueEvents="true" numberOfConcurrentTransactedReceivers="1"/>
-    <vm:connector name="vmOnFly" queueEvents="false" numberOfConcurrentTransactedReceivers="1"/>
+    <vm:connector name="vmQueue" queueEvents="true" numberOfConcurrentTransactedReceivers="1"/>
+    <vm:connector name="vmNoQueue" queueEvents="false" numberOfConcurrentTransactedReceivers="1"/>
 
     <spring:bean name="txFactory" class="org.mule.transport.vm.VMTransactionFactory"/>
 
     <model name="main">
-        <service name="testService">
+    
+        <service name="dispatchService">
             <inbound>
-                <vm:inbound-endpoint address="vm://in" connector-ref="vm">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                <vm:inbound-endpoint address="vm://dispatchInQueue" connector-ref="vmQueue">
+                    <custom-transaction action="BEGIN_OR_JOIN" factory-ref="txFactory"/>
+                </vm:inbound-endpoint>
+
+                <vm:inbound-endpoint address="vm://dispatchInNoQueue" connector-ref="vmNoQueue">
+                    <custom-transaction action="BEGIN_OR_JOIN" factory-ref="txFactory"/>
                 </vm:inbound-endpoint>
             </inbound>
 
@@ -27,47 +30,25 @@
 
             <outbound>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://out" connector-ref="vm"/>
+                    <outbound-endpoint address="vm://out" connector-ref="vmQueue"/>
                 </outbound-pass-through-router>
             </outbound>
         </service>
 
-        <service name="testService2">
+        <service name="sendRequestService">
             <inbound>
-                <vm:inbound-endpoint address="vm://sync" connector-ref="vm">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                <vm:inbound-endpoint address="vm://sendRequestInQueue" connector-ref="vmQueue">
+                    <custom-transaction action="BEGIN_OR_JOIN" factory-ref="txFactory"/>
+                </vm:inbound-endpoint>
+
+                <vm:inbound-endpoint address="vm://sendRequestInNoQueue" connector-ref="vmNoQueue">
+                    <custom-transaction action="BEGIN_OR_JOIN" factory-ref="txFactory"/>
                 </vm:inbound-endpoint>
             </inbound>
 
             <component class="org.mule.transport.vm.functional.VmTransactionTestCase$TestComponent"/>
-
-            <outbound>
-                <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://out"/>
-                </outbound-pass-through-router>
-            </outbound>
         </service>
-
-        <service name="testService3">
-            <inbound>
-                <vm:inbound-endpoint address="vm://in3" connector-ref="vmOnFly">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
-                </vm:inbound-endpoint>
-            </inbound>
-
-            <component class="org.mule.transport.vm.functional.VmTransactionTestCase$TestComponent"/>
-
-            <outbound>
-                <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://outt3" connector-ref="vm"/>
-                </outbound-pass-through-router>
-            </outbound>
-        </service>
-
+        
     </model>
 
 </mule>

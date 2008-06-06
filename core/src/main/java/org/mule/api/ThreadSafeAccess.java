@@ -10,6 +10,11 @@
 
 package org.mule.api;
 
+import org.mule.api.config.MuleConfiguration;
+
+import org.apache.commons.lang.BooleanUtils;
+
+
 /**
  * Interface implemented by message-related objects that avoid exposing mutable data to multiple threads
  * by providing immutable copies.  This interface is optional - it is an implementation detail that is
@@ -39,7 +44,7 @@ public interface ThreadSafeAccess
 {
      final boolean WRITE = true;
      final boolean READ = false;
-
+     
     /**
      * This method may be called before data in the object are accessed.  It should verify that the
      * access policy is followed correctly (if not, a runtime exception may be thrown).
@@ -61,5 +66,54 @@ public interface ThreadSafeAccess
      * @return A new instance of the implementing class, unbound to any thread and mutable.
      */
     ThreadSafeAccess newThreadCopy();
+    
+    /**
+     * This helper class can be used by code implementing this interface to determine whether
+     * the thread safety of a message should be enforced or not.
+     */
+    class AccessControl
+    {
+        private static boolean assertMessageAccess = true;
+        private static boolean failOnMessageScribbling = true;
+        
+        static
+        {
+            String propertyValue = System.getProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "message.assertAccess");
+            if (propertyValue != null)
+            {
+                assertMessageAccess = BooleanUtils.toBoolean(propertyValue);
+            }
+
+            propertyValue = System.getProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages");
+            if (propertyValue != null)
+            {
+                failOnMessageScribbling = !BooleanUtils.toBoolean(propertyValue);
+            }
+        }
+        
+        public static boolean isAssertMessageAccess()
+        {
+            return assertMessageAccess;
+        }
+        
+        public static void setAssertMessageAccess(boolean flag)
+        {
+            assertMessageAccess = flag;
+        }
+        
+        /**
+         * Should we fail when we detect "message scribbling"?  
+         * @see e.g. AbstractMessageAdapter.checkMutable()
+         */
+        public static boolean isFailOnMessageScribbling()
+        {
+            return failOnMessageScribbling;
+        }
+        
+        public static void setFailOnMessageScribbling(boolean flag)
+        {
+            failOnMessageScribbling = flag;
+        }
+    }
 
 }

@@ -31,19 +31,19 @@ public interface YourKitProfilerServiceMBean
     /**
      * @return name of host where controlled profiled application is running. The method never returns null.
      */
-    public String getHost();
+    String getHost();
 
     /**
      * @return port profiler agent listens on.
      */
-    public int getPort();
+    int getPort();
 
     /**
      * This method is just a convenient replacement of captureSnapshot(YourKitProfilerServiceMBean.SNAPSHOT_WITH_HEAP)
      *
      * @return absolute path to the captured snapshot.
      */
-    public String captureMemorySnapshot() throws Exception;
+    String captureMemorySnapshot() throws Exception;
 
     /**
      * Captures snapshot: write profiling information to file.
@@ -69,7 +69,7 @@ public interface YourKitProfilerServiceMBean
      *                   <li>agent cannot capture snapshot for some reason
      *                   </ul>
      */
-    public String captureSnapshot(long snapshotFlags) throws Exception;
+    String captureSnapshot(long snapshotFlags) throws Exception;
 
     /**
      * Advance current object generation number.
@@ -79,7 +79,7 @@ public interface YourKitProfilerServiceMBean
      *
      * @param description optional description associated with the generation
      */
-    public void advanceGeneration(String description);
+    void advanceGeneration(String description);
 
     /**
      * Start object allocation recording.
@@ -94,7 +94,7 @@ public interface YourKitProfilerServiceMBean
      * @see #captureMemorySnapshot()
      * @see #stopCPUProfiling()
      */
-    public void startAllocationRecording(long mode) throws Exception;
+    void startAllocationRecording(long mode) throws Exception;
 
     /**
      * @throws Exception if capture failed. The possible reasons are:
@@ -104,7 +104,7 @@ public interface YourKitProfilerServiceMBean
      *                   <li>agent cannot capture snapshot for some reason
      *                   </ul>
      */
-    public void stopAllocationRecording() throws Exception;
+    void stopAllocationRecording() throws Exception;
 
     /**
      * Start CPU profiling.
@@ -128,7 +128,7 @@ public interface YourKitProfilerServiceMBean
      * @see #captureSnapshot(long)
      * @see #stopCPUProfiling()
      */
-    public void startCPUProfiling(long mode, String filters) throws Exception;
+    void startCPUProfiling(long mode, String filters) throws Exception;
 
     /**
      * Stop CPU profiling.
@@ -142,7 +142,7 @@ public interface YourKitProfilerServiceMBean
      * @see #captureSnapshot(long)
      * @see #startCPUProfiling(long , String)
      */
-    public void stopCPUProfiling() throws Exception;
+    void stopCPUProfiling() throws Exception;
 
     /**
      * Force GC
@@ -150,7 +150,7 @@ public interface YourKitProfilerServiceMBean
      * @return Message contains size of objects in heap before GC, bytes and size of objects in heap after GC, bytes
      * @throws Exception
      */
-    public String forceGC() throws Exception;
+    String forceGC() throws Exception;
 
     /**
      * Start monitor profiling (requires that the profiled application runs on Java 5 or newer)
@@ -167,7 +167,7 @@ public interface YourKitProfilerServiceMBean
      * @see #stopMonitorProfiling()
      * @see #captureSnapshot(long)
      */
-    public void startMonitorProfiling() throws Exception;
+    void startMonitorProfiling() throws Exception;
 
     /**
      * Stop monitor profiling (requires that the profiled application runs on Java 5 or newer)
@@ -181,7 +181,7 @@ public interface YourKitProfilerServiceMBean
      * @see #startMonitorProfiling()
      * @see #captureSnapshot(long)
      */
-    public void stopMonitorProfiling() throws Exception;
+    void stopMonitorProfiling() throws Exception;
 
     /**
      * Starts new daemon thread which calls {@link #captureMemorySnapshot()} every N seconds.
@@ -189,14 +189,14 @@ public interface YourKitProfilerServiceMBean
      * @param seconds delay between calls
      * @see #captureMemorySnapshot()
      */
-    public void startCapturingMemSnapshot(final int seconds);
+    void startCapturingMemSnapshot(final int seconds);
 
     /**
      * Stops daemon thread started by {@link #startCapturingMemSnapshot(int)}
      *
      * @see # startCapturingMemSnapshot (int)
      */
-    public void stopCapturingMemSnapshot();
+    void stopCapturingMemSnapshot();
 
     /**
      * Get current profiling status. The following code snippet demonstrates how to use this method:
@@ -240,6 +240,6 @@ public interface YourKitProfilerServiceMBean
      * @return a bit mask to check against Profiling Modes
      * @throws java.lang.Exception
      */
-    public long getStatus() throws java.lang.Exception;
+    long getStatus() throws java.lang.Exception;
 
 }

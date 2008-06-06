@@ -29,8 +29,6 @@ public class WebsphereEmbeddedJmsConnectorTestCase extends FunctionalTestCase
 
         // TODO has to be confirmed for Websphere
         assertTrue(c.isEagerConsumer());
-        assertFalse("JMS connection recovery is not supported by Websphere Embedded provider.",
-                    c.isRecoverJmsConnections());
         JmsTopicResolver resolver = c.getTopicResolver();
         assertNotNull("Topic resolver must not be null.", resolver);
         assertTrue("Wrong topic resolver configured on the connector.",

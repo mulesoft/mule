@@ -10,6 +10,7 @@
 
 package org.mule.transaction;
 
+import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.transaction.constraints.ConstraintFilter;
@@ -34,6 +35,7 @@ public class MuleTransactionConfig implements TransactionConfig
     public static final String ACTION_BEGIN_OR_JOIN_STRING = "BEGIN_OR_JOIN";
     public static final String ACTION_ALWAYS_JOIN_STRING = "ALWAYS_JOIN";
     public static final String ACTION_JOIN_IF_POSSIBLE_STRING = "JOIN_IF_POSSIBLE";
+    public static final String ACTION_NEVER_STRING = "NEVER";
 
     private TransactionFactory factory;
 
@@ -43,26 +45,18 @@ public class MuleTransactionConfig implements TransactionConfig
 
     private int timeout;
 
+    private boolean enabled = true;
+    
     public MuleTransactionConfig()
     {
         // todo timeout = RegistryContext.getConfiguration().getDefaultTransactionTimeout();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransactionConfig#getFactory()
-     */
     public TransactionFactory getFactory()
     {
         return factory;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransactionConfig#setFactory(org.mule.umo.UMOTransactionFactory)
-     */
     public void setFactory(TransactionFactory factory)
     {
         if (factory == null)
@@ -72,21 +66,11 @@ public class MuleTransactionConfig implements TransactionConfig
         this.factory = factory;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransactionConfig#getAction()
-     */
     public byte getAction()
     {
         return action;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransactionConfig#setAction(byte)
-     */
     public void setAction(byte action)
     {
         this.action = action;
@@ -140,7 +124,9 @@ public class MuleTransactionConfig implements TransactionConfig
 
     public boolean isTransacted()
     {
-        return factory != null && factory.isTransacted() && action != ACTION_NONE;
+        Transaction tx = TransactionCoordination.getInstance().getTransaction(); 
+        boolean joinPossible = (action != ACTION_JOIN_IF_POSSIBLE || (action == ACTION_JOIN_IF_POSSIBLE && tx != null));
+        return action != ACTION_NEVER && action != ACTION_NONE && factory.isTransacted() && joinPossible;
     }
 
     public ConstraintFilter getConstraint()
@@ -204,5 +190,15 @@ public class MuleTransactionConfig implements TransactionConfig
                && ClassUtils.equal(constraint, other.constraint)
                && ClassUtils.equal(new Integer(timeout), new Integer(other.timeout));
 
+    }
+    
+    public boolean isEnabled() 
+    { 
+        return enabled; 
+    } 
+
+    public void setEnabled(boolean enabled) 
+    { 
+        this.enabled = enabled; 
     }
 }

@@ -14,7 +14,7 @@ import javax.transaction.Status;
 
 import org.safehaus.uuid.UUIDGenerator;
 
-public class AbstractTransactionContext
+public abstract class AbstractTransactionContext
 {
 
     private static UUIDGenerator gen = UUIDGenerator.getInstance();

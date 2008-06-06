@@ -46,7 +46,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     private QueuePersistenceStrategy persistenceStrategy;
 
     private QueueConfiguration defaultQueueConfiguration = new QueueConfiguration(false);
-
+    
     public synchronized QueueSession getQueueSession()
     {
         return new TransactionalQueueSession(this, this);
@@ -84,19 +84,6 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     protected Log getLogger()
     {
         return logger;
-    }
-
-    public void close()
-    {
-        try
-        {
-            stop(SHUTDOWN_MODE_NORMAL);
-        }
-        catch (ResourceManagerException e)
-        {
-            // TODO MULE-863: What should we really do?
-            logger.error("Error disposing manager", e);
-        }
     }
 
     protected void doStart() throws ResourceManagerSystemException

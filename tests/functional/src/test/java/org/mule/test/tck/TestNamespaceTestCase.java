@@ -26,8 +26,7 @@ public class TestNamespaceTestCase extends FunctionalTestCase
         Object object = getComponent("testService1");
         assertNotNull(object);
         assertTrue(object instanceof FunctionalTestComponent2);
-        FunctionalTestComponent2 ftc = (FunctionalTestComponent2
-                ) object;
+        FunctionalTestComponent2 ftc = (FunctionalTestComponent2) object;
 
         assertFalse(ftc.isEnableMessageHistory());
         assertFalse(ftc.isEnableNotifications());

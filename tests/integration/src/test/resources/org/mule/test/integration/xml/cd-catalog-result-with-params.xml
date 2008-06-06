@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--// START SNIPPET: result-data -->
+<cd-listings title="MyList" rating="6">
+    <cd-title>Empire Burlesque</cd-title>
+    <cd-title>Hide your heart</cd-title>
+    <!-- ... </cd-listings> -->
+<!--// END SNIPPET: result-data -->
+    <cd-title>Greatest Hits</cd-title>
+    <cd-title>Still got the blues</cd-title>
+    <cd-title>Eros</cd-title>
+    <cd-title>One night only</cd-title>
+    <cd-title>Sylvias Mother</cd-title>
+    <cd-title>Maggie May</cd-title>
+    <cd-title>Romanza</cd-title>
+    <cd-title>When a man loves a woman</cd-title>
+    <cd-title>Black angel</cd-title>
+    <cd-title>1999 Grammy Nominees</cd-title>
+    <cd-title>For the good times</cd-title>
+    <cd-title>Big Willie style</cd-title>
+    <cd-title>Tupelo Honey</cd-title>
+    <cd-title>Soulsville</cd-title>
+    <cd-title>The very best of</cd-title>
+    <cd-title>Stop</cd-title>
+    <cd-title>Bridge of Spies</cd-title>
+    <cd-title>Private Dancer</cd-title>
+    <cd-title>Midt om natten</cd-title>
+    <cd-title>Pavarotti Gala Concert</cd-title>
+    <cd-title>The dock of the bay</cd-title>
+    <cd-title>Picture book</cd-title>
+    <cd-title>Red</cd-title>
+    <cd-title>Unchain my heart</cd-title>
+</cd-listings>

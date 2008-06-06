@@ -16,6 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.routing.ServiceRoutingException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.endpoint.MuleEndpointURI;
@@ -78,13 +79,29 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         assertNotNull(strategy.getEndpoint());
     }
 
+    /**
+     * Test for MULE-3034
+     */
+    public void testForwardingStrategyNullEndpoint() throws Exception
+    {
+        ForwardingCatchAllStrategy strategy = new ForwardingCatchAllStrategy();
+        strategy.setEndpoint(null);
+        MuleEvent event = getTestEvent("UncaughtEvent");
+        MuleSession session = getTestSession(getTestService(), muleContext);
+     
+        try
+        {
+            strategy.catchMessage(event.getMessage(), session, false);
+            fail();
+        }
+        catch (ServiceRoutingException sre)
+        {
+            // we expected this exception
+        }
+    }
+    
     private class TestEventTransformer extends AbstractTransformer
     {
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.mule.transformer.AbstractTransformer#doTransform(java.lang.Object)
-         */
         public Object doTransform(Object src, String encoding) throws TransformerException
         {
             return "Transformed Test Data";

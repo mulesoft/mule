@@ -77,12 +77,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
      */
     private boolean clientMode = false;
 
-    /**
-     * Should we fail when we detect "message scribbling"?  
-     * @see AbstractMessageAdapter.checkMutable()
-     */
-    private boolean failOnMessageScribbling = true;
-    
     /** the unique id for this Mule instance */
     private String id;
 
@@ -99,8 +93,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
     private boolean cacheMessageOriginalPayload = true;
 
     private boolean enableStreaming = true;
-
-    private boolean assertMessageAccess = true;
 
     private boolean autoWrapMessageAwareTransform = true;
     
@@ -194,11 +186,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         {
             clientMode = BooleanUtils.toBoolean(p);
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages");
-        if (p != null)
-        {
-            failOnMessageScribbling = !BooleanUtils.toBoolean(p);
-        }
         p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "serverId");
         if (p != null)
         {
@@ -228,11 +215,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         if (p != null)
         {
             enableStreaming = BooleanUtils.toBoolean(p);
-        }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "message.assertAccess");
-        if (p != null)
-        {
-            assertMessageAccess = BooleanUtils.toBoolean(p);
         }
         p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
         if (p != null)
@@ -270,9 +252,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#isDefaultSynchronousEndpoints()
-     */
     public boolean isDefaultSynchronousEndpoints()
     {
         return synchronous;
@@ -286,9 +265,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#getDefaultSynchronousEventTimeout()
-     */
     public int getDefaultSynchronousEventTimeout()
     {
         return synchronousEventTimeout;
@@ -302,9 +278,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#isDefaultRemoteSync()
-     */
     public boolean isDefaultRemoteSync()
     {
         return remoteSync;
@@ -318,17 +291,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#getWorkingDirectory()
-     */
     public String getWorkingDirectory()
     {
         return workingDirectory;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#getMuleHomeDirectory()
-     */
     public String getMuleHomeDirectory()
     {
         return System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
@@ -343,9 +310,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#getDefaultTransactionTimeout()
-     */
     public int getDefaultTransactionTimeout()
     {
         return defaultTransactionTimeout;
@@ -359,17 +323,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#isClientMode()
-     */
     public boolean isClientMode()
     {
         return clientMode;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#getDefaultEncoding()
-     */
     public String getDefaultEncoding()
     {
         return encoding;
@@ -383,9 +341,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#getId()
-     */
     public String getId()
     {
         return id;
@@ -403,9 +358,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#getClusterId()
-     */
     public String getClusterId()
     {
         return clusterId;
@@ -419,9 +371,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#getDomainId()
-     */
     public String getDomainId()
     {
         return domainId;
@@ -435,9 +384,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#getSystemModelType()
-     */
     public String getSystemModelType()
     {
         return systemModelType;
@@ -459,49 +405,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#getSystemName()
-     */
     public String getSystemName()
     {
         return domainId + "." + clusterId + "." + id;
     }
-
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#isFailOnMessageScribbling()
-     */
-    public boolean isFailOnMessageScribbling()
-    {
-        return failOnMessageScribbling;
-    }
-
-    public void setFailOnMessageScribbling(boolean failOnMessageScribbling)
-    {
-        if (verifyContextNotStarted())
-        {
-            this.failOnMessageScribbling = failOnMessageScribbling;
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#isAssertMessageAccess()
-     */
-    public boolean isAssertMessageAccess()
-    {
-        return assertMessageAccess;
-    }
-
-    public void setAssertMessageAccess(boolean assertMessageAccess)
-    {
-        if (verifyContextNotStarted())
-        {
-            this.assertMessageAccess = assertMessageAccess;
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#isAutoWrapMessageAwareTransform()
-     */
+    
     public boolean isAutoWrapMessageAwareTransform()
     {
         return autoWrapMessageAwareTransform;
@@ -515,9 +423,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#isCacheMessageAsBytes()
-     */
     public boolean isCacheMessageAsBytes()
     {
         return cacheMessageAsBytes;
@@ -531,9 +436,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#isCacheMessageOriginalPayload()
-     */
     public boolean isCacheMessageOriginalPayload()
     {
         return cacheMessageOriginalPayload;
@@ -547,9 +449,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.config.MuleConfiguration#isEnableStreaming()
-     */
     public boolean isEnableStreaming()
     {
         return enableStreaming;

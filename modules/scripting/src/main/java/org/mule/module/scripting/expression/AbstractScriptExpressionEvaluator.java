@@ -9,10 +9,10 @@
  */
 package org.mule.module.scripting.expression;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.scripting.component.Scriptable;
 import org.mule.util.expression.ExpressionEvaluator;
@@ -20,8 +20,8 @@ import org.mule.util.expression.ExpressionEvaluator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.script.Bindings;
 import javax.script.ScriptException;
+import javax.script.Bindings;
 
 /**
  * An abstract {@link org.mule.util.expression.ExpressionEvaluator} that can be used for any JSR-233 script engine.
@@ -44,7 +44,14 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
     {
         Scriptable script = getScript(expression);
         Bindings bindings = script.getScriptEngine().createBindings();
-        populateBindings(bindings, message);
+        if (message instanceof MuleMessage)
+        {
+            script.populateBindings(bindings, (MuleMessage) message);
+        }
+        else 
+        {
+            script.populateBindings(bindings, message);
+        }
 
         try
         {
@@ -53,19 +60,6 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
         catch (ScriptException e)
         {
             return null;
-        }
-    }
-
-    protected void populateBindings(Bindings namespace, Object message)
-    {
-        if(message instanceof MessageAdapter)
-        {
-            namespace.put("message", message);
-            namespace.put("payload", ((MessageAdapter)message).getPayload());
-        }
-        else
-        {
-            namespace.put("payload", message);
         }
     }
 

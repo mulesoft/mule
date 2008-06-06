@@ -10,7 +10,7 @@ if "%MULE_BASE%" == "" SET MULE_BASE=%MULE_HOME%
 
 REM Translate MULE_HOME to unix notation. That's used to create a system property
 REM mule.home.unix below which is used to configure openejb
-set MULE_HOME_UNIX = "%MULE_HOME:\=/%"
+set MULE_HOME_UNIX="%MULE_HOME:\=/%"
 
 REM This extends the classpath to include the configuration directory
 REM Any changes to the files in .\conf will take precedence over those deployed to %MULE_HOME%\lib\user

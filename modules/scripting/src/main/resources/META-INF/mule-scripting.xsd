@@ -10,16 +10,63 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:element name="script" substitutionGroup="mule:abstract-extension">
-        <xsd:complexType>
-            <xsd:complexContent mixed="true">
-                <xsd:extension base="mule:abstractExtensionType">
-                    <xsd:attribute name="name" type="xsd:string"/>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
+    <xsd:element name="script" type="scriptType" substitutionGroup="mule:abstract-extension">
+    	<xsd:annotation>
+            <xsd:documentation>
+            	A script to be executed by a JSR-223 compliant script engine such as Groovy, JavaScript, or Rhino
+            </xsd:documentation>
+        </xsd:annotation>
     </xsd:element>
+
+    <xsd:complexType name="scriptType">
+	    <xsd:complexContent mixed="true">
+	        <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence>
+                    <xsd:group ref="mule:propertiesGroup" minOccurs="0"/>
+                    <xsd:element name="text" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+	            <xsd:attribute name="name" type="xsd:string"/>
+                <xsd:attribute name="engine" type="xsd:string"/>
+                <xsd:attribute name="file" type="xsd:string"/>
+	        </xsd:extension>
+	    </xsd:complexContent>
+    </xsd:complexType>
     
+    <xsd:element name="component" type="scriptComponentType" substitutionGroup="mule:abstract-component">
+    	<xsd:annotation>
+            <xsd:documentation>
+            	A script service backed by a JSR-223 compliant script engine such as Groovy, JavaScript, or Rhino
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="scriptComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractComponentType">
+            	<xsd:sequence>
+                    <xsd:element name="script" type="scriptType" minOccurs="0"/>
+            	</xsd:sequence>
+                <xsd:attribute name="script-ref" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="transformer" type="scriptTransformerType" substitutionGroup="mule:abstract-transformer">
+    	<xsd:annotation>
+            <xsd:documentation>
+            	Runs a script to perform transformation on an object
+            </xsd:documentation>
+        </xsd:annotation>    
+    </xsd:element>
+    <xsd:complexType name="scriptTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransformerType">
+            	<xsd:sequence>
+				    <xsd:element name="script" type="scriptType"/>
+            	</xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="groovy-refreshable" substitutionGroup="mule:abstract-extension">
         <xsd:complexType>
             <xsd:complexContent>
@@ -49,5 +96,4 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
 </xsd:schema>

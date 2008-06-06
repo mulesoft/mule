@@ -17,19 +17,33 @@ import org.mule.transport.DefaultMessageAdapter;
 
 public class ThreadUnsafeAccessTestCase extends AbstractThreadSafeAccessTestCase
 {
+    private boolean messageScribblingState;
+    
+    //@Override
+    protected void doTearDown() throws Exception
+    {
+        ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(messageScribblingState);
+        super.doTearDown();
+    }
+
     //@Override
     protected void configureMuleContext(MuleContextBuilder contextBuilder)
     {
         super.configureMuleContext(contextBuilder);
 
+        // fiddling with ThreadSafeAccess must not have side effects on later tests. Store
+        // the current state here (cannot do that in doSetUp because that is invoked after 
+        // this method) and restore it in doTearDown.
+        messageScribblingState = ThreadSafeAccess.AccessControl.isFailOnMessageScribbling();
+
         DefaultMuleConfiguration config = new DefaultMuleConfiguration();
-        config.setFailOnMessageScribbling(false);
+        ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(false);
         contextBuilder.setMuleConfiguration(config);
     }
 
     public void testDisable() throws InterruptedException
     {
-        assertFalse(muleContext.getConfiguration().isFailOnMessageScribbling());
+        assertFalse(ThreadSafeAccess.AccessControl.isFailOnMessageScribbling());
         ThreadSafeAccess target = new DefaultMessageAdapter(new Object());
         newThread(target, false, new boolean[]{true, true, false, true});
         newThread(target, false, new boolean[]{false});

@@ -68,7 +68,6 @@
             -->
             <version>1.4</version>
             <artifactId>mail</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
@@ -78,7 +77,6 @@
                  toplevel pom's dependencyManagement section.
             -->
             <version>1.1</version>
-            <scope>provided</scope>
         </dependency>
         <!-- ActiveMQ for JMS -->
         <dependency>

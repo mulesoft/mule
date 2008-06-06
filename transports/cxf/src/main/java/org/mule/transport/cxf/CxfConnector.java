@@ -31,7 +31,9 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -59,6 +61,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
     private String configurationLocation;
     private String defaultFrontend = CxfConstants.JAX_WS_FRONTEND;
     private List<SedaService> services = new ArrayList<SedaService>();
+    private Map<String, Server> uriToServer = new HashMap<String, Server>();
     
     public CxfConnector()
     {
@@ -175,12 +178,14 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         CxfMessageReceiver cxfReceiver = (CxfMessageReceiver) receiver;
         Server server = cxfReceiver.getServer();
 
+        uriToServer.put(server.getEndpoint().getEndpointInfo().getAddress(), server);
+        
         // TODO MULE-2228 Simplify this API
         SedaService c = new SedaService();
         c.setName(CXF_SERVICE_COMPONENT_NAME + server.getEndpoint().getService().getName() + c.hashCode());
         c.setModel(muleContext.getRegistry().lookupSystemModel());
 
-        CxfServiceComponent svcComponent = new CxfServiceComponent((CxfMessageReceiver) receiver);
+        CxfServiceComponent svcComponent = new CxfServiceComponent(this, (CxfMessageReceiver) receiver);
         svcComponent.setBus(bus);
 
         c.setComponent(new DefaultJavaComponent(new SingletonObjectFactory(svcComponent)));
@@ -281,5 +286,10 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         {
             return super.isSyncEnabled(protocol);
         }
+    }
+
+    public Server getServer(String uri)
+    {
+        return uriToServer.get(uri);
     }
 }

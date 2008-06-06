@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+      xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.0"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <!--// START SNIPPET: full-config -->
+    <description>
+        Receives a message from another party. The service processes the message and then it gets routed via the
+        outbound router. The outbound router will wait for a result from the call and will return the result to the
+        originating party if one is received. This pattern is analogous to using Remote Sync on a Mule endpoint. If no
+        result is returned from the outbound call, null is returned.
+    </description>
+
+    <jms:activemq-connector name="amq"/>
+
+    <vm:connector name="vmConnector" queueEvents="true"/>
+
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
+
+    <jms:endpoint queue="external.app" name="ExternalEndpoint" remoteSync="true" remoteSyncTimeout="3000"/>
+
+    <model>
+        <service name="In-Optional-Out_Out-Optional-In-Service">
+            <inbound>
+                <vm:inbound-endpoint ref="inboundEndpoint"/>
+            </inbound>
+            <script:component>
+                <script:script engine="groovy">
+                    if (message.getProperty("foo") != null)
+                    {
+                        message.setProperty("bar", "baz")
+                        return message
+                    }
+                    else
+                        return message
+                </script:script>
+            </script:component>
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint ref="ExternalEndpoint"/>
+                    <!-- Mule will automatically listen n this destination when Remote sync is set. If this is not se
+                     a temprary destination is set up -->
+                    <!--<reply-to address="jms://reply"/>-->
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="Mock-External-App">
+            <inbound>
+                <inbound-endpoint ref="ExternalEndpoint"/>
+            </inbound>
+            <script:component>
+                <script:script engine="groovy">
+                    message.setProperty("externalApp", "Received")
+                    if (message.getProperty("bar") != null)
+                        return "bar header received"
+                    else
+                        return null
+                </script:script>
+            </script:component>
+        </service>
+    </model>
+    <!--// END SNIPPET: full-config -->
+</mule>

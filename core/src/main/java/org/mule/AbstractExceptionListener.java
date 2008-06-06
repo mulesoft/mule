@@ -19,7 +19,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
@@ -36,6 +35,7 @@ import org.mule.message.ExceptionMessage;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.NullPayload;
+import org.mule.util.CollectionUtils;
 
 import java.beans.ExceptionListener;
 import java.util.Iterator;
@@ -87,15 +87,15 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         if (endpoints != null)
         {
             this.endpoints.clear();
-            // Ensure all endpoints are response endpoints
+            // Ensure all endpoints are outbound endpoints
             // This will go when we start dropping suport for 1.4 and start using 1.5
-            for (Iterator it = this.endpoints.iterator(); it.hasNext();)
+            for (Iterator it = endpoints.iterator(); it.hasNext();)
             {
                 ImmutableEndpoint endpoint = (ImmutableEndpoint) it.next();
-                if (!(endpoint instanceof InboundEndpoint))
+                if (!(endpoint instanceof OutboundEndpoint))
                 {
                     throw new InvalidEndpointTypeException(CoreMessages.exceptionListenerMustUseOutboundEndpoint(this,
-                            endpoint));
+                        endpoint));
                 }
             }
             this.endpoints.addAll(endpoints);
@@ -268,8 +268,8 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      */
     protected void routeException(MuleMessage message, ImmutableEndpoint failedEndpoint, Throwable t)
     {
-        OutboundEndpoint endpoint = getEndpoint(t);
-        if (endpoint != null)
+        List endpoints = getEndpoints(t);
+        if (CollectionUtils.isNotEmpty(endpoints))
         {
             try
             {
@@ -301,16 +301,20 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                 {
                     exceptionMessage = new DefaultMuleMessage(msg, ctx.getMessage());
                 }
-                MuleEvent exceptionEvent = new DefaultMuleEvent(exceptionMessage, endpoint, new DefaultMuleSession(
-                        exceptionMessage, new MuleSessionHandler(), muleContext), true);
-                exceptionEvent = RequestContext.setEvent(exceptionEvent);
-                endpoint.send(exceptionEvent);
 
-                if (logger.isDebugEnabled())
+                for (int i = 0; i < endpoints.size(); i++)
                 {
-                    logger.debug("routed Exception message via " + endpoint);
-                }
+                    OutboundEndpoint endpoint = (OutboundEndpoint) endpoints.get(i);
+                    MuleEvent exceptionEvent = new DefaultMuleEvent(exceptionMessage, endpoint, new DefaultMuleSession(
+                        exceptionMessage, new MuleSessionHandler(), muleContext), true);
+                    exceptionEvent = RequestContext.setEvent(exceptionEvent);
+                    endpoint.send(exceptionEvent);
 
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("routed Exception message via " + endpoint);
+                    }
+                }
             }
             catch (MuleException e)
             {
@@ -347,11 +351,11 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * @return The endpoint used to dispatch an exception message on or null if there
      *         are no endpoints registered
      */
-    protected OutboundEndpoint getEndpoint(Throwable t)
+    protected List getEndpoints(Throwable t)
     {
         if (endpoints.size() > 0)
         {
-            return (OutboundEndpoint) endpoints.get(0);
+            return endpoints;
         }
         else
         {

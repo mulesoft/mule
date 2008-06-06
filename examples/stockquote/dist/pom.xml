@@ -15,6 +15,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
         <!-- we need both axis and cxf -->
         <dependency>
             <groupId>org.mule.transports</groupId>

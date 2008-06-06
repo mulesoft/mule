@@ -219,7 +219,7 @@
                                              absolute paths are absolute.
                                              in either case, directories are created as needed. -->
                                         <!-- argument>normalized/normalized.xsd</argument -->
-                                        <argument>/www/html/docs/xsd-doc/normalized.xsd</argument>
+                                        <argument>/var/www/html/docs/xsd-doc/normalized.xsd</argument>
                                     </arguments>
                                 </configuration>
                                 <goals>

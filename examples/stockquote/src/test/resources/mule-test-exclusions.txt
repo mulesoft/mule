@@ -4,3 +4,8 @@
 
 # Requires tools.jar on the classpath for dynamic client compilation
 org.mule.example.stockquote.WsdlStockQuoteFunctionalTestCase
+
+#see MULE-3395 for a resolution. Fail because the external service being used has been unavailable for a week
+org.mule.example.stockquote.SoapStockQuoteFunctionalTestCase
+org.mule.example.stockquote.RestStockQuoteFunctionalTestCase
+

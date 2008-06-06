@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/file/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/file/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -10,17 +11,37 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
 
-    <xsd:complexType name="filenameParserType">
+    <xsd:annotation>
+        <xsd:documentation>The File transport allows files to be read and written to and from directories on the local
+            file system. The connector can be configured to filter the file it reads and the way files are written, such
+            as whether binary output is used or the file is appended to.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>flie</schemadoc:short-name>
+            <schemadoc:page-title>File Transport</schemadoc:page-title>
+            <schemadoc:additional-documentation where="before-specific-elements">
+                h2. Filename Parsers
+
+                The {{filenameParser}} is set on the connector used when writing files to a directory. The parser will convert the _outputPattern_ attribute to a string using the parser and the current message.
+            </schemadoc:additional-documentation>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="false"
+                                          requestEvents="true"
+                                          transactions="false" streaming="true">
+                <schemadoc:inboundMEPs in-only="true"/>
+                <schemadoc:outboundMEPs out-only="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+    <xsd:element name="connector" type="fileConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
-            <xsd:documentation>
-                This controls the mapping from filename patterns to filenames.
-                Is requires an implementation of the FilenameParser interface,
-                which is used to control how filename patterns are used to generate file names.
+            <xsd:documentation>The File connector is used to configure the default behaviour for File endpoints that
+                reference the connector. Note if there is only one File connector configured, all File endpoints
+                will use that connector.
             </xsd:documentation>
         </xsd:annotation>
-    </xsd:complexType>
+    </xsd:element>
 
-    <xsd:element name="connector" type="fileConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="fileConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
@@ -89,15 +110,35 @@
     </xsd:complexType>
 
     <xsd:element name="file-to-byte-array-transformer" type="mule:abstractTransformerType"
-                 substitutionGroup="mule:abstract-transformer"/>
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>Reads the contents of a {{java.io.File}} into a byte array (byte[]).</xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:element name="file-to-string-transformer" type="mule:abstractTransformerType"
-                 substitutionGroup="mule:abstract-transformer"/>
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>Reads the contents of a {{java.io.File}} into a {{java.lang.String}}.</xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="filename-wildcard-filter" type="mule:wildcardFilterType"
-                 substitutionGroup="mule:abstract-filter"/>
+                 substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>This filter can be used to restrict the files being processed by applying [Wildcard
+                Expressions] to the filename.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="filename-regex-filter" type="mule:wildcardFilterType"
-                 substitutionGroup="mule:abstract-filter"/>
+                 substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>This filter can be used to restrict the files being processed by applying Java Regular
+                Expressions to the filename.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
@@ -131,6 +172,16 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:complexType name="filenameParserType">
+        <xsd:annotation>
+            <xsd:documentation>
+                The {{filenameParser}} is used when writing files to a directory. The parser will
+                convert the _outputPattern_ attribute to a string using the parser and the current message.
+                The default implmentation used is {{SimpleFilenameParser}}.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:complexType>
+
     <xsd:attributeGroup name="inboundAttributes">
         <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
             <xsd:annotation>
@@ -143,7 +194,9 @@
         <xsd:attribute name="fileAge" type="mule:substitutableLong">
             <xsd:annotation>
                 <xsd:documentation>
-                    Miniumum age (ms) for a file to be processed.
+                    Miniumum age (ms) for a file to be processed. This can be useful when consuming large files. It
+                    tells Mule to wait for a period of time before consuming the file allowing the file to be completely
+                    written before the file is porcessed.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -196,87 +249,86 @@
         <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    A file location.
+                    A file drectory location.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:element name="legacy-filename-parser" type="legacyFilenameParserType" substitutionGroup="abstract-filenameParser"/>
-    <xsd:complexType name="legacyFilenameParserType">
+    <xsd:element name="legacy-filename-parser" type="legacyFilenameParserType"
+                 substitutionGroup="abstract-filenameParser">
         <xsd:annotation>
             <xsd:documentation>
                 The file connector uses this as a default implementation, it understands the following patterns:
-                <ul>
-                    <li>${DATE} - the current date in the format dd-MM-yy_HH-mm-ss.SS;</li>
-                    <li>${DATE:yy-MM-dd} - the current date using the specified format;</li>
-                    <li>${SYSTIME} - The current system time milliseconds;</li>
-                    <li>${UUID} - A generated Universally unique id;</li>
-                    <li>${ORIGINALNAME} - The original file name if the file being written was read from another
-                        location;
-                    </li>
-                    <li>${COUNT} - An incremental counter.</li>
-                </ul>
+
+                * $\{DATE\} - the current date in the format dd-MM-yy_HH-mm-ss.SS
+                * $\{DATE:yy-MM-dd\} - the current date using the specified format
+                * $\{SYSTIME\} - The current system time milliseconds
+                * $\{UUID\} - A generated Universally unique id
+                * $\{ORIGINALNAME\} - The original file name if the file being written was read from another location
+                * $\{COUNT\} - An incremental counter.
             </xsd:documentation>
         </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="legacyFilenameParserType">
         <xsd:complexContent>
             <xsd:extension base="filenameParserType"/>
         </xsd:complexContent>
     </xsd:complexType>
-    
-    <xsd:element name="expression-filename-parser" type="expressionFilenameParserType" substitutionGroup="abstract-filenameParser"/>
-     <xsd:complexType name="expressionFilenameParserType">
+
+    <xsd:element name="expression-filename-parser" type="expressionFilenameParserType"
+                 substitutionGroup="abstract-filenameParser">
         <xsd:annotation>
             <xsd:documentation>
                 ExpressionFilenameParser can use any expression language supported by Mule
                 to construct a file name for the current message. Expressions can be xpath, xquery, ognl, mvel, header,
-                function
-                and more. For more information see http://muledocs.org/v2/Expressions.
-
-                For example an xpath expression can be defined to pull a message id out of an xml message and use that
+                function and more. For more information see [Expressions]. For example an xpath expression can be defined to pull a message id out of an xml message and use that
                 as the file name -
 
+                {noformat}
                 ${xpath:/message/header/@id}
+                {noformat}
 
                 This parser superseeds the legacy-filename-parser which has been kept in
-                Mule 2 for
-                compatibility. The following demonstrates how to achieve the same results when using the
+                Mule 2 for compatibility. The following demonstrates how to achieve the same results when using the
                 expression-filename-parser over the legacy-filename-parser.
-                <ul>
-                    <li>${DATE} : ${function:dateStamp}</li>
-                    <li>${DATE:yy-MM-dd} : ${function:dateStamp(yy-MM-dd)}</li>
-                    <li>${SYSTIME} : ${function:systime}</li>
-                    <li>${UUID} : ${function:uuid}</li>
-                    <li>${ORIGINALNAME} : ${header:originalFilename}</li>
-                    <li>${COUNT} : ${function:counter} - note that this is a global counter. If you want a local counter
-                        per file connector then you should use the legacy-filename-parser.
-                    </li>
-                    <li>${[Message Property Name]} : ${header:[Message Property Name]}</li>
-                </ul>
+
+                * $\{DATE\} : $\{function:dateStamp\}
+                * $\{DATE:yy-MM-dd\} : $\{function:dateStamp(yy-MM-dd)\}
+                * $\{SYSTIME\} : $\{function:systime\}
+                * $\{UUID\} : $\{function:uuid\}
+                * $\{ORIGINALNAME\} : $\{header:originalFilename\}
+                * $\{COUNT\} : $\{function:counter\} - note that this is a global counter. If you want a local counter per file connector then you should use the legacy-filename-parser.
+                * $\{\[Message Property Name\]\} : $\{header:\[Message Property Name\]\}
+
             </xsd:documentation>
         </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="expressionFilenameParserType">
         <xsd:complexContent>
             <xsd:extension base="filenameParserType"/>
-        </xsd:complexContent>                
+        </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="custom-filename-parser" type="customFilenameParserType"
                  substitutionGroup="abstract-filenameParser">
         <xsd:annotation>
             <xsd:documentation>
                 Allows the user to specify custom filename parser. The implementation has to implement
-                org.mule.transports.file.FilenameParser.
+                {{org.mule.transport.file.FilenameParser}}.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+    
     <xsd:complexType name="customFilenameParserType">
         <xsd:complexContent>
             <xsd:extension base="filenameParserType">
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The implementation class name that implement s
-                            org.mule.transports.file.FilenameParser.
+                            The implementation class name that implements
+                            {{org.mule.transport.file.FilenameParser}}.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

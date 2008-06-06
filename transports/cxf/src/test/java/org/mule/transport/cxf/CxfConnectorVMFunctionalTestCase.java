@@ -10,16 +10,29 @@
 
 package org.mule.transport.cxf;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.providers.soap.AbstractSoapResourceEndpointFunctionalTestCase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CxfConnectorVMFunctionalTestCase extends AbstractSoapResourceEndpointFunctionalTestCase
 {
 
-    @Override
-    public void testRequest() throws Throwable
+    public void testWSDL() throws Throwable
     {
-        // TODO Auto-generated method stub
-        super.testRequest();
+        MuleClient client = new MuleClient();
+        
+        Map<String,Object> props = new HashMap<String, Object>();
+        props.put("http.method", "GET");
+        
+        MuleMessage response = client.send("http://localhost:63081/test?wsdl", "", props);
+        
+        assertTrue(response.getPayloadAsString().indexOf("http://localhost:63081/test") != -1);
+        
+        // this doesn't work as now the endpoint is registered on a different url...
+        testRequestResponse();
     }
 
     public String getConfigResources()

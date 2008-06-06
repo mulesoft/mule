@@ -48,6 +48,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -75,26 +76,19 @@ public class CxfServiceComponent implements Callable, Lifecycle
     protected Bus bus;
 
     // manager to the component
-    protected MuleUniversalTransport universalTransport;
     protected String transportClass;
 
     private CxfMessageReceiver receiver;
 
-    public CxfServiceComponent(CxfMessageReceiver receiver) throws ConfigurationException
+    private final CxfConnector connector;
+
+    public CxfServiceComponent(CxfConnector connector,
+                               CxfMessageReceiver receiver) throws ConfigurationException
     {
         super();
+        this.connector = connector;
         this.receiver = receiver;
         this.bus = receiver.connector.getCxfBus();
-        
-        try
-        {
-            universalTransport = (MuleUniversalTransport) getBus().getExtension(
-                DestinationFactoryManager.class).getDestinationFactory(MuleUniversalTransport.TRANSPORT_ID);
-        }
-        catch (BusException e)
-        {
-            throw new ConfigurationException(e);
-        }
     }
 
 
@@ -126,15 +120,17 @@ public class CxfServiceComponent implements Callable, Lifecycle
         
         // TODO: Is there a way to make this not so ugly?
         String ctxUri;
-        String uriBase = null;
+        String uriBase = (String) eventContext.getMessage().getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
         
-        EndpointURI epUri = eventContext.getEndpointURI();
-        String host = (String) eventContext.getMessage().getProperty("Host", epUri.getHost());
+        if (uriBase == null) {
+            EndpointURI epUri = eventContext.getEndpointURI();
+            String host = (String) eventContext.getMessage().getProperty("Host", epUri.getHost());
+            
+            uriBase = epUri.getScheme() + "://" + host + epUri.getPath();
+        }
         
         // This is the case of the HTTP message receiver. The servlet one sends different info
         if (req != null && req.length() > 0) {
-            
-            uriBase = epUri.getScheme() + "://" + host + epUri.getPath();
             int qIdx = uriBase.indexOf('?');
             if (qIdx > -1) {
                 uriBase = uriBase.substring(0, qIdx);
@@ -250,15 +246,15 @@ public class CxfServiceComponent implements Callable, Lifecycle
             String soapAction = getSoapAction(ctx.getMessage());
             m.put(org.mule.transport.soap.SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
 
-            EndpointInfo ei = receiver.getServer().getEndpoint().getEndpointInfo();
-
-            MuleUniversalDestination d = (MuleUniversalDestination) universalTransport.getDestination(ei);
-            if (d.getMessageObserver() == null)
+            EndpointURI epUri = ctx.getEndpointURI();
+            Server server = connector.getServer(epUri.toString());
+            if (server == null)
             {
                 // TODO is this the right Mule exception?
                 throw new EndpointNotFoundException(uri);
             }
 
+            org.apache.cxf.transport.Destination d = server.getDestination();
             // Set up a listener for the response
             m.put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
             m.put(MuleProperties.MULE_EVENT_PROPERTY, RequestContext.getEvent());

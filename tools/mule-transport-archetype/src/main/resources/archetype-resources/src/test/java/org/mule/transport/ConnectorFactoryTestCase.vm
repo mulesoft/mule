@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: ConnectorFactoryTestCase.vm 11967 2008-06-05 20:32:19Z dfeist $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -30,7 +30,7 @@ public class ${TransportName}ConnectorFactoryTestCase extends AbstractMuleTestCa
         assertTrue(endpoint.getConnector() instanceof ${TransportName}Connector);
         assertEquals(getEndpointURI(), endpoint.getEndpointURI().getAddress());
     }
-    
+
     public String getEndpointURI() 
     {
         // TODO return a valid endpoint URI string for your transport

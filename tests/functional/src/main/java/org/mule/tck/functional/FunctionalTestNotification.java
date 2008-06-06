@@ -13,6 +13,7 @@ package org.mule.tck.functional;
 import org.mule.api.MuleEventContext;
 import org.mule.api.transformer.TransformerException;
 import org.mule.context.notification.CustomNotification;
+import org.mule.RequestContext;
 
 /**
  * A <code>FunctionlTestNotification</code> is fired by the {@link org.mule.tck.functional.FunctionalTestComponent}
@@ -48,6 +49,16 @@ public class FunctionalTestNotification extends CustomNotification
 
     private final Object replyMessage;
     private final MuleEventContext eventContext;
+
+    public FunctionalTestNotification(Object message, int action)
+            throws TransformerException
+    {
+        super(message, action);
+        this.replyMessage = null;
+        this.eventContext = RequestContext.getEventContext();
+        resourceIdentifier = eventContext.getService().getName();
+
+    }
 
     public FunctionalTestNotification(MuleEventContext context, Object replyMessage, int action)
             throws TransformerException

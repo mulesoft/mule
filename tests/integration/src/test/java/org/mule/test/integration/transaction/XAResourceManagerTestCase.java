@@ -70,7 +70,9 @@ public class XAResourceManagerTestCase extends AbstractMuleTestCase
 
         protected AbstractTransactionContext createTransactionContext(Object session)
         {
-            return new AbstractTransactionContext();
+            return new AbstractTransactionContext() 
+            {
+            };
         }
 
         protected void doBegin(AbstractTransactionContext context)

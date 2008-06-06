@@ -43,14 +43,14 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 /**
  * <code>XsltTransformer</code> performs an XSLT transform on a DOM (or other XML-ish)
  * object.
- *
+ * <p/>
  * This transformer maintains a pool of {@link javax.xml.Transformer} objects to speed up processing of concurrent requests.
  * The pool can be configured using {@link #setMaxIdleTransformers()} and {@link #setMaxIdleTransformers()}.
- *
+ * <p/>
  * Parameter can also be set as part of the transformation context and these can be mapped to conent in the current message using
  * property extractors or can be fixed values.
- *
- *
+ * <p/>
+ * <p/>
  * For example, the current event's message has a property named "myproperty", also you want to generate a uuid as a
  * parameter. To do this you can define context properties that can provide an expression to be evaluated on the current
  * message.
@@ -58,28 +58,28 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * <p>
  * Example Configuration:
  * </p>
- *
+ * <p/>
  * <pre>
  *  &lt;mxml:xslt-transformer name=&quot;MyXsltTransformer&quot; xslFile=&quot;myXslFile.xsl&quot;&amp;gt
  *      &lt;context-property name=&quot;myParameter&quot; value=&quot;${head:myproperty}&quot;/&amp;gt
  *      &lt;context-property name=&quot;myParameter2&quot; value=&quot;${function:uuid}&quot;/&amp;gt
  *  &lt;/mxml:xslt-transformer&amp;gt
  * </pre>
- *
+ * <p/>
  * <p>
  * The 'header' expression pulls a header from the current message and 'function' can execute a set of arbitrary functions.
  * You can also pass in static values by ommitting the expression prefix '${'.
  * </p>
- *
+ * <p/>
  * In addition to being able to pass in an XSLT file you can also define templates inline. For example -
- *
+ * <p/>
  * <pre>
  *  &lt;mxml:xslt-transformer name=&quot;MyXsltTransformer&quot;&amp;gt
  *      &lt;mxml:xslt-text&amp;gt
  *          <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://test.com" version="2.0">
-
+ * <p/>
  *                <xsl:param name="echo"/>
- *
+ * <p/>
  *               <xsl:template match="/">
  *                   <echo-value>
  *                       <xsl:value-of select="$echo"/>
@@ -88,7 +88,6 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  *           </xsl:stylesheet>
  *  &lt;/mxml:xslt-text&amp;gt
  * </pre>
- *
  */
 
 public class XsltTransformer extends AbstractXmlTransformer
@@ -109,6 +108,8 @@ public class XsltTransformer extends AbstractXmlTransformer
     private volatile String xslt;
     private volatile Map contextProperties;
 
+    private URIResolver uriResolver;
+
     public XsltTransformer()
     {
         super();
@@ -116,6 +117,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         transformerPool.setMinIdle(MIN_IDLE_TRANSFORMERS);
         transformerPool.setMaxIdle(MAX_IDLE_TRANSFORMERS);
         transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
+        uriResolver = new LocalURIResolver();
     }
 
     public void initialise() throws InitialisationException
@@ -132,7 +134,7 @@ public class XsltTransformer extends AbstractXmlTransformer
 
     /**
      * Transform, using XSLT, a XML String to another String.
-     * 
+     *
      * @param src The source XML (String, byte[], DOM, etc.)
      * @return The result String (or DOM)
      */
@@ -205,7 +207,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     /**
      * Returns the name of the currently configured javax.xml.transform.Transformer
      * factory class used to create XSLT Transformers.
-     * 
+     *
      * @return a TransformerFactory class name or <code>null</code> if none has been
      *         configured
      */
@@ -216,7 +218,7 @@ public class XsltTransformer extends AbstractXmlTransformer
 
     /**
      * Configures the javax.xml.transform.Transformer factory class
-     * 
+     *
      * @param xslTransformerFactory the name of the TransformerFactory class to use
      */
     public void setXslTransformerFactory(String xslTransformerFactory)
@@ -250,9 +252,19 @@ public class XsltTransformer extends AbstractXmlTransformer
         this.xslt = xslt;
     }
 
+    public URIResolver getUriResolver()
+    {
+        return uriResolver;
+    }
+
+    public void setUriResolver(URIResolver uriResolver)
+    {
+        this.uriResolver = uriResolver;
+    }
+
     /**
      * Returns the StreamSource corresponding to xslFile
-     * 
+     *
      * @return The StreamSource
      */
     protected StreamSource getStreamSource() throws InitialisationException
@@ -301,7 +313,7 @@ public class XsltTransformer extends AbstractXmlTransformer
             if (StringUtils.isNotEmpty(factoryClassName))
             {
                 factory = (TransformerFactory) ClassUtils.instanciateClass(factoryClassName,
-                    ClassUtils.NO_ARGS, this.getClass());
+                        ClassUtils.NO_ARGS, this.getClass());
             }
             else
             {
@@ -317,21 +329,7 @@ public class XsltTransformer extends AbstractXmlTransformer
                 }
             }
 
-            factory.setURIResolver(new URIResolver()
-            {
-                public Source resolve(String href, String base)
-                    throws javax.xml.transform.TransformerException
-                {
-                    try
-                    {
-                        return new StreamSource(IOUtils.getResourceAsStream(href, getClass()));
-                    }
-                    catch (IOException e)
-                    {
-                        throw new javax.xml.transform.TransformerException(e);
-                    }
-                }
-            });
+            factory.setURIResolver(getUriResolver());
             return factory.newTransformer(source);
         }
     }
@@ -357,19 +355,19 @@ public class XsltTransformer extends AbstractXmlTransformer
         }
 
         public void error(javax.xml.transform.TransformerException exception)
-            throws javax.xml.transform.TransformerException
+                throws javax.xml.transform.TransformerException
         {
             e = new TransformerException(trans, exception);
         }
 
         public void fatalError(javax.xml.transform.TransformerException exception)
-            throws javax.xml.transform.TransformerException
+                throws javax.xml.transform.TransformerException
         {
             e = new TransformerException(trans, exception);
         }
 
         public void warning(javax.xml.transform.TransformerException exception)
-            throws javax.xml.transform.TransformerException
+                throws javax.xml.transform.TransformerException
         {
             logger.warn(exception.getMessage());
         }
@@ -387,7 +385,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     /**
      * Sets the the current maximum number of active transformer objects allowed in the
      * pool
-     * 
+     *
      * @param maxActiveTransformers New maximum size to set
      */
     public void setMaxActiveTransformers(int maxActiveTransformers)
@@ -406,7 +404,7 @@ public class XsltTransformer extends AbstractXmlTransformer
 
     /**
      * Sets the the current maximum number of idle transformer objects allowed in the pool
-     * 
+     *
      * @param maxIdleTransformers New maximum size to set
      */
     public void setMaxIdleTransformers(int maxIdleTransformers)
@@ -416,10 +414,10 @@ public class XsltTransformer extends AbstractXmlTransformer
 
     /**
      * Gets the parameters to be used when applying the transformation
-     * 
+     *
+     * @return a map of the parameter names and associated values
      * @see javax.xml.transform.Transformer#setParameter(java.lang.String,
      *      java.lang.Object)
-     * @return a map of the parameter names and associated values
      */
     public Map getContextProperties()
     {
@@ -428,10 +426,10 @@ public class XsltTransformer extends AbstractXmlTransformer
 
     /**
      * Sets the parameters to be used when applying the transformation
-     * 
+     *
+     * @param contextProperties a map of the parameter names and associated values
      * @see javax.xml.transform.Transformer#setParameter(java.lang.String,
      *      java.lang.Object)
-     * @param contextProperties a map of the parameter names and associated values
      */
     public void setContextProperties(Map contextProperties)
     {
@@ -445,8 +443,8 @@ public class XsltTransformer extends AbstractXmlTransformer
      * used. Any attribute of the current MuleEvent can be accessed using Property Extractors
      * such as JXpath, bean path or header retrieval.
      *
-     * @param name the name of the parameter. The name isn't used for this implementation but is exposed as a
-     * param for classes that may need it.
+     * @param name  the name of the parameter. The name isn't used for this implementation but is exposed as a
+     *              param for classes that may need it.
      * @param value the value of the paramter
      * @return the object to be set as the parameter value
      * @throws TransformerException
@@ -476,4 +474,19 @@ public class XsltTransformer extends AbstractXmlTransformer
         return value;
     }
 
+    private class LocalURIResolver implements URIResolver
+    {
+        public Source resolve(String href, String base)
+                throws javax.xml.transform.TransformerException
+        {
+            try
+            {
+                return new StreamSource(IOUtils.getResourceAsStream(href, getClass()));
+            }
+            catch (IOException e)
+            {
+                throw new javax.xml.transform.TransformerException(e);
+            }
+        }
+    }
 }

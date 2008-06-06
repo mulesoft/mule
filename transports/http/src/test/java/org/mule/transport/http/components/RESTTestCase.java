@@ -48,8 +48,9 @@ public class RESTTestCase extends FunctionalTestCase
         MuleMessage reply  = client.send("vm://in3", new DefaultMuleMessage(new Object[]{"IBM"}));
         
         assertNotNull(reply);
-        assertNotNull(reply.getPayloadAsString());
-        assertTrue(reply.getPayloadAsString().indexOf("Symbol&gt;IBM&lt;") > -1);
+        String replyStr = reply.getPayloadAsString();
+        assertNotNull(replyStr);
+        assertTrue("'Symbol&gt;IBM&lt;' not found in reply: " + replyStr, replyStr.indexOf("Symbol&gt;IBM&lt;") > -1);
     }
     
     public void testRest2ParamsGet() throws Exception
@@ -57,8 +58,9 @@ public class RESTTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         MuleMessage reply  = client.send("vm://in4", new DefaultMuleMessage(new Object[]{"MTL","MTL"}));
         
-        assertNotNull(reply.getPayloadAsString());
-        assertTrue(reply.getPayloadAsString().indexOf(">1</double>") > -1);
+        String replyStr = reply.getPayloadAsString();
+        assertNotNull(replyStr);
+        assertTrue("'>1</double>' not found in reply: " + replyStr, replyStr.indexOf(">1</double>") > -1);
     }
 
 }

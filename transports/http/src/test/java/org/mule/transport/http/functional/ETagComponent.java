@@ -11,6 +11,7 @@
 package org.mule.transport.http.functional;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.util.StringUtils;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.transport.DefaultMessageAdapter;
@@ -28,7 +29,7 @@ public class ETagComponent implements org.mule.api.lifecycle.Callable
         String etag = msg.getStringProperty(HttpConstants.HEADER_IF_NONE_MATCH, null);
         if (etag != null && etag.equals(ETAG_VALUE))
         {
-           DefaultMessageAdapter res = new DefaultMessageAdapter("");
+           DefaultMessageAdapter res = new DefaultMessageAdapter(StringUtils.EMPTY);
            res.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 304);
            msg = new DefaultMuleMessage(res);
         }

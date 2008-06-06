@@ -10,15 +10,17 @@
 
 package org.mule;
 
+import org.mule.api.ThreadSafeAccess;
 import org.mule.transport.DefaultMessageAdapter;
 
 import java.util.Map;
 
 public class ThreadSafeAccessTestCase extends AbstractThreadSafeAccessTestCase
 {
-    public void testConfig() 
+    public void testConfig()
     {
-        assertTrue(muleContext.getConfiguration().isFailOnMessageScribbling());
+        assertTrue(ThreadSafeAccess.AccessControl.isFailOnMessageScribbling());
+        assertTrue(ThreadSafeAccess.AccessControl.isAssertMessageAccess());
     }
 
     public void testMessage() throws InterruptedException

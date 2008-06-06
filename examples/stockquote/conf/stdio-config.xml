@@ -19,7 +19,6 @@
         <service name="Console I/O">
             <inbound>
                 <stdio:inbound-endpoint system="IN"/>
-                <forwarding-router/>
             </inbound>
             <outbound>
                 <!--

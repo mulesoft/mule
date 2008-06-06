@@ -23,6 +23,6 @@
         <jdbc:query key="writeTest"
                     value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)"/>
         <jdbc:query key="writeMap"
-                    value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${map:data}, NULL, NULL)"/>
+                    value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${map-payload:data}, NULL, NULL)"/>
     </jdbc:connector>
 </mule>

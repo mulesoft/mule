@@ -10,53 +10,60 @@
 
 package org.mule.module.scripting.component;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.util.MuleLogger;
+import org.mule.DefaultMuleMessage;
+import org.mule.transport.NullPayload;
+import org.mule.transformer.TransformerTemplate;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.component.AbstractComponent;
+
+import java.util.Collections;
 
 import javax.script.Bindings;
+import javax.script.ScriptEngine;
 
 /**
- * A JSR 223 Script service. Allows any JSR 223 compliant script engines such as
- * JavaScript, Groovy or Rhino to be embedded as Mule components.
+ * A Script service backed by a JSR-223 compliant script engine such as
+ * Groovy, JavaScript, or Rhino.
  */
-public class ScriptComponent extends Scriptable implements Callable
+public class ScriptComponent extends AbstractComponent 
 {
-    private Bindings bindings;
+    private Scriptable script;
 
-    // @Override
-    public void initialise() throws InitialisationException
+    //@Override
+    protected MuleMessage doOnCall(MuleEvent event) throws Exception
     {
-        super.initialise();
-        bindings = getScriptEngine().createBindings();
-    }
+        // Set up initial script variables.
+        Bindings bindings = script.getScriptEngine().createBindings();
+        script.populateBindings(bindings, event);
+        Object result = script.runScript(bindings);
 
-    public Object onCall(MuleEventContext eventContext) throws Exception
-    {
-        populateBindings(bindings, eventContext);
-        Object result = runScript(bindings);
-        if (result == null)
+        if (result != null)
         {
-            result = bindings.get("result");
+            if (result instanceof MuleMessage)
+            {
+                return (MuleMessage) result;
+            }
+            else
+            {
+                event.getMessage().applyTransformers(Collections.singletonList(new TransformerTemplate(
+                        new TransformerTemplate.OverwitePayloadCallback(result))));
+                return event.getMessage();
+            }
         }
-        return result;
+        else
+        {
+            return new DefaultMuleMessage(NullPayload.getInstance());
+        }
     }
 
-    protected void populateBindings(Bindings namespace, MuleEventContext context)
+    public Scriptable getScript()
     {
-        namespace.put("eventContext", context);
-        namespace.put("muleContext", context.getMuleContext());
-        namespace.put("message", context.getMessage());
-        namespace.put("descriptor", context.getService());
-        namespace.put("componentNamespace", this.bindings);
-        namespace.put("log", new MuleLogger(logger));
-        namespace.put("result", new Object());
+        return script;
     }
 
-    public Bindings getBindings()
+    public void setScript(Scriptable script)
     {
-        return bindings;
+        this.script = script;
     }
-
 }

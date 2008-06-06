@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.http.HttpConstants;
 
 import java.util.List;
 
@@ -46,6 +47,9 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
 
+        String ct = reply.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "");
+        assertEquals("text/xml", ct);
+        
         Document document = DocumentHelper.parseText(reply.getPayloadAsString());
         List fault = document.selectNodes("//soap:Envelope/soap:Body/soap:Fault/faultcode");
 
@@ -57,7 +61,7 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
         fault = document.selectNodes("//soap:Envelope/soap:Body/soap:Fault/faultstring");
         assertEquals(1, fault.size());
         Element faultStringElement = (Element) fault.get(0);
-        assertEquals("Message part {http://www.muleumo.org}ssss was not recognized.",
+        assertEquals("Message part {http://www.muleumo.org}ssss was not recognized.  (Does it exist in service WSDL?)",
             faultStringElement.getStringValue());
     }
 

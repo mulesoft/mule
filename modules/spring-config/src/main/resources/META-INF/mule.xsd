@@ -280,6 +280,14 @@
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-inbound-router" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
+        <xsd:attribute name="matchAll" type="substitutableBoolean" default="true">
+            <xsd:annotation>
+                <xsd:documentation>
+                    If true, the input message will be passed through inbound routers, otherwise only
+                    the first matching router is used.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:element name="abstract-catch-all-strategy" abstract="true" type="abstractCatchAllStrategyType">
@@ -1086,9 +1094,10 @@
 
     <xsd:complexType name="asyncReplyCollectionType">
         <xsd:sequence>
-            <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="abstract-async-reply-router" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-inbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-async-reply-router" minOccurs="0" maxOccurs="1"/>
+            <!-- TODO leaving this commented here, but I don't think there should be a transformer here -->
+            <!--<xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>-->
         </xsd:sequence>
         <xsd:attribute name="timeout" type="substitutableInt">
             <xsd:annotation>
@@ -1901,7 +1910,7 @@
                 <xsd:attribute name="expression" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>The expression that will be evaluated. This should always be a boolean
-                            expression.
+                            expression. The syntax of the exprsssion will be determined by the exprsssion langage being used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2378,6 +2387,13 @@
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:sequence>
+                    <xsd:attribute name="returnSourceIfNull" type="xsd:boolean" use="optional">
+                        <xsd:annotation>
+                            <xsd:documentation>If all expressions return null on this transformer, this flag will cause
+                                the source payload to be returned without modification.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -2402,6 +2418,7 @@
                     <xsd:enumeration value="attachment"/>
                     <xsd:enumeration value="attachments"/>
                     <xsd:enumeration value="attachments-list"/>
+                    <xsd:enumeration value="map-payload"/>
                     <xsd:enumeration value="payload"/>
                     <xsd:enumeration value="xpath"/>
                     <xsd:enumeration value="jxpath"/>
@@ -2414,7 +2431,7 @@
         </xsd:attribute>
         <xsd:attribute name="expression" type="xsd:string" use="required">
             <xsd:annotation>
-                <xsd:documentation>The expression to evaluate. The syntax of this will change depeneding on the
+                <xsd:documentation>The expression to evaluate. The syntax of this attribute will change depending on the
                     evaluator being used.
                 </xsd:documentation>
             </xsd:annotation>
@@ -3669,7 +3686,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-
     <!--==============================================================-->
     <!--   Connector support                                          -->
     <!--==============================================================-->
@@ -3686,7 +3702,6 @@
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                     <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0"/>
                 </xsd:sequence>
-                <xsd:attribute name="createDispatcherPerRequest" type="substitutableBoolean"/>
                 <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
                 <xsd:attribute name="numberOfConcurrentTransactedReceivers" type="substitutableInt"/>
                 <xsd:attribute name="dynamicNotification" type="substitutableBoolean"/>

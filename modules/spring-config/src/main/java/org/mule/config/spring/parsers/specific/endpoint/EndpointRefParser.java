@@ -13,7 +13,6 @@ import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.util.StringUtils;
 
-import org.springframework.beans.factory.BeanCreationException;
 import org.w3c.dom.Element;
 
 /**

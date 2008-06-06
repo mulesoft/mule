@@ -31,6 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 
 /**
  * <code>DefaultInboundRouterCollection</code> is a collection of routers that will be
@@ -46,6 +48,8 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
     public DefaultInboundRouterCollection()
     {
         super(RouterStatistics.TYPE_INBOUND);
+        //default for inbound routing
+        setMatchAll(true);
     }
 
     public MuleMessage route(MuleEvent event) throws MessagingException
@@ -74,10 +78,11 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
 
         String componentName = event.getSession().getService().getName();
 
-        MuleEvent[] eventsToRoute = null;
+        ConcurrentMap eventsToRoute = new ConcurrentHashMap(2);
         boolean noRoute = true;
         boolean match = false;
         InboundRouter umoInboundRouter;
+        MuleEvent lastEvent= null;
 
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
         {
@@ -86,9 +91,19 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
             if (umoInboundRouter.isMatch(event))
             {
                 match = true;
-                eventsToRoute = umoInboundRouter.process(event);
-                noRoute = (eventsToRoute == null);
-                if (!matchAll)
+                MuleEvent[] events = umoInboundRouter.process(event);
+                if(events!=null)
+                {
+                    for (int i = 0; i < events.length; i++)
+                    {
+                        lastEvent = events[i];
+                        //Only add the event if it's a new event
+                        eventsToRoute.putIfAbsent(lastEvent.getId(), lastEvent);
+                    }
+                }
+
+                noRoute = (events == null);
+                if (!isMatchAll())
                 {
                     break;
                 }
@@ -151,8 +166,10 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
                 try
                 {
                     MuleMessage messageResult = null;
-                    for (int i = 0; i < eventsToRoute.length; i++)
+                    for (Iterator iterator = eventsToRoute.values().iterator(); iterator.hasNext();)
                     {
+                        MuleEvent eventToRoute = (MuleEvent) iterator.next();
+
                         // Set the originating endpoint so we'll know where this event came from further down the pipeline.
                         if (event.getMessage().getProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY) == null)
                         {
@@ -161,16 +178,16 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
 
                         if (event.isSynchronous())
                         {
-                            messageResult = send(eventsToRoute[i]);
+                            messageResult = send(eventToRoute);
                         }
                         else
                         {
-                            dispatch(eventsToRoute[i]);
+                            dispatch(eventToRoute);
                         }
                         // Update stats
                         if (getStatistics().isEnabled())
                         {
-                            getStatistics().incrementRoutedMessage(eventsToRoute[i].getEndpoint());
+                            getStatistics().incrementRoutedMessage(eventToRoute.getEndpoint());
                         }
                     }
                     return messageResult;
@@ -181,8 +198,16 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
                 }
             }
         }
-        return (eventsToRoute != null && eventsToRoute.length > 0
-                        ? eventsToRoute[eventsToRoute.length - 1].getMessage() : null);
+        if(event.isSynchronous())
+        {
+            //This is required if the Router short-circuits the service and diverts processing elsewhere
+            //The only example of this right now is the FowardingConsumer (<forwarding-router/>)
+            return (lastEvent == null ? null : lastEvent.getMessage());
+        }
+        else
+        {
+            return null;
+        }
 
     }
 
@@ -233,8 +258,8 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
         if (endpoints != null)
         {
             this.endpoints.clear();
-            // Ensure all endpoints are response endpoints
-            // This will go when we start dropping suport for 1.4 and start using 1.5
+            // Ensure all endpoints are inbound endpoints
+            // This will go when we start dropping support for 1.4 and start using 1.5
             for (Iterator it = endpoints.iterator(); it.hasNext();)
             {
                 ImmutableEndpoint endpoint = (ImmutableEndpoint) it.next();

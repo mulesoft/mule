@@ -30,6 +30,9 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.UUID;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -57,7 +60,7 @@ public final class DefaultMuleSession implements MuleSession
     /**
      * The Mule service associated with the session
      */
-    private Service service = null;
+    private transient Service service = null;
 
     /**
      * Determines if the service is valid
@@ -70,7 +73,7 @@ public final class DefaultMuleSession implements MuleSession
 
     private Map properties = null;
 
-    private MuleContext muleContext;
+    private transient MuleContext muleContext;
     
     public DefaultMuleSession(Service service, MuleContext muleContext)
     {
@@ -538,6 +541,20 @@ public final class DefaultMuleSession implements MuleSession
     public Iterator getPropertyNames()
     {
         return properties.keySet().iterator();
+    }
+    
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+        out.defaultWriteObject();
+        out.writeObject(getService().getName());
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        String serviceName = (String) in.readObject();
+        service = RegistryContext.getRegistry().lookupService(serviceName);
+        muleContext = MuleServer.getMuleContext();
     }
 
 }

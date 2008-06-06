@@ -106,3 +106,6 @@ org.mule.test.integration.client.MuleClientWSDLExternalTestCase
 
 # Some initial work on MULE-2499
 org.mule.test.integration.streaming.StreamClosingTestCase
+
+# MULE-3307
+org.mule.test.integration.streaming.JmsStreamMessageTestCase

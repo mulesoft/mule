@@ -11,11 +11,8 @@
 package org.mule.transport.quartz;
 
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.functional.FunctionalTestComponent2;
 import org.mule.tck.functional.CountdownCallback;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.mule.tck.functional.FunctionalTestComponent2;
 
 public class QuartzFunctionalTestCase extends FunctionalTestCase
 {

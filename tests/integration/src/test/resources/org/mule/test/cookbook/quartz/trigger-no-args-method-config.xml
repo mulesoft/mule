@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--// START SNIPPET: full-config -->
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.0"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/quartz/2.0 http://www.mulesource.org/schema/mule/quartz/2.0/mule-quartz.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+
+    <vm:connector name="resultQueueConnector" queueEvents="true"/>
+
+    <vm:endpoint name="resultQueue" path="results"/>
+
+    <model>
+        <service name="noArgService">
+            <description>This example demonstrates invoking a method on a service without any arguments. The method will
+                get called every second. We are using the event generator job and since we do not specify a payload a
+                NulePayload object will be used and the method on the component will be matched by Mule.
+            </description>
+            <inbound>
+                <quartz:inbound-endpoint jobName="myServiceJob" repeatInterval="1000">
+                    <quartz:event-generator-job/>
+                </quartz:inbound-endpoint>
+            </inbound>
+            <component class="org.mule.test.cookbook.quartz.NoArgsMethodComponent"/>
+            <outbound>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint ref="resultQueue"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>
+<!--// END SNIPPET: full-config -->

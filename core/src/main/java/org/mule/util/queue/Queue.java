@@ -43,4 +43,5 @@ public interface Queue
 
     boolean offer(Object o, long timeout) throws InterruptedException;
 
+    String getName();
 }

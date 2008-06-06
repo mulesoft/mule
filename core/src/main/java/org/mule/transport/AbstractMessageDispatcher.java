@@ -66,7 +66,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 // TODO MULE-863: Do we need this warning?
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
                 connector.fireNotification(new SecurityNotification(e,
-                    SecurityNotification.ADMIN_EVENT_ACTION_START_RANGE));
+                    SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
                 connector.handleException(e);
                 return;
             }
@@ -82,7 +82,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             Transaction tx = TransactionCoordination.getInstance().getTransaction();
             if (isDoThreading() && !event.isSynchronous() && tx == null)
             {
-                workManager.scheduleWork(new Worker(event), WorkManager.INDEFINITE, null, connector);
+                connector.getDispatcherWorkManager().scheduleWork(new Worker(event), WorkManager.INDEFINITE, null, connector);
             }
             else
             {

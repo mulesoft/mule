@@ -178,7 +178,8 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             {
                 sfb.setOutFaultInterceptors(new ArrayList<Interceptor>());
             }
-            sfb.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
+            sfb.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
+            
             sfb.setServiceClass(svcCls);
             sfb.setAddress(getAddressWithoutQuery());
 

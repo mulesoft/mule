@@ -4,7 +4,9 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+        xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
     xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
@@ -29,7 +31,6 @@
         <service name="baseService1">
             <inbound>
                 <http:inbound-endpoint ref="base"/>
-                <forwarding-router/>
             </inbound>
             <outbound>
                 <outbound-pass-through-router>
@@ -42,7 +43,7 @@
             <inbound>
                 <inbound-endpoint address="vm://echo1" synchronous="true"/>
             </inbound>
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <test:component doInboundTransform="false" appendString=" Received"/>
         </service>
 
     </model>
@@ -69,7 +70,7 @@
             <inbound>
                 <inbound-endpoint address="vm://echo2" synchronous="true"/>
             </inbound>
-            <component class="org.mule.transport.http.issues.NoTransformFunctionalTestComponent"/>
+            <test:component doInboundTransform="false" appendString=" Received"/>
         </service>
 
     </model>
@@ -95,7 +96,7 @@
             <inbound>
                 <inbound-endpoint address="vm://echo3" synchronous="true" transformer-refs="appendString2"/>
             </inbound>
-            <component class="org.mule.transport.http.issues.NoTransformFunctionalTestComponent"/>
+            <test:component doInboundTransform="false" appendString=" Received"/>
         </service>
 
     </model>
@@ -110,7 +111,6 @@
                     <object-to-string-transformer/>
                     <transformer ref="appendString"/>
                 </inbound-endpoint>
-                <forwarding-router/>
             </inbound>
             <outbound>
                 <outbound-pass-through-router>
@@ -126,7 +126,7 @@
                   <transformer ref="appendString2" />
                 </inbound-endpoint>
             </inbound>
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <test:component appendString=" Received"/>
         </service>
 
     </model>

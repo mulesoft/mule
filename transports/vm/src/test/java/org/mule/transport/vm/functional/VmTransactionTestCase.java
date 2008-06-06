@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class VmTransactionTestCase extends FunctionalTestCase
 {
-    protected static volatile boolean success = true;
+    protected static volatile boolean serviceComponentAck = false;
     protected static final Log logger = LogFactory.getLog(VmTransactionTestCase.class);
 
     protected String getConfigResources()
@@ -27,50 +27,54 @@ public class VmTransactionTestCase extends FunctionalTestCase
         return "vm/vm-transaction.xml";
     }
 
-    public void testTransactionQueueEventsTrue() throws Exception
+    public void testDispatchWithQueueEvent() throws Exception
     {
-        success = true;
+        serviceComponentAck = false;
         MuleClient client = new MuleClient();
-        client.dispatch("vm://in?connector=vm", "TEST", null);
-        MuleMessage message = client.request("vm://out?connector=vm", 10000);
-        assertNotNull(message);
-        assertTrue(success);
-
+        client.dispatch("vm://dispatchInQueue?connector=vmQueue", "TEST", null);
+        MuleMessage message = client.request("vm://out?connector=vmQueue", 10000);
+        assertNotNull("Message", message);
+        assertTrue("Service component acknowledgement", serviceComponentAck);
     }
 
-    public void testTransactionSyncEndpoint() throws Exception
+    public void testDispatchWithoutQueueEvent() throws Exception
     {
-        success = true;
+        serviceComponentAck = false;
         MuleClient client = new MuleClient();
-        MuleMessage message = client.send("vm://sync?connector=vm", "TEST", null);
-        assertNotNull(message);
-        assertTrue(success);
-
+        client.dispatch("vm://dispatchInNoQueue?connector=vmNoQueue", "TEST", null);
+        MuleMessage message = client.request("vm://out?connector=vmQueue", 10000);
+        assertNotNull("Message", message);
+        assertTrue("Service component acknowledgement", serviceComponentAck);
     }
 
-    public void testTransactionQueueEventsFalse() throws Exception
+    public void testSendWithQueueEvent() throws Exception
     {
-        success = true;
+        serviceComponentAck = false;
         MuleClient client = new MuleClient();
-        client.dispatch("vm://int3?connector=vmOnFly", "TEST", null);
-        MuleMessage message = client.request("vm://outt3?connector=vm", 10000);
-        assertNotNull(message);
-        assertTrue(success);
-
+        MuleMessage message = client.send("vm://sendRequestInQueue?connector=vmQueue", "TEST", null);
+        assertNotNull("Message", message);
+        assertTrue("Service component acknowledgement", serviceComponentAck);
     }
 
+    public void testSendWithoutQueueEvent() throws Exception
+    {
+        serviceComponentAck = false;
+        MuleClient client = new MuleClient();
+        MuleMessage message = client.send("vm://sendRequestInNoQueue?connector=vmNoQueue", "TEST", null);
+        assertNotNull("Message", message);
+        assertTrue("Service component acknowledgement", serviceComponentAck);
+    }
 
     public static class TestComponent
     {
 
-        public Object process(Object a) throws Exception
+        public Object process(Object message) throws Exception
         {
-            if (TransactionCoordination.getInstance().getTransaction() == null)
+            if (TransactionCoordination.getInstance().getTransaction() != null)
             {
-                success = false;
-                logger.error("Transction is null");
+                serviceComponentAck = true;
             }
-            return a;
+            return message;
         }
 
     }

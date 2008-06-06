@@ -47,10 +47,6 @@ public interface MuleConfiguration
 
     String getSystemName();
 
-    boolean isFailOnMessageScribbling();
-
-    boolean isAssertMessageAccess();
-
     boolean isAutoWrapMessageAwareTransform();
 
     boolean isCacheMessageAsBytes();

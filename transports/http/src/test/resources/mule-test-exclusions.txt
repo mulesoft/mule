@@ -4,7 +4,8 @@
 
 # this test depends on external services which may not always be available
 # even so, as soon as we disable it, it drifts out of maintenance...
-#org.mule.transport.http.components.RESTTestCase
+#External service failing again (21/5/2008)
+org.mule.transport.http.components.RESTTestCase
 
 # MULE-1389
 org.mule.transport.http.issues.StreamingDownloadMule1389TestCase

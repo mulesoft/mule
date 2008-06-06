@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: NamespaceHandler.vm 10621 2008-01-30 12:15:16Z dirk.olmes $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Registers a Bean Definition Parser for handling <code><${TransportNameLower}:connector></code> elements.
- *
  */
 public class ${TransportName}NamespaceHandler extends NamespaceHandlerSupport
 {

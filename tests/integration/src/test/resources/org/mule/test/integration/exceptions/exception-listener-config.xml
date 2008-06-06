@@ -3,7 +3,9 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+        xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
       xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
@@ -15,11 +17,7 @@
             <inbound>
                 <inbound-endpoint address="vm://component.in"/>
             </inbound>
-            <pooled-component>
-                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <property key="throwException" value="true"/>
-                </prototype-object>
-            </pooled-component>
+            <test:component throwException="true"/>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://component.out"/>

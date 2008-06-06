@@ -3,8 +3,10 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
       xsi:schemaLocation="
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
     <jms:activemq-connector name="jmsConnector"/>
@@ -14,9 +16,7 @@
             <inbound>
                 <jms:inbound-endpoint queue="in"/>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
+            <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q1"/>
@@ -28,9 +28,7 @@
             <inbound>
                 <jms:inbound-endpoint queue="q1"/>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
+            <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q2"/>
@@ -42,11 +40,9 @@
             <inbound>
                 <jms:inbound-endpoint queue="q2"/>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <property key="returnMessage" value="OUTPUT MESSAGE"/>
-                </singleton-object>
-            </component>
+            <test:component>
+                <test:return-data>OUTPUT MESSAGE</test:return-data>
+            </test:component>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="out"/>

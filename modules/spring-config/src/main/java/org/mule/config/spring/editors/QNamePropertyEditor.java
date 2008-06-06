@@ -64,27 +64,30 @@ public class QNamePropertyEditor extends PropertyEditorSupport
 
         switch (elements.size())
         {
+            case 0 :
+            {
+                return null;
+            }
             case 1 :
             {
-                return new QName((String)elements.get(0));
+                return new QName((String) elements.get(0));
             }
             case 2 :
             {
-                return new QName((String)elements.get(0), (String)elements.get(1));
+                return new QName((String) elements.get(0), (String) elements.get(1));
             }
             case 3 :
             {
-                return new QName((String)elements.get(1) + ":" + (String)elements.get(2),
-                    (String)elements.get(0));
-            }
-            case 4 :
-            {
-                return new QName((String)elements.get(2) + ":" + (String)elements.get(3),
-                    (String)elements.get(1), (String)elements.get(0));
+                return new QName((String) elements.get(1) + ":" + (String) elements.get(2), (String) elements.get(0));
             }
             default :
             {
-                return null;
+                String prefix = (String) elements.get(0);
+                String local = (String) elements.get(1);
+                // namespace can have multiple colons in it, so just assume the rest
+                // is a namespace
+                String ns = val.substring(prefix.length() + local.length() + 2);
+                return new QName(ns, local, prefix);
             }
         }
     }

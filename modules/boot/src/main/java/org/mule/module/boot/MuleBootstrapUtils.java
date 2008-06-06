@@ -56,20 +56,6 @@ public final class MuleBootstrapUtils
     {
         DefaultMuleClassPathConfig classPath = new DefaultMuleClassPathConfig(muleHome, muleBase);
         addLibrariesToClasspath(classPath.getURLs());
-    }    
-    
-    public static void addExternalJarFilesToClasspath(File muleHome, ProxyInfo proxyInfo) throws Exception
-    {
-        LibraryDownloader downloader = null;
-        if (proxyInfo != null)
-        {
-            downloader = new LibraryDownloader(muleHome, proxyInfo.host, proxyInfo.port, proxyInfo.username, proxyInfo.password);
-        }
-        else 
-        {
-            downloader = new LibraryDownloader(muleHome);
-        }
-        addLibrariesToClasspath(downloader.downloadLibraries());
     }
     
     public static void addLibrariesToClasspath(List urls) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException

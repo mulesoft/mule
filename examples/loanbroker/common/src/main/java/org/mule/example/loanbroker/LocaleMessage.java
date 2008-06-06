@@ -12,7 +12,6 @@ package org.mule.example.loanbroker;
 
 import org.mule.config.i18n.MessageFactory;
 import org.mule.example.loanbroker.messages.LoanQuote;
-import org.mule.util.StringMessageUtils;
 
 public class LocaleMessage extends MessageFactory
 {
@@ -52,7 +51,7 @@ public class LocaleMessage extends MessageFactory
 
     public static String receivedProfile(String[] params)
     {
-        return factory.getString(BUNDLE_PATH, 7, StringMessageUtils.toString(params));
+        return factory.getString(BUNDLE_PATH, 7, params);
     }
 
     public static String responseNumQuotes(int i)

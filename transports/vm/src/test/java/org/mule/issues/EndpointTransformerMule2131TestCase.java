@@ -19,7 +19,6 @@ import org.mule.tck.functional.StringAppendTestTransformer;
 public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 {
 
-    public static final long TIMEOUT = 1000L;
     public static final String MESSAGE = "a message";
 
     protected String getConfigResources()
@@ -74,7 +73,7 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 
     protected String request(MuleClient client, String endpoint) throws Exception
     {
-        MuleMessage message = client.request(endpoint, TIMEOUT);
+        MuleMessage message = client.request(endpoint, RECEIVE_TIMEOUT);
         assertNotNull(message);
         assertNotNull(message.getPayloadAsString());
         return message.getPayloadAsString();

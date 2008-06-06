@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--// START SNIPPET: full-config -->
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <model name="Remote_Synchronous_Message_Pattern">
+        <service name="RemoteSynchronousService">
+            <inbound>
+                <jms:inbound-endpoint queue="test.in" synchronous="true"/>
+            </inbound>
+
+            <test:component/>
+
+            <outbound>
+                <outbound-pass-through-router>
+                    <jms:outbound-endpoint queue="another.service" remoteSync="true" remoteSyncTimeout="5000"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="AnotherService">
+            <inbound>
+                <jms:inbound-endpoint queue="another.service" synchronous="true"/>
+            </inbound>
+
+            <test:component/>
+        </service>
+    </model>
+</mule>
+<!--// END SNIPPET: full-config -->

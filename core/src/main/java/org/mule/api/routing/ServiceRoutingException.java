@@ -71,9 +71,7 @@ public class ServiceRoutingException extends RoutingException
                                            ImmutableEndpoint endpoint,
                                            Service service)
     {
-
-        Message m = CoreMessages.routingFailedOnEndpoint(service.getName(), 
-            endpoint.getEndpointURI());
+        Message m = CoreMessages.routingFailedOnEndpoint(service, endpoint);
         if (message != null)
         {
             message.setNextMessage(m);

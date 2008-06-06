@@ -161,5 +161,10 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             }
         }
 
+        public String getName()
+        {
+            return queue.getName();
+        }
+
     }
 }

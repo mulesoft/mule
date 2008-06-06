@@ -3,6 +3,7 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/ftp/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -10,15 +11,47 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/file/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
-                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
 
-    <xsd:element name="connector" type="ftpConnectorType" substitutionGroup="mule:abstract-connector"/>
+    <xsd:annotation>
+        <xsd:documentation>The FTP connector provides connectivity to FTP servers to allow files to be read and written
+            as events in Mule.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>ftp</schemadoc:short-name>
+            <schemadoc:page-title>FTP Transport</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="false"
+                                          requestEvents="true"
+                                          transactions="false" streaming="true">
+                <schemadoc:inboundMEPs in-only="true"/>
+                <schemadoc:outboundMEPs out-only="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+    <xsd:element name="connector" type="ftpConnectorType" substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>The FTP connector is used to configure the default behaviour for FTP endpoints that
+                reference the connector. Note if there is only one FTP connector configured, all FTP endpoints
+                will use that connector.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="ftpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence minOccurs="0" maxOccurs="1">
-                    <xsd:element ref="abstract-filenameParser"/>
+                    <xsd:element ref="file:abstract-filenameParser">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The {{filenameParser}} is used when writing files to an FTP server. The parser will
+                                convert the _outputPattern_ attribute to a string using the parser and the current message. To add a
+                                parser to your configuration you need to import the *file* namespace into your Xml
+                                configuration. For more information about filenameParsers see the [File Transport].
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="inboundAttributes"/>
                 <xsd:attributeGroup ref="outboundAttributes"/>
@@ -26,14 +59,16 @@
                 <xsd:attribute name="validateConnections" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Validate connection (via NOOP) before use.
+                            Will cause Mule to validate connections before use.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="connectionFactoryClass" type="mule:substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A class that extends FtpConnectionFactory.
+                            A class that extends FtpConnectionFactory. The FtpConnectionFactory is responsible for
+                            creating a connection to the server usin the credentials provided by the endpoint. The
+                            default implementation supplied with MUle uses the Commons Net project from Apache.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -52,7 +87,8 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType"
+                 substitutionGroup="mule:abstract-outbound-endpoint"/>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
@@ -91,7 +127,8 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The pattern to use when writing a file to disk.
-                    This can use the patterns supported by the filename-parser configured for this connector                </xsd:documentation>
+                    This can use the patterns supported by the filename-parser configured for this connector
+                </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
@@ -117,47 +154,38 @@
         <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    A file location.
+                    A file location on the remote server.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="user" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    A username.
+                    If FTP is authenticated this is the username used for authenitcation
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="password" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    A password.
+                    The password for the user being authenitcated.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="host" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    An IP address (eg www.mulesource.com, localhost, 127.0.0.1).
+                    An IP address (eg www.mulesource.com, localhost, 192.168.0.1).
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="port" type="mule:substitutablePortNumber">
             <xsd:annotation>
                 <xsd:documentation>
-                    A port number.
+                    The port number to connect on.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
-    
-    <xsd:element name="abstract-filenameParser" abstract="true" type="file:filenameParserType"/>
-    
-    <xsd:element name="legacy-filename-parser" type="file:legacyFilenameParserType" 
-                 substitutionGroup="abstract-filenameParser"/>
-    <xsd:element name="expression-filename-parser" type="file:expressionFilenameParserType"
-                 substitutionGroup="abstract-filenameParser"/>
-    <xsd:element name="custom-filename-parser" type="file:customFilenameParserType"
-                 substitutionGroup="abstract-filenameParser"/>
 
 </xsd:schema>

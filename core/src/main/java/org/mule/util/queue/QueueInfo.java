@@ -26,6 +26,11 @@ public class QueueInfo
         return (obj instanceof QueueInfo && name.equals(((QueueInfo) obj).name));
     }
 
+    public String getName()
+    {
+        return name;
+    }
+    
     public int hashCode()
     {
         return name.hashCode();

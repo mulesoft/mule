@@ -17,16 +17,6 @@ public class GuiInstallerLibraryDownloader
     public static void main(String args[]) throws Exception
     {
         File muleHome = new File(args[0]);
-        MuleBootstrapUtils.ProxyInfo proxyInfo = null;
-        if (args.length > 2)
-        {
-            proxyInfo = new MuleBootstrapUtils.ProxyInfo(args[1], args[2]);
-        }
-        if (args.length > 4)
-        {
-            proxyInfo = new MuleBootstrapUtils.ProxyInfo(args[1], args[2], args[3], args[4]);
-        }
         MuleBootstrapUtils.addLocalJarFilesToClasspath(muleHome, muleHome);
-        MuleBootstrapUtils.addExternalJarFilesToClasspath(muleHome, proxyInfo);
     }
 }

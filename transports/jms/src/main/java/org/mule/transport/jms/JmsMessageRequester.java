@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
+import org.mule.transport.jms.filters.JmsSelectorFilter;
 
 import javax.jms.Destination;
 import javax.jms.Message;
@@ -34,7 +35,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
     public JmsMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
-        this.connector = (JmsConnector)endpoint.getConnector();
+        this.connector = (JmsConnector) endpoint.getConnector();
     }
 
     protected void doConnect() throws Exception
@@ -71,7 +72,41 @@ public class JmsMessageRequester extends AbstractMessageRequester
             session = connector.getSession(false, topic);
             Destination dest = support.createDestination(session, endpoint.getEndpointURI().getAddress(),
                 topic);
-            consumer = support.createConsumer(session, dest, topic);
+
+            // Extract jms selector
+            String selector = null;
+            if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)
+            {
+                selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
+            }
+            else if (endpoint.getProperties() != null)
+            {
+                // still allow the selector to be set as a property on the endpoint
+                // to be backward compatable
+                selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
+            }
+            String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
+            boolean durable = connector.isDurable();
+            if (tempDurable != null)
+            {
+                durable = Boolean.valueOf(tempDurable).booleanValue();
+            }
+
+            // Get the durable subscriber name if there is one
+            String durableName = (String) endpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY);
+            if (durableName == null && durable && topic)
+            {
+                durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
+                             + durableName);
+                }
+            }
+
+            // Create consumer
+            consumer = support.createConsumer(session, dest, selector, connector.isNoLocal(), durableName,
+                topic);
 
             try
             {

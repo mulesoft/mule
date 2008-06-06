@@ -22,8 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * This transformer will evaluate one or more expressions on the current message and return the 
- * results as an Array. If only one expression is defined it will return the object returned from 
+ * This transformer will evaluate one or more expressions on the current message and return the
+ * results as an Array. If only one expression is defined it will return the object returned from
  * the expression.
  * <p/>
  * You can use expressions to extract
@@ -37,12 +37,13 @@ import java.util.List;
  * </ul>
  * and more.
  * <p/>
- * This transformer provides a very powerful way to pull different bits of information from the 
+ * This transformer provides a very powerful way to pull different bits of information from the
  * message and pass them to the service.
  */
 public class ExpressionTransformer extends AbstractMessageAwareTransformer
 {
     private List arguments;
+    private boolean returnSourceIfNull = false;
 
     public ExpressionTransformer()
     {
@@ -61,6 +62,7 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
     {
         return arguments.remove(argument);
     }
+
     /**
      * Template method were deriving classes can do any initialisation after the
      * properties have been set on this transformer
@@ -71,7 +73,7 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
     //@Override
     public void initialise() throws InitialisationException
     {
-        if(arguments==null || arguments.size()==0)
+        if (arguments == null || arguments.size() == 0)
         {
             throw new InitialisationException(CoreMessages.objectIsNull("arguments[]"), this);
         }
@@ -93,8 +95,8 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Object results[] = new Object[arguments.size()];
-        int i =0;
-        for (Iterator iterator = arguments.iterator(); iterator.hasNext();i++)
+        int i = 0;
+        for (Iterator iterator = arguments.iterator(); iterator.hasNext(); i++)
         {
             Argument argument = (Argument) iterator.next();
             try
@@ -106,7 +108,7 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
                 throw new TransformerException(this, e);
             }
 
-            if(!argument.isOptional() && results[i]==null)
+            if (!argument.isOptional() && results[i] == null)
             {
                 throw new TransformerException(CoreMessages.expressionEvaluatorReturnedNull(
                         argument.getEvaluator(), argument.getExpression()), this);
@@ -114,7 +116,12 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
             }
 
         }
-        if(results.length==1)
+        if (isReturnSourceIfNull() && checkIfAllAreNull(results))
+        {
+            return message;
+        }
+
+        if (results.length == 1)
         {
             return results[0];
         }
@@ -122,6 +129,18 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
         {
             return results;
         }
+    }
+
+    private boolean checkIfAllAreNull(Object[] objects)
+    {
+        for (int i = 0; i < objects.length; i++)
+        {
+            if (objects[i] != null)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public List getArguments()
@@ -132,6 +151,16 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
     public void setArguments(List arguments)
     {
         this.arguments = arguments;
+    }
+
+    public boolean isReturnSourceIfNull()
+    {
+        return returnSourceIfNull;
+    }
+
+    public void setReturnSourceIfNull(boolean returnSourceIfNull)
+    {
+        this.returnSourceIfNull = returnSourceIfNull;
     }
 
     public static class Argument
@@ -189,8 +218,8 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
         protected String getFullExpression()
         {
             //Sprecial handling of these evaluators since they don't retuen nul if some headers or attachments were found
-            if(!optional && ( evaluator.equals("headers") || evaluator.equals("headers-list") ||
-               (evaluator.equals("attachments") || evaluator.equals("attachments-list"))))
+            if (!optional && (evaluator.equals("headers") || evaluator.equals("headers-list") ||
+                    (evaluator.equals("attachments") || evaluator.equals("attachments-list"))))
             {
                 return evaluator + EVAL_TOKEN + expression + "required";
             }
@@ -199,19 +228,19 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
 
         protected void validate()
         {
-            if(expression==null)
+            if (expression == null)
             {
                 throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
             }
 
-            if(evaluator ==null)
+            if (evaluator == null)
             {
                 throw new IllegalArgumentException(CoreMessages.objectIsNull("evaluator").getMessage());
             }
 
-            if(evaluator.equals("custom"))
+            if (evaluator.equals("custom"))
             {
-                if(customEvaluator==null)
+                if (customEvaluator == null)
                 {
                     throw new IllegalArgumentException(CoreMessages.objectIsNull("customEvaluator").getMessage());
                 }
@@ -221,7 +250,7 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
                 }
             }
 
-            if(!ExpressionEvaluatorManager.isEvaluatorRegistered(evaluator))
+            if (!ExpressionEvaluatorManager.isEvaluatorRegistered(evaluator))
             {
                 throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator).getMessage());
             }

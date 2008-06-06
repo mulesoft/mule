@@ -14,9 +14,11 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transaction.TransactionTemplate;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.vm.i18n.VMMessages;
 import org.mule.util.queue.Queue;
@@ -36,7 +38,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (VMConnector) endpoint.getConnector();
     }
 
-    protected void doDispatch(MuleEvent event) throws Exception
+    protected void doDispatch(final MuleEvent event) throws Exception
     {
         EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         //Apply any outbound transformers on this event before we dispatch
@@ -55,7 +57,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
         else
         {
-            VMMessageReceiver receiver = connector.getReceiver(event.getEndpoint().getEndpointURI());
+            final VMMessageReceiver receiver = connector.getReceiver(event.getEndpoint().getEndpointURI());
             if (receiver == null)
             {
                 logger.warn("No receiver for endpointUri: " + event.getEndpoint().getEndpointURI());
@@ -63,7 +65,18 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             }
             MuleMessage message = event.getMessage(); 
             connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
-            receiver.onMessage(message);
+            TransactionTemplate tt = new TransactionTemplate(receiver.getEndpoint().getTransactionConfig(), 
+                connector.getExceptionListener(), event.getMuleContext());
+
+            TransactionCallback cb = new TransactionCallback()
+            {
+                public Object doInTransaction() throws Exception
+                {
+                    receiver.onMessage(event.getMessage());
+                    return null;
+                }
+            };
+            tt.execute(cb);
         }
         if (logger.isDebugEnabled())
         {
@@ -71,11 +84,11 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected MuleMessage doSend(MuleEvent event) throws Exception
+    protected MuleMessage doSend(final MuleEvent event) throws Exception
     {
         MuleMessage retMessage;
         EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-        VMMessageReceiver receiver = connector.getReceiver(endpointUri);
+        final VMMessageReceiver receiver = connector.getReceiver(endpointUri);
         //Apply any outbound transformers on this event before we dispatch
         event.transformMessage();
         if (receiver == null)
@@ -101,8 +114,19 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
         MuleMessage message = event.getMessage(); 
         connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
-        retMessage = (MuleMessage) receiver.onCall(message, event.isSynchronous());
 
+        TransactionTemplate tt = new TransactionTemplate(receiver.getEndpoint().getTransactionConfig(), 
+            connector.getExceptionListener(), event.getMuleContext());
+        
+        TransactionCallback cb = new TransactionCallback()
+        {
+            public Object doInTransaction() throws Exception
+            {
+                return receiver.onCall(event.getMessage(), true);
+            }
+        };
+        retMessage = (MuleMessage) tt.execute(cb);
+        
         if (logger.isDebugEnabled())
         {
             logger.debug("sent event on endpointUri: " + event.getEndpoint().getEndpointURI());

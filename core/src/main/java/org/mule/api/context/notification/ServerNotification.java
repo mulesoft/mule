@@ -35,20 +35,20 @@ public abstract class ServerNotification extends EventObject
     public static final String TYPE_ERROR = "error";
     public static final String TYPE_FATAL = "fatal";
 
-    public static final int CONTEXT_EVENT_ACTION_START_RANGE = 100;
-    public static final int MODEL_EVENT_ACTION_START_RANGE = 200;
-    public static final int SERVICE_EVENT_ACTION_START_RANGE = 300;
-    public static final int SECURITY_EVENT_ACTION_START_RANGE = 400;
-    public static final int MANAGEMENT_EVENT_ACTION_START_RANGE = 500;
-    public static final int ADMIN_EVENT_ACTION_START_RANGE = 600;
-    public static final int CONNECTION_EVENT_ACTION_START_RANGE = 700;
-    public static final int MESSAGE_EVENT_ACTION_START_RANGE = 800;
-    public static final int SPACE_EVENT_ACTION_START_RANGE = 900;
-    public static final int REGISTRY_EVENT_ACTION_START_RANGE = 1000;
-    public static final int EXCEPTION_EVENT_ACTION_START_RANGE = 1100;
-    public static final int TRANSACTION_EVENT_ACTION_START_RANGE = 1200;
-    public static final int ROUTING_EVENT_ACTION_START_RANGE = 1300;
-    public static final int CUSTOM_EVENT_ACTION_START_RANGE = 100000;
+    protected static final int CONTEXT_EVENT_ACTION_START_RANGE = 100;
+    protected static final int MODEL_EVENT_ACTION_START_RANGE = 200;
+    protected static final int SERVICE_EVENT_ACTION_START_RANGE = 300;
+    protected static final int SECURITY_EVENT_ACTION_START_RANGE = 400;
+    protected static final int MANAGEMENT_EVENT_ACTION_START_RANGE = 500;
+    protected static final int ADMIN_EVENT_ACTION_START_RANGE = 600;
+    protected static final int CONNECTION_EVENT_ACTION_START_RANGE = 700;
+    protected static final int MESSAGE_EVENT_ACTION_START_RANGE = 800;
+    protected static final int SPACE_EVENT_ACTION_START_RANGE = 900;
+    protected static final int REGISTRY_EVENT_ACTION_START_RANGE = 1000;
+    protected static final int EXCEPTION_EVENT_ACTION_START_RANGE = 1100;
+    protected static final int TRANSACTION_EVENT_ACTION_START_RANGE = 1200;
+    protected static final int ROUTING_EVENT_ACTION_START_RANGE = 1300;
+    protected static final int CUSTOM_EVENT_ACTION_START_RANGE = 100000;
 
     public static final int NULL_ACTION = 0;
     public static final Object NULL_MESSAGE = "";

@@ -19,7 +19,6 @@ import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;
 import org.tanukisoftware.wrapper.WrapperSimpleApp;
 
@@ -103,11 +102,6 @@ public class MuleBootstrap
         setSystemMuleVersion();
         requestLicenseAcceptance();        
 
-        // TODO Make this work with OSGi Framework
-        if (setupClassLoader)
-        {
-            MuleBootstrapUtils.addExternalJarFilesToClasspath(muleHome, null);
-        }
     }
     
     private static File lookupMuleHome() throws Exception

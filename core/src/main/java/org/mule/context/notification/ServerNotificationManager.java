@@ -178,6 +178,10 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
                 }
             }
         }
+        else
+        {
+            logger.warn("Notification not enqueued after ServerNotificationManager disposal: " + notification);
+        }
     }
 
     public boolean isNotificationEnabled(Class type)
@@ -196,6 +200,10 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         if (!disposed.get())
         {
             configuration.getPolicy().dispatch(notification);
+        }
+        else
+        {
+            logger.warn("Notification not delivered after ServerNotificationManager disposal: " + notification);
         }
     }
 

@@ -30,7 +30,8 @@ public class WireTapTestCase extends FunctionalTestCase
     public void testWireTap() throws Exception
     {
         final Latch receiverLatch = new Latch();
-        final Latch tappedReceiverLatch = new Latch();
+        final Latch tappedReceiver1Latch = new Latch();
+        final Latch tappedReceiver2Latch = new Latch();
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
             public void onNotification(ServerNotification notification)
@@ -39,15 +40,20 @@ public class WireTapTestCase extends FunctionalTestCase
                 {
                     receiverLatch.countDown();
                 }
-                else if (notification.getResourceIdentifier().equals("TappedReceiver"))
+                else if (notification.getResourceIdentifier().equals("TappedReceiver1"))
                 {
-                    tappedReceiverLatch.countDown();
+                    tappedReceiver1Latch.countDown();
+                }
+                else if (notification.getResourceIdentifier().equals("TappedReceiver2"))
+                {
+                    tappedReceiver2Latch.countDown();
                 }
             }
         });
         MuleClient client = new MuleClient();
         client.send("vm://inbound.channel", "test", null);
         assertTrue(receiverLatch.await(3L, TimeUnit.SECONDS));
-        assertTrue(tappedReceiverLatch.await(1L, TimeUnit.SECONDS));
+        assertTrue(tappedReceiver1Latch.await(1L, TimeUnit.SECONDS));
+        assertTrue(tappedReceiver2Latch.await(1L, TimeUnit.SECONDS));
     }
 }

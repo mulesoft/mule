@@ -20,6 +20,6 @@ public class WebsphereJmsConnector extends JmsConnector
     /** Constructs a new WebsphereJmsConnector. */
     public WebsphereJmsConnector()
     {
-        setRecoverJmsConnections(false);
+        setRecoverJmsConnections(isRecoverJmsConnections());
     }
 }

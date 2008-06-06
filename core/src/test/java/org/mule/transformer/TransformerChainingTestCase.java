@@ -100,7 +100,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         }
         catch (TransformerException tfe)
         {
-            ; // ignore
+            // ignore
         }
     }
 
