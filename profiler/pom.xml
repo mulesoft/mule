@@ -18,18 +18,19 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <!--
-                    Don't upgrade because of http://jira.codehaus.org/browse/MASSEMBLY-194,
-                    Needs to be fixed and then assembly descriptors should be updated.
-                 -->
+                    2.2-beta-2 is broken due to a regression. Attempting
+                    to configure permissions via multiple includes/excludes
+                    adds duplicate entries to the assembly:
+
+                    http://jira.codehaus.org/browse/MASSEMBLY-285
+
+                    2.2-beta-1 is broken too:
+                    http://jira.codehaus.org/browse/MASSEMBLY-194
+                    Fixed in 2.2-beta-2, but it has a blocker regression in turn.
+
+                    WT$%#^!
+                    -->
                 <version>2.1</version>
-                <configuration>
-                    <finalName>${pom.artifactId}</finalName>
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <tarLongFileMode>gnu</tarLongFileMode>
-                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -40,10 +41,17 @@
                             -->
                             <goal>attached</goal>
                         </goals>
+                        <configuration>
+                            <finalName>${pom.artifactId}</finalName>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <tarLongFileMode>gnu</tarLongFileMode>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-
 
             <plugin>
                 <groupId>org.mule.tools</groupId>
