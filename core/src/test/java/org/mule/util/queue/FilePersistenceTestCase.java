@@ -16,7 +16,9 @@ public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTest
     protected TransactionalQueueManager createQueueManager() throws Exception
     {
         TransactionalQueueManager mgr = new TransactionalQueueManager();
-        mgr.setPersistenceStrategy(new FilePersistenceStrategy());
+        FilePersistenceStrategy ps = new FilePersistenceStrategy();
+        ps.setMuleContext(muleContext);
+        mgr.setPersistenceStrategy(ps);
         mgr.setDefaultQueueConfiguration(new QueueConfiguration(true));
         return mgr;
     }
