@@ -42,6 +42,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-integration</artifactId>
+            <version>${version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <scope>test</scope>
