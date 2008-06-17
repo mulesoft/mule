@@ -19,4 +19,4 @@ org.mule.transport.tcp.integration.MuleMessageProtocolChunkingTestCase
 org.mule.transport.tcp.issues.SynchStreamingMule1687TestCase
 
 # Disable this long-running test to speed up testing during development
-#org.mule.transport.tcp.integration.StreamingCapacityTestCase
+org.mule.transport.tcp.integration.StreamingCapacityTestCase

@@ -56,8 +56,8 @@
         <jdk14Name>jdk1.4</jdk14Name>
         <jdk5Name>jdk5</jdk5Name>
 
-        <springVersion>2.5.3</springVersion>
-        <springOsgiVersion>1.0</springOsgiVersion>
+        <springVersion>2.5.4</springVersion>
+        <springOsgiVersion>1.0.2</springOsgiVersion>
         <cxfVersion>2.0.6</cxfVersion>
         <coberturaVersion>2.2</coberturaVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
