@@ -61,11 +61,11 @@ org.mule.module.xml.functional.BeanPropertyExtractorMultipleEndpointsTestCase
 org.mule.module.xml.functional.BeanPropertyExtractorTestCase
 
 ##########################################################################
-# Mule 2.x failures
+# Mule 2.1.x failures
 ##########################################################################
 
-# TC: I managed to break this test again, not sure why
-#org.mule.context.notification.ServerNotificationManagerTestCase
+# TODO MULE-2903
+org.mule.context.notification.ServerNotificationManagerTestCase
 
 ##########################################################################
 # Low priority
