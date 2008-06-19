@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This is a static class that provides access to the Mule core manifest file. 
  */
+// TODO EE-572
 public class MuleManifest
 {
     /**
