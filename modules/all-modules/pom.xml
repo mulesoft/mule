@@ -107,13 +107,6 @@
             <version>${version}</version>
             <scope>runtime</scope>
         </dependency>
-        <!-- MULE-2917 exclude wssecurity for now - this drops it from the binary distributions -->
-        <!-- dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-wssecurity</artifactId>
-            <version>${version}</version>
-            <scope>runtime</scope>
-        </dependency -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
