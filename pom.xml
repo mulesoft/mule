@@ -65,6 +65,7 @@
         <backportUtilConcurrentVersion>3.1</backportUtilConcurrentVersion>
         <aopallianceVersion>1.0</aopallianceVersion>
         <paxLoggingVersion>1.1.1</paxLoggingVersion>
+        <slf4jVersion>1.5.0</slf4jVersion>        
     </properties>
 
     <!-- Declare all dependencies that are used in more than one module here. 
@@ -527,22 +528,22 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jcl104-over-slf4j</artifactId>
-                <version>1.5.0</version>
+                <version>${slf4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.5.0</version>
+                <version>${slf4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.5.0</version>
+                <version>${slf4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
-                <version>1.5.0</version>
+                <version>${slf4jVersion}</version>
             </dependency>
             <!-- OSGi Specification -->
             <dependency>
