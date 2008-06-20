@@ -8,9 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.registry;
+package org.mule.module.osgi;
 
 import org.mule.api.registry.Registry;
+import org.mule.registry.AbstractRegistryBroker;
 
 import java.util.ArrayList;
 import java.util.Collection;

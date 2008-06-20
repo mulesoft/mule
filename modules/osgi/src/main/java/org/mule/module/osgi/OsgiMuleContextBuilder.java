@@ -8,10 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.context;
+package org.mule.module.osgi;
 
-import org.mule.OsgiMuleContext;
 import org.mule.api.MuleContext;
+import org.mule.context.DefaultMuleContextBuilder;
 
 import org.osgi.framework.BundleContext;
 

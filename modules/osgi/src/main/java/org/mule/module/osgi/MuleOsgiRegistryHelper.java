@@ -8,13 +8,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.registry;
+package org.mule.module.osgi;
 
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.registry.MuleRegistryHelper;
 import org.mule.transport.service.TransportServiceDescriptor;
 
 import java.util.Properties;

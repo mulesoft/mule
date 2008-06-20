@@ -8,11 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.osgi;
+package org.mule.module.osgi;
 
 import org.mule.api.MuleContext;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.context.OsgiMuleContextBuilder;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
