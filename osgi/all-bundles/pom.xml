@@ -83,12 +83,12 @@
         <dependency>
               <groupId>org.ops4j.pax.logging</groupId>
               <artifactId>pax-logging-api</artifactId>
-              <version>1.0.0</version>
+              <version>${paxLoggingVersion}</version>
         </dependency>
         <dependency>
               <groupId>org.ops4j.pax.logging</groupId>
               <artifactId>pax-logging-service</artifactId>
-              <version>1.0.0</version>
+              <version>${paxLoggingVersion}</version>
         </dependency>
         
         <!-- TODO Include Apache Commons libs, others? -->
