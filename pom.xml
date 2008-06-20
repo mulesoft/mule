@@ -51,6 +51,7 @@
             instead a module artifact id is erroneously substituted.
          -->
         <productUrl>http://mule.mulesource.org</productUrl>
+        <muleCEVersion>2.1.0-M2-SNAPSHOT</muleCEVersion>
         <eclipsePluginVersion>2.5</eclipsePluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <jdk14Name>jdk1.4</jdk14Name>
@@ -63,6 +64,7 @@
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
         <backportUtilConcurrentVersion>3.1</backportUtilConcurrentVersion>
         <aopallianceVersion>1.0</aopallianceVersion>
+        <paxLoggingVersion>1.1.1</paxLoggingVersion>
     </properties>
 
     <!-- Declare all dependencies that are used in more than one module here. 
@@ -73,57 +75,48 @@
             <dependency>
                 <groupId>org.mule</groupId>
                 <artifactId>mule-core</artifactId>
-                <version>${version}</version>
-                <scope>provided</scope>
+                <version>${muleCEVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.modules</groupId>
                 <artifactId>mule-module-spring-config</artifactId>
-                <version>${version}</version>
-                <scope>provided</scope>
+                <version>${muleCEVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.modules</groupId>
                 <artifactId>mule-module-builders</artifactId>
-                <version>${version}</version>
-                <scope>provided</scope>
+                <version>${muleCEVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.modules</groupId>
                 <artifactId>mule-module-xml</artifactId>
-                <version>${version}</version>
-                <scope>provided</scope>
+                <version>${muleCEVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-http</artifactId>
-                <version>${version}</version>
-                <scope>provided</scope>
+                <version>${muleCEVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-ssl</artifactId>
-                <version>${version}</version>
-                <scope>provided</scope>
+                <version>${muleCEVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-vm</artifactId>
-                <version>${version}</version>
-                <scope>provided</scope>
+                <version>${muleCEVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-stdio</artifactId>
-                <version>${version}</version>
-                <scope>provided</scope>
+                <version>${muleCEVersion}</version>
             </dependency>
             
             <dependency>
                 <groupId>backport-util-concurrent</groupId>
                 <artifactId>backport-util-concurrent</artifactId>
                 <version>${backportUtilConcurrentVersion}</version>
-                <scope>provided</scope>
             </dependency>
  
             <dependency>
@@ -140,7 +133,6 @@
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
                 <version>${geronimoSpecsVersion}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -161,7 +153,6 @@
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
                 <version>${geronimoSpecsVersion}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -177,13 +168,11 @@
                 <groupId>javax.activation</groupId>
                 <artifactId>activation</artifactId>
                 <version>1.1</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
                 <version>1.4</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -194,7 +183,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
                 <version>${springVersion}</version>
-                <scope>provided</scope>
                 <exclusions>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
@@ -206,7 +194,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
                 <version>${springVersion}</version>
-                <scope>provided</scope>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -222,7 +209,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
                 <version>${springVersion}</version>
-                <scope>provided</scope>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -329,13 +315,11 @@
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>1.1</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.14</version>
-                <scope>provided</scope>
             </dependency>
             <!-- commons-codec is used by the http transport and commons-httpclient
                  in different versions.
@@ -565,26 +549,22 @@
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_core</artifactId>
                 <version>1.0</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_compendium</artifactId>
                 <version>1.0</version>
-                <scope>provided</scope>
             </dependency>
             <!-- Spring OSGi -->
             <dependency>
                 <groupId>org.springframework.osgi</groupId>
                 <artifactId>spring-osgi-core</artifactId>
                 <version>${springOsgiVersion}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.osgi</groupId>
                 <artifactId>spring-osgi-io</artifactId>
                 <version>${springOsgiVersion}</version>
-                <scope>provided</scope>
             </dependency>
             <!-- We package this one ourselves 
             <dependency>
