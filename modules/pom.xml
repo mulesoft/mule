@@ -30,6 +30,7 @@
         <module>scripting</module>
         <module>spring-extras</module>
         <module>spring-config</module>
+        <module>spring-osgi</module>
         <module>xml</module>
     </modules>
 </project>

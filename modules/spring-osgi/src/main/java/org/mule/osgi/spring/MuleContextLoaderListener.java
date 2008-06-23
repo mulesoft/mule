@@ -8,10 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.osgi;
+package org.mule.osgi.spring;
 
 import org.mule.api.MuleContext;
-import org.mule.config.spring.MuleOsgiApplicationContext;
 import org.mule.config.spring.SpringRegistry;
 
 import org.osgi.framework.Bundle;

@@ -16,6 +16,7 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.osgi.util.BundleDelegatingClassLoader;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
@@ -30,7 +31,6 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.util.BundleDelegatingClassLoader;
 
 
 public class TransportActivator implements BundleActivator {

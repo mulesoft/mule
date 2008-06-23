@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring;
+package org.mule.osgi.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -16,6 +16,9 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transport.Connector;
 import org.mule.config.factories.HostNameFactory;
+import org.mule.config.spring.MissingParserProblemReporter;
+import org.mule.config.spring.MuleBeanDefinitionDocumentReader;
+import org.mule.config.spring.MuleContextPostProcessor;
 import org.mule.config.spring.editors.ConnectorPropertyEditor;
 import org.mule.config.spring.editors.URIBuilderPropertyEditor;
 import org.mule.config.spring.processors.MuleObjectNameProcessor;

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.osgi;
+package org.mule.osgi.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
