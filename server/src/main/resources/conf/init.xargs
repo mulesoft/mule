@@ -110,6 +110,7 @@
 -istart mule/mule-module-osgi.jar
 # Modules
 -istart mule/mule-module-spring-config.jar
+-istart mule/mule-module-spring-osgi.jar
 # Transports
 -istart mule/mule-transport-vm.jar
 -istart mule/mule-transport-file.jar
