@@ -16,7 +16,7 @@
  * "Sterilized" for use in Mule (all dependencies on Spring removed).
  */
 
-package org.mule.module.osgi.util;
+package org.mule.osgi.util;
 
 import org.mule.util.DebugUtils;
 

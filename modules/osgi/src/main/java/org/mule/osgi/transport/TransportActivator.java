@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.osgi;
+package org.mule.osgi.transport;
 
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
@@ -16,7 +16,7 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.module.osgi.util.BundleDelegatingClassLoader;
+import org.mule.osgi.util.BundleDelegatingClassLoader;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.osgi;
+package org.mule.osgi.context;
 
 import org.mule.api.MuleContext;
 import org.mule.context.DefaultMuleContextFactory;

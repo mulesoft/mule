@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.osgi;
+package org.mule.osgi.context;
 
 import org.mule.DefaultMuleContext;
 import org.mule.api.config.MuleConfiguration;
@@ -17,6 +17,8 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryBroker;
 import org.mule.context.notification.ServerNotificationManager;
+import org.mule.osgi.registry.MuleOsgiRegistryHelper;
+import org.mule.osgi.registry.OsgiRegistryBroker;
 
 import javax.resource.spi.work.WorkListener;
 

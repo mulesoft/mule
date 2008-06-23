@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.osgi;
+package org.mule.osgi.registry;
 
 import org.mule.api.registry.Registry;
 import org.mule.registry.AbstractRegistryBroker;
