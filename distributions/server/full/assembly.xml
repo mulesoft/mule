@@ -390,31 +390,82 @@ Assembly descriptor for the full Mule distribution.
       <outputDirectory>lib/opt</outputDirectory>
       <!-- No version number  -->
       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
-      <includes>
-        <!-- Spring IoC -->
-        <include>org.springframework:spring-core</include>
-        <include>org.springframework:spring-beans</include>
-        <include>org.springframework:spring-context</include>
-        <!-- Spring OSGi -->
-        <include>org.springframework.osgi:spring-osgi-core</include>
-        <include>org.springframework.osgi:spring-osgi-io</include>
-        <include>org.springframework.osgi:spring-osgi-extender</include>
-        <include>org.springframework:spring-aop</include>
-        <include>aopalliance:aopalliance.osgi</include>
-        <!-- PAX Logging -->
-        <include>org.ops4j.pax.logging:pax-logging-api</include>
-        <include>org.ops4j.pax.logging:pax-logging-service</include> 
-        <!-- Re-packaged by Mule for OSGi -->
-        <include>backport-util-concurrent:backport-util-concurrent.osgi</include> 
-        <include>org.apache.geronimo.specs:geronimo-j2ee-connector.osgi</include> 
-        <include>org.apache.geronimo.specs:geronimo-jta.osgi</include> 
-      </includes>
-      <!-- no XML -->
+
       <excludes>
-          <exclude>xml-apis:xml-apis</exclude>
-          <exclude>xerces:xercesImpl</exclude>
-          <exclude>xerces:xml-serializer</exclude>
-          <exclude>xalan:xalan</exclude>
+        <!-- Core -->
+        <exclude>org.mule:mule-core</exclude>
+        <!-- Transports -->
+        <exclude>org.mule.transports:mule-transports-all</exclude>
+        <exclude>org.mule.transports:mule-transport-axis</exclude>
+        <exclude>org.mule.transports:mule-transport-bpm</exclude>
+        <exclude>org.mule.transports:mule-transport-cxf</exclude>
+        <exclude>org.mule.transports:mule-transport-ejb</exclude>
+        <exclude>org.mule.transports:mule-transport-email</exclude>
+        <exclude>org.mule.transports:mule-transport-file</exclude>
+        <exclude>org.mule.transports:mule-transport-ftp</exclude>
+        <exclude>org.mule.transports:mule-transport-http</exclude>
+        <exclude>org.mule.transports:mule-transport-jbpm</exclude>
+        <exclude>org.mule.transports:mule-transport-jdbc</exclude>
+        <exclude>org.mule.transports:mule-transport-jms</exclude>
+        <exclude>org.mule.transports:mule-transport-multicast</exclude>
+        <exclude>org.mule.transports:mule-transport-quartz</exclude>
+        <exclude>org.mule.transports:mule-transport-rmi</exclude>
+        <exclude>org.mule.transports:mule-transport-soap</exclude>
+        <exclude>org.mule.transports:mule-transport-ssl</exclude>
+        <exclude>org.mule.transports:mule-transport-stdio</exclude>
+        <exclude>org.mule.transports:mule-transport-tcp</exclude>
+        <exclude>org.mule.transports:mule-transport-udp</exclude>
+        <exclude>org.mule.transports:mule-transport-vm</exclude>
+        <exclude>org.mule.transports:mule-transport-xfire</exclude>
+        <exclude>org.mule.transports:mule-transport-xmpp</exclude>
+        <!-- Modules -->
+        <exclude>org.mule.modules:mule-module-acegi</exclude>
+        <exclude>org.mule.modules:mule-modules-all</exclude>
+        <exclude>org.mule.modules:mule-module-boot</exclude>
+        <exclude>org.mule.modules:mule-module-builders</exclude>
+        <exclude>org.mule.modules:mule-module-client</exclude>
+        <exclude>org.mule.modules:mule-module-jaas</exclude>
+        <exclude>org.mule.modules:mule-module-jbossts</exclude>
+        <exclude>org.mule.modules:mule-module-jca</exclude>
+        <exclude>org.mule.modules:mule-module-management</exclude>
+        <exclude>org.mule.modules:mule-module-ognl</exclude>
+        <exclude>org.mule.modules:mule-module-pgp</exclude>
+        <exclude>org.mule.modules:mule-module-scripting</exclude>
+        <exclude>org.mule.modules:mule-module-spring-config</exclude>
+        <exclude>org.mule.modules:mule-module-spring-extras</exclude>
+        <exclude>org.mule.modules:mule-module-xml</exclude>
+        <!-- Examples -->
+        <exclude>org.mule.examples:mule-examples-all</exclude>
+        <exclude>org.mule.examples:mule-example-echo</exclude>
+        <exclude>org.mule.examples:mule-example-errorhandler</exclude>
+        <exclude>org.mule.examples:mule-example-hello</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-common</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-esn</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-bpm</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-credit-agency</exclude>
+        <exclude>org.mule.examples:mule-example-scripting</exclude>
+        <exclude>org.mule.examples:mule-example-stockquote</exclude>
+        <!-- TODO The following exclusions shouldn't be necessary here if they are kept 
+        out in their originating POMs, need to do some transitive dependency debugging
+        to figure out who is dragging them into the distro. -->
+        <exclude>org.mule.tests:mule-tests-functional</exclude>
+        <exclude>commons-logging:commons-logging</exclude>
+        <!-- these two are already in lib/boot -->
+        <exclude>commons-cli:commons-cli</exclude>
+        <exclude>tanukisoft:wrapper</exclude>
+
+        <exclude>org.apache.activemq:activemq-core</exclude>
+        <exclude>org.apache.activemq:activeio-core</exclude>
+
+        <!-- this lib is provided separately in 'profiler' distribution -->
+        <exclude>com.yourkit:yjp-controller-api-redist</exclude>
+
+        <!-- no XML -->
+        <exclude>xml-apis:xml-apis</exclude>
+        <exclude>xerces:xercesImpl</exclude>
+        <exclude>xerces:xml-serializer</exclude>
+        <exclude>xalan:xalan</exclude>
 
         <!-- MULE-3044: exclude the wsdl4j artifact from the axis transport -->
         <exclude>axis:axis-wsdl4j</exclude>

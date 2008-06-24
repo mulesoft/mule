@@ -35,5 +35,18 @@
             <artifactId>spring-osgi-extender</artifactId>
             <version>${springOsgiVersion}</version>
         </dependency>
+        <dependency>
+          <groupId>aopalliance</groupId>
+          <artifactId>aopalliance.osgi</artifactId>
+          <version>${aopallianceVersion}</version>
+       </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_compendium</artifactId>
+        </dependency>
     </dependencies>
 </project>

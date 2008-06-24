@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
+            <artifactId>com.springsource.javax.activation</artifactId>
         </dependency>
 
         <!-- Unit tests -->

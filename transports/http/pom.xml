@@ -21,12 +21,12 @@
             <artifactId>mule-transport-ssl</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>com.springsource.org.apache.commons.codec</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>com.springsource.org.apache.commons.httpclient</artifactId>
         </dependency>
         <dependency>
             <groupId>jetty</groupId>
@@ -34,8 +34,8 @@
             <version>5.1.12</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-servlet_2.4_spec</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>com.springsource.javax.servlet</artifactId>
         </dependency>
         
         <!-- Unit tests -->

@@ -68,67 +68,96 @@
         <slf4jVersion>1.5.0</slf4jVersion>     
     </properties>
 
-    <!-- Declare all dependencies that are used in more than one module here. 
-         Any dependency which is to be deployed to OSGi as a bundle should
-         have scope="provided" -->
+    <!-- Declare all dependencies that are used in more than one module here. -->
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.mule</groupId>
                 <artifactId>mule-core</artifactId>
                 <version>${muleCEVersion}</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.modules</groupId>
+                <artifactId>mule-module-client</artifactId>
+                <version>${muleCEVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.modules</groupId>
                 <artifactId>mule-module-spring-config</artifactId>
                 <version>${muleCEVersion}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.mule.modules</groupId>
                 <artifactId>mule-module-builders</artifactId>
                 <version>${muleCEVersion}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.mule.modules</groupId>
                 <artifactId>mule-module-xml</artifactId>
                 <version>${muleCEVersion}</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-bpm</artifactId>
+                <version>${muleCEVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-file</artifactId>
+                <version>${muleCEVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-http</artifactId>
                 <version>${muleCEVersion}</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-rmi</artifactId>
+                <version>${muleCEVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-soap</artifactId>
+                <version>${muleCEVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-ssl</artifactId>
                 <version>${muleCEVersion}</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-tcp</artifactId>
+                <version>${muleCEVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-udp</artifactId>
+                <version>${muleCEVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-vm</artifactId>
                 <version>${muleCEVersion}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-stdio</artifactId>
                 <version>${muleCEVersion}</version>
-                <scope>provided</scope>
             </dependency>
-            
+<!-- 
             <dependency>
                 <groupId>backport-util-concurrent</groupId>
                 <artifactId>backport-util-concurrent</artifactId>
                 <version>${backportUtilConcurrentVersion}</version>
-                <scope>provided</scope>
             </dependency>
- 
+ -->
+            <dependency>
+                <groupId>backport-util-concurrent</groupId>
+                <artifactId>backport-util-concurrent.osgi</artifactId>
+                <version>${backportUtilConcurrentVersion}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-annotation_1.0_spec</artifactId>
@@ -143,11 +172,20 @@
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
                 <version>${geronimoSpecsVersion}</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-j2ee-connector.osgi</artifactId>
+                <version>${geronimoSpecsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
+                <version>${geronimoSpecsVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-j2ee-management.osgi</artifactId>
                 <version>${geronimoSpecsVersion}</version>
             </dependency>
             <dependency>
@@ -162,9 +200,18 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jms.osgi</artifactId>
+                <version>${geronimoSpecsVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
                 <version>${geronimoSpecsVersion}</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+	            <artifactId>geronimo-jta.osgi</artifactId>
+                <version>${geronimoSpecsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -172,22 +219,40 @@
                 <version>${geronimoSpecsVersion}</version>
             </dependency>
             <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>com.springsource.javax.servlet</artifactId>
+                <version>2.4.0</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
                 <version>1.1.1</version>
             </dependency>
+            
+             <!-- OSGI: Available from SSEBR --> 
             <dependency>
                 <groupId>javax.activation</groupId>
                 <artifactId>activation</artifactId>
                 <version>1.1</version>
-                <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>com.springsource.javax.activation</artifactId>
+                <version>1.1.0</version>
+            </dependency>
+            
+            <!-- OSGI: Available from SSEBR -->
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
                 <version>1.4</version>
-                <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>com.springsource.javax.mail</artifactId>
+                <version>1.4.0</version>
+            </dependency>
+            
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -197,7 +262,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
                 <version>${springVersion}</version>
-                <scope>provided</scope>
                 <exclusions>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
@@ -209,7 +273,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
                 <version>${springVersion}</version>
-                <scope>provided</scope>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -225,7 +288,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
                 <version>${springVersion}</version>
-                <scope>provided</scope>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -344,14 +406,44 @@
                  in different versions.
             -->
             <dependency>
+                <!--
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>1.3</version>
+                -->
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.codec</artifactId>
+                <version>1.3.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
                 <version>3.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.httpclient</artifactId>
+                <version>3.1.0</version>
+                <exclusions>
+                    <!-- we like slf4j -->
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            
+            <!-- OSGI: Wrapped for mule ("osgi" suffix) -->
+            <dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli.osgi</artifactId>
+                <version>1.0</version>
                 <exclusions>
                     <!-- we like slf4j -->
                     <exclusion>
@@ -360,6 +452,40 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            
+            <!-- OSGI: Headers in maven repo -->
+            <dependency>
+                <groupId>commons-pool</groupId>
+                <artifactId>commons-pool</artifactId>
+                <version>1.4</version>
+            </dependency>
+            
+            <!-- OSGI: Wrapped for mule ("osgi" suffix) -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io.osgi</artifactId>
+                <version>1.3.1</version>
+            </dependency>
+            
+            <!-- OSGI: Available from SSEBR -->
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.collections</artifactId>
+                <version>3.2.0</version>
+            </dependency>
+            
+            <!-- OSGI: Wrapped for mule ("osgi" suffix) -->
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang.osgi</artifactId>
+                <version>2.3</version>
+            </dependency>            
+
             <dependency>
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derby</artifactId>
@@ -568,33 +694,28 @@
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_core</artifactId>
                 <version>1.0</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_compendium</artifactId>
                 <version>1.0</version>
-                <scope>provided</scope>
             </dependency>
             <!-- Spring OSGi -->
             <dependency>
                 <groupId>org.springframework.osgi</groupId>
                 <artifactId>spring-osgi-core</artifactId>
                 <version>${springOsgiVersion}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.osgi</groupId>
                 <artifactId>spring-osgi-io</artifactId>
                 <version>${springOsgiVersion}</version>
-                <scope>provided</scope>
             </dependency>
             <!-- We package this one ourselves 
             <dependency>
                 <groupId>org.springframework.osgi</groupId>
                 <artifactId>spring-osgi-extender</artifactId>
                 <version>${springOsgiVersion}</version>
-                <scope>provided</scope>
             </dependency>
             -->
             <!-- 
@@ -770,6 +891,12 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
+        <repository>
+            <id>com.springsource.repository.bundles.external</id>
+            <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+            <url>http://repository.springsource.com/maven/bundles/external</url>
+        </repository>
+        <!-- TODO: This has been replaced with SSEBR.  Remove if possible -->
         <repository>
             <id>spring-osgi</id>
             <name>Spring OSGi Artifacts Repo</name>
@@ -1006,9 +1133,10 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.2.0</version>
+                <version>1.4.1</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <obrRepository>NONE</obrRepository>
                     <instructions>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                         <Bundle-Version>${pom.version}</Bundle-Version>
@@ -1017,7 +1145,6 @@
                         <_include>-osgi.properties</_include>
                         <!-- OSGi R4 -->
                         <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
-                        
                         <!-- Non-OSGi manifest entries -->
                         <More-Info>For more information go to ${productUrl}</More-Info>
                         <Support>Get commercial support: ${pom.organization.url}/support</Support>
@@ -1341,80 +1468,16 @@
          Global dependencies - these will be available for all Mule modules
          ******************************************************************* -->
     <dependencies>    
+ 
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
         </dependency>
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>backport-util-concurrent</groupId>
-            <artifactId>backport-util-concurrent</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.7.0</version>
-            <exclusions>
-                <!-- we like slf4j -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.2</version>
-            <exclusions>
-                <!-- we like slf4j -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.3</version>
-        </dependency>
-        <!-- Used by mules default component pooling mechanism -->
-        <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <!-- OSGi Specification -->
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi_R4_core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi_R4_compendium</artifactId>
-        </dependency>
+        
+        <!-- 
+        We cannot add apache commons, activation of j2ee specs jars here because child
+        projects create the osgi ready versions of these and this causes cyclic dependencies
+        -->
 
         <!-- Unit tests -->
         <dependency>
@@ -1428,5 +1491,7 @@
             <version>0.09</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>    
+    
 </project>

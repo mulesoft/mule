@@ -15,8 +15,12 @@
     <modules>
         <module>backport-util-concurrent</module>
         <module>aopalliance</module>
+        <module>commons-cli</module>
+        <module>commons-io</module>
+        <module>commons-lang</module>
         <module>geronimo-j2ee-connector</module>
+        <module>geronimo-j2ee-management</module>
         <module>geronimo-jta</module>
-        <module>all-bundles</module>
+        <module>geronimo-jms</module>
     </modules>
 </project>

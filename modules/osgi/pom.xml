@@ -18,5 +18,13 @@
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_compendium</artifactId>
+        </dependency>
   </dependencies>
 </project>
