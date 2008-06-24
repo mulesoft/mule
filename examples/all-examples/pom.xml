@@ -23,73 +23,61 @@
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-echo</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-errorhandler</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-hello</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-bpm</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-common</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <!-- <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-common-tests</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency> -->
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-credit-agency</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-esb</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-esn</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-scripting</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-stockquote</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <!-- <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-webapp</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
             <type>war</type>
         </dependency> -->
     </dependencies>

@@ -21,103 +21,86 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-acegi</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-boot</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jaas</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jbossts</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules.jca</groupId>
             <artifactId>mule-module-jca-generic</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules.jca</groupId>
             <artifactId>mule-module-jca-jboss</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-management</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-osgi</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-ognl</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-pgp</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-osgi</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
-            <scope>runtime</scope>
         </dependency>
     </dependencies>
 </project>
