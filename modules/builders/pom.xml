@@ -10,6 +10,7 @@
     </parent>
     <artifactId>mule-module-builders</artifactId>
     <name>Mule Configuration Builders</name>
+    <packaging>bundle</packaging>
     <description>Standard configuration builders for Mule</description>
 
     <dependencies>
@@ -27,9 +28,8 @@
         </dependency>
         <!-- Used by MuleXmlBuilderContextServlet -->
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-servlet_2.4_spec</artifactId>
-            <scope>provided</scope> 
+            <groupId>javax.servlet</groupId>
+            <artifactId>com.springsource.javax.servlet</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
