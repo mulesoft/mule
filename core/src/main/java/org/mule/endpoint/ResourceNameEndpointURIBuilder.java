@@ -10,12 +10,14 @@
 
 package org.mule.endpoint;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;import org.mule.api.endpoint.MalformedEndpointException;
+import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.util.StringUtils;
 
 import java.net.URI;
 import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>ResourceNameEndpointBuilder</code> extracts a resource name from a uri
@@ -24,8 +26,10 @@ import java.util.Properties;
  */
 public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
-    public static final String RESOURCE_INFO_PROPERTY = "resourceInfo";
+
     protected static final Log logger = LogFactory.getLog(ResourceNameEndpointURIBuilder.class);
+    
+    public static final String RESOURCE_INFO_PROPERTY = "resourceInfo";
 
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
@@ -48,14 +52,14 @@ public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
             address += path.substring(1);
         }
         else if (authority != null && !authority.equals(address))
-        {        	
+        {
             address += authority;
             
             int atCharIndex = -1;
             if (address != null && address.length() != 0 && ((atCharIndex = address.indexOf("@")) > -1))
             {
-            	userInfo = address.substring(0, atCharIndex);
-            	address = address.substring(atCharIndex + 1);           	
+                userInfo = address.substring(0, atCharIndex);
+                address = address.substring(atCharIndex + 1);
             }
 
         }
@@ -72,7 +76,7 @@ public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
         String credentials = uri.getUserInfo();
         if (credentials != null && credentials.length() != 0)
         {
-        	userInfo = credentials;
+            userInfo = credentials;
         }
         
         int x = address.indexOf(":", y);

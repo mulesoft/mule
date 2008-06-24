@@ -7,13 +7,13 @@ Enterprise Integration Patterns book.
 There are several variations of the same application which illustrate different 
 architectural styles and Mule constructs.
 
-For more information, refer to http://www.muledocs.org/Examples
+For more information, refer to http://mule.mulesource.org/display/MULEINTRO/Examples
 
 +----------------------+
 | Building the example |
 +----------------------+
 First, make sure you have set the MULE_HOME environment variable as recommended 
-in INSTALL.txt
+in Mule's README.txt
 
 Depending on the build tool you are using (Ant or Maven), you can build the 
 example by simply running "ant" or "mvn".  This will download any additional 

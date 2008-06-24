@@ -9,17 +9,14 @@
         <name>radioselection</name>
         <value>skip</value>
     </condition>
+    <condition type="packselection" id="cxfselected"> 
+        <packid>cxfpack</packid> 
+    </condition> 
+    <condition type="not" id="cxfnotselected">
+        <condition type="packselection"> 
+            <packid>cxfpack</packid> 
+        </condition> 
+    </condition>
     <panelcondition conditionid="download" panelid="download3rdparty"/>
     <panelcondition conditionid="skip" panelid="skipdownload"/>
-
-    <condition type="variable" id="show.lib.standard">
-        <name>radioselection</name>
-        <value>skip</value>
-    </condition>
-    <condition type="variable" id="show.lib.full">
-        <name>radioselection</name>
-        <value>download</value>
-    </condition>
-    <packcondition packid="standard library" conditionid="show.lib.standard"/>
-    <packcondition packid="full library" conditionid="show.lib.full"/>
 </conditions>

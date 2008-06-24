@@ -20,4 +20,12 @@
         <https:tls-protocol-handler property="foo"/>
     </https:connector>
 
+    <https:polling-connector name="polling" checkEtag="false" pollingFrequency="3456" discardEmptyContent="false">
+        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <https:tls-key-store keyPassword="mulepassword" path="serverKeystore" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword" explicitOnly="true"
+                          requireClientAuthentication="true"/>    
+    </https:polling-connector>
+
+
 </mule>

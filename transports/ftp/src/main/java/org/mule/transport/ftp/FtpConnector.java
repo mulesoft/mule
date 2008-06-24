@@ -541,15 +541,14 @@ public class FtpConnector extends AbstractConnector
 
     private String getFilename(ImmutableEndpoint endpoint, MuleMessage message) throws IOException
     {
-        String filename = (String)message.getProperty(FtpConnector.PROPERTY_FILENAME);
-        if (filename == null)
+        String filename = (String) message.getProperty(FtpConnector.PROPERTY_FILENAME);
+        String outPattern = (String) endpoint.getProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN);
+        if (outPattern == null)
         {
-            String outPattern = (String) endpoint.getProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN);
-            if (outPattern == null)
-            {
-                outPattern = message.getStringProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN,
-                        getOutputPattern());
-            }
+            outPattern = message.getStringProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN, getOutputPattern());
+        }
+        if (outPattern != null || filename == null)
+        {
             filename = generateFilename(message, outPattern);
         }
         if (filename == null)
@@ -558,7 +557,7 @@ public class FtpConnector extends AbstractConnector
         }
         return filename;
     }
-
+    
     private String generateFilename(MuleMessage message, String pattern)
     {
         if (pattern == null)

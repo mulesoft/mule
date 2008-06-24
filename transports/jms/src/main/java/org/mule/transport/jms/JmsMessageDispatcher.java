@@ -13,8 +13,10 @@ package org.mule.transport.jms;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageAdapter;
@@ -159,6 +161,26 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             if (connector.supportsProperty(JmsConstants.JMS_REPLY_TO))
             {
                 Object tempReplyTo = eventMsg.removeProperty(JmsConstants.JMS_REPLY_TO);
+                if(tempReplyTo==null)
+                {
+                    //It may be a Mule URI or global endpoint Ref
+                    tempReplyTo = eventMsg.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+                    if(tempReplyTo!=null)
+                    {
+                        if(tempReplyTo.toString().startsWith("jms://"))
+                        {
+                            tempReplyTo = tempReplyTo.toString().substring(6);
+                        }
+                        else
+                        {
+                            EndpointBuilder epb = event.getMuleContext().getRegistry().lookupEndpointBuilder(tempReplyTo.toString());
+                            if(epb != null)
+                            {
+                                tempReplyTo = epb.buildOutboundEndpoint().getEndpointURI().getAddress();
+                            }
+                        }
+                    }
+                }
                 if (tempReplyTo != null)
                 {
                     if (tempReplyTo instanceof Destination)

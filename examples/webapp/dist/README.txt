@@ -6,20 +6,24 @@ LoanBroker, Hello World and Echo examples. It also provides examples of
 accessing Mule using REST style service calls and is itself an example of how
 to embed Mule in a webapp.
 
-For more information, refer to http://www.muledocs.org/Examples
+For more information, refer to http://mule.mulesource.org/display/MULEINTRO/Examples
 
 +---------------------+
 | Running the example |
 +---------------------+
-First, make sure you have set the MULE_HOME environment variable as recommended 
-in INSTALL.txt
+First, make sure you have set the MULE_HOME environment variable as recommended
+in Mule's README.txt
+
+NOTE: The echo (mule-example-echo), hello (mule-example-hello),
+stockquote (mule-example-stockquote) and loanbroker (mule-example-loanbroker-esn)
+need to be built before  you can run the Web App.
+Please look in the respective README of these example for instructions of how to build.
 
 Depending on the build tool you are using (Ant or Maven), you can build the 
 example by simply running "ant" or "mvn".  This will generate a WAR file in the 
 "target" directory which can be deployed to any standard JEE web server.
 
-By default, the "mvn" build will automatically start up the WAR in Jetty!  
+By default, the "mvn" build will automatically start up the WAR in Jetty!
 Just surf to the following URL in your browser and enjoy:
 
 http://localhost:8090/mule-examples
-

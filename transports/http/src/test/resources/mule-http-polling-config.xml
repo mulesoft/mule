@@ -12,9 +12,7 @@
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-    <http:connector name="PollingHttpConnector" reuseAddress="true">
-        <service-overrides messageReceiver="org.mule.transport.http.PollingHttpMessageReceiver"/>
-    </http:connector>
+    <http:polling-connector name="PollingHttpConnector" pollingFrequency="30000" reuseAddress="true"/>
 
     <http:connector name="HttpConnector"/>
 
@@ -25,9 +23,7 @@
         <service name="pollingUMO">
             <inbound>
                 <http:inbound-endpoint user="marie" password="marie" host="localhost" port="61205"
-                                       connector-ref="PollingHttpConnector">
-                    <property key="pollingFrequency" value="30000"/>
-                </http:inbound-endpoint>
+                                       connector-ref="PollingHttpConnector"/>
             </inbound>
             <test:component/>
             <outbound>
@@ -39,9 +35,11 @@
 
         <service name="polledUMO">
             <inbound>
-                <inbound-endpoint address="http://localhost:61205" connector-ref="HttpConnector"/>
+                <inbound-endpoint address="http://localhost:61205" synchronous="true" connector-ref="HttpConnector"/>
             </inbound>
-            <test:component/>
+            <test:component>
+                <test:return-data>foo</test:return-data>
+            </test:component>
         </service>
 
     </model>

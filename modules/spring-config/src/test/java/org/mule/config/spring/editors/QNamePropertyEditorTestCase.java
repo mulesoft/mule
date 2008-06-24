@@ -19,7 +19,7 @@ public class QNamePropertyEditorTestCase extends AbstractMuleTestCase
 
     public void testFullQNameString()
     {
-        QName name = (QName) QNamePropertyEditor.convert("qname{e:echo:http://muleumo.org/echo}");
+        QName name = QNamePropertyEditor.convert("qname{e:echo:http://muleumo.org/echo}");
         assertNotNull(name);
         assertEquals("e", name.getPrefix());
         assertEquals("echo", name.getLocalPart());
@@ -28,7 +28,7 @@ public class QNamePropertyEditorTestCase extends AbstractMuleTestCase
 
     public void testFullQNameStringWithColonsInNamespace()
     {
-        QName name = (QName) QNamePropertyEditor.convert("qname{e:echo:urn:muleumo:echo}");
+        QName name = QNamePropertyEditor.convert("qname{e:echo:urn:muleumo:echo}");
         assertNotNull(name);
         assertEquals("e", name.getPrefix());
         assertEquals("echo", name.getLocalPart());
@@ -37,7 +37,7 @@ public class QNamePropertyEditorTestCase extends AbstractMuleTestCase
 
     public void testNameAndNamespace()
     {
-        QName name = (QName) QNamePropertyEditor.convert("qname{echo:http://muleumo.org/echo}");
+        QName name = QNamePropertyEditor.convert("qname{echo:http://muleumo.org/echo}");
         assertNotNull(name);
         assertEquals("http://muleumo.org/echo", name.getNamespaceURI());
         assertEquals("echo", name.getLocalPart());
@@ -46,7 +46,7 @@ public class QNamePropertyEditorTestCase extends AbstractMuleTestCase
 
     public void testNameOnly()
     {
-        QName name = (QName) QNamePropertyEditor.convert("qname{echo}");
+        QName name = QNamePropertyEditor.convert("qname{echo}");
         assertNotNull(name);
         assertEquals("", name.getNamespaceURI());
         assertEquals("echo", name.getLocalPart());
@@ -55,7 +55,7 @@ public class QNamePropertyEditorTestCase extends AbstractMuleTestCase
 
     public void testNameOnlyWithoutBraces()
     {
-        QName name = (QName) QNamePropertyEditor.convert("echo");
+        QName name = QNamePropertyEditor.convert("echo");
         assertNotNull(name);
         assertEquals("", name.getNamespaceURI());
         assertEquals("echo", name.getLocalPart());

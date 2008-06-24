@@ -31,6 +31,18 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="jaxen-filter" type="jaxenFilterType" substitutionGroup="mule:abstract-filter"/>
+    <xsd:complexType name="jaxenFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:patternFilterType">
+                <xsd:sequence>
+                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="expectedValue" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
     <!-- xml outbound routers -->
 
     <xsd:element name="message-splitter" type="messageSplitterType" substitutionGroup="mule:abstract-outbound-router"/>

@@ -31,7 +31,7 @@
                 <vm:inbound-endpoint path="chunking.channel"/>
                 <message-chunking-aggregator-router/>
             </inbound>
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <test:component appendString=" Received"/>
         </service>
 
         <!-- this has changed slightly from 1.x; we need to stop the functional test component from

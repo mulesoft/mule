@@ -11,8 +11,10 @@ package org.mule.transport.vm.config;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.QueueProfile;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transport.vm.VMConnector;
 
 
@@ -79,6 +81,30 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(uri);
         String address = uri.getAddress();
         assertEquals(address, "queue");
+    }
+    
+    public void testVmTransaction() throws Exception
+    {
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("globalWithTx");
+        assertNotNull(endpoint);
+        
+        TransactionConfig txConfig = endpoint.getTransactionConfig();
+        assertNotNull(txConfig);
+        assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, txConfig.getAction());
+        assertEquals(42, txConfig.getTimeout());
+    }
+
+    public void testCustomTransaction() throws Exception
+    {
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("customTx").buildInboundEndpoint();
+        assertNotNull(endpoint);
+        
+        TransactionConfig txConfig = endpoint.getTransactionConfig();
+        assertNotNull(txConfig);
+        assertEquals(TransactionConfig.ACTION_JOIN_IF_POSSIBLE, txConfig.getAction());
+        TestTransactionFactory factory = (TestTransactionFactory) endpoint.getTransactionConfig().getFactory();
+        assertNotNull(factory);
+        assertEquals("foo", factory.getValue());
     }
 
 }

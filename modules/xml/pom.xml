@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
-            <version>3.2.2</version>
+            <version>3.2.4</version>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
@@ -85,6 +85,17 @@
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.stax-utils</groupId>
+            <artifactId>stax-utils</artifactId>
+            <version>20060502</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.bea.xml</groupId>
+                    <artifactId>jsr173-ri</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

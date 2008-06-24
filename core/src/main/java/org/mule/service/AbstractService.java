@@ -10,6 +10,7 @@
 
 package org.mule.service;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -865,6 +866,9 @@ public abstract class AbstractService implements Service
         return replyToHandler;
     }
 
+    // This method is used when the service invoked asynchronously. It should really
+    // be used independantly of if the service is invoked asynchronously when we are
+    // using an out-in or out-optional-in outbound message exchange pattern
     protected void dispatchToOutboundRouter(MuleEvent event, MuleMessage result) throws MessagingException
     {
         if (event.isStopFurtherProcessing())
@@ -875,11 +879,15 @@ public abstract class AbstractService implements Service
         {
             if (getOutboundRouter().hasEndpoints())
             {
+                // Here we can use the same message instance because there is no inbound response.
                 getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
             }
         }
     }
 
+    // This method is used when the service invoked synchronously. It should really
+    // be used independantly of if the service is invoked synchronously when we are
+    // using an out-only outbound message exchange pattern
     protected MuleMessage sendToOutboundRouter(MuleEvent event, MuleMessage result) throws MessagingException
     {
         if (event.isStopFurtherProcessing())
@@ -890,7 +898,10 @@ public abstract class AbstractService implements Service
         {
             if (getOutboundRouter().hasEndpoints())
             {
-                MuleMessage outboundReturnMessage = getOutboundRouter().route(result, event.getSession(),
+                // Here we need to use a copy of the message instance because there
+                // is an inbound response so that transformers executed as part of
+                // the outbound phase do not affect the inbound response. MULE-3307
+                MuleMessage outboundReturnMessage = getOutboundRouter().route(new DefaultMuleMessage(result), event.getSession(),
                     event.isSynchronous());
                 if (outboundReturnMessage != null)
                 {

@@ -20,7 +20,6 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.component.AbstractComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.filters.MessagePropertyFilter;
-import org.mule.routing.filters.RegExFilter;
 import org.mule.transport.NullPayload;
 import org.mule.util.expression.ExpressionEvaluator;
 import org.mule.util.expression.ExpressionEvaluatorManager;
@@ -43,7 +42,6 @@ import org.apache.commons.logging.LogFactory;
 public class RestServiceWrapper extends AbstractComponent
 {
 
-    public static final String REST_SERVICE_URL = "rest.service.url";
     public static final String GET = "GET";
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_TYPE_VALUE = "application/x-www-form-urlencoded";
@@ -55,13 +53,11 @@ public class RestServiceWrapper extends AbstractComponent
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private String serviceUrl;
-    private boolean urlFromMessage = false;
     private Map requiredParams = new HashMap();
     private Map optionalParams = new HashMap();
     private String httpMethod = "GET";
     private List payloadParameterNames;
     private Filter errorFilter;
-    private String errorExpression;
 
     public String getServiceUrl()
     {
@@ -73,15 +69,6 @@ public class RestServiceWrapper extends AbstractComponent
         this.serviceUrl = serviceUrl;
     }
 
-    public boolean isUrlFromMessage()
-    {
-        return urlFromMessage;
-    }
-
-    public void setUrlFromMessage(boolean urlFromMessage)
-    {
-        this.urlFromMessage = urlFromMessage;
-    }
 
     public Map getRequiredParams()
     {
@@ -93,7 +80,7 @@ public class RestServiceWrapper extends AbstractComponent
      * the call will fail Note that you can use
      * {@link org.mule.util.expression.ExpressionEvaluator} expressions such as
      * xpath, header, xquery, etc
-     * 
+     *
      * @param requiredParams
      */
     public void setRequiredParams(Map requiredParams)
@@ -105,7 +92,7 @@ public class RestServiceWrapper extends AbstractComponent
      * Optional params that are pulled from the message. If these params don't exist
      * execution will continue. Note that you can use {@link ExpressionEvaluator}
      * expressions such as xpath, header, xquery, etc
-     * 
+     *
      * @param requiredParams
      */
     public Map getOptionalParams()
@@ -148,23 +135,14 @@ public class RestServiceWrapper extends AbstractComponent
         this.errorFilter = errorFilter;
     }
 
-    public String getErrorExpression()
-    {
-        return errorExpression;
-    }
-
-    public void setErrorExpression(String errorExpression)
-    {
-        this.errorExpression = errorExpression;
-    }
 
     protected void doInitialise() throws InitialisationException
     {
-        if (serviceUrl == null && !urlFromMessage)
+        if (serviceUrl == null)
         {
             throw new InitialisationException(CoreMessages.objectIsNull("serviceUrl"), this);
         }
-        else if (serviceUrl != null)
+        else if (!ExpressionEvaluatorManager.isValidExpression(serviceUrl))
         {
             try
             {
@@ -178,39 +156,24 @@ public class RestServiceWrapper extends AbstractComponent
 
         if (errorFilter == null)
         {
-            if (errorExpression == null)
-            {
-                // We'll set a default filter that checks the return code
-                errorFilter = new MessagePropertyFilter("http.status!=200");
-                logger.info("Setting default error filter to MessagePropertyFilter('http.status!=200')");
-            }
-            else
-            {
-                errorFilter = new RegExFilter(errorExpression);
-            }
+            // We'll set a default filter that checks the return code
+            errorFilter = new MessagePropertyFilter("http.status!=200");
+            logger.info("Setting default error filter to MessagePropertyFilter('http.status!=200')");
         }
     }
 
     public MuleMessage doOnCall(MuleEvent event) throws Exception
     {
-        String tempUrl;
-        MuleMessage result = null;
+        Object requestBody;
 
         Object request = event.transformMessage();
-        Object requestBody;
-        if (urlFromMessage)
+        String tempUrl = serviceUrl;
+        MuleMessage result;
+        if (ExpressionEvaluatorManager.isValidExpression(serviceUrl))
         {
-            tempUrl = event.getMessage().getStringProperty(REST_SERVICE_URL, null);
-            if (tempUrl == null)
-            {
-                throw new IllegalArgumentException(CoreMessages.propertyIsNotSetOnEvent(REST_SERVICE_URL)
-                    .toString());
-            }
+            tempUrl = ExpressionEvaluatorManager.parse(serviceUrl, event.getMessage(), true);
         }
-        else
-        {
-            tempUrl = serviceUrl;
-        }
+
         StringBuffer urlBuffer = new StringBuffer(tempUrl);
 
         if (GET.equalsIgnoreCase(this.httpMethod))
@@ -236,11 +199,11 @@ public class RestServiceWrapper extends AbstractComponent
         event.getMessage().setProperty(HTTP_METHOD, httpMethod);
 
         result = RequestContext.getEventContext().sendEvent(
-            new DefaultMuleMessage(requestBody, event.getMessage()), tempUrl);
+                new DefaultMuleMessage(requestBody, event.getMessage()), tempUrl);
         if (isErrorPayload(result))
         {
             handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), result),
-                result);
+                    result);
         }
 
         return result;
@@ -332,12 +295,12 @@ public class RestServiceWrapper extends AbstractComponent
                     if (requestBodyBuffer != null)
                     {
                         requestBodyBuffer.append(sep).append(payloadParameterNames.get(i)).append('=').append(
-                            requestArray[i].toString());
+                                requestArray[i].toString());
                     }
                     else
                     {
                         url.append(sep).append(payloadParameterNames.get(i)).append('=').append(
-                            requestArray[i].toString());
+                                requestArray[i].toString());
                     }
 
                     sep = updateSeparator(sep);

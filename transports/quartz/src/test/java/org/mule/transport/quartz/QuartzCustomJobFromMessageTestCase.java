@@ -12,7 +12,7 @@ package org.mule.transport.quartz;
 
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.functional.FunctionalTestComponent2;
+import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
@@ -30,7 +30,7 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
 
     public void testDelegatingJobAsProperty() throws Exception
     {
-        FunctionalTestComponent2 component = (FunctionalTestComponent2) getComponent("scheduledService");
+        FunctionalTestComponent component = (FunctionalTestComponent) getComponent("scheduledService");
         assertNotNull(component);
         CountdownCallback count = new CountdownCallback(1);
         component.setEventCallback(count);
@@ -48,7 +48,7 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
 
     public void testDelegatingJobAsPayload() throws Exception
     {
-        FunctionalTestComponent2 component = (FunctionalTestComponent2) getComponent("scheduledService");
+        FunctionalTestComponent component = (FunctionalTestComponent) getComponent("scheduledService");
         assertNotNull(component);
         CountdownCallback count = new CountdownCallback(1);
         component.setEventCallback(count);

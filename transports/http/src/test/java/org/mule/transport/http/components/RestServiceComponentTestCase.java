@@ -18,7 +18,8 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
 {
     
     public static final String SERVICE_NAME = "WORMS";
-    public static final String SERVICE_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote";
+    public static final String SERVICE_URL = "${header:serviceUrl}";
+    //public static final String SERVICE_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote";
 
     protected String getConfigResources()
     {
@@ -33,8 +34,6 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
         RestServiceWrapper restServiceWrapper = (RestServiceWrapper) component;
         assertEquals(restServiceWrapper.getServiceUrl(), SERVICE_URL);
         assertEquals(restServiceWrapper.getHttpMethod(), "POST");
-        assertEquals(restServiceWrapper.isUrlFromMessage(), true);
-        assertEquals(restServiceWrapper.getErrorExpression(), "ErrorExp");
         assertNotNull(restServiceWrapper.getFilter());
         assertEquals(NotFilter.class, restServiceWrapper.getFilter().getClass());
         NotFilter filter = (NotFilter) restServiceWrapper.getFilter();

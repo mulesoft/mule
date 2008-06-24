@@ -12,21 +12,21 @@ package org.mule.tck.functional;
 
 import org.mule.MuleServer;
 import org.mule.RequestContext;
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,13 +35,13 @@ import org.apache.commons.logging.LogFactory;
  * functional tests. This service accepts an EventCallback that can be used to
  * assert the state of the current event.
  * <p/>
- * Also, this service fires {@link FunctionalTestNotification} via Mule for every message received.
+ * Also, this service fires {@link org.mule.tck.functional.FunctionalTestNotification} via Mule for every message received.
  * Tests can register with Mule to receive these events by implementing
- * {@link FunctionalTestNotificationListener}.
+ * {@link org.mule.tck.functional.FunctionalTestNotificationListener}.
  *
- * @see org.mule.tck.functional.EventCallback
- * @see org.mule.tck.functional.FunctionalTestNotification
- * @see org.mule.tck.functional.FunctionalTestNotificationListener
+ * @see EventCallback
+ * @see FunctionalTestNotification
+ * @see FunctionalTestNotificationListener
  */
 
 public class FunctionalTestComponent implements Callable, Initialisable, Disposable
@@ -51,12 +51,14 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     public static final int STREAM_SAMPLE_SIZE = 4;
     public static final int STREAM_BUFFER_SIZE = 4096;
     private EventCallback eventCallback;
-    private Object returnMessage = null;
-    private boolean appendComponentName = false;
+    private Object returnData = null;
     private boolean throwException = false;
     private boolean enableMessageHistory = true;
-    private boolean addReceived = true;
-    private boolean asString = true;
+    private boolean enableNotifications = true;
+    private boolean doInboundTransform = true;
+    private String appendString;
+    private Class exceptionToThrow;
+    private long waitTime = 0;
 
     /**
      * Keeps a list of any messages received on this service. Note that only references
@@ -78,90 +80,110 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         // nothing to do
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public Object onCall(MuleEventContext context) throws Exception
     {
-        if (enableMessageHistory)
+        if (isThrowException())
         {
-            messageHistory.add(context.transformMessage());
+            throwException();
         }
+        return process(getMessageFromContext(context), context);
+    }
 
-        String contents = context.transformMessageToString();
-        String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
-                + context.getService().getName() + ". Content is: "
-                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
-
-        logger.info(msg);
-
-        if (eventCallback != null)
+    private Object getMessageFromContext(MuleEventContext context) throws MuleException
+    {
+        if(isDoInboundTransform())
         {
-            eventCallback.eventReceived(context, this);
+            Object o = context.transformMessage();
+            if(getAppendString()!=null && !(o instanceof String))
+            {
+                o = context.transformMessageToString();
+            }
+            return o;
         }
-        
-        Object replyMessage;
-        if (returnMessage != null)
+        else if(getAppendString()!=null)
         {
-            replyMessage = returnMessage;
+            return context.getMessageAsString();
         }
         else
         {
-            if (isAsString())
-            {
-                replyMessage = (addReceived ? received(contents) : contents)
-                        + (appendComponentName ? " " + context.getService().getName() : "");
-            }
-            else
-            {
-                replyMessage = context.getMessage().getPayload();
-            }
+            return context.getMessage().getPayload();
         }
+    }
 
-        MuleContext muleContext = context.getMuleContext();
-        if (muleContext == null)
+    /**
+         * This method is used by some WebServices tests where you don' want to be introducing the {@link org.mule.api.MuleEventContext} as
+         * a complex type.
+         *
+         * @param data the event data received
+         * @return the processed message
+         * @throws Exception
+         */
+        public Object onReceive(Object data) throws Exception
         {
-            logger.warn("No MuleContext available from MuleEventContext");
-            muleContext = MuleServer.getMuleContext();
-        }
-        muleContext.fireNotification(
-            new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
+            MuleEventContext context = RequestContext.getEventContext();
 
-        if (throwException)
+            if (isThrowException())
+            {
+                throwException();
+            }
+            return process(data, context);
+        }
+
+
+    /**
+     * Always throws a {@link org.mule.tck.exceptions.FunctionalTestException}.  This methodis only called if
+     * {@link #isThrowException()} is true.
+     *
+     * @throws FunctionalTestException or the exception specified in 'exceptionType
+     */
+    protected void throwException() throws Exception
+    {
+        if (getExceptionToThrow() != null)
+        {
+            throw (Exception)getExceptionToThrow().newInstance();
+        }
+        else
         {
             throw new FunctionalTestException();
         }
-
-        return replyMessage;
     }
 
     /**
-     * Append " Received" to contents.  Exposed as static method so tests can call to
-     * construct string for comparison.
+     * Will append the value of {@link #getAppendString()} to the contents of the message. This has a side affect
+     * that the inbound message will be converted to a string and the return payload will be a string.
+     * Note that the value of {@link #getAppendString()} can contain expressions.
      *
-     * @param contents
-     * @return Extended message
+     * @param contents the string vlaue of the current message payload
+     * @param message  the current message
+     * @return a concatenated string of the current payload and the appendString
      */
-    public static String received(String contents)
+    protected String append(String contents, MuleMessage message)
     {
-        return contents + " Received";
+        return contents + ExpressionEvaluatorManager.parse(appendString, message);
     }
 
     /**
-     * This method duplicates much of the functionality for the {@link #onCall} method above. This method is currently
-     * used by some WebServices tests where you don' want to be introducing the {@link org.mule.api.MuleEventContext} as
-     * a complex type.
-     * TODO: It would be nice to remove this method or at least refactor the methods so there is little or no duplication
+     * The service method that implements the test component logic.  This method can be called publically through
+     * either {@link #onCall(org.mule.api.MuleEventContext)} or {@link #onReceive(Object)}
      *
-     * @param data the event data received
-     * @return the processed message
-     * @throws Exception
+     * @param data    The message payload
+     * @param context the current {@link org.mule.api.MuleEventContext}
+     * @return a new message payload according to the configuration of the component
+     * @throws Exception if there is a general failure or if {@link #isThrowException()} is true.
      */
-    public Object onReceive(Object data) throws Exception
+    protected Object process(Object data, MuleEventContext context) throws Exception
     {
-        MuleEventContext context = RequestContext.getEventContext();
-        String contents = data.toString();
+        if (enableMessageHistory)
+        {
+            messageHistory.add(data);
+        }
+
         String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
                 + context.getService().getName() + ". Content is: "
-                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+                + StringMessageUtils.truncate(data.toString(), 100, true), '*', 80);
 
         logger.info(msg);
 
@@ -171,30 +193,53 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         }
 
         Object replyMessage;
-        if (returnMessage != null)
+        if (returnData != null)
         {
-            replyMessage = returnMessage;
-        }
-        else
-        {
-            replyMessage = contents + " Received";
-        }
-
-        context.getMuleContext().fireNotification(
-                new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
-
-        if (throwException)
-        {
-            if (returnMessage != null && returnMessage instanceof Exception)
+            if (returnData instanceof String && ExpressionEvaluatorManager.isValidExpression(returnData.toString()))
             {
-                throw (Exception) returnMessage;
+                replyMessage = ExpressionEvaluatorManager.parse(returnData.toString(), context.getMessage());
             }
             else
             {
-                throw new DefaultMuleException(MessageFactory.createStaticMessage("Functional Test Service Exception"));
+                replyMessage = returnData;
+            }
+        }
+        else
+        {
+            if (appendString != null)
+            {
+                replyMessage = append(data.toString(), context.getMessage());
+            }
+            else
+            {
+                replyMessage = data;
             }
         }
 
+        if (isEnableNotifications())
+        {
+            MuleContext muleContext = context.getMuleContext();
+            if (muleContext == null)
+            {
+                logger.warn("No MuleContext available from MuleEventContext");
+                muleContext = MuleServer.getMuleContext();
+            }
+            muleContext.fireNotification(
+                    new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
+        }
+
+        //Time to wait before returning
+        if(waitTime > 0)
+        {
+            try
+            {
+                Thread.sleep(waitTime);
+            }
+            catch (InterruptedException e)
+            {
+                logger.info("FunctionalTestComponent waitTime was interrupted");
+            }
+        }
         return replyMessage;
     }
 
@@ -205,13 +250,13 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      * Note that the FunctionalTestComponent should be made a singleton
      * {@link org.mule.api.UMODescriptor#setSingleton} when using MuleEvent callbacks
      * <p/>
-     * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this
-     * will deleiver a {@link FunctionalTestNotification} for every message received by this service
+     * Another option is to register a {@link org.mule.tck.functional.FunctionalTestNotificationListener} with Mule and this
+     * will deleiver a {@link org.mule.tck.functional.FunctionalTestNotification} for every message received by this service
      *
      * @return the callback to call when a message is received
      * @see org.mule.api.UMODescriptor
-     * @see org.mule.tck.functional.FunctionalTestNotification
-     * @see org.mule.tck.functional.FunctionalTestNotificationListener
+     * @see FunctionalTestNotification
+     * @see FunctionalTestNotificationListener
      */
     public EventCallback getEventCallback()
     {
@@ -225,13 +270,13 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      * Note that the FunctionalTestComponent should be made a singleton
      * {@link org.mule.api.UMODescriptor#setSingleton} when using MuleEvent callbacks
      * <p/>
-     * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this
-     * will deleiver a {@link FunctionalTestNotification} for every message received by this service
+     * Another option is to register a {@link org.mule.tck.functional.FunctionalTestNotificationListener} with Mule and this
+     * will deleiver a {@link org.mule.tck.functional.FunctionalTestNotification} for every message received by this service
      *
      * @param eventCallback the callback to call when a message is received
      * @see org.mule.api.UMODescriptor
-     * @see org.mule.tck.functional.FunctionalTestNotification
-     * @see org.mule.tck.functional.FunctionalTestNotificationListener
+     * @see FunctionalTestNotification
+     * @see FunctionalTestNotificationListener
      */
     public void setEventCallback(EventCallback eventCallback)
     {
@@ -240,26 +285,26 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
     /**
      * Often you will may want to return a fixed message payload to simulate and external system call.
-     * This can be done using the 'returnMessage' property. Note that you can return complex objects by
+     * This can be done using the 'returnData' property. Note that you can return complex objects by
      * using the <container-property> element in the Xml configuration.
      *
      * @return the message payload to always return from this service instance
      */
-    public Object getReturnMessage()
+    public Object getReturnData()
     {
-        return returnMessage;
+        return returnData;
     }
 
     /**
      * Often you will may want to return a fixed message payload to simulate and external system call.
-     * This can be done using the 'returnMessage' property. Note that you can return complex objects by
+     * This can be done using the 'returnData' property. Note that you can return complex objects by
      * using the <container-property> element in the Xml configuration.
      *
-     * @param returnMessage the message payload to always return from this service instance
+     * @param returnData the message payload to always return from this service instance
      */
-    public void setReturnMessage(Object returnMessage)
+    public void setReturnData(Object returnData)
     {
-        this.returnMessage = returnMessage;
+        this.returnData = returnData;
     }
 
     /**
@@ -267,7 +312,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      * set the 'throwException' property to true.
      *
      * @return throwException true if an exception should always be thrown from this instance.
-     *         If the {@link #returnMessage} property is set and is of type
+     *         If the {@link #returnData} property is set and is of type
      *         java.lang.Exception, that exception will be thrown.
      */
     public boolean isThrowException()
@@ -280,38 +325,12 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      * set the 'throwException' property to true.
      *
      * @param throwException true if an exception should always be thrown from this instance.
-     *                       If the {@link #returnMessage} property is set and is of type
+     *                       If the {@link #returnData} property is set and is of type
      *                       java.lang.Exception, that exception will be thrown.
      */
     public void setThrowException(boolean throwException)
     {
         this.throwException = throwException;
-    }
-
-    /**
-     * This will cause the service to append the compoent name to the end of the message
-     * returned from this service. This only works when processing String messages.
-     * This feature is useful when processing multiple messages using a pool of FunctionalTestComponents
-     * to determine who processed the resulting message
-     *
-     * @return true if the service name will be appended to the return message
-     */
-    public boolean isAppendComponentName()
-    {
-        return appendComponentName;
-    }
-
-    /**
-     * This will cause the service to append the compoent name to the end of the message
-     * returned from this service. This only works when processing String messages.
-     * This feature is useful when processing multiple messages using a pool of FunctionalTestComponents
-     * to determine who processed the resulting message
-     *
-     * @param appendComponentName true if the service name will be appended to the return message
-     */
-    public void setAppendComponentName(boolean appendComponentName)
-    {
-        this.appendComponentName = appendComponentName;
     }
 
     public boolean isEnableMessageHistory()
@@ -324,7 +343,9 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         this.enableMessageHistory = enableMessageHistory;
     }
 
-    /** If enableMessageHistory = true, returns the number of messages received by this service. */
+    /**
+     * If enableMessageHistory = true, returns the number of messages received by this service.
+     */
     public int getReceivedMessages()
     {
         if (messageHistory != null)
@@ -355,7 +376,9 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         return message;
     }
 
-    /** If enableMessageHistory = true, returns the last message received by the service in chronological order. */
+    /**
+     * If enableMessageHistory = true, returns the last message received by the service in chronological order.
+     */
     public Object getLastReceivedMessage()
     {
         if (messageHistory != null)
@@ -368,25 +391,53 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         }
     }
 
-    public boolean isAddReceived()
+    public String getAppendString()
     {
-        return addReceived;
+        return appendString;
     }
 
-    public void setAddReceived(boolean addReceived)
+    public void setAppendString(String appendString)
     {
-        this.addReceived = addReceived;
+        this.appendString = appendString;
     }
 
-    public boolean isAsString()
+    public boolean isEnableNotifications()
     {
-        return asString;
+        return enableNotifications;
     }
 
-    public void setAsString(boolean asString)
+    public void setEnableNotifications(boolean enableNotifications)
     {
-        this.asString = asString;
+        this.enableNotifications = enableNotifications;
     }
-    
+
+    public Class getExceptionToThrow()
+    {
+        return exceptionToThrow;
+    }
+
+    public void setExceptionToThrow(Class exceptionToThrow)
+    {
+        this.exceptionToThrow = exceptionToThrow;
+    }
+
+    public long getWaitTime()
+    {
+        return waitTime;
+    }
+
+    public void setWaitTime(long waitTime)
+    {
+        this.waitTime = waitTime;
+    }
+
+    public boolean isDoInboundTransform()
+    {
+        return doInboundTransform;
+    }
+
+    public void setDoInboundTransform(boolean doInboundTransform)
+    {
+        this.doInboundTransform = doInboundTransform;
+    }
 }
-

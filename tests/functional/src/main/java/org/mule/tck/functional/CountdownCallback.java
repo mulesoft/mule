@@ -13,10 +13,9 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.MessageFactory;
 
-import junit.framework.AssertionFailedError;
-
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import junit.framework.AssertionFailedError;
 
 public class CountdownCallback implements EventCallback
 {

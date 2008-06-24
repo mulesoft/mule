@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+       xsi:schemaLocation="
+               http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
+
+    <tcp:connector name="tcpConnector" keepSendSocketOpen="true">
+        <tcp:direct-protocol payloadOnly="false"/>
+    </tcp:connector>
+
+    <model name="TestTcpReceiverModel">
+        <service name="BounceTcpMMP">
+            <inbound>
+                <tcp:inbound-endpoint host="localhost" port="61200" synchronous="true"/>
+            </inbound>
+            <echo-component/>
+        </service>
+    </model>
+</mule>

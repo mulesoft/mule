@@ -25,7 +25,7 @@ public class MuleClientWSDLExternalTestCase extends AbstractMuleTestCase
 {
     public void testRequestResponse() throws Throwable
     {
-        if (isOffline("org.mule.test.integration.client.MuleClientAxisExternalTestCase.testRequestResponse()"))
+        if (isOffline("org.mule.test.integration.client.MuleClientWSDLExternalTestCase.testRequestResponse()"))
         {
             return;
         }

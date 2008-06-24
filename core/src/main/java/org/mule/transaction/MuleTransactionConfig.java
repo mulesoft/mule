@@ -126,7 +126,8 @@ public class MuleTransactionConfig implements TransactionConfig
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction(); 
         boolean joinPossible = (action != ACTION_JOIN_IF_POSSIBLE || (action == ACTION_JOIN_IF_POSSIBLE && tx != null));
-        return action != ACTION_NEVER && action != ACTION_NONE && factory.isTransacted() && joinPossible;
+        return action != ACTION_NEVER && action != ACTION_NONE && factory != null &&
+            factory.isTransacted() && joinPossible;
     }
 
     public ConstraintFilter getConstraint()

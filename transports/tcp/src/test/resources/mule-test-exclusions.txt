@@ -12,8 +12,6 @@ org.mule.transport.tcp.issues.ReuseExperimentMule2067TestCase
 # cannot have a legacy test case with old config without 1to2migration
 org.mule.transport.tcp.integration.TcpFunctionalLegacyTestCase
 
-# MULE-2574
-org.mule.transport.tcp.integration.MuleMessageProtocolChunkingTestCase
 
 # MULE-2730
 org.mule.transport.tcp.issues.SynchStreamingMule1687TestCase

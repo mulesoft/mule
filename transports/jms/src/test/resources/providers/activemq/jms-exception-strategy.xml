@@ -18,13 +18,7 @@
                     <jms:transaction action="ALWAYS_BEGIN"/>
                 </jms:inbound-endpoint>
             </inbound>
-            <!--<test:component throwException="true"-->
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <property key="returnMessage" value="OUTPUT MESSAGE"/>
-                    <property key="throwException" value="true"/>                    
-                </singleton-object>
-            </component>
+            <test:component throwException="true"/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="out">

@@ -90,6 +90,11 @@ public class HttpMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 18, line);
     }
+
+    public static Message pollingReciverCannotbeUsed()
+    {
+        return factory.createMessage(BUNDLE_PATH, 19);
+    }
 }
 
 

@@ -26,6 +26,8 @@
                     sendTcpNoDelay="true"
                     validateConnections="false"
     />
+
+    <http:polling-connector name="polling" checkEtag="false" pollingFrequency="3456" discardEmptyContent="false"/>
     
     <endpoint name="ep1" address="test://ep1">
         <http:http-client-response-to-object-transformer ignoreBadInput="true" name="test1" returnClass="java.lang.Object"/>

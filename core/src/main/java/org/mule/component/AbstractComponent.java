@@ -26,7 +26,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.management.stats.ComponentStatistics;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,7 +35,9 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractComponent implements Component
 {
 
-    /** logger used by this class */
+    /**
+     * logger used by this class
+     */
     protected final Log logger = LogFactory.getLog(this.getClass());
 
     protected Service service;
@@ -68,7 +69,7 @@ public abstract class AbstractComponent implements Component
         if (!(event.getEndpoint() instanceof InboundEndpoint))
         {
             throw new IllegalStateException(
-                "Unable to process outbound event, components only process incoming events.");
+                    "Unable to process outbound event, components only process incoming events.");
         }
         if (stopping.get() || !started.get())
         {
@@ -129,7 +130,7 @@ public abstract class AbstractComponent implements Component
         return service;
     }
 
-    public void initialise() throws InitialisationException
+    public final void initialise() throws InitialisationException
     {
         if (!initialised.get())
         {
@@ -140,8 +141,8 @@ public abstract class AbstractComponent implements Component
             if (service == null)
             {
                 throw new InitialisationException(
-                    MessageFactory.createStaticMessage("Component has not been initialized properly, no service."),
-                    this);
+                        MessageFactory.createStaticMessage("Component has not been initialized properly, no service."),
+                        this);
             }
             doInitialise();
             initialised.set(true);

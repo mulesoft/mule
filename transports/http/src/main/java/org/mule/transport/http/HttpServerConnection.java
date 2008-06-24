@@ -12,6 +12,7 @@ package org.mule.transport.http;
 
 import org.mule.RequestContext;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.Connector;
 import org.mule.api.transport.OutputHandler;
 
 import java.io.DataOutputStream;
@@ -42,7 +43,7 @@ public class HttpServerConnection
     private boolean keepAlive = false;
     private final String encoding;
 
-    public HttpServerConnection(final Socket socket, String encoding) throws IOException
+    public HttpServerConnection(final Socket socket, String encoding, HttpConnector connector) throws IOException
     {
         super();
 
@@ -53,12 +54,24 @@ public class HttpServerConnection
 
         this.socket = socket;
         this.socket.setTcpNoDelay(true);
+        
+        if (connector.getReceiveBufferSize() != Connector.INT_VALUE_NOT_SET
+            && socket.getReceiveBufferSize() != connector.getReceiveBufferSize())
+        {
+            socket.setReceiveBufferSize(connector.getReceiveBufferSize());            
+        }
+        if (connector.getServerSoTimeout() != Connector.INT_VALUE_NOT_SET
+            && socket.getSoTimeout() != connector.getServerSoTimeout())
+        {
+            socket.setSoTimeout(connector.getServerSoTimeout());
+        }
+        
         this.in = socket.getInputStream();
         this.out = new DataOutputStream(socket.getOutputStream());
         this.encoding = encoding;
     }
 
-    public void close()
+    public synchronized void close()
     {
         try
         {
@@ -76,6 +89,15 @@ public class HttpServerConnection
                 catch (UnsupportedOperationException e)
                 {
                     //Can't shutdown in/output on SSL sockets
+                }
+                
+                if (in != null)
+                {
+                    in.close();
+                }
+                if (out != null)
+                {
+                    out.close();
                 }
                 socket.close();
             }

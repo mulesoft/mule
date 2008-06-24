@@ -20,6 +20,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.model.streaming.CallbackOutputStream;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.tcp.protocols.SafeProtocol;
+import org.mule.util.monitor.ExpiryMonitor;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -68,6 +69,8 @@ public class TcpConnector extends AbstractConnector
     private AbstractTcpSocketFactory socketFactory;
     private SimpleServerSocketFactory serverSocketFactory;
     private GenericKeyedObjectPool socketsPool = new GenericKeyedObjectPool();
+    private int keepAliveTimeout = 0;
+    private ExpiryMonitor keepAliveMonitor;
 
     //TODO MULE-2300 remove once fixed
     private TcpSocketKey lastSocketKey;
@@ -77,6 +80,7 @@ public class TcpConnector extends AbstractConnector
         setSocketFactory(new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
         setTcpProtocol(new SafeProtocol());
+        keepAliveMonitor = new ExpiryMonitor("SocketTimeoutMonitor", 1000);
     }
 
     public void configureSocket(boolean client, Socket socket) throws SocketException
@@ -147,6 +151,8 @@ public class TcpConnector extends AbstractConnector
         {
             logger.warn("Failed to close dispatcher socket pool: " + e.getMessage());
         }
+        
+        keepAliveMonitor.dispose();
     }
 
     /**
@@ -469,4 +475,25 @@ public class TcpConnector extends AbstractConnector
         this.reuseAddress = reuseAddress;
     }
 
+    public ExpiryMonitor getKeepAliveMonitor()
+    {
+        return keepAliveMonitor;
+    }
+    
+    /**
+     * @return keep alive timeout in Milliseconds
+     */
+    public int getKeepAliveTimeout()
+    {
+        return keepAliveTimeout;
+    }
+    
+    /**
+     * Sets the keep alive timeout (in Milliseconds)
+     */
+    public void setKeepAliveTimeout(int keepAliveTimeout)
+    {
+        this.keepAliveTimeout = keepAliveTimeout;
+    }
+    
 }

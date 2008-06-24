@@ -62,4 +62,5 @@
         <xsd:attribute name="path" type="xsd:string"/>
     </xsd:attributeGroup>
 
+    <xsd:element name="transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
 </xsd:schema>

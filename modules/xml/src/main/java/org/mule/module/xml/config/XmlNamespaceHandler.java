@@ -17,6 +17,7 @@ import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.filters.JXPathFilter;
+import org.mule.module.xml.filters.JaxenFilter;
 import org.mule.module.xml.routing.FilteringXmlMessageSplitter;
 import org.mule.module.xml.routing.RoundRobinXmlSplitter;
 import org.mule.module.xml.transformer.DocumentToOutputHandler;
@@ -33,6 +34,7 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerBeanDefinitionParser("jxpath-filter", new ChildDefinitionParser("filter", JXPathFilter.class));
+        registerBeanDefinitionParser("jaxen-filter", new ChildDefinitionParser("filter", JaxenFilter.class));
         registerBeanDefinitionParser("is-xml-filter", new ChildDefinitionParser("filter", IsXmlFilter.class));
         registerBeanDefinitionParser("message-splitter", new RouterDefinitionParser(FilteringXmlMessageSplitter.class));
         registerMuleBeanDefinitionParser("round-robin-splitter", new RouterDefinitionParser(RoundRobinXmlSplitter.class)).addAlias("endpointFiltering", "enableEndpointFiltering");

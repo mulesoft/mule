@@ -11,7 +11,6 @@ package org.mule.transport.tcp;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -21,12 +20,12 @@ import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverResourceWorker;
 import org.mule.transport.ConnectException;
 import org.mule.transport.tcp.i18n.TcpMessages;
+import org.mule.util.monitor.Expirable;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -44,6 +43,8 @@ import java.util.List;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * <code>TcpMessageReceiver</code> acts like a TCP server to receive socket
@@ -211,7 +212,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         return new TcpWorker(socket, this);
     }
 
-    protected class TcpWorker extends AbstractReceiverResourceWorker implements Disposable
+    protected class TcpWorker extends AbstractReceiverResourceWorker implements Disposable, Expirable
     {
         protected Socket socket = null;
         protected TcpInputStream dataIn;
@@ -259,6 +260,11 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             }
         }
 
+        public void expired()
+        {
+            dispose();
+        }
+        
         public void dispose()
         {
             releaseSocket();
@@ -329,7 +335,14 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
         protected void shutdownSocket() throws IOException
         {
-            socket.shutdownOutput();
+            try
+            {
+                socket.shutdownOutput();
+            }
+            catch (UnsupportedOperationException e)
+            {
+                //Ignore, not supported by ssl sockets
+            }
         }
 
         protected void bindTransaction(Transaction tx) throws TransactionException
@@ -339,11 +352,23 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
         protected Object getNextMessage(Object resource) throws Exception
         {
+            long keepAliveTimeout = ((TcpConnector)connector).getKeepAliveTimeout();
+            
         	Object readMsg = null;
             try
             {
+                // Create a monitor if expiry was set
+                if(keepAliveTimeout > 0)
+                {
+                    ((TcpConnector) connector).getKeepAliveMonitor().addExpirable(keepAliveTimeout, 
+                        TimeUnit.MILLISECONDS, this);
+                }
+                
                 readMsg = protocol.read(dataIn);
-
+                
+                // There was some action so we can clear the monitor
+                ((TcpConnector) connector).getKeepAliveMonitor().removeExpirable(this);
+                
                 if (dataIn.isStreaming())
                 {
                     moreMessages = false;
@@ -353,10 +378,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             }
             catch (SocketTimeoutException e)
             {
-                if (!socket.getKeepAlive())
-                {
-                    return null;
-                }
+                ((TcpConnector) connector).getKeepAliveMonitor().removeExpirable(this);
             }
             finally
             {
@@ -390,21 +412,6 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                     protocol.write(dataOut, o);
                     dataOut.flush();
                 }
-            }
-        }
-
-        protected Object processData(Object data) throws Exception
-        {
-            MessageAdapter adapter = connector.getMessageAdapter(data);
-            OutputStream os = ((TcpConnector) connector).getTcpProtocol().createResponse(socket);
-            MuleMessage returnMessage = routeMessage(new DefaultMuleMessage(adapter), endpoint.isSynchronous(), os);
-            if (returnMessage != null)
-            {
-                return returnMessage;
-            }
-            else
-            {
-                return null;
             }
         }
 

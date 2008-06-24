@@ -16,7 +16,6 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -34,9 +33,6 @@ import java.io.InputStream;
  */
 public abstract class FunctionalTestCase extends AbstractMuleTestCase
 {
-    /** Expected response after the test message has passed through the FunctionalTestComponent. */
-    public static final String TEST_MESSAGE_RESPONSE = FunctionalTestComponent.received(TEST_MESSAGE);
-    
     public FunctionalTestCase()
     {
         super();

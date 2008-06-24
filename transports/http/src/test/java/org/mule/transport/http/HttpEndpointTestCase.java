@@ -75,4 +75,21 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
         assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
     }
+
+    public void testHostPortAndPathUrlUserInfoAndQuery() throws Exception
+    {
+        EndpointURI endpointUri = new MuleEndpointURI("http://admin:pwd@localhost:8080/app/path?${foo}");
+        endpointUri.initialise();
+        assertEquals("http", endpointUri.getScheme());
+        assertEquals("http://localhost:8080/app/path?$[foo]", endpointUri.getAddress());
+        assertNull(endpointUri.getEndpointName());
+        assertEquals(8080, endpointUri.getPort());
+        assertEquals("localhost", endpointUri.getHost());
+        assertEquals(endpointUri.getPath(), "/app/path");
+        assertEquals(endpointUri.getQuery(), "$[foo]");
+        assertEquals(1, endpointUri.getParams().size());
+        assertEquals("admin:pwd", endpointUri.getUserInfo());
+        assertEquals("admin", endpointUri.getUser());
+        assertEquals("pwd", endpointUri.getPassword());
+    }
 }

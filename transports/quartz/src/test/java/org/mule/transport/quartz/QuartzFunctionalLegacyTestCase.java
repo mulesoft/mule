@@ -12,7 +12,7 @@ package org.mule.transport.quartz;
 
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CountdownCallback;
-import org.mule.tck.functional.FunctionalTestComponent2;
+import org.mule.tck.functional.FunctionalTestComponent;
 
 public class QuartzFunctionalLegacyTestCase extends FunctionalTestCase
 {
@@ -23,12 +23,12 @@ public class QuartzFunctionalLegacyTestCase extends FunctionalTestCase
 
     public void testMuleReceiverJob() throws Exception
     {
-        FunctionalTestComponent2 component = (FunctionalTestComponent2) getComponent("quartzService1");
+        FunctionalTestComponent component = (FunctionalTestComponent) getComponent("quartzService1");
         assertNotNull(component);
         CountdownCallback count1 = new CountdownCallback(4);
         component.setEventCallback(count1);
 
-        component = (FunctionalTestComponent2) getComponent("quartzService2");
+        component = (FunctionalTestComponent) getComponent("quartzService2");
         assertNotNull(component);
         CountdownCallback count2 = new CountdownCallback(2);
         component.setEventCallback(count2);

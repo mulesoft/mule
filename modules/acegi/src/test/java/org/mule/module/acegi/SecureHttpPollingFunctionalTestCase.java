@@ -10,17 +10,41 @@
 package org.mule.module.acegi;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.context.notification.SecurityNotificationListener;
+import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.concurrent.Latch;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.HttpConnector;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
 {
 
     public void testPollingHttpConnectorSentCredentials() throws Exception
     {
+        final Latch latch = new Latch();
+        muleContext.registerListener(new SecurityNotificationListener()
+        {
+            public void onNotification(ServerNotification notification)
+            {
+                latch.countDown();
+            }
+        });
         MuleClient client = new MuleClient();
         MuleMessage result = client.request("vm://toclient", 5000);
-        assertNotNull(result.getPayload());
+        assertNotNull(result);
+        assertEquals("foo", result.getPayloadAsString());
+
+        result = client.request("vm://toclient2", 1000);
+        //This seems a little odd that we forward the exception to the outbound endpoint, but I guess users
+        // can just add a filter
+        assertNotNull(result);
+        assertEquals(401, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
+
     }
 
     protected String getConfigResources()

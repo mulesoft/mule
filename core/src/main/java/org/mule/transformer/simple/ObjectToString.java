@@ -10,8 +10,10 @@
 
 package org.mule.transformer.simple;
 
+import org.mule.RequestContext;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.util.IOUtils;
@@ -39,6 +41,7 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
         registerSourceType(Object.class);
         registerSourceType(byte[].class);
         registerSourceType(InputStream.class);
+        registerSourceType(OutputHandler.class);
         setReturnClass(String.class);
     }
 
@@ -70,6 +73,23 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
                     logger.warn("Could not close stream", e);
                 }
             }
+        }
+        else if (src instanceof OutputHandler)
+        {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            
+            try
+            {
+                ((OutputHandler) src).write(RequestContext.getEvent(), bytes);
+                
+                output = new String((byte[]) bytes.toByteArray(), encoding);
+            }
+            catch (IOException e)
+            {
+                throw new TransformerException(this, e);
+            }
+            
+            
         }
         else if (src instanceof byte[])
         {

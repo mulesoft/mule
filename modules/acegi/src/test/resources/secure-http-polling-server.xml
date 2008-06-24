@@ -29,11 +29,13 @@
     <model name="http secured test model">
         <service name="SecureUMO">
             <inbound>
-                <inbound-endpoint address="http://localhost:4567" connector-ref="HttpConnector">
+                <inbound-endpoint address="http://localhost:4567" synchronous="true" connector-ref="HttpConnector">
                     <acegi:http-security-filter realm="mule-realm"/>
                 </inbound-endpoint>
             </inbound>
-            <test:component/>
+            <test:component>
+                <test:return-data>foo</test:return-data>
+            </test:component>
         </service>
     </model>
 

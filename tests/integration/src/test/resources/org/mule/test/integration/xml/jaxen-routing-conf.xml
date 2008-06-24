@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:spring="http://www.springframework.org/schema/beans"
+  xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.0"
+  xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+  xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
+               http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
+
+  <model name="BasicCxfTest">
+
+    <service name="inService">
+      <inbound>
+        <inbound-endpoint address="vm://in"/>
+      </inbound>
+      <bridge-component/>
+      <outbound>
+        <filtering-router>
+          <outbound-endpoint address="vm://echo"/>
+          <mule-xml:jaxen-filter pattern="/e:purchaseOrder/e:shipTo/@country" expectedValue="US">
+            <mule-xml:namespace prefix="e" uri="http://www.example.com"/>
+          </mule-xml:jaxen-filter>
+        </filtering-router>
+        <outbound-pass-through-router>
+            <outbound-endpoint address="vm://null"/>
+        </outbound-pass-through-router>
+      </outbound>
+    </service>
+    
+    <service name="echoService">
+      <inbound>
+        <inbound-endpoint address="vm://echo"/>
+      </inbound>
+      <component class="org.mule.component.simple.EchoComponent" />
+    </service>
+    
+    <service name="nullService">
+      <inbound>
+        <inbound-endpoint address="vm://null"/>
+      </inbound>
+      <log-component />
+    </service>
+  </model>
+</mule>
+

@@ -63,7 +63,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
 
         // return the list of attachment names
         FunctionalTestComponent fc = (FunctionalTestComponent) component;
-        fc.setReturnMessage(message.getAttachmentNames().toString());
+        fc.setReturnData(message.getAttachmentNames().toString());
     }
 
     public void testSingleComponentKnowsAttachments() throws Exception

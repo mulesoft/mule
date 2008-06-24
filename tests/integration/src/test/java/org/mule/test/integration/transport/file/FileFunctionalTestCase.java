@@ -14,9 +14,9 @@ package org.mule.test.integration.transport.file;
 import org.mule.api.MuleEventContext;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
@@ -96,7 +96,7 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
         {
             // there should not be any transformers configured by default, so the
             // return message should be a byte[]
-            super.setReturnMessage(context.transformMessage());
+            super.setReturnData(context.transformMessage());
             return super.onCall(context);
         }
     }

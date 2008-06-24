@@ -12,10 +12,12 @@ package org.mule.module.scripting.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.TextDefinitionParser;
+import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.module.scripting.component.ScriptComponent;
 import org.mule.module.scripting.transformer.ScriptTransformer;
+import org.mule.routing.nested.DefaultNestedRouter;
 
 
 public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler
@@ -25,6 +27,8 @@ public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("script", new ScriptDefinitionParser());
         registerBeanDefinitionParser("text", new TextDefinitionParser("scriptText"));
         registerBeanDefinitionParser("component", new ComponentDefinitionParser(ScriptComponent.class));
+        registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("nestedRouter.routers", DefaultNestedRouter.class)).addCollection("nestedRouter.routers");
+
         registerBeanDefinitionParser("transformer", new TransformerDefinitionParser(ScriptTransformer.class));
 
         // For Spring-based scripting support

@@ -10,6 +10,8 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.api.transformer.TransformerException;
+import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractTransformer;
 
@@ -18,6 +20,8 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -41,48 +45,81 @@ import org.dom4j.io.DocumentSource;
 public abstract class AbstractXmlTransformer extends AbstractTransformer
 {
     private String outputEncoding;
-
+    private XMLInputFactory xmlInputFactory;
+    private boolean useStaxSource = false;
+    
     public AbstractXmlTransformer()
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);
-        registerSourceType(DocumentSource.class);
+        registerSourceType(Source.class);
         registerSourceType(Document.class);
         registerSourceType(org.w3c.dom.Document.class);
         registerSourceType(org.w3c.dom.Element.class);
         registerSourceType(InputStream.class);
         setReturnClass(byte[].class);
+        
+        xmlInputFactory = XMLInputFactory.newInstance();
     }
 
-    public Source getXmlSource(Object src)
+    public Source getXmlSource(Object src) throws TransformerException
     {
-        if (src instanceof byte[])
+        try
         {
-            return new StreamSource(new ByteArrayInputStream((byte[]) src));
+            // Convert our object to a Source type efficiently.
+            if (src instanceof Source)
+            {
+                return (Source) src;
+            }
+            else if (src instanceof byte[])
+            {
+                ByteArrayInputStream stream = new ByteArrayInputStream((byte[]) src);
+                return createStreamSource(stream);
+            }
+            else if (src instanceof InputStream)
+            {
+                return createStreamSource((InputStream) src);
+            }
+            else if (src instanceof String)
+            {
+                if (useStaxSource)
+                {
+                    return new StaxSource(xmlInputFactory.createXMLStreamReader(new StringReader((String) src)));
+                }
+                else
+                {
+                    return new StreamSource(new StringReader((String) src));
+                }
+            }
+            else if (src instanceof Document)
+            {
+                return new DocumentSource((Document) src);
+            }
+            else if (src instanceof org.w3c.dom.Document || src instanceof org.w3c.dom.Element)
+            {
+                return new DOMSource((org.w3c.dom.Node) src);
+            }
+            else
+            {
+                return null;
+            }
         }
-        else if (src instanceof InputStream)
+        catch (XMLStreamException e)
         {
-            return new StreamSource((InputStream) src);
+            throw new TransformerException(this, e);
         }
-        else if (src instanceof String)
+    }
+
+    private Source createStreamSource(InputStream stream) throws XMLStreamException
+    {
+        if (useStaxSource)
         {
-            return new StreamSource(new StringReader((String) src));
+            return new StaxSource(xmlInputFactory.createXMLStreamReader(stream));
         }
-        else if (src instanceof DocumentSource)
+        else 
         {
-            return (Source) src;
-        }
-        else if (src instanceof Document)
-        {
-            return new DocumentSource((Document) src);
-        }
-        else if (src instanceof org.w3c.dom.Document || src instanceof org.w3c.dom.Element)
-        {
-            return new DOMSource((org.w3c.dom.Node) src);
-        }
-        else
-        {
-            return null;
+            
+            return new StreamSource(stream);
         }
     }
 
@@ -210,10 +247,11 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
      *          On error
      * @throws javax.xml.transform.TransformerException
      *          On error
+     * @throws TransformerException 
      * @deprecated Replaced by convertToText(Object obj, String ouputEncoding)
      */
     protected String convertToText(Object obj)
-            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException
+            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException, TransformerException
     {
         return convertToText(obj, null);
     }
@@ -232,9 +270,10 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
      *          On error
      * @throws javax.xml.transform.TransformerException
      *          On error
+     * @throws TransformerException 
      */
     protected String convertToText(Object obj, String outputEncoding)
-            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException
+            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException, TransformerException
     {
         // Catch the direct translations
         if (obj instanceof String)
@@ -276,9 +315,10 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
      *          On error
      * @throws javax.xml.transform.TransformerException
      *          On error
+     * @throws TransformerException 
      */
     protected String convertToBytes(Object obj, String outputEncoding)
-            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException
+            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException, TransformerException
     {
         // Always use the transformer, even for byte[] (to get the encoding right!)
         Source src = getXmlSource(obj);
@@ -307,4 +347,25 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
     {
         this.outputEncoding = outputEncoding;
     }
+    
+    public boolean isUseStaxSource()
+    {
+        return useStaxSource;
+    }
+
+    public void setUseStaxSource(boolean useStaxSource)
+    {
+        this.useStaxSource = useStaxSource;
+    }
+
+    public XMLInputFactory getXMLInputFactory()
+    {
+        return xmlInputFactory;
+    }
+
+    public void setXMLInputFactory(XMLInputFactory xmlInputFactory)
+    {
+        this.xmlInputFactory = xmlInputFactory;
+    }
+    
 }

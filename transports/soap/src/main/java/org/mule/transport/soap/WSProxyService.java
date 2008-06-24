@@ -29,6 +29,7 @@ import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,7 +52,6 @@ import org.apache.commons.logging.LogFactory;
  * address must contain no xfire or axis endpoints, just plain http endpoints. Even
  * the inbound endpoint of the WSProxyService must be residing on an http protocol
  * (with no xfire or axis).
- * 
  */
 public class WSProxyService implements Callable, ServiceAware, Initialisable
 {
@@ -143,12 +143,17 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
 
             wsdlString = replyWSDL.getPayloadAsString();
 
-            // find all dependencies and change them
-            wsdlString = wsdlString.replaceAll(this.urlWebservice, eventContext.getEndpointURI().getAddress());
-
             // create a new mule message with the new WSDL
-            DefaultMuleMessage modifiedWsdl = new DefaultMuleMessage(wsdlString, message);
-
+            String realWSDLURI = wsdlEndpoint.split("\\?")[0];
+            String proxyWSDLURI = eventContext.getEndpointURI().toString();
+            
+            wsdlString = wsdlString.replaceAll(realWSDLURI, proxyWSDLURI);
+            if (wsdlString.indexOf("localhost") > -1)
+            {
+                wsdlString = wsdlString.replaceAll("localhost", InetAddress.getLocalHost().getHostName());
+            }
+            
+            DefaultMuleMessage modifiedWsdl = new DefaultMuleMessage(wsdlString);
             logger.debug("WSDL retrieved successfully");
 
             // the processing is stopped so that the result is not passed through the

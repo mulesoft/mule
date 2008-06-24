@@ -21,7 +21,7 @@
     </xsd:element>
 
 
-    <xsd:complexType name="test2ConnectorType">
+    <xsd:complexType name="${TransportNameLower}ConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
             <!--
@@ -55,5 +55,54 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <!--
+    The following define endpoint elements for this transport. Attributes for the endpoint can be defined at the section
+    at the bottom
+    -->
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:inboundEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="propertyAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:outboundEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="propertyAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:globalEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="propertyAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="addressAttributes">
+    <!--
+        TODO define address attributes for this endpoints i.e. queue, host, port, etc
+        <xsd:attribute name="foo" type="xsd:string"/>
+    -->
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="propertyAttributes">
+         <!--
+        TODO define property attributes for this endpoint. These are properties that can configure the way the
+        transport behaves but are not used to create the endpoint address.
+        <xsd:attribute name="bar" type="xsd:string"/>
+    -->
+    </xsd:attributeGroup>
 
 </xsd:schema>

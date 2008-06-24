@@ -98,9 +98,9 @@
             <xsl:choose>
                 <xsl:when test="schemadoc:inboundMEPs/@none = 'true'">None</xsl:when>
                 <xsl:otherwise>
-                    <xsl:if test="schemadoc:inboundMEPs/@in-only = 'true'">In-Only</xsl:if>
-                    <xsl:if test="schemadoc:inboundMEPs/@in-out = 'true'">In-Out</xsl:if>
-                    <xsl:if test="schemadoc:inboundMEPs/@in-optional-out = 'true'">In-Optional-Out</xsl:if>
+                    <xsl:if test="schemadoc:inboundMEPs/@in-only = 'true'">In-Only </xsl:if>
+                    <xsl:if test="schemadoc:inboundMEPs/@in-out = 'true'">In-Out </xsl:if>
+                    <xsl:if test="schemadoc:inboundMEPs/@in-optional-out = 'true'">In-Optional-Out </xsl:if>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
@@ -108,9 +108,9 @@
             <xsl:choose>
                 <xsl:when test="schemadoc:outboundMEPs/@none = 'true'">None</xsl:when>
                 <xsl:otherwise>
-                    <xsl:if test="schemadoc:outboundMEPs/@out-only = 'true'">Out-Only</xsl:if>
-                    <xsl:if test="schemadoc:outboundMEPs/@out-in = 'true'">Out-In</xsl:if>
-                    <xsl:if test="schemadoc:outboundMEPs/@out-optional-in = 'true'">Out-Optional-In</xsl:if>
+                    <xsl:if test="schemadoc:outboundMEPs/@out-only = 'true'">Out-Only </xsl:if>
+                    <xsl:if test="schemadoc:outboundMEPs/@out-in = 'true'">Out-In </xsl:if>
+                    <xsl:if test="schemadoc:outboundMEPs/@out-optional-in = 'true'">Out-Optional-In </xsl:if>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>

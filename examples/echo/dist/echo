@@ -22,5 +22,20 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-exec "$MULE_BASE/bin/mule" -config echo-config.xml
+echo "The Echo example is available in three variations:"
+echo "  1. Simple Echo Configuration"
+echo "  2. Echo using the Axis Transport"
+echo "  3. Echo using the Cxf Transport"
+echo "Select the one you wish to execute and press Enter..."
+read i
 
+if [ 1 = $i ]
+then
+    exec "$MULE_BASE/bin/mule" -config ./conf/echo-config.xml
+elif [ 2 = $i ]
+then
+    exec "$MULE_BASE/bin/mule" -config ./conf/echo-axis-config.xml
+elif [ 3 = $i ]
+then
+    exec "$MULE_BASE/bin/mule" -config ./conf/echo-cxf-config.xml
+fi

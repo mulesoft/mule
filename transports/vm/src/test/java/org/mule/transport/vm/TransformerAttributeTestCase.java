@@ -13,7 +13,6 @@ package org.mule.transport.vm;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.StringAppendTestTransformer;
 
 public class TransformerAttributeTestCase extends FunctionalTestCase
@@ -30,9 +29,7 @@ public class TransformerAttributeTestCase extends FunctionalTestCase
     {
         MuleMessage message = new MuleClient().send("vm://simple", OUTBOUND_MESSAGE, null);
         assertNotNull(message);
-        assertEquals(
-                FunctionalTestComponent.received(
-                        StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)),
+        assertEquals(StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)  + " Received",
                 message.getPayloadAsString());
     }
 
@@ -40,9 +37,7 @@ public class TransformerAttributeTestCase extends FunctionalTestCase
     {
         MuleMessage message = new MuleClient().send("vm://chained", OUTBOUND_MESSAGE, null);
         assertNotNull(message);
-        assertEquals(
-                FunctionalTestComponent.received(
-                        StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)),
+        assertEquals(StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)  + " Received",
                 message.getPayloadAsString());
     }
 

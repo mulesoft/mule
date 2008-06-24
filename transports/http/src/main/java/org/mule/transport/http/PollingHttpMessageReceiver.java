@@ -26,17 +26,23 @@ import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.DefaultMessageAdapter;
+import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.MapUtils;
 
 import java.util.Collections;
 import java.util.Map;
 
-/** Will poll an http URL and use the response as the input for a service request. */
+/**
+ * Will poll an http URL and use the response as the input for a service request.
+ */
 public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 {
     protected String etag = null;
     private boolean checkEtag;
-    
+    private boolean discardEmptyContent;
+    //The outbound endpoint to poll
+    private OutboundEndpoint outboundEndpoint;
+
     public PollingHttpMessageReceiver(Connector connector,
                                       Service service,
                                       final InboundEndpoint endpoint) throws CreateException
@@ -44,14 +50,26 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 
         super(connector, service, endpoint);
 
+        HttpPollingConnector pollingConnector;
+
+        if (connector instanceof HttpPollingConnector)
+        {
+            pollingConnector = (HttpPollingConnector) connector;
+        }
+        else
+        {
+            throw new CreateException(HttpMessages.pollingReciverCannotbeUsed(), this);
+        }
+
         long pollingFrequency = MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency",
-                -1);
+                pollingConnector.getPollingFrequency());
         if (pollingFrequency > 0)
         {
             this.setFrequency(pollingFrequency);
         }
-        
-        checkEtag = MapUtils.getBooleanValue(endpoint.getProperties(), "checkEtag", true);
+
+        checkEtag = MapUtils.getBooleanValue(endpoint.getProperties(), "checkEtag", pollingConnector.isCheckEtag());
+        discardEmptyContent = MapUtils.getBooleanValue(endpoint.getProperties(), "discardEmptyContent", pollingConnector.isDiscardEmptyContent());
     }
 
     protected void doDispose()
@@ -80,21 +98,34 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         req.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
 
         MuleSession session = new DefaultMuleSession(service, connector.getMuleContext());
-        MuleEvent event = new DefaultMuleEvent(req, endpoint, session, true);
 
-        // We need to create an outbound endpoint to do the polled request using
-        // send() as thats the only way we can customize headers and use eTags
-        MuleContext muleContext = endpoint.getMuleContext();
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
-        OutboundEndpoint outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            endpointBuilder);
-        
+        if (outboundEndpoint == null)
+        {
+            // We need to create an outbound endpoint to do the polled request using
+            // send() as thats the only way we can customize headers and use eTags
+            MuleContext muleContext = endpoint.getMuleContext();
+            EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
+            //Must not use inbound transformers for the outbound request
+            endpointBuilder.setTransformers(Collections.EMPTY_LIST);
+            outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+                    endpointBuilder);
+        }
+        MuleEvent event = new DefaultMuleEvent(req, outboundEndpoint, session, true);
+
         MuleMessage message = connector.send(outboundEndpoint, event);
 
+        if (message.getIntProperty(HttpConstants.HEADER_CONTENT_LENGTH, 0) == 0 && discardEmptyContent)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Received empty message and ignoring from: " + endpoint.getEndpointURI());
+            }
+            return;
+        }
         int status = message.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         etag = message.getStringProperty(HttpConstants.HEADER_ETAG, null);
 
-        if (status != 304 || !checkEtag)
+        if ((status != 304 || !checkEtag))
         {
             routeMessage(message, endpoint.isSynchronous());
         }

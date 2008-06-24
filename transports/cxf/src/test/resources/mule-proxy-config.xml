@@ -1,0 +1,50 @@
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
+
+    <configuration defaultSynchronousEndpoints="true"/>
+    
+    <spring:bean name="WSProxyService" class="org.mule.transport.soap.WSProxyService">
+        <spring:property name="wsdlFile" value="localWsdl.wsdl"/>
+    </spring:bean>
+    
+    <model name="Proxy_Test">
+        <service name="WebService">
+            <inbound>
+                <inbound-endpoint address="cxf:http://localhost:6065"/>
+            </inbound>
+            <echo-component/>
+        </service>
+        
+        <service name="webServiceProxy">
+            <inbound>
+                <inbound-endpoint address="http://localhost:6070/webServiceProxy"/>
+            </inbound>
+            <component class="org.mule.transport.soap.WSProxyService"/>
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="http://localhost:6065/WebService"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="webServiceProxyWithWsdlFromFile">
+            <inbound>
+                <inbound-endpoint address="http://localhost:6075/webServiceProxy" />
+            </inbound>
+            <component>
+                <spring-object bean="WSProxyService" />
+            </component>
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="http://localhost:6065/WebService" />
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

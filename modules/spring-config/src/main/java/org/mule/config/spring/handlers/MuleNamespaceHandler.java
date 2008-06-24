@@ -10,6 +10,8 @@
 package org.mule.config.spring.handlers;
 
 import org.mule.DefaultExceptionStrategy;
+import org.mule.util.store.InMemoryObjectStore;
+import org.mule.util.store.TextFileObjectStore;
 import org.mule.api.config.MuleProperties;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
@@ -279,7 +281,11 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         // Life-cycle Adapters Factories
         registerBeanDefinitionParser("custom-lifecycle-adapter-factory", new ChildDefinitionParser("lifecycleAdapterFactory"));
-        
+
+        //Stores
+        registerBeanDefinitionParser("in-memory-store", new ChildDefinitionParser("store", InMemoryObjectStore.class));
+        registerBeanDefinitionParser("simple-text-file-store", new ChildDefinitionParser("store", TextFileObjectStore.class));
+
         //Routers
         registerBeanDefinitionParser("inbound", new ChildDefinitionParser("inboundRouter", DefaultInboundRouterCollection.class));
         registerBeanDefinitionParser("outbound", new ChildDefinitionParser("outboundRouter", DefaultOutboundRouterCollection.class));

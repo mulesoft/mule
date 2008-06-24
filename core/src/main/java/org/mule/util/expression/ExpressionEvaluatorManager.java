@@ -150,7 +150,7 @@ public class ExpressionEvaluatorManager
      * @param expression a single expression i.e. xpath://foo
      * @param object The object (usually {@link org.mule.api.MuleMessage}) to evaluate the expression on.
      * @param expressionPrefix the expression prefix to use. The default is "${" but any character is valid.
-     * It is unlikely that users will want to change this execpt maybe to use "["  instead.
+     * It is unlikely that users will want to change this except maybe to use "["  instead.
      * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
      * null.
      * @return the result of the evaluation

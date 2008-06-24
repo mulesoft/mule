@@ -10,16 +10,29 @@
 
 package org.mule.transport.jms.websphere;
 
+import org.mule.api.config.MuleProperties;
 import org.mule.transport.jms.JmsConnector;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Websphere-specific JMS connector.
  */
 public class WebsphereJmsConnector extends JmsConnector
 {
+    
+    public static final String DEFAULT_XA_RECEIVER_CLASS = WebsphereTransactedJmsMessageReceiver.class.getName();
+    
     /** Constructs a new WebsphereJmsConnector. */
     public WebsphereJmsConnector()
     {
         setRecoverJmsConnections(isRecoverJmsConnections());
+        if (serviceOverrides == null || serviceOverrides.isEmpty())
+        {
+            Map overrides = Collections.singletonMap(MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS,
+                DEFAULT_XA_RECEIVER_CLASS);
+            setServiceOverrides(overrides);
+        }
     }
 }

@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.StringAppendTestTransformer;
 
 public class HttpTransformersMule1822TestCase extends FunctionalTestCase
@@ -42,8 +41,7 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
      */
     public void testBase() throws Exception
     {
-        assertEquals(
-                FunctionalTestComponent.received(OUTBOUND_MESSAGE),
+        assertEquals(OUTBOUND_MESSAGE  + " Received",
                 sendTo("base").getPayloadAsString());
     }
 
@@ -57,8 +55,7 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
         assertEquals(
                 StringAppendTestTransformer.append(" response",
                         StringAppendTestTransformer.append(" response 2",
-                                FunctionalTestComponent.received(
-                                        OUTBOUND_MESSAGE))),
+                                        OUTBOUND_MESSAGE + " Received")),
                 sendTo("response").getPayloadAsString());
     }
 
@@ -72,10 +69,9 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
         assertEquals(
                 StringAppendTestTransformer.append(" response",
                         StringAppendTestTransformer.append(" response 2",
-                                FunctionalTestComponent.received(
                                         StringAppendTestTransformer.append(" transformed 2",
                                                 StringAppendTestTransformer.appendDefault(
-                                        OUTBOUND_MESSAGE))))),
+                                        OUTBOUND_MESSAGE)) + " Received")),
                 sendTo("both").getPayloadAsString());
     }
 

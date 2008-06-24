@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.0"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+    <vm:connector name="vmConnector" queueEvents="true"/>
+
+    <vm:endpoint name="client_request" path="in1"/>
+    <vm:endpoint name="client_response" path="out1"/>
+    <vm:endpoint name="callout_1" path="callout1"/>
+    <vm:endpoint name="callout_2" path="callout2"/>
+
+    <model>
+        <!--// START SNIPPET: binding-config -->
+        <service name="scriptWithBindings">
+            <description>
+                This example demonstrates how to orchestrate message flows using bindings. The example calls out to two
+                different services and passes the results on to the outbound router.
+            </description>
+            <inbound>
+                <inbound-endpoint ref="client_request"/>
+            </inbound>
+            <script:component>
+                <script:script engine="groovy">
+                    msg = CalloutService.doSomething(payload)
+                    return CalloutService.doSomethingElse(msg)
+                </script:script>
+                <script:binding interface="org.mule.components.script.CalloutService" method="doSomething">
+                    <outbound-endpoint ref="callout_1" synchronous="true"/>
+                </script:binding>
+                <script:binding interface="org.mule.components.script.CalloutService" method="doSomethingElse">
+                    <outbound-endpoint ref="callout_2" synchronous="true"/>
+                </script:binding>
+            </script:component>
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint ref="client_response"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="Callout1">
+            <inbound>
+                <inbound-endpoint ref="callout_1"/>
+            </inbound>
+            <test:component appendString=" Received by ${mule:serviceName}"/>
+        </service>
+
+        <service name="Callout2">
+            <inbound>
+                <inbound-endpoint ref="callout_2"/>
+            </inbound>
+            <test:component appendString=" Received by ${mule:serviceName}"/>
+        </service>
+        <!--// END SNIPPET: binding-config -->
+    </model>
+</mule>

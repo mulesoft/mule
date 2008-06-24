@@ -10,8 +10,8 @@
 
 package org.mule.config.spring.parsers;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.config.spring.parsers.beans.ThirdPartyContainer;
+import org.mule.tck.FunctionalTestCase;
 
 public class ThirdPartyTestCase extends FunctionalTestCase
 {

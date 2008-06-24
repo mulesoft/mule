@@ -25,6 +25,7 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
+import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.PooledJavaComponent;
 import org.mule.config.PoolingProfile;
@@ -41,6 +42,7 @@ import org.mule.tck.testmodels.mule.TestCatchAllStrategy;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
+import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
 
@@ -91,16 +93,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         super.testEndpointConfig();
 
         // test that endpoints have been resolved on endpoints
-        ImmutableEndpoint endpoint = null;
-        try
-        {
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("waterMelonEndpoint");
-        }
-        catch (MuleException e)
-        {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("waterMelonEndpoint");
         assertNotNull(endpoint);
         assertEquals("UTF-8-TEST", endpoint.getEncoding());
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
@@ -322,10 +315,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(inEndpoint);
         assertEquals(1, apple.getOutboundRouter().getRouters().size());
         assertNotNull(inEndpoint.getTransactionConfig());
-     // TODO MULE-2185 Transaction config needs some work
-//        assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, inEndpoint.getTransactionConfig().getAction());
-//        assertTrue(inEndpoint.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
-//        assertNull(inEndpoint.getTransactionConfig().getConstraint());
+        assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, inEndpoint.getTransactionConfig().getAction());
+        assertTrue(inEndpoint.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
+        assertNull(inEndpoint.getTransactionConfig().getConstraint());
 
         OutboundRouter outRouter = (OutboundRouter) apple.getOutboundRouter().getRouters().get(0);
         OutboundEndpoint outEndpoint = (OutboundEndpoint) outRouter.getEndpoints().get(0);

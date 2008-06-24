@@ -38,7 +38,7 @@
         </xsl:if>
 
         <!-- Render Example configurations -->
-        <xsl:apply-templates select="xsd:annotation/xsd:appinfo"/>
+        <xsl:apply-templates select="xsd:annotation/xsd:appinfo/schemadoc:snippet"/>
     </xsl:template>
 
     <xsl:template match="xsd:complexType" mode="table">
@@ -49,7 +49,7 @@
         <xsl:apply-templates select="." mode="attributes"/>
         </xsl:if>
 
-        <xsl:if test="(count(.//xsd:element) + count(.//xsd:sequence) + count(.//xsd:group) + count(.//xsd:choice)) > 0 ">
+        <xsl:if test="(count(.//xsd:element) + count(.//xsd:choice)) > 0 ">
         h3. Child Elements of &lt;<xsl:value-of select="$name"/>...&gt;
         ||Name||Cardinality||Description||
         <xsl:call-template name="element-children"/>
@@ -60,13 +60,18 @@
     <xsl:template name="transformers">
 
         h2. Transformers
-        These are transformers specific to this transport.  Note that these are added automatically to the Mule registry at start up. When doing automatic transformations these will be included when searching for the correct transformers.
+        These are transformers specific to this transport. Note that these are added automatically to the Mule registry
+        at start up. When doing automatic transformations these will be included when searching for the correct
+        transformers.
 
-        ||Name||Description||<xsl:apply-templates select="//xsd:element[contains(@substitutionGroup,'abstract-transformer')]" mode="transformer"/>
+        ||Name||Description||
+        <xsl:apply-templates select="//xsd:element[contains(@substitutionGroup,'abstract-transformer')]"
+                             mode="transformer"/>
     </xsl:template>
 
     <xsl:template match="xsd:element" mode="transformer">
-        | <xsl:value-of select="@name"/>| <xsl:value-of select="normalize-space(xsd:annotation/xsd:documentation)"/>|</xsl:template>
+        |<xsl:value-of select="@name"/>|<xsl:value-of select="normalize-space(xsd:annotation/xsd:documentation)"/>|
+    </xsl:template>
 
     <!-- FILTERS -->
     <xsl:template name="filters">
@@ -74,22 +79,16 @@
         h2. Filters
         Filters can be used on inbound endpoints to control which data is received by a service.
 
-        ||Name||Description||<xsl:apply-templates select="//xsd:element[contains(@substitutionGroup,'abstract-filter')]" mode="filter"/>
+        ||Name||Description||
+        <xsl:apply-templates select="//xsd:element[contains(@substitutionGroup,'abstract-filter')]" mode="filter"/>
     </xsl:template>
 
     <xsl:template match="xsd:element" mode="filter">
-        | <xsl:value-of select="@name"/>| <xsl:value-of select="normalize-space(xsd:annotation/xsd:documentation)"/>|</xsl:template>
-
-    <!-- App Info extension processing -->
-    <xsl:template match="xsd:appinfo">
-        h3. Example Configurations
-
-        Note that the documentation for each on the configurations is embedded within the example code.
-
-        <xsl:apply-templates select="schemadoc:snippet"/>
+        |<xsl:value-of select="@name"/>|<xsl:value-of select="normalize-space(xsd:annotation/xsd:documentation)"/>|
     </xsl:template>
 
-    <xsl:template match="schemadoc:snippet">
+    <!-- App Info extension processing -->
+    <xsl:template match="xsd:appinfo/schemadoc:snippet">
 
         <xsl:variable name="snippet">
             <xsl:choose>
@@ -101,7 +100,16 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <!-- TODO @useExpand -->
+        h3. Example Configurations
+        <xsl:choose>
+            <xsl:when test="string-length(.) > 0">
+                <xsl:value-of select="."/>
+            </xsl:when>
+            <xsl:otherwise>
+                Note that the documentation for this example should be embedded within the code.
+            </xsl:otherwise>
+        </xsl:choose>
+
         {expand}
         {snippet:lang=<xsl:value-of select="@lang"/>|id=<xsl:value-of select="@id"/>|url=<xsl:value-of
             select="$snippet"/>/<xsl:value-of select="@sourcePath"/>}
@@ -119,13 +127,13 @@
 
     <xsl:template match="xsd:element[@ref]" mode="documentation">
         <xsl:if test="xsd:annotation/xsd:documentation/text()|xsd:annotation/xsd:documentation/*">
-                <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()"
-                                     mode="copy"/>
-                <xsl:call-template name="attribution">
-                    <xsl:with-param name="text">
-                        From reference for element<xsl:value-of select="@ref"/>.
-                    </xsl:with-param>
-                </xsl:call-template>
+            <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()"
+                                 mode="copy"/>
+            <xsl:call-template name="attribution">
+                <xsl:with-param name="text">
+                    From reference for element<xsl:value-of select="@ref"/>.
+                </xsl:with-param>
+            </xsl:call-template>
 
         </xsl:if>
         <xsl:variable name="ref" select="@ref"/>
@@ -135,13 +143,13 @@
 
     <xsl:template match="xsd:element[@name]" mode="documentation">
         <xsl:if test="xsd:annotation/xsd:documentation/text()|xsd:annotation/xsd:documentation/*">
-                <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()"
-                                     mode="copy"/>
-                <xsl:call-template name="attribution">
-                    <xsl:with-param name="text">
-                        From declaration of element<xsl:value-of select="@name"/>.
-                    </xsl:with-param>
-                </xsl:call-template>
+            <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()"
+                                 mode="copy"/>
+            <xsl:call-template name="attribution">
+                <xsl:with-param name="text">
+                    From declaration of element<xsl:value-of select="@name"/>.
+                </xsl:with-param>
+            </xsl:call-template>
 
         </xsl:if>
         <xsl:if test="@type">
@@ -159,20 +167,20 @@
 
     <xsl:template match="xsd:complexType" mode="documentation">
         <xsl:if test="xsd:annotation/xsd:documentation/text()|xsd:annotation/xsd:documentation/*">
-                <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()"
-                                     mode="copy"/>
-                <xsl:call-template name="attribution">
-                    <xsl:with-param name="text">
-                        <xsl:choose>
-                            <xsl:when test="@name">
-                                From declaration of type<xsl:value-of select="@name"/>.
-                            </xsl:when>
-                            <xsl:otherwise>
-                                From type declaration.
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:with-param>
-                </xsl:call-template>
+            <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()"
+                                 mode="copy"/>
+            <xsl:call-template name="attribution">
+                <xsl:with-param name="text">
+                    <xsl:choose>
+                        <xsl:when test="@name">
+                            From declaration of type<xsl:value-of select="@name"/>.
+                        </xsl:when>
+                        <xsl:otherwise>
+                            From type declaration.
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:with-param>
+            </xsl:call-template>
         </xsl:if>
     </xsl:template>
 
@@ -181,34 +189,34 @@
 
     <xsl:template match="xsd:attribute[@name]" mode="attributes">
         <xsl:variable name="type">
-                <xsl:choose>
-                    <xsl:when test="string-length(@type)">
-                        <xsl:call-template name="rewrite-type">
-                            <xsl:with-param name="type" select="@type"/>
-                        </xsl:call-template>
-                    </xsl:when>
-                    <xsl:when test="xsd:simpleType/xsd:restriction/xsd:enumeration">
-                        <xsl:for-each select="xsd:simpleType/xsd:restriction/xsd:enumeration">
-                            <xsl:if test="@value">
-                                <xsl:value-of select="@value"/>
-                                <xsl:if test="position()!=last()"> / </xsl:if>
-                            </xsl:if>
-                        </xsl:for-each>
-                    </xsl:when>
-                </xsl:choose>
-            </xsl:variable>
+            <xsl:choose>
+                <xsl:when test="string-length(@type)">
+                    <xsl:call-template name="rewrite-type">
+                        <xsl:with-param name="type" select="@type"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="xsd:simpleType/xsd:restriction/xsd:enumeration">
+                    <xsl:for-each select="xsd:simpleType/xsd:restriction/xsd:enumeration">
+                        <xsl:if test="@value">
+                            <xsl:value-of select="@value"/>
+                            <xsl:if test="position()!=last()">/</xsl:if>
+                        </xsl:if>
+                    </xsl:for-each>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
 
-            <xsl:variable name="required">
-                <xsl:choose>
-                    <xsl:when test="@required">yes</xsl:when>
-                    <xsl:otherwise>no</xsl:otherwise>
-                </xsl:choose>
-            </xsl:variable>
-            <xsl:variable name="default">
-                <xsl:if test="@default">
-                    <xsl:value-of select="@default"/>
-                </xsl:if>
-            </xsl:variable>
+        <xsl:variable name="required">
+            <xsl:choose>
+                <xsl:when test="@required">yes</xsl:when>
+                <xsl:otherwise>no</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="default">
+            <xsl:if test="@default">
+                <xsl:value-of select="@default"/>
+            </xsl:if>
+        </xsl:variable>
         <xsl:variable name="doc">
             <xsl:if test="xsd:annotation/xsd:documentation/text()|xsd:annotation/xsd:documentation/*">
                         <xsl:apply-templates
@@ -313,22 +321,22 @@
                   mode="elements-abstract">
         <!--element (abstract) <xsl:value-of select="@name"/>-->
         <xsl:variable name="name" select="@name"/>
-            <xsl:choose>
-                <!-- this should always be true when using the normalized schema -->
-                <xsl:when test="/xsd:schema/xsd:element[@substitutionGroup=$name]">
-                    The following elements can be used here:
+        <xsl:choose>
+            <!-- this should always be true when using the normalized schema -->
+            <xsl:when test="/xsd:schema/xsd:element[@substitutionGroup=$name]">
+                The following elements can be used here:
 
-                        <xsl:apply-templates
-                                select="/xsd:schema/xsd:element[@substitutionGroup=$name]"
-                                mode="elements-list"/>
+                <xsl:apply-templates
+                        select="/xsd:schema/xsd:element[@substitutionGroup=$name]"
+                        mode="elements-list"/>
 
-                </xsl:when>
-                <xsl:otherwise>
-                    This is an abstract element; another element with a compatible
-                    type must be used in its place. However, no replacements were
-                    found when generating this documentation.
-                </xsl:otherwise>
-            </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                This is an abstract element; another element with a compatible
+                type must be used in its place. However, no replacements were
+                found when generating this documentation.
+            </xsl:otherwise>
+        </xsl:choose>
 
         <!--element (abstract) done-->
     </xsl:template>
@@ -339,10 +347,10 @@
     <xsl:template match="xsd:element[@name]" mode="elements-list">
         <!--element (list) <xsl:value-of select="@name"/>-->
           * <xsl:call-template name="link">
-                <xsl:with-param name="item">
-                    <xsl:value-of select="@name"/>
-                </xsl:with-param>
-            </xsl:call-template>
+            <xsl:with-param name="item">
+                <xsl:value-of select="@name"/>
+            </xsl:with-param>
+        </xsl:call-template>
         <!-- li>&lt;<xsl:value-of select="@name"/> ...&gt;</li -->
         <!--element (list) done-->
     </xsl:template>
@@ -350,8 +358,8 @@
     <xsl:template match="xsd:element" mode="elements-doc">
         <!--element (doc) <xsl:value-of select="@name"/>-->
         <xsl:if test="xsd:annotation/xsd:documentation/text()|xsd:annotation/xsd:documentation/*">
-                <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()"
-                                     mode="copy"/>
+            <xsl:apply-templates select="xsd:annotation/xsd:documentation/*|xsd:annotation/xsd:documentation/text()"
+                                 mode="copy"/>
         </xsl:if>
         <!--element (doc) done-->
     </xsl:template>
@@ -370,13 +378,13 @@
 
     <xsl:template match="xsd:element[@name]" mode="elements">
         <!--element <xsl:value-of select="@name"/>-->
-            <!--<xsl:variable name="name">-->
-                <!--<xsl:call-template name="link">-->
-                    <!--<xsl:with-param name="item">-->
-                        <!--<xsl:value-of select="@name"/>-->
-                    <!--</xsl:with-param>-->
-                <!--</xsl:call-template>-->
-            <!--</xsl:variable>-->
+        <!--<xsl:variable name="name">-->
+        <!--<xsl:call-template name="link">-->
+        <!--<xsl:with-param name="item">-->
+        <!--<xsl:value-of select="@name"/>-->
+        <!--</xsl:with-param>-->
+        <!--</xsl:call-template>-->
+        <!--</xsl:variable>-->
 
         <!-- cardinality i.e. minoccurs/maxoccurs -->
         <xsl:variable name="min">

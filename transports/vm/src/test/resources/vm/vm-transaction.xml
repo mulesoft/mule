@@ -11,18 +11,15 @@
     <vm:connector name="vmQueue" queueEvents="true" numberOfConcurrentTransactedReceivers="1"/>
     <vm:connector name="vmNoQueue" queueEvents="false" numberOfConcurrentTransactedReceivers="1"/>
 
-    <spring:bean name="txFactory" class="org.mule.transport.vm.VMTransactionFactory"/>
-
     <model name="main">
-    
         <service name="dispatchService">
             <inbound>
                 <vm:inbound-endpoint address="vm://dispatchInQueue" connector-ref="vmQueue">
-                    <custom-transaction action="BEGIN_OR_JOIN" factory-ref="txFactory"/>
+                    <vm:transaction action="BEGIN_OR_JOIN"/>
                 </vm:inbound-endpoint>
 
                 <vm:inbound-endpoint address="vm://dispatchInNoQueue" connector-ref="vmNoQueue">
-                    <custom-transaction action="BEGIN_OR_JOIN" factory-ref="txFactory"/>
+                    <vm:transaction action="BEGIN_OR_JOIN"/>
                 </vm:inbound-endpoint>
             </inbound>
 
@@ -38,17 +35,15 @@
         <service name="sendRequestService">
             <inbound>
                 <vm:inbound-endpoint address="vm://sendRequestInQueue" connector-ref="vmQueue">
-                    <custom-transaction action="BEGIN_OR_JOIN" factory-ref="txFactory"/>
+                    <vm:transaction action="BEGIN_OR_JOIN"/>
                 </vm:inbound-endpoint>
 
                 <vm:inbound-endpoint address="vm://sendRequestInNoQueue" connector-ref="vmNoQueue">
-                    <custom-transaction action="BEGIN_OR_JOIN" factory-ref="txFactory"/>
+                    <vm:transaction action="BEGIN_OR_JOIN"/>
                 </vm:inbound-endpoint>
             </inbound>
 
             <component class="org.mule.transport.vm.functional.VmTransactionTestCase$TestComponent"/>
         </service>
-        
     </model>
-
 </mule>

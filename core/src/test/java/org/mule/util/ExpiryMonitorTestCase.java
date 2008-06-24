@@ -14,6 +14,8 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 public class ExpiryMonitorTestCase extends AbstractMuleTestCase
 {
     private boolean expired = false;
@@ -25,7 +27,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
 
     public void testExpiry() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor(100);
+        ExpiryMonitor monitor = new ExpiryMonitor("test", 100);
         Expirable e = new Expirable()
         {
             public void expired()
@@ -33,7 +35,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
                 expired = true;
             }
         };
-        monitor.addExpirable(300, e);
+        monitor.addExpirable(300, TimeUnit.MILLISECONDS, e);
         Thread.sleep(800);
         assertTrue(expired);
         assertTrue(!monitor.isRegistered(e));
@@ -41,7 +43,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
 
     public void testNotExpiry() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor(100);
+        ExpiryMonitor monitor = new ExpiryMonitor("test", 100);
         Expirable e = new Expirable()
         {
             public void expired()
@@ -49,7 +51,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
                 expired = true;
             }
         };
-        monitor.addExpirable(800, e);
+        monitor.addExpirable(800, TimeUnit.MILLISECONDS, e);
         Thread.sleep(300);
         assertTrue(!expired);
         Thread.sleep(800);
@@ -59,7 +61,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
 
     public void testExpiryWithReset() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor(100);
+        ExpiryMonitor monitor = new ExpiryMonitor("test", 100);
         Expirable e = new Expirable()
         {
             public void expired()
@@ -67,7 +69,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
                 expired = true;
             }
         };
-        monitor.addExpirable(600, e);
+        monitor.addExpirable(600, TimeUnit.MILLISECONDS, e);
         Thread.sleep(200);
         assertTrue(!expired);
         monitor.resetExpirable(e);
@@ -81,7 +83,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
 
     public void testNotExpiryWithRemove() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor(100);
+        ExpiryMonitor monitor = new ExpiryMonitor("test", 100);
         Expirable e = new Expirable()
         {
             public void expired()
@@ -89,7 +91,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
                 expired = true;
             }
         };
-        monitor.addExpirable(1000, e);
+        monitor.addExpirable(1000, TimeUnit.MILLISECONDS, e);
         Thread.sleep(200);
         assertTrue(!expired);
         Thread.sleep(200);

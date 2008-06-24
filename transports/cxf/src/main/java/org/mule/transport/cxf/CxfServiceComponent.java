@@ -24,12 +24,12 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.message.DefaultExceptionPayload;
+import org.mule.module.xml.stax.StaxSource;
 import org.mule.transport.cxf.support.DelegatingOutputStream;
-import org.mule.transport.cxf.transport.MuleUniversalDestination;
-import org.mule.transport.cxf.transport.MuleUniversalTransport;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.soap.SoapConstants;
@@ -43,11 +43,12 @@ import java.io.OutputStream;
 import java.io.Reader;
 
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusException;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
@@ -55,11 +56,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xmlsoap.schemas.wsdl.http.AddressType;
 
 /**
@@ -216,30 +218,14 @@ public class CxfServiceComponent implements Callable, Lifecycle
                 m.put(Message.PATH_INFO, path);
                 m.put(Message.BASE_PATH, ctx.getEndpointURI().getPath());
                 
-                if (!"GET".equals(method.toUpperCase())) 
-                {
-                    Object payload = ctx.transformMessage();
+                method = method.toUpperCase();
+            }
+            
+            if (!"GET".equals(method)) 
+            {
+                Object payload = ctx.transformMessage();
 
-                    if (payload instanceof InputStream)
-                    {
-                        m.put(Message.ENCODING, ctx.getEncoding());
-                        m.setContent(InputStream.class, payload);
-                    }
-                    else if (payload instanceof Reader)
-                    {
-                        m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader((Reader) payload));
-                    }
-                    else if (payload instanceof byte[])
-                    {
-                        m.setContent(InputStream.class, new ByteArrayInputStream((byte[]) payload));
-                    }
-                    else
-                    {
-                        InputStream is = (InputStream) ctx.transformMessage(InputStream.class);
-                        m.put(Message.ENCODING, ctx.getEncoding());
-                        m.setContent(InputStream.class, is);
-                    }
-                }
+                setPayload(ctx, m, payload);
             }
             
             // TODO: Not sure if this is 100% correct - DBD
@@ -314,6 +300,48 @@ public class CxfServiceComponent implements Callable, Lifecycle
         {
             logger.warn("Could not dispatch message to XFire!", e);
             throw e;
+        }
+    }
+
+
+    private void setPayload(MuleEventContext ctx, final MessageImpl m, Object payload)
+        throws TransformerException
+    {
+        if (payload instanceof InputStream)
+        {
+            m.put(Message.ENCODING, ctx.getEncoding());
+            m.setContent(InputStream.class, payload);
+        }
+        else if (payload instanceof Reader)
+        {
+            m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader((Reader) payload));
+        }
+        else if (payload instanceof byte[])
+        {
+            m.setContent(InputStream.class, new ByteArrayInputStream((byte[]) payload));
+        }
+        else if (payload instanceof StaxSource)
+        {
+            m.setContent(XMLStreamReader.class, ((StaxSource) payload).getXMLStreamReader());
+        }
+        else if (payload instanceof Source)
+        {
+            m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader((Source) payload));
+        }
+        else if (payload instanceof XMLStreamReader)
+        {
+            m.setContent(XMLStreamReader.class, (XMLStreamReader) payload);
+        }
+        else if (payload instanceof Document)
+        {
+            DOMSource source = new DOMSource((Node) payload);
+            m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader(source));
+        }
+        else
+        {
+            InputStream is = (InputStream) ctx.transformMessage(InputStream.class);
+            m.put(Message.ENCODING, ctx.getEncoding());
+            m.setContent(InputStream.class, is);
         }
     }
 

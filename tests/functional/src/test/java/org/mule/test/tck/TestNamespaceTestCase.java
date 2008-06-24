@@ -10,7 +10,9 @@
 package org.mule.test.tck;
 
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.functional.FunctionalTestComponent2;
+import org.mule.tck.functional.CounterCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.functional.ResponseWriterCallback;
 
 import java.io.IOException;
 
@@ -25,13 +27,15 @@ public class TestNamespaceTestCase extends FunctionalTestCase
     {
         Object object = getComponent("testService1");
         assertNotNull(object);
-        assertTrue(object instanceof FunctionalTestComponent2);
-        FunctionalTestComponent2 ftc = (FunctionalTestComponent2) object;
+        assertTrue(object instanceof FunctionalTestComponent);
+        FunctionalTestComponent ftc = (FunctionalTestComponent) object;
 
         assertFalse(ftc.isEnableMessageHistory());
         assertFalse(ftc.isEnableNotifications());
         assertNull(ftc.getAppendString());
         assertEquals("Foo Bar Car Jar", ftc.getReturnData());
+        assertNotNull(ftc.getEventCallback());
+        assertTrue(ftc.getEventCallback() instanceof CounterCallback);
     }
 
     public void testComponent2Config() throws Exception
@@ -39,8 +43,8 @@ public class TestNamespaceTestCase extends FunctionalTestCase
         String testData = loadResourceAsString("test-data.txt");
         Object object = getComponent("testService2");
         assertNotNull(object);
-        assertTrue(object instanceof FunctionalTestComponent2);
-        FunctionalTestComponent2 ftc = (FunctionalTestComponent2) object;
+        assertTrue(object instanceof FunctionalTestComponent);
+        FunctionalTestComponent ftc = (FunctionalTestComponent) object;
 
         assertTrue(ftc.isThrowException());
         assertNotNull(ftc.getExceptionToThrow());
@@ -51,19 +55,23 @@ public class TestNamespaceTestCase extends FunctionalTestCase
         assertTrue(ftc.isEnableMessageHistory());
         assertTrue(ftc.isEnableNotifications());
         assertNull(ftc.getAppendString());
+        assertNotNull(ftc.getEventCallback());
+        assertTrue(ftc.getEventCallback() instanceof ResponseWriterCallback);
+
     }
 
     public void testComponent3Config() throws Exception
     {
         Object object = getComponent("testService3");
         assertNotNull(object);
-        assertTrue(object instanceof FunctionalTestComponent2);
-        FunctionalTestComponent2 ftc = (FunctionalTestComponent2) object;
+        assertTrue(object instanceof FunctionalTestComponent);
+        FunctionalTestComponent ftc = (FunctionalTestComponent) object;
 
         assertFalse(ftc.isEnableMessageHistory());
         assertTrue(ftc.isEnableNotifications());
         assertEquals(" ${mule:serviceName}", ftc.getAppendString());
         assertNull(ftc.getReturnData());
+        assertNull(ftc.getEventCallback());
     }
 
 }

@@ -35,9 +35,7 @@
 
     <xsd:element name="connector" type="fileConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
-            <xsd:documentation>The File connector is used to configure the default behaviour for File endpoints that
-                reference the connector. Note if there is only one File connector configured, all File endpoints
-                will use that connector.
+            <xsd:documentation>The File connector is used to configure the default behaviour for File endpoints that reference the connector. Note if there is only one File connector configured, all File endpoints will use that connector.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

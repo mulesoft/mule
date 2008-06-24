@@ -12,6 +12,7 @@ package org.mule.example.loanbroker.esb;
 
 import org.mule.example.loanbroker.AbstractLoanBrokerApp;
 import org.mule.example.loanbroker.LocaleMessage;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 
@@ -28,9 +29,12 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
 
     public static void main(String[] args) throws Exception
     {
-        LoanBrokerApp loanBrokerApp = null;
-        loanBrokerApp = new LoanBrokerApp(getInteractiveConfig());
-        loanBrokerApp.run(false);
+        String config = getInteractiveConfig();
+        if (StringUtils.isNotEmpty(config))
+        {
+            LoanBrokerApp loanBrokerApp = new LoanBrokerApp(config);
+            loanBrokerApp.run(false);
+        }
     }
 
     protected static String getInteractiveConfig() throws IOException
@@ -40,16 +44,22 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
         System.out.println("******************\n"
             + LocaleMessage.esbWelcome()
             + "\n******************");
-        response = readCharacter();
-        if (response == '1')
+        
+        while (response != 'q')
         {
-            System.out.println(LocaleMessage.loadingEndpointEjb());
-            return "loan-broker-esb-mule-config.xml";
+            response = readCharacter();
+            if (response == '1')
+            {
+                System.out.println(LocaleMessage.loadingEndpointEjb());
+                return "loan-broker-esb-mule-config.xml";
+            }
+            else
+            {
+                System.out.println(LocaleMessage.loadingManagedEjb());
+                return "loan-broker-esb-mule-config-with-ejb-container.xml";
+            }
         }
-        else
-        {
-            System.out.println(LocaleMessage.loadingManagedEjb());
-            return "loan-broker-esb-mule-config-with-ejb-container.xml";
-        }
+        
+        return "";
     }
 }

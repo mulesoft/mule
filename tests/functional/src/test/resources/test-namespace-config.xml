@@ -15,12 +15,14 @@
         <service name="testService1">
             <test:component enableNotifications="false" enableMessageHistory="false">
                 <test:return-data>Foo Bar Car Jar</test:return-data>
+                <test:callback class="org.mule.tck.functional.CounterCallback"/>
             </test:component>
         </service>
 
         <service name="testService2">
             <test:component throwException="true" exceptionToThrow="java.io.IOException">
                 <test:return-data file="test-data.txt"/>
+                <test:callback class="org.mule.tck.functional.ResponseWriterCallback"/>
             </test:component>
         </service>
 

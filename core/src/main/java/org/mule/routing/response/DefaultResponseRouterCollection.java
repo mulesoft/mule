@@ -77,7 +77,7 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
         {
             if(logger.isDebugEnabled())
             {
-                logger.debug("There are no routers configured on the response router. Returning the current message");
+                logger.error("There are no routers configured on the response router. Returning the current message");
             }
             result = message;
         }

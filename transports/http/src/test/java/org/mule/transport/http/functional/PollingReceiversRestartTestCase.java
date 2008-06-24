@@ -12,7 +12,6 @@ package org.mule.transport.http.functional;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.functional.FunctionalTestComponent2;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,10 +35,10 @@ public class PollingReceiversRestartTestCase extends FunctionalTestCase
         muleContext.start();
 
         Object ftc = getComponent("Test");
-        assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent2);
+        assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
 
         AtomicInteger pollCounter = new AtomicInteger(0);
-        ((FunctionalTestComponent2) ftc).setEventCallback(new CounterCallback(pollCounter));
+        ((FunctionalTestComponent) ftc).setEventCallback(new CounterCallback(pollCounter));
 
         // should be enough to poll for 2 messages
         Thread.sleep(WAIT_TIME);
@@ -52,7 +51,7 @@ public class PollingReceiversRestartTestCase extends FunctionalTestCase
         muleContext.start();
 
         pollCounter.set(0);
-        ((FunctionalTestComponent2) ftc).setEventCallback(new CounterCallback(pollCounter));
+        ((FunctionalTestComponent) ftc).setEventCallback(new CounterCallback(pollCounter));
 
         Thread.sleep(WAIT_TIME);
         muleContext.dispose();

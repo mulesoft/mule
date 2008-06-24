@@ -4,7 +4,7 @@
 
 # This class matches surefire's include pattern by accident.
 # Don't execute it as it's not a unit test.
-org.mule.transport.cxf.testmodels.TestXFireComponent
+org.mule.transport.cxf.testmodels.testxfirecomponent
 
 # tests with external dependencies
 org.mule.transport.cxf.CxfWsdlTestCase
@@ -23,6 +23,7 @@ org.mule.transport.cxf.jaxws.ClientTestCase
 # FunctionalTestComponent as the basis for a service...
 org.mule.transport.cxf.CxfCustomHttpHeaderTestCase
 
+# MULE-3475
+org.mule.transport.cxf.WSProxyTestCase
 
-
-
+org.mule.transport.cxf.MtomTestCase

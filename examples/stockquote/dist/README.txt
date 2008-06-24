@@ -1,20 +1,20 @@
 +---------------------+
 | Stock Quote Example |
 +---------------------+
-This example demonstrates how to invoke an ASPX web service from Mule and 
-transform the result using XSLT and deserialise the result to a StockQuote 
+This example demonstrates how to invoke an ASPX web service from Mule and
+transform the result using XSLT and deserialise the result to a StockQuote
 JavaBean. The example demonstrates using REST and SOAP to invoke the service.
 
-For more information, refer to http://www.muledocs.org/Examples
+For more information, refer http://mule.mulesource.org/display/MULEINTRO/Examples
 
 +---------------------+
 | Running the example |
 +---------------------+
-Simply use the shell script (Unix/Linux) or batch file (Windows) provided in 
+Simply use the shell script (Unix/Linux) or batch file (Windows) provided in
 this directory to run the example.
 
-Alternatively, if you have added Mule to your executable path as recommended in 
-INSTALL.txt, you can run the example from the command line as follows:
+Alternatively, if you have added Mule to your executable path as recommended in
+Mule's README.txt, you can run the example from the command line as follows:
 
     Linux / Unix
     ------------
@@ -42,8 +42,8 @@ INSTALL.txt, you can run the example from the command line as follows:
 | Firewall settings |
 +-------------------+
 
-If you are behind a firewall, you will need to configure the settings for your 
-HTTP proxy in the ./conf/proxy.properties file.  Then you can run the example as 
+If you are behind a firewall, you will need to configure the settings for your
+HTTP proxy in the ./conf/proxy.properties file.  Then you can run the example as
 follows:
 
     Linux / Unix
@@ -61,10 +61,10 @@ follows:
 +----------------------+
 | Building the example |
 +----------------------+
-First, make sure you have set the MULE_HOME environment variable as recommended 
-in INSTALL.txt
+First, make sure you have set the MULE_HOME environment variable as recommended
+in Mule's README.txt
 
-Depending on the build tool you are using (Ant or Maven), you can build the 
-example by simply running "ant" or "mvn".  This will compile the example 
-classes, produce a jar file, and copy everything to $MULE_HOME/lib/user, which 
-is where your custom classes and configuration files should go.  
+Depending on the build tool you are using (Ant or Maven), you can build the
+example by simply running "ant" or "mvn".  This will compile the example
+classes, produce a jar file, and copy everything to $MULE_HOME/lib/user, which
+is where your custom classes and configuration files should go.

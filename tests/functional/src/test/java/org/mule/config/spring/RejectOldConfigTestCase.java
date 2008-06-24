@@ -10,8 +10,8 @@
 
 package org.mule.config.spring;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.api.MuleContext;
+import org.mule.tck.FunctionalTestCase;
 
 public class RejectOldConfigTestCase extends FunctionalTestCase
 {

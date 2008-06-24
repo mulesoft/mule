@@ -3,6 +3,7 @@
             xmlns:cxf="http://cxf.apache.org/core"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             xmlns:beans="http://www.springframework.org/schema/beans"
             targetNamespace="http://www.mulesource.org/schema/mule/cxf/2.0"
             elementFormDefault="qualified"
@@ -18,23 +19,47 @@
 
     <xsd:annotation>
         <xsd:documentation>
-            <p>Apache CXF is an open source services framework. CXF helps you build and develop services
+            Apache CXF is an open source services framework. CXF helps you build and develop services
             using frontend programming APIs, like JAX-WS. These services can speak a variety of protocols such as SOAP,
             XML/HTTP, RESTful HTTP, or CORBA and work over a variety of transports such as HTTP, JMS or JBI.
-            </p>
-            <p>
+            \\
             The Mule CXF Transport is an evolution of Mule's XFire Transport which provides support for the use of web
             service integration via Apache CXF. The Mule CXF connector also provides support for WS-Security,
-            WS-Addressing and WS-Reliable-Messaging.</p>
+            WS-Addressing and WS-Reliable-Messaging.
         </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>cxf</schemadoc:short-name>
+            <schemadoc:page-title>CXF Transport</schemadoc:page-title>
+
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+                                          requestEvents="true"
+                                          transactions="false" streaming="true">
+                <schemadoc:inboundMEPs in-only="true" in-out="true" in-optional-out="true"/>
+                <schemadoc:outboundMEPs out-only="true" out-in="true" out-optional-in="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
     </xsd:annotation>
 
     <xsd:element name="connector" type="cxfConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="cxfConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:attribute name="defaultFrontend" type="xsd:string" default="jaxws"/>
-                <xsd:attribute name="configurationLocation" type="xsd:string"/>
+                <xsd:attribute name="defaultFrontend" type="xsd:string" default="jaxws">
+                   <xsd:annotation>
+                        <xsd:documentation>
+                            The CXF frontend that is used to build an internal service representation
+                            from your Java classes. The default is "jaxws". The "simple" frontend is
+                            also supported.  
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="configurationLocation" type="xsd:string">
+                	<xsd:annotation>
+                         <xsd:documentation>
+                             The location of a CXF configuration file, if any needs to be supplied.
+                         </xsd:documentation>
+                     </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -77,34 +102,143 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="commonEndpointAttributes">
-        <xsd:attribute name="mtomEnabled" type="xsd:boolean"/>
-        <xsd:attribute name="wsdlLocation" type="xsd:string"/>
+    	<xsd:attribute name="mtomEnabled" type="xsd:boolean">
+    		<xsd:annotation>
+    			<xsd:documentation>
+    				Whether or not MTOM (attachment support) is enabled for this endpoint.
+    			</xsd:documentation>
+    		</xsd:annotation>
+    	</xsd:attribute>
+    	<xsd:attribute name="wsdlLocation" type="xsd:string" >
+    		<xsd:annotation>
+    			<xsd:documentation>
+    				The location of the WSDL for your service. If this is a 
+    				server side endpoint it will served to your users. 
+    			</xsd:documentation>
+    		</xsd:annotation>
+    	</xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="inboundEndpointAttributes">
         <xsd:attribute name="bridge" type="xsd:boolean"/>
-        <xsd:attribute name="frontend" type="xsd:string"/>
-        <xsd:attribute name="bindingUri" type="xsd:string"/>
-        <xsd:attribute name="endpointName" type="xsd:string"/>
-        <xsd:attribute name="serviceClass" type="xsd:string"/>
-        <xsd:attribute name="serviceName" type="xsd:string"/>
+        <xsd:attribute name="frontend" type="xsd:string">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				The CXF frontend that is used to build an internal service representation
+                    from your Java classes. The default is "jaxws". The "simple" frontend is
+                    also supported.  
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="bindingUri" type="xsd:string">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				The binding that should be used for this service. It defaults
+    				to the soap binding by default. 
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="endpointName" type="xsd:string">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				The WSDL endpoint name of your service.
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="serviceClass" type="xsd:string">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				The class CXF should use to construct it's service model. This is
+    				optional and by default it will use the implementation class of 
+    				your component.
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="serviceName" type="xsd:string">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				The WSDL service name of your service.
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:group name="endpointElements">
         <xsd:sequence>
-            <xsd:element name="databinding" type="databindingType" minOccurs="0"/>
-            <xsd:element ref="features" minOccurs="0"/>
-            <xsd:element name="inInterceptors" type="interceptors" minOccurs="0"/>
-            <xsd:element name="inFaultInterceptors" type="interceptors" minOccurs="0"/>
-            <xsd:element name="outInterceptors" type="interceptors" minOccurs="0"/>
-            <xsd:element name="outFaultInterceptors" type="interceptors" minOccurs="0"/>
+            <xsd:element name="databinding" type="databindingType" minOccurs="0">
+	            <xsd:annotation>
+	    			<xsd:documentation>
+	    				The databinding implementation that should be used.
+	    				By default, this is JAXB for the JAX-WS frontend and Aegis
+	    				for the simple frontend. This should be specified in the form
+	    				of a spring bean.
+	    			</xsd:documentation>
+	    		</xsd:annotation>
+	        </xsd:element>
+            <xsd:element ref="features" minOccurs="0">
+	            <xsd:annotation>
+	    			<xsd:documentation>
+	    				Any CXF features you wish to apply to the client/server. 
+	    				See the CXF documentation for more information on features.
+	    			</xsd:documentation>
+	    		</xsd:annotation>
+	        </xsd:element>
+            <xsd:element name="inInterceptors" type="interceptors" minOccurs="0">
+	            <xsd:annotation>
+	    			<xsd:documentation>
+	    				Additional incoming interceptors for this service.
+	    			</xsd:documentation>
+	    		</xsd:annotation>
+	        </xsd:element>
+            <xsd:element name="inFaultInterceptors" type="interceptors" minOccurs="0">
+	            <xsd:annotation>
+	    			<xsd:documentation>
+	    				Additional incoming fault interceptors.
+	    			</xsd:documentation>
+	    		</xsd:annotation>
+	        </xsd:element>
+            <xsd:element name="outInterceptors" type="interceptors" minOccurs="0">
+	            <xsd:annotation>
+	    			<xsd:documentation>
+	    				Additional outgoing interceptors.
+	    			</xsd:documentation>
+	    		</xsd:annotation>
+	        </xsd:element>
+            <xsd:element name="outFaultInterceptors" type="interceptors" minOccurs="0">
+	            <xsd:annotation>
+	    			<xsd:documentation>
+	    				Additional outgoing fault interceptors.
+	    			</xsd:documentation>
+	    		</xsd:annotation>
+	        </xsd:element>
         </xsd:sequence>
     </xsd:group>
 
     <xsd:attributeGroup name="outboundEndpointAttributes">
-        <xsd:attribute name="wsdlPort" type="xsd:string"/>
-        <xsd:attribute name="clientClass" type="xsd:string"/>
-        <xsd:attribute name="operation" type="xsd:string"/>
+        <xsd:attribute name="wsdlPort" type="xsd:string">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				The WSDL port you wish to use to communicate to the service.
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="clientClass" type="xsd:string">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				The name of the client class that CXF generated using CXF's wsdl2java
+    				tool. You must use wsdl2java if you do not have both the client and the
+    				server in the same JVM. Otherwise, this can be optional if the endpoint
+    				address is the same in both cases.
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="operation" type="xsd:string">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				The operation you wish to invoke on the outbound endpoint.
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:complexType name="databindingType">
@@ -115,7 +249,13 @@
 
     <xsd:complexType name="schemasType">
         <xsd:sequence>
-            <xsd:element name="schemaLocation" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="schemaLocation" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+	            <xsd:annotation>
+	    			<xsd:documentation>
+	    				The location of any additional schema to be included inside the WSDL.
+	    			</xsd:documentation>
+	    		</xsd:annotation>
+	        </xsd:element>
         </xsd:sequence>
     </xsd:complexType>
 

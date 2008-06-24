@@ -12,9 +12,7 @@
        http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-    <http:connector name="PollingHttpConnector">
-        <service-overrides messageReceiver="org.mule.transport.http.PollingHttpMessageReceiver"/>
-    </http:connector>
+    <http:polling-connector name="PollingHttpConnector" discardEmptyContent="false"/>
 
     <http:connector name="HttpConnector"/>
 

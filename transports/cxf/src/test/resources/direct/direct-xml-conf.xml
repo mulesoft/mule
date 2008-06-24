@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:spring="http://www.springframework.org/schema/beans"
+  xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+  xmlns:cxf-core="http://cxf.apache.org/core"
+  xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.0"
+  xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+  xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd
+               http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
+               http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
+               http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+
+  <mule-xml:xslt-transformer xsl-file="direct/test.xsl" name="TestXslt" 
+      returnClass="org.w3c.dom.Document"/>
+  
+  <model name="DirectXmlTest">
+
+    <service name="echoService">
+      <inbound>
+        <cxf:inbound-endpoint
+          address="vm://echo" frontend="simple" synchronous="true"/>
+      </inbound>
+      <component class="org.mule.component.simple.EchoComponent" />
+    </service>
+    
+    <service name="echoWithTransform">
+      <inbound>
+        <inbound-endpoint
+          address="vm://echoWithTransform" synchronous="true"/>
+      </inbound>
+      <outbound>
+        <filtering-router>
+            <outbound-endpoint address="vm://echo" synchronous="true"/>
+            <mule-xml:jaxen-filter pattern="/s:Envelope/s:Body/@foo" expectedValue="bar">
+	            <mule-xml:namespace prefix="s" uri="http://schemas.xmlsoap.org/soap/envelope/"/>
+	        </mule-xml:jaxen-filter>
+        </filtering-router>
+      </outbound>
+    </service>
+    
+  </model>
+
+</mule>
+

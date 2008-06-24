@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/jbossts/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:spring="http://www.springframework.org/schema/beans"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/jbossts/2.0"
             elementFormDefault="qualified"
@@ -13,8 +14,32 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
 
+    <xsd:annotation>
+        <xsd:documentation>This module enables Mule to use the JBoss transaction manager (previously Arjuna). Developers
+            can configure one Transaction Manger per Mule instance. For more information, see the [Transaction Management]
+            page.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>jbossts</schemadoc:short-name>
+            <schemadoc:page-title>JBoss Transaction Manager</schemadoc:page-title>
+        </xsd:appinfo>
+    </xsd:annotation>
+
     <xsd:element name="transaction-manager" type="transactionManagerType"
-                 substitutionGroup="mule:abstract-transaction-manager"/>
+                 substitutionGroup="mule:abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>By adding this element to a Mule XML configuration you will enable Mule to use the JBoss
+                Transaction Manager. You can configure arbitrary properties on the transaction manager that will be
+                passed on to the underlying transaction manager. For example:
+
+{code:xml}
+&lt;jbossts:transaction-manager&gt;
+   &lt;property key="test" value="TEST"/&gt;
+&lt;/jbossts:transaction-manager&gt;
+{code}
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:complexType name="transactionManagerType">
         <xsd:complexContent>

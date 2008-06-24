@@ -13,7 +13,7 @@ package org.mule.transport.quartz;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CountdownCallback;
-import org.mule.tck.functional.FunctionalTestComponent2;
+import org.mule.tck.functional.FunctionalTestComponent;
 
 public class QuartzReceiveAndDispatchJobTestCase extends FunctionalTestCase
 {
@@ -24,7 +24,7 @@ public class QuartzReceiveAndDispatchJobTestCase extends FunctionalTestCase
 
     public void testMuleClientReceiveAndDispatchJob() throws Exception
     {
-        FunctionalTestComponent2 component = (FunctionalTestComponent2)getComponent("scheduledService");
+        FunctionalTestComponent component = (FunctionalTestComponent)getComponent("scheduledService");
         assertNotNull(component);
         CountdownCallback count = new CountdownCallback(3);
         component.setEventCallback(count);

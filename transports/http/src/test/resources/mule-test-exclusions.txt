@@ -20,3 +20,6 @@ org.mule.transport.http.functional.HttpsFunctionalTestCase
 #
 # Explanation at: http://jakarta.apache.org/bcel/faq.html
 org.mule.transport.http.functional.HttpContentLengthPropagationTestCase
+
+# MULE-3450
+org.mule.transport.http.components.RestErrorExpressionTestCase

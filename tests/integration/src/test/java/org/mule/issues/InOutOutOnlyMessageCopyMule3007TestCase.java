@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: JmsStreamMessageTestCase.java 11700 2008-05-08 11:16:01Z dirk.olmes $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -8,25 +8,25 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.streaming;
+package org.mule.issues;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-public class JmsStreamMessageTestCase extends FunctionalTestCase
+public class InOutOutOnlyMessageCopyMule3007TestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/streaming/jms-stream-message.xml";
+        return "org/mule/issues/inout-outonly-message-copy-mule3007-test.xml";
     }
 
     public void testStreamMessage() throws MuleException
     {
         MuleClient client = new MuleClient();
-        MuleMessage response = client.send("http://localhost:8080/services", "test", null);
+        MuleMessage response = client.send("http://localhost:38900/services", "test", null);
         assertNull(response.getExceptionPayload());
     }
     

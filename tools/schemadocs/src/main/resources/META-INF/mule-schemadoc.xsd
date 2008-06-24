@@ -32,7 +32,7 @@
         </xsd:annotation>
     </xsd:element>
 
-     <xsd:element name="short-name" type="xsd:string">
+    <xsd:element name="short-name" type="xsd:string">
         <xsd:annotation>
             <xsd:documentation>The short name of the module or transport, i.e. 'xml' or 'tcp'.</xsd:documentation>
         </xsd:annotation>
@@ -102,7 +102,7 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:complexType name="snippetType">
+    <xsd:complexType name="snippetType" mixed="true">
         <xsd:attribute name="id" type="xsd:NMTOKEN" use="required">
             <xsd:annotation>
                 <xsd:documentation>The ID of the snippet to embed in the wiki page. This ID is embedded in the source
@@ -135,7 +135,9 @@
 
     <xsd:element name="transport-features" type="transportFeaturesType">
         <xsd:annotation>
-            <xsd:documentation>This element defines meta information about transports such as whether they can send or receive events and if they supprt transactions.</xsd:documentation>
+            <xsd:documentation>Defines meta information about transports such as whether they can send or receive events
+                and if they supprt transactions.
+            </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
@@ -154,27 +156,36 @@
         </xsd:sequence>
         <xsd:attribute name="receiveEvents" type="xsd:boolean" use="required">
             <xsd:annotation>
-                <xsd:documentation>Whether the transport can receive events and thus can be used for an inbound endpoint.</xsd:documentation>
+                <xsd:documentation>Whether the transport can receive events and thus can be used for an inbound
+                    endpoint.
+                </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="dispatchEvents" type="xsd:boolean" use="required">
             <xsd:annotation>
-                <xsd:documentation>Ehether the transport can be used to dispatch events and thus is supported as an outbound endpoint.</xsd:documentation>
+                <xsd:documentation>Ehether the transport can be used to dispatch events and thus is supported as an
+                    outbound endpoint.
+                </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="requestEvents" type="xsd:boolean" use="required">
             <xsd:annotation>
-                <xsd:documentation>Whether the transport can be used to request events directly from the source.</xsd:documentation>
+                <xsd:documentation>Whether the transport can be used to request events directly from the source.
+                </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="responseEvents" type="xsd:boolean" use="required">
             <xsd:annotation>
-                <xsd:documentation>Whether the transport can be used in request/response style messaging. This means that the transport provides a back-channel to the callee.</xsd:documentation>
+                <xsd:documentation>Whether the transport can be used in request/response style messaging. This means
+                    that the transport provides a back-channel to the callee.
+                </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="transactions" type="xsd:boolean" use="required">
             <xsd:annotation>
-                <xsd:documentation>Whether transactions are supported by the transports. Transports that support (/)A transactions can be configured in a distributed 2 Phase Commit (Distributed) transaction.</xsd:documentation>
+                <xsd:documentation>Whether transactions are supported by the transports. Transports that support (/)A
+                    transactions can be configured in a distributed 2 Phase Commit (Distributed) transaction.
+                </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="transactionTypes" type="xsd:string" use="optional">
@@ -184,7 +195,8 @@
         </xsd:attribute>
         <xsd:attribute name="streaming" type="xsd:boolean" use="required">
             <xsd:annotation>
-                <xsd:documentation>Whether the transport supports streaming of the data is provides or publishes.</xsd:documentation>
+                <xsd:documentation>Whether the transport supports streaming of the data is provides or publishes.
+                </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>

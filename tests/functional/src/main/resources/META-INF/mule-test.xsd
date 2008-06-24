@@ -45,6 +45,22 @@
                             </xsd:attribute>
                         </xsd:complexType>
                     </xsd:element>
+
+                    <xsd:element name="callback" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>A user-defined callback that will get invoked when the test component is invked.
+                                This can be useful for capturing information such as message counts.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:attribute name="class" type="xsd:NMTOKEN" use="required">
+                                <xsd:annotation>
+                                    <xsd:documentation>A class name of an object that implements {{org.mule.tck.functional.EventCallback}}.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                        </xsd:complexType>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="throwException" type="xsd:boolean">
                     <xsd:annotation>

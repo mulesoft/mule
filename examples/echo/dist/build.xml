@@ -10,24 +10,59 @@
     <property name="app.name" value="mule-example-echo"/>
     <property environment="env"/>
 
+    <property name="dir.java" value="src"/>
     <property name="dir.conf" value="conf"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
 
+    <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
+    
     <target name="clean"
             description="Clean the output directory (start from scratch).">
         <delete dir="${dir.build}"/>
     </target>
 
-    <target name="init">
+    <!-- Download any additional libraries needed to run the application -->
+    <target name="get.libraries">
+        <get src="${url.maven.repo}/xmlunit/xmlunit/1.1/xmlunit-1.1.jar"
+             dest="${dir.user.lib}/xmlunit-1.1.jar"
+             verbose="true"
+             usetimestamp="true"/>
+    </target>
 
+    <target name="init" depends="get.libraries">
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
+        
+        <!-- Configure Mule classpath (mirrors wrapper.conf settings) -->
+        <path id="classpath.mule">
+            <pathelement location="${dir.mule.home}/conf"/>
+            <fileset dir="${dir.mule.home}/lib/user">
+                <include name="**/*.jar"/>
+            </fileset>
+            <fileset dir="${dir.mule.home}/lib/mule">
+                <include name="**/*.jar"/>
+            </fileset>
+            <fileset dir="${dir.mule.home}/lib/opt">
+                <include name="**/*.jar"/>
+            </fileset>
+            <fileset dir="${dir.mule.home}/lib">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
     </target>
 
     <target name="compile"
             depends="init"
             description="Compile the application.">
+
+        <javac srcdir="${dir.java}"
+               destdir="${dir.classes}"
+               debug="true"
+               source="1.5"
+               target="1.5">
+            <classpath refid="classpath.mule"/>
+        </javac>
 
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">

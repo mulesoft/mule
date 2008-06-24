@@ -50,7 +50,7 @@ public class LengthProtocol extends DirectProtocol
 
     public Object read(InputStream is) throws IOException
     {
-        // original comments indicated that we nede to use read(byte[]) rather than readInt()
+        // original comments indicated that we need to use read(byte[]) rather than readInt()
         // to avoid socket timeouts - don't understand, but don't want to risk change.
 
         // first read the data necessary to know the length of the payload

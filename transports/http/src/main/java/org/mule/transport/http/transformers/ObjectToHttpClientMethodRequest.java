@@ -23,6 +23,7 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.StreamPayloadRequestEntity;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.StringUtils;
+import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -30,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,7 +70,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         registerSourceType(NullPayload.class);
     }
 
-    protected int addParameters(String queryString, PostMethod postMethod)
+    protected int addParameters(String queryString, PostMethod postMethod, MuleMessage msg)
     {
         // Parse the HTTP argument list and convert to a NameValuePair
         // collection
@@ -100,8 +102,46 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             {
                 paramName = currentParam.substring(0, equals);
                 paramValue = currentParam.substring(equals + 1);
-                parameterIndex++;
-                postMethod.addParameter(paramName, paramValue);
+                //Run query params through the expression evaluator
+//                Object temp = ExpressionEvaluatorManager.evaluate(paramValue, msg, "$[", true);
+//                if (temp != null)
+//                {
+//                    //Process param collections
+//                    if (temp instanceof List)
+//                    {
+//                        StringBuffer buf = new StringBuffer();
+//                        List list = (List) temp;
+//                        for (Iterator iterator = list.iterator(); iterator.hasNext();)
+//                        {
+//                            Object object = iterator.next();
+//                            buf.append(object).append(",");
+//                        }
+//                        parameterIndex++;
+//                        postMethod.addParameter(paramName, buf.toString());
+//                    }
+//                    else if (temp instanceof Map)
+//                    {
+//                        Map map = (Map) temp;
+//                        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();)
+//                        {
+//                            Map.Entry entry = (Map.Entry) iterator.next();
+//                            parameterIndex++;
+//                            postMethod.addParameter(entry.getKey().toString(), entry.getValue().toString());
+//                        }
+//                    }
+//                    else
+//                    {
+//                        parameterIndex++;
+//                        postMethod.addParameter(paramName, temp.toString());
+//                    }
+//                }
+//                else
+//                {
+                    parameterIndex++;
+                    postMethod.addParameter(paramName, paramValue);
+                //}
+
+
             }
             equals = queryString.indexOf("&");
             if (equals > -1)
@@ -133,6 +173,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
         try
         {
+            //Allow Expressions to be embedded
+            endpoint = endpoint.replaceAll("\\[", "\\{");
+            endpoint = endpoint.replaceAll("\\]", "\\}");
+            endpoint = ExpressionEvaluatorManager.parse(endpoint, msg, true);
             URI uri = new URI(endpoint);
             HttpMethod httpMethod;
 
@@ -142,7 +186,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 String paramName = URLEncoder.encode(msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
                         HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY), outputEncoding);
                 String paramValue = URLEncoder.encode(src.toString(), outputEncoding);
-                
+
                 String query = uri.getRawQuery();
                 if (!(src instanceof NullPayload) && !StringUtils.EMPTY.equals(src))
                 {
@@ -166,7 +210,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 if (paramName == null)
                 {
                     // Call method to manage the parameter array
-                    addParameters(uri.getQuery(), postMethod);
+                    addParameters(uri.getQuery(), postMethod, msg);
                     setupEntityMethod(src, outputEncoding, msg, uri, postMethod);
                 }
                 else
@@ -225,7 +269,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                     httpMethod.getParams().setVersion(HttpVersion.HTTP_1_1);
                 }
             }
-            
+
             setHeaders(httpMethod, msg);
 
             return httpMethod;
@@ -237,10 +281,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
     }
 
     protected void setupEntityMethod(Object src,
-                                   String encoding,
-                                   MuleMessage msg,
-                                   URI uri,
-                                   EntityEnclosingMethod postMethod)
+                                     String encoding,
+                                     MuleMessage msg,
+                                     URI uri,
+                                     EntityEnclosingMethod postMethod)
             throws UnsupportedEncodingException, TransformerException
     {
         // Dont set a POST payload if the body is a Null Payload.
@@ -272,20 +316,20 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                         encoding));
                 return;
             }
-            
+
 
             if (mimeType == null)
             {
                 mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
             }
-            
+
             if (encoding != null
                     && !"UTF-8".equals(encoding.toUpperCase())
                     && mimeType.indexOf("charset") == -1)
             {
                 mimeType += "; charset=" + encoding;
             }
-            
+
             if (src instanceof InputStream)
             {
                 // TODO Danger here! We don't know if the content is
@@ -317,7 +361,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 {
                     mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
                 }
-                
+
                 byte[] buffer = SerializationUtils.serialize((Serializable) src);
                 postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, mimeType));
             }
@@ -366,6 +410,35 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         {
             // must set this for receiver to properly parse attachments
             httpMethod.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, "multipart/related");
+        }
+    }
+
+    protected String paramToString(Object param)
+    {
+        StringBuffer buf = new StringBuffer();
+        if (param instanceof List)
+        {
+            List list = (List) param;
+            for (Iterator iterator = list.iterator(); iterator.hasNext();)
+            {
+                Object object = iterator.next();
+                buf.append(object).append(",");
+            }
+            return buf.toString();
+        }
+        else if (param instanceof Map)
+        {
+            Map map = (Map) param;
+            for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();)
+            {
+                Map.Entry entry = (Map.Entry) iterator.next();
+                buf.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+            }
+            return buf.toString().substring(0, buf.length() - 1);
+        }
+        else
+        {
+            return param.toString();
         }
     }
 }

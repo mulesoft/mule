@@ -41,7 +41,7 @@ public class DocumentToOutputHandler extends AbstractXmlTransformer implements D
                 {
                     out.write(convertToBytes(src, encoding).getBytes());
                 }
-                catch (javax.xml.transform.TransformerException e)
+                catch (Exception e)
                 {
                     throw new IOException(e.toString());
                 }

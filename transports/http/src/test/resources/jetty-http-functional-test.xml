@@ -22,9 +22,7 @@
             <inbound>
                 <inbound-endpoint ref="serverEndpoint"/>
             </inbound>
-            <!--<test:component appendString=" Received"/>-->
-            
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <test:component appendString=" Received"/>
         </service>
     </model>
 

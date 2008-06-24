@@ -12,9 +12,12 @@ package org.mule.routing.inbound;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.routing.IdempotentMessageIdStore;
+import org.mule.api.store.ObjectStore;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.store.InMemoryObjectStore;
+import org.mule.util.expression.ExpressionEvaluatorManager;
 
 /**
  * <code>IdempotentReceiver</code> ensures that only unique messages are received by a
@@ -26,81 +29,47 @@ import org.mule.config.i18n.CoreMessages;
  */
 public class IdempotentReceiver extends SelectiveConsumer
 {
-    protected volatile IdempotentMessageIdStore idStore;
+    protected volatile ObjectStore store;
     protected volatile String assignedComponentName;
 
-    // The maximum number of messages to keep in the store; exact interpretation of this
-    // limit is up to the store implementation. By default the store is unbounded.
-    protected volatile int maxMessages = -1;
-
-    // The number of seconds each message ID is kept in the store;
-    // by default each entry is kept for 5 minutes
-    protected volatile int messageTTL = (60 * 5);
-
-    // The number of seconds between expiration intervals;
-    // by default we expire every minute
-    protected volatile int expirationInterval = 60;
+    protected String idExpression = "${message:id}";
 
     public IdempotentReceiver()
     {
         super();
     }
 
-    public int getMaxMessages()
-    {
-        return maxMessages;
-    }
-
-    public void setMaxMessages(int maxMessages)
-    {
-        this.maxMessages = maxMessages;
-    }
-
-    public int getMessageTTL()
-    {
-        return messageTTL;
-    }
-
-    public void setMessageTTL(int messageTTL)
-    {
-        this.messageTTL = messageTTL;
-    }
-
-    public int getExpirationInterval()
-    {
-        return expirationInterval;
-    }
-
-    public void setExpirationInterval(int expirationInterval)
-    {
-        if (expirationInterval <= 0)
-        {
-            throw new IllegalArgumentException(CoreMessages.propertyHasInvalidValue("expirationInterval",
-                new Integer(expirationInterval)).toString());
-        }
-
-        this.expirationInterval = expirationInterval;
-    }
-
     protected void initialize(MuleEvent event) throws RoutingException
     {
-        if (assignedComponentName == null && idStore == null)
+        if (assignedComponentName == null && store == null)
         {
             this.assignedComponentName = event.getService().getName();
-            this.idStore = this.createMessageIdStore();
+            try
+            {
+                this.store = this.createMessageIdStore();
+            }
+            catch (InitialisationException e)
+            {
+                throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
+            }
         }
     }
 
-    protected IdempotentMessageIdStore createMessageIdStore()
+    protected ObjectStore createMessageIdStore() throws InitialisationException
     {
-        return new IdempotentInMemoryMessageIdStore(assignedComponentName, maxMessages, messageTTL,
-            expirationInterval);
+        InMemoryObjectStore s = new InMemoryObjectStore();
+        s.setName(assignedComponentName);
+        s.setMaxEntries(-1);
+        s.setEntryTTL(60 * 5);
+        s.setExpirationInterval(6000);
+        s.initialise();
+        return s;
     }
 
     // @Override
     public boolean isMatch(MuleEvent event) throws MessagingException
     {
-        if (idStore == null)
+        if (store == null)
         {
             // we need to load this on the first request as we need the service name
             synchronized (this)
@@ -111,7 +80,7 @@ public class IdempotentReceiver extends SelectiveConsumer
 
         try
         {
-            return !idStore.containsId(this.getIdForEvent(event));
+            return !store.containsObject(this.getIdForEvent(event));
         }
         catch (Exception ex)
         {
@@ -133,11 +102,11 @@ public class IdempotentReceiver extends SelectiveConsumer
             throw new RoutingException(event.getMessage(), event.getEndpoint(), iex);
         }
 
-        Object id = this.getIdForEvent(event);
+        String id = this.getIdForEvent(event);
 
         try
         {
-            if (idStore.storeId(id))
+            if (store.storeObject(id, id))
             {
                 return new MuleEvent[]{event};
             }
@@ -153,9 +122,28 @@ public class IdempotentReceiver extends SelectiveConsumer
         }
     }
 
-    protected Object getIdForEvent(MuleEvent event) throws MessagingException
+    protected String getIdForEvent(MuleEvent event) throws MessagingException
     {
-        return event.getMessage().getUniqueId();
+        return ExpressionEvaluatorManager.parse(idExpression, event.getMessage(), true);
     }
 
+    public String getIdExpression()
+    {
+        return idExpression;
+    }
+
+    public void setIdExpression(String idExpression)
+    {
+        this.idExpression = idExpression;
+    }
+
+    public ObjectStore getStore()
+    {
+        return store;
+    }
+
+    public void setStore(ObjectStore store)
+    {
+        this.store = store;
+    }
 }

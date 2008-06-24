@@ -17,10 +17,10 @@
 
     <vm:connector name="vmConnector1"/>
     <vm:connector name="vmConnector2"/>
-    <test:connector name="testConnector1"/>
+    <custom-connector name="testConnector1" class="org.mule.tck.testmodels.mule.TestConnector"/>
     <!-- need second connector as "create connector" no longer supported
          and we want same uri to be used twice on inbound  -->
-    <test:connector name="testConnector2"/>
+    <custom-connector name="testConnector2" class="org.mule.tck.testmodels.mule.TestConnector"/>
 
     <file:file-to-string-transformer name="ObjectToFileMessage"/>
     <xm:object-to-xml-transformer name="ObjectToXml"/>

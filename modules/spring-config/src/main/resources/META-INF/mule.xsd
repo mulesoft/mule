@@ -1267,7 +1267,7 @@
 
     <xsd:complexType name="pojoBindingType">
         <xsd:sequence>
-            <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-outbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="interface" use="required" type="substitutableClass">
             <xsd:annotation>
@@ -1729,7 +1729,8 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The reference name of a global endpoint to use. If this EndpointRef will be associated to a message
-                    such as a Reply-To address, this endpoint ref has to be available on the remote Mule instance that reads the
+                    such as a Reply-To address, this endpoint ref has to be available on the remote Mule instance that
+                    reads the
                     Reply-To address.
                 </xsd:documentation>
             </xsd:annotation>
@@ -1910,7 +1911,8 @@
                 <xsd:attribute name="expression" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>The expression that will be evaluated. This should always be a boolean
-                            expression. The syntax of the exprsssion will be determined by the exprsssion langage being used.
+                            expression. The syntax of the exprsssion will be determined by the exprsssion langage being
+                            used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2418,6 +2420,7 @@
                     <xsd:enumeration value="attachment"/>
                     <xsd:enumeration value="attachments"/>
                     <xsd:enumeration value="attachments-list"/>
+                    <xsd:enumeration value="message"/>
                     <xsd:enumeration value="map-payload"/>
                     <xsd:enumeration value="payload"/>
                     <xsd:enumeration value="xpath"/>
@@ -2822,15 +2825,114 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!--==============================================================-->
+    <!--  Object stores                                                     -->
+    <!--==============================================================-->
+
+
+    <xsd:complexType name="abstractObjectStoreType"/>
+
+        <xsd:element name="abstract-object-store" abstract="true" type="abstractObjectStoreType">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A placeholder for an object store that can be used by routers to maintain state
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:element>
+
+        <xsd:element name="in-memory-store" type="abstractMonitoredObjectStoreType"
+                     substitutionGroup="abstract-object-store">
+            <xsd:annotation>
+                <xsd:documentation>
+                    An optionally bounded in-memory store for message IDs with periodic expiry of old entries. The bounded
+                    size is a _soft_ limit and only enforced periodically by the expiry process; this means that the store
+                    may temporarily exceed its maximum size between expiry runs, but will eventually shrink to its
+                    configured size.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:element>
+
+        <xsd:element name="simple-text-file-store" type="textFileObjectStoreType" substitutionGroup="abstract-object-store">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A Simple object store that stores String objects by key to a text file. This store is only suitable for
+                    storing simple key value pair strings. This store is backed by an in-memory store and supports the
+                    ability to expire and apply TTL to objects in the store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:element>
+
+        <xsd:complexType name="textFileObjectStoreType">
+            <xsd:complexContent>
+                <xsd:extension base="abstractMonitoredObjectStoreType">
+                    <xsd:attribute name="directory" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The file location (directory) where the object store will be saved. If this value is not set
+                                Mule will default to using the {{mule.working.dir/objectstore}}.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+
+        <xsd:complexType name="abstractMonitoredObjectStoreType">
+            <xsd:complexContent>
+                <xsd:extension base="abstractObjectStoreType">
+                    <xsd:attribute name="name" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                An id for this store, can be used for logging and identification purposes.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="maxEntries" type="substitutableInt">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                the maximum number of entries that this store keeps around. Specify {{-1}} if the store is
+                                supposed to be "unbounded".
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="entryTTL" type="substitutableInt">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                the time-to-live for each message ID, specified in seconds, or {{-1}} for entries that
+                                should never expire. DO NOT combine this with an unbounded store!
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="expirationInterval" type="substitutableInt">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                the interval for periodic bounded size enforcement and entry expiration, specified in
+                                seconds. Arbitrary positive values between 1 second and several hours or days are possible,
+                                but should be chosen carefully according to the expected message rate to prevent OutOfMemory
+                                conditions.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
 
     <!--==============================================================-->
     <!--  Routers                                                     -->
     <!--==============================================================-->
 
+    <xsd:element name="abstract-message-info-mapping" abstract="true" type="abstractMessageInfoMappingType">
+        <xsd:annotation>
+            <xsd:documentation>A Message info mapping element is used to map the attributes of the current message to
+                known message elements in Mule; namely, Message ID, CrrelationID.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractMessageInfoMappingType"/>
+
     <!-- Inbound Router implementations -->
 
-    <xsd:element name="idempotent-secure-hash-receiver-router" type="filteredInboundRouterType"
-                 substitutionGroup="abstract-inbound-router"/>
+
     <xsd:element name="inbound-pass-through-router" type="filteredInboundRouterType"
                  substitutionGroup="abstract-inbound-router"/>
     <xsd:complexType name="filteredInboundRouterType">
@@ -2844,11 +2946,75 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-message-info-mapping" abstract="true" type="abstractMessageInfoMappingType"/>
-    <xsd:complexType name="abstractMessageInfoMappingType"/>
+    <xsd:element name="idempotent-receiver-router" type="idempotentReceiverType"
+                 substitutionGroup="abstract-inbound-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                Ensures that only unique messages are received by a service. It does this by checking the unique ID of
+                the incoming message. Note that The id used to can be generated from the message using an expression
+                defined in the _idExpression_ attribute. By default, the expression used is $\{message:id\}, which means
+                the underlying endpoint must support unique message IDs for this to work, otherwise a
+                {{UniqueIdNotSupportedException}} is thrown.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
-    <xsd:element name="idempotent-receiver-router" type="filteredInboundRouterType"
-                 substitutionGroup="abstract-inbound-router"/>
+    <xsd:element name="idempotent-secure-hash-receiver-router" type="idempotentSecureHashReceiverType"
+                 substitutionGroup="abstract-inbound-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                Ensures that only unique messages are received by a service by calculating the
+                hash of the message itself using a message digest algorithm. This provides a value with an
+                infinitesimally small chance of a collision.
+                This can be used to filter message duplicates. Please keep in mind that the hash is calculated over the
+                entire byte array representing the message, so any leading or trailing spaces or extraneous bytes (like
+                padding) can produce different hash values for the same semantic message content. Care should be taken
+                to ensure that messages do not contain extraneous bytes. This class is useful when the message does not
+                support unique identifiers.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="idempotentReceiverType">
+        <xsd:complexContent>
+            <xsd:extension base="filteredInboundRouterType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-object-store" maxOccurs="1" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="idExpression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines one or more expressions to use when extrating the ID from the message. For example,
+                            it would be possible to combine to headers as the id of the message to provide idempotency
+                            against:
+                            "$\{headers:foo,bar\}" or
+                            combine the message ide with a header:
+                            "$\{message:id\}-${header:foo}".
+                            If this property is not set "$\{message:id\}" will be used by default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="idempotentSecureHashReceiverType">
+        <xsd:complexContent>
+            <xsd:extension base="filteredInboundRouterType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-object-store" maxOccurs="1" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="messageDigestAlgorithm" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The secure hashing algorithm to use. If not set this will default to SHA-256.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 
     <xsd:element name="wire-tap-router" type="wireTapRouterType" substitutionGroup="abstract-inbound-router"/>
     <xsd:complexType name="wireTapRouterType">

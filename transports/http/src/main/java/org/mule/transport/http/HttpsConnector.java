@@ -30,7 +30,10 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.TrustManagerFactory;
 
-/** <code>HttpsConnector</code> provides Https connectivity */
+/**
+ * <code>HttpsConnector</code> provides Secure http connectivity on top of what is already provided with the
+ * Mule {@link org.mule.transport.http.HttpConnector}.
+ */
 public class HttpsConnector extends HttpConnector
         implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
 {

@@ -5,7 +5,9 @@
       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
       xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.0"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
       xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
@@ -25,9 +27,7 @@
             <inbound>
                 <inbound-endpoint ref="in"/>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
+            <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q1"/>
@@ -42,9 +42,7 @@
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
+            <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q2">
@@ -60,9 +58,7 @@
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
+            <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q3">
@@ -78,9 +74,7 @@
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
+            <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q4">
@@ -96,9 +90,7 @@
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
+            <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q5">
@@ -114,11 +106,9 @@
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <property key="returnMessage" value="OUTPUT MESSAGE"/>
-                </singleton-object>
-            </component>
+            <test:component>
+                <test:return-data>OUTPUT MESSAGE</test:return-data>
+            </test:component>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out"/>

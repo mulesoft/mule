@@ -5,3 +5,6 @@
 # MULE-3300
 org.mule.transport.vm.functional.VMRequestorTestCase
 
+# MULE-2931
+org.mule.transport.vm.functional.VmXATransactionTestCase
+

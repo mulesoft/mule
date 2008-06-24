@@ -34,9 +34,11 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.i18n.HttpMessages;
+import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.tcp.TcpMessageReceiver;
 import org.mule.util.MapUtils;
 import org.mule.util.ObjectUtils;
+import org.mule.util.monitor.Expirable;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -46,6 +48,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.resource.spi.work.Work;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -117,7 +121,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return message;
     }
 
-    protected class HttpWorker implements Work
+    protected class HttpWorker implements Work, Expirable
     {
         private HttpServerConnection conn;
         private String cookieSpec;
@@ -132,7 +136,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 encoding = MuleServer.getMuleContext().getConfiguration().getDefaultEncoding();
             }
 
-            conn = new HttpServerConnection(socket, encoding);
+            conn = new HttpServerConnection(socket, encoding, (HttpConnector) connector);
 
             cookieSpec =
                     MapUtils.getString(endpoint.getProperties(), HttpConnector.HTTP_COOKIE_SPEC_PROPERTY,
@@ -147,19 +151,41 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 remoteClientAddress = clientAddress.toString();
             }
         }
+        
+        public void expired()
+        {
+            if (conn.isOpen())
+            {
+                conn.close();
+            }
+        }
 
         public void run()
         {
+            long keepAliveTimeout = ((TcpConnector) connector).getKeepAliveTimeout();
+            
             try
             {
                 do
                 {
                     conn.setKeepAlive(false);
+                    
+                    // Only add a monitor if the timeout has been set
+                    if(keepAliveTimeout > 0)
+                    {
+                        ((HttpConnector) connector).getKeepAliveMonitor().addExpirable(
+                            keepAliveTimeout, TimeUnit.MILLISECONDS, this);
+                    }
+                    
                     HttpRequest request = conn.readRequest();
                     if (request == null)
                     {
                         break;
                     }
+                    
+                    // Ensure that we drop any monitors, we'll add again for the next request
+                    ((HttpConnector) connector).getKeepAliveMonitor().removeExpirable(this);
+                    
                     conn.writeResponse(processRequest(request));
                 }
                 while (conn.isKeepAlive());
@@ -172,8 +198,14 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             {
                 logger.info("Closing HTTP connection.");
 
-                conn.close();
-                conn = null;
+                if (conn.isOpen())
+                {
+                    conn.close();
+                    conn = null;
+                    
+                    // Ensure that we drop any monitors
+                    ((HttpConnector) connector).getKeepAliveMonitor().removeExpirable(this);
+                }
             }
         }
 

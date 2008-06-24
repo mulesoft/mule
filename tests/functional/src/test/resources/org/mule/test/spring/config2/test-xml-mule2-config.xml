@@ -28,12 +28,13 @@
         <agent name="jmxAgent" className="org.mule.management.agents.JmxAgent"/>
         </agents -->
 
-        <test:connector name="dummyConnector">
+
+        <mule:custom-connector name="dummyConnector" class="org.mule.tck.testmodels.mule.TestConnector" >
             <mule:dispatcher-threading-profile maxBufferSize="2"/>
             <mule:custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
             <!-- TODO -->
             <!-- no way to specify connection strategy on a connector? -->
-        </test:connector>
+        </mule:custom-connector>
 
         <mule:endpoint name="AppleQueue" address="test://apple.queue"/>
         <mule:endpoint name="Banana_Queue" address="test://banana.queue"/>

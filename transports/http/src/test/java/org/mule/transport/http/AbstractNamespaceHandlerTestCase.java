@@ -28,6 +28,7 @@ public abstract class AbstractNamespaceHandlerTestCase extends FunctionalTestCas
         return prefix + "-namespace-config.xml";
     }
 
+    
     protected void testBasicProperties(HttpConnector connector)
     {
         assertNotNull(connector);

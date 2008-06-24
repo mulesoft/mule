@@ -36,10 +36,10 @@
    </issueManagement>
 
    <scm>
-       <connection>scm:svn:http://svn.muleforge.org/${artifactId}/</connection>
-       <developerConnection>scm:svn:https://svn.muleforge.org/${artifactId}/</developerConnection>
+       <connection>scm:svn:http://svn.muleforge.org/${TransportNameLower}/</connection>
+       <developerConnection>scm:svn:https://svn.muleforge.org/${TransportNameLower}/</developerConnection>
        <tag>HEAD</tag>
-       <url>http://svn.${artifactId}.muleforge.org/</url>
+       <url>http://svn.${TransportNameLower}.muleforge.org/</url>
    </scm>
 
 
@@ -52,22 +52,29 @@
    <distributionManagement>
        <repository>
            <id>muleforge.webdav.releases</id>
-           <url>dav:https://dav.muleforge.org/repository/${artifactId}/</url>
+           <url>dav:https://dav.muleforge.org/repository/${TransportNameLower}/</url>
        </repository>
        <snapshotRepository>
            <id>muleforge.webdav.snapshots</id>
-           <url>dav:https://dav.muleforge.org/snapshots.repository/${artifactId}/</url>
+           <url>dav:https://dav.muleforge.org/snapshots.repository/${TransportNameLower}/</url>
        </snapshotRepository>
        <site>
            <id>muleforge.webdav.sites</id>
-           <url>dav:https://dav.muleforge.org/${artifactId}/</url>
+           <url>dav:https://dav.muleforge.org/${TransportNameLower}/</url>
        </site>
    </distributionManagement>
 
    <repositories>
        <repository>
-           <id>ch-dep</id>
-           <name>Codehaus Dependencies</name>
+           <id>muleforge-repo</id>
+           <name>MuleForge Repository</name>
+           <url>http://repository.muleforge.org</url>
+           <layout>default</layout>
+       </repository>
+
+       <repository>
+           <id>codehaus-repo</id>
+           <name>Codehaus Repository</name>
            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
            <layout>default</layout>
        </repository>
@@ -76,9 +83,9 @@
                 is not available on any other repository. Its the users' responsibility to make sure that no
                 licenses are violated by uploading dependencies to this location
            -->
-           <id>${thransportId}-deps</id>
+           <id>${TransportNameLower}-deps</id>
            <name>${TransportName} Dependencies</name>
-           <url>http://dist.muleforge.org/${artefactId}/dependencies/maven2</url>
+           <url>http://dist.muleforge.org/${artifactId}/dependencies/maven2</url>
            <snapshots>
                <enabled>false</enabled>
            </snapshots>
@@ -100,6 +107,24 @@
                    <appendAssemblyId>false</appendAssemblyId>
                </configuration>
            </plugin>
+
+           <!-- When we build an IDEA project make sure we attach sources for convenience -->
+           <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-idea-plugin</artifactId>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                </configuration>
+            </plugin>
+
+            <!-- When we build an Eclipse project make sure we attach sources for convenience -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                </configuration>
+            </plugin>
        </plugins>
    </build>
 

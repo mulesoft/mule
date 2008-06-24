@@ -30,6 +30,16 @@ public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCa
                 (HttpConnector) muleContext.getRegistry().lookupConnector("httpConnector");
         testBasicProperties(connector);
     }
+
+    public void testPollingProperties()
+    {
+         HttpPollingConnector connector =
+                (HttpPollingConnector) muleContext.getRegistry().lookupConnector("polling");
+        assertNotNull(connector);
+        assertEquals(3456, connector.getPollingFrequency());
+        assertFalse(connector.isCheckEtag());
+        assertFalse(connector.isDiscardEmptyContent());
+    }
     
     public void testTransformersOnEndpoints() throws Exception
     {

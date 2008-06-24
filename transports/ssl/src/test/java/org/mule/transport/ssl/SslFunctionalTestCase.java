@@ -19,9 +19,6 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.mule.TestSedaService;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class SslFunctionalTestCase extends FunctionalTestCase 
 {
 
@@ -36,18 +33,16 @@ public class SslFunctionalTestCase extends FunctionalTestCase
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
-        MuleMessage result = client.send("sendEndpoint", TEST_MESSAGE, props);
+        MuleMessage result = client.send("sendEndpoint", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
     public void testSendMany() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
         for (int i = 0; i < NUM_MESSAGES; ++i)
         {
-            MuleMessage result = client.send("sendManyEndpoint", TEST_MESSAGE, props);
+            MuleMessage result = client.send("sendManyEndpoint", TEST_MESSAGE, null);
             assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         }
 

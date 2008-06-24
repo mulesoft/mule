@@ -52,7 +52,7 @@ public class XmlPrettyPrinterTransformerTestCase extends AbstractTransformerTest
         XmlPrettyPrinter t = new XmlPrettyPrinter();
         OutputFormat f = t.getOutputFormat();
         assertEquals(2, f.getIndent().length());
-        assertFalse(f.isPadText());
+        assertTrue(f.isPadText());
 
         t.setIndentSize(4);
         t.setPadText(true);

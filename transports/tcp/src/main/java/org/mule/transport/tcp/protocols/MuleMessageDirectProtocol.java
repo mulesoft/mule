@@ -35,4 +35,10 @@ public class MuleMessageDirectProtocol extends DirectProtocol
         super.write(os, MuleMessageWorker.doWrite());
     }
 
+    // @Override
+    public void write(OutputStream os, Object data) throws IOException
+    {
+        super.write(os, MuleMessageWorker.doWrite());
+    }
+
 }

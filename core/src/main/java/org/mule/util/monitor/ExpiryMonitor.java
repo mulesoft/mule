@@ -11,14 +11,16 @@
 package org.mule.util.monitor;
 
 import org.mule.api.lifecycle.Disposable;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.util.concurrent.DaemonThreadFactory;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
+import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,41 +29,67 @@ import org.apache.commons.logging.LogFactory;
  * invoke a callback method once the object time has expired. If the object does
  * expire it is removed from this monitor.
  */
-
-// TODO we should probably rewrite this with ScheduledExecutor for stability IF we
-// need it; right now this class is unused
-
-public class ExpiryMonitor extends TimerTask implements Disposable
+public class ExpiryMonitor implements Runnable, Disposable
 {
     /**
      * logger used by this class
      */
     protected static final Log logger = LogFactory.getLog(ExpiryMonitor.class);
 
-    private Timer timer;
+    protected ScheduledThreadPoolExecutor scheduler;
+
     private Map monitors;
 
-    public ExpiryMonitor()
+    private int monitorFrequency;
+
+    private String name;
+
+    public ExpiryMonitor(String name)
     {
-        this(1000);
+        this(name, 1000);
     }
 
-    public ExpiryMonitor(long monitorFrequency)
+    public ExpiryMonitor(String name, int monitorFrequency)
     {
+        this.name = name;
+        this.monitorFrequency = monitorFrequency;
+        init();
+    }
 
-        timer = new Timer(true);
-        timer.schedule(this, monitorFrequency, monitorFrequency);
+    public ExpiryMonitor(String name, int monitorFrequency, ScheduledThreadPoolExecutor scheduler)
+    {
+        this.name = name;
+        this.monitorFrequency = monitorFrequency;
+        this.scheduler = scheduler;
+        init();
+    }
+
+    protected void init()
+    {
+        if (monitorFrequency <= 0)
+        {
+            throw new IllegalArgumentException(CoreMessages.propertyHasInvalidValue("monitorFrequency",
+                    new Integer(monitorFrequency)).toString());
+        }
         monitors = new ConcurrentHashMap();
+        if (scheduler == null)
+        {
+            this.scheduler = new ScheduledThreadPoolExecutor(1);
+            scheduler.setThreadFactory(new DaemonThreadFactory(name + "-Monitor"));
+            scheduler.scheduleWithFixedDelay(this, 0, monitorFrequency,
+                    TimeUnit.MILLISECONDS);
+        }
     }
 
     /**
      * Adds an expirable object to monitor. If the Object is already being monitored
      * it will be reset and the millisecond timeout will be ignored
-     * 
-     * @param milliseconds
-     * @param expirable
+     *
+     * @param value     the expiry value
+     * @param timeUnit  The time unit of the Expiry value
+     * @param expirable the objec that will expire
      */
-    public void addExpirable(long milliseconds, Expirable expirable)
+    public void addExpirable(long value, TimeUnit timeUnit, Expirable expirable)
     {
         if (isRegistered(expirable))
         {
@@ -73,7 +101,7 @@ public class ExpiryMonitor extends TimerTask implements Disposable
             {
                 logger.debug("Adding new expirable: " + expirable);
             }
-            monitors.put(expirable, new ExpirableHolder(milliseconds, expirable));
+            monitors.put(expirable, new ExpirableHolder(timeUnit.toNanos(value), expirable));
         }
     }
 
@@ -124,7 +152,7 @@ public class ExpiryMonitor extends TimerTask implements Disposable
     public void dispose()
     {
         logger.info("disposing monitor");
-        timer.cancel();
+        scheduler.shutdown();
         ExpirableHolder holder;
         for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
         {
@@ -145,20 +173,20 @@ public class ExpiryMonitor extends TimerTask implements Disposable
     private class ExpirableHolder
     {
 
-        private long milliseconds;
+        private long nanoseconds;
         private Expirable expirable;
         private long created;
 
-        public ExpirableHolder(long milliseconds, Expirable expirable)
+        public ExpirableHolder(long nanoseconds, Expirable expirable)
         {
-            this.milliseconds = milliseconds;
+            this.nanoseconds = nanoseconds;
             this.expirable = expirable;
-            created = System.currentTimeMillis();
+            created = Utils.nanoTime();
         }
 
-        public long getMilliseconds()
+        public long getNanoSeconds()
         {
-            return milliseconds;
+            return nanoseconds;
         }
 
         public Expirable getExpirable()
@@ -168,12 +196,12 @@ public class ExpiryMonitor extends TimerTask implements Disposable
 
         public boolean isExpired()
         {
-            return (System.currentTimeMillis() - milliseconds) > created;
+            return (Utils.nanoTime() - nanoseconds) > created;
         }
 
         public void reset()
         {
-            created = System.currentTimeMillis();
+            created = Utils.nanoTime();
         }
     }
 }

@@ -38,7 +38,13 @@ public class SslCertificateTestCase extends FunctionalTestCase
 
     protected void doTests(int n) throws Exception
     {
-        SaveCertificateCallback callback = (SaveCertificateCallback) muleContext.getRegistry().lookupObject("certificates");
+        FunctionalTestComponent ftc = (FunctionalTestComponent) getComponent("service");
+        assertNotNull(ftc);
+        assertNotNull(ftc.getEventCallback());
+
+        SaveCertificateCallback callback = (SaveCertificateCallback) ftc.getEventCallback();
+        callback.clear();
+
         MuleClient client = new MuleClient();
         for (int i = 0; i < n; ++i)
         {
@@ -47,7 +53,7 @@ public class SslCertificateTestCase extends FunctionalTestCase
             MuleMessage result = client.send("in", msg, null);
             assertTrue(callback.isCalled());
             assertNotNull("Null certificates", callback.getCertificates());
-            assertEquals(FunctionalTestComponent.received(msg), result.getPayloadAsString());
+            assertEquals(msg + " Received", result.getPayloadAsString());
         }
     }
 

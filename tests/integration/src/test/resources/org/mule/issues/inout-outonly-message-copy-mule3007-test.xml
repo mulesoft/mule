@@ -19,7 +19,7 @@
     <model name="StreamTest">
         <service name="StreamTestService">
             <inbound>
-                <inbound-endpoint address="http://localhost:8080/services" />
+                <inbound-endpoint address="http://localhost:38900/services" />
             </inbound>
             <outbound>
                 <outbound-pass-through-router>

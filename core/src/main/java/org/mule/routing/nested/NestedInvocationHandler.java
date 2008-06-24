@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,7 +35,7 @@ public class NestedInvocationHandler implements InvocationHandler
 
     protected Map routers = new ConcurrentHashMap();
 
-    protected NestedInvocationHandler(NestedRouter router)
+    public NestedInvocationHandler(NestedRouter router)
     {
         addRouterForInterface(router);
     }
@@ -77,8 +76,7 @@ public class NestedInvocationHandler implements InvocationHandler
         {
             message = new DefaultMuleMessage(args);
         }
-        
-        
+
 
         NestedRouter router = (NestedRouter) routers.get(method.getName());
         if (router == null)

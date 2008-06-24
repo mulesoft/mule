@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
        xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
@@ -23,7 +23,7 @@
             <inbound>
                 <tcp:inbound-endpoint ref="clientEndpoint"/>
             </inbound>
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <test:component appendString=" Received"/>
         </service>
 
         <!-- this doesn't work because it uses the output stream and length encoding doesn't
@@ -32,15 +32,9 @@
             <inbound>
                 <tcp:inbound-endpoint ref="asyncClientEndpoint1"/>
             </inbound>
-            <pooled-component>
-                <prototype-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="eventCallback">
-                            <spring:bean class="org.mule.tck.functional.ResponseWriterCallback"/>
-                        </spring:entry>
-                    </properties>
-                </prototype-object>
-            </pooled-component>
+            <test:component>
+                <test:callback class="org.mule.tck.functional.ResponseWriterCallback"/>
+            </test:component>
         </service>
 
         <!-- this doesn't work because, in essence, the existing socket is opened in the wrong
@@ -49,7 +43,7 @@
             <inbound>
                 <tcp:inbound-endpoint ref="asyncClientEndpoint2"/>
             </inbound>
-            <pooled-component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <test:component appendString=" Received"/>
             <outbound>
                 <outbound-pass-through-router>
                     <tcp:outbound-endpoint ref="asyncClientEndpoint2"/>

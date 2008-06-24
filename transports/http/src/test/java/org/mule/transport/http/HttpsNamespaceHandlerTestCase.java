@@ -42,4 +42,14 @@ public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestC
         assertEquals("foo", connector.getProtocolHandler());
     }
 
+    public void testPollingProperties()
+    {
+         HttpsPollingConnector connector =
+                (HttpsPollingConnector) muleContext.getRegistry().lookupConnector("polling");
+        assertNotNull(connector);
+        assertEquals(3456, connector.getPollingFrequency());
+        assertFalse(connector.isCheckEtag());
+        assertFalse(connector.isDiscardEmptyContent());
+    }
+
 }

@@ -7,7 +7,7 @@ user's name is then passed to the first component which adds something to the
 string before passes on to the second component that also adds some text before 
 outputting the results back to the console.
 
-For more information, refer to http://www.muledocs.org/Examples
+For more information, refer to http://mule.mulesource.org/display/MULEINTRO/Examples
 
 +---------------------+
 | Running the example |
@@ -16,7 +16,7 @@ Simply use the shell script (Unix/Linux) or batch file (Windows) provided in
 this directory to run the example.
 
 Alternatively, if you have added Mule to your executable path as recommended in 
-INSTALL.txt, you can run the example from the command line as follows:
+Mule's README.txt, you can run the example from the command line as follows:
 
     Linux / Unix
     ------------
@@ -44,7 +44,7 @@ To invoke the hello component over http, hit the following URL
 | Building the example |
 +----------------------+
 First, make sure you have set the MULE_HOME environment variable as recommended 
-in INSTALL.txt
+in Mule's README.txt
 
 Depending on the build tool you are using (Ant or Maven), you can build the 
 example by simply running "ant" or "mvn".  This will compile the example 

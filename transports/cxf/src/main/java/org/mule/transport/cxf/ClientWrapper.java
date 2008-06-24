@@ -22,7 +22,6 @@ import org.mule.transport.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.transport.soap.i18n.SoapMessages;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -79,8 +78,7 @@ public class ClientWrapper
         return proxy;
     }
 
-    @SuppressWarnings("unchecked")
-    public void initialize() throws Exception, IOException
+    public void initialize() throws Exception
     {
         String clientClass = (String) endpoint.getProperty(CxfConstants.CLIENT_CLASS);
         if (clientClass != null)
@@ -110,7 +108,8 @@ public class ClientWrapper
         EndpointImpl ep = (EndpointImpl) client.getEndpoint();
         
         Object mtomEnabled = endpoint.getProperty(CxfConstants.MTOM_ENABLED);
-        if (mtomEnabled != null) {
+        if (mtomEnabled != null) 
+        {
             HashMap<String, Object> props = new HashMap<String, Object>();
             props.put(Message.MTOM_ENABLED, mtomEnabled);
             ep.setProperties(props);
@@ -267,7 +266,7 @@ public class ClientWrapper
         return m;
     }
 
-    protected void createClientFromLocalServer(final Bus bus) throws Exception, IOException
+    protected void createClientFromLocalServer(final Bus bus) throws Exception
     {
         String uri = endpoint.getEndpointURI().toString();
         int idx = uri.indexOf('?');

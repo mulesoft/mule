@@ -1,0 +1,276 @@
+/*
+ * $Id: JXPathFilter.java 11195 2008-03-06 04:13:01Z tcarlson $
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.module.xml.filters;
+
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
+
+import java.io.InputStream;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.xml.transform.dom.DOMSource;
+
+import org.apache.commons.jxpath.AbstractFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.Document;
+import org.jaxen.BaseXPath;
+import org.jaxen.JaxenException;
+import org.jaxen.dom.DOMXPath;
+import org.jaxen.dom4j.Dom4jXPath;
+import org.jaxen.javabean.JavaBeanXPath;
+
+/**
+ * <code>JaxenFilter</code> evaluates an XPath expression against an XML document
+ * using Jaxen.
+ */
+public class JaxenFilter implements Filter
+{
+    protected transient Log logger = LogFactory.getLog(getClass());
+
+    private String pattern;
+    private String expectedValue;
+    private Map namespaces = null;
+    private Map contextProperties = null;
+    private AbstractFactory factory;
+
+    public JaxenFilter()
+    {
+        super();
+    }
+
+    public JaxenFilter(String pattern)
+    {
+        this.pattern = pattern;
+    }
+
+    public JaxenFilter(String pattern, String expectedValue)
+    {
+        this.pattern = pattern;
+        this.expectedValue = expectedValue;
+    }
+
+    public boolean accept(MuleMessage obj)
+    {
+        Object payload = obj.getPayload();
+        
+        try 
+        {
+            // Ensure that we have an object we can run an XPath on
+            if (payload instanceof DOMSource)
+            {
+                accept(((DOMSource) payload).getNode());
+            }
+            else if (payload instanceof byte[] 
+                     || payload instanceof InputStream 
+                     || payload instanceof String)
+            {
+                try
+                {
+                    return accept(obj.getPayload(org.w3c.dom.Document.class));
+                }
+                catch (Exception e)
+                {
+                    logger.warn("JaxenPath filter rejected message because it could not convert from " 
+                            + payload.getClass() 
+                            + " to Source: "+ e.getMessage(), e);
+                    return false;
+                }
+            }
+        
+            return accept(payload);
+        }
+        catch (JaxenException e) 
+        {
+            logger.warn("JaxenPath filter rejected message because it could not build/evaluate the XPath expression.", e);
+            return false;
+        }
+    }
+
+    private boolean accept(Object obj) throws JaxenException
+    {
+        if (obj == null)
+        {
+            logger.warn("Applying JaxenFilter to null object.");
+            return false;
+        }
+        if (pattern == null)
+        {
+            logger.warn("Expression for JaxenFilter is not set.");
+            return false;
+        }
+        if (expectedValue == null)
+        {
+            // Handle the special case where the expected value really is null.
+            if (pattern.endsWith("= null") || pattern.endsWith("=null"))
+            {
+                expectedValue = "null";
+                pattern = pattern.substring(0, pattern.lastIndexOf("="));
+            }
+            else
+            {
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Expected value for JaxenFilter is not set, using 'true' by default");
+                }
+                expectedValue = Boolean.TRUE.toString();
+            }
+        }
+
+        Object xpathResult = null;
+        boolean accept = false;
+
+        // Payload is a DOM Document
+        if (obj instanceof Document)
+        {
+            xpathResult = getDom4jXPath().valueOf((Document) obj);
+        }
+        // Payload is a W3C Document
+        else if (obj instanceof DOMSource)
+        {
+            xpathResult = getDOMXPath().valueOf(obj);
+        }
+        // Payload is a W3C Document
+        else if (obj instanceof org.w3c.dom.Document)
+        {
+            xpathResult = getDOMXPath().valueOf(obj);
+        }
+        // Payload is a Java object
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Passing object of type " + obj.getClass().getName() + " to JaxenContext");
+            }
+            xpathResult = getJavaBeanXPath().valueOf(obj);
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("JaxenFilter Expression result = '" + xpathResult + "' -  Expected value = '"
+                    + expectedValue + "'");
+        }
+        // Compare the XPath result with the expected result.
+        if (xpathResult != null)
+        {
+            accept = xpathResult.toString().equals(expectedValue);
+        }
+        else
+        {
+            // A null result was actually expected.
+            if (expectedValue.equals("null"))
+            {
+                accept = true;
+            }
+            // A null result was not expected, something probably went wrong.
+            else
+            {
+                logger.warn("JaxenFilter expression evaluates to null: " + pattern);
+            }
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("JaxenFilter accept object  : " + accept);
+        }
+
+        return accept;
+    }
+
+    protected DOMXPath getDOMXPath() throws JaxenException
+    {
+        DOMXPath xpath = new DOMXPath(pattern);
+        setupNamespaces(xpath);
+        return xpath;
+    }
+
+    protected Dom4jXPath getDom4jXPath() throws JaxenException
+    {
+        Dom4jXPath xpath = new Dom4jXPath(pattern);
+        setupNamespaces(xpath);
+        return xpath;
+    }
+    
+    protected JavaBeanXPath getJavaBeanXPath() throws JaxenException
+    {
+        JavaBeanXPath xpath = new JavaBeanXPath(pattern);
+        setupNamespaces(xpath);
+        return xpath;
+    }
+
+    private void setupNamespaces(BaseXPath xpath) throws JaxenException
+    {
+        if (namespaces != null) 
+        {
+            for (Iterator itr = namespaces.entrySet().iterator(); itr.hasNext();)
+            {
+                Map.Entry entry = (Map.Entry) itr.next();
+                
+                xpath.addNamespace((String) entry.getKey(), (String) entry.getValue());
+            }
+        }
+    }
+
+    /** @return XPath expression */
+    public String getPattern()
+    {
+        return pattern;
+    }
+
+    /** @param pattern The XPath expression */
+    public void setPattern(String pattern)
+    {
+        this.pattern = pattern;
+    }
+
+    /** @return The expected result value of the XPath expression */
+    public String getExpectedValue()
+    {
+        return expectedValue;
+    }
+
+    /** Sets the expected result value of the XPath expression */
+    public void setExpectedValue(String expectedValue)
+    {
+        this.expectedValue = expectedValue;
+    }
+
+    public Map getNamespaces()
+    {
+        return namespaces;
+    }
+
+    public void setNamespaces(Map namespaces)
+    {
+        this.namespaces = namespaces;
+    }
+
+    public Map getContextProperties()
+    {
+        return contextProperties;
+    }
+
+    public void setContextProperties(Map contextProperties)
+    {
+        this.contextProperties = contextProperties;
+    }
+
+    public AbstractFactory getFactory()
+    {
+        return factory;
+    }
+
+    public void setFactory(AbstractFactory factory)
+    {
+        this.factory = factory;
+    }
+}

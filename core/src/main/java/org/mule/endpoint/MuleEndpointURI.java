@@ -128,6 +128,9 @@ public class MuleEndpointURI implements EndpointURI
     public MuleEndpointURI(String uri) throws EndpointException
     {
         uri = uri.trim().replaceAll(" ", "%20");
+        //Allow Expressions to be embedded
+        uri = uri.replaceAll("\\{", "\\[");
+        uri = uri.replaceAll("\\}", "\\]");
 
         if (!validateUrl(uri))
         {

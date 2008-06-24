@@ -34,18 +34,18 @@ import java.security.NoSuchAlgorithmException;
 
 public class IdempotentSecureHashReceiver extends IdempotentReceiver
 {
-    private static final String messageDigestAlgorithm = "SHA-256";
+    private String messageDigestAlgorithm = "SHA-256";
 
     private final SerializableToByteArray objectToByteArray = new SerializableToByteArray();
     private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
 
     // @Override
-    protected Object getIdForEvent(MuleEvent event) throws MessagingException
+    protected String getIdForEvent(MuleEvent event) throws MessagingException
     {
         try
         {
             MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
-            return byteArrayToHexString.transform(md.digest((byte[]) objectToByteArray.transform(event.getMessage()
+            return (String)byteArrayToHexString.transform(md.digest((byte[]) objectToByteArray.transform(event.getMessage()
                 .getPayload())));
         }
         catch (NoSuchAlgorithmException nsa)
@@ -56,5 +56,15 @@ public class IdempotentSecureHashReceiver extends IdempotentReceiver
         {
             throw new RoutingException(event.getMessage(), event.getEndpoint(), te);
         }
+    }
+
+    public String getMessageDigestAlgorithm()
+    {
+        return messageDigestAlgorithm;
+    }
+
+    public void setMessageDigestAlgorithm(String messageDigestAlgorithm)
+    {
+        this.messageDigestAlgorithm = messageDigestAlgorithm;
     }
 }

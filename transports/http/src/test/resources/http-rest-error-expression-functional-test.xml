@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+
+        <http:endpoint name="serverEndpoint" host="localhost" port="60203" synchronous="true" transformer-refs="ByteArrayToString"/>
+        <vm:endpoint name="restServiceEndpoint" path="restservice" />
+        <vm:endpoint name="restServiceEndpoint2" path="restservice2" />
+
+        <byte-array-to-string-transformer name="ByteArrayToString"/>
+
+    <model name="Sample">
+        <service name="HTTPPostSample">
+            <inbound>
+                <inbound-endpoint ref="restServiceEndpoint"/>
+            </inbound>
+            <http:rest-service-component serviceUrl="http://localhost:60203" httpMethod="POST">
+                <http:error-filter>
+                    <regex-filter pattern="echo(.*)"/>
+                </http:error-filter>
+                <http:payloadParameterName value="echo"/>
+            </http:rest-service-component>
+        </service>
+
+        <service name="HTTPPostSample2">
+            <inbound>
+                <inbound-endpoint ref="restServiceEndpoint2"/>
+            </inbound>
+            <http:rest-service-component serviceUrl="http://localhost:60203" httpMethod="POST">
+                <http:error-filter>
+                    <regex-filter pattern="test(.*)"/>
+                </http:error-filter>
+                <http:payloadParameterName value="echo"/>
+            </http:rest-service-component>
+        </service>
+
+        <service name="Service">
+            <inbound>
+                <inbound-endpoint ref="serverEndpoint"/>    
+            </inbound>
+            <component class="org.mule.transport.http.components.RestErrorExpressionTestCase$EchoComponent"/>
+        </service>
+        
+    </model>
+    
+</mule>
