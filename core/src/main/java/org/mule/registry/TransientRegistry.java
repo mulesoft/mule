@@ -135,6 +135,7 @@ public class TransientRegistry extends AbstractRegistry
         return registry.get(key);
     }
 
+    // TODO This is not threadsafe!
     public Collection lookupObjects(Class returntype)
     {
         return CollectionUtils.select(registry.values(), new InstanceofPredicate(returntype));

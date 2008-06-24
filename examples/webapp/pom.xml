@@ -81,6 +81,10 @@
                     <groupId>jetty</groupId>
                     <artifactId>org.mortbay.jetty</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty.osgi</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -91,6 +95,10 @@
                 <exclusion>
                     <groupId>jetty</groupId>
                     <artifactId>org.mortbay.jetty</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty.osgi</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -103,6 +111,10 @@
                     <groupId>jetty</groupId>
                     <artifactId>org.mortbay.jetty</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty.osgi</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -113,6 +125,10 @@
                 <exclusion>
                     <groupId>jetty</groupId>
                     <artifactId>org.mortbay.jetty</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty.osgi</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -125,6 +141,10 @@
                     <groupId>jetty</groupId>
                     <artifactId>org.mortbay.jetty</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty.osgi</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -136,7 +156,16 @@
                     <groupId>jetty</groupId>
                     <artifactId>org.mortbay.jetty</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty.osgi</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-management</artifactId>
+            <version>${version}</version>
         </dependency>
         <!-- For REST Servlet example -->
         <dependency>
@@ -148,6 +177,10 @@
                     <groupId>jetty</groupId>
                     <artifactId>org.mortbay.jetty</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty.osgi</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -158,6 +191,10 @@
                 <exclusion>
                     <groupId>jetty</groupId>
                     <artifactId>org.mortbay.jetty</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty.osgi</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

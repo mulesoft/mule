@@ -131,9 +131,9 @@ public class DefaultLifecyclePhase implements LifecyclePhase
                     target.remove();
                     duplicates.add(o);
                 }
-                
-                lo.firePostNotification(MuleServer.getMuleContext());
             }
+            
+            lo.firePostNotification(MuleServer.getMuleContext());
         }
     }
 

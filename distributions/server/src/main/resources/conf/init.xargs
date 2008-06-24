@@ -89,24 +89,22 @@
 -istart opt/commons-lang.osgi.jar
 -istart opt/commons-pool.jar
 -istart opt/com.springsource.javax.activation.jar
+-istart mule/mule-module-spring-osgi.jar
 -istart mule/mule-core.jar
 
 # Mule OSGi 
 -istart mule/mule-module-osgi.jar
-
 # Spring OSGi
 -istart opt/spring-osgi-core.jar
 -istart opt/spring-osgi-io.jar
 -istart opt/spring-aop.jar
 -istart opt/aopalliance.osgi.jar
--istart mule/mule-module-spring-osgi.jar
 
 # Mule Modules and their dependencies
 -istart opt/spring-core.jar
 -istart opt/spring-context.jar
 -istart opt/spring-beans.jar
 -istart mule/mule-module-spring-config.jar
-
 -istart mule/mule-module-xml.jar
 
 -istart opt/com.springsource.javax.servlet.jar
@@ -118,13 +116,9 @@
 
 # Mule Transports and their dependencies
 -istart mule/mule-transport-vm.jar
-
 -istart mule/mule-transport-tcp.jar
-
 -istart mule/mule-transport-ssl.jar
-
 -istart mule/mule-transport-stdio.jar
-
 -istart mule/mule-transport-file.jar
 
 -istart opt/org.mortbay.jetty.osgi.jar
