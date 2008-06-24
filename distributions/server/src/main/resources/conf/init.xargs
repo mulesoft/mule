@@ -2,7 +2,7 @@
 -init
 
 # Set Start Level = User Application
--startlevel 10
+-startlevel 9
 
 #############################################################
 # Knopflerfish 
@@ -72,26 +72,13 @@
 -istart boot/osgi/io/io_all-2.0.0.jar
 
 #############################################################
-# 3rd party libraries
+# Mule
 #############################################################
 -initlevel 8
 
-# PAX Logging - supports log4j, commons-logging, and slf4j APIs
+# Mule Core and dependencies
 -istart opt/pax-logging-api.jar
 -istart opt/pax-logging-service.jar
-
-# Spring 
--istart opt/spring-core.jar
--istart opt/spring-context.jar
--istart opt/spring-beans.jar
-
-# Spring OSGi
--istart opt/spring-osgi-core.jar
--istart opt/spring-osgi-io.jar
--istart opt/spring-aop.jar
--istart opt/aopalliance.osgi.jar
-
-# Re-packaged by Mule for OSGi
 -istart opt/backport-util-concurrent.osgi.jar
 -istart opt/geronimo-j2ee-connector.osgi.jar
 -istart opt/geronimo-jta.osgi.jar
@@ -102,20 +89,24 @@
 -istart opt/commons-lang.osgi.jar
 -istart opt/commons-pool.jar
 -istart opt/com.springsource.javax.activation.jar
-
-#############################################################
-# Mule
-#############################################################
--initlevel 9
-
-# Core
 -istart mule/mule-core.jar
 
-# OSGi support for Mule
+# Mule OSGi 
+-istart mule/mule-module-osgi.jar
+
+# Spring OSGi
+-istart opt/spring-osgi-core.jar
+-istart opt/spring-osgi-io.jar
+-istart opt/spring-aop.jar
+-istart opt/aopalliance.osgi.jar
 -istart mule/mule-module-spring-osgi.jar
 
-# Modules
+# Mule Modules and their dependencies
+-istart opt/spring-core.jar
+-istart opt/spring-context.jar
+-istart opt/spring-beans.jar
 -istart mule/mule-module-spring-config.jar
+
 -istart mule/mule-module-xml.jar
 
 -istart opt/com.springsource.javax.servlet.jar
@@ -125,11 +116,15 @@
 -istart opt/groovy-all.osgi.jar
 -istart mule/mule-module-scripting.jar
 
-# Transports
+# Mule Transports and their dependencies
 -istart mule/mule-transport-vm.jar
+
 -istart mule/mule-transport-tcp.jar
+
 -istart mule/mule-transport-ssl.jar
+
 -istart mule/mule-transport-stdio.jar
+
 -istart mule/mule-transport-file.jar
 
 -istart opt/org.mortbay.jetty.osgi.jar
@@ -143,9 +138,9 @@
 -istart mule/mule-transport-jms.jar
 	      
 #############################################################
-# User Application
+# User Applications
 #############################################################
--initlevel 10
+-initlevel 9
 # Install but don't start the examples
 -install user/mule-example-echo.jar
 -install user/mule-example-hello.jar
