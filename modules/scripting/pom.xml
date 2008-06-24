@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all.osgi</artifactId>
-            <version>1.5.4</version>
+            <version>1.5.6</version>
         </dependency>
         <!-- Annoying: we need to override retrotranslated dependencies -->
         <dependency>

@@ -24,7 +24,6 @@
                 <plugin>
                     <groupId>org.codehaus.mojo.groovy</groupId>
                     <artifactId>groovy-maven-plugin</artifactId>
-                    <version>1.0-beta-3</version>
                     <executions>
                         <execution>
                             <phase>generate-test-sources</phase>
