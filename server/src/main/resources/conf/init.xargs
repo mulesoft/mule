@@ -82,6 +82,7 @@
 #    3. distributions/server/src/main/resources/conf/init.xargs
 
 # PAX Logging - supports log4j, commons-logging, and slf4j APIs
+
 -istart opt/pax-logging-api.jar
 -istart opt/pax-logging-service.jar
 
@@ -89,6 +90,7 @@
 -istart opt/spring-core.jar
 -istart opt/spring-context.jar
 -istart opt/spring-beans.jar
+
 # Spring OSGi
 -istart opt/spring-osgi-core.jar
 -istart opt/spring-osgi-io.jar
@@ -99,29 +101,50 @@
 -istart opt/backport-util-concurrent.osgi.jar
 -istart opt/geronimo-j2ee-connector.osgi.jar
 -istart opt/geronimo-jta.osgi.jar
+-istart opt/com.springsource.org.apache.commons.beanutils.jar
+-istart opt/commons-cli.osgi.jar
+-istart opt/com.springsource.org.apache.commons.collections.jar
+-istart opt/commons-io.osgi.jar
+-istart opt/commons-lang.osgi.jar
+-istart opt/commons-pool.jar
+-istart opt/com.springsource.javax.activation.jar
 
 #############################################################
 # Mule
 #############################################################
 -initlevel 9
+
 # Core
+-istart mule/mule-module-osgi.jar
 -istart mule/mule-core.jar
 # Registers Mule bundle listener
 -istart mule/mule-module-osgi.jar
+
 # Modules
 -istart mule/mule-module-spring-config.jar
--istart mule/mule-module-spring-osgi.jar
+-istart mule/mule-module-xml.jar
+#-istart mule/mule-module-scripting.jar
+
 # Transports
 -istart mule/mule-transport-vm.jar
--istart mule/mule-transport-file.jar
 -istart mule/mule-transport-tcp.jar
 -istart mule/mule-transport-ssl.jar
--istart mule/mule-transport-http.jar
 -istart mule/mule-transport-stdio.jar
+-istart mule/mule-transport-file.jar
+
+-istart opt/com.springsource.javax.servlet.jar
+-istart opt/com.springsource.org.apache.commons.httpclient.jar
+-istart opt/com.springsource.org.apache.commons.codec.jar
+-istart mule/mule-transport-http.jar
+
+-istart opt/geronimo-jms.osgi.jar
+-istart opt/geronimo-j2ee-management.osgi.jar
+-istart mule/mule-transport-jms.jar
 	      
 #############################################################
 # User Application
 #############################################################
 -initlevel 10
 # Install but don't start the examples
--install user/mule-example-echo.jar-install user/mule-example-hello.jar
+-install user/mule-example-echo.jar
+-install user/mule-example-hello.jar
