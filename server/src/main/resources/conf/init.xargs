@@ -118,12 +118,17 @@
 -istart mule/mule-module-osgi.jar
 -istart mule/mule-core.jar
 # Registers Mule bundle listener
--istart mule/mule-module-osgi.jar
 
 # Modules
 -istart mule/mule-module-spring-config.jar
 -istart mule/mule-module-xml.jar
-#-istart mule/mule-module-scripting.jar
+
+-istart opt/com.springsource.javax.servlet.jar
+-istart opt/spring-web.jar
+-istart mule/mule-module-builders.jar
+
+-istart opt/groovy-all.osgi.jar
+-istart mule/mule-module-scripting.jar
 
 # Transports
 -istart mule/mule-transport-vm.jar
@@ -132,6 +137,7 @@
 -istart mule/mule-transport-stdio.jar
 -istart mule/mule-transport-file.jar
 
+-istart opt/org.mortbay.jetty.osgi.jar
 -istart opt/com.springsource.javax.servlet.jar
 -istart opt/com.springsource.org.apache.commons.httpclient.jar
 -istart opt/com.springsource.org.apache.commons.codec.jar
