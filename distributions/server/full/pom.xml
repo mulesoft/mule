@@ -67,7 +67,8 @@
                 </executions>
             </plugin>
 
-            <!-- Disable for now since this will completely change for OSGi.
+<!-- TODO UNCOMMENT THIS!!!
+Disable for now since this will completely change for OSGi.
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>mule-assembly-verifier</artifactId>
@@ -98,7 +99,7 @@
                     </blacklist>
                 </configuration>
             </plugin>
-            -->
+-->
 
             <plugin>
                 <groupId>org.codehaus.mojo.groovy</groupId>
@@ -194,18 +195,8 @@ Disable temporarily to speed up build cycle during development
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transports-all</artifactId>
             <version>${version}</version>
-            <scope>compile</scope>
             <type>pom</type>
         </dependency>
-        <!-- Include all 3rd-party OSGi Bundles 
-        <dependency>
-            <groupId>org.mule.distributions</groupId>
-            <artifactId>mule-bundles-all</artifactId>
-            <version>${version}</version>
-            <scope>compile</scope>
-            <type>pom</type>
-        </dependency>
-        -->
         
         <!-- PAX Logging -->
         <dependency>
