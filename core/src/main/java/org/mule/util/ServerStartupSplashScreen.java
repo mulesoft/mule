@@ -25,7 +25,7 @@ import java.util.jar.Manifest;
 
 public class ServerStartupSplashScreen extends SplashScreen
 {
-    public void setHeader(MuleContext context)
+    protected void doHeader(MuleContext context)
     {
         String notset = CoreMessages.notSet().getMessage();
 
@@ -68,7 +68,7 @@ public class ServerStartupSplashScreen extends SplashScreen
         header.add(" ");
     }
    
-    public void setFooter(MuleContext context)
+    protected void doFooter(MuleContext context)
     {
         // Mule Agents
         if (!body.isEmpty())

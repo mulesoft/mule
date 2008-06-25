@@ -60,26 +60,50 @@ public abstract class SplashScreen
         return splashScreen;
     }
 
-    public void setHeader(MuleContext context)
+    /**
+     * Setting the header clears body and footer assuming a new
+     * splash-screen is built.
+     * 
+     * @param context
+     */
+    final public void setHeader(MuleContext context)
+    {
+        header.clear();
+        doHeader(context);
+    }
+    
+    final public void addBody(String line)
+    {
+        doBody(line);
+    }
+    
+    final public void setFooter(MuleContext context)
+    {
+        footer.clear();
+        doFooter(context);
+    }
+    
+    protected void doHeader(MuleContext context)
     {
         // default reserved for mule core info
     }   
     
-    public void addBody(String line)
+    protected void doBody(String line)
     {
         body.add(line);
     }
 
-    public void setFooter(MuleContext context)
+    protected void doFooter(MuleContext context)
     {
         // default reserved for mule core info
     }    
     
     public String toString()
     {
-        header.addAll(body);
-        header.addAll(footer);
-        return StringMessageUtils.getBoilerPlate(header, '*', 70);
+        List boilerPlate = new ArrayList(header);
+        boilerPlate.addAll(body);
+        boilerPlate.addAll(footer);
+        return StringMessageUtils.getBoilerPlate(boilerPlate, '*', 70);
     }
     
     protected SplashScreen()

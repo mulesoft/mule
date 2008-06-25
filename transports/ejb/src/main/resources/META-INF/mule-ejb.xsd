@@ -16,7 +16,7 @@
     <xsd:element name="connector" type="ejbConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                Connector for EJB beans.
+                The Mule EJB Connector provides connectivity for EJB beans.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

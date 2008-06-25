@@ -17,7 +17,7 @@ import java.util.Date;
 
 public class ServerShutdownSplashScreen extends SplashScreen
 {
-    public void setHeader(MuleContext context)
+    protected void doHeader(MuleContext context)
     {
         long currentTime = System.currentTimeMillis();
         header.add(CoreMessages.shutdownNormally(new Date()).getMessage());
