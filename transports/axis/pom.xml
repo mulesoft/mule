@@ -9,7 +9,7 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-axis</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>SOAP Transport: Axis</name>
     <description>A Mule transport for Soap Connectivity using Axis.</description>
 
@@ -49,23 +49,23 @@
              POMs. The duplication here seems to be the lesser evil.
              -->
         <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis-jaxrpc</artifactId>
-            <version>1.4</version>
+            <groupId>javax.xml.rpc</groupId>
+            <artifactId>com.springsource.javax.xml.rpc</artifactId>
+            <version>1.1.0</version>
         </dependency>
         <!-- This library causes conflicts with the SAAJ library used by CXF,
           and the decision was made to make CXF work OOTB.  Therefore the 
           axis-saaj library must be provided manually on the classpath -->
         <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis-saaj</artifactId>
-            <version>1.4</version>
+            <groupId>javax.xml.soap</groupId>
+            <artifactId>com.springsource.javax.xml.soap</artifactId>
+            <version>1.3.0</version>
             <scope>provided</scope>
         </dependency>
         <!-- Use the latest version of WSDL4J as it is compatible with CXF -->
         <dependency>
-            <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j</artifactId>
+            <groupId>javax.wsdl</groupId>
+            <artifactId>com.springsource.javax.wsdl</artifactId>
             <version>1.6.1</version>
         </dependency>
         <!-- needed by the Axis Service component -->
@@ -77,19 +77,6 @@
             <groupId>javax.mail</groupId>
             <artifactId>com.springsource.javax.mail</artifactId>
         </dependency>
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery.osgi</artifactId>
-            <version>0.2</version>
-            <exclusions>
-                <!-- we like slf4j -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        
 
         <!-- Unit tests -->
         <dependency>

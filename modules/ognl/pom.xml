@@ -13,31 +13,6 @@
     <name>OGNL Filter</name>
     <description>Support for filtering events using OGNL notation.</description>
 
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <!-- TODO This module needs reorganization in order to properly export its packages. 
-                                <Export-Package>
-                                </Export-Package>
-                                -->
-                                <Private-Package>
-                                    ognl.*
-                                </Private-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

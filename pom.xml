@@ -644,6 +644,11 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>commons-jxpath</groupId>
+                <artifactId>commons-jxpath.osgi</artifactId>
+                <version>1.2</version>
+            </dependency>
+            <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate</artifactId>
                 <version>3.2.2.ga</version>
