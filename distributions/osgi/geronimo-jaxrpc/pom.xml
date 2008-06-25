@@ -9,17 +9,18 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
 
-    <groupId>aopalliance</groupId>
-    <artifactId>aopalliance.osgi</artifactId>
-    <version>${aopallianceVersion}</version>
+    <groupId>org.apache.geronimo.specs</groupId>
+    <artifactId>geronimo-jaxrpc.osgi</artifactId>
+    <version>${geronimoSpecsVersion}</version>
     <packaging>bundle</packaging>
-    <name>aopalliance repackaged for OSGi</name>
+    <name>geronimo-jaxrpc spec. repackaged for OSGi</name>
 
     <dependencies>
         <dependency>
-            <groupId>aopalliance</groupId>
-            <artifactId>aopalliance</artifactId>
-            <version>${aopallianceVersion}</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
+            <version>${geronimoSpecsVersion}</version>
+            <scope>compile</scope>
          </dependency>
     </dependencies>
 </project>

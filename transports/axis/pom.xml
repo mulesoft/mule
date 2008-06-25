@@ -17,33 +17,29 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-soap</artifactId>
-            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
-            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-tcp</artifactId>
-            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ssl</artifactId>
-            <version>${version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.axis</groupId>
-            <artifactId>axis</artifactId>
-            <version>1.4</version>
+            <artifactId>com.springsource.org.apache.axis</artifactId>
+            <version>1.4.0</version>
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>com.springsource.org.apache.commons.logging</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -76,15 +72,14 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <artifactId>com.springsource.javax.mail</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
+            <artifactId>commons-discovery.osgi</artifactId>
             <version>0.2</version>
             <exclusions>
                 <!-- we like slf4j -->
@@ -166,24 +161,6 @@
                     <type>jar</type>
                 </dependency>
             </dependencies>
-        </profile>
-        <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <Export-Package>
-                                    org.mule.transport.soap.axis.*
-                                </Export-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>

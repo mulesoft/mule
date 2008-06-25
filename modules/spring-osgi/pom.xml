@@ -36,9 +36,9 @@
             <version>${springOsgiVersion}</version>
         </dependency>
         <dependency>
-          <groupId>aopalliance</groupId>
-          <artifactId>aopalliance.osgi</artifactId>
-          <version>${aopallianceVersion}</version>
+            <groupId>org.aopalliance</groupId>
+            <artifactId>com.springsource.org.aopalliance</artifactId>
+            <version>1.0.0</version>
        </dependency>
         <dependency>
             <groupId>org.osgi</groupId>

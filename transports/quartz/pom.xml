@@ -15,11 +15,21 @@
 
     <dependencies>
         <dependency>
-            <groupId>quartz</groupId>
-            <artifactId>quartz-all</artifactId>
+            <groupId>com.opensymphony.quartz</groupId>
+            <artifactId>com.springsource.org.quartz</artifactId>
             <version>1.6.0</version>
-        </dependency>
-
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jgroups</groupId>
+                    <artifactId>com.springsource.org.jgroups</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>        
+        
         <!-- The Mule client is needed for EndpointPollingJob and ScheduledDispatchJob -->
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -42,24 +52,4 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <Export-Package>
-                                    org.mule.transport.quartz.*
-                                </Export-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

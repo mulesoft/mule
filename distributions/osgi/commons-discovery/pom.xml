@@ -9,17 +9,18 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
 
-    <groupId>backport-util-concurrent</groupId>
-    <artifactId>backport-util-concurrent.osgi</artifactId>
-    <version>${backportUtilConcurrentVersion}</version>
+    <groupId>commons-discovery</groupId>
+    <artifactId>commons-discovery.osgi</artifactId>
+    <version>0.2</version>
     <packaging>bundle</packaging>
-    <name>backport-util-concurrent repackaged for OSGi</name>
+    <name>commons-discovery repackaged for OSGi</name>
 
     <dependencies>
         <dependency>
-            <groupId>backport-util-concurrent</groupId>
-            <artifactId>backport-util-concurrent</artifactId>
-            <version>${backportUtilConcurrentVersion}</version>
-         </dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>${version}</version>
+        </dependency>
     </dependencies>
+    
 </project>

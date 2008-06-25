@@ -62,8 +62,7 @@
         <cxfVersion>2.0.6</cxfVersion>
         <coberturaVersion>2.2</coberturaVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
-        <backportUtilConcurrentVersion>3.1</backportUtilConcurrentVersion>
-        <aopallianceVersion>1.0</aopallianceVersion>
+        <backportUtilConcurrentVersion>3.1.0</backportUtilConcurrentVersion>
         <paxLoggingVersion>1.1.1</paxLoggingVersion>   
         <slf4jVersion>1.5.0</slf4jVersion>     
     </properties>
@@ -146,19 +145,12 @@
                 <artifactId>mule-transport-stdio</artifactId>
                 <version>${muleCEVersion}</version>
             </dependency>
-<!-- 
             <dependency>
-                <groupId>backport-util-concurrent</groupId>
-                <artifactId>backport-util-concurrent</artifactId>
+                <groupId>edu.emory.mathcs.backport</groupId>
+                <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
                 <version>${backportUtilConcurrentVersion}</version>
             </dependency>
- -->
-            <dependency>
-                <groupId>backport-util-concurrent</groupId>
-                <artifactId>backport-util-concurrent.osgi</artifactId>
-                <version>${backportUtilConcurrentVersion}</version>
-            </dependency>
-            <dependency>
+             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-annotation_1.0_spec</artifactId>
                 <version>${geronimoSpecsVersion}</version>
@@ -196,6 +188,11 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
+                <version>${geronimoSpecsVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jaxrpc.osgi</artifactId>
                 <version>${geronimoSpecsVersion}</version>
             </dependency>
             <dependency>
@@ -284,6 +281,10 @@
                         <artifactId>aopalliance</artifactId>
                     </exclusion>
                     <exclusion>
+                        <groupId>org.aopalliance</groupId>
+                        <artifactId>com.springsource.org.aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
                     </exclusion>
@@ -299,6 +300,10 @@
                         <artifactId>aopalliance</artifactId>
                     </exclusion>
                     <exclusion>
+                        <groupId>org.aopalliance</groupId>
+                        <artifactId>com.springsource.org.aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
                     </exclusion>
@@ -312,6 +317,10 @@
                     <exclusion>
                         <groupId>aopalliance</groupId>
                         <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.aopalliance</groupId>
+                        <artifactId>com.springsource.org.aopalliance</artifactId>
                     </exclusion>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
@@ -333,6 +342,10 @@
                         <artifactId>aopalliance</artifactId>
                     </exclusion>
                     <exclusion>
+                        <groupId>org.aopalliance</groupId>
+                        <artifactId>com.springsource.org.aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
                     </exclusion>
@@ -348,6 +361,10 @@
                         <artifactId>aopalliance</artifactId>
                     </exclusion>
                     <exclusion>
+                        <groupId>org.aopalliance</groupId>
+                        <artifactId>com.springsource.org.aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
                     </exclusion>
@@ -361,6 +378,10 @@
                     <exclusion>
                         <groupId>aopalliance</groupId>
                         <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.aopalliance</groupId>
+                        <artifactId>com.springsource.org.aopalliance</artifactId>
                     </exclusion>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
@@ -564,6 +585,11 @@
                         <artifactId>msv</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.dom4j</groupId>
+                <artifactId>com.springsource.org.dom4j</artifactId>
+                <version>1.6.1</version>
             </dependency>
             <dependency>
                 <groupId>commons-jxpath</groupId>

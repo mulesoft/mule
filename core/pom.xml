@@ -65,8 +65,8 @@
 
 		<!--  OTHERS.  group/artifact id only, version and exclusions are specified via dependency management -->
         <dependency>
-            <groupId>backport-util-concurrent</groupId>
-            <artifactId>backport-util-concurrent.osgi</artifactId>
+            <groupId>edu.emory.mathcs.backport</groupId>
+            <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
         </dependency>
         <!-- TODO MULE-1947 Remove this since command-line parsing is limited to mule-module-boot -->
         <dependency>
