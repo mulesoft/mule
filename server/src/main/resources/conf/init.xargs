@@ -79,7 +79,7 @@
 # Mule Core and dependencies
 -istart opt/pax-logging-api.jar
 -istart opt/pax-logging-service.jar
--istart opt/backport-util-concurrent.osgi.jar
+-istart opt/com.springsource.edu.emory.mathcs.backport.jar
 -istart opt/geronimo-j2ee-connector.osgi.jar
 -istart opt/geronimo-jta.osgi.jar
 -istart opt/com.springsource.org.apache.commons.beanutils.jar
@@ -98,7 +98,7 @@
 -istart opt/spring-osgi-core.jar
 -istart opt/spring-osgi-io.jar
 -istart opt/spring-aop.jar
--istart opt/aopalliance.osgi.jar
+-istart opt/com.springsource.org.aopalliance.jar
 
 # Mule Modules and their dependencies
 -istart opt/spring-core.jar
@@ -114,6 +114,8 @@
 -istart opt/groovy-all.osgi.jar
 -istart mule/mule-module-scripting.jar
 
+-istart mule/mule-module-client.jar
+
 # Mule Transports and their dependencies
 -istart mule/mule-transport-vm.jar
 -istart mule/mule-transport-tcp.jar
@@ -126,15 +128,24 @@
 -istart opt/com.springsource.org.apache.commons.codec.jar
 -istart mule/mule-transport-http.jar
 
-#-istart mule/mule-transport-soap.jar
+-istart opt/geronimo-jaxrpc.osgi.jar
+-istart opt/com.springsource.javax.xml.soap.jar
+-istart opt/com.springsource.com.sun.xml.messaging.saaj.jar
+-istart opt/com.springsource.org.dom4j.jar
+-istart opt/com.springsource.javax.xml.stream.jar
+-istart mule/mule-transport-soap.jar
 
 -istart opt/geronimo-jms.osgi.jar
 -istart opt/geronimo-j2ee-management.osgi.jar
 -istart mule/mule-transport-jms.jar
 
 #-istart mule/mule-transport-axis.jar
-#-istart mule/mule-transport-bpm.jar
-#-istart mule/mule-transport-quartz.jar
+
+-istart mule/mule-transport-bpm.jar
+
+-istart opt/com.springsource.org.quartz.jar
+-istart mule/mule-transport-quartz.jar
+
 #-istart mule/mule-transport-cxf.jar
 
 -istart mule/mule-transport-rmi.jar
@@ -142,8 +153,8 @@
 -istart opt/geronimo-ejb.osgi.jar
 -istart mule/mule-transport-ejb.jar
 
-#-istart mule/mule-transport-email.jar
-
+-istart opt/com.springsource.javax.mail.jar
+-istart mule/mule-transport-email.jar
 -istart mule/mule-transport-file.jar
 
 -istart opt/com.springsource.org.apache.oro.jar
@@ -155,9 +166,12 @@
 -istart mule/mule-transport-jdbc.jar
 
 #-istart mule/mule-transport-jbpm.jar
-#-istart mule/mule-transport-udp.jar
-#-istart mule/mule-transport-multicast.jar
-#-istart mule/mule-transport-xmpp.jar
+
+-istart mule/mule-transport-udp.jar
+-istart mule/mule-transport-multicast.jar
+
+-istart opt/smack.osgi.jar
+-istart mule/mule-transport-xmpp.jar
 
 
 	      

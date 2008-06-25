@@ -13,8 +13,6 @@
     <name>Artifacts needed for Mule's OSGi support</name>
 
     <modules>
-        <module>backport-util-concurrent</module>
-        <module>aopalliance</module>
         <module>commons-cli</module>
         <module>commons-io</module>
         <module>commons-lang</module>
