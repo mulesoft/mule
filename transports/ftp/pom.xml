@@ -9,25 +9,24 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-ftp</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>FTP Transport</name>
     <description>A Mule transport for Ftp Connectivity.</description>
 
     <dependencies>
         <dependency>
-            <artifactId>commons-net</artifactId>
-            <groupId>commons-net</groupId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>com.springsource.org.apache.commons.net</artifactId>
             <version>1.4.1</version>
         </dependency>
         <dependency>
-            <artifactId>oro</artifactId>
-            <groupId>oro</groupId>
-            <version>2.0.7</version>
+            <groupId>org.apache.oro</groupId>
+            <artifactId>com.springsource.org.apache.oro</artifactId>
+            <version>2.0.8</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-file</artifactId>
-            <version>${version}</version>
         </dependency>
 
         <!-- Unit tests -->

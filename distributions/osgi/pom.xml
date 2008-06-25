@@ -18,10 +18,12 @@
         <module>commons-cli</module>
         <module>commons-io</module>
         <module>commons-lang</module>
+        <module>commons-dbutils</module>
         <module>geronimo-j2ee-connector</module>
         <module>geronimo-j2ee-management</module>
         <module>geronimo-jta</module>
         <module>geronimo-jms</module>
+        <module>geronimo-ejb</module>
         <module>groovy</module>
         <module>jetty</module>
     </modules>

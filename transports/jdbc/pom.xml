@@ -9,7 +9,7 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-jdbc</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>JDBC Transport</name>
     <description>A Mule transport for JDBC connectivity.</description>
 
@@ -32,12 +32,12 @@
     <dependencies>
         <dependency>
             <groupId>commons-dbutils</groupId>
-            <artifactId>commons-dbutils</artifactId>
+            <artifactId>commons-dbutils.osgi</artifactId>
             <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>com.experlog</groupId>
-            <artifactId>xapool</artifactId>
+            <artifactId>xapool.osgi</artifactId>
             <version>1.4</version>
         </dependency>
 
@@ -61,24 +61,4 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <Export-Package>
-                                    org.mule.transport.jdbc.*
-                                </Export-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
