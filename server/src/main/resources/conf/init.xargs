@@ -119,7 +119,6 @@
 -istart mule/mule-transport-tcp.jar
 -istart mule/mule-transport-ssl.jar
 -istart mule/mule-transport-stdio.jar
--istart mule/mule-transport-file.jar
 
 -istart opt/org.mortbay.jetty.osgi.jar
 -istart opt/com.springsource.javax.servlet.jar
@@ -127,9 +126,40 @@
 -istart opt/com.springsource.org.apache.commons.codec.jar
 -istart mule/mule-transport-http.jar
 
+#-istart mule/mule-transport-soap.jar
+
 -istart opt/geronimo-jms.osgi.jar
 -istart opt/geronimo-j2ee-management.osgi.jar
 -istart mule/mule-transport-jms.jar
+
+#-istart mule/mule-transport-axis.jar
+#-istart mule/mule-transport-bpm.jar
+#-istart mule/mule-transport-quartz.jar
+#-istart mule/mule-transport-cxf.jar
+
+-istart mule/mule-transport-rmi.jar
+
+-istart opt/geronimo-ejb.osgi.jar
+-istart mule/mule-transport-ejb.jar
+
+#-istart mule/mule-transport-email.jar
+
+-istart mule/mule-transport-file.jar
+
+-istart opt/com.springsource.org.apache.oro.jar
+-istart opt/com.springsource.org.apache.commons.net.jar
+-istart mule/mule-transport-ftp.jar
+
+-istart opt/commons-dbutils.osgi.jar
+-istart opt/xapool.osgi.jar
+-istart mule/mule-transport-jdbc.jar
+
+#-istart mule/mule-transport-jbpm.jar
+#-istart mule/mule-transport-udp.jar
+#-istart mule/mule-transport-multicast.jar
+#-istart mule/mule-transport-xmpp.jar
+
+
 	      
 #############################################################
 # User Applications
