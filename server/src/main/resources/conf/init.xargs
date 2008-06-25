@@ -89,6 +89,8 @@
 -istart opt/commons-lang.osgi.jar
 -istart opt/commons-pool.jar
 -istart opt/com.springsource.javax.activation.jar
+-istart opt/com.springsource.javax.mail.jar
+-istart opt/jug.osgi.jar
 -istart mule/mule-module-spring-osgi.jar
 -istart mule/mule-core.jar
 
@@ -115,6 +117,7 @@
 -istart mule/mule-module-scripting.jar
 
 -istart mule/mule-module-client.jar
+-istart mule/mule-module-jaas.jar
 
 # Mule Transports and their dependencies
 -istart mule/mule-transport-vm.jar
@@ -129,6 +132,7 @@
 -istart mule/mule-transport-http.jar
 
 -istart opt/geronimo-jaxrpc.osgi.jar
+-istart opt/com.springsource.javax.wsdl.jar
 -istart opt/com.springsource.javax.xml.soap.jar
 -istart opt/com.springsource.com.sun.xml.messaging.saaj.jar
 -istart opt/com.springsource.org.dom4j.jar
@@ -139,13 +143,18 @@
 -istart opt/geronimo-j2ee-management.osgi.jar
 -istart mule/mule-transport-jms.jar
 
-#-istart mule/mule-transport-axis.jar
+-istart opt/com.springsource.javax.xml.rpc.jar
+-istart opt/com.springsource.javax.xml.soap.jar
+-istart opt/com.springsource.org.apache.commons.discovery.jar
+-istart opt/com.springsource.org.apache.axis.jar
+-istart mule/mule-transport-axis.jar
 
 -istart mule/mule-transport-bpm.jar
 
 -istart opt/com.springsource.org.quartz.jar
 -istart mule/mule-transport-quartz.jar
 
+#-istart opt/cxf-libs.osgi.jar
 #-istart mule/mule-transport-cxf.jar
 
 -istart mule/mule-transport-rmi.jar
@@ -153,7 +162,6 @@
 -istart opt/geronimo-ejb.osgi.jar
 -istart mule/mule-transport-ejb.jar
 
--istart opt/com.springsource.javax.mail.jar
 -istart mule/mule-transport-email.jar
 -istart mule/mule-transport-file.jar
 

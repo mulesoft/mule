@@ -17,7 +17,9 @@
         <module>commons-dbutils</module>
         <module>commons-discovery</module>
         <module>commons-io</module>
+        <module>commons-jxpath</module>
         <module>commons-lang</module>
+        <module>cxf-libs</module>
         <module>geronimo-ejb</module>
         <module>geronimo-j2ee-connector</module>
         <module>geronimo-j2ee-management</module>
@@ -26,6 +28,7 @@
         <module>geronimo-jta</module>
         <module>groovy</module>
         <module>jetty</module>
+        <module>jug</module>
         <module>smack</module>
         <module>xapool</module>
     </modules>
