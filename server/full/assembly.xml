@@ -289,6 +289,17 @@ Assembly descriptor for the full Mule distribution.
     </fileSet>
   </fileSets>
 
+    <!-- Insert version numbers into OSGi startup file -->
+    <files>
+        <file>
+            <source>../src/main/resources/conf/init.xargs</source>
+            <outputDirectory>conf</outputDirectory>
+            <filtered>true</filtered>
+            <!-- Workaround for http://jira.codehaus.org/browse/MASSEMBLY-153 -->
+            <fileMode>420</fileMode>            
+        </file>
+    </files>
+
     <!--
     ============================
         Libraries
@@ -306,8 +317,6 @@ Assembly descriptor for the full Mule distribution.
     <!-- Mule bootstrap -->
     <dependencySet>
       <outputDirectory>lib/boot</outputDirectory>
-      <!-- No version number  -->
-      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
         <include>org.mule.modules:mule-module-boot</include>
         <include>commons-cli:commons-cli</include>
@@ -326,8 +335,6 @@ Assembly descriptor for the full Mule distribution.
     <!-- Mule libraries -->
     <dependencySet>
       <outputDirectory>lib/mule</outputDirectory>
-      <!-- No version number  -->
-      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <scope>runtime</scope>
       <includes>
         <!-- Core -->
@@ -379,18 +386,8 @@ Assembly descriptor for the full Mule distribution.
     </excludes>
     </dependencySet>
 
-    <!-- 3rd-party libraries -->
-    <!-- 
-    When a new 3rd party library is added to the distro, it must be added in 3 places:
-       1. distributions/osgi/all-bundles/pom.xml
-       2. distributions/server/full/assembly.xml
-       3. distributions/server/src/main/resources/conf/init.xargs
-    -->
     <dependencySet>
       <outputDirectory>lib/opt</outputDirectory>
-      <!-- No version number  -->
-      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
-
       <excludes>
         <!-- Core -->
         <exclude>org.mule:mule-core</exclude>
@@ -476,8 +473,6 @@ Assembly descriptor for the full Mule distribution.
     <dependencySet>
       <outputDirectory>lib/user</outputDirectory>
       <scope>runtime</scope>
-      <!-- Don't put the version number in the examples. -->
-      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
         <include>org.mule.examples:mule-example-echo</include>
         <include>org.mule.examples:mule-example-errorhandler</include>
@@ -501,8 +496,6 @@ Assembly descriptor for the full Mule distribution.
 
     <dependencySet>
       <outputDirectory>lib/user</outputDirectory>
-      <!-- No version number  -->
-      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <scope>test</scope>
       <includes>
         <include>org.mule.tests:mule-tests-core</include>
