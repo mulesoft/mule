@@ -77,109 +77,113 @@
 -initlevel 8
 
 # Mule Core and dependencies
--istart opt/pax-logging-api.jar
--istart opt/pax-logging-service.jar
--istart opt/com.springsource.edu.emory.mathcs.backport.jar
--istart opt/geronimo-j2ee-connector.osgi.jar
--istart opt/geronimo-jta.osgi.jar
--istart opt/com.springsource.org.apache.commons.beanutils.jar
--istart opt/commons-cli.osgi.jar
--istart opt/com.springsource.org.apache.commons.collections.jar
--istart opt/commons-io.osgi.jar
--istart opt/commons-lang.osgi.jar
--istart opt/commons-pool.jar
--istart opt/com.springsource.javax.activation.jar
--istart opt/com.springsource.javax.mail.jar
--istart opt/jug.osgi.jar
--istart mule/mule-module-spring-osgi.jar
--istart mule/mule-core.jar
+-istart opt/pax-logging-api-${paxLoggingVersion}.jar
+-istart opt/pax-logging-service-${paxLoggingVersion}.jar
+-istart opt/com.springsource.edu.emory.mathcs.backport-${backportUtilConcurrentVersion}.jar
+-istart opt/geronimo-j2ee-connector.osgi-${geronimoSpecsVersion}.jar
+-istart opt/geronimo-jta.osgi-${geronimoSpecsVersion}.jar
+-istart opt/com.springsource.org.apache.commons.beanutils-${commonsBeanUtilsVersion}.jar
+-istart opt/com.springsource.org.apache.commons.collections-${commonsCollectionsVersion}.jar
+# TODO MULE-1947
+-istart opt/commons-cli.osgi-${commonsCliVersion}.jar
+-istart opt/commons-io.osgi-${commonsIoVersion}.jar
+-istart opt/commons-lang.osgi-${commonsLangVersion}.jar
+-istart opt/commons-pool-${commonsPoolVersion}.jar
+-istart opt/com.springsource.javax.activation-${javaActivationVersion}.jar
+-istart opt/com.springsource.javax.mail-${javaMailVersion}.jar
+-istart opt/jug.osgi-${jugVersion}.jar
+-istart mule/mule-core-${muleCEVersion}.jar
+-istart mule/mule-module-osgi-${muleCEVersion}.jar
 
-# Mule OSGi 
--istart mule/mule-module-osgi.jar
 # Spring OSGi
--istart opt/spring-osgi-core.jar
--istart opt/spring-osgi-io.jar
--istart opt/spring-aop.jar
--istart opt/com.springsource.org.aopalliance.jar
+-istart opt/spring-osgi-core-${springOsgiVersion}.jar
+-istart opt/spring-osgi-io-${springOsgiVersion}.jar
+-istart opt/spring-aop-${springVersion}.jar
+-istart opt/com.springsource.org.aopalliance-${aopAllianceVersion}.jar
+-istart mule/mule-module-spring-osgi-${muleCEVersion}.jar
 
 # Mule Modules and their dependencies
--istart opt/spring-core.jar
--istart opt/spring-context.jar
--istart opt/spring-beans.jar
--istart mule/mule-module-spring-config.jar
--istart mule/mule-module-xml.jar
+-istart opt/spring-core-${springVersion}.jar
+-istart opt/spring-context-${springVersion}.jar
+-istart opt/spring-beans-${springVersion}.jar
+-istart mule/mule-module-spring-config-${muleCEVersion}.jar
 
--istart opt/com.springsource.javax.servlet.jar
--istart opt/spring-web.jar
--istart mule/mule-module-builders.jar
+-istart mule/mule-module-xml-${muleCEVersion}.jar
 
--istart opt/groovy-all.osgi.jar
--istart mule/mule-module-scripting.jar
+-istart opt/com.springsource.javax.servlet-${javaServletVersion}.jar
+-istart opt/spring-web-${springVersion}.jar
+-istart mule/mule-module-builders-${muleCEVersion}.jar
 
--istart mule/mule-module-client.jar
--istart mule/mule-module-jaas.jar
+-istart opt/groovy-all.osgi-${groovyVersion}.jar
+-istart mule/mule-module-scripting-${muleCEVersion}.jar
+
+-istart mule/mule-module-client-${muleCEVersion}.jar
+
+-istart mule/mule-module-jaas-${muleCEVersion}.jar
 
 # Mule Transports and their dependencies
--istart mule/mule-transport-vm.jar
--istart mule/mule-transport-tcp.jar
--istart mule/mule-transport-ssl.jar
--istart mule/mule-transport-stdio.jar
+-istart mule/mule-transport-vm-${muleCEVersion}.jar
+-istart mule/mule-transport-tcp-${muleCEVersion}.jar
+-istart mule/mule-transport-ssl-${muleCEVersion}.jar
+-istart mule/mule-transport-stdio-${muleCEVersion}.jar
 
--istart opt/org.mortbay.jetty.osgi.jar
--istart opt/com.springsource.javax.servlet.jar
--istart opt/com.springsource.org.apache.commons.httpclient.jar
--istart opt/com.springsource.org.apache.commons.codec.jar
--istart mule/mule-transport-http.jar
+-istart opt/org.mortbay.jetty.osgi-${jettyVersion}.jar
+# Already listed above
+#-istart opt/com.springsource.javax.servlet-${javaServletVersion}.jar
+-istart opt/com.springsource.org.apache.commons.httpclient-${commonsHttpClientVersion}.jar
+-istart opt/com.springsource.org.apache.commons.codec-${commonsCodecVersion}.jar
+-istart mule/mule-transport-http-${muleCEVersion}.jar
 
--istart opt/geronimo-jaxrpc.osgi.jar
--istart opt/com.springsource.javax.wsdl.jar
--istart opt/com.springsource.javax.xml.soap.jar
--istart opt/com.springsource.com.sun.xml.messaging.saaj.jar
--istart opt/com.springsource.org.dom4j.jar
--istart opt/com.springsource.javax.xml.stream.jar
--istart mule/mule-transport-soap.jar
+-istart opt/geronimo-jaxrpc.osgi-${geronimoSpecsVersion}.jar
+-istart opt/com.springsource.javax.wsdl-${javaWsdlVersion}.jar
+-istart opt/com.springsource.javax.xml.soap-${javaXmlSoapVersion}.jar
+-istart opt/com.springsource.com.sun.xml.messaging.saaj-${saajVersion}.jar
+-istart opt/com.springsource.org.dom4j-${dom4jVersion}.jar
+-istart opt/com.springsource.javax.xml.stream-${javaXmlStreamVersion}.jar
+-istart mule/mule-transport-soap-${muleCEVersion}.jar
 
--istart opt/geronimo-jms.osgi.jar
--istart opt/geronimo-j2ee-management.osgi.jar
--istart mule/mule-transport-jms.jar
+-istart opt/geronimo-jms.osgi-${geronimoSpecsVersion}.jar
+-istart opt/geronimo-j2ee-management.osgi-${geronimoSpecsVersion}.jar
+-istart mule/mule-transport-jms-${muleCEVersion}.jar
 
--istart opt/com.springsource.javax.xml.rpc.jar
--istart opt/com.springsource.javax.xml.soap.jar
--istart opt/com.springsource.org.apache.commons.discovery.jar
--istart opt/com.springsource.org.apache.axis.jar
--istart mule/mule-transport-axis.jar
+-istart opt/com.springsource.javax.xml.rpc-${javaXmlRpcVersion}.jar
+# Already listed above
+#-istart opt/com.springsource.javax.xml.soap-${javaXmlSoapVersion}.jar
+-istart opt/com.springsource.org.apache.commons.discovery-${commonsDiscoveryVersion}.jar
+-istart opt/com.springsource.org.apache.axis-${axisVersion}.jar
+-istart mule/mule-transport-axis-${muleCEVersion}.jar
 
--istart mule/mule-transport-bpm.jar
+-istart mule/mule-transport-bpm-${muleCEVersion}.jar
 
--istart opt/com.springsource.org.quartz.jar
--istart mule/mule-transport-quartz.jar
+-istart opt/com.springsource.org.quartz-${quartzVersion}.jar
+-istart mule/mule-transport-quartz-${muleCEVersion}.jar
 
-#-istart opt/cxf-libs.osgi.jar
-#-istart mule/mule-transport-cxf.jar
+#-istart opt/cxf-libs.osgi-${cxfVersion}.jar
+#-istart mule/mule-transport-cxf-${muleCEVersion}.jar
 
--istart mule/mule-transport-rmi.jar
+-istart mule/mule-transport-rmi-${muleCEVersion}.jar
 
--istart opt/geronimo-ejb.osgi.jar
--istart mule/mule-transport-ejb.jar
+-istart opt/geronimo-ejb.osgi-${geronimoSpecsVersion}.jar
+-istart mule/mule-transport-ejb-${muleCEVersion}.jar
 
--istart mule/mule-transport-email.jar
--istart mule/mule-transport-file.jar
+-istart mule/mule-transport-email-${muleCEVersion}.jar
+-istart mule/mule-transport-file-${muleCEVersion}.jar
 
--istart opt/com.springsource.org.apache.oro.jar
--istart opt/com.springsource.org.apache.commons.net.jar
--istart mule/mule-transport-ftp.jar
+-istart opt/com.springsource.org.apache.oro-${oroVersion}.jar
+-istart opt/com.springsource.org.apache.commons.net-${commonsNetVersion}.jar
+-istart mule/mule-transport-ftp-${muleCEVersion}.jar
 
--istart opt/commons-dbutils.osgi.jar
--istart opt/xapool.osgi.jar
--istart mule/mule-transport-jdbc.jar
+-istart opt/commons-dbutils.osgi-${commonsDbUtilsVersion}.jar
+-istart opt/xapool.osgi-${xaPoolVersion}.jar
+-istart mule/mule-transport-jdbc-${muleCEVersion}.jar
 
-#-istart mule/mule-transport-jbpm.jar
+#-istart mule/mule-transport-jbpm-${muleCEVersion}.jar
 
--istart mule/mule-transport-udp.jar
--istart mule/mule-transport-multicast.jar
+-istart mule/mule-transport-udp-${muleCEVersion}.jar
+-istart mule/mule-transport-multicast-${muleCEVersion}.jar
 
--istart opt/smack.osgi.jar
--istart mule/mule-transport-xmpp.jar
+-istart opt/smack.osgi-${smackVersion}.jar
+-istart mule/mule-transport-xmpp-${muleCEVersion}.jar
 
 
 	      
@@ -188,5 +192,5 @@
 #############################################################
 -initlevel 9
 # Install but don't start the examples
--install user/mule-example-echo.jar
--install user/mule-example-hello.jar
+-install user/mule-example-echo-${muleCEVersion}.jar
+-install user/mule-example-hello-${muleCEVersion}.jar

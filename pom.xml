@@ -46,25 +46,55 @@
     </scm>
 
     <properties>
+        <muleCEVersion>2.1.0-M2-SNAPSHOT</muleCEVersion>
         <!--
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
          -->
         <productUrl>http://mule.mulesource.org</productUrl>
-        <muleCEVersion>2.1.0-M2-SNAPSHOT</muleCEVersion>
         <eclipsePluginVersion>2.5</eclipsePluginVersion>
+        <coberturaVersion>2.2</coberturaVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <jdk14Name>jdk1.4</jdk14Name>
         <jdk5Name>jdk5</jdk5Name>
-
-        <springVersion>2.5.2</springVersion>
-        <springOsgiVersion>1.0.2</springOsgiVersion>
-        <cxfVersion>2.0.6</cxfVersion>
-        <coberturaVersion>2.2</coberturaVersion>
-        <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
+        
+        <aopAllianceVersion>1.0.0</aopAllianceVersion>
+        <axisVersion>1.4.0</axisVersion>
         <backportUtilConcurrentVersion>3.1.0</backportUtilConcurrentVersion>
+        <commonsBeanUtilsVersion>1.7.0</commonsBeanUtilsVersion>
+        <commonsCliVersion>1.0</commonsCliVersion>
+        <commonsCodecVersion>1.3.0</commonsCodecVersion>
+        <commonsCollectionsVersion>3.2.0</commonsCollectionsVersion>
+        <commonsDbUtilsVersion>1.1</commonsDbUtilsVersion>
+        <commonsDiscoveryVersion>0.4.0</commonsDiscoveryVersion>
+        <commonsHttpClientVersion>3.1.0</commonsHttpClientVersion>
+        <commonsIoVersion>1.3.1</commonsIoVersion>
+        <commonsJxpathVersion>1.2</commonsJxpathVersion>
+        <commonsLangVersion>2.3</commonsLangVersion>
+        <commonsNetVersion>1.4.1</commonsNetVersion>
+        <commonsPoolVersion>1.4</commonsPoolVersion>
+        <cxfVersion>2.0.6</cxfVersion>
+        <dom4jVersion>1.6.1</dom4jVersion>
+        <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
+        <groovyVersion>1.5.6</groovyVersion>
+        <javaActivationVersion>1.1.0</javaActivationVersion>
+        <javaMailVersion>1.4.0</javaMailVersion>
+        <javaServletVersion>2.4.0</javaServletVersion>
+        <javaWsdlVersion>1.6.1</javaWsdlVersion>
+        <javaXmlRpcVersion>1.1.0</javaXmlRpcVersion>
+        <javaXmlSoapVersion>1.3.0</javaXmlSoapVersion>
+        <javaXmlStreamVersion>1.0.1</javaXmlStreamVersion>
+        <jettyVersion>5.1.12</jettyVersion>
+        <jugVersion>2.0.0</jugVersion>
+        <oroVersion>2.0.8</oroVersion>
         <paxLoggingVersion>1.1.1</paxLoggingVersion>   
+        <quartzVersion>1.6.0</quartzVersion>
+        <saajVersion>1.3.0</saajVersion>
         <slf4jVersion>1.5.0</slf4jVersion>     
+        <smackVersion>2.2.1</smackVersion>
+        <springOsgiVersion>1.0.2</springOsgiVersion>
+        <springVersion>2.5.2</springVersion>
+        <xaPoolVersion>1.4</xaPoolVersion>
     </properties>
 
     <!-- Declare all dependencies that are used in more than one module here. -->
