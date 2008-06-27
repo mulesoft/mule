@@ -294,7 +294,9 @@ Assembly descriptor for the full Mule distribution.
     <!-- Insert version numbers into OSGi startup file -->
     <files>
         <file>
-            <source>../src/main/resources/conf/init.xargs</source>
+            <!-- Relative path doesn't work here due to a bug in maven-assembly-plugin apparently
+            <source>../src/main/resources/conf/init.xargs</source> -->
+            <source>distributions/server/src/main/resources/conf/init.xargs</source>
             <outputDirectory>conf</outputDirectory>
             <filtered>true</filtered>
             <!-- Workaround for http://jira.codehaus.org/browse/MASSEMBLY-153 -->
