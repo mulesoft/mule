@@ -12,6 +12,8 @@ Assembly descriptor for the full Mule distribution.
     <fileSet>
       <directory>../src/main/resources</directory>
       <outputDirectory></outputDirectory>
+      <!-- Only available as of version 2.2 of maven-assembly-plugin
+      <filtered>true</filtered> -->
     </fileSet>
 
     <!-- Make binary directories executable. -->
