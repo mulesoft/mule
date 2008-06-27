@@ -11,7 +11,7 @@
 
     <groupId>commons-jxpath</groupId>
     <artifactId>commons-jxpath.osgi</artifactId>
-    <version>1.2</version>
+    <version>${commonsJxpathVersion}</version>
     <packaging>bundle</packaging>
     <name>commons-jxpath repackaged for OSGi</name>
 

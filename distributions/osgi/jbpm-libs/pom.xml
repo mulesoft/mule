@@ -9,18 +9,110 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
 
-    <groupId>commons-io</groupId>
-    <artifactId>commons-io.osgi</artifactId>
-    <version>1.3.1</version>
+    <groupId>org.mule.transports</groupId>
+    <artifactId>jbpm-libs.osgi</artifactId>
+    <version>${jbpmVersion}</version>
     <packaging>bundle</packaging>
-    <name>commons-io repackaged for OSGi</name>
+    <name>jbpm-libs repackaged for OSGi</name>
 
     <dependencies>
+
+        <!-- jBPM --> 
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.3.1</version>
+            <groupId>org.jbpm</groupId>
+            <artifactId>jbpm-jpdl</artifactId>
+            <version>${version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <!-- Use the combined cglib-nodep instead of separate cglib and asm dependencies -->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+            <version>2.1_3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.jcr</groupId>
+            <artifactId>jcr</artifactId>
+            <version>1.0</version>
+        </dependency>        
+
+        <!-- Only needed for Spring-based configuration -->
+        <dependency>
+            <groupId>org.springmodules</groupId>
+            <artifactId>spring-modules-jbpm31</artifactId>
+            <version>0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+
+        <!-- Hibernate --> 
+        <dependency>
+            <groupId>bsh</groupId>
+            <artifactId>bsh</artifactId>
+            <version>1.3.0</version>
+            <optional>true</optional>
+        </dependency>
+
     </dependencies>
     
+    
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.4.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <obrRepository>NONE</obrRepository>
+                    <instructions>
+                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Version>${pom.version}</Bundle-Version>
+                        <Bundle-DocURL>${pom.url}</Bundle-DocURL>
+                        <!-- Each module can override these defaults in their osgi.properties file -->
+                        <_include>-osgi.properties</_include>
+                        <!-- OSGi R4 -->
+                        <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+                        <!-- Non-OSGi manifest entries -->
+                        <More-Info>For more information go to ${productUrl}</More-Info>
+                        <Support>Get commercial support: ${pom.organization.url}/support</Support>
+                        <Description>Mule ESB and Integration Platform</Description>
+                        <License>CPAL v1.0 http://www.mulesource.com/CPAL/</License>
+                        <Vendor-Url>${pom.organization.url}</Vendor-Url>
+                        <Product-Url>${productUrl}</Product-Url>
+                        <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
+                        <!--Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date-->
+                        <!-- include repository revision from buildnumber plugin -->
+                        <Build-Revision>${buildNumber}</Build-Revision>
+                        <Build-Date>${timestamp}</Build-Date>
+                        <Embed-Transitive>true</Embed-Transitive>
+                        <Embed-Dependency>*;scope=compile|runtime;artifactId=!spring-core|spring-beans|spring-context</Embed-Dependency>
+                        <Import-Package>!org.jbpm.*, *;resolution:=optional</Import-Package>
+                        <_exportcontents>org.jbpm.*</_exportcontents>
+                        <!--
+                        <Embed-Dependency>*;scope=compile|runtime;artifactId=!cxf-*</Embed-Dependency>
+                        <_exportcontents>!org.apache.cxf.*, *</_exportcontents>
+                        -->
+                        <_failok>true</_failok>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

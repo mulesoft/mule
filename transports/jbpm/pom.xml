@@ -9,7 +9,7 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-jbpm</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>BPM Transport: JBoss jBPM</name>
     <description>Classes which allow Mule to integrate with JBoss jBPM via the BPM Connector.</description>
 
@@ -23,60 +23,16 @@
 
         <!-- jBPM --> 
         <dependency>
-            <groupId>org.jbpm</groupId>
-            <artifactId>jbpm-jpdl</artifactId>
-            <version>3.2.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>jbpm-libs.osgi</artifactId>
+            <version>${jbpmVersion}</version>
         </dependency>
-        <!-- Use the combined cglib-nodep instead of separate cglib and asm dependencies -->
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>2.1_3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.jcr</groupId>
-            <artifactId>jcr</artifactId>
-            <version>1.0</version>
-        </dependency>        
-
-        <!-- Only needed for Spring-based configuration -->
-        <dependency>
-            <groupId>org.springmodules</groupId>
-            <artifactId>spring-modules-jbpm31</artifactId>
-            <version>0.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-orm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-        </dependency>
-
-        <!-- Hibernate --> 
-        <dependency>
-            <groupId>bsh</groupId>
-            <artifactId>bsh</artifactId>
-            <version>1.3.0</version>
-            <optional>true</optional>
-        </dependency>
-
         <!-- Needed for org.mule.transport.bpm.jbpm.actions.SendMuleEvent -->
         <dependency>
             <groupId>commons-jxpath</groupId>
             <artifactId>commons-jxpath</artifactId>
         </dependency>
+        
         
         <!-- Simple Java DB for persistence -->
         <dependency>

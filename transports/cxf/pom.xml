@@ -8,7 +8,7 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-cxf</artifactId>
-    <!-- <packaging>bundle</packaging> -->
+    <packaging>bundle</packaging>
     <name>SOAP Transport: CXF</name>
     <description>A Mule transport for web service connectivity using CXF.</description>
 
@@ -111,8 +111,16 @@
         </dependency>
 
         <!-- CXF dependencies -->
+        <!--
         <dependency>
             <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-bundle</artifactId>
+            <version>${cxfVersion}</version>
+        </dependency>
+        -->
+        <!-- CXF libs + all required dependencies not already needed for soap transport or xml module --> 
+        <dependency>
+            <groupId>org.mule.transports</groupId>
             <artifactId>cxf-libs.osgi</artifactId>
             <version>${cxfVersion}</version>
         </dependency>
