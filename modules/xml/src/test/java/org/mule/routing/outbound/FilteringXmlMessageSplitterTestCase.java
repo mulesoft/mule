@@ -98,6 +98,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
     private void internalTestSuccessfulXmlSplitter(Object payload) throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
 
         MuleMessage message = new DefaultMuleMessage(payload);
 

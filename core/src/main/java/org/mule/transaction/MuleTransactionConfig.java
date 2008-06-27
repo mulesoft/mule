@@ -13,6 +13,7 @@ package org.mule.transaction;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.constraints.ConstraintFilter;
 import org.mule.util.ClassUtils;
 
@@ -39,13 +40,11 @@ public class MuleTransactionConfig implements TransactionConfig
 
     private TransactionFactory factory;
 
-    private byte action = ACTION_NONE;
+    private byte action = ACTION_DEFAULT;
 
     private ConstraintFilter constraint = null;
 
     private int timeout;
-
-    private boolean enabled = true;
     
     public MuleTransactionConfig()
     {
@@ -99,6 +98,10 @@ public class MuleTransactionConfig implements TransactionConfig
         {
             this.action = ACTION_NONE;
         }
+        else if (ACTION_NEVER_STRING.equals(action))
+        {
+            this.action = ACTION_NEVER;
+        }
         else
         {
             throw new IllegalArgumentException("Action " + action + " is not recognised as a begin action.");
@@ -109,16 +112,18 @@ public class MuleTransactionConfig implements TransactionConfig
     {
         switch (action)
         {
-            case ACTION_ALWAYS_BEGIN :
+            case ACTION_ALWAYS_BEGIN:
                 return ACTION_ALWAYS_BEGIN_STRING;
-            case ACTION_BEGIN_OR_JOIN :
+            case ACTION_BEGIN_OR_JOIN:
                 return ACTION_BEGIN_OR_JOIN_STRING; 
-            case ACTION_ALWAYS_JOIN :
+            case ACTION_ALWAYS_JOIN:
                 return ACTION_ALWAYS_JOIN_STRING;
-            case ACTION_JOIN_IF_POSSIBLE :
+            case ACTION_JOIN_IF_POSSIBLE:
                 return ACTION_JOIN_IF_POSSIBLE_STRING;
-            default :
+            case ACTION_NONE:
                 return ACTION_NONE_STRING;
+            default :
+                return ACTION_NEVER_STRING;
         }
     }
 
@@ -126,8 +131,17 @@ public class MuleTransactionConfig implements TransactionConfig
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction(); 
         boolean joinPossible = (action != ACTION_JOIN_IF_POSSIBLE || (action == ACTION_JOIN_IF_POSSIBLE && tx != null));
-        return action != ACTION_NEVER && action != ACTION_NONE && factory != null &&
-            factory.isTransacted() && joinPossible;
+        if (action != ACTION_NEVER && action != ACTION_NONE && factory == null)
+        {
+            // TODO use TransactionException here? This causes API changes as TE is a checked exception ...
+            throw new RuntimeException(CoreMessages.transactionFactoryIsMandatory(getActionAsString()).getMessage());
+        }
+        return action != ACTION_NEVER && action != ACTION_NONE && factory.isTransacted() && joinPossible;
+    }
+    
+    public boolean isConfigured()
+    {
+        return factory != null;
     }
 
     public ConstraintFilter getConstraint()
@@ -193,13 +207,4 @@ public class MuleTransactionConfig implements TransactionConfig
 
     }
     
-    public boolean isEnabled() 
-    { 
-        return enabled; 
-    } 
-
-    public void setEnabled(boolean enabled) 
-    { 
-        this.enabled = enabled; 
-    }
 }

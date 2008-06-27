@@ -30,7 +30,6 @@
     <vm:endpoint name="out" path="out" connector-ref="vm"/>
 
     <model name="TEST">
-
         <service name="InputPart">
             <inbound>
                 <inbound-endpoint ref="in"/>
@@ -40,7 +39,9 @@
             </test:component>
             <outbound>
                 <outbound-pass-through-router>
-                    <jms:outbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorTestDriver"/>
+                    <jms:outbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorTestDriver">
+                        <jms:xa-transaction action="BEGIN_OR_JOIN"/> 
+                    </jms:outbound-endpoint>
                     <!--
                         There's no inbound TX, so make sure XA is happy by starting it via router
                         on the outbound. Such problems are now nicely detected and reported via an error.
@@ -61,7 +62,10 @@
             </test:component>
             <outbound>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="out"/>
+                    <outbound-endpoint ref="out">
+                        <!-- MULE-3382 -->
+                        <custom-transaction action="NONE" factory-class="org.mule.transaction.XaTransactionFactory"/>
+                    </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>
         </service>
@@ -77,10 +81,12 @@
             </test:component>
             <outbound>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="out"/>
+                    <outbound-endpoint ref="out">
+                        <!-- MULE-3382 -->
+                        <custom-transaction action="NONE" factory-class="org.mule.transaction.XaTransactionFactory"/>
+                    </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>
         </service>
-
     </model>
 </mule>

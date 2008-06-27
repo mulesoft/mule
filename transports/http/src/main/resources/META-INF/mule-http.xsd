@@ -39,7 +39,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 Allows Mule to communicate over Http. All parts of the Http spec are covered by Mule so you can expect
-                ETags to be honoured as well as keepa live semantics and cookies.
+                ETags to be honoured as well as keep alive semantics and cookies.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

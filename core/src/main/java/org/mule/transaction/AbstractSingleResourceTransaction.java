@@ -30,44 +30,24 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     protected final AtomicBoolean rolledBack = new AtomicBoolean(false);
     protected final AtomicBoolean rollbackOnly = new AtomicBoolean(false);
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#begin()
-     */
     public void begin() throws TransactionException
     {
         super.begin();
         started.compareAndSet(false, true);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#commit()
-     */
     public void commit() throws TransactionException
     {
         super.commit();
         committed.compareAndSet(false, true);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#rollback()
-     */
     public void rollback() throws TransactionException
     {
         super.rollback();
         rolledBack.compareAndSet(false, true);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#getStatus()
-     */
     public int getStatus() throws TransactionStatusException
     {
         if (rolledBack.get())
@@ -89,32 +69,16 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
         return STATUS_NO_TRANSACTION;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#getResource(java.lang.Object)
-     */
     public Object getResource(Object key)
     {
         return key != null && this.key == key ? this.resource : null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#hasResource(java.lang.Object)
-     */
     public boolean hasResource(Object key)
     {
         return key != null && this.key == key;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#bindResource(java.lang.Object,
-     *      java.lang.Object)
-     */
     public void bindResource(Object key, Object resource) throws TransactionException
     {
         if (key == null)
@@ -129,15 +93,16 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
         {
             throw new IllegalTransactionStateException(CoreMessages.transactionSingleResourceOnly());
         }
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Binding " + resource + " to " + key);
+        }
+        
         this.key = key;
         this.resource = resource;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#setRollbackOnly()
-     */
     public void setRollbackOnly()
     {
         rollbackOnly.set(true);

@@ -20,6 +20,8 @@
                     value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${jxpath:type} AND ACK IS NULL"/>
         <jdbc:query key="getTest.ack"
                     value="UPDATE TEST SET ACK = ${function:NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}"/>
+        <jdbc:query key="selectCount"
+                    value="SELECT COUNT(*) FROM TEST"/>
         <jdbc:query key="writeTest"
                     value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)"/>
         <jdbc:query key="writeMap"

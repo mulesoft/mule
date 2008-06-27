@@ -16,7 +16,6 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
-import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -36,9 +35,8 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
     public void testFilteringOutboundRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
-        messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
-
+        session.matchAndReturn("getService", getTestService());
+        
         ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
@@ -89,9 +87,6 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 
     public void testFilteringOutboundRouterWithTemplates() throws Exception
     {
-        DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
-        messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
-
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://foo?[barValue]");
         assertNotNull(endpoint1);
 

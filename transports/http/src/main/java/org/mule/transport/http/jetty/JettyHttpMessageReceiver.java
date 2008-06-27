@@ -14,7 +14,6 @@ import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -25,25 +24,16 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.transport.http.servlet.MuleRESTReceiverServlet;
 import org.mule.transport.http.servlet.ServletConnector;
 import org.mule.util.StringUtils;
 
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.SocketListener;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.util.InetAddrPort;
-
 /**
- * <code>HttpMessageReceiver</code> is a simple http server that can be used to
+ * <code>JettyHttpMessageReceiver</code> is a simple http server that can be used to
  * listen for http requests on a particular port
  */
 public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 {
     public static final String JETTY_SERVLET_CONNECTOR_NAME = "_jettyConnector";
-
-    private Server httpServer;
 
     public JettyHttpMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
             throws CreateException
@@ -97,60 +87,13 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 
     protected void doConnect() throws Exception
     {
-        httpServer = new Server();
-        SocketListener socketListener = new SocketListener(new InetAddrPort(endpoint.getEndpointURI()
-                .getPort()));
 
-        // apply Threading settings
-        ThreadingProfile tp = connector.getReceiverThreadingProfile();
-        socketListener.setMaxIdleTimeMs((int) tp.getThreadTTL());
-        int threadsActive = tp.getMaxThreadsActive();
-        int threadsMin = socketListener.getMinThreads();
-        if (threadsMin >= threadsActive)
-        {
-            socketListener.setMinThreads(threadsActive - 1);
-        }
-        socketListener.setMaxThreads(threadsActive);
-        // thread priorities are evil and gone from ThreadingProfile
-        // (google for priority inversion)
-        // socketListener.setThreadsPriority(tp.getThreadPriority());
-
-        httpServer.addListener(socketListener);
-
-        String path = endpoint.getEndpointURI().getPath();
-        if (StringUtils.isEmpty(path))
-        {
-            path = "/";
-        }
-
-        if (!path.endsWith("/"))
-        {
-            path += "/";
-        }
-
-        HttpContext context = httpServer.getContext("/");
-        context.setRequestLog(null);
-
-        ServletHandler handler = new ServletHandler();
-        if ("rest".equals(endpoint.getEndpointURI().getScheme()))
-        {
-            handler.addServlet("MuleRESTReceiverServlet", path + "*", MuleRESTReceiverServlet.class.getName());
-        }
-        else
-        {
-            handler.addServlet("JettyReceiverServlet", path + "*", JettyReceiverServlet.class.getName());
-        }
-
-
-        context.addHandler(handler);
-        // setAttribute is already synchronized in Jetty
-        context.setAttribute("messageReceiver", this);
 
     }
 
     protected void doDisconnect() throws Exception
     {
-        // stop is automativcally called by Mule
+
     }
 
 
@@ -160,21 +103,14 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
      */
     protected void doDispose()
     {
-        try
-        {
-            httpServer.stop(false);
-        }
-        catch (InterruptedException e)
-        {
-            logger.error("Error disposing Jetty recevier on: " + endpoint.getEndpointURI().toString(), e);
-        }
+        //Do nothing
     }
 
     protected void doStart() throws MuleException
     {
         try
         {
-            httpServer.start();
+            ((JettyHttpConnector)connector).registerListener(this);
         }
         catch (Exception e)
         {
@@ -186,9 +122,9 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            httpServer.stop(true);
+            ((JettyHttpConnector)connector).unregisterListener(this);
         }
-        catch (InterruptedException e)
+        catch (Exception e)
         {
             throw new LifecycleException(CoreMessages.failedToStop("Jetty Http Receiver"), e, this);
         }

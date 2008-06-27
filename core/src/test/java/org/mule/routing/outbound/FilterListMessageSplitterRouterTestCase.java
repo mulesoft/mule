@@ -33,6 +33,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
     public void testMessageSplitterRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1", null, new PayloadTypeFilter(Apple.class), null);
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2", null, new PayloadTypeFilter(Orange.class), null);

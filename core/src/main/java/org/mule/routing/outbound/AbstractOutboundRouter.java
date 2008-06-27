@@ -19,10 +19,13 @@ import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.api.routing.RoutingException;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.MuleMessageInfoMapping;
+import org.mule.transaction.TransactionTemplate;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
@@ -59,7 +62,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
     protected TransactionConfig transactionConfig;
 
-    public void dispatch(MuleSession session, MuleMessage message, OutboundEndpoint endpoint) throws MuleException
+    public void dispatch(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint) throws MuleException
     {
         setMessageProperties(session, message, endpoint);
 
@@ -79,7 +82,26 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
         }
 
-        session.dispatchEvent(message, endpoint);
+        TransactionTemplate tt = createTransactionTemplate(session, endpoint);
+        TransactionCallback cb = new TransactionCallback()
+        {
+            public Object doInTransaction() throws Exception
+            {
+                session.dispatchEvent(message, endpoint);
+                return null;
+            }
+        };
+        
+        try
+        {
+            tt.execute(cb);
+        }
+        catch (Exception e)
+        {
+            throw new RoutingException(message, null, e);
+        }
+        
+        
         if (getRouterStatistics() != null)
         {
             if (getRouterStatistics().isEnabled())
@@ -89,7 +111,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
     }
 
-    public MuleMessage send(MuleSession session, MuleMessage message, OutboundEndpoint endpoint) throws MuleException
+    public MuleMessage send(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint) throws MuleException
     {
         if (replyTo != null)
         {
@@ -118,8 +140,25 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
         }
 
-        MuleMessage result = session.sendEvent(message, endpoint);
-
+        TransactionTemplate tt = createTransactionTemplate(session, endpoint);
+        TransactionCallback cb = new TransactionCallback()
+        {
+            public Object doInTransaction() throws Exception
+            {
+                return session.sendEvent(message, endpoint);
+            }
+        };
+        
+        MuleMessage result;
+        try
+        {
+            result = (MuleMessage) tt.execute(cb);
+        }
+        catch (Exception e)
+        {
+            throw new RoutingException(message, null, e);
+        }
+        
         if (getRouterStatistics() != null)
         {
             if (getRouterStatistics().isEnabled())
@@ -147,6 +186,12 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
 
         return result;
+    }
+    
+    protected TransactionTemplate createTransactionTemplate(MuleSession session, ImmutableEndpoint endpoint)
+    {
+        return new TransactionTemplate(endpoint.getTransactionConfig(),
+            session.getService().getExceptionListener(), muleContext);
     }
 
     protected void setMessageProperties(MuleSession session, MuleMessage message, OutboundEndpoint endpoint)
@@ -233,7 +278,8 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
                 throw new InvalidEndpointTypeException(CoreMessages.outboundRouterMustUseOutboudEndpoints(
                     this, umoEndpoint));
             }
-            else{
+            else
+            {
                 addEndpoint((OutboundEndpoint) umoEndpoint);
             }
         }
@@ -328,7 +374,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         OutboundEndpoint endpointDescriptor;
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            endpointDescriptor = (OutboundEndpoint)iterator.next();
+            endpointDescriptor = (OutboundEndpoint) iterator.next();
             if (endpointDescriptor.getName().equals(name))
             {
                 return endpointDescriptor;

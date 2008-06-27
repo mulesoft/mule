@@ -19,9 +19,12 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.ConnectException;
 import org.mule.transport.TransactedPollingMessageReceiver;
+import org.mule.transport.jdbc.i18n.JdbcMessages;
 import org.mule.util.ArrayUtils;
+import org.mule.util.MapUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -32,12 +35,16 @@ import java.util.List;
 public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 {
 
+    public static final String RECEIVE_MESSAGE_IN_TRANSCTION = "receiveMessageInTransaction";
+    public static final String RECEIVE_MESSAGES_IN_XA_TRANSCTION = "receiveMessagesInXaTransaction";
+    
     protected JdbcConnector connector;
     protected String readStmt;
     protected String ackStmt;
     protected List readParams;
     protected List ackParams;
-
+    public boolean receiveMessagesInXaTransaction = false;
+    
     public JdbcMessageReceiver(Connector connector,
                                Service service,
                                InboundEndpoint endpoint,
@@ -46,9 +53,38 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
     {
         super(connector, service, endpoint);
         this.setFrequency(((JdbcConnector) connector).getPollingFrequency());
-        this.setReceiveMessagesInTransaction(false);
 
+        boolean transactedEndpoint = endpoint.getTransactionConfig().isTransacted();
+        boolean xaTransactedEndpoint = (transactedEndpoint &&
+            endpoint.getTransactionConfig().getFactory() instanceof XaTransactionFactory);
+        
+        boolean receiveMessageInTransaction = MapUtils.getBooleanValue(endpoint.getProperties(),
+            RECEIVE_MESSAGE_IN_TRANSCTION, false);
+        this.setReceiveMessagesInTransaction(receiveMessageInTransaction && transactedEndpoint);
+        if (receiveMessageInTransaction && !transactedEndpoint)
+        {
+            logger.warn(JdbcMessages.forcePropertyNoTransaction(RECEIVE_MESSAGE_IN_TRANSCTION, "transaction"));
+            receiveMessageInTransaction = false;
+        }
+        
+        receiveMessagesInXaTransaction = MapUtils.getBooleanValue(endpoint.getProperties(),
+            RECEIVE_MESSAGES_IN_XA_TRANSCTION, false);
+        if (receiveMessagesInXaTransaction && !receiveMessageInTransaction)
+        {
+            logger.warn(JdbcMessages.forceProperty(RECEIVE_MESSAGES_IN_XA_TRANSCTION, RECEIVE_MESSAGE_IN_TRANSCTION));
+            receiveMessagesInXaTransaction = false;
+        }
+        else if (receiveMessagesInXaTransaction && isReceiveMessagesInTransaction() && !xaTransactedEndpoint)
+        {
+            logger.warn(JdbcMessages.forcePropertyNoTransaction(RECEIVE_MESSAGES_IN_XA_TRANSCTION, "XA transaction"));
+            receiveMessagesInXaTransaction = false;
+        }
+    
+        
         this.connector = (JdbcConnector) connector;
+        this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().isTransacted()
+            && !this.connector.isTransactionPerMessage());
+        
         this.readParams = new ArrayList();
         this.readStmt = this.connector.parseStatement(readStmt, this.readParams);
         this.ackParams = new ArrayList();
@@ -158,11 +194,24 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             }
             Object results = connector.getQueryRunner().query(con, this.readStmt, readParams,
                     connector.getResultSetHandler());
-            return (List) results;
+
+            List resultList = (List) results;
+            if (resultList != null && resultList.size() > 1 && isReceiveMessagesInTransaction() && !receiveMessagesInXaTransaction)
+            {
+                logger.warn(JdbcMessages.moreThanOneMessageInTransaction(RECEIVE_MESSAGE_IN_TRANSCTION, RECEIVE_MESSAGES_IN_XA_TRANSCTION));
+                List singleResultList = new ArrayList(1);
+                singleResultList.add(resultList);
+                return singleResultList;
+            }
+            
+            return resultList;
         }
         finally
         {
-            JdbcUtils.close(con);
+            if (TransactionCoordination.getInstance().getTransaction() == null)
+            {
+                JdbcUtils.close(con);
+            }
         }
     }
 

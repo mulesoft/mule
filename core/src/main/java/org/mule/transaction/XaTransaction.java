@@ -48,7 +48,7 @@ public class XaTransaction extends AbstractTransaction
     {
         this.txManager = txManager;
     }
-
+    
     protected void doBegin() throws TransactionException
     {
         if (txManager == null)
@@ -185,7 +185,7 @@ public class XaTransaction extends AbstractTransaction
            recovery process. Instead TransactionManager or UserTransaction must be used.
             */
             TransactionManager txManager = MuleServer.getMuleContext().getTransactionManager();
-            delistResources();
+//            delistResources();
             txManager.rollback();
         }
         catch (SystemException e)
@@ -268,6 +268,21 @@ public class XaTransaction extends AbstractTransaction
         }
 
         resources.put(key, resource);
+        
+        if (key == null)
+        {
+            logger.error("Key for binded resource " + resource + " is null");
+        }
+        
+        if (resource instanceof MuleXaObject)
+        {
+            MuleXaObject xaObject = (MuleXaObject) resource;
+            xaObject.enlist();
+        }
+        else
+        {
+            logger.error("Binded resource " + resource + " is not MuleXaObject ");
+        }
     }
 
 
@@ -377,21 +392,21 @@ public class XaTransaction extends AbstractTransaction
         while (i.hasNext())
         {
             Map.Entry entry = (Map.Entry) i.next();
-            if (entry.getValue() instanceof MuleXaObject)
+            final Object xaObject = entry.getValue();
+            if (xaObject instanceof MuleXaObject)
             {
                 //there is need for reuse object
                 try
                 {
-                    ((MuleXaObject) entry.getValue()).delist();
+                    ((MuleXaObject) xaObject).delist();
                 }
                 catch (Exception e)
                 {
-                    logger.error("Cann't delist resource " + entry.getValue() + " " + e);
+                    logger.error("Failed to delist resource " + xaObject, e);
                 }
             }
         }
     }
-
 
     protected void closeResources()
     {
@@ -399,18 +414,20 @@ public class XaTransaction extends AbstractTransaction
         while (i.hasNext())
         {
             Map.Entry entry = (Map.Entry) i.next();
-            if (entry.getValue() instanceof MuleXaObject)
+            final Object value = entry.getValue();
+            if (value instanceof MuleXaObject)
             {
-                MuleXaObject xaObject = (MuleXaObject) entry.getValue();
+                MuleXaObject xaObject = (MuleXaObject) value;
                 if (!xaObject.isReuseObject())
                 {
                     try
                     {
                         xaObject.close();
+                        i.remove();
                     }
                     catch (Exception e)
                     {
-                        logger.error("Cann't close resource " + xaObject);
+                        logger.error("Failed to close resource " + xaObject, e);
                     }
                 }
             }
@@ -426,8 +443,8 @@ public class XaTransaction extends AbstractTransaction
 
         boolean isReuseObject();
 
-        //enlist is called indirectly
-
+        boolean enlist() throws TransactionException;
+        
         boolean delist() throws Exception;
 
         /**
@@ -440,9 +457,9 @@ public class XaTransaction extends AbstractTransaction
         String SET_REUSE_OBJECT_METHOD_NAME = "setReuseObject";
         String IS_REUSE_OBJECT_METHOD_NAME = "isReuseObject";
         String DELIST_METHOD_NAME = "delist";
+        String ENLIST_METHOD_NAME = "enlist";
         String GET_TARGET_OBJECT_METHOD_NAME = "getTargetObject";
         String CLOSE_METHOD_NAME = "close";
     }
-
 
 }

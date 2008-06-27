@@ -4,22 +4,19 @@
       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
       xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
-       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
-
-    <jms:activemq-connector name="jmsConnector" specification="1.1"/>
-
-    <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
-    <jms:endpoint name="topic" topic="durable.broadcast" connector-ref="jmsConnector"/>
-
-    <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
+    
+    <jms:activemq-connector name="jmsConnector"/>
 
     <model name="TEST">
-        <service name="InputPart">
+        <service name="Part2">
             <inbound>
-                <inbound-endpoint ref="in">
+                <inbound-endpoint address="jms://in" connector-ref="jmsConnector">
                     <jms:transaction action="BEGIN_OR_JOIN"/>
                 </inbound-endpoint>
             </inbound>
@@ -28,8 +25,8 @@
             </test:component>
             <outbound>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="topic" transformer-refs="ObjectToJMSMessage">
-                        <jms:transaction action="NONE"/>
+                    <outbound-endpoint address="jms://out" connector-ref="jmsConnector">
+                        <jms:transaction action="ALWAYS_JOIN"/>
                     </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>

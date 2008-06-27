@@ -27,6 +27,7 @@ import org.mule.util.expression.ExpressionEvaluatorManager;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -114,23 +115,23 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     }
 
     /**
-         * This method is used by some WebServices tests where you don' want to be introducing the {@link org.mule.api.MuleEventContext} as
-         * a complex type.
-         *
-         * @param data the event data received
-         * @return the processed message
-         * @throws Exception
-         */
-        public Object onReceive(Object data) throws Exception
-        {
-            MuleEventContext context = RequestContext.getEventContext();
+     * This method is used by some WebServices tests where you don' want to be introducing the {@link org.mule.api.MuleEventContext} as
+     * a complex type.
+     *
+     * @param data the event data received
+     * @return the processed message
+     * @throws Exception
+     */
+    public Object onReceive(Object data) throws Exception
+    {
+        MuleEventContext context = RequestContext.getEventContext();
 
-            if (isThrowException())
-            {
-                throwException();
-            }
-            return process(data, context);
+        if (isThrowException())
+        {
+            throwException();
         }
+        return process(data, context);
+    }
 
 
     /**

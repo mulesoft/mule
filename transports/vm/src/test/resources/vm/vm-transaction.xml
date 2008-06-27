@@ -27,7 +27,9 @@
 
             <outbound>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://out" connector-ref="vmQueue"/>
+                    <outbound-endpoint address="vm://out" connector-ref="vmQueue">
+                        <vm:transaction action="NONE"/>
+                    </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>
         </service>

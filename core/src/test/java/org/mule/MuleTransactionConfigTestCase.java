@@ -45,5 +45,22 @@ public class MuleTransactionConfigTestCase extends AbstractMuleTestCase
         txConfig.setFactory(new TestTransactionFactory());
         assertFalse(txConfig.isTransacted());
     }
+    
+    public void testFailNoFactory()
+    {
+        MuleTransactionConfig txConfig = new MuleTransactionConfig();
+        txConfig.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
+        // note how we don't set a factory here so the default in MTC is null
+        
+        try
+        {
+            txConfig.isTransacted();
+            fail("isTransacted must fail if no factory is set");
+        }
+        catch (RuntimeException re)
+        {
+            // this was expected
+        }
+    }
 
 }

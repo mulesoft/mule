@@ -3,41 +3,78 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/jetty/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
-                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/http/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd"/>
 
-    <xsd:element name="connector" type="jettyConnectorType" substitutionGroup="mule:abstract-connector"/>
+    <xsd:annotation>
+        <xsd:documentation>The Jetty Http transport provides support for exposing services over http by embedding a
+            light-weight Jetty server. You can only define inbound endpoints with this transport.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>jetty</schemadoc:short-name>
+            <schemadoc:page-title>Jetty Http Transport</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false" responseEvents="true"
+                                          requestEvents="false" transactions="false" streaming="true">
+                <schemadoc:inboundMEPs in-only="true" in-optional-out="true" in-out="true"/>
+                <schemadoc:outboundMEPs none="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+    <xsd:element name="connector" type="jettyConnectorType" substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allows Mule to expose Mule Services over http using a Jttp Http server. A single Jetty server is created
+                for each connector instance. One connector can serve many endpoints. Users should rarely need to
+                have more than one Jetty connector.
+                The Jetty connector can be configured using a Jetty Xml config file, but the default configuration
+                is sufficient for most scenarios.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="jettyConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="http:httpConnectorType"/>
+            <xsd:extension base="mule:abstractConnectorType">
+                <xsd:attribute name="configFile" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>The location of the Jetty config file to configure this connector with.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>Allows a Mule service to receive requests over Http using a Jetty server.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType"/>
+            <xsd:extension base="http:inboundEndpointType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
-    <xsd:complexType name="outboundEndpointType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:outboundEndpointType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>Allows users to configure a global Jetty Http endpoint. Note that this can only ne used
+                as an inbound-endpoint reference.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:globalEndpointType"/>
+            <xsd:extension base="http:globalEndpointType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

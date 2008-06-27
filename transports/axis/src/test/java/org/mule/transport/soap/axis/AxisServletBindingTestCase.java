@@ -13,11 +13,10 @@ package org.mule.transport.soap.axis;
 import org.mule.tck.providers.soap.AbstractSoapFunctionalTestCase;
 import org.mule.transport.http.servlet.MuleReceiverServlet;
 
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.util.InetAddrPort;
+import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
 
 public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 {
@@ -30,16 +29,18 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
     {
         super.doSetUp();
         httpServer = new Server();
-        SocketListener socketListener = new SocketListener(new InetAddrPort(HTTP_PORT));
-        httpServer.addListener(socketListener);
+        SelectChannelConnector connector = new SelectChannelConnector();
+        connector.setPort(HTTP_PORT);
+        httpServer.addConnector(connector);
 
-        HttpContext context = httpServer.getContext("/");
-        context.setRequestLog(null);
+        Context context = new Context();
+        context.setContextPath("/");
 
-        ServletHandler handler = new ServletHandler();
-        handler.addServlet("MuleReceiverServlet", "/services/*", MuleReceiverServlet.class.getName());
+        ServletHolder holder = new ServletHolder();
+        holder.setServlet(new MuleReceiverServlet());
+        context.addServlet(holder, "/services/*");
 
-        context.addHandler(handler);
+        httpServer.addHandler(context);
         httpServer.start();
     }
 
@@ -50,7 +51,7 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
         // this generates an exception in GenericServlet which we can safely ignore
         if (httpServer != null)
         {
-            httpServer.stop(false);
+            httpServer.stop();
             httpServer.destroy();
         }
     }

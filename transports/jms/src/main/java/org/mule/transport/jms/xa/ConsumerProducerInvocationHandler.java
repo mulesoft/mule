@@ -17,30 +17,14 @@ public class ConsumerProducerInvocationHandler implements InvocationHandler
 {
 
     private Object target;
-    private SessionInvocationHandler sessionInvocationHandler;
 
     public ConsumerProducerInvocationHandler(SessionInvocationHandler sessionInvocationHandler, Object target)
     {
-        this.sessionInvocationHandler = sessionInvocationHandler;
         this.target = target;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
-     *      java.lang.reflect.Method, java.lang.Object[])
-     */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
-        if (ConnectionFactoryWrapper.logger.isDebugEnabled())
-        {
-            ConnectionFactoryWrapper.logger.debug("Invoking " + method);
-        }
-        if (!method.getName().equals("close"))
-        {
-            sessionInvocationHandler.enlist();
-        }
         try
         {
             return method.invoke(target, args);
@@ -50,4 +34,5 @@ public class ConsumerProducerInvocationHandler implements InvocationHandler
             throw e.getCause();
         }
     }
+
 }

@@ -21,7 +21,9 @@
             <test:component/>
             <outbound>
                 <outbound-pass-through-router>
-                    <jms:outbound-endpoint queue="middle"/>
+                    <jms:outbound-endpoint queue="middle">
+                        <jms:transaction action="NONE"/>
+                    </jms:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>
         </service>

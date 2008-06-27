@@ -44,10 +44,10 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
 
        public void testMaxSize() throws Exception
        {
-           // entryTTL=-1 means we will have to expire manually
            InMemoryObjectStore store = new InMemoryObjectStore();
            store.setName("bounded");
            store.setMaxEntries(3);
+           // entryTTL=-1 means we will have to expire manually
            store.setEntryTTL(-1);
            store.setExpirationInterval(1000);
            store.initialise();

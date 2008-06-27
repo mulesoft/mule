@@ -84,12 +84,5 @@ public interface TransactionConfig
 
     int getTimeout();
     
-    /**
-     * Processing by TransactionTemplate must be disabled in some cases, like OutboundRouterCollection 
-     * 
-     * @return true, if this Transaction config should be processed by TransactionTemplate 
-     */ 
-    boolean isEnabled(); 
-
-    void setEnabled(boolean enabled);
+    boolean isConfigured();
 }

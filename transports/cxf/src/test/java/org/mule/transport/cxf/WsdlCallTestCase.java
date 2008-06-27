@@ -24,11 +24,10 @@ import java.util.Map;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.util.InetAddrPort;
+import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
 
 public class WsdlCallTestCase extends FunctionalTestCase
 {
@@ -41,16 +40,18 @@ public class WsdlCallTestCase extends FunctionalTestCase
     {
         super.doSetUp();
         httpServer = new Server();
-        SocketListener socketListener = new SocketListener(new InetAddrPort(HTTP_PORT));
-        httpServer.addListener(socketListener);
+        SelectChannelConnector connector = new SelectChannelConnector();
+        connector.setPort(HTTP_PORT);
+        httpServer.addConnector(connector);
 
-        HttpContext context = httpServer.getContext("/");
-        context.setRequestLog(null);
+        Context context = new Context();
+        context.setContextPath("/");
 
-        ServletHandler handler = new ServletHandler();
-        handler.addServlet("MuleReceiverServlet", "/services/*", MuleReceiverServlet.class.getName());
+        ServletHolder holder = new ServletHolder();
+        holder.setServlet(new MuleReceiverServlet());
+        context.addServlet(holder, "/services/*");
 
-        context.addHandler(handler);
+        httpServer.addHandler(context);
         httpServer.start();
     }
 

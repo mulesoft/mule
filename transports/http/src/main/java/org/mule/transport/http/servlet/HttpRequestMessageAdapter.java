@@ -18,6 +18,7 @@ import org.mule.api.transport.UniqueIdNotSupportedException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.http.HttpConstants;
+import org.mule.util.UUID;
 
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -194,7 +195,8 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         }
         catch (Exception e)
         {
-            throw new UniqueIdNotSupportedException(this, CoreMessages.objectIsNull("Http session"));
+            return UUID.getUUID();
+            //throw new UniqueIdNotSupportedException(this, CoreMessages.objectIsNull("Http session"));
         }
         if (session == null)
         {

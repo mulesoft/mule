@@ -83,13 +83,15 @@
 -istart opt/geronimo-j2ee-connector.osgi-${geronimoSpecsVersion}.jar
 -istart opt/geronimo-jta.osgi-${geronimoSpecsVersion}.jar
 -istart opt/com.springsource.org.apache.commons.beanutils-${commonsBeanUtilsVersion}.jar
+-istart opt/com.springsource.org.apache.commons.codec-${commonsCodecVersion}.jar
 -istart opt/com.springsource.org.apache.commons.collections-${commonsCollectionsVersion}.jar
+-istart opt/com.springsource.org.apache.oro-${oroVersion}.jar
 # TODO MULE-1947
--istart opt/commons-cli.osgi-${commonsCliVersion}.jar
--istart opt/commons-io.osgi-${commonsIoVersion}.jar
+-istart opt/commons-cli.osgi-${commonsCliVersion}.jarcd -istart opt/commons-io.osgi-${commonsIoVersion}.jar
 -istart opt/commons-jxpath.osgi-${commonsJxpathVersion}.jar
 -istart opt/commons-lang.osgi-${commonsLangVersion}.jar
 -istart opt/commons-pool-${commonsPoolVersion}.jar
+
 -istart opt/com.springsource.javax.activation-${javaActivationVersion}.jar
 -istart opt/com.springsource.javax.mail-${javaMailVersion}.jar
 -istart opt/jug.osgi-${jugVersion}.jar
@@ -130,7 +132,6 @@
 
 -istart opt/org.mortbay.jetty.osgi-${jettyVersion}.jar
 -istart opt/com.springsource.org.apache.commons.httpclient-${commonsHttpClientVersion}.jar
--istart opt/com.springsource.org.apache.commons.codec-${commonsCodecVersion}.jar
 -istart mule/mule-transport-http-${muleCEVersion}.jar
 
 -istart opt/geronimo-jaxrpc.osgi-${geronimoSpecsVersion}.jar
@@ -166,7 +167,6 @@
 -istart mule/mule-transport-email-${muleCEVersion}.jar
 -istart mule/mule-transport-file-${muleCEVersion}.jar
 
--istart opt/com.springsource.org.apache.oro-${oroVersion}.jar
 -istart opt/com.springsource.org.apache.commons.net-${commonsNetVersion}.jar
 -istart mule/mule-transport-ftp-${muleCEVersion}.jar
 

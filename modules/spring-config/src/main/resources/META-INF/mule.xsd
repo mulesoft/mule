@@ -1403,9 +1403,9 @@
                 <xsd:attribute name="factory-class" type="substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A class that implements the TransactionFactory interface.
-                            This will be instantiated and used to generate a transaction.
-                            The attribute and the "factory-ref" attribute are mutually exclusive;
+                            A class that implements the TransactionFactory interface that will be 
+                            instantiated and used to generate a transaction.
+                            This attribute and the "factory-ref" attribute are mutually exclusive;
                             one of the two is required.
                         </xsd:documentation>
                     </xsd:annotation>
@@ -1413,9 +1413,9 @@
                 <xsd:attribute name="factory-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A bean that implements the TransactionFactory interface.
-                            This will be used to generate a transaction.
-                            The attribute and the "factory-class" attribute are mutually exclusive;
+                            A bean that implements the TransactionFactory interface that will be 
+                            used to generate a transaction.
+                            This attribute and the "factory-class" attribute are mutually exclusive;
                             one of the two is required.
                         </xsd:documentation>
                     </xsd:annotation>
@@ -3053,7 +3053,9 @@
     <xsd:complexType name="messageChunkingAggregatorRouterType">
         <xsd:complexContent>
             <xsd:extension base="baseAggregatorRouterType">
-                <xsd:attribute name="correlationExpression" type="xsd:string"/>
+                <xsd:sequence>
+                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>
+                </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

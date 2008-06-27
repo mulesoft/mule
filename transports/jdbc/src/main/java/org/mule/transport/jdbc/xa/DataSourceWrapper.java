@@ -36,68 +36,34 @@ public class DataSourceWrapper implements DataSource
         this.xaDataSource = xaDataSource;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.sql.DataSource#getLoginTimeout()
-     */
     public int getLoginTimeout() throws SQLException
     {
         return xaDataSource.getLoginTimeout();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.sql.DataSource#setLoginTimeout(int)
-     */
     public void setLoginTimeout(int seconds) throws SQLException
     {
         xaDataSource.setLoginTimeout(seconds);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.sql.DataSource#getLogWriter()
-     */
     public PrintWriter getLogWriter() throws SQLException
     {
         return xaDataSource.getLogWriter();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.sql.DataSource#setLogWriter(java.io.PrintWriter)
-     */
     public void setLogWriter(PrintWriter out) throws SQLException
     {
         xaDataSource.setLogWriter(out);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.sql.DataSource#getConnection()
-     */
     public Connection getConnection() throws SQLException
     {
-        final Connection connWrapper = new ConnectionWrapper(xaDataSource.getXAConnection());
-        connWrapper.setAutoCommit(false);
-        return connWrapper;
+        return new ConnectionWrapper(xaDataSource.getXAConnection());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.sql.DataSource#getConnection(java.lang.String, java.lang.String)
-     */
     public Connection getConnection(String username, String password) throws SQLException
     {
-        final Connection connWrapper = new ConnectionWrapper(xaDataSource.getXAConnection(username, password));
-        connWrapper.setAutoCommit(false);
-        return connWrapper;
+        return new ConnectionWrapper(xaDataSource.getXAConnection(username, password));    
     }
 
     /**
@@ -115,4 +81,5 @@ public class DataSourceWrapper implements DataSource
     {
         this.xaDataSource = xads;
     }
+
 }

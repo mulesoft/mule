@@ -22,6 +22,7 @@ import org.mule.transport.TransactedPollingMessageReceiver;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -106,7 +107,30 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         return routeMessage(newMessage, synchronous);
     }
 
+    /**
+     * It's impossible to process all messages in the receive transaction
+     */
     protected List getMessages() throws Exception
+    {
+        if (isReceiveMessagesInTransaction())
+        {
+            MuleMessage message = getFirstMessage();
+            if (message == null)
+            {
+                return null;
+            }
+            
+            List messages = new ArrayList(1);
+            messages.add(message);
+            return messages;
+        }
+        else
+        {
+            return getFirstMessages();
+        }
+    }
+    
+    protected List getFirstMessages() throws Exception
     {
         // The queue from which to pull events
         QueueSession qs = connector.getQueueSession();
@@ -146,6 +170,15 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
         // let our workManager handle the batch of events
         return messages;
+    }
+    
+    protected MuleMessage getFirstMessage() throws Exception
+    {
+        // The queue from which to pull events
+        QueueSession qs = connector.getQueueSession();
+        Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
+        // try to get the first event off the queue
+        return (MuleMessage) queue.poll(connector.getQueueTimeout());
     }
 
     protected void processMessage(Object msg) throws Exception

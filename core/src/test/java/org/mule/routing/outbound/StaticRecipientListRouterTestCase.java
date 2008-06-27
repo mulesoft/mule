@@ -29,6 +29,8 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     public void testRecipientListRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
+        
         ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 

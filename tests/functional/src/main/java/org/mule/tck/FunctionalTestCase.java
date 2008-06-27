@@ -22,21 +22,18 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Is a base tast case for tests that initialise Mule using a configuration file. The
- * default configuration builder used is the MuleXmlConfigurationBuilder. This you
- * need to have the mule-modules-builders module/jar on your classpath. If you want
- * to use a different builder, just overload the <code>getBuilder()</code> method
- * of this class to return the type of builder you want to use with your test. Note
- * you can overload the <code>getBuilder()</code> to return an initialised instance
- * of the QuickConfiguratonBuilder, this allows the developer to programmatically
- * build a Mule instance and roves the need for additional config files for the test.
+ * A base tast case for tests that initialize Mule using a configuration file. The
+ * default configuration builder used is SpringXmlConfigurationBuilder. To use this
+ * test case, ensure you have the mule-modules-builders JAR file on your classpath. 
+ * To use a different builder, just overload the <code>getBuilder()</code> method
+ * of this class to return the type of builder you want to use with your test. 
  */
 public abstract class FunctionalTestCase extends AbstractMuleTestCase
 {
     public FunctionalTestCase()
     {
         super();
-        // A functional test case starts up the management context by default.
+        // A functional test case that starts up the management context by default.
         setStartContext(true);
     }
     

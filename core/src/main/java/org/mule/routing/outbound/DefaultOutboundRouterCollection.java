@@ -16,7 +16,6 @@ import org.mule.api.MuleSession;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
@@ -42,7 +41,6 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
     public MuleMessage route(final MuleMessage message, final MuleSession session, final boolean synchronous)
             throws MessagingException
     {
-
         MuleMessage result;
         boolean matchfound = false;
 
@@ -54,10 +52,11 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                 matchfound = true;
                 // Manage outbound only transactions here
                 final OutboundRouter router = umoOutboundRouter;
-                Service service = session.getService();
-                TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig(),
-                        service.getExceptionListener(), muleContext);
 
+                
+                TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig(),
+                    session.getService().getExceptionListener(), muleContext);
+                
                 TransactionCallback cb = new TransactionCallback()
                 {
                     public Object doInTransaction() throws Exception

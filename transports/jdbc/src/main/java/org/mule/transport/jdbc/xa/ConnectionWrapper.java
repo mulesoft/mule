@@ -11,6 +11,7 @@
 package org.mule.transport.jdbc.xa;
 
 import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionCoordination;
@@ -50,212 +51,106 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
         this.connection = xaCon.getConnection();
     }
 
-    /*
-    * (non-Javadoc)
-    *
-    * @see java.sql.Connection#getHoldability()
-    */
-
     public int getHoldability() throws SQLException
     {
         return connection.getHoldability();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#getTransactionIsolation()
-     */
     public int getTransactionIsolation() throws SQLException
     {
         return connection.getTransactionIsolation();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#clearWarnings()
-     */
     public void clearWarnings() throws SQLException
     {
         connection.clearWarnings();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#close()
-     */
     public void close() throws SQLException
     {
         connection.close();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#commit()
-     */
     public void commit() throws SQLException
     {
         connection.commit();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#rollback()
-     */
     public void rollback() throws SQLException
     {
         connection.rollback();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#getAutoCommit()
-     */
     public boolean getAutoCommit() throws SQLException
     {
         return connection.getAutoCommit();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#isClosed()
-     */
     public boolean isClosed() throws SQLException
     {
         return connection.isClosed();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#isReadOnly()
-     */
     public boolean isReadOnly() throws SQLException
     {
         return connection.isReadOnly();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#setHoldability(int)
-     */
     public void setHoldability(int holdability) throws SQLException
     {
         connection.setHoldability(holdability);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#setTransactionIsolation(int)
-     */
     public void setTransactionIsolation(int level) throws SQLException
     {
         connection.setTransactionIsolation(level);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#setAutoCommit(boolean)
-     */
     public void setAutoCommit(boolean autoCommit) throws SQLException
     {
         connection.setAutoCommit(autoCommit);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#setReadOnly(boolean)
-     */
     public void setReadOnly(boolean readOnly) throws SQLException
     {
         connection.setReadOnly(readOnly);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#getCatalog()
-     */
     public String getCatalog() throws SQLException
     {
         return connection.getCatalog();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#setCatalog(java.lang.String)
-     */
     public void setCatalog(String catalog) throws SQLException
     {
         connection.setCatalog(catalog);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#getMetaData()
-     */
     public DatabaseMetaData getMetaData() throws SQLException
     {
         return connection.getMetaData();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#getWarnings()
-     */
     public SQLWarning getWarnings() throws SQLException
     {
         return connection.getWarnings();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#setSavepoint()
-     */
     public Savepoint setSavepoint() throws SQLException
     {
         return connection.setSavepoint();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#releaseSavepoint(java.sql.Savepoint)
-     */
     public void releaseSavepoint(Savepoint savepoint) throws SQLException
     {
         connection.releaseSavepoint(savepoint);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#rollback(java.sql.Savepoint)
-     */
     public void rollback(Savepoint savepoint) throws SQLException
     {
         connection.rollback();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#createStatement()
-     */
     public Statement createStatement() throws SQLException
     {
         Statement st = connection.createStatement();
@@ -263,11 +158,6 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                   new Class[]{Statement.class}, new StatementInvocationHandler(this, st));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#createStatement(int, int)
-     */
     public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException
     {
         Statement st = connection.createStatement(resultSetType, resultSetConcurrency);
@@ -275,11 +165,6 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                   new Class[]{Statement.class}, new StatementInvocationHandler(this, st));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#createStatement(int, int, int)
-     */
     public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
             throws SQLException
     {
@@ -288,41 +173,21 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                   new Class[]{Statement.class}, new StatementInvocationHandler(this, st));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#getTypeMap()
-     */
     public Map getTypeMap() throws SQLException
     {
         return connection.getTypeMap();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#setTypeMap(java.util.Map)
-     */
     public void setTypeMap(Map map) throws SQLException
     {
         connection.setTypeMap(map);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#nativeSQL(java.lang.String)
-     */
     public String nativeSQL(String sql) throws SQLException
     {
         return connection.nativeSQL(sql);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#prepareCall(java.lang.String)
-     */
     public CallableStatement prepareCall(String sql) throws SQLException
     {
         CallableStatement cs = connection.prepareCall(sql);
@@ -330,11 +195,6 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                           new Class[]{CallableStatement.class}, new StatementInvocationHandler(this, cs));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#prepareCall(java.lang.String, int, int)
-     */
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency)
             throws SQLException
     {
@@ -343,11 +203,6 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                           new Class[]{CallableStatement.class}, new StatementInvocationHandler(this, cs));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#prepareCall(java.lang.String, int, int, int)
-     */
     public CallableStatement prepareCall(String sql,
                                          int resultSetType,
                                          int resultSetConcurrency,
@@ -358,11 +213,6 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                           new Class[]{CallableStatement.class}, new StatementInvocationHandler(this, cs));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#prepareStatement(java.lang.String)
-     */
     public PreparedStatement prepareStatement(String sql) throws SQLException
     {
         PreparedStatement ps = connection.prepareStatement(sql);
@@ -370,11 +220,6 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                           new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#prepareStatement(java.lang.String, int)
-     */
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException
     {
         PreparedStatement ps = connection.prepareStatement(sql, autoGeneratedKeys);
@@ -382,11 +227,6 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                           new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#prepareStatement(java.lang.String, int, int)
-     */
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
             throws SQLException
     {
@@ -395,11 +235,6 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                           new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#prepareStatement(java.lang.String, int, int, int)
-     */
     public PreparedStatement prepareStatement(String sql,
                                               int resultSetType,
                                               int resultSetConcurrency,
@@ -411,11 +246,6 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                           new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#prepareStatement(java.lang.String, int[])
-     */
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException
     {
         PreparedStatement ps = connection.prepareStatement(sql, columnIndexes);
@@ -423,22 +253,11 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                           new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#setSavepoint(java.lang.String)
-     */
     public Savepoint setSavepoint(String name) throws SQLException
     {
         return connection.setSavepoint(name);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.sql.Connection#prepareStatement(java.lang.String,
-     *      java.lang.String[])
-     */
     public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException
     {
         PreparedStatement ps = connection.prepareStatement(sql, columnNames);
@@ -446,11 +265,20 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                           new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
-    protected void enlist() throws Exception
+    public boolean enlist() throws TransactionException
     {
+        try
+        {
+            connection.setAutoCommit(false);
+        }
+        catch (SQLException e)
+        {
+            throw new TransactionException(e);
+        }
+        
         if (isEnlisted())
         {
-            return;
+            return false;
         }
         if (logger.isDebugEnabled())
         {
@@ -468,8 +296,20 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
         }
         if (!isEnlisted())
         {
-            enlisted = ((XaTransaction) transaction).enlistResource(xaConnection.getXAResource());
+            final XAResource xaResource;
+            try
+            {
+                xaResource = xaConnection.getXAResource();
+            }
+            catch (SQLException e)
+            {
+                throw new TransactionException(e);
+            }
+            
+            enlisted = ((XaTransaction) transaction).enlistResource(xaResource);
         }
+        
+        return enlisted;
     }
 
     public boolean delist() throws Exception

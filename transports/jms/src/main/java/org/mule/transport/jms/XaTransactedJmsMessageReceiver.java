@@ -15,9 +15,11 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.transaction.TransactionTemplate;
 import org.mule.transaction.XaTransaction;
 import org.mule.transport.ConnectException;
 import org.mule.transport.SingleAttemptConnectionStrategy;
@@ -26,6 +28,7 @@ import org.mule.transport.jms.filters.JmsSelectorFilter;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javax.jms.Destination;
@@ -128,7 +131,6 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         {
             throw new CreateException(e, this);
         }
-
     }
 
     protected void doDispose()
@@ -138,30 +140,15 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
 
     protected void doConnect() throws Exception
     {
-        if (connector.isConnected() && connector.isEagerConsumer())
-        {
-            createConsumer();
-            // creating this consumer now would prevent from the actual worker
-            // consumer
-            // to receive the message!
-            //Antoine Borg 08 Dec 2006 - Uncommented for MULE-1150
-            // if we comment this line, if one tries to restart the service through
-            // JMX,
-            // this will fail...
-            //This Line seems to be the root to a number of problems and differences between
-            //Jms providers. A which point the consumer is created changes how the conneciton can be managed.
-            //For example, WebsphereMQ needs the consumer created here, otherwise ReconnectionStrategies don't work properly
-            //(See MULE-1150) However, is the consumer is created here for Active MQ, The worker thread cannot actually
-            //receive the message.  We need to test with a few more Jms providers and transactions to see which behaviour
-            // is correct.  My gut feeling is that the consumer should be created here and there is a bug in ActiveMQ
-        }
+        // template method
     }
 
     protected void doDisconnect() throws Exception
     {
         if (connector.isConnected())
         {
-            closeConsumer(true);
+            // TODO All resources will be close by transaction or by connection close
+            closeResource(true);
         }
     }
 
@@ -170,52 +157,55 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
      */
     public void poll() throws Exception
     {
-        try
+        TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(), 
+            connector.getExceptionListener(), connector.getMuleContext());
+        TransactionCallback cb = new TransactionCallback()
         {
-            JmsThreadContext ctx = context.getContext();
-            // Create consumer if necessary
-            if (ctx.consumer == null)
+            public Object doInTransaction() throws Exception
             {
-                createConsumer();
+                try
+                {
+                    List messages = getMessages();
+                    if (messages != null && messages.size() > 0)
+                    {
+                        for (Iterator it = messages.iterator(); it.hasNext();)
+                        {
+                            processMessage(it.next());
+                        }
+                    }
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    // There is not a need to close resources here,
+                    // they will be close by XaTransaction,  
+                    JmsThreadContext ctx = context.getContext();
+                    ctx.consumer = null;
+                    Transaction tx = TransactionCoordination.getInstance().getTransaction();
+                    if (ctx.session != null && tx instanceof XaTransaction.MuleXaObject)
+                    {
+                        ((XaTransaction.MuleXaObject) ctx.session).setReuseObject(false);
+                    }
+                    ctx.session = null;
+                    throw e;
+                }
             }
-            // Do polling
-            super.poll();
-        }
-        catch (Exception e)
-        {
-            // Force consumer to close
-            closeConsumer(true);
-            throw e;
-        }
-        finally
-        {
-            // Close consumer if necessary
-            closeConsumer(false);
-        }
+        };
+        
+        tt.execute(cb);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transport.TransactionEnabledPollingMessageReceiver#getMessages()
-     */
     protected List getMessages() throws Exception
     {
-        // As the session is created outside the transaction, it is not
-        // bound to it yet
-        JmsThreadContext ctx = context.getContext();
-
+        Session session = this.connector.getSessionFromTransaction();
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx != null)
-        {
-            tx.bindResource(connector.getConnection(), ctx.session);
-        }
+        MessageConsumer consumer = createConsumer();
 
         // Retrieve message
         Message message = null;
         try
         {
-            message = ctx.consumer.receive(timeout);
+            message = consumer.receive(timeout);
         }
         catch (JMSException e)
         {
@@ -229,6 +219,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                 throw e;
             }
         }
+        
         if (message == null)
         {
             if (tx != null)
@@ -237,7 +228,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             }
             return null;
         }
-        message = connector.preProcessMessage(message, ctx.session);
+        message = connector.preProcessMessage(message, session);
 
         // Process message
         if (logger.isDebugEnabled())
@@ -267,47 +258,42 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             redeliveryHandler.handleRedelivery(message);
         }
 
-        if (tx instanceof JmsClientAcknowledgeTransaction)
-        {
-            tx.bindResource(message, null);
-        }
-
         MessageAdapter adapter = connector.getMessageAdapter(message);
         routeMessage(new DefaultMuleMessage(adapter));
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transport.TransactionEnabledPollingMessageReceiver#processMessage(java.lang.Object)
-     */
     protected void processMessage(Object msg) throws Exception
     {
         // This method is never called as the
         // message is processed when received
     }
 
-    protected void closeConsumer(boolean force)
+    /**
+     * Close Sesison and consumer
+     */
+    protected void closeResource(boolean force)
     {
         JmsThreadContext ctx = context.getContext();
         if (ctx == null)
         {
             return;
         }
+        
         // Close consumer
         if (force || !reuseSession || !reuseConsumer)
         {
             connector.closeQuietly(ctx.consumer);
             ctx.consumer = null;
         }
+            
         // Do not close session if a transaction is in progress
         // the session will be closed by the transaction
         if (force || !reuseSession)
         {
             connector.closeQuietly(ctx.session);
             ctx.session = null;
-        }
+        }        
     }
 
     /**
@@ -315,24 +301,49 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
      * 
      * @throws Exception
      */
-    protected void createConsumer() throws Exception
+    protected MessageConsumer createConsumer() throws Exception
     {
+        logger.debug("Create a consumer for the jms destination");
         try
         {
             JmsSupport jmsSupport = this.connector.getJmsSupport();
-            JmsThreadContext ctx = context.getContext();
-            // Create session if none exists
-            if (ctx.session == null)
-            {
-                ctx.session = this.connector.getSession(endpoint);
-                //set reuse flag
-                ((XaTransaction.MuleXaObject) ctx.session).setReuseObject(reuseSession);
 
+            JmsThreadContext ctx = context.getContext();
+            if (ctx == null)
+            {
+                ctx = new JmsThreadContext();
+            }
+            
+            Session session;
+            Transaction tx = TransactionCoordination.getInstance().getTransaction();
+            if (this.reuseSession && ctx.session != null)
+            {
+                session = ctx.session;
+                tx.bindResource(this.connector.getConnection(), session);
+            }
+            else
+            {
+                session = this.connector.getSession(endpoint);
+                if (tx != null)
+                {
+                    ((XaTransaction.MuleXaObject) session).setReuseObject(reuseSession);
+                }
+            }
+            
+            if (reuseSession)
+            {
+                ctx.session = session;
+            }
+            
+            // TODO How can I verify that the consumer is active?
+            if (this.reuseConsumer && ctx.consumer != null)
+            {
+                return ctx.consumer;
             }
 
             // Create destination
             final boolean topic = connector.getTopicResolver().isTopic(endpoint);
-            Destination dest = jmsSupport.createDestination(ctx.session, endpoint.getEndpointURI()
+            Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI()
                 .getAddress(), topic);
 
             // Extract jms selector
@@ -364,8 +375,13 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             }
 
             // Create consumer
-            ctx.consumer = jmsSupport.createConsumer(ctx.session, dest, selector, connector.isNoLocal(),
+            MessageConsumer consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(),
                 durableName, topic);
+            if (reuseConsumer)
+            {
+                ctx.consumer = consumer;
+            }
+            return consumer;
         }
         catch (JMSException e)
         {

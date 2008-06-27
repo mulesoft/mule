@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -30,9 +29,8 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
     public void testMulticastingRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
-        messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
-
+        session.matchAndReturn("getService", getTestService());
+        
         ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 

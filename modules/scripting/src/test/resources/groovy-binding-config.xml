@@ -32,12 +32,12 @@
                     msg = CalloutService.doSomething(payload)
                     return CalloutService.doSomethingElse(msg)
                 </script:script>
-                <script:binding interface="org.mule.components.script.CalloutService" method="doSomething">
+                <script:java-interface-binding interface="org.mule.components.script.CalloutService" method="doSomething">
                     <outbound-endpoint ref="callout_1" synchronous="true"/>
-                </script:binding>
-                <script:binding interface="org.mule.components.script.CalloutService" method="doSomethingElse">
+                </script:java-interface-binding>
+                <script:java-interface-binding interface="org.mule.components.script.CalloutService" method="doSomethingElse">
                     <outbound-endpoint ref="callout_2" synchronous="true"/>
-                </script:binding>
+                </script:java-interface-binding>
             </script:component>
             <outbound>
                 <outbound-pass-through-router>

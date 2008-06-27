@@ -96,7 +96,7 @@
                                 Groovy, JavaScript(Rhino), Python, Ruby or Beanshell (etc).</xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element name="binding" type="mule:pojoBindingType" minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="java-interface-binding" type="mule:pojoBindingType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
                                 A binding associates a Mule endpoint with an injected Java interface

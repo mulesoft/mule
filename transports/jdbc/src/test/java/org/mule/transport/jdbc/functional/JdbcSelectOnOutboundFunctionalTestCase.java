@@ -28,8 +28,38 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunction
 
     public void testSelectOnOutbound() throws Exception
     {
+        doSelectOnOutbound("vm://jdbc.test");
+    }
+
+//    public void testSelectOnOutboundByExpression() throws Exception
+//    {
+//        MuleClient client = new MuleClient();
+//        MyMessage payload = new MyMessage(2);
+//        MuleMessage reply = client.send("vm://terra", new DefaultMuleMessage(payload));
+//        assertNotNull(reply.getPayload());
+//        assertTrue(reply.getPayload() instanceof List);
+//        List resultList = (List) reply.getPayload();
+//        assertTrue(resultList.size() == 1);
+//        assertTrue(resultList.get(0) instanceof Map);
+//        Map resultMap = (Map) resultList.get(0);
+//        assertEquals(new Integer(2), resultMap.get("TYPE"));
+//        assertEquals(TEST_VALUES[1], resultMap.get("DATA"));
+//    }
+
+    public void testChain2SelectAlwaysBegin() throws Exception 
+    { 
+        doSelectOnOutbound("vm://chain.always.begin"); 
+    } 
+
+    public void testChain2SelectBeginOrJoin() throws Exception 
+    { 
+        doSelectOnOutbound("vm://chain.begin.or.join"); 
+    }
+    
+    private void doSelectOnOutbound(String endpoint) throws Exception
+    {
         MuleClient client = new MuleClient();
-        MuleMessage reply = client.send("vm://jdbc.test", new DefaultMuleMessage(NullPayload.getInstance()));
+        MuleMessage reply = client.send(endpoint, new DefaultMuleMessage(NullPayload.getInstance()));
         assertNotNull(reply.getPayload());
         assertTrue(reply.getPayload() instanceof List);
         List resultList = (List) reply.getPayload();
@@ -39,23 +69,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunction
         assertEquals(new Integer(1), resultMap.get("TYPE"));
         assertEquals(TEST_VALUES[0], resultMap.get("DATA"));
     }
-
-    public void testSelectOnOutboundByExpression() throws Exception
-    {
-        MuleClient client = new MuleClient();
-        MyMessage payload = new MyMessage(2);
-        MuleMessage reply = client.send("vm://terra", new DefaultMuleMessage(payload));
-        assertNotNull(reply.getPayload());
-        assertTrue(reply.getPayload() instanceof List);
-        List resultList = (List) reply.getPayload();
-        logger.debug("resultList.size() " + resultList.size());
-        assertTrue(resultList.size() == 1);
-        assertTrue(resultList.get(0) instanceof Map);
-        Map resultMap = (Map) resultList.get(0);
-        assertEquals(new Integer(2), resultMap.get("TYPE"));
-        assertEquals(TEST_VALUES[1], resultMap.get("DATA"));
-    }
-
+    
     public static class MyMessage implements Serializable
     {
         public MyMessage(int type)

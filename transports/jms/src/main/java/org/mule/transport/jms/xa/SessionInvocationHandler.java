@@ -81,12 +81,6 @@ public class SessionInvocationHandler implements InvocationHandler
         this.xaResource = new XAResourceWrapper(xaSession.getXAResource(), this);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
-     *      java.lang.reflect.Method, java.lang.Object[])
-     */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
         if (logger.isDebugEnabled())
@@ -102,6 +96,10 @@ public class SessionInvocationHandler implements InvocationHandler
         if (XaTransaction.MuleXaObject.DELIST_METHOD_NAME.equals(method.getName()))
         {
             return Boolean.valueOf(delist());
+        }
+        else if (XaTransaction.MuleXaObject.ENLIST_METHOD_NAME.equals(method.getName()))
+        {
+            return Boolean.valueOf(enlist());
         }
         else if (XaTransaction.MuleXaObject.SET_REUSE_OBJECT_METHOD_NAME.equals(method.getName()))
         {
@@ -157,11 +155,11 @@ public class SessionInvocationHandler implements InvocationHandler
         return result;
     }
 
-    protected void enlist() throws Exception
+    public boolean enlist() throws Exception
     {
         if (isEnlisted())
         {
-            return;
+            return false;
         }
 
         if (logger.isDebugEnabled())
@@ -188,6 +186,8 @@ public class SessionInvocationHandler implements InvocationHandler
 
             enlisted = ((XaTransaction) transaction).enlistResource(xaResource);
         }
+        
+        return enlisted;
     }
 
     public boolean delist() throws Exception
@@ -224,7 +224,6 @@ public class SessionInvocationHandler implements InvocationHandler
         return !isEnlisted();
     }
 
-
     public boolean isEnlisted()
     {
         return enlisted;
@@ -244,6 +243,5 @@ public class SessionInvocationHandler implements InvocationHandler
     {
         return xaResource;
     }
-
 
 }

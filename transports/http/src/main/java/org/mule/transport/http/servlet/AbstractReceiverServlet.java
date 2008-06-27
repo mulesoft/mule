@@ -13,6 +13,7 @@ package org.mule.transport.http.servlet;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.OutputHandler;
+import org.mule.config.ExceptionHelper;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
@@ -163,8 +164,10 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             else
             {
                 servletResponse.setContentType(contentType);
+                String s = httpResponse.getBodyAsString();
                 // Encoding: this method will check the charset on the content type
-                servletResponse.getWriter().write(httpResponse.getBodyAsString());
+                servletResponse.getWriter().write(s);
+
             }
         }
         servletResponse.flushBuffer();
@@ -173,11 +176,11 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     protected void handleException(Throwable exception, String message, HttpServletResponse response)
     {
         logger.error("message: " + exception.getMessage(), exception);
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        int code = Integer.valueOf(ExceptionHelper.getErrorMapping("http", exception.getClass())).intValue();
+        response.setStatus(code);
         try
         {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message + ": "
-                                                                             + exception.getMessage());
+            response.sendError(code, message + ": " + exception.getMessage());
         }
         catch (IOException e)
         {

@@ -22,9 +22,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-/**
- * NOTE: Don't forget to duplicate all the changes in {@link org.mule.example.loanbroker.bpm.DbUtils}
- */
 public class MuleDerbyUtils
 {
     private static final String DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver";

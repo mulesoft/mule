@@ -59,6 +59,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         router.setEndpoints(endpoints);
 
         assertEquals(filter, router.getFilter());
+        session.matchAndReturn("getService", getTestService("TEST", Object.class));    
     }
 
     public void testChainingOutboundRouterSynchronous() throws Exception

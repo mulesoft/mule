@@ -20,7 +20,9 @@
             <echo-component/>
             <outbound>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="jms://testout"/>
+                    <outbound-endpoint address="jms://testout">
+                        <jms:transaction action="NONE"/>
+                    </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>
         </service>

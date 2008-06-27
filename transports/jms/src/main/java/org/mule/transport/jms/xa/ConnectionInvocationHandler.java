@@ -9,6 +9,8 @@
  */
 package org.mule.transport.jms.xa;
 
+import org.mule.api.transaction.Transaction;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
 
 import java.lang.reflect.InvocationHandler;
@@ -52,26 +54,50 @@ public class ConnectionInvocationHandler implements InvocationHandler
         {
             ConnectionFactoryWrapper.logger.debug("Invoking " + method);
         }
+        
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        
         if (method.getName().equals("createSession"))
         {
-            XASession xas = ((XAConnection) xaConnection).createXASession();
-            return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), 
-                new Class[]{Session.class, XaTransaction.MuleXaObject.class},
-                new SessionInvocationHandler(xas));
+            if (tx != null)
+            {
+                XASession xas = ((XAConnection) xaConnection).createXASession();
+                return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), 
+                    new Class[]{ Session.class, XaTransaction.MuleXaObject.class },
+                    new SessionInvocationHandler(xas));
+            }
+            else
+            {
+                return ((XAConnection) xaConnection).createSession(false, Session.AUTO_ACKNOWLEDGE);
+            }
         }
         else if (method.getName().equals("createQueueSession"))
         {
-            XAQueueSession xaqs = ((XAQueueConnection) xaConnection).createXAQueueSession();
-            return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-                new Class[]{QueueSession.class, XaTransaction.MuleXaObject.class}, 
-                new SessionInvocationHandler(xaqs));
+            if (tx != null)
+            {
+                XAQueueSession xaqs = ((XAQueueConnection) xaConnection).createXAQueueSession();
+                return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+                    new Class[]{ QueueSession.class, XaTransaction.MuleXaObject.class }, 
+                    new SessionInvocationHandler(xaqs));
+            }
+            else
+            {
+                return ((XAQueueConnection) xaConnection).createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+            }
         }
         else if (method.getName().equals("createTopicSession"))
         {
-            XATopicSession xats = ((XATopicConnection) xaConnection).createXATopicSession();
-            return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-                new Class[]{TopicSession.class, XaTransaction.MuleXaObject.class}, 
-                new SessionInvocationHandler(xats));
+            if (tx != null)
+            {
+                XATopicSession xats = ((XATopicConnection) xaConnection).createXATopicSession();
+                return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+                    new Class[]{ TopicSession.class, XaTransaction.MuleXaObject.class }, 
+                    new SessionInvocationHandler(xats));
+            }
+            else
+            {
+                return ((XATopicConnection) xaConnection).createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+            }
         }
         else
         {

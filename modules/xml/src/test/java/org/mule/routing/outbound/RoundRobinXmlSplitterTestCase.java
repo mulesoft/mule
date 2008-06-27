@@ -83,6 +83,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     private void internalTestSuccessfulXmlSplitter(Object payload) throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
 
         MuleMessage message = new DefaultMuleMessage(payload);
 
@@ -111,6 +112,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     {
         final String invalidSchemaLocation = "non-existent.xsd";
         Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
 
         RoundRobinXmlSplitter splitter = new RoundRobinXmlSplitter();
         splitter.setValidateSchema(true);
@@ -139,6 +141,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         Exception unsupportedPayload = new Exception();
 
         Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
 
         MuleMessage message = new DefaultMuleMessage(unsupportedPayload);
 
@@ -156,6 +159,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     public void testInvalidXmlPayloadThrowsException() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
 
         RoundRobinXmlSplitter splitter = new RoundRobinXmlSplitter();
 

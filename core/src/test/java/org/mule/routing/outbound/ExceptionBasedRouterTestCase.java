@@ -39,7 +39,9 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
      */
     public void testSuccessfulExceptionRouter() throws Exception
     {
-        Mock session = MuleTestUtils.getMockSession();
+        Mock mockSession = MuleTestUtils.getMockSession();
+        mockSession.matchAndReturn("getService", getTestService());
+        
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
  
@@ -70,20 +72,20 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
 
-        session.expect("sendEvent", C.eq(message, endpoint1));
-        MuleMessage result = router.route(message, (MuleSession)session.proxy(), false);
+        mockSession.expect("sendEvent", C.eq(message, endpoint1));
+        MuleMessage result = router.route(message, (MuleSession)mockSession.proxy(), false);
         assertNull("Async call should've returned null.", result);
-        session.verify();
+        mockSession.verify();
 
         message = new DefaultMuleMessage("test event");
 
         // only one send should be called and succeed, the others should not be
         // called
-        session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
-        result = router.route(message, (MuleSession)session.proxy(), true);
+        mockSession.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
+        result = router.route(message, (MuleSession)mockSession.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
-        session.verify();
+        mockSession.verify();
     }
 
     /**
@@ -93,8 +95,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     public void testBothFailing() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();
-        DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
-        messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
+        mockSession.matchAndReturn("getService", getTestService());
 
         ImmutableEndpoint endpoint1 = muleContext.getRegistry()
             .lookupEndpointFactory()
@@ -147,6 +148,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     public void testFailFirstSuccessSecondSync() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();
+        mockSession.matchAndReturn("getService", getTestService());
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
@@ -181,6 +183,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     public void testFailFirstSuccessSecondAsync() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();
+        mockSession.matchAndReturn("getService", getTestService());
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
@@ -214,6 +217,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     public void testFirstHadExceptionPayloadSuccessSecondSyncWithExceptionPayload() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();
+        mockSession.matchAndReturn("getService", getTestService());
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");

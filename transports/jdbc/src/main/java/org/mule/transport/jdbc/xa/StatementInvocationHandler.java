@@ -19,26 +19,14 @@ public class StatementInvocationHandler implements InvocationHandler
 {
 
     private Statement statement;
-    private ConnectionWrapper connectionWrapper;
 
     public StatementInvocationHandler(ConnectionWrapper connectionWrapper, Statement statement)
     {
-        this.connectionWrapper = connectionWrapper;
         this.statement = statement;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
-     *      java.lang.reflect.Method, java.lang.Object[])
-     */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
-        if (method.getName().startsWith("execute"))
-        {
-            connectionWrapper.enlist();
-        }
         try
         {
             return method.invoke(statement, args);

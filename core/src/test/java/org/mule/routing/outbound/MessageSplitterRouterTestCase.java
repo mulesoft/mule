@@ -31,6 +31,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
     public void testMessageSplitterRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://endpointUri.1");
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://endpointUri.2");

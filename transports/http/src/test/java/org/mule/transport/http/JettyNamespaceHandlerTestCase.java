@@ -10,21 +10,22 @@
 
 package org.mule.transport.http;
 
-import org.mule.transport.http.jetty.JettyConnector;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.http.jetty.JettyHttpConnector;
 
-public class JettyNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCase
+public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
-    public JettyNamespaceHandlerTestCase()
+    protected String getConfigResources()
     {
-        super("jetty");
+        return "jetty-namespace-config.xml";
     }
 
     public void testConnectorProperties()
     {
-        JettyConnector connector =
-                (JettyConnector) muleContext.getRegistry().lookupConnector("jettyConnector");
-        testBasicProperties(connector);
+        JettyHttpConnector connector = (JettyHttpConnector) muleContext.getRegistry().lookupConnector("jettyConnector");
+        assertNotNull(connector.getConfigFile());
+        assertEquals("jetty-config.xml", connector.getConfigFile());
     }
 
 }

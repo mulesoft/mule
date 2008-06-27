@@ -33,5 +33,42 @@
                 </outbound-pass-through-router>
             </outbound>
         </service>
+        
+        <service name="chain2SelectAlwaysBegin">
+            <inbound>
+                <inbound-endpoint address="vm://chain.always.begin"/>
+            </inbound>
+            <outbound>
+                <chaining-router>
+                    <jdbc:outbound-endpoint queryKey="selectCount">
+                        <jdbc:transaction action="ALWAYS_BEGIN"/>
+                    </jdbc:outbound-endpoint>
+                    
+                    <jdbc:outbound-endpoint address="jdbc://getTest?type=1">
+                        <jdbc:transaction action="ALWAYS_BEGIN"/>
+                    </jdbc:outbound-endpoint>
+                    
+                    <jdbc:transaction action="ALWAYS_BEGIN"/>
+                </chaining-router>
+            </outbound>
+        </service>
+        
+        <service name="chain2SelectBeginOrJoin">
+            <inbound>
+                <inbound-endpoint address="vm://chain.begin.or.join"/>
+            </inbound>
+            <outbound>
+                <chaining-router>
+                    <jdbc:outbound-endpoint queryKey="selectCount">
+                        <jdbc:transaction action="BEGIN_OR_JOIN"/>
+                    </jdbc:outbound-endpoint>
+                    <jdbc:outbound-endpoint address="jdbc://getTest?type=1">
+                        <jdbc:transaction action="ALWAYS_BEGIN"/>
+                    </jdbc:outbound-endpoint>
+                    
+                    <jdbc:transaction action="ALWAYS_BEGIN"/>
+                </chaining-router>
+            </outbound>
+        </service>
     </model>
 </mule>

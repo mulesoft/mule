@@ -48,11 +48,6 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (JdbcConnector) endpoint.getConnector();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transport.AbstractMessageDispatcher#doDispose()
-     */
     protected void doDispose()
     {
         // template method
@@ -134,11 +129,6 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transport.AbstractMessageDispatcher#doDispatch(org.mule.api.MuleEvent)
-     */
     protected void doDispatch(MuleEvent event) throws Exception
     {
         if (logger.isDebugEnabled())
@@ -158,11 +148,6 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transport.AbstractMessageDispatcher#doSend(org.mule.api.MuleEvent)
-     */
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         String statement = getStatement(event.getEndpoint());
@@ -205,6 +190,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
 
         Connection con = null;
         long t0 = System.currentTimeMillis();
+        Transaction tx  = TransactionCoordination.getInstance().getTransaction();
         try
         {
             con = connector.getConnection();
@@ -264,12 +250,19 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             }
             MessageAdapter msgAdapter = connector.getMessageAdapter(result);
             MuleMessage message = new DefaultMuleMessage(msgAdapter);
-            JdbcUtils.commitAndClose(con);
+            if (tx == null)
+            {
+                JdbcUtils.commitAndClose(con);
+            }
+            
             return message;
         }
         catch (Exception e)
         {
-            JdbcUtils.rollbackAndClose(con);
+            if (tx == null)
+            {
+                JdbcUtils.rollbackAndClose(con);
+            }
             throw e;
         }
 

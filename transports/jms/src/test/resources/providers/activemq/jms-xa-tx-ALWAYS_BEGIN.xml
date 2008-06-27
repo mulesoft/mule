@@ -40,9 +40,8 @@
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="out">
-                        <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                        <jms:xa-transaction action="ALWAYS_BEGIN"/>
                     </jms:outbound-endpoint>
-                    <jms:xa-transaction action="ALWAYS_BEGIN"/>
                 </outbound-pass-through-router>
             </outbound>
         </service>

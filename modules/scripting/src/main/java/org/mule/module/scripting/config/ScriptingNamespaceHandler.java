@@ -27,7 +27,7 @@ public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("script", new ScriptDefinitionParser());
         registerBeanDefinitionParser("text", new TextDefinitionParser("scriptText"));
         registerBeanDefinitionParser("component", new ComponentDefinitionParser(ScriptComponent.class));
-        registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("nestedRouter.routers", DefaultNestedRouter.class)).addCollection("nestedRouter.routers");
+        registerMuleBeanDefinitionParser("java-interface-binding", new BindingDefinitionParser("nestedRouter.routers", DefaultNestedRouter.class)).addCollection("nestedRouter.routers");
 
         registerBeanDefinitionParser("transformer", new TransformerDefinitionParser(ScriptTransformer.class));
 

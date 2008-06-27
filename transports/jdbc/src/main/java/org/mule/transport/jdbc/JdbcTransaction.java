@@ -62,6 +62,12 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
 
     protected void doCommit() throws TransactionException
     {
+        if (resource == null)
+        {
+            logger.warn(CoreMessages.noBindingResource());
+            return;
+        }
+        
         try
         {
             ((Connection)resource).commit();
@@ -75,6 +81,12 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
 
     protected void doRollback() throws TransactionException
     {
+        if (resource == null)
+        {
+            logger.warn(CoreMessages.noBindingResource());
+            return;
+        }
+
         try
         {
             ((Connection)resource).rollback();

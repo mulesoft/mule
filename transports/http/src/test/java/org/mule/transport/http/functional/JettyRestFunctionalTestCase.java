@@ -10,7 +10,6 @@
 package org.mule.transport.http.functional;
 
 
-
 public class JettyRestFunctionalTestCase extends HttpFunctionalTestCase
 {
     //@Override

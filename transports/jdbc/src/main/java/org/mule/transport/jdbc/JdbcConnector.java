@@ -59,9 +59,12 @@ public class JdbcConnector extends AbstractConnector
     private DataSource dataSource;
     private ResultSetHandler resultSetHandler;
     private QueryRunner queryRunner;
+    protected boolean transactionPerMessage = true;
     
     protected void doInitialise() throws InitialisationException
     {
+        createMultipleTransactedReceivers = false;
+        
         if (dataSource == null)
         {
             throw new InitialisationException(MessageFactory.createStaticMessage("Missing data source"), this);
@@ -219,6 +222,22 @@ public class JdbcConnector extends AbstractConnector
         return con;
     }
 
+    public boolean isTransactionPerMessage() 
+    {
+        return transactionPerMessage;
+    }
+    
+    public void setTransactionPerMessage(boolean transactionPerMessage) 
+    {
+        this.transactionPerMessage = transactionPerMessage;
+        if (!transactionPerMessage)
+        {
+            logger.warn("transactionPerMessage property is set to false so setting createMultipleTransactedReceivers " +
+                "to false also to prevent creation of multiple JdbcMessageReceivers");
+            setCreateMultipleTransactedReceivers(transactionPerMessage);
+        }
+    }
+    
     /**
      * Parse the given statement filling the parameter list and return the ready to
      * use statement.

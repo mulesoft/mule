@@ -58,6 +58,7 @@
         <jdk14Name>jdk1.4</jdk14Name>
         <jdk5Name>jdk5</jdk5Name>
         
+        <acegiSecurityVersion>1.0.1</acegiSecurityVersion>
         <aopAllianceVersion>1.0.0</aopAllianceVersion>
         <axisVersion>1.4.0</axisVersion>
         <backportUtilConcurrentVersion>3.1.0</backportUtilConcurrentVersion>
@@ -85,7 +86,7 @@
         <javaXmlSoapVersion>1.3.0</javaXmlSoapVersion>
         <javaXmlStreamVersion>1.0.1</javaXmlStreamVersion>
         <jbpmVersion>3.2.2</jbpmVersion>
-        <jettyVersion>5.1.12</jettyVersion>
+        <jettyVersion>6.1.9</jettyVersion>
         <jugVersion>2.0.0</jugVersion>
         <oroVersion>2.0.8</oroVersion>
         <paxLoggingVersion>1.1.1</paxLoggingVersion>   
@@ -533,7 +534,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>com.springsource.org.apache.commons.collections</artifactId>
-                <version>3.2.0</version>
+                <version>${commonsCollectionsVersion}</version>
             </dependency>
             
             <!-- OSGI: Wrapped for mule ("osgi" suffix) -->
@@ -890,6 +891,17 @@
                 <groupId>tanukisoft</groupId>
                 <artifactId>wrapper</artifactId>
                 <version>3.2.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty</artifactId>
+                <version>${jettyVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>servlet-api-2.5</artifactId>
+                    </exclusion>                    
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
