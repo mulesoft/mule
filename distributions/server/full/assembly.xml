@@ -314,7 +314,8 @@ Assembly descriptor for the full Mule distribution.
        http://jira.codehaus.org/browse/MASSEMBLY-220
   -->
   <dependencySets>
-    <!-- Mule bootstrap -->
+
+    <!-- Bootstrap -->
     <dependencySet>
       <outputDirectory>lib/boot</outputDirectory>
       <includes>
@@ -386,6 +387,7 @@ Assembly descriptor for the full Mule distribution.
     </excludes>
     </dependencySet>
 
+    <!-- 3rd-party libraries -->
     <dependencySet>
       <outputDirectory>lib/opt</outputDirectory>
       <excludes>
@@ -469,10 +471,29 @@ Assembly descriptor for the full Mule distribution.
       </excludes>
     </dependencySet>
 
+    <!-- Mule testing framework -->
+    <dependencySet>
+      <outputDirectory>lib/user</outputDirectory>
+      <scope>test</scope>
+      <includes>
+        <include>org.mule.tests:mule-tests-core</include>
+        <include>org.mule.tests:mule-tests-functional</include>
+      </includes>
+      <!-- no XML -->
+      <excludes>
+          <exclude>xml-apis:xml-apis</exclude>
+          <exclude>xerces:xercesImpl</exclude>
+          <exclude>xerces:xml-serializer</exclude>
+          <exclude>xalan:xalan</exclude>
+      </excludes>
+    </dependencySet>
+
     <!-- Mule examples -->
     <dependencySet>
       <outputDirectory>lib/user</outputDirectory>
       <scope>runtime</scope>
+      <!-- Don't put the version number in the examples. -->
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
         <include>org.mule.examples:mule-example-echo</include>
         <include>org.mule.examples:mule-example-errorhandler</include>
@@ -484,22 +505,6 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.examples:mule-example-loanbroker-credit-agency</include>
         <include>org.mule.examples:mule-example-scripting</include>
         <include>org.mule.examples:mule-example-stockquote</include>
-      </includes>
-      <!-- no XML -->
-      <excludes>
-          <exclude>xml-apis:xml-apis</exclude>
-          <exclude>xerces:xercesImpl</exclude>
-          <exclude>xerces:xml-serializer</exclude>
-          <exclude>xalan:xalan</exclude>
-      </excludes>
-    </dependencySet>
-
-    <dependencySet>
-      <outputDirectory>lib/user</outputDirectory>
-      <scope>test</scope>
-      <includes>
-        <include>org.mule.tests:mule-tests-core</include>
-        <include>org.mule.tests:mule-tests-functional</include>
       </includes>
       <!-- no XML -->
       <excludes>

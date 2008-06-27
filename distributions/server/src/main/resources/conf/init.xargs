@@ -184,13 +184,11 @@
 
 -istart opt/smack.osgi-${smackVersion}.jar
 -istart mule/mule-transport-xmpp-${muleCEVersion}.jar
-
-
 	      
 #############################################################
 # User Applications
 #############################################################
 -initlevel 9
 # Install but don't start the examples
--install user/mule-example-echo-${muleCEVersion}.jar
--install user/mule-example-hello-${muleCEVersion}.jar
+-install user/mule-example-echo.jar
+-install user/mule-example-hello.jar
