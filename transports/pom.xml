@@ -44,53 +44,6 @@
 
     <profiles>
         <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <Bundle-Category>Mule Transport</Bundle-Category>
-                                <Bundle-Activator>org.mule.module.osgi.TransportActivator</Bundle-Activator>
-                                <!-- The Bundle-Activator can't be imported from another bundle,
-                                    so we need to have a local copy of it. -->
-                                <Private-Package>
-                                    org.mule.module.osgi
-                                </Private-Package>
-                                <!-- Since org.mule.module.osgi is included as a private package,
-                                    we need to explicitly declare its imports (they aren't
-                                    automatically generated.
-                                    Note: manifest settings don't get merged with the parent, so
-                                    we need to repeat all settings from ../pom.xml here :-( -->
-                                <Import-Package>
-                                    org.mule.providers.service,
-                                    !com.ccg.net.ethernet,
-                                    !com.sun.activation.registries,
-                                    !com.sun.net.ssl,
-                                    !com.sun.net.ssl.internal.ssl,
-                                    !javax.crypto,
-                                    !javax.crypto.spec,
-                                    !javax.naming,
-                                    !javax.naming.spi,
-                                    !javax.net,
-                                    !javax.net.ssl,
-                                    !javax.security.auth,
-                                    !javax.security.cert,
-                                    !javax.xml.namespace,
-                                    !javax.xml.transform,
-                                    !org.xml.sax,
-                                    !sun.misc,
-                                    *
-                                </Import-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                 </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>jdk14</id>
             <activation>
                 <property>
