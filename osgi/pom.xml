@@ -27,7 +27,6 @@
         <module>geronimo-jms</module>
         <module>geronimo-jta</module>
         <module>groovy</module>
-        <module>jetty</module>
         <module>jug</module>
         <module>smack</module>
         <module>xapool</module>
