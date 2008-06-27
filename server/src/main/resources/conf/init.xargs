@@ -87,6 +87,7 @@
 # TODO MULE-1947
 -istart opt/commons-cli.osgi-${commonsCliVersion}.jar
 -istart opt/commons-io.osgi-${commonsIoVersion}.jar
+-istart opt/commons-jxpath.osgi-${commonsJxpathVersion}.jar
 -istart opt/commons-lang.osgi-${commonsLangVersion}.jar
 -istart opt/commons-pool-${commonsPoolVersion}.jar
 -istart opt/com.springsource.javax.activation-${javaActivationVersion}.jar
@@ -128,8 +129,6 @@
 -istart mule/mule-transport-stdio-${muleCEVersion}.jar
 
 -istart opt/org.mortbay.jetty.osgi-${jettyVersion}.jar
-# Already listed above
-#-istart opt/com.springsource.javax.servlet-${javaServletVersion}.jar
 -istart opt/com.springsource.org.apache.commons.httpclient-${commonsHttpClientVersion}.jar
 -istart opt/com.springsource.org.apache.commons.codec-${commonsCodecVersion}.jar
 -istart mule/mule-transport-http-${muleCEVersion}.jar
@@ -147,8 +146,6 @@
 -istart mule/mule-transport-jms-${muleCEVersion}.jar
 
 -istart opt/com.springsource.javax.xml.rpc-${javaXmlRpcVersion}.jar
-# Already listed above
-#-istart opt/com.springsource.javax.xml.soap-${javaXmlSoapVersion}.jar
 -istart opt/com.springsource.org.apache.commons.discovery-${commonsDiscoveryVersion}.jar
 -istart opt/com.springsource.org.apache.axis-${axisVersion}.jar
 -istart mule/mule-transport-axis-${muleCEVersion}.jar
@@ -158,8 +155,8 @@
 -istart opt/com.springsource.org.quartz-${quartzVersion}.jar
 -istart mule/mule-transport-quartz-${muleCEVersion}.jar
 
-#-istart opt/cxf-libs.osgi-${cxfVersion}.jar
-#-istart mule/mule-transport-cxf-${muleCEVersion}.jar
+-istart opt/cxf-libs.osgi-${cxfVersion}.jar
+-istart mule/mule-transport-cxf-${muleCEVersion}.jar
 
 -istart mule/mule-transport-rmi-${muleCEVersion}.jar
 
@@ -177,7 +174,8 @@
 -istart opt/xapool.osgi-${xaPoolVersion}.jar
 -istart mule/mule-transport-jdbc-${muleCEVersion}.jar
 
-#-istart mule/mule-transport-jbpm-${muleCEVersion}.jar
+-istart opt/jbpm-libs.osgi-${jbpmVersion}.jar
+-istart mule/mule-transport-jbpm-${muleCEVersion}.jar
 
 -istart mule/mule-transport-udp-${muleCEVersion}.jar
 -istart mule/mule-transport-multicast-${muleCEVersion}.jar
