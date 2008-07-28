@@ -27,6 +27,7 @@
         <module>geronimo-jms</module>
         <module>geronimo-jta</module>
         <module>groovy</module>
+        <module>jbpm-libs</module>
         <module>jug</module>
         <module>smack</module>
         <module>xapool</module>
