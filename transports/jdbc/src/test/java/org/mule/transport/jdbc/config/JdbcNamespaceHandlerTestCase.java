@@ -11,7 +11,10 @@ package org.mule.transport.jdbc.config;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transaction.MuleTransactionConfig;
+import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.jdbc.JdbcConnector;
+import org.mule.transport.jdbc.JdbcTransactionFactory;
 import org.mule.transport.jdbc.test.TestDataSource;
 
 
@@ -20,6 +23,7 @@ import org.mule.transport.jdbc.test.TestDataSource;
  */
 public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
 {
+    
     protected String getConfigResources()
     {
         return "jdbc-namespace-config.xml";
@@ -80,4 +84,27 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         //Does not exist on either
         assertNull(c.getQuery(testJdbcEndpoint, "getTest4"));
     }
+    
+    public void testEndpointWithTransaction() throws Exception
+    {
+        ImmutableEndpoint endpoint = muleContext.getRegistry().
+            lookupEndpointBuilder("endpointWithTransaction").buildInboundEndpoint();
+        assertNotNull(endpoint);
+        assertEquals(JdbcTransactionFactory.class, 
+            endpoint.getTransactionConfig().getFactory().getClass());
+        assertEquals(MuleTransactionConfig.ACTION_NONE, 
+            endpoint.getTransactionConfig().getAction());
+    }
+    
+    public void testEndpointWithXaTransaction() throws Exception
+    {
+        ImmutableEndpoint endpoint = muleContext.getRegistry().
+            lookupEndpointBuilder("endpointWithXaTransaction").buildInboundEndpoint();
+        assertNotNull(endpoint);
+        assertEquals(XaTransactionFactory.class, 
+            endpoint.getTransactionConfig().getFactory().getClass());
+        assertEquals(MuleTransactionConfig.ACTION_ALWAYS_BEGIN, 
+            endpoint.getTransactionConfig().getAction());
+    }
+
 }

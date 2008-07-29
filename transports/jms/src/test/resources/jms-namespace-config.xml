@@ -69,4 +69,12 @@
         <custom-transaction factory-ref="txFactory"/>
     </jms:endpoint>
 
+    <jms:endpoint name="endpoint4" queue="blub" connector-ref="jmsConnectorDefaults">
+        <xa-transaction action="ALWAYS_JOIN"/>
+    </jms:endpoint>
+    
+    <!-- test the deprecated endpoint specific xa-transaction element. Remove in Mule 2.1 -->
+    <jms:endpoint name="endpoint5" queue="blurb" connector-ref="jmsConnectorDefaults">
+        <jms:xa-transaction action="ALWAYS_BEGIN"/>
+    </jms:endpoint>
 </mule>

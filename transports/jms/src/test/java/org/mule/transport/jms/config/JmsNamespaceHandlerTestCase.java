@@ -16,6 +16,8 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
+import org.mule.transaction.MuleTransactionConfig;
+import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.jms.DefaultRedeliveryHandler;
 import org.mule.transport.jms.DefaultRedeliveryHandlerFactory;
 import org.mule.transport.jms.JmsConnector;
@@ -156,5 +158,24 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(factory);
         assertEquals("foo", factory.getValue());
     }
+    
+    public void testXaTransactions() throws Exception
+    {
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("endpoint4").buildInboundEndpoint();
+        assertNotNull(endpoint);
+        assertEquals(XaTransactionFactory.class,
+            endpoint.getTransactionConfig().getFactory().getClass());
+        assertEquals(MuleTransactionConfig.ACTION_ALWAYS_JOIN, endpoint.getTransactionConfig().getAction());
+    }
+    
+    public void testEndpointSpecificXaTransactions() throws Exception
+    {
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("endpoint5").buildInboundEndpoint();
+        assertNotNull(endpoint);
+        assertEquals(XaTransactionFactory.class,
+            endpoint.getTransactionConfig().getFactory().getClass());
+        assertEquals(MuleTransactionConfig.ACTION_ALWAYS_BEGIN, endpoint.getTransactionConfig().getAction());
+    }
+
 
 }

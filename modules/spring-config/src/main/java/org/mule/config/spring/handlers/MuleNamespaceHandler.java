@@ -10,8 +10,6 @@
 package org.mule.config.spring.handlers;
 
 import org.mule.DefaultExceptionStrategy;
-import org.mule.util.store.InMemoryObjectStore;
-import org.mule.util.store.TextFileObjectStore;
 import org.mule.api.config.MuleProperties;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
@@ -118,6 +116,7 @@ import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.service.DefaultServiceExceptionStrategy;
+import org.mule.transaction.XaTransactionFactory;
 import org.mule.transaction.lookup.GenericTransactionManagerLookupFactory;
 import org.mule.transaction.lookup.JBossTransactionManagerLookupFactory;
 import org.mule.transaction.lookup.JRunTransactionManagerLookupFactory;
@@ -144,6 +143,8 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.util.store.InMemoryObjectStore;
+import org.mule.util.store.TextFileObjectStore;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -234,6 +235,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("inbound-endpoint", new GenericEndpointDefinitionParser(InboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("outbound-endpoint", new GenericEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
+        registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));
 
         // Models
         registerBeanDefinitionParser("model", new ModelDefinitionParser());

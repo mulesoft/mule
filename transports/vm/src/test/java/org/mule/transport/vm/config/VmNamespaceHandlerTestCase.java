@@ -15,6 +15,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.QueueProfile;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
+import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.vm.VMConnector;
 
 
@@ -105,6 +106,17 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         TestTransactionFactory factory = (TestTransactionFactory) endpoint.getTransactionConfig().getFactory();
         assertNotNull(factory);
         assertEquals("foo", factory.getValue());
+    }
+
+    public void testXaTransaction() throws Exception
+    {
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("xaTx").buildInboundEndpoint();
+        assertNotNull(endpoint);
+        
+        TransactionConfig txConfig = endpoint.getTransactionConfig();
+        assertNotNull(txConfig);
+        assertEquals(TransactionConfig.ACTION_ALWAYS_JOIN, txConfig.getAction());
+        assertEquals(XaTransactionFactory.class, txConfig.getFactory().getClass());
     }
 
 }

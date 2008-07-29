@@ -29,4 +29,8 @@
     <vm:endpoint path="bar" name="customTx" connector-ref="vmConnectorDefaults">
         <custom-transaction action="JOIN_IF_POSSIBLE" factory-ref="txFactory"/>
     </vm:endpoint>
+    
+    <vm:endpoint path="baz" name="xaTx" connector-ref="vmConnectorDefaults">
+        <xa-transaction action="ALWAYS_JOIN"/>
+    </vm:endpoint>
 </mule>

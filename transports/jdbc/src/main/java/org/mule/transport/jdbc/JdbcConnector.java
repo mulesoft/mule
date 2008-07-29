@@ -22,6 +22,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
+import org.mule.transport.jdbc.xa.DataSourceWrapper;
 import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.sql.Connection;
@@ -31,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
+import javax.sql.XADataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
@@ -341,7 +343,14 @@ public class JdbcConnector extends AbstractConnector
 
     public void setDataSource(DataSource dataSource)
     {
-        this.dataSource = dataSource;
+        if (dataSource instanceof XADataSource)
+        {
+            this.dataSource = new DataSourceWrapper((XADataSource) dataSource); 
+        }
+        else
+        {
+            this.dataSource = dataSource;
+        }
     }
 
     public ResultSetHandler getResultSetHandler()

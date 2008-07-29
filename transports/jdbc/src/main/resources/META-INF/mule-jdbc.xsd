@@ -25,8 +25,7 @@
             </xsd:appinfo>
 	</xsd:annotation>
 
-	<xsd:element name="connector" type="jdbcConnectorType"
-		substitutionGroup="mule:abstract-connector"/>
+	<xsd:element name="connector" type="jdbcConnectorType" substitutionGroup="mule:abstract-connector"/>
 	
 	<xsd:complexType name="jdbcConnectorType">
 		<xsd:annotation>
@@ -88,8 +87,8 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 	
-	<xsd:element name="inbound-endpoint" type="inboundEndpointType"
-		substitutionGroup="mule:abstract-inbound-endpoint">
+	<xsd:element name="inbound-endpoint" type="inboundEndpointType" 
+        substitutionGroup="mule:abstract-inbound-endpoint">
 		<xsd:annotation>
 			<xsd:documentation>Receives or fetches data from a database. You can reference SQL select statements or call stored procedures on inbound endpoints. Statements on the inbound endpoint get
 				invoked periodically according to the pollingInterval. Statements that contain an insert, update, or delete are not allowed.
@@ -98,7 +97,7 @@
 	</xsd:element>
 	<xsd:complexType name="inboundEndpointType">
 		<xsd:complexContent>
-			<xsd:extension base="mule:inboundEndpointType">
+			<xsd:extension base="mule:inboundEndpointWithXaType">
         		<xsd:sequence>
                     <xsd:element ref="abstract-query" minOccurs="0" maxOccurs="unbounded"/>
         		</xsd:sequence>
@@ -116,7 +115,7 @@
 	</xsd:element>
 	<xsd:complexType name="outboundEndpointType">
 		<xsd:complexContent>
-			<xsd:extension base="mule:outboundEndpointType">
+			<xsd:extension base="mule:outboundEndpointWithXaType">
         		<xsd:sequence>
                     <xsd:element ref="abstract-query" minOccurs="0" maxOccurs="unbounded"/>
         		</xsd:sequence>
@@ -129,7 +128,7 @@
 		substitutionGroup="mule:abstract-global-endpoint"/>
 	<xsd:complexType name="globalEndpointType">
 		<xsd:complexContent>
-			<xsd:extension base="mule:globalEndpointType">
+			<xsd:extension base="mule:globalEndpointWithXaType">
         		<xsd:sequence>
                     <xsd:element ref="abstract-query" minOccurs="0" maxOccurs="unbounded"/>
         		</xsd:sequence>

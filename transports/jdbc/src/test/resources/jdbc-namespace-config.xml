@@ -30,6 +30,14 @@
         <jdbc:query key="getTest3" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL" />
     </jdbc:endpoint>
 
+    <jdbc:endpoint name="endpointWithTransaction" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
+        <jdbc:transaction action="NONE"/>
+    </jdbc:endpoint>
+    
+    <jdbc:endpoint name="endpointWithXaTransaction" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
+        <xa-transaction action="ALWAYS_BEGIN"/>
+    </jdbc:endpoint>
+    
     <spring:bean id="testDS1" class="org.mule.transport.jdbc.test.TestDataSource" />
 
     <spring:beans>

@@ -1342,6 +1342,15 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+    <xsd:element name="abstract-xa-transaction" abstract="true" type="abstractTransactionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for XA transaction elements.
+                XA Transactions allow a series of operations to be grouped together spanning different
+                transports, e.g. JMS and JDBC.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="abstractTransactionType">
         <xsd:attribute name="action">
             <xsd:annotation>
@@ -1413,6 +1422,19 @@
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="xa-transaction" type="xaTransactionType" substitutionGroup="abstract-transaction">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allow access to XA transactions.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="xaTransactionType">
+        <xsd:complexContent>
+            <xsd:extension base="baseTransactionType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -1559,6 +1581,15 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    <!-- extend this type for endpoints that support XA transactions -->
+    <xsd:complexType name="globalEndpointWithXaType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractGlobalEndpointType">
+                <xsd:group ref="defaultXaEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="abstract-inbound-endpoint">
         <xsd:annotation>
@@ -1574,6 +1605,15 @@
         <xsd:complexContent>
             <xsd:extension base="abstractInboundEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <!-- extend this type for endpoints that support XA transactions -->
+    <xsd:complexType name="inboundEndpointWithXaType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInboundEndpointType">
+                <xsd:group ref="defaultXaEndpointElements"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -1597,6 +1637,14 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    <xsd:complexType name="outboundEndpointWithXaType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractOutboundEndpointType">
+                <xsd:group ref="defaultXaEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <!-- these include option/repeats - should be embedded once -->
     <xsd:group name="defaultEndpointElements">
@@ -1604,6 +1652,18 @@
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                 <xsd:group ref="endpointTransformers"/>
                 <xsd:element ref="abstract-transaction" minOccurs="0"/>
+                <xsd:element ref="abstract-filter" minOccurs="0"/>
+                <xsd:element ref="abstract-security-filter" minOccurs="0"/>
+                <xsd:group ref="propertiesGroup"/>
+            </xsd:sequence>
+        </xsd:sequence>
+    </xsd:group>
+    <xsd:group name="defaultXaEndpointElements">
+        <xsd:sequence>
+            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                <xsd:group ref="endpointTransformers"/>
+                <xsd:element ref="abstract-transaction" minOccurs="0"/>
+                <xsd:element ref="abstract-xa-transaction" minOccurs="0"/>
                 <xsd:element ref="abstract-filter" minOccurs="0"/>
                 <xsd:element ref="abstract-security-filter" minOccurs="0"/>
                 <xsd:group ref="propertiesGroup"/>

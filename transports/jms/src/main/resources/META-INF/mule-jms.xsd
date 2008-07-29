@@ -94,6 +94,9 @@
  
     <xsd:element name="transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
     <xsd:element name="client-ack-transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
+    <!-- 
+        This element is deprecated in favor of the global xa-transaction element. Remove in Mule 2.1 
+    -->
     <xsd:element name="xa-transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
 
     <xsd:element name="jmsmessage-to-object-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
@@ -159,6 +162,7 @@
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                 <xsd:group ref="mule:endpointTransformers"/>
                 <xsd:element ref="mule:abstract-transaction" minOccurs="0"/>
+                <xsd:element ref="mule:abstract-xa-transaction" minOccurs="0"/>
                 <xsd:choice>
                     <xsd:element ref="mule:abstract-filter" minOccurs="0"/>
                     <xsd:element name="selector" type="jmsSelectorFilter" minOccurs="0"/>

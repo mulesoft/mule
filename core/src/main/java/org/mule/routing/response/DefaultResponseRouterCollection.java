@@ -75,9 +75,9 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
         MuleMessage result = null;
         if (routers.size() == 0)
         {
-            if(logger.isDebugEnabled())
+            if(logger.isWarnEnabled())
             {
-                logger.error("There are no routers configured on the response router. Returning the current message");
+                logger.warn("There are no routers configured on the response router. Returning the current message");
             }
             result = message;
         }

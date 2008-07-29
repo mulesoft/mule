@@ -688,9 +688,8 @@ public abstract class AbstractService implements Service
         {
             endpoint = (InboundEndpoint) it.next();
             AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-            MessageReceiver receiver = connector.getReceiver(this,
-                    endpoint);
-            if (receiver != null && connector.isStarted())
+            MessageReceiver receiver = connector.getReceiver(this, endpoint);
+            if (receiver != null && connector.isConnected())
             {
                 try
                 {
@@ -700,8 +699,7 @@ public abstract class AbstractService implements Service
                 {
                     throw new ModelException(
                             MessageFactory.createStaticMessage("Failed to connect listener "
-                                    + receiver + " for endpoint " + endpoint.getName()),
-                            e);
+                                    + receiver + " for endpoint " + endpoint.getName()), e);
                 }
             }
         }

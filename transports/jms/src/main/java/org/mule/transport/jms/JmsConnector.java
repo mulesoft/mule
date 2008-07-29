@@ -21,6 +21,7 @@ import org.mule.api.lifecycle.StartException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
+import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.ExceptionHelper;
@@ -911,5 +912,10 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
    public boolean isHonorQosHeaders()
    {
        return honorQosHeaders;
+   }
+   
+   public ConnectionStrategy getConnectionStrategy()
+   {
+       return connectionStrategy;
    }
 }

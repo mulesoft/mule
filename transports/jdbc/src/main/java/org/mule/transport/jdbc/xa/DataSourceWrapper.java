@@ -31,7 +31,16 @@ public class DataSourceWrapper implements DataSource
         super();
     }
 
+    /**
+     * @deprecated this method is only kept for API compatability with 
+     * JdbcTransactionalXaFunctionalTestCase. Remove if that test is refactored.
+     */
     public DataSourceWrapper(XADataSource xaDataSource, TransactionManager tm)
+    {
+        this(xaDataSource);
+    }
+    
+    public DataSourceWrapper(XADataSource xaDataSource)
     {
         this.xaDataSource = xaDataSource;
     }

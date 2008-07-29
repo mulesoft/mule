@@ -39,6 +39,7 @@ import javax.resource.spi.work.WorkException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -144,11 +145,16 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         private volatile Session session;
         private volatile MessageConsumer consumer;
+        private volatile boolean startOnConnect = false;
 
         protected void doConnect() throws Exception
         {
             subLogger.debug("SUB doConnect()");
             createConsumer();
+            if (startOnConnect)
+            {
+                doStart();
+            }
         }
 
         protected void doDisconnect() throws Exception
@@ -167,8 +173,19 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         protected void doStart() throws MuleException
         {
             try
-            {
-                consumer.setMessageListener(this);
+            { 
+                // If the consumer is null it means that the connection strategy is being
+                // run in a separate thread (doThreading=true), and hasn't managed to connect 
+                // yet. This doStart will then be called from doConnect.
+                if (consumer == null)
+                {
+                    startOnConnect = true;
+                }
+                else
+                {
+                    startOnConnect = false;
+                    consumer.setMessageListener(this);
+                }
             }
             catch (JMSException e)
             {
@@ -200,13 +217,13 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             try
             {
                 JmsSupport jmsSupport = jmsConnector.getJmsSupport();
+                boolean topic = jmsConnector.getTopicResolver().isTopic(endpoint, true);
+                
                 // Create session if none exists
                 if (session == null)
                 {
                     session = jmsConnector.getSession(endpoint);
                 }
-
-                boolean topic = jmsConnector.getTopicResolver().isTopic(endpoint, true);
 
                 // Create destination
                 Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(),

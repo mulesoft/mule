@@ -58,6 +58,8 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(JmsTransactionFactory.class));
         registerBeanDefinitionParser("client-ack-transaction", new TransactionDefinitionParser(JmsClientAcknowledgeTransactionFactory.class));
+        
+        // this is the legacy, transport specific xa-transaction element. Can be removed in Mule 2.1
         registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));        
 
         registerBeanDefinitionParser("jmsmessage-to-object-transformer", new TransformerDefinitionParser(JMSMessageToObject.class));
