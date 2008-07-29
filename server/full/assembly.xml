@@ -288,7 +288,6 @@ Assembly descriptor for the full Mule distribution.
             <include>stockquote-rest-config.xml</include>
         </includes>
     </fileSet>
-  </fileSets>
 
     <!-- Insert version numbers into OSGi startup file -->
     <files>
@@ -301,6 +300,27 @@ Assembly descriptor for the full Mule distribution.
         </file>
     </files>
 
+    <!--
+    ============================
+      Mule Examples: Bookstore
+    ============================
+    -->
+
+    <fileSet>
+        <directory>../../../examples/bookstore/dist</directory>
+        <outputDirectory>examples/bookstore</outputDirectory>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/bookstore/dist</directory>
+        <outputDirectory>examples/bookstore</outputDirectory>
+        <fileMode>755</fileMode>
+        <includes>
+            <include>bookstore</include>
+            <include>bookstore.bat</include>
+        </includes>
+    </fileSet>
+
+  </fileSets>
     <!--
     ============================
         Libraries
@@ -356,6 +376,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-multicast</include>
         <include>org.mule.transports:mule-transport-quartz</include>
         <include>org.mule.transports:mule-transport-rmi</include>
+        <include>org.mule.transports:mule-transport-servlet</include>
         <include>org.mule.transports:mule-transport-soap</include>
         <include>org.mule.transports:mule-transport-ssl</include>
         <include>org.mule.transports:mule-transport-stdio</include>
@@ -410,6 +431,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.transports:mule-transport-multicast</exclude>
         <exclude>org.mule.transports:mule-transport-quartz</exclude>
         <exclude>org.mule.transports:mule-transport-rmi</exclude>
+        <exclude>org.mule.transports:mule-transport-servlet</exclude>
         <exclude>org.mule.transports:mule-transport-soap</exclude>
         <exclude>org.mule.transports:mule-transport-ssl</exclude>
         <exclude>org.mule.transports:mule-transport-stdio</exclude>
@@ -446,6 +468,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-loanbroker-credit-agency</exclude>
         <exclude>org.mule.examples:mule-example-scripting</exclude>
         <exclude>org.mule.examples:mule-example-stockquote</exclude>
+        <exclude>org.mule.examples:mule-example-bookstore</exclude>
         <!-- TODO The following exclusions shouldn't be necessary here if they are kept 
         out in their originating POMs, need to do some transitive dependency debugging
         to figure out who is dragging them into the distro. -->
@@ -506,6 +529,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.examples:mule-example-loanbroker-credit-agency</include>
         <include>org.mule.examples:mule-example-scripting</include>
         <include>org.mule.examples:mule-example-stockquote</include>
+        <include>org.mule.examples:mule-example-bookstore</include>
       </includes>
       <!-- no XML -->
       <excludes>

@@ -27,6 +27,7 @@ cryptix-pki-api-20050405
 cxf-api-2.0.6
 cxf-common-schemas-2.0.6
 cxf-common-utilities-2.0.6
+cxf-rt-bindings-http-2.0.6
 cxf-rt-bindings-soap-2.0.6
 cxf-rt-bindings-xml-2.0.6
 cxf-rt-core-2.0.6
@@ -51,8 +52,6 @@ jbpm-jpdl-3.2.2
 jcl104-over-slf4j-1.5.0
 jcr-1.0
 jdom-1.0
-jetty-6.1.9
-jetty-util-6.1.9
 jug-2.0.0-asl
 junit-3.8.2
 mail-1.4
@@ -85,6 +84,7 @@ mule-transport-jms
 mule-transport-multicast
 mule-transport-quartz
 mule-transport-rmi
+mule-transport-servlet
 mule-transport-soap
 mule-transport-ssl
 mule-transport-stdio
@@ -97,6 +97,7 @@ mx4j-remote-2.1.1
 mx4j-tools-2.1.1
 neethi-2.0.4
 ognl-2.7.2
+org.mortbay.jetty-5.1.12
 oro-2.0.7
 quartz-all-1.6.0
 retrotranslator-runtime-1.2.1
