@@ -49,8 +49,6 @@
             <artifactId>geronimo-servlet_2.5_spec</artifactId>
             <scope>provided</scope>
         </dependency>
-    </dependencies>
-    <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>

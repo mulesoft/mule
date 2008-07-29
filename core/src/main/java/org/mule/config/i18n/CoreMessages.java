@@ -1115,6 +1115,6 @@ public class CoreMessages extends MessageFactory
 
     public static Message failedToCreateProxyFor(Object target)
     {
-        return createMessage(BUNDLE_PATH, 270, target);
+        return factory.createMessage(BUNDLE_PATH, 270, target);
     }
 }
