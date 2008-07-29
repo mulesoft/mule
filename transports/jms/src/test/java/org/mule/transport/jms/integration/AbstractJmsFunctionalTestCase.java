@@ -260,7 +260,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         abstract protected void applyTransaction(Session session) throws JMSException;
     }
 
-    Scenario scenarioNoTx = new NonTransactedScenario();
+    protected Scenario scenarioNoTx = new NonTransactedScenario();
     class NonTransactedScenario extends AbstractScenario
     {
         public boolean isTransacted()
@@ -274,7 +274,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }        
     }
 
-    Scenario scenarioCommit = new ScenarioCommit();
+    protected Scenario scenarioCommit = new ScenarioCommit();
     class ScenarioCommit extends AbstractScenario
     {
         public boolean isTransacted()
@@ -288,7 +288,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }        
     }
 
-    Scenario scenarioRollback = new ScenarioRollback();
+    protected Scenario scenarioRollback = new ScenarioRollback();
     class ScenarioRollback extends AbstractScenario
     {
         public boolean isTransacted()
@@ -302,7 +302,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }        
     }
 
-    Scenario scenarioNotReceive = new ScenarioNotReceive();
+    protected Scenario scenarioNotReceive = new ScenarioNotReceive();
     class ScenarioNotReceive extends NonTransactedScenario
     {
         // @Override

@@ -54,7 +54,7 @@ public class MuleInvoker implements Invoker
             CxfMessageAdapter messageAdapter = (CxfMessageAdapter) receiver.getConnector().getMessageAdapter(
                 exchange.getInMessage());
 
-            if (!receiver.isBridge())
+            if (!receiver.isProxy())
             {
                 BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
                 Service svc = exchange.get(Service.class);

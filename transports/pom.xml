@@ -72,6 +72,7 @@
                 <module>multicast</module>
                 <module>quartz</module>
                 <module>rmi</module>
+                <module>servlet</module>
                 <module>soap</module>
                 <module>ssl</module>
                 <module>stdio</module>

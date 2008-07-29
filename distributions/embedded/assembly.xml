@@ -36,6 +36,7 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.transports:mule-transport-quartz</include>
         <include>org.mule.transports:mule-transport-rmi</include>
         <include>org.mule.transports:mule-transport-soap</include>
+        <include>org.mule.transports:mule-transport-servlet</include>
         <include>org.mule.transports:mule-transport-ssl</include>
         <include>org.mule.transports:mule-transport-stdio</include>
         <include>org.mule.transports:mule-transport-tcp</include>

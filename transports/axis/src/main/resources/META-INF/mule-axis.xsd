@@ -139,26 +139,10 @@
         <xsd:attribute name="soapAction" type="xsd:string"/>
         <xsd:attribute name="SOAPAction" type="xsd:string"/>
         <xsd:attribute name="serviceNamespace" type="xsd:string"/>
-        <xsd:attribute name="style">
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <!-- see org.apache.axis.constants.Style -->
-                    <xsd:enumeration value="RPC"/>
-                    <xsd:enumeration value="DOCUMENT"/>
-                    <xsd:enumeration value="MESSAGE"/>
-                    <xsd:enumeration value="WRAPPED"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
-        <xsd:attribute name="use">
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="ENCODED"/>
-                    <xsd:enumeration value="LITERAL"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
+        <xsd:attribute name="style" type="styleType"/>
+        <xsd:attribute name="use" type="useType"/>
     </xsd:attributeGroup>
+    
 
     <xsd:group name="inboundPropertyElements">
         <xsd:sequence>
@@ -189,40 +173,92 @@
                     <xsd:attribute name="interface" type="xsd:string"/>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="soap-method" minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="soap-method" type="soapMethodType"  minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:group>
+    
+    <xsd:complexType name="soapMethodType">
+        <xsd:sequence>
+            <xsd:element name="soap-parameter" minOccurs="0" maxOccurs="unbounded">
                 <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="soap-parameter" minOccurs="0" maxOccurs="unbounded">
-                            <xsd:complexType>
-                                <xsd:attribute name="parameter" type="xsd:string" use="required"/>
-                                <xsd:attribute name="type" type="xsd:string" use="required"/>
-                                <xsd:attribute name="mode">
-                                    <xsd:simpleType>
-                                        <xsd:restriction base="xsd:NMTOKEN">
-                                            <xsd:enumeration value="IN"/>
-                                            <xsd:enumeration value="OUT"/>
-                                            <xsd:enumeration value="INOUT"/>
-                                        </xsd:restriction>
-                                    </xsd:simpleType>
-                                </xsd:attribute>
-                            </xsd:complexType>
-                        </xsd:element>
-                        <xsd:element name="soap-return" minOccurs="0">
-                            <xsd:complexType>
-                                <xsd:attribute name="type" type="xsd:string" use="required"/>
-                            </xsd:complexType>
-                        </xsd:element>
-                    </xsd:sequence>
-                    <xsd:attribute name="method" type="xsd:string" use="required"/>
+                    <xsd:attribute name="parameter" type="xsd:string" use="required" />
+                    <xsd:attribute name="type" type="xsd:string" use="required" />
+                    <xsd:attribute name="mode">
+                        <xsd:simpleType>
+                            <xsd:restriction base="xsd:NMTOKEN">
+                                <xsd:enumeration value="IN" />
+                                <xsd:enumeration value="OUT" />
+                                <xsd:enumeration value="INOUT" />
+                            </xsd:restriction>
+                        </xsd:simpleType>
+                    </xsd:attribute>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="soap-return" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:attribute name="type" type="xsd:string" use="required" />
                 </xsd:complexType>
             </xsd:element>
         </xsd:sequence>
-    </xsd:group>
+        <xsd:attribute name="method" type="xsd:string" use="required" />
+    </xsd:complexType>
 
     <xsd:element name="bean-type">
         <xsd:complexType>
             <xsd:attribute name="interface" type="xsd:string"/>
         </xsd:complexType>
     </xsd:element>
+
+    <xsd:element name="wrapper-component" type="wrapperComponentType" substitutionGroup="mule:abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                The WebServiceWrapperComponent class allows you to send 
+                the result of a web service call to another endpoint. 
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="wrapperComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractComponentType">
+                <xsd:sequence>
+                    <xsd:element name="soap-method" type="soapMethodType"  minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="address" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Specifies the URL of the web service to call.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="addressFromMessage" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Specifies that the URL of the web service will be obtained from the message itself.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="style" type="styleType"/>
+                <xsd:attribute name="use" type="useType"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:simpleType name="styleType">
+        <xsd:restriction base="xsd:NMTOKEN">
+            <!-- see org.apache.axis.constants.Style -->
+            <xsd:enumeration value="RPC" />
+            <xsd:enumeration value="DOCUMENT" />
+            <xsd:enumeration value="MESSAGE" />
+            <xsd:enumeration value="WRAPPED" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="useType">
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="ENCODED" />
+            <xsd:enumeration value="LITERAL" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
 </xsd:schema>

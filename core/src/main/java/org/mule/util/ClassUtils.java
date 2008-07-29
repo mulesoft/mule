@@ -320,7 +320,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         }
         catch (ClassNotFoundException e)
         {
-            throw new IllegalStateException();
+            throw new IllegalStateException(e);
         }
     }
 

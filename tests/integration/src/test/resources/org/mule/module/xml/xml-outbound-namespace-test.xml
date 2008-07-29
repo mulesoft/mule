@@ -20,6 +20,7 @@
                 <mxml:message-splitter splitExpression="/expression" enableCorrelation="ALWAYS"
                                        externalSchemaLocation="external" honorSynchronicity="true"
                                        validateSchema="true">
+                    <outbound-endpoint address="test://test"/>
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:message-splitter>
             </outbound>
@@ -33,6 +34,7 @@
                 <mxml:round-robin-splitter splitExpression="/expression" enableCorrelation="IF_NOT_SET"
                                            externalSchemaLocation="external" honorSynchronicity="true"
                                            validateSchema="true" endpointFiltering="true">
+                    <outbound-endpoint address="test://test"/>
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:round-robin-splitter>
             </outbound>

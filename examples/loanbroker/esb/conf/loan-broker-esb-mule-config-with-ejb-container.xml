@@ -137,7 +137,6 @@
             <mule:service name="LenderGatewayService">
                 <mule:inbound>
                     <mule:inbound-endpoint ref="LenderGateway" />
-                    <mule:forwarding-router/>
                 </mule:inbound>
                 <mule:outbound>
                     <mule:chaining-router>
@@ -158,7 +157,6 @@
             <mule:service name="BankingGatewayService">
                 <mule:inbound>
                     <mule:inbound-endpoint ref="BankingGateway" />
-                    <mule:forwarding-router/>
                 </mule:inbound>
                 <mule:outbound>
                     <mule:static-recipient-list-router>

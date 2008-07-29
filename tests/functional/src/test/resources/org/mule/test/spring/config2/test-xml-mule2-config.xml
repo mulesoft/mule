@@ -216,6 +216,7 @@
                 <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
                 <mule:outbound>
                     <mule:filtering-router>
+                        <mule:outbound-endpoint address="test://msgInfoMappingTestComponent" name="msgInfoMappingTestComponent-Out"/>
                         <mule:expression-message-info-mapping messageIdExpression="${header:id}"
                                                               correlationIdExpression="${header:correlation}"/>
                     </mule:filtering-router>

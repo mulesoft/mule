@@ -11,7 +11,7 @@
     <global-property name="prop1" value="value1"/>
 
 
-    <context:property-placeholder location="org/mule/test/spring/test.properties"/>
+    <context:property-placeholder location="${systemProperty}/mule/test/spring/test.properties"/>
 
     <spring:bean name="props" class="org.mule.test.spring.MapHolder">
         <spring:property name="map">

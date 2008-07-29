@@ -25,7 +25,7 @@ public interface CxfConstants
     String SERVICE_INTERFACE = "serviceInterface";
     String CLIENT_PORT = "wsdlPort";
     String OPERATION = "operation";
-    String BRIDGE = "bridge";
+    String PROXY = "proxy";
     String SERVICE_CLASS = "serviceClass";
     String FEATURES = "features";
     String IN_INTERCEPTORS = "inInterceptors";

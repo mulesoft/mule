@@ -23,9 +23,9 @@ import java.util.Set;
 
 /**
  * An Entrypoint resolver that allows the user to set one or more acceptiple methd names to look for.
- * For each method reflection will be used to see if the method accepts the current payload types (
- * the results are cached to improve performance).
- * There has to be at least one method name set on this resolver
+ * For each method reflection will be used to see if the method accepts the current payload types 
+ * (the results are cached to improve performance). There has to be at least one method name set 
+ * on this resolver
  */
 public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
 {
@@ -69,7 +69,19 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
             if (method != null)
             {
                 addMethodByName(method, context);
-                break;
+                
+                // check if the current payload can be handled by this method
+                Class[] parameterTypes = method.getParameterTypes();
+                if (ClassUtils.compare(parameterTypes, classTypes, false))
+                {
+                    // we found a matching method, let's invoke it
+                    break;
+                }
+                else
+                {
+                    // zero out the reference to the method, it doesn't match
+                    method = null;
+                }
             }
         }
 
@@ -85,7 +97,7 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();
-        sb.append("ExplicitEntryPointResolver");
+        sb.append("ExplicitMethodEntryPointResolver");
         sb.append("{methods=").append(StringMessageUtils.toString(methods));
         sb.append("{transformFirst=").append(isTransformFirst());
         sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());

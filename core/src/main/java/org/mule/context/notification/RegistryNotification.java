@@ -14,8 +14,8 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.registry.Registry;
 
 /**
- * <code>RegistyNotification</code> is fired when an event such as an object being
- * registered in the Registry starting occurs. The payload of this event will always
+ * <code>RegistryNotification</code> is fired when an event such as a Registry
+ * being started occurs. The payload of this event will always
  * be a reference to the Registry ID.
  *
  * @see org.mule.api.registry.Registry

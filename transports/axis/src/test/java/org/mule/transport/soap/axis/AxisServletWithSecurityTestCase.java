@@ -14,17 +14,17 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.servlet.MuleReceiverServlet;
+import org.mule.transport.servlet.MuleReceiverServlet;
 
 import java.beans.ExceptionListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.mortbay.http.HttpContext;
+import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
-
+import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.util.InetAddrPort;
 
 public class AxisServletWithSecurityTestCase extends FunctionalTestCase
 {
@@ -32,22 +32,26 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
 
     private Server httpServer;
 
+    protected String getConfigResources()
+    {
+        return "axis-servlet-security-config.xml";
+    }
+
     // @Override
     protected void doSetUp() throws Exception
     {
         httpServer = new Server();
-        SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(HTTP_PORT);
-        httpServer.addConnector(connector);
+        SocketListener socketListener = new SocketListener(new InetAddrPort(HTTP_PORT));
+        httpServer.addListener(socketListener);
 
-        Context context = new Context();
-        context.setContextPath("/");
+        HttpContext context = httpServer.getContext("/");
+        context.setRequestLog(null);
 
-        ServletHolder holder = new ServletHolder();
-        holder.setServlet(new MuleReceiverServlet());
-        context.addServlet(holder, "/services/*");
+        ServletHandler handler = new ServletHandler();
+        handler.addServlet("MuleReceiverServlet", "/services/*",
+            MuleReceiverServlet.class.getName());
 
-        httpServer.addHandler(context);
+        context.addHandler(handler);
         httpServer.start();
     }
 
@@ -56,7 +60,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
     {
         if (httpServer != null)
         {
-            httpServer.stop();
+            httpServer.stop(false);
             httpServer.destroy();
         }
     }
@@ -78,10 +82,5 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
         
         assertNotNull(result);
         // assertTrue(result.getPayload() instanceof byte[]);
-    }
-   
-    protected String getConfigResources()
-    {
-        return "axis-servlet-security-config.xml";
     }
 }

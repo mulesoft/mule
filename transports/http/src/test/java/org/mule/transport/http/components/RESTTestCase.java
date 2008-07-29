@@ -20,7 +20,7 @@ public class RESTTestCase extends FunctionalTestCase
     
     protected String getConfigResources()
     {
-        return "rest-functional-test.xml";
+        return "/rest-functional-test.xml";
     }
     
     public void testRest1ParamPost() throws Exception

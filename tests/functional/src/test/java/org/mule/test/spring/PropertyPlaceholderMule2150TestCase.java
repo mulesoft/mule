@@ -17,6 +17,7 @@ public class PropertyPlaceholderMule2150TestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
+        System.getProperties().put("systemProperty", "org");
         return "org/mule/test/spring/property-placeholder-mule-2150-test.xml";
     }
 

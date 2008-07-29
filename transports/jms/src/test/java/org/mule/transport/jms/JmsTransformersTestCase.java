@@ -10,6 +10,15 @@
 
 package org.mule.transport.jms;
 
+import org.mule.RequestContext;
+import org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase;
+import org.mule.transport.jms.transformers.AbstractJmsTransformer;
+import org.mule.transport.jms.transformers.JMSMessageToObject;
+import org.mule.transport.jms.transformers.ObjectToJMSMessage;
+import org.mule.util.FileUtils;
+import org.mule.util.compression.CompressionStrategy;
+import org.mule.util.compression.GZipCompression;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,14 +36,6 @@ import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.mule.RequestContext;
-import org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase;
-import org.mule.transport.jms.transformers.AbstractJmsTransformer;
-import org.mule.transport.jms.transformers.JMSMessageToObject;
-import org.mule.transport.jms.transformers.ObjectToJMSMessage;
-import org.mule.util.FileUtils;
-import org.mule.util.compression.CompressionStrategy;
-import org.mule.util.compression.GZipCompression;
 
 /**
  * <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations.
@@ -150,11 +151,11 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         RequestContext.setEvent(getTestEvent("test"));
 
         String text = "Test Text";
-        Integer i = 97823;
-        Double d = 0923.2143E124;
+        int i = 97823;
+        double d = 0923.2143E124;
         List list = new ArrayList();
-        list.add(i);
-        list.add(d);
+        list.add(new Integer(i));
+        list.add(new Double(d));
         list.add(text);
 
         StreamMessage message = session.createStreamMessage();
@@ -170,8 +171,8 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         String newText = (String) ((Vector) result).get(0);
         Integer newI = (Integer) ((Vector) result).get(1);
         Double newD = (Double) ((Vector) result).get(2);
-        assertEquals(i, newI);
-        assertEquals(d, newD);
+        assertEquals(i, newI.intValue());
+        assertEquals(new Double(d), newD);
         assertEquals(text, newText);
     }
     

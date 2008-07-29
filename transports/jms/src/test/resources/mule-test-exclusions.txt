@@ -1,3 +1,4 @@
 #
 # Test cases listed in this file are not run.
 #
+org.mule.transport.jms.issues.JmsReconnectionFunctionalMule1720TestCase

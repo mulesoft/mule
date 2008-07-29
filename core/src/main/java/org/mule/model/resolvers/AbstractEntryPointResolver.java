@@ -69,7 +69,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
     {
         StringBuffer key = new StringBuffer(24).append(context.getService().getName())
                 .append(".").append(methodName);
-        Method method = (Method) methodCache.get(key);
+        Method method = (Method) methodCache.get(key.toString());
         return method;
     }
 
@@ -77,7 +77,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
     {
         StringBuffer key = new StringBuffer(24).append(context.getService().getName())
                 .append(".").append(method.getName());
-        Method previousMethod = (Method) methodCache.putIfAbsent(key, method);
+        Method previousMethod = (Method) methodCache.putIfAbsent(key.toString(), method);
         return (previousMethod != null ? previousMethod : method);
     }
 

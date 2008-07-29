@@ -17,6 +17,7 @@ import org.mule.config.spring.parsers.assembly.configuration.PropertyConfigurati
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.processors.AttributeConcatenation;
+import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.properties.ElementInNestedMapDefinitionParser;
 import org.mule.config.spring.parsers.specific.properties.ListPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.properties.NestedListDefinitionParser;
@@ -25,6 +26,7 @@ import org.mule.config.spring.parsers.specific.properties.SimplePropertyDefiniti
 import org.mule.transport.soap.SoapConstants;
 import org.mule.transport.soap.axis.AxisConnector;
 import org.mule.transport.soap.axis.AxisMessageReceiver;
+import org.mule.transport.soap.axis.component.WebServiceWrapperComponent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,6 +70,8 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("bean-type",
                 new ParentContextDefinitionParser("connector", new ChildListEntryDefinitionParser(AxisMessageReceiver.BEAN_TYPES, "interface"))
                         .otherwise(new NestedListDefinitionParser(PROPERTIES, AxisMessageReceiver.BEAN_TYPES, "interface")));
+        
+        registerBeanDefinitionParser("wrapper-component", new ComponentDefinitionParser(WebServiceWrapperComponent.class));
     }
 
     private static class SoapParameterDefinitionParser extends ListPropertyDefinitionParser

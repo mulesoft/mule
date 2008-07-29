@@ -86,6 +86,7 @@
                 <module>webapp</module>
                 <!-- Uses a Groovy script with JDK 5 syntax -->
                 <module>scripting</module>
+                <module>bookstore</module>
             </modules>
         </profile>
     </profiles>

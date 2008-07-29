@@ -120,7 +120,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         ((ClientImpl)wrapper.getClient()).setSynchronousTimeout(event.getTimeout());
-        if (!wrapper.isProxy())
+        if (!wrapper.isClientProxyAvailable())
         {
             return doSendWithClient(event);
         }
@@ -145,10 +145,10 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
             props.put(org.apache.cxf.binding.soap.SoapConstants.SOAP_ACTION, soapAction);
         }
         
-        BindingProvider bp = wrapper.getProxy();
+        BindingProvider bp = wrapper.getClientProxy();
         bp.getRequestContext().putAll(props);
         
-        Object response = method.invoke(wrapper.getProxy(), getArgs(event));
+        Object response = method.invoke(wrapper.getClientProxy(), getArgs(event));
         
         // TODO: handle holders
         

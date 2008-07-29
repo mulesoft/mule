@@ -74,6 +74,11 @@
             <artifactId>mule-example-stockquote</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-bookstore</artifactId>
+            <version>${version}</version>
+        </dependency>
         <!-- <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-webapp</artifactId>

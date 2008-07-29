@@ -11,8 +11,10 @@
 package org.mule.transport.cxf.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.transport.cxf.CxfConnector;
 import org.mule.transport.cxf.CxfConstants;
+import org.mule.transport.cxf.component.WebServiceWrapperComponent;
 
 public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -39,5 +41,7 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser(CxfConstants.OUT_FAULT_INTERCEPTORS, new EndpointChildDefinitionParser(
             CxfConstants.OUT_FAULT_INTERCEPTORS));
+        
+        registerBeanDefinitionParser("wrapper-component", new ComponentDefinitionParser(WebServiceWrapperComponent.class));
     }
 }

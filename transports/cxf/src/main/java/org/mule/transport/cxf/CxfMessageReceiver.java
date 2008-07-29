@@ -11,6 +11,7 @@
 package org.mule.transport.cxf;
 
 import org.mule.api.MuleException;
+import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
@@ -21,11 +22,13 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceAware;
 import org.mule.api.transport.Connector;
+import org.mule.component.simple.BridgeComponent;
+import org.mule.component.simple.PassThroughComponent;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.cxf.i18n.CxfMessages;
 import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
-import org.mule.transport.cxf.support.ProviderService;
+import org.mule.transport.cxf.support.ProxyService;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
@@ -36,11 +39,12 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.databinding.stax.StaxDataBinding;
+import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ServerFactoryBean;
@@ -58,7 +62,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
 
     protected CxfConnector connector;
     private Server server;
-    private boolean bridge;
+    private boolean proxy;
 
     public CxfMessageReceiver(Connector Connector, Service service, InboundEndpoint Endpoint)
         throws CreateException
@@ -77,7 +81,6 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             String wsdlUrl = (String) endpointProps.get(CxfConstants.WSDL_LOCATION);
             String bindingId = (String) endpointProps.get(CxfConstants.BINDING_ID);
             String frontend = (String) endpointProps.get(CxfConstants.FRONTEND);
-            String bridgeProp = (String) endpointProps.get(CxfConstants.BRIDGE);
             String serviceClassName = (String) endpointProps.get(CxfConstants.SERVICE_CLASS);
             String mtomEnabled = (String) endpointProps.get(CxfConstants.MTOM_ENABLED);
             List<DataBinding> databinding = (List<DataBinding>) endpointProps.get(CxfConstants.DATA_BINDING);
@@ -86,12 +89,15 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             Class<?> svcCls;
             Class<?> targetCls;
             
-            bridge = BooleanUtils.toBoolean(bridgeProp);
-            if (bridge)
+            Component component = service.getComponent();
+            proxy = component instanceof BridgeComponent
+                || component instanceof PassThroughComponent;
+            
+            if (proxy)
             {
-                svcCls = ProviderService.class;
+                svcCls = ProxyService.class;
                 targetCls = svcCls;
-                frontend = "jaxws";
+                frontend = "simple";
             }
             else 
             {
@@ -126,7 +132,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                 throw new CreateException(CxfMessages.invalidFrontend(frontend), this);
             }
 
-            if (!bridge)
+            if (!proxy)
             {
                 if (databinding != null && databinding.size() > 0)
                 {
@@ -143,7 +149,12 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                     sfb.setServiceBean(((JavaComponent) service.getComponent()).getObjectFactory().getInstance());
                 }
             }
-            
+            else
+            {
+                sfb.setDataBinding(new StaxDataBinding());
+                sfb.getFeatures().add(new StaxDataBindingFeature());
+            }
+           
             // The binding - i.e. SOAP, XML, HTTP Binding, etc
             if (bindingId != null)
             {
@@ -152,7 +163,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             
             if (features != null) 
             {
-                sfb.setFeatures(features);
+                sfb.getFeatures().addAll(features);
             }
             
             if (mtomEnabled != null)
@@ -361,9 +372,9 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         return server;
     }
 
-    public boolean isBridge()
+    public boolean isProxy()
     {
-        return bridge;
+        return proxy;
     }
 
 }

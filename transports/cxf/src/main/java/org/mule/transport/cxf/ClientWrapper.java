@@ -20,6 +20,7 @@ import org.mule.transport.cxf.i18n.CxfMessages;
 import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
 import org.mule.transport.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
+import org.mule.transport.cxf.support.ProxyService;
 import org.mule.transport.soap.i18n.SoapMessages;
 
 import java.lang.reflect.Constructor;
@@ -34,17 +35,24 @@ import javax.xml.ws.Service;
 import javax.xml.ws.WebEndpoint;
 import javax.xml.ws.WebServiceClient;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.Binding;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.databinding.stax.StaxDataBinding;
+import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -65,25 +73,34 @@ public class ClientWrapper
 
     // If we have a proxy we're going to invoke it directly
     // Since the JAX-WS proxy does extra special things for us.
-    protected BindingProvider proxy;
+    protected BindingProvider clientProxy;
     protected Method defaultMethod;
 
+    protected boolean proxy;
+    
     public Client getClient()
     {
         return client;
     }
 
-    public BindingProvider getProxy()
+    public BindingProvider getClientProxy()
     {
-        return proxy;
+        return clientProxy;
     }
 
+    @SuppressWarnings("unchecked")
     public void initialize() throws Exception
     {
         String clientClass = (String) endpoint.getProperty(CxfConstants.CLIENT_CLASS);
+        String proxy = (String) endpoint.getProperty(CxfConstants.PROXY);
+        
         if (clientClass != null)
         {
             createClientFromClass(bus, clientClass);
+        }
+        else if (BooleanUtils.toBoolean(proxy))
+        {
+            createClientProxy(bus);
         }
         else
         {
@@ -174,6 +191,46 @@ public class ClientWrapper
         return md.getMethod(bop);
     }
 
+    protected void createClientProxy(Bus bus) throws Exception
+    {
+        // TODO: Specify WSDL
+        String wsdlLocation = (String) endpoint.getProperty(CxfConstants.WSDL_LOCATION);
+        
+        ClientProxyFactoryBean cpf = new ClientProxyFactoryBean();
+        cpf.setServiceClass(ProxyService.class);
+        cpf.setDataBinding(new StaxDataBinding());
+        cpf.getFeatures().add(new StaxDataBindingFeature());
+        cpf.setAddress(endpoint.getEndpointURI().getAddress());
+
+        if (wsdlLocation != null) 
+        {
+            cpf.setWsdlLocation(wsdlLocation);
+        }
+        
+        this.client = ClientProxy.getClient(cpf.create());
+        
+        Binding binding = this.client.getEndpoint().getBinding();
+        
+        removeInterceptor(binding.getOutInterceptors(), WrappedOutInterceptor.class.getName());
+        
+        proxy = true;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void removeInterceptor(List<Interceptor> inInterceptors, String name) {
+
+        for (Interceptor<?> i : inInterceptors) {
+            if (i instanceof PhaseInterceptor) {
+                PhaseInterceptor<Message> p = (PhaseInterceptor<Message>)i;
+
+                if (p.getId().equals(name)) {
+                    inInterceptors.remove(p);
+                    return;
+                }
+            }
+        }
+    }
+
     protected void createClientFromClass(Bus bus, String clientClassName) throws Exception
     {
         // TODO: Specify WSDL
@@ -214,7 +271,7 @@ public class ClientWrapper
             throw new CreateException(CxfMessages.mustSpecifyPort(), this);
         }
 
-        proxy = null;
+        clientProxy = null;
         if (port != null)
         {
             for (Method m : clientCls.getMethods())
@@ -223,13 +280,13 @@ public class ClientWrapper
 
                 if (we != null && we.name().equals(port))
                 {
-                    proxy = (BindingProvider) m.invoke(s, new Object[0]);
+                    clientProxy = (BindingProvider) m.invoke(s, new Object[0]);
                     break;
                 }
             }
         }
 
-        if (proxy == null)
+        if (clientProxy == null)
         {
             throw new CreateException(CxfMessages.portNotFound(port), this);
         }
@@ -237,17 +294,17 @@ public class ClientWrapper
         EndpointURI uri = endpoint.getEndpointURI();
         if (uri.getUser() != null)
         {
-            proxy.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, uri.getUser());
+            clientProxy.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, uri.getUser());
         }
 
         if (uri.getPassword() != null)
         {
-            proxy.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, uri.getPassword());
+            clientProxy.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, uri.getPassword());
         }
 
-        proxy.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, uri.getAddress());
+        clientProxy.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, uri.getAddress());
 
-        client = ClientProxy.getClient(proxy);
+        client = ClientProxy.getClient(clientProxy);
 
         defaultMethod = findMethod(clientCls);
         defaultMethodName = getDefaultMethodName();
@@ -325,6 +382,11 @@ public class ClientWrapper
         {
             method = defaultMethodName;
         }
+        
+        if (method == null && proxy)
+        {
+            return "invoke";
+        }
 
         if (method == null)
         {
@@ -345,9 +407,9 @@ public class ClientWrapper
         this.bus = bus;
     }
 
-    public boolean isProxy()
+    public boolean isClientProxyAvailable()
     {
-        return proxy != null;
+        return clientProxy != null;
     }
 
     public BindingOperationInfo getOperation(MuleEvent event) throws Exception

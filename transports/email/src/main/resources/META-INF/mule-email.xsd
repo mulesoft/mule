@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/email/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/email/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -16,14 +17,14 @@
                 <xsd:attribute name="backupEnabled" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Should we save copies to backupFolder (default is false)?
+                            Whether to save copies to the backup folder (default is false).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="backupFolder" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The folder to which messages are moved when read.
+                            The folder where messages are moved after they have been read.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -44,7 +45,7 @@
                 <xsd:attribute name="deleteReadMessages" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether or not to delete messages from the server when they have been downloaded.
+                            Whether to delete messages from the server when they have been downloaded.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

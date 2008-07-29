@@ -5,6 +5,7 @@
  */
 
 import org.apache.commons.io.FileUtils
+import org.apache.commons.lang.SystemUtils
 
 /*
  * Make sure that the archetype can do its job, i.e. remove any leftovers from
@@ -29,7 +30,7 @@ existingProjectDir.mkdirs()
 /*
  * run Maven archetype
  */
-def cmdline = "mvn -o "
+def cmdline = "-o "
 
 if (project.properties.archetype == null)
 {
@@ -48,15 +49,22 @@ if (project.properties.archetypeParams != null)
 }
 cmdline += " -DmuleVersion=" + project.version
 cmdline += " -Dinteractive=false"
-runCommand(cmdline, buildDir)
+runMaven(cmdline, buildDir)
 
 // now that the source is generated, compile it using Maven
 // Do not run "mvn test" here since the generated source is not testable as is
-cmdline = "mvn test-compile"
-runCommand(cmdline, existingProjectDir)
+cmdline = "test-compile"
+runMaven(cmdline, existingProjectDir)
 
-def runCommand(String commandline, File directory)
+def runMaven(String commandline, File directory)
 {
+    def maven = "mvn"
+    if (SystemUtils.IS_OS_WINDOWS)
+    {
+        maven = "mvn.bat"
+    }
+    commandline = maven + " " + commandline
+
     log.info("***** commandline: '" + commandline + "'")
 
     // null means inherit parent's env ...

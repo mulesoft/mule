@@ -118,7 +118,6 @@
         <service name="LenderGatewayService">
             <inbound>
                 <inbound-endpoint ref="LenderGateway" />
-                <forwarding-router/>
             </inbound>
             <outbound>
                 <chaining-router>
@@ -139,7 +138,6 @@
         <service name="BankingGatewayService">
             <inbound>
                 <inbound-endpoint ref="BankingGateway" />
-                <forwarding-router/>
             </inbound>
             <outbound>
                 <static-recipient-list-router>

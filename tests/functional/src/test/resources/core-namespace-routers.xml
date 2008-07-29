@@ -31,11 +31,7 @@
         
         <service name="InboundPassThroughRouter">
             <inbound>
-                <inbound-pass-through-router>
-                    <!-- TODO 
-                    <xsd:element ref="abstract-property-extractor"/>
-                    -->
-                </inbound-pass-through-router>
+                <inbound-pass-through-router/>
             </inbound>
         </service>
         

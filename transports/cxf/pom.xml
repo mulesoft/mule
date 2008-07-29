@@ -137,6 +137,17 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+	        <groupId>org.apache.cxf</groupId>
+	        <artifactId>cxf-rt-bindings-http</artifactId>
+	        <version>${cxfVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.jra</groupId>
+                    <artifactId>jra</artifactId>
+                </exclusion>
+            </exclusions>
+	    </dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${cxfVersion}</version>
@@ -166,6 +177,12 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-servlet</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>

@@ -85,7 +85,6 @@
             <outbound>
                 <filtering-router>
                     <outbound-endpoint address="udp://localhost:56731" />
-                    <outbound-endpoint ref="testEndpoint2" />
                 </filtering-router>
             </outbound>
         </service>
@@ -98,7 +97,6 @@
             <outbound>
                 <filtering-router>
                     <outbound-endpoint ref="server1" />
-                    <outbound-endpoint ref="server2" />
                 </filtering-router>
             </outbound>
         </service>

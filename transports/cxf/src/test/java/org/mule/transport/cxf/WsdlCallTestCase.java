@@ -15,7 +15,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.transport.http.servlet.MuleReceiverServlet;
+import org.mule.transport.servlet.MuleReceiverServlet;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,10 +24,11 @@ import java.util.Map;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.mortbay.http.HttpContext;
+import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.util.InetAddrPort;
 
 public class WsdlCallTestCase extends FunctionalTestCase
 {
@@ -40,18 +41,16 @@ public class WsdlCallTestCase extends FunctionalTestCase
     {
         super.doSetUp();
         httpServer = new Server();
-        SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(HTTP_PORT);
-        httpServer.addConnector(connector);
+        SocketListener socketListener = new SocketListener(new InetAddrPort(HTTP_PORT));
+        httpServer.addListener(socketListener);
 
-        Context context = new Context();
-        context.setContextPath("/");
+        HttpContext context = httpServer.getContext("/");
+        context.setRequestLog(null);
 
-        ServletHolder holder = new ServletHolder();
-        holder.setServlet(new MuleReceiverServlet());
-        context.addServlet(holder, "/services/*");
+        ServletHandler handler = new ServletHandler();
+        handler.addServlet("MuleReceiverServlet", "/services/*", MuleReceiverServlet.class.getName());
 
-        httpServer.addHandler(context);
+        context.addHandler(handler);
         httpServer.start();
     }
 
