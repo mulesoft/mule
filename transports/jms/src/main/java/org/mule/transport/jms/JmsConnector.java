@@ -22,7 +22,6 @@ import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
@@ -36,9 +35,6 @@ import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -51,6 +47,8 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 import javax.jms.XAConnectionFactory;
 import javax.naming.NamingException;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.UnhandledException;
 
@@ -65,6 +63,8 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     public static final String JMS = "jms";
 
+    private AtomicInteger receiverReportedExceptionCount = new AtomicInteger();
+    
     ////////////////////////////////////////////////////////////////////////
     // Properties
     ////////////////////////////////////////////////////////////////////////
@@ -229,53 +229,44 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             {
                 public void onException(JMSException jmsException)
                 {
-                    logger.debug("About to recycle myself due to remote JMS connection shutdown.");
                     final JmsConnector jmsConnector = JmsConnector.this;
-                    try
+                    int expectedReceiverCount = jmsConnector.getReceivers().size() * jmsConnector.getNumberOfConcurrentTransactedReceivers();
+                    
+                    if (logger.isDebugEnabled())
                     {
-                        jmsConnector.stop();
-                        jmsConnector.initialised.set(false);
+                        logger.debug("About to recycle myself due to remote JMS connection shutdown but need "
+                            + "to wait for all active receivers to report connection loss. Receiver count: " 
+                            + (receiverReportedExceptionCount.get() + 1) + '/' + expectedReceiverCount);
                     }
-                    catch (MuleException e)
+                    
+                    if (receiverReportedExceptionCount.incrementAndGet() == expectedReceiverCount)
                     {
-                        logger.warn(e.getMessage(), e);
-                    }
-
-                    try
-                    {
-                        connectionStrategy.connect(jmsConnector);
-
-                        // TODO The following code fragment until jmsConnector.start() is a workaround as 
-                        // suggested in MULE-1720. The real solution will be the long awaited re-connection
-                        // strategy implementation.
-
-                        // keep the receivers in memory so we can register them after initialization
-                        Map receivers = new HashMap(jmsConnector.getReceivers());
-                        jmsConnector.initialise();
-                        // register the receivers
-                        for (Iterator itReceivers = receivers.values().iterator(); itReceivers.hasNext();) 
+                        receiverReportedExceptionCount.set(0);
+                    
+                        try
                         {
-                            MessageReceiver receiver = (MessageReceiver) itReceivers.next();
-                            try 
-                            {
-                                jmsConnector.registerListener(receiver.getService(), receiver.getEndpoint());
-                            } 
-                            catch (Exception ex) 
-                            {
-                                throw new FatalConnectException(ex, receiver);
-                            }
+                            jmsConnector.stop();
+                            jmsConnector.initialised.set(true);
                         }
-                        
-                        jmsConnector.start();
+                        catch (MuleException e)
+                        {
+                            logger.warn(e.getMessage(), e);
+                        }
+    
+                        try
+                        {
+                            jmsConnector.start();
+                        }
+                        catch (FatalConnectException fcex)
+                        {
+                            logger.fatal("Failed to reconnect to JMS server. I'm giving up.");
+                        }
+                        catch (MuleException umoex)
+                        {
+                            throw new UnhandledException("Failed to recover a connector.", umoex);
+                        }
                     }
-                    catch (FatalConnectException fcex)
-                    {
-                        logger.fatal("Failed to reconnect to JMS server. I'm giving up.");
-                    }
-                    catch (MuleException umoex)
-                    {
-                        throw new UnhandledException("Failed to recover a connector.", umoex);
-                    }
+
                 }
             });
         }

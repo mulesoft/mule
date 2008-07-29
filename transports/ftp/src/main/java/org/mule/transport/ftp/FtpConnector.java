@@ -32,11 +32,14 @@ import org.mule.util.ClassUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
@@ -91,12 +94,19 @@ public class FtpConnector extends AbstractConnector
 
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
-        long polling = pollingFrequency;
-        Map props = endpoint.getProperties();
-        if (props != null)
+        List args = getReceiverArguments(endpoint.getProperties());
+        return serviceDescriptor.createMessageReceiver(this, service, endpoint, args.toArray());
+    }
+
+    protected List getReceiverArguments(Map endpointProperties)
+    {
+        List args = new ArrayList();
+        
+        long polling = getPollingFrequency();
+        if (endpointProperties != null)
         {
             // Override properties on the endpoint for the specific endpoint
-            String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
+            String tempPolling = (String) endpointProperties.get(PROPERTY_POLLING_FREQUENCY);
             if (tempPolling != null)
             {
                 polling = Long.parseLong(tempPolling);
@@ -107,10 +117,11 @@ public class FtpConnector extends AbstractConnector
             polling = DEFAULT_POLLING_FREQUENCY;
         }
         logger.debug("set polling frequency to " + polling);
-        return serviceDescriptor.createMessageReceiver(this, service, endpoint,
-                new Object[]{new Long(polling)});
+        args.add(new Long(polling));
+        
+        return args;
     }
-
+    
     /**
      * @return Returns the pollingFrequency.
      */
@@ -593,5 +604,13 @@ public class FtpConnector extends AbstractConnector
                                                        new Object[] {path, new Integer(client.getReplyCode())}));
         }
         return client;
+    }
+
+    /**
+     * Override this method to do extra checking on the file.
+     */
+    protected boolean validateFile(FTPFile file)
+    {
+        return true;
     }
 }

@@ -44,7 +44,7 @@ public class BookstoreClient
         // create client
         JaxWsProxyFactoryBean pf = new JaxWsProxyFactoryBean();
         pf.setServiceClass(Bookstore.class);
-        pf.setAddress("http://localhost:8080/services/bookstore");
+        pf.setAddress("http://localhost:8777/services/bookstore");
         bookstore = (Bookstore) pf.create();
         
         // add a book to the bookstore

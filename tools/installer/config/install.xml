@@ -63,7 +63,7 @@
         <res id="conditions.xml" src="conditions.xml" />
         <res id="TargetPanel.dir.windows" src="TargetDir.properties"/>
     </resources>
-    
+
     <!-- For ANT actions -->
     <jar src="../distribution/lib/opt/ant-1.6.5.jar" stage="postinstall" />
     <!-- jar src="../distribution/lib/opt/ant-launcher-1.7.0.jar" stage="postinstall" /-->
@@ -108,7 +108,7 @@
               <include name="src/**/*"/>
 
               <!-- Exclude profiler package -->
-              <exclude name="sbin/profiler/**/*"/>
+              <exclude name="lib/native/profiler/**/*"/>
               <exclude name="lib/user/yjp-controller-api-redist.jar"/>
 
               <!-- Exclude scripting package -->
@@ -119,7 +119,7 @@
               <exclude name="lib/user/jruby-engine-1.1-jdk14.jar"/>
               <exclude name="lib/user/jruby-complete-1.0.jar"/>
             </fileset>
-            
+
             <!-- make the scripts etc. executable -->
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/launcher" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/mule" stage="never"/>
@@ -144,7 +144,7 @@
                 </args>
             </executable>
         </pack>
-        
+
         <pack name="Profiler" required="no">
             <description>Profiler Package</description>
             <fileset dir="../distribution" targetdir="$INSTALL_PATH">

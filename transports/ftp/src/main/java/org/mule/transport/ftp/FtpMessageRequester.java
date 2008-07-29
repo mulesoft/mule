@@ -96,15 +96,20 @@ public class FtpMessageRequester extends AbstractMessageRequester
                 return null;
             }
             List fileList = new ArrayList();
+            FTPFile file = null;
             for (int i = 0; i < files.length; i++)
             {
-                if (files[i].isFile())
+                file = files[i];
+                if (file.isFile())
                 {
-                    if (filenameFilter == null || filenameFilter.accept(null, files[i].getName()))
+                    if (filenameFilter == null || filenameFilter.accept(null, file.getName()))
                     {
-                        fileList.add(files[i]);
-                        // only read the first one
-                        break;
+                        if (connector.validateFile(file))
+                        {
+                            fileList.add(file);
+                            // only read the first one
+                            break;
+                        }
                     }
                 }
             }
@@ -113,7 +118,6 @@ public class FtpMessageRequester extends AbstractMessageRequester
                 return null;
             }
 
-            FTPFile file = (FTPFile) fileList.get(0);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             if (!client.retrieveFile(file.getName(), baos))
             {
@@ -131,5 +135,4 @@ public class FtpMessageRequester extends AbstractMessageRequester
             connector.releaseFtp(endpoint.getEndpointURI(), client);
         }
     }
-
 }

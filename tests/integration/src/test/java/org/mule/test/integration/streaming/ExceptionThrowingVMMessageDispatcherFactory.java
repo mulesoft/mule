@@ -67,7 +67,7 @@ public class ExceptionThrowingVMMessageDispatcherFactory implements MessageDispa
             throw new RuntimeException("");
         }
 
-        @Override
+        // @Override
         protected void doDispatch(MuleEvent event) throws Exception
         {
             throw new RuntimeException("");

@@ -158,7 +158,7 @@ public class CloseStreanOnMuleExceptionTestCase extends FunctionalTestCase
             super(buf, offset, length);
         }
 
-        @Override
+        // @Override
         public void close() throws IOException
         {
             super.close();

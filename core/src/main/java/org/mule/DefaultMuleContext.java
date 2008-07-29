@@ -31,6 +31,7 @@ import org.mule.api.registry.RegistryBroker;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.api.transport.ConnectionStrategy;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -158,6 +159,8 @@ public class DefaultMuleContext implements MuleContext
                 throw new MuleRuntimeException(CoreMessages.objectIsNull("queueManager"));
             }
 
+            startDate = System.currentTimeMillis();
+
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
 
             lifecycleManager.firePhase(this, Startable.PHASE_NAME);
@@ -171,8 +174,6 @@ public class DefaultMuleContext implements MuleContext
             }
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
         }
-
-        startDate = System.currentTimeMillis();
     }
 
     /**

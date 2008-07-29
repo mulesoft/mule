@@ -28,8 +28,8 @@
     <target name="get.libraries">
 
         <!-- Jython (Python for Java) -->            
-        <get src="${url.maven.repo2}/javax/script/jython-engine/1.0/jython-engine-1.0-jdk14.jar"
-             dest="${dir.user.lib}/jython-engine-1.0-jdk14.jar"
+        <get src="${url.maven.repo2}/javax/script/jython-engine/1.1/jython-engine-1.1-jdk14.jar"
+             dest="${dir.user.lib}/jython-engine-1.1-jdk14.jar"
              verbose="true"
              usetimestamp="true"/>
         <get src="${url.maven.repo}/org/python/jython/2.2.1/jython-2.2.1.jar"

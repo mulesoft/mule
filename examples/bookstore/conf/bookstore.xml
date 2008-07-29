@@ -32,7 +32,7 @@
  
           <service name="echoService">
                <inbound>
-                    <inbound-endpoint address="cxf:http://localhost:8080/services/bookstore" />
+                    <inbound-endpoint address="cxf:http://localhost:8777/services/bookstore" />
                </inbound>
                <component>
                     <singleton-object class="org.mule.example.bookstore.BookstoreImpl" />

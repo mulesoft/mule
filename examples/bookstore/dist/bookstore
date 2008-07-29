@@ -6,7 +6,6 @@ if [ -z "$MULE_HOME" ] ; then
   MULE_HOME=`pwd`
   MULE_HOME=`dirname "$MULE_HOME"`
   MULE_HOME=`dirname "$MULE_HOME"`
-  MULE_HOME=`dirname "$MULE_HOME"`
   export MULE_HOME
 fi
 

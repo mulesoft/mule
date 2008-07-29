@@ -10,12 +10,17 @@
 
 package org.mule.transport;
 
-import org.mule.api.context.WorkManager;
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.context.notification.MuleContextNotificationListener;
+import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.transport.Connectable;
 import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.NotificationException;
 import org.mule.util.ClassUtils;
 
 import javax.resource.spi.work.Work;
@@ -24,97 +29,35 @@ import javax.resource.spi.work.WorkException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * TODO document
- */
-public abstract class AbstractConnectionStrategy implements ConnectionStrategy
+public abstract class AbstractConnectionStrategy implements ConnectionStrategy, MuleContextAware
 {
-    /**
-     * logger used by this class
-     */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    private volatile boolean doThreading = false;
+    protected final Object reconnectLock = new Object();
 
-    private WorkManager workManager;
-
-    private final Object reconnectLock = new Object();
-
-    public final void connect(final Connectable connectable) throws FatalConnectException
+    protected ThreadLocal isInitialThread = new ThreadLocal()
     {
-        if (doThreading)
-        {
-            try
-            {
-                WorkManager wm = getWorkManager();
-                if (wm == null)
-                {
-                    throw new FatalConnectException(MessageFactory.createStaticMessage("No WorkManager is available"), connectable);
-                }
-                
-                wm.scheduleWork(new Work()
-                {
-                    public void release()
-                    {
-                        // nothing to do
-                    }
+      protected synchronized Object initialValue()
+      {
+          return new Boolean(true);
+      }
+    };
+    
+    private MuleContext muleContext;
 
-                    public void run()
-                    {
-                        try
-                        {
-                            synchronized (reconnectLock)
-                            {
-                                doConnect(connectable);
-                            }
-                        }
-                        catch (FatalConnectException e)
-                        {
-                            synchronized (reconnectLock)
-                            {
-                                resetState();
-                            }
-                            // TODO should really extract an interface for
-                            // classes capable of handling an exception
-                            if (connectable instanceof Connector)
-                            {
-                                ((Connector) connectable).handleException(e);
-                            }
-                            // TODO: this cast is evil
-                            else if (connectable instanceof AbstractMessageReceiver)
-                            {
-                                ((AbstractMessageReceiver) connectable).handleException(e);
-                            }
-                            // if it's none of the above, it's not handled and Mule just sits doing nothing
-                        }
-                    }
-                });
-            }
-            catch (WorkException e)
-            {
-                synchronized (reconnectLock)
-                {
-                    resetState();
-                }
-                throw new FatalConnectException(e, connectable);
-            }
-        }
-        else
+    private volatile boolean doThreading = false;
+    
+    private volatile boolean isConnecting = false;    
+
+    public final void connect(Connectable connectable) throws FatalConnectException
+    {
+        if (doThreading && !isConnecting)
         {
-            try
-            {
-                synchronized (reconnectLock)
-                {
-                    doConnect(connectable);
-                }
-            }
-            finally
-            {
-                synchronized (reconnectLock)
-                {
-                    resetState();
-                }
-            }
+            connectAfterServerStartup(connectable);
+        }
+        else if (!isInitialThread() || !isConnecting)
+        {
+            connectImmediately(connectable);
         }
     }
 
@@ -128,15 +71,24 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
         this.doThreading = doThreading;
     }
 
-
-    public WorkManager getWorkManager()
+    public boolean isConnecting()
     {
-        return workManager;
+        return isConnecting;
     }
 
-    public void setWorkManager(WorkManager workManager)
+    public boolean isInitialThread()
     {
-        this.workManager = workManager;
+        return ((Boolean) isInitialThread.get()).booleanValue();
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
+
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
     }
 
     protected abstract void doConnect(Connectable connectable) throws FatalConnectException;
@@ -160,7 +112,14 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
 
     public int hashCode()
     {
-        return ClassUtils.hash(new Object[]{doThreading ? Boolean.TRUE : Boolean.FALSE, workManager});
+        if (muleContext != null)
+        {
+            return ClassUtils.hash(new Object[]{doThreading ? Boolean.TRUE : Boolean.FALSE, muleContext.getWorkManager()});
+        }
+        else
+        {
+            return ClassUtils.hash(new Object[]{doThreading ? Boolean.TRUE : Boolean.FALSE});
+        }
     }
 
     public boolean equals(Object obj)
@@ -170,8 +129,113 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
 
         final AbstractConnectionStrategy other = (AbstractConnectionStrategy) obj;
         return ClassUtils.equal(new Boolean(doThreading), new Boolean(other.doThreading))
-               && ClassUtils.equal(workManager, other.workManager);
+               && ClassUtils.equal(muleContext.getWorkManager(), other.muleContext.getWorkManager());
 
     }
 
+    protected void connectAfterServerStartup(final Connectable connectable) throws FatalConnectException
+    {
+        isConnecting = true;
+        doThreading = false;
+        
+        try
+        {
+            muleContext.registerListener(new MuleContextNotificationListener()
+            {
+                public void onNotification(ServerNotification notification)
+                {
+                    if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+                    {
+                        try
+                        {
+                            if (muleContext.getWorkManager() == null)
+                            {
+                                logger.error(MessageFactory.createStaticMessage("No WorkManager is available."));
+                            }
+                            else
+                            {
+                                muleContext.getWorkManager().scheduleWork(new Work()
+                                {
+                                    public void release()
+                                    {
+                                        // ignore
+                                    }
+        
+                                    public void run()
+                                    {
+                                        isInitialThread.set(new Boolean(false));
+        
+                                        try
+                                        {
+                                            synchronized (reconnectLock)
+                                            {
+                                                doConnect(connectable);
+                                            }
+                                        }
+                                        catch (FatalConnectException e)
+                                        {
+                                            synchronized (reconnectLock)
+                                            {
+                                                resetState();
+                                            }
+                                            // TODO should really extract an interface for
+                                            // classes capable of handling an exception
+                                            if (connectable instanceof Connector)
+                                            {
+                                                ((Connector) connectable).handleException(e);
+                                            }
+                                            // TODO: this cast is evil
+                                            else if (connectable instanceof AbstractMessageReceiver)
+                                            {
+                                                ((AbstractMessageReceiver) connectable).handleException(e);
+                                            }
+                                            // if it's none of the above, it's not handled and Mule just sits doing nothing
+                                        }
+                                        finally
+                                        {
+                                            isConnecting = false;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                        catch (WorkException e)
+                        {
+                            synchronized (reconnectLock)
+                            {
+                                resetState();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        catch (NotificationException e)
+        {
+            synchronized (reconnectLock)
+            {
+                resetState();
+            }
+            throw new FatalConnectException(e, connectable);
+        }
+    }
+    
+    protected void connectImmediately(Connectable connectable) throws FatalConnectException
+    {
+        try
+        {
+            synchronized (reconnectLock)
+            {
+                doConnect(connectable);
+            }
+        }
+        finally
+        {
+            synchronized (reconnectLock)
+            {
+                resetState();
+            }
+        }
+    }
+    
 }

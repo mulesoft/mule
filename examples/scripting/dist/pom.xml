@@ -40,7 +40,7 @@
         <dependency>
             <groupId>javax.script</groupId>
             <artifactId>jython-engine</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
             <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
             <scope>provided</scope>
@@ -161,7 +161,7 @@
                                 <artifactItem>
                                     <groupId>javax.script</groupId>
                                     <artifactId>jython-engine</artifactId>
-                                    <version>1.0</version>
+                                    <version>1.1</version>
                                     <!-- we use our own retrotranslated version -->
                                     <classifier>jdk14</classifier>
                                 </artifactItem>

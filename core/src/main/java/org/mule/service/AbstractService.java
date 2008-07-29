@@ -687,9 +687,10 @@ public abstract class AbstractService implements Service
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
             endpoint = (InboundEndpoint) it.next();
-            MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
+            AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
+            MessageReceiver receiver = connector.getReceiver(this,
                     endpoint);
-            if (receiver != null)
+            if (receiver != null && connector.isStarted())
             {
                 try
                 {

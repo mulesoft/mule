@@ -20,7 +20,6 @@ import java.util.Map;
 
 public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
 {
-
     private static int PORT = 60198;
 
     public FtpFunctionalTestCase()
@@ -33,16 +32,21 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         return "ftp-functional-test.xml";
     }
 
+    protected int getPort()
+    {
+        return PORT;
+    }
+    
     public void testSendAndRequest() throws Exception
     {
         Map properties = new HashMap();
         MuleClient client = new MuleClient();
-        client.dispatch("ftp://anonymous:email@localhost:" + PORT, TEST_MESSAGE, properties);
+        client.dispatch("ftp://anonymous:email@localhost:" + getPort(), TEST_MESSAGE, properties);
         NamedPayload payload = awaitUpload();
         assertNotNull(payload);
         assertEquals(TEST_MESSAGE, new String(payload.getPayload()));
         logger.info("received message OK!");
-        MuleMessage retrieved = client.request("ftp://anonymous:email@localhost:" + PORT, getTimeout());
+        MuleMessage retrieved = client.request("ftp://anonymous:email@localhost:" + getPort(), getTimeout());
         assertNotNull(retrieved);
         assertNotNull(retrieved.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
         assertNotNull(retrieved.getProperty(FileConnector.PROPERTY_FILE_SIZE));

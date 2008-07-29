@@ -46,7 +46,10 @@ public class ServerStartupSplashScreen extends SplashScreen
             header.add(CoreMessages.versionNotSet().getMessage());
         }
         header.add(" ");
-        header.add(CoreMessages.serverStartedAt(context.getStartDate()).getMessage());
+        if (context.getStartDate() > 0)
+        {
+            header.add(CoreMessages.serverStartedAt(context.getStartDate()).getMessage());
+        }
         header.add("Server ID: " + context.getConfiguration().getId());
 
         // JDK, OS, and Host

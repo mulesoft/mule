@@ -136,29 +136,28 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         FTPClient client = null;
         try
         {
+            if (!connector.validateFile(file))
+            {
+                return;
+            }
+            
             client = connector.createFtpClient(endpoint);
 
-            final String fileName = file.getName();
-
             MuleMessage message;
-            InputStream stream = client.retrieveFileStream(fileName);
+            InputStream stream = client.retrieveFileStream(file.getName());
             if (stream == null)
             {
                 throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
-                        new Object[]{fileName, new Integer(client.getReplyCode())}));
+                        new Object[]{file.getName(), new Integer(client.getReplyCode())}));
             }
             message = new DefaultMuleMessage(connector.getMessageAdapter(stream));
             
 
-            message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, fileName);
+            message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
             message.setProperty(FileConnector.PROPERTY_FILE_SIZE, new Long(file.getSize()));
             routeMessage(message);
 
-            if (!client.deleteFile(fileName))
-            {
-                throw new IOException(MessageFormat.format("Failed to delete file {0}. Ftp error: {1}",
-                        new Object[]{fileName, new Integer(client.getReplyCode())}));
-            }
+            postProcess(client, file, message);
         }
         finally
         {
@@ -170,6 +169,16 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    protected void postProcess(FTPClient client, FTPFile file, MuleMessage message) throws Exception
+    {
+        if (!client.deleteFile(file.getName()))
+        {
+            throw new IOException(MessageFormat.format("Failed to delete file {0}. Ftp error: {1}",
+                    new Object[]{file.getName(), new Integer(client.getReplyCode())}));
+        }
+        logger.debug("Deleted processed file " + file.getName());
+    }
+    
     protected void doConnect() throws Exception
     {
         // why?!

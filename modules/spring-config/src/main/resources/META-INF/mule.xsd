@@ -242,13 +242,7 @@
         <xsd:attribute name="ignoreBadInput" type="substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    Many transformers only accept certain classes.
-                    Such transformers are never called with inappropriate input
-                    (whatever the value of this attribute).
-                    If a transformer forms part of a chain and cannot accept the current message class,
-                    then this flag controls whether the remaining part of the chain is evaluated.
-                    If true, the next transformer is called.
-                    If false the chain ends, keeping the result generated up to that point.
+                    Many transformers only accept certain classes. Such transformers are never called with inappropriate input (whatever the value of this attribute). If a transformer forms part of a chain and cannot accept the current message class, then this flag controls whether the remaining part of the chain is evaluated. If true, the next transformer is called. If false the chain ends, keeping the result generated up to that point.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
