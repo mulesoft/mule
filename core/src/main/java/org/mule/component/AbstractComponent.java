@@ -16,6 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.Component;
+import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -23,9 +24,12 @@ import org.mule.api.service.Service;
 import org.mule.api.service.ServiceException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.context.notification.ComponentMessageNotification;
+import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.management.stats.ComponentStatistics;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,6 +51,7 @@ public abstract class AbstractComponent implements Component
     protected final AtomicBoolean initialised = new AtomicBoolean(false);
     protected final AtomicBoolean disposing = new AtomicBoolean(false);
     protected final AtomicBoolean disposed = new AtomicBoolean(false);
+    protected ServerNotificationHandler notificationHandler;
 
     public AbstractComponent()
     {
@@ -79,6 +84,9 @@ public abstract class AbstractComponent implements Component
         // Invoke component implementation and gather statistics
         try
         {
+
+            fireComponentNotification(event.getMessage(), ComponentMessageNotification.COMPONENT_PRE_INVOKE);
+
             long startTime = 0;
             if (statistics.isEnabled())
             {
@@ -91,6 +99,9 @@ public abstract class AbstractComponent implements Component
             {
                 statistics.addExecutionTime(System.currentTimeMillis() - startTime);
             }
+
+            fireComponentNotification(result, ComponentMessageNotification.COMPONENT_POST_INVOKE);
+
             return result;
         }
         catch (MuleException me)
@@ -220,6 +231,8 @@ public abstract class AbstractComponent implements Component
             {
                 logger.info("Starting: " + this);
             }
+            notificationHandler = new OptimisedNotificationHandler(service.getMuleContext()
+                .getNotificationManager(), ComponentMessageNotification.class);
             doStart();
             started.set(true);
         }
@@ -235,6 +248,14 @@ public abstract class AbstractComponent implements Component
         if (disposed.get())
         {
             throw new DisposeException(CoreMessages.createStaticMessage("Cannot use a disposed component"), this);
+        }
+    }
+
+    protected void fireComponentNotification(MuleMessage message, int action)
+    {
+        if (notificationHandler.isNotificationEnabled(ComponentMessageNotification.class))
+        {
+            notificationHandler.fireNotification(new ComponentMessageNotification(message, this, action));
         }
     }
 

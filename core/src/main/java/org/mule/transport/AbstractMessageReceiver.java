@@ -36,7 +36,7 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
-import org.mule.context.notification.MessageNotification;
+import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.ClassUtils;
@@ -296,7 +296,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
         if (connector.isEnableMessageEvents())
         {
             connector.fireNotification(
-                    new MessageNotification(message, endpoint, service.getName(), MessageNotification.MESSAGE_RECEIVED));
+                    new EndpointMessageNotification(message, endpoint, service.getName(), EndpointMessageNotification.MESSAGE_RECEIVED));
         }
 
         //IF REMOTE_SYNCis set on the endpoint, we need to set it on the message

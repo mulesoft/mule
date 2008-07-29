@@ -51,8 +51,10 @@ public class MuleInvoker implements Invoker
         MuleMessage message = null;
         try
         {
+            MuleMessage reqMsg = (MuleMessage) exchange.get(CxfConstants.MULE_REQUEST_MESSAGE);
             CxfMessageAdapter messageAdapter = (CxfMessageAdapter) receiver.getConnector().getMessageAdapter(
-                exchange.getInMessage());
+                reqMsg);
+            messageAdapter.setPayload(exchange.getInMessage());
 
             if (!receiver.isProxy())
             {

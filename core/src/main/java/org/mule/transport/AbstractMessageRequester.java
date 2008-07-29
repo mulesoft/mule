@@ -15,7 +15,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.ReceiveException;
-import org.mule.context.notification.MessageNotification;
+import org.mule.context.notification.EndpointMessageNotification;
 
 /**
  * Provide a default dispatch (client) support for handling threads lifecycle and validation.
@@ -48,8 +48,8 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
             MuleMessage result = doRequest(timeout);
             if (result != null && connector.isEnableMessageEvents())
             {
-                connector.fireNotification(new MessageNotification(result, endpoint, null,
-                    MessageNotification.MESSAGE_REQUESTED));
+                connector.fireNotification(new EndpointMessageNotification(result, endpoint, null,
+                    EndpointMessageNotification.MESSAGE_REQUESTED));
             }
             return result;
         }

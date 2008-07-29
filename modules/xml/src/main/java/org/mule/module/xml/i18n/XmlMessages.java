@@ -27,4 +27,9 @@ public class XmlMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 2, type);
     }
+
+    public static Message invalidReturnTypeForTransformer(Class resultCls)
+    {
+        return createMessage(BUNDLE_PATH, 3, resultCls.getName());
+    }
 }

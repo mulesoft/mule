@@ -22,12 +22,11 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceAware;
 import org.mule.api.transport.Connector;
-import org.mule.component.simple.BridgeComponent;
-import org.mule.component.simple.PassThroughComponent;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.cxf.i18n.CxfMessages;
 import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
+import org.mule.transport.cxf.support.OutputPayloadInterceptor;
 import org.mule.transport.cxf.support.ProxyService;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
@@ -39,6 +38,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.configuration.Configurer;
@@ -85,13 +85,12 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             String mtomEnabled = (String) endpointProps.get(CxfConstants.MTOM_ENABLED);
             List<DataBinding> databinding = (List<DataBinding>) endpointProps.get(CxfConstants.DATA_BINDING);
             List<AbstractFeature> features = (List<AbstractFeature>) endpointProps.get(CxfConstants.FEATURES);
-            
-            Class<?> svcCls;
+            String proxyStr = (String) endpointProps.get(CxfConstants.PROXY);
+
+            Class<?> svcCls = null;
             Class<?> targetCls;
             
-            Component component = service.getComponent();
-            proxy = component instanceof BridgeComponent
-                || component instanceof PassThroughComponent;
+            proxy = BooleanUtils.toBoolean(proxyStr);
             
             if (proxy)
             {
@@ -106,12 +105,14 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                     frontend = connector.getDefaultFrontend();
                 }
                 
-                targetCls = getTargetClass();
                 if (!StringUtils.isEmpty(serviceClassName)) 
                 {
                     svcCls = ClassUtils.loadClass(serviceClassName, getClass());
                 } 
-                else 
+                
+                targetCls = getTargetClass(svcCls);
+                
+                if (svcCls == null)
                 {
                     svcCls = targetCls;
                 }
@@ -140,11 +141,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                     sfb.setDataBinding(databinding.get(0));
                 }
                 
-                if (!(service.getComponent() instanceof JavaComponent))
-                {
-                    throw new InitialisationException(CxfMessages.javaComponentRequiredForInboundEndpoint(), this);
-                }
-                else
+                if (service.getComponent() instanceof JavaComponent)
                 {
                     sfb.setServiceBean(((JavaComponent) service.getComponent()).getObjectFactory().getInstance());
                 }
@@ -200,6 +197,11 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                 sfb.setOutFaultInterceptors(new ArrayList<Interceptor>());
             }
             sfb.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
+            
+            if (proxy)
+            {
+                sfb.getOutInterceptors().add(new OutputPayloadInterceptor());
+            }
             
             sfb.setServiceClass(svcCls);
             sfb.setAddress(getAddressWithoutQuery());
@@ -328,11 +330,24 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    private Class<?> getTargetClass() throws MuleException, ClassNotFoundException
+    private Class<?> getTargetClass(Class<?> svcCls) throws MuleException, ClassNotFoundException
     {
+        Component component = service.getComponent();
+        if (!(component instanceof JavaComponent)) 
+        {
+            if (svcCls == null)
+            {
+                throw new InitialisationException(CxfMessages.serviceClassRequiredWithPassThrough(), this);
+            }
+            else
+            {
+                return svcCls;
+            }
+        }
+        
         try
         {
-            return ((JavaComponent) service.getComponent()).getObjectType();
+            return ((JavaComponent) component).getObjectType();
         }
         catch (Exception e)
         {

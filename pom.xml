@@ -1324,7 +1324,6 @@
                 </configuration>
             </plugin>
 
-
             <!-- Source code cross-reference -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1539,6 +1538,51 @@
             <properties>
                 <vmtype>org.eclipse.jdt.internal.launching.macosx.MacOSXType</vmtype>
             </properties>
+        </profile>
+
+        <!--
+            This profile is somewhat similar to what's in Maven's toplevel POM. It will be 
+            activated when -DperformRelease=true is given on the commandline which is 
+            usually used in conjunction with the install or deploy goal.
+            (See http://www.propellors.net/maven/site/guides/introduction/introduction-to-the-pom.html).
+
+            The full distribution (distributions/server/full) wants to package javadocs. This
+            was previously a manual process, i.e. one had to call "mvn site" first and only
+            when running "mvn -DperformRelease=true" afterwards (and not running "mvn clean" in
+            between) we would end up with a valid full distro.
+
+            In order to make the release process less error prone, the javadoc plugin is bound
+            to the install lifecycle phase here but only if Maven was invoked with
+            -DperformRelease=true. The javadoc plugin then generates the toplevel, aggregated
+            javadocs that are included into the full distro, only a single Maven invocation
+            is needed now for building a proper set of distributions.
+        -->
+        <profile>
+            <id>release-profile</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <inherited>false</inherited>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>aggregated-javadocs</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>javadoc</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
     

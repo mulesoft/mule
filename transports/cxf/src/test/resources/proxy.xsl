@@ -7,11 +7,6 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
  -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-     <xsl:template match="/">
-     	<another xmlns="http://foo"> 
-     	  <xsl:copy-of select="/">
-	      </xsl:copy-of> 
-	    </another>
-     </xsl:template>
-</xsl:stylesheet>
+<transformed xmlns="http://foo" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xsl:version="2.0">
+  <xsl:copy-of select="/"/>
+</transformed>

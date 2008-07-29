@@ -12,8 +12,7 @@ package org.mule.transport.cxf;
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
-
-import org.apache.cxf.message.MessageImpl;
+import org.mule.transport.DefaultMessageAdapter;
 
 public class CxfConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -24,7 +23,7 @@ public class CxfConnectorTestCase extends AbstractConnectorTestCase
 
     public Object getValidMessage() throws Exception
     {
-        return new MessageImpl();
+        return new DefaultMessageAdapter("");
     }
 
     @Override

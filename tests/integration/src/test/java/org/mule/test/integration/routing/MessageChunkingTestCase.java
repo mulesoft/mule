@@ -11,9 +11,9 @@
 package org.mule.test.integration.routing;
 
 
-import org.mule.api.context.notification.MessageNotificationListener;
+import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.context.notification.MessageNotification;
+import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestNotification;
@@ -87,11 +87,11 @@ public class MessageChunkingTestCase extends FunctionalTestCase
 
         // Listen to Message Notifications on the Chunking receiver so we can
         // determine how many message parts have been received
-        muleContext.registerListener(new MessageNotificationListener()
+        muleContext.registerListener(new EndpointMessageNotificationListener()
         {
             public void onNotification(ServerNotification notification)
             {
-                if (notification.getAction() == MessageNotification.MESSAGE_RECEIVED)
+                if (notification.getAction() == EndpointMessageNotification.MESSAGE_RECEIVED)
                 {
                     messagePartsCount.getAndIncrement();
                 }
@@ -129,11 +129,11 @@ public class MessageChunkingTestCase extends FunctionalTestCase
 
         // Listen to Message Notifications on the Chunking receiver so we can
         // determine how many message parts have been received
-        muleContext.registerListener(new MessageNotificationListener()
+        muleContext.registerListener(new EndpointMessageNotificationListener()
         {
             public void onNotification(ServerNotification notification)
             {
-                if (notification.getAction() == MessageNotification.MESSAGE_RECEIVED)
+                if (notification.getAction() == EndpointMessageNotification.MESSAGE_RECEIVED)
                 {
                     messagePartsCount.getAndIncrement();
                 }

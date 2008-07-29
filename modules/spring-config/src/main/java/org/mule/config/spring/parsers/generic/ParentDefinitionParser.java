@@ -13,6 +13,7 @@ import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -54,11 +55,12 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
         Class beanClass = getBeanClass(element);
         Assert.state(beanClass != null, "Class returned from getBeanClass(Element) must not be null, element is: " + element.getNodeName());
         BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);
-        builder.setSource(parserContext.extractSource(element));
+        builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
         if (parserContext.isNested())
         {
             // Inner bean definition must receive same singleton status as containing bean.
-            builder.setSingleton(parserContext.getContainingBeanDefinition().isSingleton());
+            builder.setScope(parserContext.getContainingBeanDefinition().isSingleton()
+                ? BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);
         }
         doParse(element, parserContext, builder);
         BeanAssembler beanAssembler = getBeanAssembler(element, builder);

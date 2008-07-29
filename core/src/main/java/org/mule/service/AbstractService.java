@@ -214,7 +214,7 @@ public abstract class AbstractService implements Service
         stats.setComponentStat(component.getStatistics());
 
         initialised.set(true);
-        fireComponentNotification(ServiceNotification.SERVICE_INITIALISED);
+        fireServiceNotification(ServiceNotification.SERVICE_INITIALISED);
     }
 
     protected ServiceStatistics createStatistics()
@@ -222,7 +222,7 @@ public abstract class AbstractService implements Service
         return new ServiceStatistics(name);
     }
 
-    protected void fireComponentNotification(int action)
+    protected void fireServiceNotification(int action)
     {
         muleContext.fireNotification(new ServiceNotification(this, action));
     }
@@ -233,11 +233,11 @@ public abstract class AbstractService implements Service
         {
             logger.debug("Stopping Service");
             stopping.set(true);
-            fireComponentNotification(ServiceNotification.SERVICE_STOPPING);
+            fireServiceNotification(ServiceNotification.SERVICE_STOPPING);
             doForceStop();
             stopped.set(true);
             stopping.set(false);
-            fireComponentNotification(ServiceNotification.SERVICE_STOPPED);
+            fireServiceNotification(ServiceNotification.SERVICE_STOPPED);
         }
     }
 
@@ -247,7 +247,7 @@ public abstract class AbstractService implements Service
         {
             logger.debug("Stopping Service");
             stopping.set(true);
-            fireComponentNotification(ServiceNotification.SERVICE_STOPPING);
+            fireServiceNotification(ServiceNotification.SERVICE_STOPPING);
 
             // Unregister Listeners for the service
             unregisterListeners();
@@ -256,7 +256,7 @@ public abstract class AbstractService implements Service
 
             doStop();
             stopped.set(true);
-            fireComponentNotification(ServiceNotification.SERVICE_STOPPED);
+            fireServiceNotification(ServiceNotification.SERVICE_STOPPED);
             logger.info("Mule Service " + name + " has been stopped successfully");
         }
     }
@@ -330,7 +330,7 @@ public abstract class AbstractService implements Service
             paused.set(false);
             doStart();
         }
-        fireComponentNotification(ServiceNotification.SERVICE_STARTED);
+        fireServiceNotification(ServiceNotification.SERVICE_STARTED);
         if (startPaused)
         {
             pause();
@@ -352,7 +352,7 @@ public abstract class AbstractService implements Service
     {
         doPause();
         paused.set(true);
-        fireComponentNotification(ServiceNotification.SERVICE_PAUSED);
+        fireServiceNotification(ServiceNotification.SERVICE_PAUSED);
         logger.info("Mule Service " + name + " has been paused successfully");
     }
 
@@ -364,7 +364,7 @@ public abstract class AbstractService implements Service
     {
         doResume();
         paused.set(false);
-        fireComponentNotification(ServiceNotification.SERVICE_RESUMED);
+        fireServiceNotification(ServiceNotification.SERVICE_RESUMED);
         logger.info("Mule Service " + name + " has been resumed successfully");
     }
 
@@ -419,7 +419,7 @@ public abstract class AbstractService implements Service
         doDispose();
         component.dispose();
         initialised.set(false);
-        fireComponentNotification(ServiceNotification.SERVICE_DISPOSED);
+        fireServiceNotification(ServiceNotification.SERVICE_DISPOSED);
         muleContext.getStatistics().remove(stats);
     }
 
@@ -924,6 +924,11 @@ public abstract class AbstractService implements Service
             result = getResponseRouter().getResponse(result);
         }
         return result;
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
     }
 
 }

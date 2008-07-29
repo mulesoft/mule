@@ -70,6 +70,7 @@ mule-module-pgp
 mule-module-scripting
 mule-module-spring-config
 mule-module-spring-extras
+mule-module-sxc
 mule-module-xml
 mule-transport-axis
 mule-transport-bpm
@@ -122,12 +123,15 @@ spring-orm-2.5.3
 spring-tx-2.5.3
 spring-web-2.5.3
 stax-api-1.0.1
-stax-utils-20060502
+stax-utils-20080702
+sxc-core-0.7
+sxc-runtime-0.7
+sxc-xpath-0.7
 velocity-1.4
 velocity-dep-1.4
 wrapper-3.2.3
 wsdl4j-1.6.1
-wstx-asl-3.2.4
+wstx-asl-3.2.6
 xapool-1.4
 xml-resolver-1.2
 xpp3_min-1.1.3.4.O

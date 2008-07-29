@@ -12,8 +12,8 @@ package org.mule.config.spring.parsers.specific;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 
-import org.springframework.util.SystemPropertyUtils;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.SystemPropertyUtils;
 import org.w3c.dom.Element;
 
 public class GlobalPropertyDefinitionParser extends MuleOrphanDefinitionParser
@@ -42,7 +42,7 @@ public class GlobalPropertyDefinitionParser extends MuleOrphanDefinitionParser
         }
 
         String value = element.getAttribute(VALUE_ATTR);
-        assembler.getBean().addConstructorArg(SystemPropertyUtils.resolvePlaceholders(value));
+        assembler.getBean().addConstructorArgValue(SystemPropertyUtils.resolvePlaceholders(value));
         super.postProcess(context, assembler, element);
     }
 }

@@ -36,7 +36,7 @@ public class GeneratedClientTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "bridge-conf.xml";
+        return "proxy-conf.xml";
     }
 
 }

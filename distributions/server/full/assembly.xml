@@ -53,13 +53,13 @@ Assembly descriptor for the full Mule distribution.
       </includes>
     </fileSet>
 
-    <!-- Copy javadocs ("mvn site:site" must have been run previously) -->
+    <!-- Copy javadocs (the build must be run with -DperformRelease=true) -->
     <fileSet>
       <directory>../../../target/site/apidocs</directory>
       <outputDirectory>docs/api</outputDirectory>
     </fileSet>
 
-    <!-- Copy source bundle ("mvn -DperformRelease=true" must have been run previously) -->
+    <!-- Copy source bundle (the build must be run with -DperformRelease=true) -->
     <fileSet>
       <directory>target</directory>
       <outputDirectory>src</outputDirectory>

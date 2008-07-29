@@ -37,6 +37,7 @@ public class ChildMapEntryDefinitionParser extends ChildDefinitionParser
 
         public KeyValuePair()
         {
+            super();
         }
 
         public KeyValuePair(String key, Object value)

@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.util.StringUtils;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -53,7 +54,7 @@ public abstract class AbstractChildDefinitionParser
 
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        builder.setSingleton(isSingleton());
+        builder.setScope(isSingleton() ? BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);
         super.doParse(element, parserContext, builder);
     }
 

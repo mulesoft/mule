@@ -567,17 +567,13 @@
 
 
     <xsd:simpleType name="notificationTypes">
-        <xsd:annotation>
-            <xsd:documentation>
-                The interface that will no longer receive an event.
-            </xsd:documentation>
-        </xsd:annotation>
         <xsd:restriction base="xsd:NMTOKEN">
-            <xsd:enumeration value="MANAGER"/>
+            <xsd:enumeration value="CONTEXT"/>
             <xsd:enumeration value="MODEL"/>
             <xsd:enumeration value="SERVICE"/>
             <xsd:enumeration value="SECURITY"/>
-            <xsd:enumeration value="MESSAGE"/>
+            <xsd:enumeration value="ENDPOINT-MESSAGE"/>
+            <xsd:enumeration value="COMPONENT-MESSAGE"/>
             <xsd:enumeration value="MANAGEMENT"/>
             <xsd:enumeration value="CONNECTION"/>
             <xsd:enumeration value="REGISTRY"/>
@@ -585,6 +581,8 @@
             <xsd:enumeration value="EXCEPTION"/>
             <xsd:enumeration value="TRANSACTION"/>
             <xsd:enumeration value="ROUTING"/>
+            <!-- DEPRECATED -->
+            <xsd:enumeration value="MESSAGE"/>
         </xsd:restriction>
     </xsd:simpleType>
     <!--==============================================================-->

@@ -15,7 +15,12 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
-                    <xsd:element name="queueProfile" type="mule:queueProfileType" minOccurs="0"/>
+                    <xsd:element name="queueProfile" type="mule:queueProfileType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>DEPRECATED. USE "&lt;queue-profile&gt;"</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="queue-profile" type="mule:queueProfileType" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="queueEvents" type="mule:substitutableBoolean">
                     <xsd:annotation>

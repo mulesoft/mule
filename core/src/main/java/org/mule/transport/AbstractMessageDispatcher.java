@@ -23,7 +23,7 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
-import org.mule.context.notification.MessageNotification;
+import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
 
@@ -96,8 +96,8 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                     {
                         component = event.getService().getName();
                     }
-                    connector.fireNotification(new MessageNotification(event.getMessage(), event
-                        .getEndpoint(), component, MessageNotification.MESSAGE_DISPATCHED));
+                    connector.fireNotification(new EndpointMessageNotification(event.getMessage(), event
+                        .getEndpoint(), component, EndpointMessageNotification.MESSAGE_DISPATCHED));
                 }
             }
         }
@@ -162,8 +162,8 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 {
                     component = event.getService().getName();
                 }
-                connector.fireNotification(new MessageNotification(event.getMessage(), event.getEndpoint(),
-                    component, MessageNotification.MESSAGE_SENT));
+                connector.fireNotification(new EndpointMessageNotification(event.getMessage(), event.getEndpoint(),
+                    component, EndpointMessageNotification.MESSAGE_SENT));
             }
 
             //TODO: This chunk can be removed since there is no need to remove any properites since they are now scoped
@@ -269,8 +269,8 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                         component = event.getService().getName();
                     }
 
-                    connector.fireNotification(new MessageNotification(event.getMessage(), event
-                        .getEndpoint(), component, MessageNotification.MESSAGE_DISPATCHED));
+                    connector.fireNotification(new EndpointMessageNotification(event.getMessage(), event
+                        .getEndpoint(), component, EndpointMessageNotification.MESSAGE_DISPATCHED));
                 }
             }
             catch (Exception e)

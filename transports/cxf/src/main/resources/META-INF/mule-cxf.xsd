@@ -102,6 +102,14 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="commonEndpointAttributes">
+        <xsd:attribute name="proxy" type="xsd:boolean">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				Whether or not this outbound endpoint is acting as a web service proxy. If so,
+    				it will expect raw xml as the input parameter and return an XML stream as the output.
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
     	<xsd:attribute name="mtomEnabled" type="xsd:boolean">
     		<xsd:annotation>
     			<xsd:documentation>
@@ -214,14 +222,6 @@
     </xsd:group>
 
     <xsd:attributeGroup name="outboundEndpointAttributes">
-        <xsd:attribute name="proxy" type="xsd:boolean">
-            <xsd:annotation>
-    			<xsd:documentation>
-    				Whether or not this outbound endpoint is acting as a web service proxy. If so,
-    				it will expect raw xml as the input parameter and return an XML stream as the output.
-    			</xsd:documentation>
-    		</xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="wsdlPort" type="xsd:string">
             <xsd:annotation>
     			<xsd:documentation>

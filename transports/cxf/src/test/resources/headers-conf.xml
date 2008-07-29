@@ -10,6 +10,10 @@
         http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
         http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
 
+    <notifications dynamic="true">
+        <notification event="ENDPOINT-MESSAGE"/>
+    </notifications>
+
     <cxf:connector name="cxf" defaultFrontend="simple"/>
     
      <model name="TestCxfHeaders">
@@ -17,7 +21,7 @@
             <inbound>
                 <inbound-endpoint address="cxf:http://localhost:63181/services/TestComponent"/>
             </inbound>
-            <test:component/>
+            <test:component appendString=" Received"/>
         </service>
      </model>
 

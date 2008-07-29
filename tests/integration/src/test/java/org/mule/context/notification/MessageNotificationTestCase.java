@@ -35,18 +35,18 @@ public class MessageNotificationTestCase extends AbstractNotificationTestCase
     public RestrictedNode getSpecification()
     {
         return new Node()
-                .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_SENT, CLIENT))
-                .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_RECEIVED, SERVICE_1))
-                .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_DISPATCHED, CLIENT))
-                .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_RECEIVED, SERVICE_2))
-                .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_DISPATCHED, SERVICE_2))
-                .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_REQUESTED, CLIENT));
+                .parallel(new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_SENT, CLIENT))
+                .parallel(new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_RECEIVED, SERVICE_1))
+                .parallel(new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_DISPATCHED, CLIENT))
+                .parallel(new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_RECEIVED, SERVICE_2))
+                .parallel(new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_DISPATCHED, SERVICE_2))
+                .parallel(new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_REQUESTED, CLIENT));
     }
 
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
-        verifyAllNotifications(spec, MessageNotification.class,
-                MessageNotification.MESSAGE_RECEIVED, MessageNotification.MESSAGE_REQUESTED);
+        verifyAllNotifications(spec, EndpointMessageNotification.class,
+            EndpointMessageNotification.MESSAGE_RECEIVED, EndpointMessageNotification.MESSAGE_REQUESTED);
     }
 
 }

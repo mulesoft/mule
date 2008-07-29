@@ -10,6 +10,7 @@
 
 package org.mule.api.service;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -204,5 +205,7 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
      * @param component
      */
     void setComponent(Component component);
+    
+    MuleContext getMuleContext();
 
 }

@@ -12,10 +12,12 @@ package org.mule.agent;
 
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
+import org.mule.api.context.MuleContextBuilder;
+import org.mule.api.context.notification.ComponentMessageNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
+import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
-import org.mule.api.context.notification.MessageNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
@@ -34,7 +36,10 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
- * and logs them and can optionally route them to an endpoint
+ * and logs them and can optionally route them to an endpoint. This agent will only
+ * receive notifications for notification events that are enabled. The notifications
+ * that are enabled are determined by the {@link MuleContextBuilder} that is used or
+ * configuration mechanisms that may override these values.
  */
 public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 {
@@ -52,6 +57,8 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     private boolean ignoreCustomNotifications = false;
     private boolean ignoreAdminNotifications = false;
     private boolean ignoreMessageNotifications = false;
+    private boolean ignoreEndpointMessageNotifications = false;
+    private boolean ignoreComponentMessageNotifications = false;
 
     private Set listeners = new HashSet();
 
@@ -178,6 +185,26 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     public void setIgnoreConnectionNotifications(boolean ignoreConnectionNotifications)
     {
         this.ignoreConnectionNotifications = ignoreConnectionNotifications;
+    }
+    
+    public boolean isIgnoreComponentMessageNotifications()
+    {
+        return ignoreComponentMessageNotifications;
+    }
+
+    public void setIgnoreComponentMessageNotifications(boolean ignoreComponentMessageNotifications)
+    {
+        this.ignoreComponentMessageNotifications = ignoreComponentMessageNotifications;
+    }
+
+    public boolean isIgnoreEndpointMessageNotifications()
+    {
+        return ignoreEndpointMessageNotifications;
+    }
+
+    public void setIgnoreEndpointMessageNotifications(boolean ignoreEndpointMessageNotifications)
+    {
+        this.ignoreEndpointMessageNotifications = ignoreEndpointMessageNotifications;
     }
 
     public final void initialise() throws InitialisationException
@@ -320,13 +347,9 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             listeners.add(l);
         }
 
-        if (!ignoreMessageNotifications /** &&  TODO RM* !RegistryContext.getConfiguration().isEnableMessageEvents() **/)
+        if (!ignoreMessageNotifications && !ignoreEndpointMessageNotifications)
         {
-            logger.warn("EventLogger agent has been asked to log message notifications, but the MuleManager is configured not to fire Message notifications");
-        }
-        else if (!ignoreMessageNotifications)
-        {
-            ServerNotificationListener l = new MessageNotificationListener()
+            ServerNotificationListener l = new EndpointMessageNotificationListener()
             {
                 public void onNotification(ServerNotification notification)
                 {
@@ -343,6 +366,27 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             }
             listeners.add(l);
         }
+        
+        if (!ignoreMessageNotifications && !ignoreComponentMessageNotifications)
+        {
+            ServerNotificationListener l = new ComponentMessageNotificationListener()
+            {
+                public void onNotification(ServerNotification notification)
+                {
+                    logEvent(notification);
+                }
+            };
+            try
+            {
+               muleContext.registerListener(l);
+            }
+            catch (NotificationException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+            listeners.add(l);
+        }
+
     }
 
     protected abstract void doInitialise() throws InitialisationException;

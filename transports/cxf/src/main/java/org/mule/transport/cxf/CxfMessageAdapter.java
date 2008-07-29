@@ -12,6 +12,7 @@ package org.mule.transport.cxf;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
+import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.cxf.i18n.CxfMessages;
 
@@ -37,14 +38,15 @@ public class CxfMessageAdapter extends AbstractMessageAdapter
      */
     private static final long serialVersionUID = -1L;
 
-    private final Message payload;
+    private Message payload;
     
-    public CxfMessageAdapter(Message message) throws MuleException
+    public CxfMessageAdapter(MessageAdapter msg) throws MuleException
     {
-        if (message == null)
-        {
-            throw new DefaultMuleException(CxfMessages.unableToConstructAdapterForNullMessage());
-        }
+        super(msg);
+    }
+    
+    public void setPayload(Message message) 
+    {
         this.payload = message;
     }
 

@@ -20,6 +20,7 @@ import org.mule.transport.cxf.i18n.CxfMessages;
 import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
 import org.mule.transport.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
+import org.mule.transport.cxf.support.OutputPayloadInterceptor;
 import org.mule.transport.cxf.support.ProxyService;
 import org.mule.transport.soap.i18n.SoapMessages;
 
@@ -92,13 +93,13 @@ public class ClientWrapper
     public void initialize() throws Exception
     {
         String clientClass = (String) endpoint.getProperty(CxfConstants.CLIENT_CLASS);
-        String proxy = (String) endpoint.getProperty(CxfConstants.PROXY);
+        proxy = BooleanUtils.toBoolean((String) endpoint.getProperty(CxfConstants.PROXY));
         
         if (clientClass != null)
         {
             createClientFromClass(bus, clientClass);
         }
-        else if (BooleanUtils.toBoolean(proxy))
+        else if (proxy)
         {
             createClientProxy(bus);
         }
@@ -111,6 +112,11 @@ public class ClientWrapper
         addInterceptors(client.getInFaultInterceptors(), (List<Interceptor>) endpoint.getProperty(CxfConstants.IN_FAULT_INTERCEPTORS));
         addInterceptors(client.getOutInterceptors(), (List<Interceptor>) endpoint.getProperty(CxfConstants.OUT_INTERCEPTORS));
         addInterceptors(client.getOutFaultInterceptors(), (List<Interceptor>) endpoint.getProperty(CxfConstants.OUT_FAULT_INTERCEPTORS));
+
+        if (proxy)
+        {
+            client.getOutInterceptors().add(new OutputPayloadInterceptor());
+        }
         
         List<AbstractFeature> features = (List<AbstractFeature>) endpoint.getProperty(CxfConstants.OUT_FAULT_INTERCEPTORS);
         

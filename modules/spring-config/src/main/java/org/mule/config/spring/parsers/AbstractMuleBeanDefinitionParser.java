@@ -31,6 +31,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -252,8 +253,8 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         checkElementNameUnique(element);
         Class beanClass = getClassInternal(element);
         BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);
-        builder.setSource(parserContext.extractSource(element));
-        builder.setSingleton(isSingleton());
+        builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
+        builder.setScope(isSingleton() ? BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);
 
         List interfaces = ClassUtils.getAllInterfaces(beanClass);
         if(interfaces!=null)
@@ -272,7 +273,8 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         if (parserContext.isNested())
         {
             // Inner bean definition must receive same singleton status as containing bean.
-            builder.setSingleton(parserContext.getContainingBeanDefinition().isSingleton());
+            builder.setScope(parserContext.getContainingBeanDefinition().isSingleton() 
+                ? BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);
         }
 
         doParse(element, parserContext, builder);

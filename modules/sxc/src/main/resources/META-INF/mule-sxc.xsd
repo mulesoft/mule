@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/sxc/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/sxc/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/xml/2.0" 
+                schemaLocation="http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd" />
+
+
+    <xsd:element name="filter" type="sxcFilterType" substitutionGroup="mule:abstract-filter"/>
+    <xsd:complexType name="sxcFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:patternFilterType">
+                <xsd:attribute name="expectedValue" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:element name="filtering-router" type="filteringOutboundRouterType"
+                 substitutionGroup="mule:abstract-outbound-router"/>
+                 
+    <xsd:complexType name="filteringOutboundRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:filteringOutboundRouterType">
+                <xsd:sequence>
+                    <xsd:element name="namespace" type="mule-xml:namespaceType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>

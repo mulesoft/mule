@@ -84,6 +84,11 @@ public class CxfMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH,22);
     }
+
+    public static Message serviceClassRequiredWithPassThrough()
+    {
+        return createMessage(BUNDLE_PATH,23);
+    }
 }
 
 

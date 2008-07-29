@@ -23,9 +23,11 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.NullPayload;
+import org.mule.util.ClassUtils;
 
 import java.io.InputStream;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +55,20 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
     private MessageAdapter originalAdapter = null;
     private transient List appliedTransformerHashCodes = new CopyOnWriteArrayList();
     private byte[] cache;
-
+    
+    private static final List consumableClasses = new ArrayList(); 
+    
+    static
+    {
+        try
+        {
+            consumableClasses.add(ClassUtils.loadClass("javax.xml.stream.XMLStreamReader",
+                DefaultMuleMessage.class));
+        }
+        catch (ClassNotFoundException e)
+        {
+        }
+    }
     public DefaultMuleMessage(Object message)
     {
         this(message, (Map) null);
@@ -194,7 +209,26 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
      */
     protected boolean isPayloadConsumed(Class inputCls)
     {
-        return InputStream.class.isAssignableFrom(inputCls);
+        return InputStream.class.isAssignableFrom(inputCls) || isConsumedFromAdditional(inputCls);
+    }
+
+    private boolean isConsumedFromAdditional(Class inputCls)
+    {
+        if (consumableClasses.size() == 0)
+        {
+            return false;
+        }
+        
+        for (Iterator itr = consumableClasses.iterator(); itr.hasNext();) 
+        {
+            Class c = (Class) itr.next();
+        
+            if (c.isAssignableFrom(inputCls))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** {@inheritDoc} */

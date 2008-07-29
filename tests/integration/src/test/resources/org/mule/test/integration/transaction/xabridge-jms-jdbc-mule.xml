@@ -23,8 +23,7 @@
     <!-- JOTM Transaction manager -->
     <spring:bean name="ArjunaFactory" class="org.mule.module.jboss.transactions.JBossArjunaTransactionManagerFactory"/>
 
-    <spring:bean id="arjunaTM"
-        factory-bean="ArjunaFactory" factory-method="create"/>
+    <spring:bean id="arjunaTM" factory-bean="ArjunaFactory" factory-method="create"/>
 
 
     <context:property-placeholder location="classpath:derby.properties"/>
@@ -61,11 +60,7 @@
 
     <custom-transaction-factory name="xaTxFactory" class="org.mule.transaction.XaTransactionFactory"/>
 
-    <jms:connector name="jmsConnector" eagerConsumer="false">
-        <jms:connection-factory class="org.apache.activemq.ActiveMQXAConnectionFactory">
-            <property key="brokerURL" value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
-        </jms:connection-factory>
-    </jms:connector>
+    <jms:activemq-connector name="jmsConnector" eagerConsumer="false"/>
 
     <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSource">
         <receiver-threading-profile maxThreadsActive="2" maxThreadsIdle="2" maxBufferSize="1" doThreading="false" poolExhaustedAction="WAIT"/>
@@ -79,11 +74,11 @@
     <model name="model">
         <service name="JdbcToJms">
             <inbound>
-                <inbound-endpoint address="jdbc://getTest?type=1">
-                    <transaction action="ALWAYS_BEGIN">
+                <jdbc:inbound-endpoint address="jdbc://getTest?type=1">
+                    <jdbc:transaction action="ALWAYS_BEGIN"/>
                         <transaction-factory ref="xaTxFactory"/>
-                    </transaction>
-                </inbound-endpoint>
+                    </jdbc:transaction>
+                </jdbc:inbound-endpoint>
             </inbound>
             <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
             <outbound>
@@ -94,14 +89,12 @@
         </service>
 
         <service name="JmsToJdbc">
-            <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
             <inbound>
-                <inbound-endpoint address="jms://my.queue?frequency=60000&amp;reuseSession=false">
-                    <transaction action="ALWAYS_BEGIN">
-                        <transaction-factory ref="xaTxFactory"/>
-                    </transaction>
-                </inbound-endpoint>
+                <jms:inbound-endpoint address="jms://my.queue?frequency=60000&amp;reuseSession=false">
+                    <jms:xa-transaction action="ALWAYS_BEGIN"/>
+                </jms:inbound-endpoint>
             </inbound>
+            <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jdbc://writeTest?type=2" />

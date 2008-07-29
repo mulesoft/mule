@@ -48,7 +48,7 @@ import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
-import org.mule.context.notification.MessageNotification;
+import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.lifecycle.AlreadyInitialisedException;
 import org.mule.model.streaming.DelegatingInputStream;
@@ -1540,14 +1540,14 @@ public abstract class AbstractConnector
             else
             {
                 cachedNotificationHandler =
-                        new OptimisedNotificationHandler(muleContext.getNotificationManager(), MessageNotification.class);
+                        new OptimisedNotificationHandler(muleContext.getNotificationManager(), EndpointMessageNotification.class);
             }
         }
     }
 
-    public boolean isEnableMessageEvents()
+    protected boolean isEnableMessageEvents()
     {
-        return cachedNotificationHandler.isNotificationEnabled(MessageNotification.class);
+        return cachedNotificationHandler.isNotificationEnabled(EndpointMessageNotification.class);
     }
 
     /**

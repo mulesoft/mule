@@ -57,8 +57,8 @@ org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
 org.mule.test.integration.util.ObjectNameHelperTestCase
 
 # MULE-2620
-org.mule.module.xml.functional.BeanPropertyExtractorMultipleEndpointsTestCase
-org.mule.module.xml.functional.BeanPropertyExtractorTestCase
+#org.mule.module.xml.functional.BeanPropertyExtractorMultipleEndpointsTestCase
+#org.mule.module.xml.functional.BeanPropertyExtractorTestCase
 
 ##########################################################################
 # Mule 2.1.x failures
@@ -84,10 +84,6 @@ org.mule.test.integration.models.SedaPipelineTestCase
 # MULE-1789
 org.mule.test.integration.config.MultiContainerTestCase
 
-# MULE-2745
-# How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?
-org.mule.test.integration.persistence.FilePersistenceTestCase
-
 # MULE-2996
 org.mule.config.spring.VmSchemaValidationTestCase
 
@@ -97,9 +93,6 @@ org.mule.config.spring.ComponentInterceptorTestCase
 # MULE-3000
 org.mule.test.integration.client.MuleClientRemotingTcpTestCase
 org.mule.test.integration.client.MuleClientRemotingJmsTestCase
-
-# MULE-3002
-#org.mule.test.integration.management.ManagementSimpleStartupTestCase
 
 # This works, but it requires tools.jar on the classpath which we currently don't require:
 org.mule.test.integration.client.MuleClientWSDLExternalTestCase

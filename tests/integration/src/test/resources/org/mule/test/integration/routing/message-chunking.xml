@@ -12,7 +12,9 @@
 
     <!-- the test registers notifications via java that we want the connector to respond to,
          so disable caching -->
-    <notifications dynamic="true"/>
+    <notifications dynamic="true">
+        <notification event="ENDPOINT-MESSAGE"/>
+    </notifications>
 
     <model name="main">
         <service name="Receiver">

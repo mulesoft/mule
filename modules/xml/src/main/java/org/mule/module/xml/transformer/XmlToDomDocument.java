@@ -14,6 +14,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.util.XMLUtils;
 
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -35,6 +36,15 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
                 return null;
             }
 
+            if (XMLStreamReader.class.equals(returnClass))
+            {
+                return getXMLInputFactory().createXMLStreamReader(sourceDoc);
+            }
+            else if (returnClass.isAssignableFrom(sourceDoc.getClass()))
+            {
+                return sourceDoc;
+            }
+            
             // If returnClass is not set, assume W3C DOM
             // This is the original behaviour
             ResultHolder holder = getResultHolder(returnClass);

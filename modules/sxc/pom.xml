@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.modules</groupId>
+        <artifactId>mule-modules</artifactId>
+        <version>2.0.2-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-module-sxc</artifactId>
+    <name>SXC Module</name>
+    <description>Efficiently route messages using streaming XPath.</description>
+
+    <profiles>
+        <profile>
+            <id>osgi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <!-- TODO This module needs reorganization in order to properly export its packages. -->
+                                <Export-Package>
+                                    org.mule.transformer.xml,
+                                    org.mule.routing.filters.xml
+                                </Export-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-xml</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.envoisolutions.sxc</groupId>
+            <artifactId>sxc-xpath</artifactId>
+            <version>0.7</version>
+        </dependency>
+    </dependencies>
+    
+    <build>
+    	<plugins>
+    	    <!-- Without this the compilation aspect of SXC doesn't work so hot -->
+    		<plugin>
+        		<artifactId>maven-surefire-plugin</artifactId>
+        		<configuration>
+        			<forkMode>none</forkMode>
+        		</configuration>
+        	</plugin>
+        </plugins>
+    </build>
+    
+</project>

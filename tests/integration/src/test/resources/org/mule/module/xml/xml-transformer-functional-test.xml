@@ -13,7 +13,7 @@
     <vm:connector name="default">
         <custom-exception-strategy class="org.mule.module.xml.functional.HideExceptions"/>
     </vm:connector>
-
+<!--// START SNIPPET: xml-transformers1 -->
     <vm:connector name="queue" queueEvents="true">
         <custom-exception-strategy class="org.mule.module.xml.functional.HideExceptions"/>
     </vm:connector>
@@ -25,6 +25,7 @@
 
     <mxml:object-to-xml-transformer name="objectToXml"/>
     <mxml:xml-to-object-transformer name="xmlToObject"/>
+<!--// END SNIPPET: xml-transformers1 -->
 
     <mxml:xslt-transformer name="xslt" returnClass="org.dom4j.Document">
         <mxml:xslt-text>
@@ -55,6 +56,7 @@
         </xsl:stylesheet>
         </mxml:xslt-text>
     </mxml:xslt-transformer>
+<!--// START SNIPPET: xml-transformers2 -->
 
     <endpoint name="xml-in" address="vm://xml-in" connector-ref="default"/>
     <vm:endpoint name="object-in" path="object-in" connector-ref="default"/>
@@ -70,6 +72,7 @@
     <endpoint name="object-out" address="vm://object-out" connector-ref="queue"/>
     <vm:endpoint name="object-xml-out" path="object-xml-out" connector-ref="queue"/>
     <endpoint name="dom-xml-out" address="vm://dom-xml-out" connector-ref="queue"/>
+
 
     <model name="xml transformer tests">
 
@@ -118,5 +121,5 @@
         </service>
 
     </model>
-
+<!--// END SNIPPET: xml-transformers2 -->
 </mule>

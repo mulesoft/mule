@@ -198,15 +198,15 @@ public class CxfServiceComponent implements Callable, Lifecycle
         try
         {
             final MessageImpl m = new MessageImpl();
-            final MuleMessage muleMsg = ctx.getMessage();
-            String method = (String) muleMsg.getProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+            final MuleMessage muleReqMsg = ctx.getMessage();
+            String method = (String) muleReqMsg.getProperty(HttpConnector.HTTP_METHOD_PROPERTY);
             
-            String ct = (String) muleMsg.getProperty(HttpConstants.HEADER_CONTENT_TYPE);
+            String ct = (String) muleReqMsg.getProperty(HttpConstants.HEADER_CONTENT_TYPE);
             if (ct != null) {
                 m.put(Message.CONTENT_TYPE, ct);
             }
             
-            String path = (String) muleMsg.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+            String path = (String) muleReqMsg.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
             if (path == null) 
             {
                 path = "";
@@ -278,13 +278,14 @@ public class CxfServiceComponent implements Callable, Lifecycle
                 }
                 
             };
-            DefaultMuleMessage responseMsg = new DefaultMuleMessage(outputHandler);
+            DefaultMuleMessage muleResMsg = new DefaultMuleMessage(outputHandler);
             
             ExchangeImpl exchange = new ExchangeImpl();
             exchange.setInMessage(m);
-            exchange.put(CxfConstants.MULE_MESSAGE, responseMsg);
+            exchange.put(CxfConstants.MULE_REQUEST_MESSAGE, muleReqMsg);
+            exchange.put(CxfConstants.MULE_MESSAGE, muleResMsg);
             
-            // invoke the actual web service up until right before we serialize the respones
+            // invoke the actual web service up until right before we serialize the response
             d.getMessageObserver().onMessage(m);
             
             // Handle a fault if there is one.
@@ -299,7 +300,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
                 }
             }
             
-            return responseMsg;
+            return muleResMsg;
         }
         catch (MuleException e)
         {

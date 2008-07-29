@@ -21,7 +21,9 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -57,6 +59,7 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         registerSourceType(org.w3c.dom.Document.class);
         registerSourceType(org.w3c.dom.Element.class);
         registerSourceType(InputStream.class);
+        registerSourceType(XMLStreamReader.class);
         setReturnClass(byte[].class);
         
         xmlInputFactory = XMLInputFactory.newInstance();
@@ -95,6 +98,19 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
             {
                 return new DocumentSource((Document) src);
             }
+            else if (src instanceof XMLStreamReader)
+            {
+                XMLStreamReader xsr = (XMLStreamReader) src;
+                
+                // StaxSource requires that we advance to a start element/document event
+                if (!xsr.isStartElement() && 
+                                xsr.getEventType() != XMLStreamConstants.START_DOCUMENT) 
+                {
+                    xsr.nextTag();
+                }
+                
+                return new StaxSource((XMLStreamReader) src);
+            }
             else if (src instanceof org.w3c.dom.Document || src instanceof org.w3c.dom.Element)
             {
                 return new DOMSource((org.w3c.dom.Node) src);
@@ -118,7 +134,6 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         }
         else 
         {
-            
             return new StreamSource(stream);
         }
     }
@@ -234,7 +249,8 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
                     return result.getDocument();
                 }
             };
-        }
+        } 
+        
         return null;
     }
 

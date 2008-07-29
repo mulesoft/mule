@@ -114,6 +114,10 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
             args = temp.toArray();
         }
 
+        if (args.length == 0)
+        {
+            return null;
+        }
         return args;
     }
 
@@ -148,7 +152,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         BindingProvider bp = wrapper.getClientProxy();
         bp.getRequestContext().putAll(props);
         
-        Object response = method.invoke(wrapper.getClientProxy(), getArgs(event));
+        Object response = method.invoke(wrapper.getClientProxy(), (Object[]) getArgs(event));
         
         // TODO: handle holders
         

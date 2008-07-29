@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -137,7 +138,7 @@ public class XsltTransformer extends AbstractXmlTransformer
      * Transform, using XSLT, a XML String to another String.
      *
      * @param src The source XML (String, byte[], DOM, etc.)
-     * @return The result String (or DOM)
+     * @return The result in the type specified by the user
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
@@ -150,58 +151,94 @@ public class XsltTransformer extends AbstractXmlTransformer
             }
 
             ResultHolder holder = getResultHolder(returnClass);
+
+            // If the users hasn't specified a class, lets return the same type they gave us
             if (holder == null)
             {
                 holder = getResultHolder(src.getClass());
             }
-
-            DefaultErrorListener errorListener = new DefaultErrorListener(this);
-            javax.xml.transform.Transformer transformer = null;
-            Object result;
-
-            try
+            
+            // If we still don't have a result type, lets fall back to using a DelayedResult
+            // as it is the most efficient.
+            if (holder == null || DelayedResult.class.equals(returnClass))
             {
-                transformer = (javax.xml.transform.Transformer) transformerPool.borrowObject();
-
-                transformer.setErrorListener(errorListener);
-                transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
-
-                // set transformation parameters
-                if (contextProperties != null)
-                {
-                    for (Iterator i = contextProperties.entrySet().iterator(); i.hasNext();)
-                    {
-                        Map.Entry parameter = (Entry) i.next();
-                        String key = (String) parameter.getKey();
-                        transformer.setParameter(key, evaluateTransformParameter(key, parameter.getValue()));
-                    }
-                }
-
-                transformer.transform(sourceDoc, holder.getResult());
-                result = holder.getResultObject();
-
-                if (errorListener.isError())
-                {
-                    throw errorListener.getException();
-                }
+                return getDelayedResult(encoding, sourceDoc);
             }
-            finally
-            {
-                if (transformer != null)
-                {
-                    // clear transformation parameters before returning transformer to the
-                    // pool
-                    transformer.clearParameters();
-
-                    transformerPool.returnObject(transformer);
-                }
-            }
-
-            return result;
+            
+            doTransform(encoding, sourceDoc, holder.getResult());
+            
+            return holder.getResultObject();
         }
         catch (Exception e)
         {
             throw new TransformerException(this, e);
+        }
+    }
+
+    protected Object getDelayedResult(final String encoding, final Source sourceDoc)
+    {
+        return new DelayedResult()
+        {
+            private String systemId;
+            
+            public void write(Result result) throws Exception
+            {
+                doTransform(encoding, sourceDoc, result);
+            }
+
+            public String getSystemId()
+            {
+                return systemId;
+            }
+
+            public void setSystemId(String systemId)
+            {
+                this.systemId = systemId;
+            }
+        };
+    }
+
+    protected void doTransform(String encoding, Source sourceDoc, Result result)
+        throws Exception
+    {
+        DefaultErrorListener errorListener = new DefaultErrorListener(this);
+        javax.xml.transform.Transformer transformer = null;
+
+        try
+        {
+            transformer = (javax.xml.transform.Transformer) transformerPool.borrowObject();
+
+            transformer.setErrorListener(errorListener);
+            transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+
+            // set transformation parameters
+            if (contextProperties != null)
+            {
+                for (Iterator i = contextProperties.entrySet().iterator(); i.hasNext();)
+                {
+                    Map.Entry parameter = (Entry) i.next();
+                    String key = (String) parameter.getKey();
+                    transformer.setParameter(key, evaluateTransformParameter(key, parameter.getValue()));
+                }
+            }
+
+            transformer.transform(sourceDoc, result);
+            
+            if (errorListener.isError())
+            {
+                throw errorListener.getException();
+            }
+        }
+        finally
+        {
+            if (transformer != null)
+            {
+                // clear transformation parameters before returning transformer to the
+                // pool
+                transformer.clearParameters();
+
+                transformerPool.returnObject(transformer);
+            }
         }
     }
 

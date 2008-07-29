@@ -28,8 +28,11 @@ public class VmNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerStandardTransportEndpoints(VMConnector.VM, URIBuilder.PATH_ATTRIBUTES);
         registerConnectorDefinitionParser(VMConnector.class);
-        registerBeanDefinitionParser("queueProfile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
+        registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
         registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(VMTransactionFactory.class));
+
+        // DEPRECATED. Use "queue-profile"
+        registerBeanDefinitionParser("queueProfile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
     }
 
 }

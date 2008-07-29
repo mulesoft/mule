@@ -102,5 +102,10 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-sxc</artifactId>
+            <version>${version}</version>
+        </dependency>
     </dependencies>
 </project>

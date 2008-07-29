@@ -64,7 +64,7 @@ public class AttributeListEntryDefinitionParser
                     "No value for " + attributeName + " in " + SpringXMLUtils.elementToString(element));
         }
         String value = attribute.getNodeValue();
-        builder.setSource(new ChildListEntryDefinitionParser.ListEntry(value));
+        builder.getRawBeanDefinition().setSource(new ChildListEntryDefinitionParser.ListEntry(value));
         this.postProcess(parserContext, getBeanAssembler(element, builder), element);
     }
 

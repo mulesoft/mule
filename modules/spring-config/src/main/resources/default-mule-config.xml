@@ -55,7 +55,7 @@
         <mule:configuration/>
 
         <mule:notifications>
-            <mule:notification event="MANAGER"/>
+            <mule:notification event="CONTEXT"/>
             <mule:notification event="MODEL"/>
             <mule:notification event="SERVICE"/>
             <mule:notification event="SECURITY"/>
@@ -63,7 +63,6 @@
             <mule:notification event="CONNECTION"/>
             <mule:notification event="REGISTRY"/>
             <mule:notification event="CUSTOM"/>
-            <mule:notification event="MESSAGE"/>
             <mule:notification event="EXCEPTION"/>
             <mule:notification event="TRANSACTION"/>
         </mule:notifications>
@@ -74,16 +73,7 @@
 
     <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager">
         <property name="persistenceStrategy">
-            <bean class="org.mule.util.queue.MemoryPersistenceStrategy"/>
-<!--
-            CachingPersistenceStrategy was removed in r10660,r10661
-
-            <bean class="org.mule.util.queue.CachingPersistenceStrategy">
-                <constructor-arg>
-                    <bean class="org.mule.util.queue.MemoryPersistenceStrategy"/>
-                </constructor-arg>
-            </bean>
--->
+            <bean class="org.mule.util.queue.FilePersistenceStrategy"/>
         </property>
     </bean>
 

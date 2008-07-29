@@ -12,16 +12,16 @@ package org.mule.transport.cxf;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.context.notification.MessageNotificationListener;
+import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.context.notification.MessageNotification;
+import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
-public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements MessageNotificationListener
+public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements EndpointMessageNotificationListener
 {
     protected static final String endpointAddress = "http://localhost:63181/services/TestComponent?method=onReceive";
 
@@ -74,9 +74,9 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements M
 
     public void onNotification(ServerNotification notification)
     {
-        if (notification instanceof MessageNotification)
+        if (notification instanceof EndpointMessageNotification)
         {
-            String uri = ((MessageNotification) notification).getEndpoint().getEndpointURI().toString();
+            String uri = ((EndpointMessageNotification) notification).getEndpoint().getEndpointURI().toString();
             if (endpointAddress.equals(uri))
             {
                 notificationMsg = (MuleMessage) notification.getSource();
