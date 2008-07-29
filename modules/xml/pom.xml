@@ -97,5 +97,18 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- XSLT Support -->
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon</artifactId>
+            <version>8.9.0.4</version>
+        </dependency>
+
+        <!-- XQuery Support -->
+        <!--<dependency>-->
+            <!--<groupId>net.sf.saxon</groupId>-->
+            <!--<artifactId>saxon-xqj</artifactId>-->
+            <!--<version>8.9.0.4</version>-->
+        <!--</dependency>-->
     </dependencies>
 </project>

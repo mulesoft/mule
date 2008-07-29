@@ -28,6 +28,8 @@ import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
  */
 public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
 {
+    private final static Object CLIENT_CREATION_LOCK = new Object();
+    
     public CxfWsdlMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
@@ -91,9 +93,12 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
 
     protected Client createClient(Bus bus, String wsdlUrl, String serviceName, String portName) throws Exception
     {
-        DynamicClientFactory cf = DynamicClientFactory.newInstance(bus);
-        return cf.createClient(wsdlUrl, 
-           (serviceName == null ? null : QName.valueOf(serviceName)), 
-           (portName == null ? null : QName.valueOf(portName)));
+        synchronized (CLIENT_CREATION_LOCK)
+        {
+            DynamicClientFactory cf = DynamicClientFactory.newInstance(bus);
+            return cf.createClient(wsdlUrl, 
+               (serviceName == null ? null : QName.valueOf(serviceName)), 
+               (portName == null ? null : QName.valueOf(portName)));
+        }
     }
 }

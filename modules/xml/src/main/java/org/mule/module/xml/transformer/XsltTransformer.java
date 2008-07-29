@@ -103,7 +103,8 @@ public class XsltTransformer extends AbstractXmlTransformer
 
     protected final GenericObjectPool transformerPool;
 
-    private volatile String xslTransformerFactoryClassName;
+    /** Default to Saxon */
+    private volatile String xslTransformerFactoryClassName = "net.sf.saxon.TransformerFactoryImpl";
     private volatile String xslFile;
     private volatile String xslt;
     private volatile Map contextProperties;

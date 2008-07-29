@@ -22,6 +22,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.MessageAdapter;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
@@ -35,6 +36,9 @@ import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -239,8 +243,29 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
                     try
                     {
-                        //connectionStrategy.connect(jmsConnector);
+                        connectionStrategy.connect(jmsConnector);
+
+                        // TODO The following code fragment until jmsConnector.start() is a workaround as 
+                        // suggested in MULE-1720. The real solution will be the long awaited re-connection
+                        // strategy implementation.
+
+                        // keep the receivers in memory so we can register them after initialization
+                        Map receivers = new HashMap(jmsConnector.getReceivers());
                         jmsConnector.initialise();
+                        // register the receivers
+                        for (Iterator itReceivers = receivers.values().iterator(); itReceivers.hasNext();) 
+                        {
+                            MessageReceiver receiver = (MessageReceiver) itReceivers.next();
+                            try 
+                            {
+                                jmsConnector.registerListener(receiver.getService(), receiver.getEndpoint());
+                            } 
+                            catch (Exception ex) 
+                            {
+                                throw new FatalConnectException(ex, receiver);
+                            }
+                        }
+                        
                         jmsConnector.start();
                     }
                     catch (FatalConnectException fcex)

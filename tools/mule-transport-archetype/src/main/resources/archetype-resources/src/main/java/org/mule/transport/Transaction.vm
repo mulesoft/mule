@@ -10,11 +10,8 @@
 
 package org.mule.transport.${TransportNameLower};
 
-import org.mule.config.i18n.Message;
-import org.mule.transaction.AbstractSingleResourceTransaction;
-import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.api.transaction.TransactionException;
-
+import org.mule.transaction.AbstractSingleResourceTransaction;
 
 /**
  * <code>${TransportName}Transaction</code> is a wrapper for a

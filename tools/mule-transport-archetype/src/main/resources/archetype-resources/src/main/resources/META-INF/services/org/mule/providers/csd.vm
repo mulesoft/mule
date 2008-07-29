@@ -20,10 +20,13 @@ streaming.message.adapter=org.mule.transport.${TransportNameLower}.${TransportNa
 #The factory used to create dispatchers responsible for sending events from the underlying technology
 dispatcher.factory=org.mule.transport.${TransportNameLower}.${TransportName}MessageDispatcherFactory
 #end
-#if( $Receiver == "y")
+#if( $hasReceiver == "y")
 
 #The standard message receiver used to consume events from the underlying technology
 message.receiver=org.mule.transport.${TransportNameLower}.${TransportName}MessageReceiver
+
+#The standard message requester used to request data from the underlying technology
+requester.factory=org.mule.transport.${TransportNameLower}.${TransportName}MessageRequesterFactory
 #end
 #if( $hasTransactions == "y")
 

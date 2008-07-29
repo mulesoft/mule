@@ -10,7 +10,6 @@
 
 package org.mule.transport.${TransportNameLower}.i18n;
 
-import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 
 public class ${TransportName}Messages extends MessageFactory

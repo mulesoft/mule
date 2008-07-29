@@ -77,32 +77,38 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             String wsdlUrl = (String) endpointProps.get(CxfConstants.WSDL_LOCATION);
             String bindingId = (String) endpointProps.get(CxfConstants.BINDING_ID);
             String frontend = (String) endpointProps.get(CxfConstants.FRONTEND);
-            String bridge = (String) endpointProps.get(CxfConstants.BRIDGE);
+            String bridgeProp = (String) endpointProps.get(CxfConstants.BRIDGE);
             String serviceClassName = (String) endpointProps.get(CxfConstants.SERVICE_CLASS);
             String mtomEnabled = (String) endpointProps.get(CxfConstants.MTOM_ENABLED);
             List<DataBinding> databinding = (List<DataBinding>) endpointProps.get(CxfConstants.DATA_BINDING);
             List<AbstractFeature> features = (List<AbstractFeature>) endpointProps.get(CxfConstants.FEATURES);
             
-            Class<?> svcCls = null;
-            Class<?> targetCls = getTargetClass();
-            if (!StringUtils.isEmpty(serviceClassName)) 
-            {
-                svcCls = ClassUtils.loadClass(serviceClassName, getClass());
-            } 
-            else 
-            {
-                svcCls = targetCls;
-            }
+            Class<?> svcCls;
+            Class<?> targetCls;
             
-            if (BooleanUtils.toBoolean(bridge))
+            bridge = BooleanUtils.toBoolean(bridgeProp);
+            if (bridge)
             {
                 svcCls = ProviderService.class;
+                targetCls = svcCls;
                 frontend = "jaxws";
             }
-
-            if (StringUtils.isEmpty(frontend))
+            else 
             {
-                frontend = connector.getDefaultFrontend();
+                if (StringUtils.isEmpty(frontend))
+                {
+                    frontend = connector.getDefaultFrontend();
+                }
+                
+                targetCls = getTargetClass();
+                if (!StringUtils.isEmpty(serviceClassName)) 
+                {
+                    svcCls = ClassUtils.loadClass(serviceClassName, getClass());
+                } 
+                else 
+                {
+                    svcCls = targetCls;
+                }
             }
 
             ServerFactoryBean sfb = null;
@@ -119,29 +125,33 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             {
                 throw new CreateException(CxfMessages.invalidFrontend(frontend), this);
             }
+
+            if (!bridge)
+            {
+                if (databinding != null && databinding.size() > 0)
+                {
+                    // TODO: find a way to make this not a list
+                    sfb.setDataBinding(databinding.get(0));
+                }
+                
+                if (!(service.getComponent() instanceof JavaComponent))
+                {
+                    throw new InitialisationException(CxfMessages.javaComponentRequiredForInboundEndpoint(), this);
+                }
+                else
+                {
+                    sfb.setServiceBean(((JavaComponent) service.getComponent()).getObjectFactory().getInstance());
+                }
+            }
             
-            if (databinding != null && databinding.size() > 0)
-            {
-                // TODO: find a way to make this not a list
-                sfb.setDataBinding(databinding.get(0));
-            }
-
-            if (!(service.getComponent() instanceof JavaComponent))
-            {
-                throw new InitialisationException(CxfMessages.javaComponentRequiredForInboundEndpoint(), this);
-            }
-            else
-            {
-                sfb.setServiceBean(((JavaComponent) service.getComponent()).getObjectFactory().getInstance());
-            }
-
             // The binding - i.e. SOAP, XML, HTTP Binding, etc
             if (bindingId != null)
             {
                 sfb.setBindingId(bindingId);
             }
             
-            if (features != null) {
+            if (features != null) 
+            {
                 sfb.setFeatures(features);
             }
             

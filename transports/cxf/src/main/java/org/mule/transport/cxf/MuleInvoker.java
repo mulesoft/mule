@@ -47,14 +47,6 @@ public class MuleInvoker implements Invoker
 
     public Object invoke(Exchange exchange, Object o)
     {
-        BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
-        Service svc = exchange.get(Service.class);
-        MethodDispatcher md = (MethodDispatcher) svc.get(MethodDispatcher.class.getName());
-        Method m = md.getMethod(bop);
-        if (targetClass != null)
-        {
-            m = matchMethod(m, targetClass);
-        }
         
         MuleMessage message = null;
         try
@@ -64,6 +56,15 @@ public class MuleInvoker implements Invoker
 
             if (!receiver.isBridge())
             {
+                BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
+                Service svc = exchange.get(Service.class);
+                MethodDispatcher md = (MethodDispatcher) svc.get(MethodDispatcher.class.getName());
+                Method m = md.getMethod(bop);
+                if (targetClass != null)
+                {
+                    m = matchMethod(m, targetClass);
+                }
+            
                 messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m);
             }
             

@@ -20,5 +20,11 @@
       </inbound>
       <component class="org.mule.transport.cxf.testmodels.Echo"/>
     </service>
+    <service name="asyncService">
+      <inbound>
+          <cxf:inbound-endpoint address="http://localhost:63081/services/async"/>
+      </inbound>
+      <component class="org.mule.transport.cxf.testmodels.AsyncService"/>
+    </service>
   </model>
 </mule>

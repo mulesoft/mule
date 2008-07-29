@@ -10,9 +10,8 @@
 
 package org.mule.transport.${TransportNameLower};
 
-import org.mule.transport.AbstractMessageAdapter;
 import org.mule.api.MessagingException;
-import org.mule.api.transport.MessageTypeNotSupportedException;
+import org.mule.transport.AbstractMessageAdapter;
 
 /**
  * <code>${TransportName}MessageAdapter</code> TODO document

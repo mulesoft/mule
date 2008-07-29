@@ -10,8 +10,24 @@
 
 package org.mule.transport.jms;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Vector;
+
+import javax.jms.BytesMessage;
+import javax.jms.ConnectionFactory;
+import javax.jms.MapMessage;
+import javax.jms.ObjectMessage;
+import javax.jms.Session;
+import javax.jms.StreamMessage;
+import javax.jms.TextMessage;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.mule.RequestContext;
-import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase;
 import org.mule.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.transport.jms.transformers.JMSMessageToObject;
@@ -19,20 +35,6 @@ import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 import org.mule.util.FileUtils;
 import org.mule.util.compression.CompressionStrategy;
 import org.mule.util.compression.GZipCompression;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.jms.BytesMessage;
-import javax.jms.ConnectionFactory;
-import javax.jms.MapMessage;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
 
 /**
  * <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations.
@@ -143,6 +145,37 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         assertEquals("Source and result should be equal", text, res);
     }
 
+    public void testTransformStreamMessage() throws Exception
+    {
+        RequestContext.setEvent(getTestEvent("test"));
+
+        String text = "Test Text";
+        Integer i = 97823;
+        Double d = 0923.2143E124;
+        List list = new ArrayList();
+        list.add(i);
+        list.add(d);
+        list.add(text);
+
+        StreamMessage message = session.createStreamMessage();
+        message.writeString(text);
+        message.writeInt(i);
+        message.writeDouble(d);
+        message.reset();
+
+        AbstractJmsTransformer trans = new JMSMessageToObject();
+        Object result = trans.transform(message);
+        assertTrue("Transformed object should be a Vector", result instanceof Vector);
+
+        String newText = (String) ((Vector) result).get(0);
+        Integer newI = (Integer) ((Vector) result).get(1);
+        Double newD = (Double) ((Vector) result).get(2);
+        assertEquals(i, newI);
+        assertEquals(d, newD);
+        assertEquals(text, newText);
+    }
+    
+    
     // The following test was disabled for ActiveMQ 3.x because ActiveMQ 3.2.4
     // unconditionally uncompresses BytesMessages for reading, even if it is not
     // supposed to do so (the layer doing the message reading seems to have no access

@@ -96,6 +96,14 @@
 #end
 
    <build>
+        <extensions>
+            <!-- WebDAV for remote deployment -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav</artifactId>
+            </extension>
+        </extensions>
+
        <plugins>
            <plugin>
                <artifactId>maven-assembly-plugin</artifactId>
@@ -140,8 +148,7 @@
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-checkstyle-plugin</artifactId>
                <configuration>
-                   <configLocation>http://mulesource.org/download/attachments/92/checkstyle.xml?version=1
-                   </configLocation>
+                   <configLocation>http://www.muleforge.org/download/checkstyle.xml</configLocation>
                </configuration>
            </plugin>
 #end

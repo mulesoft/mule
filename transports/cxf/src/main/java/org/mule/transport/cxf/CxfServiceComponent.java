@@ -263,6 +263,11 @@ public class CxfServiceComponent implements Callable, Lifecycle
                         contentMsg = outMessage;
                     }
                     
+                    if (contentMsg == null)
+                    {
+                        return;
+                    }
+                    
                     DelegatingOutputStream delegate = (DelegatingOutputStream) contentMsg.getContent(OutputStream.class);
                     out.write(((ByteArrayOutputStream) delegate.getOutputStream()).toByteArray());
                     delegate.setOutputStream(out);

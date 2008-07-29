@@ -10,10 +10,6 @@
 
 package org.mule.transport.jms;
 
-import org.mule.util.ArrayUtils;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
@@ -21,6 +17,7 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -38,6 +35,9 @@ import javax.jms.TextMessage;
 import javax.jms.Topic;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.mule.util.ArrayUtils;
+import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
 /**
  * <code>JmsMessageUtils</code> contains helper method for dealing with JMS
@@ -112,7 +112,7 @@ public class JmsMessageUtils
         }
         else if (object instanceof InputStream)
         {
-            StreamMessage sMsg = session.createStreamMessage();
+            StreamMessage sMsg = session.createStreamMessage();	
             InputStream temp = (InputStream)object;
 
             byte[] buffer = new byte[4096];
@@ -130,6 +130,16 @@ public class JmsMessageUtils
                 throw new JMSException("Failed to read input stream to create a stream message: " + e);
             }
 
+            return sMsg;
+        }
+        else if (object instanceof List)
+        {
+            StreamMessage sMsg = session.createStreamMessage();
+            List list = (List) object;
+            for (Iterator iter = list.iterator(); iter.hasNext();)
+            {
+                sMsg.writeObject(iter.next());
+            }
             return sMsg;
         }
         else if (object instanceof byte[])
@@ -182,16 +192,15 @@ public class JmsMessageUtils
         }
         else if (source instanceof StreamMessage)
         {
+            Vector result = new Vector();
             try
             {
                 StreamMessage sMsg = (StreamMessage)source;
-                Vector result = new Vector();
                 Object obj;
                 while ((obj = sMsg.readObject()) != null)
                 {
                     result.addElement(obj);
                 }
-                return result;
             }
             catch (MessageEOFException eof)
             {
@@ -201,6 +210,7 @@ public class JmsMessageUtils
             {
                 throw new JMSException("Failed to extract information from JMS Stream Message: " + e);
             }
+            return result;
         }
 
         // what else is there to do?

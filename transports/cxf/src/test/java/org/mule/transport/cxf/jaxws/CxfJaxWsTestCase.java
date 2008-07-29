@@ -13,6 +13,7 @@ package org.mule.transport.cxf.jaxws;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.NullPayload;
 
 public class CxfJaxWsTestCase extends FunctionalTestCase
 {
@@ -22,6 +23,14 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
         MuleMessage result = client.send("cxf:http://localhost:63081/services/Echo?method=echo", "Hello!",
             null);
         assertEquals("Hello!", result.getPayload());
+    }
+
+    public void testOneWay() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        MuleMessage result = client.send("cxf:http://localhost:63081/services/async?method=send", "Hello!",
+            null);
+        assertEquals(NullPayload.getInstance(), result.getPayload());
     }
 
     protected String getConfigResources()

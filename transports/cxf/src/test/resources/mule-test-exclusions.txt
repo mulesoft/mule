@@ -14,7 +14,6 @@ org.mule.transport.cxf.ServiceUsingAxisEndpointTestCase
 
 # Not working yet...
 org.mule.transport.cxf.client.GeneratedClientTestCase
-org.mule.transport.cxf.bridge.BridgeTest
 
 # Doesn't work on build server for some reason?
 org.mule.transport.cxf.jaxws.ClientTestCase

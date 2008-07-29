@@ -10,16 +10,14 @@
 
 package org.mule.transport.${TransportNameLower};
 
-import org.mule.config.i18n.Message;
 import org.mule.DefaultMuleMessage;
-import org.mule.transport.ConnectException;
-import org.mule.transport.TransactedPollingMessageReceiver;
-import org.mule.api.MuleMessage;
-import org.mule.api.service.Service;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
+import org.mule.transport.ConnectException;
+import org.mule.transport.TransactedPollingMessageReceiver;
 
 import java.util.List;
 
@@ -35,10 +33,9 @@ public class ${TransportName}TransactedMessageReceiver extends TransactedPolling
 
     public ${TransportName}TransactedMessageReceiver(Connector connector,
                                           Service service,
-                                          final InboundEndpoint endpoint,
-                                          long pollingFrequency) throws CreateException
+                                          final InboundEndpoint endpoint) throws CreateException
     {
-        super(connector, service, endpoint, pollingFrequency);
+        super(connector, service, endpoint);
     }
 
     protected List getMessages() throws Exception

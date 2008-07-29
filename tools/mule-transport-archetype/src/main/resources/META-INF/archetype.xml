@@ -100,7 +100,7 @@
         </template>
         <template>
             <file>src/main/resources/META-INF/services/org/mule/providers/csd.vm</file>
-            <output>src/main/resources/META-INF/services/org/mule/transport/${TransportNameLower}.properties</output>
+            <output>src/main/resources/META-INF/services/org/mule/providers/${TransportNameLower}.properties</output>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/Messages.vm</file>
@@ -169,6 +169,20 @@
             <dependsOnVar>hasReceiver=y</dependsOnVar>
         </template>
         <template>
+            <file>src/main/java/org/mule/transport/MessageRequester.vm</file>
+            <output>
+                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageRequester.java
+            </output>
+            <dependsOnVar>hasReceiver=y</dependsOnVar>
+        </template>
+        <template>
+            <file>src/main/java/org/mule/transport/MessageRequesterFactory.vm</file>
+            <output>
+                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageRequesterFactory.java
+            </output>
+            <dependsOnVar>hasReceiver=y</dependsOnVar>
+        </template>
+        <template>
             <file>src/main/java/org/mule/transport/TransactedMessageReceiver.vm</file>
             <output>
                 src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}TransactedMessageReceiver.java
@@ -207,8 +221,8 @@
         </template>
 
         <template>
-            <file>src/main/java/org/mule/transport/EndpointBuilder.vm</file>
-            <output>src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}EndpointBuilder.java</output>
+            <file>src/main/java/org/mule/transport/EndpointURIBuilder.vm</file>
+            <output>src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}EndpointURIBuilder.java</output>
             <dependsOnVar>endpointBuilder=c</dependsOnVar>
         </template>
 

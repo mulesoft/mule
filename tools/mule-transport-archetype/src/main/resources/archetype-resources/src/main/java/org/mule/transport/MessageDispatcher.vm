@@ -10,13 +10,10 @@
 
 package org.mule.transport.${TransportNameLower};
 
-import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.transport.AbstractMessageDispatcher;
 
 /**
  * <code>${TransportName}MessageDispatcher</code> TODO document
@@ -79,32 +76,20 @@ public class ${TransportName}MessageDispatcher extends AbstractMessageDispatcher
            endpoint is running synchronously and any response returned will
            ultimately be passed back to the callee. This method is executed in
            the same thread as the request thread. */
-        
+
         // TODO Write the client code here to send the event over this
         // transport (or to dispatch the event to a store or repository)
-        
+
         // TODO Once the event has been sent, return the result (if any)
         // wrapped in a MuleMessage object
 
         throw new UnsupportedOperationException("doSend");
     }
 
-    public MuleMessage doReceive(long timeout) throws Exception
-    {
-        /* IMPLEMENTATION NOTE: Can be used to make arbitary requests to a
-           transport resource. if the timeout is 0 the method should block
-           until an event on the endpoint is received. */
-        
-        // TODO Write the client code here to perform a request over the
-        // transport
-
-        throw new UnsupportedOperationException("receive");
-    }
-
     public void doDispose()
     {
         // Optional; does not need to be implemented. Delete if not required
-        
+
         /* IMPLEMENTATION NOTE: Is called when the Dispatcher is being
            disposed and should clean up any open resources. */
     }

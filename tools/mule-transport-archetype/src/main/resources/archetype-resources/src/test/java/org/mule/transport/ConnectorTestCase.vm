@@ -11,9 +11,8 @@
 #set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1)}")
 package org.mule.transport.${TransportName.toLowerCase()};
 
-import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.transport.AbstractConnectorTestCase;
 
 public class ${TransportName}ConnectorTestCase extends AbstractConnectorTestCase
 {

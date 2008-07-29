@@ -41,6 +41,7 @@ import java.net.MalformedURLException;
 import java.util.logging.Logger;
 
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -181,7 +182,7 @@ public class MuleUniversalConduit extends AbstractConduit
             MuleMessage result = sendStream(req, ep);
 
             // If we have a result, send it back to CXF
-            if (result != null)
+            if (result != null && !isOneway(m.getExchange()))
             {
                 Message inMessage = new MessageImpl();
                 String contentType = req.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
@@ -208,6 +209,11 @@ public class MuleUniversalConduit extends AbstractConduit
         }
     }
 
+    private boolean isOneway(Exchange exchange)
+    {
+        return exchange != null && exchange.isOneWay();
+    }
+    
     private String setupURL(Message message) throws MalformedURLException
     {
         String value = (String) message.get(Message.ENDPOINT_ADDRESS);

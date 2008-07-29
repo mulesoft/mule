@@ -11,13 +11,12 @@
 #set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1)}")
 package org.mule.transport.${TransportName.toLowerCase()};
 
-import com.mockobjects.dynamic.Mock;
-import org.mule.transport.AbstractConnector;
-import org.mule.transport.${TransportName.toLowerCase()}.${TransportName}MessageReceiver;
-import org.mule.transport.AbstractMessageReceiverTestCase;
-import org.mule.api.service.Service;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.transport.AbstractMessageReceiverTestCase;
+
+import com.mockobjects.dynamic.Mock;
 
 
 public class ${TransportName}MessageReceiverTestCase extends AbstractMessageReceiverTestCase
@@ -30,11 +29,7 @@ public class ${TransportName}MessageReceiverTestCase extends AbstractMessageRece
     {
         Mock mockService = new Mock(Service.class);
         mockService.expectAndReturn("getResponseTransformer", null);
-#if( $isPollingReceiver == "y")
-        return new ${TransportName}MessageReceiver(endpoint.getConnector(), (Service) mockService.proxy(), endpoint, 1000);
-#else
         return new ${TransportName}MessageReceiver(endpoint.getConnector(), (Service) mockService.proxy(), endpoint);
-#end
     }
 
     public InboundEndpoint getEndpoint() throws Exception
