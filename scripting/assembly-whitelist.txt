@@ -3,4 +3,4 @@ js-engine-1.1-jdk14
 jython-engine-1.1-jdk14
 jruby-complete-1.0
 js-1.6R5
-jython-2.1
+jython-2.2.1

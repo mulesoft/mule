@@ -23,7 +23,6 @@
                  -->
                 <version>2.1</version>
                 <configuration>
-                    <finalName>${pom.artifactId}</finalName>
                     <descriptors>
                         <descriptor>assembly.xml</descriptor>
                     </descriptors>
@@ -60,7 +59,7 @@
                     -->
                 </executions>
                 <configuration>
-                    <projectOutputFile>${pom.artifactId}.zip</projectOutputFile>
+                    <projectOutputFile>${pom.artifactId}-${pom.version}.zip</projectOutputFile>
                     <whitelist>assembly-whitelist.txt</whitelist>
                 </configuration>
             </plugin>
@@ -70,14 +69,19 @@
 
     <dependencies>
         <dependency>
+            <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
             <groupId>javax.script</groupId>
-            <artifactId>jruby-engine</artifactId>
-            <version>1.1</version>
+            <artifactId>jython-engine</artifactId>
             <classifier>jdk14</classifier>
         </dependency>
         <dependency>
+            <!-- This is the actual language implementation -->
+            <groupId>org.python</groupId>
+            <artifactId>jython</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.script</groupId>
-            <artifactId>jython-engine</artifactId>
+            <artifactId>jruby-engine</artifactId>
             <version>1.1</version>
             <classifier>jdk14</classifier>
         </dependency>
@@ -91,11 +95,6 @@
             <groupId>org.jruby</groupId>
             <artifactId>jruby-complete</artifactId>
             <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>jython</groupId>
-            <artifactId>jython</artifactId>
-            <version>2.1</version>
         </dependency>
         <dependency>
             <groupId>rhino</groupId>
