@@ -25,6 +25,7 @@ import org.mule.util.StringUtils;
 import java.util.Collection;
 import java.util.Map;
 
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 

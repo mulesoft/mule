@@ -15,21 +15,23 @@ import org.mule.config.i18n.MessageFactory;
 
 public class ServletMessages extends MessageFactory
 {
+    private static final ServletMessages factory = new ServletMessages();
+    
     private static final String BUNDLE_PATH = getBundlePath("servlet");
 
     public static Message failedToReadPayload(String string)
     {
-        return createMessage(BUNDLE_PATH, 3, string);
+        return factory.createMessage(BUNDLE_PATH, 3, string);
     }
 
     public static Message noConnectorForProtocolServlet()
     {
-        return createMessage(BUNDLE_PATH, 4);
+        return factory.createMessage(BUNDLE_PATH, 4);
     }
 
     public static Message noServletConnectorFound(String name)
     {
-        return createMessage(BUNDLE_PATH, 5, name);
+        return factory.createMessage(BUNDLE_PATH, 5, name);
     }
 
 }

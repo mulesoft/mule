@@ -11,7 +11,6 @@
 package org.mule.service;
 
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.registry.Registry;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.QueueProfile;
@@ -31,15 +30,14 @@ public class ServiceTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        Registry registry = muleContext.getRegistry();
 
         testConnector = new TestConnector();
         testConnector.setName("customTestConnector");
-        registry.registerConnector(testConnector);
+        muleContext.getRegistry().registerConnector(testConnector);
 
-        InboundEndpoint inboundEndpoint1 = registry.lookupEndpointFactory().getInboundEndpoint(
+        InboundEndpoint inboundEndpoint1 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://test1?connector=customTestConnector");
-        InboundEndpoint inboundEndpoint2 = registry.lookupEndpointFactory().getInboundEndpoint(
+        InboundEndpoint inboundEndpoint2 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://test2?connector=customTestConnector");
 
         service = new SedaService();
@@ -48,7 +46,7 @@ public class ServiceTestCase extends AbstractMuleTestCase
         service.getInboundRouter().addEndpoint(inboundEndpoint2);
         service.setModel(new SedaModel());
         ((SedaService) service).setQueueProfile(new QueueProfile());
-        registry.registerService(service);
+        muleContext.getRegistry().registerService(service);
 
     }
 

@@ -10,18 +10,7 @@
 
 package org.mule.registry;
 
-import org.mule.MuleServer;
-import org.mule.RegistryContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.agent.Agent;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.EndpointFactory;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
