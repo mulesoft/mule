@@ -117,7 +117,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-servlet_2.4_spec</artifactId>
+            <artifactId>geronimo-servlet_2.5_spec</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
