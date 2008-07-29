@@ -23,8 +23,8 @@ import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.model.seda.SedaModel;
 import org.mule.security.MuleSecurityManager;
 import org.mule.transport.SingleAttemptConnectionStrategy;
+import org.mule.util.DefaultStreamCloserService;
 import org.mule.util.queue.FilePersistenceStrategy;
-import org.mule.util.queue.MemoryPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
 
@@ -67,6 +67,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
         
         registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
+        registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE, new DefaultStreamCloserService());
         
         ThreadingProfile defaultThreadingProfile = new ChainedThreadingProfile();
         defaultThreadingProfile.setThreadWaitTimeout(30);

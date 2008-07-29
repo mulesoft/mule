@@ -12,7 +12,11 @@ package org.mule.transformers.xml;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.module.xml.transformer.XsltTransformer;
+import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.util.IOUtils;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {
@@ -57,5 +61,27 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
     public Object getResultData()
     {
         return resultData;
+    }
+
+    public void testAllXmlMessageTypes() throws Exception
+    {
+        List list = XMLTestUtils.getXmlMessageVariants("simple.xml");
+        Iterator it = list.iterator();
+        
+        Object expectedResult = getResultData();
+        assertNotNull(expectedResult);
+        
+        Object msg, result;
+        while (it.hasNext())
+        {
+            msg = it.next();
+            // TODO Not working for XMLStreamReader 
+            if (!(msg instanceof javax.xml.stream.XMLStreamReader))
+            {
+                result = getTransformer().transform(msg);
+                assertNotNull(result);
+                assertTrue("Test failed for message type: " + msg.getClass(), compareResults(expectedResult, result));
+            }
+        }        
     }
 }

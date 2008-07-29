@@ -11,7 +11,6 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.OutputHandler;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractTransformer;
 
@@ -21,7 +20,6 @@ import java.io.StringWriter;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -50,14 +48,15 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);
-        registerSourceType(Source.class);
-        registerSourceType(Document.class);
+        registerSourceType(javax.xml.transform.Source.class);
+        registerSourceType(org.xml.sax.InputSource.class);
+        registerSourceType(org.dom4j.Document.class);
         registerSourceType(org.w3c.dom.Document.class);
         registerSourceType(org.w3c.dom.Element.class);
-        registerSourceType(InputStream.class);
-        registerSourceType(OutputHandler.class);
-        registerSourceType(XMLStreamReader.class);
-        registerSourceType(DelayedResult.class);
+        registerSourceType(java.io.InputStream.class);
+        registerSourceType(org.mule.api.transport.OutputHandler.class);
+        registerSourceType(javax.xml.stream.XMLStreamReader.class);
+        registerSourceType(org.mule.module.xml.transformer.DelayedResult.class);
         setReturnClass(byte[].class);
         
         xmlInputFactory = XMLInputFactory.newInstance();

@@ -25,7 +25,7 @@ Please enter something:
 </form>
 <p/>
 <table border="1" bordercolor="#990000"  align="left">
-<tr><td>For more information about Echo example go <a target="_blank" href="http://mule.mulesource.org/display/MULEINTRO/Echo+Example">here</a>.</td></tr>
+<tr><td>For more information about Echo example go <a target="_blank" href="http://mule.mulesource.org/display/MULE2INTRO/Echo+Example">here</a>.</td></tr>
 </table>
 </body>
 </html>

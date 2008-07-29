@@ -93,11 +93,18 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         }
     }
 
-    protected synchronized void initialize() throws Exception
+    protected void initialize() throws Exception
     {
         if (evaluator == null)
         {
-            System.setProperty("com.envoisolutions.sxc.output.directory", "target/tmp-xpath");
+            doInitialize();
+        }
+    }
+
+    private synchronized void doInitialize()
+    {
+        if (evaluator == null)
+        {
             builder = new XPathBuilder();
 
             addEventHandlers(builder, getFilter());

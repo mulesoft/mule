@@ -20,6 +20,7 @@ import org.mule.api.registry.Registry;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.util.StreamCloser;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.PropertiesUtils;
@@ -209,6 +210,10 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             if(o instanceof ObjectProcessor)
             {
                 meta = ObjectProcessor.class;
+            }
+            else if(o instanceof StreamCloser)
+            {
+                meta = StreamCloser.class;
             }
             registry.registerObject(OBJECT_PREFIX + i + "#" + o.hashCode(), o, meta);
             props.remove(OBJECT_PREFIX + i++);

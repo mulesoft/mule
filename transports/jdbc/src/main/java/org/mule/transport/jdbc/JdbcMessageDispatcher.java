@@ -36,11 +36,11 @@ import org.apache.commons.logging.LogFactory;
 public class JdbcMessageDispatcher extends AbstractMessageDispatcher
 {
 
-    private static Log staticLogger = LogFactory.getLog(AbstractMessageDispatcher.class);
+    protected static Log staticLogger = LogFactory.getLog(AbstractMessageDispatcher.class);
 
-    private JdbcConnector connector;
-    private static final String STORED_PROCEDURE_PREFIX = "{ ";
-    private static final String STORED_PROCEDURE_SUFFIX = " }";
+    protected JdbcConnector connector;
+    protected static final String STORED_PROCEDURE_PREFIX = "{ ";
+    protected static final String STORED_PROCEDURE_SUFFIX = " }";
 
     public JdbcMessageDispatcher(OutboundEndpoint endpoint)
     {
@@ -53,7 +53,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         // template method
     }
     
-    protected void executeWriteStatement(MuleEvent event, String writeStmt) throws Exception
+    protected Object executeWriteStatement(MuleEvent event, String writeStmt) throws Exception
     {
         List paramNames = new ArrayList();
         writeStmt = connector.parseStatement(writeStmt, paramNames);
@@ -63,6 +63,9 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
 
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         Connection con = null;
+        
+        MuleMessage message = event.getMessage();
+        
         try
         {
             con = this.connector.getConnection();
@@ -96,6 +99,8 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             }
             throw e;
         }
+        
+        return message;
     }
     
     protected String getStatement(ImmutableEndpoint endpoint)

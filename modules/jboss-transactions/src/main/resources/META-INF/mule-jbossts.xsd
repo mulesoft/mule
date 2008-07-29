@@ -28,7 +28,7 @@
     <xsd:element name="transaction-manager" type="transactionManagerType"
                  substitutionGroup="mule:abstract-transaction-manager">
         <xsd:annotation>
-            <xsd:documentation>By adding this element to a Mule XML configuration you will enable Mule to use the JBoss
+            <xsd:documentation>By adding this element to a Mule XML configuration, you will enable Mule to use the JBoss
                 Transaction Manager. You can configure arbitrary properties on the transaction manager that will be
                 passed on to the underlying transaction manager. For example:
 

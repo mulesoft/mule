@@ -118,4 +118,33 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         assertTrue(filter.accept(new DefaultMuleMessage("The quickbrown fox")));
     }
 
+    public void testTrueString()
+    {
+        ExpressionFilter filter = new ExpressionFilter("payload:");
+        filter.setNullReturnsTrue(true);
+
+        assertTrue(filter.accept(new DefaultMuleMessage("true")));
+        assertTrue(filter.accept(new DefaultMuleMessage("TRUE")));
+        assertTrue(filter.accept(new DefaultMuleMessage("tRuE")));
+    }
+
+    public void testFalseString()
+    {
+        ExpressionFilter filter = new ExpressionFilter("payload:");
+        filter.setNullReturnsTrue(false);
+
+        assertFalse(filter.accept(new DefaultMuleMessage("false")));
+        assertFalse(filter.accept(new DefaultMuleMessage("FALSE")));
+        assertFalse(filter.accept(new DefaultMuleMessage("faLSe")));
+    }
+
+    public void testOtherString()
+    {
+        ExpressionFilter filter = new ExpressionFilter("payload:");
+        filter.setNullReturnsTrue(false);
+
+        assertFalse(filter.accept(new DefaultMuleMessage("otherTrueString")));
+        assertFalse(filter.accept(new DefaultMuleMessage("otherFalseString")));
+        assertFalse(filter.accept(new DefaultMuleMessage("!trueFALSE")));
+    }
 }

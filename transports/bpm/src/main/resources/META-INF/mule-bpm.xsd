@@ -99,7 +99,7 @@
                  substitutionGroup="mule:abstract-outbound-router"/>
     <xsd:complexType name="bpmOutboundRouterType">
         <xsd:complexContent>
-            <xsd:extension base="mule:filteringOutboundRouterType"/>
+            <xsd:extension base="mule:multipleEndpointFilteringOutboundRouterType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

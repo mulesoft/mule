@@ -123,7 +123,7 @@ public final class PropertyScope implements Serializable
      * Used for comparing {@link PropertyScope} instances in a map. The {@link PropertyScope#getOrder()}
      * property is used to determine the order in the map
      */
-    public static class ScopeComarator implements Comparator, Serializable
+    public static class ScopeComparator implements Comparator, Serializable
     {
         private static final long serialVersionUID = -3346258000312580166L;
 

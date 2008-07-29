@@ -43,6 +43,7 @@
     <custom-transformer name="HttpRequestToNameString" class="org.mule.example.hello.HttpRequestToNameString"/>
     <custom-transformer name="ExceptionToString" class="org.mule.example.hello.ExceptionToString"/>
     <custom-transformer name="HttpRequestToParameter" class="org.mule.transport.servlet.HttpRequestToParameter"/>
+    <custom-transformer name="ObjectToString" class="org.mule.transformer.simple.ObjectToString"/>
 
     <!-- workaround for http://mule.mulesource.org/jira/browse/MULE-1827 -->
     <message-properties-transformer name="PlainTextResponseTransformer">

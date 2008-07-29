@@ -98,6 +98,7 @@ public interface MuleProperties
     String OBJECT_QUEUE_MANAGER = "_muleQueueManager";
     String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";
     String OBJECT_MULE_ENDPOINT_FACTORY = "_muleEndpointFactory";
+    String OBJECT_MULE_STREAM_CLOSER_SERVICE = "_muleStreamCloserService";
     String OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP = "_muleSimpleRegistryBootstrap";
     String OBJECT_DEFAULT_THREADING_PROFILE = "_defaultThreadingProfile";
     String OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE = "_defaultMessageDispatcherThreadingProfile";

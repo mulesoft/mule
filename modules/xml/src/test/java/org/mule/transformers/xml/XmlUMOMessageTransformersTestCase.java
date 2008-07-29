@@ -72,7 +72,7 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
                + " <message class=\"string\">test</message>\n"
                + "   <properties>\n"
                + "     <scopedMap class=\"tree-map\">\n"
-               + "       <comparator class=\"org.mule.api.transport.PropertyScope$ScopeComarator\"/>\n"
+               + "       <comparator class=\"org.mule.api.transport.PropertyScope$ScopeComparator\"/>\n"
                + "       <entry>\n"
                + "         <org.mule.api.transport.PropertyScope>\n"
                + "           <scope>invocation</scope>\n"

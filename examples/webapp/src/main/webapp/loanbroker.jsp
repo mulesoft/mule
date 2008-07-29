@@ -73,7 +73,7 @@
 
 <p/>
 <table border="1" bordercolor="#990000"  align="left">
-<tr><td>For more information about Loan Broker example go <a target="_blank" href="http://mule.mulesource.org/display/MULEINTRO/Loan+Broker+Example">here</a>.</td></tr>
+<tr><td>For more information about Loan Broker example go <a target="_blank" href="http://mule.mulesource.org/display/MULE2INTRO/Loan+Broker+Example">here</a>.</td></tr>
 </table>
 </body>
 </html>

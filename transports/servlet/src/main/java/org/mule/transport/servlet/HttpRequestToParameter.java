@@ -10,27 +10,30 @@
 
 package org.mule.transport.servlet;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractDiscoverableTransformer;
+import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.util.SystemUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class HttpRequestToParameter extends AbstractDiscoverableTransformer
+public class HttpRequestToParameter extends AbstractMessageAwareTransformer
 {
 
     public HttpRequestToParameter()
     {
-        registerSourceType(HttpServletRequest.class);
+        registerSourceType(Object.class);
         setReturnClass(String.class);
     }
 
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        HttpServletRequest request = (HttpServletRequest)src;
+        HttpServletRequest request = ((HttpRequestMessageAdapter) message.getAdapter()).getRequest();
 
         String payloadParam = (String)request.getAttribute(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME);
         if (null == payloadParam)
@@ -45,7 +48,8 @@ public class HttpRequestToParameter extends AbstractDiscoverableTransformer
             {
                 try
                 {
-                    BufferedReader reader = request.getReader();
+                    InputStream is = (InputStream) message.getPayload();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, request.getCharacterEncoding()));
                     StringBuffer buffer = new StringBuffer(8192);
                     String line = reader.readLine();
                     while (line != null)

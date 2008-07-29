@@ -45,7 +45,7 @@ public class MessagePropertiesContext implements Serializable
     public MessagePropertiesContext()
     {
         keySet = new TreeSet();
-        scopedMap = new TreeMap(new PropertyScope.ScopeComarator());
+        scopedMap = new TreeMap(new PropertyScope.ScopeComparator());
 
         scopedMap.put(PropertyScope.INVOCATION, new HashMap(6));
         scopedMap.put(PropertyScope.INBOUND, new HashMap(6));

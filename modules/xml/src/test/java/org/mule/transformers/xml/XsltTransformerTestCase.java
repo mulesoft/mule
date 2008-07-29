@@ -16,11 +16,18 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XsltTransformer;
+import org.mule.module.xml.util.XMLTestUtils;
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
 
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
+import javax.xml.stream.XMLStreamReader;
 
 public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {
@@ -66,6 +73,39 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         return resultData;
     }
 
+    public void testAllXmlMessageTypes() throws Exception
+    {
+        List list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
+        Iterator it = list.iterator();
+        
+        Object expectedResult = getResultData();
+        assertNotNull(expectedResult);
+        
+        Object msg, result;
+        while (it.hasNext())
+        {
+            msg = it.next();
+            result = getTransformer().transform(msg);
+            assertNotNull(result);
+            assertTrue("Test failed for message type: " + msg.getClass(), compareResults(expectedResult, result));
+        }        
+    }
+
+    public void testTransformXMLStreamReader() throws Exception
+    {
+        Object expectedResult = getResultData();
+        assertNotNull(expectedResult);
+        
+        XsltTransformer transformer = (XsltTransformer) getTransformer();
+        
+        InputStream is = IOUtils.getResourceAsStream("cdcatalog.xml", XMLTestUtils.class);
+        XMLStreamReader sr = XMLUtils.toXMLStreamReader(transformer.getXMLInputFactory(), is);
+
+        Object result = transformer.transform(sr);
+        assertNotNull(result);
+        assertTrue("expected: " + expectedResult + "\nresult: " + result, compareResults(expectedResult, result));
+    }
+    
     public void testCustomTransformerFactoryClass() throws InitialisationException
     {
         XsltTransformer t = new XsltTransformer();

@@ -16,6 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -28,6 +29,7 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
+import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ExceptionNotification;
@@ -319,11 +321,22 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
             catch (MuleException e)
             {
                 logFatal(message, e);
+                closeStream(message);
             }
         }
         else
         {
             handleTransaction(t);
+            closeStream(message);
+        }
+    }
+
+    protected void closeStream(MuleMessage message)
+    {
+        if (muleContext != null)
+        {
+            ((StreamCloserService) muleContext.getRegistry().lookupObject(
+                MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).closeStream(message.getPayload());
         }
     }
 

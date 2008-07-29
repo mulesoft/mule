@@ -32,6 +32,7 @@ public class ExpressionFilter implements Filter
     private String customEvaluator;
     private String fullExpression;
     private boolean nullReturnsTrue = false;
+    private static final String TRUE = "true";
 
     /** For evaluators that are not expression languages we can delegate the execution to another filter */
     private Filter delegateFilter;
@@ -74,23 +75,28 @@ public class ExpressionFilter implements Filter
     public boolean accept(MuleMessage message)
     {
         String expr = getFullExpression();
-        if(delegateFilter!=null)
+        if (delegateFilter != null)
         {
             return delegateFilter.accept(message);
         }
 
         Object result = ExpressionEvaluatorManager.evaluate(expr, message);
-        if(result==null)
+        if (result == null)
         {
             return nullReturnsTrue;
         }
-        else if(result instanceof Boolean)
+        else if (result instanceof Boolean)
         {
-            return ((Boolean)result).booleanValue();
+            return ((Boolean) result).booleanValue();
+        }
+        else if (result instanceof String)
+        {
+            return ((String) result).toLowerCase().equals(TRUE);
         }
         else
         {
-            logger.warn("Expression: " + expr + ", returned an non-boolean result. Returning: " + !nullReturnsTrue);
+            logger.warn("Expression: " + expr + ", returned an non-boolean result. Returning: "
+                        + !nullReturnsTrue);
             return !nullReturnsTrue;
         }
     }

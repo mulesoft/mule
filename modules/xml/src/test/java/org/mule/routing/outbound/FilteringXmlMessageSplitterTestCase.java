@@ -16,7 +16,6 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.module.xml.routing.FilteringXmlMessageSplitter;
 import org.mule.module.xml.util.XMLTestUtils;
-import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
@@ -31,8 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.Source;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -93,6 +91,15 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         internalTestSuccessfulXmlSplitter2(doc);
     }
 
+// TODO MULE-3554
+//    public void testW3CDocumentPayloadXmlMessageSplitter() throws Exception
+//    {
+//        InputStream is = IOUtils.getResourceAsStream("purchase-order.xml", getClass());
+//        org.w3c.dom.Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+//        internalTestSuccessfulXmlSplitter(doc);
+//        internalTestSuccessfulXmlSplitter2(doc);
+//    }
+
     public void testByteArrayPayloadXmlMessageSplitter() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
@@ -117,7 +124,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         while (it.hasNext())
         {
             msg = it.next();
-            // TODO Not working for W3C Documents
+            // TODO MULE-3554 Not working for W3C Documents, see testW3CDocumentPayloadXmlMessageSplitter()
             if (!(msg instanceof org.w3c.dom.Document))
             {
                 internalTestSuccessfulXmlSplitter(msg);
@@ -134,7 +141,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         while (it.hasNext())
         {
             msg = it.next();
-            // TODO Not working for W3C Documents
+            // TODO MULE-3554 Not working for W3C Documents, see testW3CDocumentPayloadXmlMessageSplitter()
             if (!(msg instanceof org.w3c.dom.Document))
             {
                 internalTestSuccessfulXmlSplitter2(msg);

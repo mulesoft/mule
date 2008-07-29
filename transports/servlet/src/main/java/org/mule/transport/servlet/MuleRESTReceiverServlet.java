@@ -78,7 +78,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             }
             else
             {
-            	MessageReceiver receiver = getReceiverForURI(httpServletRequest);
+                MessageReceiver receiver = getReceiverForURI(httpServletRequest);
                 httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
                 MuleMessage message = new DefaultMuleMessage(receiver.getConnector().getMessageAdapter(
                     httpServletRequest));
@@ -97,7 +97,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
     {
         try
         {
-        	MessageReceiver receiver = getReceiverForURI(httpServletRequest);
+            MessageReceiver receiver = getReceiverForURI(httpServletRequest);
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
             MuleMessage message = new DefaultMuleMessage(receiver.getConnector()
                 .getMessageAdapter(httpServletRequest));
@@ -116,7 +116,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
     {
         try
         {
-        	MessageReceiver receiver = getReceiverForURI(httpServletRequest);
+            MessageReceiver receiver = getReceiverForURI(httpServletRequest);
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
             MuleMessage message = new DefaultMuleMessage(receiver.getConnector()
                 .getMessageAdapter(httpServletRequest));
