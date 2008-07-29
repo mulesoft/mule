@@ -289,17 +289,6 @@ Assembly descriptor for the full Mule distribution.
         </includes>
     </fileSet>
 
-    <!-- Insert version numbers into OSGi startup file -->
-    <files>
-        <file>
-            <source>${pom.basedir}/../src/main/resources/conf/init.xargs</source> 
-            <outputDirectory>conf</outputDirectory>
-            <filtered>true</filtered>
-            <!-- Workaround for http://jira.codehaus.org/browse/MASSEMBLY-153 -->
-            <fileMode>420</fileMode>            
-        </file>
-    </files>
-
     <!--
     ============================
       Mule Examples: Bookstore
@@ -319,8 +308,19 @@ Assembly descriptor for the full Mule distribution.
             <include>bookstore.bat</include>
         </includes>
     </fileSet>
-
   </fileSets>
+
+    <!-- Insert version numbers into OSGi startup file -->
+    <files>
+        <file>
+            <source>${pom.basedir}/../src/main/resources/conf/init.xargs</source> 
+            <outputDirectory>conf</outputDirectory>
+            <filtered>true</filtered>
+            <!-- Workaround for http://jira.codehaus.org/browse/MASSEMBLY-153 -->
+            <fileMode>420</fileMode>            
+        </file>
+    </files>
+
     <!--
     ============================
         Libraries
