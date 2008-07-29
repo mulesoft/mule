@@ -1445,6 +1445,13 @@
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <source>1.5</source>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-eclipse-plugin</artifactId>
                         <version>${eclipsePluginVersion}</version>
                         <configuration>
@@ -1460,6 +1467,7 @@
             </build>
             <modules>
                 <module>examples</module>
+                <module>modules</module>
                 <module>transports</module>
                 <module>tests</module>
             </modules>

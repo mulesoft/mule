@@ -18,9 +18,9 @@ package org.mule.api.transformer;
  */
 public interface DiscoverableTransformer
 {
-    public static final int MAX_PRIORITY_WEIGHTING = 10;
-    public static final int MIN_PRIORITY_WEIGHTING = 1;
-    public static final int DEFAULT_PRIORITY_WEIGHTING = MIN_PRIORITY_WEIGHTING;
+    int MAX_PRIORITY_WEIGHTING = 10;
+    int MIN_PRIORITY_WEIGHTING = 1;
+    int DEFAULT_PRIORITY_WEIGHTING = MIN_PRIORITY_WEIGHTING;
 
     /**
      * If 2 or more discoverable transformers are equal, this value can be used to select the correct one
@@ -28,7 +28,7 @@ public interface DiscoverableTransformer
      * @return the priority weighting for this transformer. This is a value between
      *         {@link #MIN_PRIORITY_WEIGHTING} and {@link #MAX_PRIORITY_WEIGHTING}.
      */
-    public int getPriorityWeighting();
+    int getPriorityWeighting();
 
     /**
      * If 2 or more discoverable transformers are equal, this value can be used to select the correct one
@@ -36,5 +36,5 @@ public interface DiscoverableTransformer
      * @param weighting the priority weighting for this transformer. This is a value between
      *                  {@link #MIN_PRIORITY_WEIGHTING} and {@link #MAX_PRIORITY_WEIGHTING}.
      */
-    public void setPriorityWeighting(int weighting);
+    void setPriorityWeighting(int weighting);
 }

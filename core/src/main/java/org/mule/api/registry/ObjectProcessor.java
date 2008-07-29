@@ -15,5 +15,5 @@ package org.mule.api.registry;
 
 public interface ObjectProcessor
 {
-    public Object process(Object object);
+    Object process(Object object);
 }

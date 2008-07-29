@@ -282,7 +282,8 @@ public class CxfServiceComponent implements Callable, Lifecycle
             
             ExchangeImpl exchange = new ExchangeImpl();
             exchange.setInMessage(m);
-            exchange.put(CxfConstants.MULE_REQUEST_MESSAGE, muleReqMsg);
+            m.put(CxfConstants.MULE_MESSAGE, muleReqMsg);
+            
             exchange.put(CxfConstants.MULE_MESSAGE, muleResMsg);
             
             // invoke the actual web service up until right before we serialize the response

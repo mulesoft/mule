@@ -11,7 +11,6 @@
 package org.mule.util.pool;
 
 import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
 import org.mule.config.PoolingProfile;
@@ -30,7 +29,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * that internally uses the commons-pool {@link GenericObjectPool} and uses a
  * {@link ObjectFactory} for creating new pooled instances.
  */
-public class CommonsPoolObjectPool implements ObjectPool, Initialisable, Disposable
+public class CommonsPoolObjectPool implements ObjectPool
 {
     /**
      * logger used by this class

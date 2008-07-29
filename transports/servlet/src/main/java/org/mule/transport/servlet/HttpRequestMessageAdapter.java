@@ -20,6 +20,7 @@ import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.UUID;
 
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
@@ -104,7 +105,14 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
      */
     public Object getPayload()
     {
-        return request;
+        try
+        {
+            return request.getInputStream();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean isBinary()

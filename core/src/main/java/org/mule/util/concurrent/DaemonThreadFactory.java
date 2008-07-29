@@ -10,9 +10,8 @@
 
 package org.mule.util.concurrent;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 
-public class DaemonThreadFactory extends NamedThreadFactory implements ThreadFactory
+public class DaemonThreadFactory extends NamedThreadFactory
 {
 
     public DaemonThreadFactory(String name)

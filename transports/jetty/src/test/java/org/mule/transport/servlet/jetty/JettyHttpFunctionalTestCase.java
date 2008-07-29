@@ -8,14 +8,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.xml.filters;
+package org.mule.transport.servlet.jetty;
 
-/**
- * @inheritDoc
- * @deprecated Please use <code>org.mule.routing.filters.xml.JXPathFilter</code>
- *             instead.
- */
-public class JXPathMessageFilter extends JXPathFilter
+import org.mule.transport.http.functional.HttpFunctionalTestCase;
+
+public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
 {
-    // nothing here any more.
+
+    //@Override
+    protected String getConfigResources()
+    {
+        return "jetty-http-functional-test.xml";
+    }
+
 }

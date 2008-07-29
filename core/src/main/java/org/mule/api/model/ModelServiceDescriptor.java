@@ -23,9 +23,9 @@ import org.mule.api.registry.ServiceException;
  */
 public interface ModelServiceDescriptor extends ServiceDescriptor
 {
-    public Model createModel() throws ServiceException;
+    Model createModel() throws ServiceException;
 
-    public Class getModelClass() throws ServiceException;
+    Class getModelClass() throws ServiceException;
 }
 
 

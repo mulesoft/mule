@@ -44,12 +44,9 @@ public class DirectXmlTestCase extends FunctionalTestCase
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         assertNotNull(xml);
 
-        MuleMessage result = client.send("vm://echoWithTransform", 
-            xml,
-            null);
-        
-//        System.out.println(result.getPayloadAsString()); 
-        assertTrue(result.getPayloadAsString().indexOf("echoResponse") != -1);
+        MuleMessage result = client.send("vm://echoWithTransform", xml, null);
+        String resultStr = result.getPayloadAsString();        
+        assertTrue("echoResponse not found in result: " + resultStr, resultStr.indexOf("echoResponse") != -1);
     }
     
     private void test(MuleClient client, Object xml) throws MuleException, Exception

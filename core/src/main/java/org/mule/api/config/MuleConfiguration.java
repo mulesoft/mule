@@ -19,7 +19,7 @@ public interface MuleConfiguration
     /**
      * The prefix for any Mule-specific properties set in the system properties
      */
-    public static final String SYSTEM_PROPERTY_PREFIX = "mule.";
+    String SYSTEM_PROPERTY_PREFIX = "mule.";
 
     boolean isDefaultSynchronousEndpoints();
 

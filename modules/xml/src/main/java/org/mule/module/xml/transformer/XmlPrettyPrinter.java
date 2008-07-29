@@ -11,12 +11,13 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
+import org.dom4j.DocumentException;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
@@ -42,23 +43,19 @@ public class XmlPrettyPrinter extends AbstractTransformer
     {
         try
         {
-            ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
-            Document document = null;
-
-            if (src instanceof String)
+            Document document = XMLUtils.toDocument(src);
+            if (document != null)
             {
-                String text = (String) src;
-                document = DocumentHelper.parseText(text);
+                ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
+                XMLWriter writer = new XMLWriter(resultStream, this.getOutputFormat());
+                writer.write(document);
+                writer.close();
+                return resultStream.toString(encoding);
             }
-            else if (src instanceof org.dom4j.Document)
+            else 
             {
-                document = (Document) src;
+                throw new DocumentException("Payload is not valid XML");
             }
-
-            XMLWriter writer = new XMLWriter(resultStream, this.getOutputFormat());
-            writer.write(document);
-            writer.close();
-            return resultStream.toString(encoding);
         }
         catch (Exception e)
         {

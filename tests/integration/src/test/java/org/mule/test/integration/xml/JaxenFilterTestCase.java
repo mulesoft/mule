@@ -32,7 +32,7 @@ public class JaxenFilterTestCase extends FunctionalTestCase
         MuleMessage res = client.send("vm://in", msg);
         
         Object payload = res.getPayload();
-        assertTrue(payload instanceof Document);
+        assertTrue("payload is of type " + payload.getClass(), payload instanceof Document);
     }
     
     protected String getConfigResources()

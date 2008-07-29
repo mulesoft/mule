@@ -330,8 +330,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      */
     public byte[] transformMessageToBytes() throws TransformerException
     {
-        Object obj =  transformMessage(byte[].class);
-        return (byte[])obj;
+        return (byte[]) transformMessage(byte[].class);
     }
 
     /**
@@ -537,7 +536,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
             return false;
         }
 
-        final DefaultMuleEvent event = (DefaultMuleEvent)o;
+        final DefaultMuleEvent event = (DefaultMuleEvent) o;
 
         if (message != null ? !message.equals(event.message) : event.message != null)
         {

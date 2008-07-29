@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.servlet;
+package org.mule.transport.servlet.jetty;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;

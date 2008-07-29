@@ -11,12 +11,11 @@
 package org.mule.endpoint;
 
 import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 
-public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implements MuleContextAware
+public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
 {
 
     public EndpointURIEndpointBuilder()

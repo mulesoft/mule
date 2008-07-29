@@ -41,49 +41,49 @@ public interface ThreadingProfile
     /**
      * Default value for MAX_THREADS_ACTIVE
      */
-    public static final int DEFAULT_MAX_THREADS_ACTIVE = 16;
+    int DEFAULT_MAX_THREADS_ACTIVE = 16;
 
     /**
      * Default value for MAX_THREADS_IDLE
      */
-    public static final int DEFAULT_MAX_THREADS_IDLE = 1;
+    int DEFAULT_MAX_THREADS_IDLE = 1;
 
     /**
      * Default value for MAX_BUFFER_SIZE
      */
-    public static final int DEFAULT_MAX_BUFFER_SIZE = 0;
+    int DEFAULT_MAX_BUFFER_SIZE = 0;
 
     /**
      * Default value for MAX_THREAD_TTL
      */
-    public static final long DEFAULT_MAX_THREAD_TTL = 60000;
+    long DEFAULT_MAX_THREAD_TTL = 60000;
 
     /**
      * Default value for DEFAULT_THREAD_WAIT_TIMEOUT
      */
-    public static final long DEFAULT_THREAD_WAIT_TIMEOUT = 30000L;
+    long DEFAULT_THREAD_WAIT_TIMEOUT = 30000L;
 
     /**
      * Default value for do threading
      */
-    public static final boolean DEFAULT_DO_THREADING = true;
+    boolean DEFAULT_DO_THREADING = true;
 
     /**
      * Actions to perform on pool exhaustion
      */
-    public static final int WHEN_EXHAUSTED_WAIT = 0;
-    public static final int WHEN_EXHAUSTED_DISCARD = 1;
-    public static final int WHEN_EXHAUSTED_DISCARD_OLDEST = 2;
-    public static final int WHEN_EXHAUSTED_ABORT = 3;
-    public static final int WHEN_EXHAUSTED_RUN = 4;
+    int WHEN_EXHAUSTED_WAIT = 0;
+    int WHEN_EXHAUSTED_DISCARD = 1;
+    int WHEN_EXHAUSTED_DISCARD_OLDEST = 2;
+    int WHEN_EXHAUSTED_ABORT = 3;
+    int WHEN_EXHAUSTED_RUN = 4;
 
     /**
      * Default action to perform on pool exhaustion
      */
-    static final int DEFAULT_POOL_EXHAUST_ACTION = WHEN_EXHAUSTED_RUN;
+    int DEFAULT_POOL_EXHAUST_ACTION = WHEN_EXHAUSTED_RUN;
 
     // map pool exhaustion strings to their respective values
-    static final Map POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
+    Map POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
     {
         private static final long serialVersionUID = 1L;
 
@@ -111,7 +111,7 @@ public interface ThreadingProfile
         }
     };
 
-    static final ThreadingProfile DEFAULT_THREADING_PROFILE =
+    ThreadingProfile DEFAULT_THREADING_PROFILE =
             new ImmutableThreadingProfile(
                     DEFAULT_MAX_THREADS_ACTIVE,
                     DEFAULT_MAX_THREADS_IDLE,
@@ -170,7 +170,7 @@ public interface ThreadingProfile
 
     void setDoThreading(boolean doThreading);
 
-    static interface WorkManagerFactory
+    interface WorkManagerFactory
     {
         WorkManager createWorkManager(ThreadingProfile profile, String name);
     }

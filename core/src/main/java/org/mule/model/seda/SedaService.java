@@ -128,7 +128,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
             queue = muleContext.getQueueManager().getQueueSession().getQueue(name + QUEUE_NAME_SUFFIX);
             if (queue == null)
             {
-                throw new InitialisationException(MessageFactory.createStaticMessage("Queue " + queue.getName() + " not created for service " + name), this);
+                throw new InitialisationException(MessageFactory.createStaticMessage("Queue not created for service " + name), this);
             }
         }
         catch (InitialisationException e)
@@ -277,7 +277,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
     {
         if (queue == null)
         {
-            logger.warn(new InitialisationException(MessageFactory.createStaticMessage("Queue " + queue.getName() + " not created for service " + name), this));
+            logger.warn(new InitialisationException(MessageFactory.createStaticMessage("Queue not created for service " + name), this));
             return -1;
         }
         return queue.size();

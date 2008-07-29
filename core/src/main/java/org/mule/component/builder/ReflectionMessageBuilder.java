@@ -46,7 +46,7 @@ public class ReflectionMessageBuilder extends AbstractMessageBuilder
         {
             throw new MessageBuilderException(request, e);
         }
-        if (methods.size() == 0)
+        if (methods.isEmpty())
         {
             throw new MessageBuilderException(request,
                     new NoSatisfiableMethodsException(master, new Class[]{property.getClass()}));

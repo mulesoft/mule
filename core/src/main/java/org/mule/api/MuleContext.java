@@ -175,7 +175,7 @@ public interface MuleContext extends Lifecycle
      */
     QueueManager getQueueManager();
 
-    public AllStatistics getStatistics();
+    AllStatistics getStatistics();
 
     LifecycleManager getLifecycleManager();
 

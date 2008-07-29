@@ -18,7 +18,7 @@ import org.mule.api.MuleMessage;
  */
 public interface MessageInfoMapping
 {
-    public String getMessageId(MuleMessage message);
+    String getMessageId(MuleMessage message);
 
-    public String getCorrelationId(MuleMessage message);
+    String getCorrelationId(MuleMessage message);
 }

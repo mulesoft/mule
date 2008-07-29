@@ -11,8 +11,7 @@
     <!--<packaging>bundle</packaging>-->
     <name>Servlet Transport</name>
     <description>
-        A Mule transport for Jetty Http Connectivity or binding to other Servlet containers. This transport can be used
-        to embed a Jetty server used to service inbound http endpoints.
+        A Mule transport for Servlet containers.
     </description>
 
     <profiles>
@@ -60,51 +59,8 @@
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>jetty</groupId>
-            <artifactId>org.mortbay.jetty</artifactId>
-            <version>5.1.12</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.4_spec</artifactId>
-        </dependency>
-        <!-- for functional tests only -->
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-http</artifactId>
-            <version>${version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-xml</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-stdio</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.servlet;
+package org.mule.transport.servlet.jetty;
 
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.servlet.jetty.JettyHttpConnector;

@@ -564,7 +564,6 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
             MuleSession session = new DefaultMuleSession(message, connector.getSessionHandler(), service, connector.getMuleContext());
             MuleEvent muleEvent = new DefaultMuleEvent(message, endpoint, session, synchronous, ros);
             muleEvent = OptimizedRequestContext.unsafeSetEvent(muleEvent);
-            message = muleEvent.getMessage();
 
             // Apply Security filter if one is set
             boolean authorised = false;

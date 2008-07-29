@@ -10,7 +10,9 @@
 
 package org.mule.transaction.lookup;
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -74,9 +76,9 @@ public class WebsphereTransactionManagerLookupFactory implements TransactionMana
                 catch (ClassNotFoundException ex3)
                 {
                     logger.debug("Could not find WebSphere 4 TransactionManager factory class", ex3);
-                    throw new RuntimeException(
-                        "Couldn't find any WebSphere TransactionManager factory class, "
-                        + "neither for WebSphere version 5.1 nor 5.0 nor 4",
+                    throw new MuleRuntimeException(
+                        CoreMessages.createStaticMessage("Couldn't find any WebSphere TransactionManager factory class, "
+                                                         + "neither for WebSphere version 5.1 nor 5.0 nor 4"),
                         ex);
                 }
             }
@@ -88,8 +90,10 @@ public class WebsphereTransactionManagerLookupFactory implements TransactionMana
         }
         catch (Exception ex)
         {
-            throw new RuntimeException("Found WebSphere TransactionManager factory class [" + clazz.getName()
-                                       + "], but couldn't invoke its static 'getTransactionManager' method",
+            throw new MuleRuntimeException(
+                CoreMessages.createStaticMessage("Found WebSphere TransactionManager factory class ["
+                                                 + clazz.getName()
+                                                 + "], but couldn't invoke its static 'getTransactionManager' method"),
                 ex);
         }
 

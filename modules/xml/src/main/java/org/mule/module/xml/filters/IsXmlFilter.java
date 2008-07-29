@@ -12,9 +12,7 @@ package org.mule.module.xml.filters;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
-
-import java.io.ByteArrayInputStream;
-import java.io.StringReader;
+import org.mule.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -45,20 +43,11 @@ public class IsXmlFilter implements Filter
     private boolean accept(Object obj)
     {
         XMLStreamReader parser = null;
-
         try
         {
-            if (obj instanceof String)
+            parser = XMLUtils.toXMLStreamReader(factory, obj);
+            if (parser == null)
             {
-                parser = factory.createXMLStreamReader(new StringReader((String)obj));
-            }
-            else if (obj instanceof byte[])
-            {
-                parser = factory.createXMLStreamReader(new ByteArrayInputStream((byte[])obj));
-            }
-            else
-            {
-                // neither String nor byte[]
                 return false;
             }
 

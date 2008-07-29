@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0   http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+    
+    <description>
+        This Mule configuration file is designed to show how the Idempotent router does not filter 
+        anything despite inheriting from the Selective Consumer. 
+        
+        Antoine Borg 2008
+    </description>
+
+    <vm:connector name="myVM" queueEvents="true" />
+
+    <model name="IdempotentRouterTest">
+        <service name="IdempotentPlaceHolder">
+            <inbound>
+                <inbound-endpoint address="vm://FromTestCase" />
+                <!-- Only strings should be allowed in -->
+                <idempotent-receiver-router>
+                    <payload-type-filter expectedType="java.lang.String" />
+                </idempotent-receiver-router>
+            </inbound>
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://ToTestCase" />
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+    </model>
+
+</mule>

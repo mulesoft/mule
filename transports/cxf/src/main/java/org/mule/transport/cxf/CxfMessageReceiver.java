@@ -63,12 +63,15 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     protected CxfConnector connector;
     private Server server;
     private boolean proxy;
-
-    public CxfMessageReceiver(Connector Connector, Service service, InboundEndpoint Endpoint)
+    private boolean applySecurityToProtocol;
+    private boolean applyTransformersToProtocol;
+    private boolean applyFiltersToProtocol;
+    
+    public CxfMessageReceiver(Connector connector, Service service, InboundEndpoint Endpoint)
         throws CreateException
     {
-        super(Connector, service, Endpoint);
-        connector = (CxfConnector) Connector;
+        super(connector, service, Endpoint);
+        this.connector = (CxfConnector) connector;
     }
 
     @SuppressWarnings("unchecked")
@@ -87,6 +90,10 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             List<AbstractFeature> features = (List<AbstractFeature>) endpointProps.get(CxfConstants.FEATURES);
             String proxyStr = (String) endpointProps.get(CxfConstants.PROXY);
 
+            applyFiltersToProtocol = BooleanUtils.toBoolean((String) endpointProps.get(CxfConstants.APPLY_FILTERS_TO_PROTOCOL));
+            applySecurityToProtocol = BooleanUtils.toBoolean((String) endpointProps.get(CxfConstants.APPLY_SECURITY_TO_PROTOCOL));
+            applyTransformersToProtocol = BooleanUtils.toBoolean((String) endpointProps.get(CxfConstants.APPLY_TRANSFORMERS_TO_PROTOCOL));
+            
             Class<?> svcCls = null;
             Class<?> targetCls;
             
@@ -390,6 +397,21 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     public boolean isProxy()
     {
         return proxy;
+    }
+
+    public boolean isApplySecurityToProtocol()
+    {
+        return applySecurityToProtocol;
+    }
+
+    public boolean isApplyTransformersToProtocol()
+    {
+        return applyTransformersToProtocol;
+    }
+
+    public boolean isApplyFiltersToProtocol()
+    {
+        return applyFiltersToProtocol;
     }
 
 }

@@ -170,7 +170,7 @@ public class ExpiryMonitor implements Runnable, Disposable
         }
     }
 
-    private class ExpirableHolder
+    private static class ExpirableHolder
     {
 
         private long nanoseconds;

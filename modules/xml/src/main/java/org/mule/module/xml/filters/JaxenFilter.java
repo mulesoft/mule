@@ -12,6 +12,7 @@ package org.mule.module.xml.filters;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
+import org.mule.module.xml.util.XMLUtils;
 
 import java.io.InputStream;
 import java.util.Iterator;
@@ -129,10 +130,20 @@ public class JaxenFilter implements Filter
         Object xpathResult = null;
         boolean accept = false;
 
-        // Payload is a DOM Document
-        if (obj instanceof Document)
+        Document dom4jDoc;
+        try
         {
-            xpathResult = getDom4jXPath().valueOf((Document) obj);
+            dom4jDoc = XMLUtils.toDocument(obj);
+        }
+        catch (Exception e)
+        {
+            throw new JaxenException(e);
+        }
+        
+        // Payload is a DOM Document
+        if (dom4jDoc != null)
+        {
+            xpathResult = getDom4jXPath().valueOf(dom4jDoc);
         }
         // Payload is a W3C Document
         else if (obj instanceof DOMSource)

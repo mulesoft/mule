@@ -214,7 +214,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
 
     private boolean isConsumedFromAdditional(Class inputCls)
     {
-        if (consumableClasses.size() == 0)
+        if (consumableClasses.isEmpty())
         {
             return false;
         }
@@ -553,7 +553,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
 
     public void applyTransformers(List transformers, Class outputType) throws TransformerException
     {
-        if (transformers.size() > 0 && !appliedTransformerHashCodes.contains(new Integer(transformers.hashCode())))
+        if (!transformers.isEmpty() && !appliedTransformerHashCodes.contains(new Integer(transformers.hashCode())))
         {
             applyAllTransformers(transformers);
             appliedTransformerHashCodes.add(new Integer(transformers.hashCode()));
@@ -567,7 +567,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
 
     protected void applyAllTransformers(List transformers) throws TransformerException
     {
-        if (transformers.size() > 0)
+        if (!transformers.isEmpty())
         {
 
             Iterator iterator = transformers.iterator();

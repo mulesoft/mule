@@ -28,10 +28,6 @@ import org.mule.api.model.EntryPointResolverSet;
  */
 public class DefaultLifecycleAdapterFactory implements LifecycleAdapterFactory
 {
-    public DefaultLifecycleAdapterFactory()
-    {
-        super();
-    }
 
     /*
      * (non-Javadoc)

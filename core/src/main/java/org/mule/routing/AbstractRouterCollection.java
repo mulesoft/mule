@@ -12,7 +12,6 @@ package org.mule.routing;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.Router;
@@ -33,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
  * router collections for in and outbound routers.
  */
 
-public abstract class AbstractRouterCollection implements RouterCollection, Initialisable, MuleContextAware
+public abstract class AbstractRouterCollection implements RouterCollection, MuleContextAware
 {
     /**
      * logger used by this class

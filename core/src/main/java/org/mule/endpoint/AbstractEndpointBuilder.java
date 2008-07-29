@@ -13,6 +13,7 @@ package org.mule.endpoint;
 import org.mule.RegistryContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
@@ -134,7 +135,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         if (uriBuilder == null)
         {
-            throw new NullPointerException(CoreMessages.objectIsNull("uriBuilder").getMessage());
+            throw new MuleRuntimeException(CoreMessages.objectIsNull("uriBuilder"));
         }
 
         EndpointURI endpointURI = uriBuilder.getEndpoint();
@@ -178,7 +179,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         if (uriBuilder == null)
         {
-            throw new NullPointerException(CoreMessages.objectIsNull("uriBuilder").getMessage());
+            throw new MuleRuntimeException(CoreMessages.objectIsNull("uriBuilder"));
         }
 
         EndpointURI endpointURI = uriBuilder.getEndpoint();
@@ -640,7 +641,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     public void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages)
     {
-        this.deleteUnacceptedMessages = new Boolean(deleteUnacceptedMessages);
+        this.deleteUnacceptedMessages = Boolean.valueOf(deleteUnacceptedMessages);
 
     }
 
@@ -652,13 +653,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     public void setSynchronous(boolean synchronous)
     {
-        this.synchronous = new Boolean(synchronous);
+        this.synchronous = Boolean.valueOf(synchronous);
 
     }
 
     public void setRemoteSync(boolean remoteSync)
     {
-        this.remoteSync = new Boolean(remoteSync);
+        this.remoteSync = Boolean.valueOf(remoteSync);
 
     }
 
@@ -683,7 +684,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public void setCreateConnector(int createConnector)
     {
         this.createConnector = new Integer(createConnector);
-
     }
 
     public void setRegistryId(String registryId)

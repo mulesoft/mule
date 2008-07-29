@@ -10,7 +10,6 @@
 
 package org.mule.model.direct;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -38,16 +37,7 @@ public class DirectService extends AbstractService
 
     protected MuleMessage doSend(MuleEvent event) throws MuleException
     {
-
-        Object obj = component.onCall(event);
-        if (obj instanceof MuleMessage)
-        {
-            return (MuleMessage) obj;
-        }
-        else
-        {
-            return new DefaultMuleMessage(obj, event.getMessage());
-        }
+        return component.onCall(event);
     }
 
     protected void doDispatch(MuleEvent event) throws MuleException

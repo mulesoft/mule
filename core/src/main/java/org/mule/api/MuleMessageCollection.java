@@ -18,23 +18,23 @@ import java.util.List;
  */
 public interface MuleMessageCollection extends MuleMessage
 {
-    public void addMessage(MuleMessage message);
+    void addMessage(MuleMessage message);
 
-    public void addMessage(MuleMessage message, int index);
+    void addMessage(MuleMessage message, int index);
 
-    public void addMessages(MuleMessage[] messages);
+    void addMessages(MuleMessage[] messages);
 
-    public void addMessages(MuleEvent[] events);
+    void addMessages(MuleEvent[] events);
 
-    public void addMessages(List messages);
+    void addMessages(List messages);
 
-    public void removedMessage(MuleMessage message);
+    void removedMessage(MuleMessage message);
 
-    public MuleMessage[] getMessagesAsArray();
+    MuleMessage[] getMessagesAsArray();
 
-    public MuleMessage getMessage(int index);
+    MuleMessage getMessage(int index);
 
-    public Object[] getPayloadsAsArray();
+    Object[] getPayloadsAsArray();
 
-    public int size();
+    int size();
 }

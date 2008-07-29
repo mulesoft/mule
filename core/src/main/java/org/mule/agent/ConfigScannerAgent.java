@@ -45,7 +45,7 @@ public class ConfigScannerAgent extends AbstractAgent
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(ConfigScannerAgent.class);
+    private static final Log logger = LogFactory.getLog(ConfigScannerAgent.class);
 
     private String configDirName = null;
 
@@ -151,7 +151,10 @@ public class ConfigScannerAgent extends AbstractAgent
         {
             while (true)
             {
-                if (doStop || errorCount >= errorThreshold) break;
+                if (doStop || errorCount >= errorThreshold)
+                {
+                    break;
+                }
 
                 try
                 {
@@ -165,8 +168,10 @@ public class ConfigScannerAgent extends AbstractAgent
                         {
                             // TODO: probably shouldn't delete here
                             configFile.delete();
-                            if (configFile.exists()) 
+                            if (configFile.exists())
+                            {
                                 processedFiles.remove(processedFiles.indexOf(path));
+                            }
                         }
                         else
                         {

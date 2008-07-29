@@ -11,7 +11,6 @@
 package org.mule.component;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
@@ -21,7 +20,6 @@ import org.mule.api.routing.NestedRouterCollection;
 import org.mule.config.PoolingProfile;
 import org.mule.util.pool.DefaultLifecycleEnabledObjectPool;
 import org.mule.util.pool.LifecyleEnabledObjectPool;
-import org.mule.util.pool.ObjectPool;
 
 /**
  * <code>PooledJavaComponent</code> implements pooling.

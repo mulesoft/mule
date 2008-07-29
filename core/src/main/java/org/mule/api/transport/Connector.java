@@ -17,7 +17,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Lifecycle;
@@ -145,10 +144,10 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
     boolean isRemoteSyncEnabled();
     
     /**
-     * Used to define is this connectors endpoints' should be synchronous by default rather than using mule's
-     * instance wide default. The endpoint is passed through to this method so that transports like axis/xfire
-     * can determine if synchronous should be default depending on the endpoint transport e.g. http/vm/jms
-     * etc.
+     * Used to define is this connectors endpoints' should be synchronous by default rather than 
+     * using Mule's instance wide default. The endpoint is passed through to this method so that 
+     * transports like Axis/CXF can determine if synchronous should be default depending on the 
+     * endpoint transport e.g. http/vm/jms etc.
      * 
      * @param endpoint
      * @return

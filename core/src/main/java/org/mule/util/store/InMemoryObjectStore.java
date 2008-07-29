@@ -182,7 +182,7 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
     /**
      * Represents the object stored in the store. This class holds the Object itslef and its ID.
      */
-    protected class StoredObject
+    protected static class StoredObject
     {
         private String id;
         private Object item;

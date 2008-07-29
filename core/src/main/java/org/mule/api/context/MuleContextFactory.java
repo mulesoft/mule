@@ -20,8 +20,8 @@ import java.util.List;
 
 /**
  * A {@link CopyOfMuleContextFactory} is used to create instances of
- * {@link MuleContext}. The instances of {@link MuleContext} returned by this
- * factory are initialised but not started.
+ * {@link MuleContext}. The instances of {@link MuleContext} returned by this factory
+ * are initialised but not started.
  */
 public interface MuleContextFactory
 {
@@ -45,7 +45,7 @@ public interface MuleContextFactory
      * @throws InitialisationException
      * @throws ConfigurationException
      */
-    public MuleContext createMuleContext(MuleContextBuilder muleContextBuilder)
+    MuleContext createMuleContext(MuleContextBuilder muleContextBuilder)
         throws InitialisationException, ConfigurationException;
 
     /**
@@ -56,7 +56,7 @@ public interface MuleContextFactory
      * @throws InitialisationException
      * @throws ConfigurationException
      */
-    public MuleContext createMuleContext(ConfigurationBuilder configurationBuilder)
+    MuleContext createMuleContext(ConfigurationBuilder configurationBuilder)
         throws InitialisationException, ConfigurationException;
 
     /**
@@ -69,8 +69,8 @@ public interface MuleContextFactory
      * @throws InitialisationException
      * @throws ConfigurationException
      */
-    public MuleContext createMuleContext(ConfigurationBuilder configurationBuilder,
-                                         MuleContextBuilder muleContextBuilder)
+    MuleContext createMuleContext(ConfigurationBuilder configurationBuilder,
+                                  MuleContextBuilder muleContextBuilder)
         throws InitialisationException, ConfigurationException;
 
     /**
@@ -83,7 +83,7 @@ public interface MuleContextFactory
      * @throws InitialisationException
      * @throws ConfigurationException
      */
-    public MuleContext createMuleContext(List configurationBuilders, MuleContextBuilder muleContextBuilder)
+    MuleContext createMuleContext(List configurationBuilders, MuleContextBuilder muleContextBuilder)
         throws InitialisationException, ConfigurationException;
 
 }

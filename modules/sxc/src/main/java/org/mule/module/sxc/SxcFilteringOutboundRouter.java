@@ -110,15 +110,15 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
     public boolean isMatch(MuleMessage message) throws RoutingException
     {
 
+        ReversibleXMLStreamReader reader = null;
         try
         {
             initialize();
             messages.set(message);
 
-            ReversibleXMLStreamReader reader = getXMLStreamReader(message);
+            reader = getXMLStreamReader(message);
             reader.setTracking(true);
             evaluator.evaluate(reader);
-            reader.reset();
         }
         catch (StopProcessingException e)
         {
@@ -131,6 +131,12 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         finally
         {
             messages.set(null);
+
+            if (reader != null)
+            {
+                reader.setTracking(false);
+                reader.reset();
+            }
         }
 
         try
@@ -157,7 +163,13 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
      */
     protected ReversibleXMLStreamReader getXMLStreamReader(MuleMessage message) throws TransformerException
     {
-        return (ReversibleXMLStreamReader) transformer.transform(message);
+         ReversibleXMLStreamReader r = (ReversibleXMLStreamReader) transformer.transform(message);
+         
+         if (r != message.getPayload())
+         {
+             message.setPayload(r);
+         }
+         return r;
     }
 
     public Map<String, String> getNamespaces()

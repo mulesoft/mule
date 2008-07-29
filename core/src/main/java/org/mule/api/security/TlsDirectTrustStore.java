@@ -10,8 +10,6 @@
 
 package org.mule.api.security;
 
-import org.mule.api.security.tls.TlsConfiguration;
-
 import javax.net.ssl.TrustManagerFactory;
 
 /**

@@ -77,7 +77,7 @@ public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator
                 }
                 catch (ClassNotFoundException e)
                 {
-                    e.printStackTrace();
+                    throw new MuleRuntimeException(CoreMessages.failedToProcessExtractorFunction(expression), e);
                 }
             }
         }

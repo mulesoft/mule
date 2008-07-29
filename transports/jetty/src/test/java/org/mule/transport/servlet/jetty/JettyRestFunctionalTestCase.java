@@ -7,18 +7,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
-package org.mule.transport.servlet.functional;
+package org.mule.transport.servlet.jetty;
 
 import org.mule.transport.http.functional.HttpFunctionalTestCase;
 
-public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
-{
 
+public class JettyRestFunctionalTestCase extends HttpFunctionalTestCase
+{
     //@Override
     protected String getConfigResources()
     {
-        return "jetty-http-functional-test.xml";
+        return "jetty-rest-functional-test.xml";
     }
-
 }

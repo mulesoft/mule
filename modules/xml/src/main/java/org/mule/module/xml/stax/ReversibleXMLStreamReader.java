@@ -35,15 +35,12 @@ import javax.xml.stream.events.XMLEvent;
 
 public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 {
-    private final static int MODE_NORMAL = 0;
-    private final static int MODE_TRACKING = 1;
-    private final static int MODE_REPLAY = 2;
-
-    private int mode = MODE_NORMAL;
     private List events;
     private XMLEvent current;
     private int replayIndex;
-
+    private boolean tracking = false;
+    private boolean replay = false;
+    
     public ReversibleXMLStreamReader(XMLStreamReader reader)
     {
         super(reader);
@@ -69,25 +66,28 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public void reset()
     {
-        mode = MODE_REPLAY;
+        replay = true;
+        replayIndex = 0;
+        current = null;
     }
 
     public boolean isTracking()
     {
-        return mode == MODE_TRACKING;
+        return tracking;
     }
 
     public void setTracking(boolean tracking)
     {
+        this.tracking = tracking;
+        
         if (tracking)
         {
-            mode = MODE_TRACKING;
             replayIndex = 0;
-            events = new ArrayList();
-        }
-        else
-        {
-            mode = MODE_NORMAL;
+            
+            if (events == null)
+            {
+                events = new ArrayList();
+            }
         }
     }
 
@@ -95,16 +95,11 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     {
         int event;
 
-        if (mode == MODE_TRACKING)
-        {
-            event = super.next();
-            capture(event);
-        }
-        else if (mode == MODE_REPLAY)
+        if (replay)
         {
             if (replayIndex == events.size())
             {
-                mode = MODE_NORMAL;
+                replay = false;
                 event = super.next();
             }
             else
@@ -115,6 +110,11 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         else
         {
             event = super.next();
+        }
+        
+        if (tracking && !replay) 
+        {
+            capture(event);
         }
 
         return event;
@@ -250,7 +250,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public int getAttributeCount()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return ((StartElementEventX) current).getAttributeList().size();
         }
@@ -263,7 +263,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     public String getAttributeLocalName(int i)
     {
 
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             Attribute att = (Attribute) ((StartElementEventX) current).getAttributeList().get(i);
             return att.getName().getLocalPart();
@@ -277,7 +277,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     public QName getAttributeName(int i)
     {
 
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             Attribute att = (Attribute) ((StartElementEventX) current).getAttributeList().get(i);
             return att.getName();
@@ -291,7 +291,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     public String getAttributeNamespace(int i)
     {
 
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             Attribute att = (Attribute) ((StartElementEventX) current).getAttributeList().get(i);
             return att.getName().getNamespaceURI();
@@ -304,7 +304,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getAttributePrefix(int i)
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             Attribute att = (Attribute) ((StartElementEventX) current).getAttributeList().get(i);
             return att.getName().getPrefix();
@@ -317,7 +317,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getAttributeType(int i)
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             Attribute att = (Attribute) ((StartElementEventX) current).getAttributeList().get(i);
             return att.getDTDType();
@@ -330,7 +330,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getAttributeValue(int i)
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             Attribute att = (Attribute) ((StartElementEventX) current).getAttributeList().get(i);
             return att.getValue();
@@ -343,7 +343,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getAttributeValue(String ns, String local)
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             Attribute att = ((StartElementEventX) current).getAttributeByName(new QName(ns, local));
             if (att != null)
@@ -363,8 +363,12 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public int getEventType()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
+            if (current == null)
+            {
+                return START_DOCUMENT;
+            }
             return current.getEventType();
         }
         else
@@ -375,7 +379,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getLocalName()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             if (isStartElement())
             {
@@ -394,7 +398,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public Location getLocation()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return current.getLocation();
         }
@@ -406,7 +410,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public QName getName()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             if (isStartElement())
             {
@@ -425,7 +429,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public NamespaceContext getNamespaceContext()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return ((StartElementEventX) current).getNamespaceContext();
         }
@@ -437,7 +441,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public int getNamespaceCount()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return ((StartElementEventX) current).getNamespaceList().size();
         }
@@ -449,7 +453,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getNamespacePrefix(int arg0)
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             Namespace ns = (Namespace) ((StartElementEventX) current).getNamespaceList().get(arg0);
             
@@ -463,7 +467,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getNamespaceURI()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             if (isStartElement())
             {
@@ -482,7 +486,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getNamespaceURI(int arg0)
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             Namespace ns = (Namespace) ((StartElementEventX) current).getNamespaceList().get(arg0);
             
@@ -496,7 +500,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getNamespaceURI(String prefix)
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return ((StartElementEventX) current).getNamespaceURI(prefix);
         }
@@ -508,7 +512,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getPIData()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return null;
         }
@@ -520,7 +524,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getPITarget()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return null;
         }
@@ -532,7 +536,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getPrefix()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             if (isStartElement())
             {
@@ -551,7 +555,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public String getText()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return ((CharactersEvent) current).getData();
         }
@@ -563,7 +567,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public char[] getTextCharacters()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return ((CharactersEvent) current).getData().toCharArray();
         }
@@ -575,7 +579,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public int getTextCharacters(int sourceStart, char[] target, int targetStart, int length) throws XMLStreamException
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             char[] src = getText().toCharArray();
 
@@ -597,7 +601,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public int getTextLength()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return getText().length();
         }
@@ -609,7 +613,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public int getTextStart()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return 0;
         }
@@ -621,7 +625,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public boolean hasName()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return isStartElement() || isEndElement();
         }
@@ -633,7 +637,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public boolean hasNext() throws XMLStreamException
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             if (replayIndex == events.size()) 
             {
@@ -652,7 +656,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public boolean hasText()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             int event = getEventType();
             return event == CHARACTERS || event == DTD
@@ -666,7 +670,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public boolean isAttributeSpecified(int i)
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             Attribute attr = (Attribute) ((StartElementEventX) current).getAttributeList().get(i);
             return attr.isSpecified();
@@ -679,7 +683,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public boolean isCharacters()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return current.isCharacters();
         }
@@ -691,7 +695,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public boolean isEndElement()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return current.isEndElement();
         }
@@ -704,7 +708,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public boolean isStartElement()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return current.isStartElement();
         }
@@ -716,7 +720,7 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
 
     public boolean isWhiteSpace()
     {
-        if (mode == MODE_REPLAY)
+        if (replay)
         {
             return current.getEventType() == SPACE;
         }

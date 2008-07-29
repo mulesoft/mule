@@ -16,7 +16,7 @@ package org.mule.api.registry;
 public interface ServiceDescriptor
 {
 
-    public String getService();
+    String getService();
 
 }
 

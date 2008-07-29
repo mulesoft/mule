@@ -22,7 +22,7 @@ import org.mule.api.security.CryptoFailureException;
  */
 public interface EncryptionStrategy extends Initialisable
 {
-    public String getName();
+    String getName();
 
     byte[] encrypt(byte[] data, Object info) throws CryptoFailureException;
 

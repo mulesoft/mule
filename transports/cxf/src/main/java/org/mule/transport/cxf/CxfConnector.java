@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.component.DefaultJavaComponent;
+import org.mule.config.spring.SpringRegistry;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
@@ -43,6 +44,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Connects Mule to a CXF bus instance.
@@ -62,6 +64,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
     private String defaultFrontend = CxfConstants.JAX_WS_FRONTEND;
     private List<SedaService> services = new ArrayList<SedaService>();
     private Map<String, Server> uriToServer = new HashMap<String, Server>();
+    private boolean initializeStaticBusInstance = false;
     
     public CxfConnector()
     {
@@ -85,16 +88,22 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
 
     protected void doInitialise() throws InitialisationException
     {
+        ApplicationContext context = (ApplicationContext) muleContext.getRegistry().lookupObject(SpringRegistry.SPRING_APPLICATION_CONTEXT);
+        
         if (configurationLocation != null)
         {
-            bus = new SpringBusFactory().createBus(configurationLocation);
+            bus = new SpringBusFactory(context).createBus(configurationLocation, true);
         }
         else
         {
-            bus = new SpringBusFactory().createBus();
+            bus = new SpringBusFactory(context).createBus((String)null, true);
         }
-        BusFactory.setDefaultBus(null);
-
+        
+        if (!initializeStaticBusInstance)
+        {
+            BusFactory.setDefaultBus(null);
+        }
+        
         MuleUniversalTransport transport = new MuleUniversalTransport(this);
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", transport);
@@ -196,7 +205,8 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         String endpoint = receiver.getEndpointURI().getAddress();
         String scheme = ep.getScheme().toLowerCase();
 
-        boolean sync = receiver.getEndpoint().isSynchronous();
+        InboundEndpoint originalEndpoint = receiver.getEndpoint();
+        boolean sync = originalEndpoint.isSynchronous();
 
         // If we are using sockets then we need to set the endpoint name appropiately
         // and if using http/https
@@ -204,25 +214,73 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")
             || scheme.equals("servlet"))
         {
-            receiver.getEndpoint().getProperties().put(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
-            receiver.getEndpoint().getProperties().put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+            originalEndpoint.getProperties().put(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
+            originalEndpoint.getProperties().put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
         }
 
         QName serviceName = server.getEndpoint().getEndpointInfo().getName();
+        
+        EndpointBuilder protocolEndpointBuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
+        protocolEndpointBuilder.setSynchronous(sync);
+        protocolEndpointBuilder.setName(ep.getScheme() + ":" + serviceName.getLocalPart());
+        
+        EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(originalEndpoint,
+            muleContext);
+        
+        // Apply the transformers to the correct endpoint
+        EndpointBuilder transformerEndpoint;
+        if (cxfReceiver.isApplyTransformersToProtocol())
+        {
+            transformerEndpoint = protocolEndpointBuilder; 
+            receiverEndpointBuilder.setTransformers(null);
+            receiverEndpointBuilder.setResponseTransformers(null);
+        }
+        else
+        {  
+            transformerEndpoint = receiverEndpointBuilder;
+        }
+        transformerEndpoint.setTransformers(originalEndpoint.getTransformers());
+        transformerEndpoint.setResponseTransformers(originalEndpoint.getResponseTransformers());
+        
+        // apply the filters to the correct endpoint
+        EndpointBuilder filterEndpoint;
+        if (cxfReceiver.isApplyFiltersToProtocol())
+        {
+            filterEndpoint = protocolEndpointBuilder;   
+            receiverEndpointBuilder.setFilter(null);                                                                                                
+        }
+        else
+        {  
+            filterEndpoint = receiverEndpointBuilder;
+        }
+        filterEndpoint.setFilter(originalEndpoint.getFilter());
+        
+        // apply the security filter to the correct endpoint
+        EndpointBuilder secFilterEndpoint;
+        if (cxfReceiver.isApplySecurityToProtocol())
+        {
+            secFilterEndpoint = protocolEndpointBuilder;   
+            receiverEndpointBuilder.setSecurityFilter(null);                                                                                               
+        }
+        else
+        {  
+            secFilterEndpoint = receiverEndpointBuilder;
+        }             
+        secFilterEndpoint.setSecurityFilter(originalEndpoint.getSecurityFilter());
 
-        // The 'serviceEndpoint' is the outer protocol endpoint e.g. http if the
-        // configured endpoint uri is 'cxf:http://'
-        EndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
-        serviceEndpointbuilder.setSynchronous(sync);
-        serviceEndpointbuilder.setName(ep.getScheme() + ":" + serviceName.getLocalPart());
+        InboundEndpoint protocolEndpoint = muleContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint(protocolEndpointBuilder);
 
-        // The outer 'serviceEndpoint' is not be configured with the transformers,
-        // filters or security filter configured in configuration.
+        InboundEndpoint receiverEndpoint = muleContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint(receiverEndpointBuilder);
 
+        receiver.setEndpoint(receiverEndpoint);
+        
         c.setInboundRouter(new DefaultInboundRouterCollection());
-        c.getInboundRouter().addEndpoint(
-            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(serviceEndpointbuilder));
-
+        c.getInboundRouter().addEndpoint(protocolEndpoint);
+        
         services.add(c);
     }
 
@@ -292,4 +350,15 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
     {
         return uriToServer.get(uri);
     }
+
+    public boolean isInitializeStaticBusInstance()
+    {
+        return initializeStaticBusInstance;
+    }
+
+    public void setInitializeStaticBusInstance(boolean initializeStaticBusInstance)
+    {
+        this.initializeStaticBusInstance = initializeStaticBusInstance;
+    }
+    
 }

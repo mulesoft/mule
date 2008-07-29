@@ -17,7 +17,7 @@ import org.mule.api.MuleException;
  */
 public interface Stoppable
 {
-    public static final String PHASE_NAME = "stop";
+    String PHASE_NAME = "stop";
     
     void stop() throws MuleException;
 }

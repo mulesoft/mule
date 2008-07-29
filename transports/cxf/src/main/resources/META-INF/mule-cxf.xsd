@@ -60,6 +60,15 @@
                          </xsd:documentation>
                      </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="initializeStaticBusInstance" type="mule:substitutableBoolean">
+                	<xsd:annotation>
+                         <xsd:documentation>
+                             Initialize the static CXF Bus with a Bus configured to use Mule for
+                             all transports. This will affect any CXF generated clients
+                             that you run standalone. Defaults to false.
+                         </xsd:documentation>
+                     </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -165,6 +174,27 @@
             <xsd:annotation>
     			<xsd:documentation>
     				The WSDL service name of your service.
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="applyFiltersToProtocol" type="mule:substitutableBoolean">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				Whether or not to apply the filters to the protocol endpoint.
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="applyTransformersToProtocol" type="mule:substitutableBoolean">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				Whether or not to apply the transformers to the protocol endpoint.
+    			</xsd:documentation>
+    		</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="applySecurityToProtocol" type="mule:substitutableBoolean">
+            <xsd:annotation>
+    			<xsd:documentation>
+    				Whether or not to apply the security filter to the protocol endpoint.
     			</xsd:documentation>
     		</xsd:annotation>
         </xsd:attribute>
@@ -330,4 +360,14 @@
         </xsd:complexContent>
     </xsd:complexType>
     
+    <xsd:element name="stax">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="xmlInputFactory" type="xsd:string" />
+					<xsd:attribute name="xmlOutputFactory" type="xsd:string" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
 </xsd:schema>

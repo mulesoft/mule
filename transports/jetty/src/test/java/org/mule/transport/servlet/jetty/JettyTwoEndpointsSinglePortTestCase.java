@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.servlet.functional;
+package org.mule.transport.servlet.jetty;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;

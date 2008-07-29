@@ -16,7 +16,7 @@ package org.mule.api.lifecycle;
  */
 public interface Initialisable
 {
-    static final String PHASE_NAME = "initialise";
+    String PHASE_NAME = "initialise";
 
     /**
      * Method used to perform any initialisation work. If a fatal error occurs during

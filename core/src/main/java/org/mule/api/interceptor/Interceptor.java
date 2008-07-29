@@ -10,9 +10,8 @@
 
 package org.mule.api.interceptor;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.interceptor.Invocation;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 
 
 /**

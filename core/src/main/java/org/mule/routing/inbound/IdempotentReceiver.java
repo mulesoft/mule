@@ -12,12 +12,12 @@ package org.mule.routing.inbound;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.store.ObjectStore;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.store.ObjectStore;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.expression.ExpressionEvaluatorManager;
+import org.mule.util.store.InMemoryObjectStore;
 
 /**
  * <code>IdempotentReceiver</code> ensures that only unique messages are received by a
@@ -69,22 +69,30 @@ public class IdempotentReceiver extends SelectiveConsumer
     // @Override
     public boolean isMatch(MuleEvent event) throws MessagingException
     {
-        if (store == null)
+        if (!super.isMatch(event))
         {
-            // we need to load this on the first request as we need the service name
-            synchronized (this)
+            return false;
+        }
+        else
+        {
+            if (store == null)
             {
-                this.initialize(event);
+                // we need to load this on the first request as we need the service
+                // name
+                synchronized (this)
+                {
+                    this.initialize(event);
+                }
             }
-        }
 
-        try
-        {
-            return !store.containsObject(this.getIdForEvent(event));
-        }
-        catch (Exception ex)
-        {
-            throw new RoutingException(event.getMessage(), event.getEndpoint(), ex);
+            try
+            {
+                return !store.containsObject(this.getIdForEvent(event));
+            }
+            catch (Exception ex)
+            {
+                throw new RoutingException(event.getMessage(), event.getEndpoint(), ex);
+            }
         }
     }
 

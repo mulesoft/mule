@@ -92,18 +92,15 @@ public class DefaultJavaComponent extends AbstractJavaComponent
         super.doStop();
         // It only makes sense to propagate this life-cycle to singleton component
         // implementations
-        if (singletonComponentLifecycleAdapter != null)
+        if (singletonComponentLifecycleAdapter != null && singletonComponentLifecycleAdapter.isStarted())
         {
-            if (singletonComponentLifecycleAdapter.isStarted())
+            try
             {
-                try
-                {
-                    singletonComponentLifecycleAdapter.stop();
-                }
-                catch (Exception e)
-                {
-                    throw new ModelException(CoreMessages.failedToStop("Service '" + service.getName() + "'"), e);
-                }
+                singletonComponentLifecycleAdapter.stop();
+            }
+            catch (Exception e)
+            {
+                throw new ModelException(CoreMessages.failedToStop("Service '" + service.getName() + "'"), e);
             }
         }
     }

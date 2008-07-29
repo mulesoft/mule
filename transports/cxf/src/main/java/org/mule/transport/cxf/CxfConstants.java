@@ -34,5 +34,8 @@ public interface CxfConstants
     String OUT_FAULT_INTERCEPTORS = "outFaultInterceptors";
     String MTOM_ENABLED = "mtomEnabled";
     String MULE_MESSAGE = "mule.message";
-    String MULE_REQUEST_MESSAGE = "mule.request.message";
+    
+    String APPLY_FILTERS_TO_PROTOCOL = "applyFiltersToProtocol";
+    String APPLY_TRANSFORMERS_TO_PROTOCOL = "applyTransformersToProtocol";
+    String APPLY_SECURITY_TO_PROTOCOL = "applySecurityToProtocol";
 }

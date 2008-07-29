@@ -43,7 +43,7 @@ public interface Transformer extends BaseTransformer
      */
     boolean isAcceptNull();
 
-    public boolean isIgnoreBadInput();
+    boolean isIgnoreBadInput();
 
     /**
      * Thransforms the supplied data and returns the result

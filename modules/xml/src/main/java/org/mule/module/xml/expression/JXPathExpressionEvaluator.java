@@ -11,14 +11,13 @@
 package org.mule.module.xml.expression;
 
 import org.mule.api.transport.MessageAdapter;
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.expression.ExpressionEvaluator;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
 
 /**
  * Will extract properties based on Xpath expressions. Will work on Xml/Dom and beans
@@ -41,20 +40,23 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator
             payload = ((MessageAdapter) message).getPayload();
         }
 
-        if (payload instanceof String)
+        Document dom4jDoc;
+        try
         {
-            Document doc;
-            try
-            {
-                doc = DocumentHelper.parseText((String) payload);
-            }
-            catch (DocumentException e)
-            {
-                logger.error(e);
-                return null;
-            }
-            result = doc.valueOf(name);
+            dom4jDoc = XMLUtils.toDocument(payload);
         }
+        catch (Exception e)
+        {
+            logger.error(e);
+            return null;
+        }
+        
+        // Payload is XML
+        if (dom4jDoc != null)
+        {
+            result = dom4jDoc.valueOf(name);
+        }
+        // Payload is a Java object
         else
         {
             JXPathContext context = JXPathContext.newContext(payload);

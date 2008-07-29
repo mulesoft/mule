@@ -44,7 +44,17 @@ public class ReversibleXMLStreamReaderTest extends TestCase
         assertEquals(XMLStreamConstants.END_ELEMENT, xsr.next());  
         assertEquals(XMLStreamConstants.SPACE, xsr.next());
         assertEquals(XMLStreamConstants.END_DOCUMENT, xsr.next());
+
+        xsr.reset();
+
+        assertEquals(XMLStreamConstants.START_ELEMENT, xsr.next());
+        assertEquals(start, xsr.getName());
+        assertEquals(XMLStreamConstants.CHARACTERS, xsr.next()); // this is the last event we saved
+        assertEquals(text, xsr.getText());
+        assertEquals(XMLStreamConstants.END_ELEMENT, xsr.next());  
+        assertEquals(XMLStreamConstants.END_DOCUMENT, xsr.next());
     }
+    
     public void testFullReverse() throws Exception
     {
         XMLInputFactory xif = XMLInputFactory.newInstance();

@@ -5,7 +5,7 @@
        xmlns:client="http://www.mulesource.org/schema/mule/client/2.0"
        xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/client/2.0 http://www.mulesource.org/schema/mule/client/2.0/mule-client.xsd
        http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">

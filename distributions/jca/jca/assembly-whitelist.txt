@@ -82,6 +82,7 @@ mule-transport-ftp
 mule-transport-http
 mule-transport-jbpm
 mule-transport-jdbc
+mule-transport-jetty
 mule-transport-jms
 mule-transport-multicast
 mule-transport-quartz
@@ -124,9 +125,9 @@ spring-tx-2.5.3
 spring-web-2.5.3
 stax-api-1.0.1
 stax-utils-20080702
-sxc-core-0.7
-sxc-runtime-0.7
-sxc-xpath-0.7
+sxc-core-0.7.1
+sxc-runtime-0.7.1
+sxc-xpath-0.7.1
 velocity-1.4
 velocity-dep-1.4
 wrapper-3.2.3

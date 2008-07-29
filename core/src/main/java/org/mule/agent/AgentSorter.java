@@ -45,7 +45,7 @@ public class AgentSorter extends Object
         // step 2: process the remaining agents
         List remainingAgents = new ArrayList(agents);
         remainingAgents.removeAll(agentsWithoutDependencies);
-        while (remainingAgents.size() > 0)
+        while (!remainingAgents.isEmpty())
         {
             int processedAgents = 0;
             ListIterator iter = remainingAgents.listIterator();
@@ -79,13 +79,13 @@ public class AgentSorter extends Object
         {
             Class dependentClass = (Class) dependencyIterator.next();
             
-            if (classExistsInCollection(dependentClass, allRegisteredAgents) == false)
+            if (!classExistsInCollection(dependentClass, allRegisteredAgents))
             {
                 // this agent is currently not registed, ignore this dependency
                 continue;
             }
-            
-            if (classExistsInCollection(dependentClass, sortedAgents) == false)
+
+            if (!classExistsInCollection(dependentClass, sortedAgents))
             {
                 return false;
             }

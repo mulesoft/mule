@@ -11,6 +11,7 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractTransformer;
 
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import java.util.List;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 import org.dom4j.XPath;
 
@@ -47,9 +47,11 @@ public class JXPathExtractor extends AbstractTransformer
         try
         {
             Object result;
-            if (src instanceof String)
+            Document doc = XMLUtils.toDocument(src);
+            
+            // Payload is XML
+            if (doc != null)
             {
-                Document doc = DocumentHelper.parseText((String)src);
                 if (singleResult)
                 {
                     result = doc.valueOf(expression);
@@ -68,6 +70,7 @@ public class JXPathExtractor extends AbstractTransformer
                     }
                 }
             }
+            // Payload is a Java object
             else
             {
                 JXPathContext context = JXPathContext.newContext(src);

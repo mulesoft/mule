@@ -82,7 +82,7 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
             {
                 ((OutputHandler) src).write(RequestContext.getEvent(), bytes);
                 
-                output = new String((byte[]) bytes.toByteArray(), encoding);
+                output = new String(bytes.toByteArray(), encoding);
             }
             catch (IOException e)
             {

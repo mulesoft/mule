@@ -88,7 +88,7 @@ public interface JavaComponent extends Component
      * 
      * @return
      */
-    public LifecycleAdapterFactory getLifecycleAdapterFactory();
+    LifecycleAdapterFactory getLifecycleAdapterFactory();
 
     /**
      * Sets the factory used create life-cycle adaptors that are used to wrap
@@ -96,5 +96,5 @@ public interface JavaComponent extends Component
      * 
      * @param lifecycleAdaptor
      */
-    public void setLifecycleAdapterFactory(LifecycleAdapterFactory lifecycleAdaptor);
+    void setLifecycleAdapterFactory(LifecycleAdapterFactory lifecycleAdaptor);
 }

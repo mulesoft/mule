@@ -20,7 +20,7 @@ import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.module.xml.filters.JaxenFilter;
 import org.mule.module.xml.routing.FilteringXmlMessageSplitter;
 import org.mule.module.xml.routing.RoundRobinXmlSplitter;
-import org.mule.module.xml.transformer.DocumentToOutputHandler;
+import org.mule.module.xml.transformer.XmlToOutputHandler;
 import org.mule.module.xml.transformer.DomDocumentToXml;
 import org.mule.module.xml.transformer.JXPathExtractor;
 import org.mule.module.xml.transformer.ObjectToXml;
@@ -39,7 +39,7 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("message-splitter", new RouterDefinitionParser(FilteringXmlMessageSplitter.class));
         registerMuleBeanDefinitionParser("round-robin-splitter", new RouterDefinitionParser(RoundRobinXmlSplitter.class)).addAlias("endpointFiltering", "enableEndpointFiltering");
         registerBeanDefinitionParser("dom-to-xml-transformer", new TransformerDefinitionParser(DomDocumentToXml.class));
-        registerBeanDefinitionParser("dom-to-output-handler-transformer", new TransformerDefinitionParser(DocumentToOutputHandler.class));
+        registerBeanDefinitionParser("dom-to-output-handler-transformer", new TransformerDefinitionParser(XmlToOutputHandler.class));
         registerBeanDefinitionParser("jxpath-extractor-transformer", new TransformerDefinitionParser(JXPathExtractor.class));
         registerBeanDefinitionParser("object-to-xml-transformer", new TransformerDefinitionParser(ObjectToXml.class));
         registerBeanDefinitionParser("xml-to-dom-transformer", new TransformerDefinitionParser(XmlToDomDocument.class));

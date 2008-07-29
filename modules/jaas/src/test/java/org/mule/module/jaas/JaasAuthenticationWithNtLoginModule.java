@@ -16,12 +16,18 @@ import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.security.MuleCredentials;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.SystemUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class JaasAuthenticationWithNtLoginModule extends FunctionalTestCase
 {
+
+    protected boolean isDisabledInThisEnvironment()
+    {
+        return SystemUtils.IS_OS_UNIX;
+    }
 
     public void testCaseAuthentication() throws Exception
     {

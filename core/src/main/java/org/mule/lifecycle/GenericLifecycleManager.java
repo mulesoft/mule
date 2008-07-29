@@ -33,8 +33,8 @@ public class GenericLifecycleManager implements LifecycleManager
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(GenericLifecycleManager.class);
-    protected static NotInLifecyclePhase notInLifecyclePhase = new NotInLifecyclePhase();
+    private static final Log logger = LogFactory.getLog(GenericLifecycleManager.class);
+    protected static final NotInLifecyclePhase notInLifecyclePhase = new NotInLifecyclePhase();
     protected String currentPhase = notInLifecyclePhase.getName();
     protected String executingPhase = null;
     protected ListOrderedSet lifecycles = new ListOrderedSet();

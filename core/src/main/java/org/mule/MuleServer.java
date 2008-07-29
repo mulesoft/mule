@@ -74,7 +74,7 @@ public class MuleServer implements Runnable
     /**
      * logger used by this class
      */
-    private static Log logger = LogFactory.getLog(MuleServer.class);
+    private static final Log logger = LogFactory.getLog(MuleServer.class);
 
     public static final String DEFAULT_CONFIGURATION = "mule-config.xml";
 
@@ -472,7 +472,7 @@ public class MuleServer implements Runnable
      * clean Mule shutdown can be achieved by disposing the
      * {@link org.mule.DefaultMuleContext}.
      */
-    private class ShutdownThread extends Thread
+    private static class ShutdownThread extends Thread
     {
         public void run()
         {

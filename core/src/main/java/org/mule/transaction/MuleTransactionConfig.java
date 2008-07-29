@@ -10,6 +10,7 @@
 
 package org.mule.transaction;
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
@@ -134,7 +135,7 @@ public class MuleTransactionConfig implements TransactionConfig
         if (action != ACTION_NEVER && action != ACTION_NONE && factory == null)
         {
             // TODO use TransactionException here? This causes API changes as TE is a checked exception ...
-            throw new RuntimeException(CoreMessages.transactionFactoryIsMandatory(getActionAsString()).getMessage());
+            throw new MuleRuntimeException(CoreMessages.transactionFactoryIsMandatory(getActionAsString()));
         }
         return action != ACTION_NEVER && action != ACTION_NONE && factory.isTransacted() && joinPossible;
     }

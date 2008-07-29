@@ -10,17 +10,21 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.RequestContext;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.OutputHandler;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractTransformer;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -48,6 +52,7 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
 {
     private String outputEncoding;
     private XMLInputFactory xmlInputFactory;
+    private XMLOutputFactory xmlOutputFactory;
     private boolean useStaxSource = false;
     
     public AbstractXmlTransformer()
@@ -59,10 +64,13 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         registerSourceType(org.w3c.dom.Document.class);
         registerSourceType(org.w3c.dom.Element.class);
         registerSourceType(InputStream.class);
+        registerSourceType(OutputHandler.class);
         registerSourceType(XMLStreamReader.class);
+        registerSourceType(DelayedResult.class);
         setReturnClass(byte[].class);
         
         xmlInputFactory = XMLInputFactory.newInstance();
+        xmlOutputFactory = XMLOutputFactory.newInstance();
     }
 
     public Source getXmlSource(Object src) throws TransformerException
@@ -115,6 +123,22 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
             {
                 return new DOMSource((org.w3c.dom.Node) src);
             }
+            else if (src instanceof DelayedResult) 
+            {
+                DelayedResult result = ((DelayedResult) src);
+                DOMResult domResult = new DOMResult();
+                result.write(domResult);
+                return new DOMSource(domResult.getNode());
+            }
+            else if (src instanceof OutputHandler) 
+            {
+                OutputHandler handler = ((OutputHandler) src);
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
+                
+                handler.write(RequestContext.getEvent(), output);
+                
+                return createStreamSource(new ByteArrayInputStream(output.toByteArray()));
+            }
             else
             {
                 return null;
@@ -122,6 +146,15 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         }
         catch (XMLStreamException e)
         {
+            throw new TransformerException(this, e);
+        }
+        catch (Exception e)
+        {
+            if (e instanceof TransformerException)
+            {
+                throw (TransformerException) e;
+            }
+            
             throw new TransformerException(this, e);
         }
     }
@@ -351,7 +384,25 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         idTransformer.transform(src, result);
         return writer.getBuffer().toString();
     }
+    
+    protected void writeToStream(Object obj, String outputEncoding, OutputStream output)
+        throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException,
+        TransformerException
+    {
+        // Always use the transformer, even for byte[] (to get the encoding right!)
+        Source src = getXmlSource(obj);
+        if (src == null)
+        {
+            return;
+        }
 
+        StreamResult result = new StreamResult(output);
+
+        Transformer idTransformer = XMLUtils.getTransformer();
+        idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
+        idTransformer.transform(src, result);
+    }
+    
     /** @return the outputEncoding */
     public String getOutputEncoding()
     {
@@ -382,6 +433,16 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
     public void setXMLInputFactory(XMLInputFactory xmlInputFactory)
     {
         this.xmlInputFactory = xmlInputFactory;
+    }
+
+    public XMLOutputFactory getXMLOutputFactory()
+    {
+        return xmlOutputFactory;
+    }
+
+    public void setXMLOutputFactory(XMLOutputFactory xmlOutputFactory)
+    {
+        this.xmlOutputFactory = xmlOutputFactory;
     }
     
 }

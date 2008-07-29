@@ -120,9 +120,9 @@
             <tr>
                 <th class="confluenceTh" style="width:10%">Transport</th>
                 <th class="confluenceTh" style="width:10%">Receive Events</th>
-                <th class="confluenceTh" style="width:10%">Send Events</th>
+                <th class="confluenceTh" style="width:10%">Dispatch Events</th>
                 <th class="confluenceTh" style="width:10%">Request Events</th>
-                <th class="confluenceTh" style="width:10%">Request/Response</th>
+                <th class="confluenceTh" style="width:10%">Request/Response Events</th>
                 <th class="confluenceTh" style="width:10%">Transactions</th>
                 <th class="confluenceTh" style="width:10%">Streaming</th>
                 <th class="confluenceTh" style="width:10%">Inbound MEPs</th>

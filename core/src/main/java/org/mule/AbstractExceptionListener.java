@@ -353,7 +353,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      */
     protected List getEndpoints(Throwable t)
     {
-        if (endpoints.size() > 0)
+        if (!endpoints.isEmpty())
         {
             return endpoints;
         }

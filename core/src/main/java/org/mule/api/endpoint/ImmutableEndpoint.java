@@ -29,8 +29,8 @@ import java.util.Map;
 public interface ImmutableEndpoint extends Serializable
 {
 
-    public static final String INITIAL_STATE_STARTED = "started";
-    public static final String INITIAL_STATE_STOPPED = "stopped";
+    String INITIAL_STATE_STARTED = "started";
+    String INITIAL_STATE_STOPPED = "stopped";
 
     /**
      * This specifess the communication endpointUri. This will have a different format

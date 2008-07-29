@@ -11,7 +11,6 @@
 package org.mule.api.transport;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 
 /**

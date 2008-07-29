@@ -587,8 +587,7 @@ public class MuleEventMulticaster
 
     private boolean registerAsSoap(String endpoint, Object listener) throws MuleException
     {
-        if (endpoint.startsWith("glue") || endpoint.startsWith("soap") || endpoint.startsWith("axis")
-            || endpoint.startsWith("xfire"))
+        if (endpoint.startsWith("soap") || endpoint.startsWith("axis") || endpoint.startsWith("cxf"))
         {
             EndpointURI ep = new MuleEndpointURI(endpoint);
 

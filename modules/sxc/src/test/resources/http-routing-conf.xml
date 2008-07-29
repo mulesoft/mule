@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.0"
+       xmlns:sxc="http://www.mulesource.org/schema/mule/sxc/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/sxc/2.0 http://www.mulesource.org/schema/mule/sxc/2.0/mule-sxc.xsd
+               http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+    <model name="Test">
+    
+        <service name="proxy">
+            <inbound>
+                <inbound-endpoint address="http://localhost:63081/proxy" synchronous="true"/>
+            </inbound>
+            <outbound>
+                <sxc:filtering-router>
+                    <outbound-endpoint address="http://localhost:63081/echo"/>
+                    <sxc:filter pattern="//invalid"/>
+                    <sxc:namespace prefix="test" uri="http://foo"/>
+                </sxc:filtering-router>
+                <sxc:filtering-router>
+                    <outbound-endpoint address="http://localhost:63081/echo">
+                        <transformers>
+                            <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
+                        </transformers>
+                    </outbound-endpoint>
+                    <sxc:filter pattern="//purchaseOrder[@country]"/>
+                    <sxc:namespace prefix="test" uri="http://foo"/>
+                </sxc:filtering-router>
+            </outbound>
+        </service>
+        
+        <service name="echo">
+            <inbound>
+                <inbound-endpoint address="http://localhost:63081/echo" synchronous="true"/>
+            </inbound>
+			<echo-component/>
+        </service>
+    
+    </model>
+
+</mule>
+        

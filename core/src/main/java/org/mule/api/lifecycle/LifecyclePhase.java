@@ -59,6 +59,6 @@ public interface LifecyclePhase
 
     void applyLifecycle(Object o) throws LifecycleException;
 
-    public String getOppositeLifecyclePhase();
+    String getOppositeLifecyclePhase();
 
 }

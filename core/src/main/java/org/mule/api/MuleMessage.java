@@ -45,7 +45,7 @@ public interface MuleMessage extends MessageAdapter
      * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
      * are incompatible with the message payload
      */
-    public void applyTransformers(List transformers) throws TransformerException;
+    void applyTransformers(List transformers) throws TransformerException;
 
     /**
      * Will apply a list of transformers to the payload of the message. This *Will* change the payload of the
@@ -59,7 +59,7 @@ public interface MuleMessage extends MessageAdapter
      * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
      * are incompatible with the message payload
      */
-    public void applyTransformers(List transformers, Class outputType) throws TransformerException;
+    void applyTransformers(List transformers, Class outputType) throws TransformerException;
 
     /**
      * Update the message payload. This is typically only called if the

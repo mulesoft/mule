@@ -12,10 +12,12 @@ package org.mule.routing.nested;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.NestedRouter;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
@@ -28,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultNestedRouter extends AbstractRouter implements NestedRouter
 {
 
-    protected static Log logger = LogFactory.getLog(DefaultNestedRouter.class);
+    private static final Log logger = LogFactory.getLog(DefaultNestedRouter.class);
 
     private Class interfaceClass;
 
@@ -85,8 +87,7 @@ public class DefaultNestedRouter extends AbstractRouter implements NestedRouter
         }
         catch (Exception e)
         {
-            logger.error(e);
-            throw new RuntimeException(e);
+            throw new MuleRuntimeException(CoreMessages.failedToCreateProxyFor(target), e);
         }
     }
 

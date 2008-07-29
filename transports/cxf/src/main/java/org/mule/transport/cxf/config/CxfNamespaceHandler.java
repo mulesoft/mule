@@ -15,6 +15,9 @@ import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.transport.cxf.CxfConnector;
 import org.mule.transport.cxf.CxfConstants;
 import org.mule.transport.cxf.component.WebServiceWrapperComponent;
+import org.mule.transport.cxf.support.StaxFeature;
+
+import org.apache.cxf.configuration.spring.SimpleBeanDefinitionParser;
 
 public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -41,6 +44,8 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser(CxfConstants.OUT_FAULT_INTERCEPTORS, new EndpointChildDefinitionParser(
             CxfConstants.OUT_FAULT_INTERCEPTORS));
+        
+        registerBeanDefinitionParser("stax", new SimpleBeanDefinitionParser(StaxFeature.class));
         
         registerBeanDefinitionParser("wrapper-component", new ComponentDefinitionParser(WebServiceWrapperComponent.class));
     }

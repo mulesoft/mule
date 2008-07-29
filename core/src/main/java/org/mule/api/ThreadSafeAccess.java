@@ -42,8 +42,8 @@ import org.apache.commons.lang.BooleanUtils;
  */
 public interface ThreadSafeAccess
 {
-     final boolean WRITE = true;
-     final boolean READ = false;
+     boolean WRITE = true;
+     boolean READ = false;
      
     /**
      * This method may be called before data in the object are accessed.  It should verify that the

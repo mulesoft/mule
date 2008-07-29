@@ -137,7 +137,7 @@ public class MuleShutdownHook extends Thread
         {
             return true;
         }
-        if (o != null && getClass().getName().equals(o.getClass().getName()))
+        if (o != null && getClass().equals(o.getClass()))
         {
             return true;
         }

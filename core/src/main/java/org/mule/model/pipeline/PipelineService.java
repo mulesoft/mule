@@ -10,7 +10,6 @@
 
 package org.mule.model.pipeline;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -37,16 +36,10 @@ public class PipelineService extends DirectService
     {
         try
         {
-            Object result = component.onCall(event);
+            MuleMessage result = component.onCall(event);
             MuleMessage returnMessage = null;
-            if (result instanceof MuleMessage)
-            {
-                returnMessage = (MuleMessage) result;
-            }
-            else
-            {
-                returnMessage = new DefaultMuleMessage(result, event.getMessage());
-            }
+            returnMessage = (MuleMessage) result;
+
             if (!event.isStopFurtherProcessing())
             {
                 // // TODO what about this code?

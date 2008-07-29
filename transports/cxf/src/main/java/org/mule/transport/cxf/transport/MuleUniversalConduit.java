@@ -244,7 +244,6 @@ public class MuleUniversalConduit extends AbstractConduit
         return endpoint.getAddress().toString();
     }
 
-    @SuppressWarnings("unchecked")
     public void onClose(final Message m) throws IOException
     {
     }

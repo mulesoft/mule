@@ -352,7 +352,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         {
             if (StringUtils.isBlank(id))
             {
-                throw new RuntimeException("Cannot set server id to null/blank");
+                throw new IllegalArgumentException("Cannot set server id to null/blank");
             }
             this.id = id;
         }

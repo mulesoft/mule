@@ -131,6 +131,6 @@ public interface OutboundRouter extends Router
      * @param name the Endpoint identifier
      * @return the Endpoint or null if the endpointUri is not registered
      */
-    public OutboundEndpoint getEndpoint(String name);
+    OutboundEndpoint getEndpoint(String name);
 
 }

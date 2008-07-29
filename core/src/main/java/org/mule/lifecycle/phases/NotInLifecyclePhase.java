@@ -18,7 +18,7 @@ import org.mule.lifecycle.DefaultLifecyclePhase;
  */
 public class NotInLifecyclePhase extends DefaultLifecyclePhase
 {
-    public static String PHASE_NAME = "not in lifecycle";
+    public static final String PHASE_NAME = "not in lifecycle";
 
     public NotInLifecyclePhase()
     {

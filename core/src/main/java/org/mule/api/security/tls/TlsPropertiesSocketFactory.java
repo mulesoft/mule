@@ -33,6 +33,7 @@ public class TlsPropertiesSocketFactory extends SSLSocketFactory
 
     public TlsPropertiesSocketFactory(boolean anon, String namespace)
     {
+        super();
         logger.debug("creating: " + anon + "; " + namespace);
         this.anon = anon;
         this.namespace = namespace;

@@ -14,9 +14,9 @@ package org.mule.api.context.notification;
 public interface ServerNotificationHandler
 {
 
-    public void fireNotification(ServerNotification notification);
+    void fireNotification(ServerNotification notification);
 
-    public boolean isNotificationDynamic();
+    boolean isNotificationDynamic();
 
     /**
      * This returns a very "conservative" value - it is true if the notification or any subclass would be
@@ -27,6 +27,6 @@ public interface ServerNotificationHandler
      * @param notfnClass Either the notification class being generated or some superclass
      * @return false if there is no need to dispatch the notification
      */
-    public boolean isNotificationEnabled(Class notfnClass);
+    boolean isNotificationEnabled(Class notfnClass);
 
 }

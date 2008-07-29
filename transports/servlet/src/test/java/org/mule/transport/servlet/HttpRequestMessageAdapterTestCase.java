@@ -17,6 +17,7 @@ import org.mule.transport.AbstractMessageAdapterTestCase;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -34,7 +35,12 @@ public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTes
     {
         return getMockRequest("test message");
     }
-
+    
+    protected void doTestMessageEqualsPayload(Object message, Object payload) throws Exception
+    {
+        assertTrue(payload instanceof InputStream);
+    }
+    
     public MessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new HttpRequestMessageAdapter(payload);

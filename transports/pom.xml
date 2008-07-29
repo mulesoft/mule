@@ -68,6 +68,7 @@
                 <module>http</module>
                 <module>jbpm</module>
                 <module>jdbc</module>
+                <module>jetty</module>
                 <module>jms</module>
                 <module>multicast</module>
                 <module>quartz</module>

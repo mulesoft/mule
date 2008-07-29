@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.servlet.config;
+package org.mule.transport.servlet.jetty;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.transport.servlet.jetty.JettyHttpConnector;

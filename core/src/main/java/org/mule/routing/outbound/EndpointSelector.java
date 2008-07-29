@@ -13,7 +13,6 @@ package org.mule.routing.outbound;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
@@ -42,7 +41,7 @@ import java.util.List;
  *
  * </pre>
  */
-public class EndpointSelector extends FilteringOutboundRouter implements MuleContextAware
+public class EndpointSelector extends FilteringOutboundRouter
 {
     public static final String DEFAULT_SELECTOR_EVALUATOR = "header";
     public static final String DEFAULT_SELECTOR_EXPRESSION = "endpoint";

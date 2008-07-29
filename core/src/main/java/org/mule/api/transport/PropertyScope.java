@@ -19,6 +19,8 @@ import java.util.Comparator;
  */
 public final class PropertyScope implements Serializable
 {
+    private static final long serialVersionUID = -4792653762048974018L;
+    
     public static final String INVOCATION_NAME = "invocation";
     public static final String INBOUND_NAME = "inbound";
     public static final String OUTBOUND_NAME = "outbound";
@@ -123,6 +125,8 @@ public final class PropertyScope implements Serializable
      */
     public static class ScopeComarator implements Comparator, Serializable
     {
+        private static final long serialVersionUID = -3346258000312580166L;
+
         public int compare(Object o, Object o1)
         {
             if (o == o1)

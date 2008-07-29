@@ -56,12 +56,12 @@ public interface MuleProperties
     /********************************************************************************
      * Generic Service descriptor properties
      *******************************************************************************/
-    public final String SERVICE_FINDER = "service.finder";
+    String SERVICE_FINDER = "service.finder";
     
     /********************************************************************************
      * Model Service descriptor properties
      *******************************************************************************/
-    public final String MODEL_CLASS = "model";
+    String MODEL_CLASS = "model";
 
     /********************************************************************************
      * Transport Service descriptor properties

@@ -29,11 +29,11 @@ import org.mule.api.ThreadSafeAccess;
 public final class RequestContext
 {
     // to clarify "safe" in constructors
-    public static boolean SAFE = true;
-    public static boolean UNSAFE = true;
+    public static final boolean SAFE = true;
+    public static final boolean UNSAFE = true;
 
     // setting this to false gives old (mutable) semantics in non-critical cases
-    private static boolean DEFAULT_ACTION = SAFE;
+    private static final boolean DEFAULT_ACTION = SAFE;
 
     private static final ThreadLocal currentEvent = new ThreadLocal();
 

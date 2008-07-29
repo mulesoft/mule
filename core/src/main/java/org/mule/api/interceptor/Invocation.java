@@ -10,10 +10,10 @@
 
 package org.mule.api.interceptor;
 
-import org.mule.api.service.Service;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.service.Service;
 
 /**
  * Call the embedded component.  Because interception is "lower level" in 2.x, it cannot
@@ -34,12 +34,12 @@ public interface Invocation
      * @return the result of invoking the component
      * @throws org.mule.api.MuleException if something goes wrong
      */
-    public Object execute() throws MuleException;
+    Object execute() throws MuleException;
 
-    public Service getService();
+    Service getService();
 
-    public MuleEvent getEvent();
+    MuleEvent getEvent();
 
-    public MuleMessage getMessage();
+    MuleMessage getMessage();
 
 }

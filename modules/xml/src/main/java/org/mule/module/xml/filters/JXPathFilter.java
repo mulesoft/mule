@@ -12,7 +12,7 @@ package org.mule.module.xml.filters;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
-import org.mule.util.StringMessageUtils;
+import org.mule.module.xml.util.XMLUtils;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -22,7 +22,6 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.XPath;
 
@@ -108,38 +107,31 @@ public class JXPathFilter implements Filter
         Object xpathResult = null;
         boolean accept = false;
 
-        // Payload is a DOM Document
-        if (obj instanceof Document)
+        Document dom4jDoc;
+        try
+        {
+            dom4jDoc = XMLUtils.toDocument(obj);
+        }
+        catch (Exception e)
+        {
+            logger.warn("JxPath filter rejected message because of an error while parsing XML: " + e.getMessage(), e);
+            return false;
+        }
+        
+        // Payload is XML
+        if (dom4jDoc != null)
         {
             if (namespaces == null)
             {
                 // no namespace defined, let's perform a direct evaluation
-                xpathResult = ((Document) obj).valueOf(pattern);
+                xpathResult = dom4jDoc.valueOf(pattern);
             }
             else
             {
                 // create an xpath expression with namespaces and evaluate it
                 XPath xpath = DocumentHelper.createXPath(pattern);
                 xpath.setNamespaceURIs(namespaces);
-                xpathResult = xpath.valueOf(obj);
-            }
-
-        }
-        // Payload is a String of XML
-        else if (obj instanceof String)
-        {
-            try
-            {
-                return accept(DocumentHelper.parseText((String) obj));
-            }
-            catch (DocumentException e)
-            {
-                logger.warn("JXPathFilter unable to parse XML document: " + e.getMessage(), e);
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("XML = " + StringMessageUtils.truncate((String) obj, 200, false));
-                }
-                return false;
+                xpathResult = xpath.valueOf(dom4jDoc);
             }
         }
         // Payload is a Java object

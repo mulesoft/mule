@@ -23,6 +23,8 @@ import java.util.List;
 
 public class TransformerException extends EndpointException
 {
+    private static final String TRANSFORMER = "Transformer";
+    
     /**
      * Serial version
      */
@@ -37,14 +39,14 @@ public class TransformerException extends EndpointException
     {
         super(message);
         this.transformer = transformer;
-        addInfo("Transformer", transformer.toString());
+        addInfo(TRANSFORMER, transformer.toString());
     }
 
     public TransformerException(Message message, List transformers)
     {
         super(message);
         this.transformer = TransformerUtils.firstOrNull(transformers);
-        addInfo("Transformer", TransformerUtils.toString(transformers));
+        addInfo(TRANSFORMER, TransformerUtils.toString(transformers));
     }
 
     /**
@@ -55,28 +57,28 @@ public class TransformerException extends EndpointException
     {
         super(message, cause);
         this.transformer = transformer;
-        addInfo("Transformer", transformer.toString());
+        addInfo(TRANSFORMER, transformer.toString());
     }
 
     public TransformerException(Message message, List transformers, Throwable cause)
     {
         super(message, cause);
         this.transformer = TransformerUtils.firstOrNull(transformers);
-        addInfo("Transformer", TransformerUtils.toString(transformers));
+        addInfo(TRANSFORMER, TransformerUtils.toString(transformers));
     }
 
     public TransformerException(Transformer transformer, Throwable cause)
     {
         super(cause);
         this.transformer = transformer;
-        addInfo("Transformer", (transformer == null ? "null" : transformer.toString()));
+        addInfo(TRANSFORMER, (transformer == null ? "null" : transformer.toString()));
     }
 
      public TransformerException(List transformers, Throwable cause)
     {
         super(cause);
         this.transformer = TransformerUtils.firstOrNull(transformers);
-        addInfo("Transformer", TransformerUtils.toString(transformers));
+        addInfo(TRANSFORMER, TransformerUtils.toString(transformers));
     }
 
    /**

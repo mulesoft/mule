@@ -31,7 +31,7 @@ import java.util.Properties;
 public class TextFileObjectStore extends InMemoryObjectStore
 {
 
-    protected File store;
+    protected File fileStore;
     protected String directory;
     protected String encoding;
 
@@ -54,8 +54,8 @@ public class TextFileObjectStore extends InMemoryObjectStore
         try
         {
             File dir = FileUtils.openDirectory(directory);
-            store = new File(dir, name + ".dat");
-            if (store.exists())
+            fileStore = new File(dir, name + ".dat");
+            if (fileStore.exists())
             {
                 loadFromStore();
             }
@@ -70,7 +70,7 @@ public class TextFileObjectStore extends InMemoryObjectStore
     protected synchronized void loadFromStore() throws Exception
     {
         Properties props = new Properties();
-        props.load(new FileInputStream(store));
+        props.load(new FileInputStream(fileStore));
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
         {
             Map.Entry entry = (Map.Entry) iterator.next();
@@ -99,7 +99,7 @@ public class TextFileObjectStore extends InMemoryObjectStore
         boolean result = super.storeObject(id, item);
         if (output == null)
         {
-            output = new FileOutputStream(store, true);
+            output = new FileOutputStream(fileStore, true);
         }
         StringBuffer buf = new StringBuffer();
         buf.append(id).append("=").append(item.toString()).append(IOUtils.LINE_SEPARATOR);
@@ -141,7 +141,7 @@ public class TextFileObjectStore extends InMemoryObjectStore
         {
             try
             {
-                output = new FileOutputStream(store, false);
+                output = new FileOutputStream(fileStore, false);
                 props.save(output, StringUtils.EMPTY);
                 IOUtils.closeQuietly(output);
             }

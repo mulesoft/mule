@@ -10,8 +10,6 @@
 
 package org.mule.object;
 
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
@@ -27,7 +25,7 @@ import javax.naming.NamingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JndiObjectFactory implements ObjectFactory, Initialisable, Disposable
+public class JndiObjectFactory implements ObjectFactory
 {
     /**
      * If true, the object is looked up from JNDI each time create() is called, otherwise it

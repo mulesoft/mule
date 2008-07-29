@@ -49,6 +49,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
     public AbstractJavaComponent()
     {
         // For Spring only
+        super();
     }
 
     public AbstractJavaComponent(ObjectFactory objectFactory)
@@ -60,6 +61,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
                                  EntryPointResolverSet entryPointResolverSet,
                                  NestedRouterCollection nestedRouterCollection)
     {
+        super();
         this.objectFactory = objectFactory;
         this.entryPointResolverSet = entryPointResolverSet;
         if (nestedRouterCollection != null)

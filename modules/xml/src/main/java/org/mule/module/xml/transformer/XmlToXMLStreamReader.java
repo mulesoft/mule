@@ -13,19 +13,15 @@ package org.mule.module.xml.transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
-import org.mule.module.xml.stax.StaxSource;
+import org.mule.module.xml.util.XMLUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringReader;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 public class XmlToXMLStreamReader extends AbstractXmlTransformer
 {
@@ -48,39 +44,14 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer
     {
         try 
         {
-            XMLStreamReader xsr;
-            
-            if (payload instanceof StaxSource)
-            {
-                xsr = ((StaxSource) payload).getXMLStreamReader();
-            }
-            else if (payload instanceof Source)
-            {
-                xsr = getXMLInputFactory().createXMLStreamReader((Source) payload);
-            }
-            else if (payload instanceof Document)
-            {
-                xsr = getXMLInputFactory().createXMLStreamReader(new DOMSource((Node) payload));
-            }
-            else if (payload instanceof InputStream)
-            {
-                xsr = getXMLInputFactory().createXMLStreamReader((InputStream) payload);
-            }
-            else if (payload instanceof String)
-            {
-                xsr = getXMLInputFactory().createXMLStreamReader(new StringReader((String) payload));
-            }
-            else if (payload instanceof byte[])
-            {
-                xsr = getXMLInputFactory().createXMLStreamReader(new ByteArrayInputStream((byte[]) payload));
-            }
-            else
+            XMLStreamReader xsr = XMLUtils.toXMLStreamReader(getXMLInputFactory(), payload);
+            if (xsr == null)
             {
                 throw new TransformerException(MessageFactory
                     .createStaticMessage("Unable to convert " + payload.getClass() + " to XMLStreamReader."));
             }
         
-            if (reversible)
+            if (reversible && !(xsr instanceof ReversibleXMLStreamReader))
             {
                 return new ReversibleXMLStreamReader(xsr);
             }

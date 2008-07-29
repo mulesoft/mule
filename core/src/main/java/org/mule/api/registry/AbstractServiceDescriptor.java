@@ -55,9 +55,14 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor
     protected Class removeClassProperty(String name, Properties properties) throws ClassNotFoundException
     {
         String clazz = removeProperty(name, properties);
-        if(clazz==null) return null;
-
-        return ClassUtils.loadClass(clazz, getClass());
+        if (clazz == null)
+        {
+            return null;
+        }
+        else
+        {
+            return ClassUtils.loadClass(clazz, getClass());
+        }
     }
 
 

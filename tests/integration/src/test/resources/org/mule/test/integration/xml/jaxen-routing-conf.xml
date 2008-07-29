@@ -5,7 +5,7 @@
   xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.0"
   xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
   xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
                http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
@@ -34,7 +34,7 @@
       <inbound>
         <inbound-endpoint address="vm://echo"/>
       </inbound>
-      <component class="org.mule.component.simple.EchoComponent" />
+      <echo-component/>
     </service>
     
     <service name="nullService">
