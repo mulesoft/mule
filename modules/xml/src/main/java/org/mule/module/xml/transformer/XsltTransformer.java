@@ -144,7 +144,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     {
         try
         {
-            Source sourceDoc = this.getXmlSource(src);
+            Source sourceDoc = XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), src);
             if (sourceDoc == null)
             {
                 return null;

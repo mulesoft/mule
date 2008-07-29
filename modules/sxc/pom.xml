@@ -74,10 +74,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <forkMode>none</forkMode>
-                    <excludes>
-			            <exclude>**/HttpRoutingTestCase.java</exclude>
-			            <exclude>**/SxcFilterTestCase.java</exclude>
-			        </excludes>
                 </configuration>
             </plugin>
         </plugins>

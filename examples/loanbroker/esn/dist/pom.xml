@@ -12,7 +12,6 @@
     <name>Loan Broker ESN Example</name>
     <description>The Loan Broker example application is based on the example presented in the Enterprise Integration Patterns book. This chapter of the book is available online so you can see a detailed description of the application here (http://www.eaipatterns.com/ComposedMessagingWS.html).</description>
 
-
     <dependencies>
         <dependency>
             <groupId>org.mule.examples</groupId>
@@ -44,6 +43,12 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_2.5_spec</artifactId>
+            <version>1.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

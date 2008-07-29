@@ -15,6 +15,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.module.xml.routing.FilteringXmlMessageSplitter;
+import org.mule.module.xml.util.XMLTestUtils;
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
@@ -23,8 +25,14 @@ import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Source;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -65,6 +73,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
     {
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload);
+        internalTestSuccessfulXmlSplitter2(payload);
     }
 
     public void testStringPayloadXmlMessageSplitterWithoutXsd() throws Exception
@@ -73,6 +82,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         xmlSplitter.setValidateSchema(false);
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload);
+        internalTestSuccessfulXmlSplitter2(payload);
     }
 
     public void testDom4JDocumentPayloadXmlMessageSplitter() throws Exception
@@ -80,12 +90,14 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
         Document doc = DocumentHelper.parseText(payload);
         internalTestSuccessfulXmlSplitter(doc);
+        internalTestSuccessfulXmlSplitter2(doc);
     }
 
     public void testByteArrayPayloadXmlMessageSplitter() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload.getBytes());
+        internalTestSuccessfulXmlSplitter2(payload.getBytes());
     }
 
     public void testByteArrayPayloadCorrelateNever() throws Exception
@@ -93,6 +105,41 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
         xmlSplitter.setEnableCorrelation(AbstractOutboundRouter.ENABLE_CORRELATION_NEVER);
         internalTestSuccessfulXmlSplitter(payload.getBytes());
+        internalTestSuccessfulXmlSplitter2(payload.getBytes());
+    }
+
+    public void testXmlMessageVariants() throws Exception
+    {
+        List list = XMLTestUtils.getXmlMessageVariants("purchase-order.xml");
+        Iterator it = list.iterator();
+        
+        Object msg;
+        while (it.hasNext())
+        {
+            msg = it.next();
+            // TODO Not working for W3C Documents
+            if (!(msg instanceof org.w3c.dom.Document))
+            {
+                internalTestSuccessfulXmlSplitter(msg);
+            }
+        }
+    }
+
+    public void testXmlMessageVariants2() throws Exception
+    {
+        List list = XMLTestUtils.getXmlMessageVariants("purchase-order.xml");
+        Iterator it = list.iterator();
+        
+        Object msg;
+        while (it.hasNext())
+        {
+            msg = it.next();
+            // TODO Not working for W3C Documents
+            if (!(msg instanceof org.w3c.dom.Document))
+            {
+                internalTestSuccessfulXmlSplitter2(msg);
+            }
+        }
     }
 
     private void internalTestSuccessfulXmlSplitter(Object payload) throws Exception
@@ -108,8 +155,19 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
         xmlSplitter.route(message, (MuleSession)session.proxy(), false);
         session.verify();
+    }
 
-        message = new DefaultMuleMessage(payload);
+    // Note: these used to be a single method but I split them up because if the message is an 
+    // InputStream it can't be routed (read) more than once.
+    private void internalTestSuccessfulXmlSplitter2(Object payload) throws Exception
+    {
+        Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
+
+        MuleMessage message = new DefaultMuleMessage(payload);
+
+        assertTrue(xmlSplitter.isMatch(message));
+        final ItemNodeConstraint itemNodeConstraint = new ItemNodeConstraint();
 
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint1)), message);
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint1)), message);

@@ -540,11 +540,11 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
         {
             if (isStartElement())
             {
-                return ((StartElementEventX) current).getName().getNamespaceURI();
+                return ((StartElementEventX) current).getName().getPrefix();
             }
             else 
             {
-                return ((EndElementEvent) current).getName().getNamespaceURI();
+                return ((EndElementEvent) current).getName().getPrefix();
             }
         }
         else

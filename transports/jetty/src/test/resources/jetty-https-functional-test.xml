@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:https="http://www.mulesource.org/schema/mule/https/2.0"
+       xmlns:jetty="http://www.mulesource.org/schema/mule/jetty-ssl/2.0"
+        xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+    xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/https/2.0 http://www.mulesource.org/schema/mule/https/2.0/mule-https.xsd
+       http://www.mulesource.org/schema/mule/jetty-ssl/2.0 http://www.mulesource.org/schema/mule/jetty-ssl/2.0/mule-jetty-ssl.xsd">
+
+    <https:connector name="httpConnector">
+        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword"/>
+    </https:connector>
+    
+    <jetty:connector name="jettyConnector">
+        <jetty:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <jetty:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <jetty:tls-server path="trustStore" storePassword="mulepassword"/>
+    </jetty:connector>
+
+    <endpoint name="clientEndpoint" address="https://localhost:60202" synchronous="true" connector-ref="httpConnector"/>
+
+    <model name="main">
+        <custom-service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaService">
+            <inbound>
+                <inbound-endpoint address="jetty-ssl:https://localhost:60202" synchronous="true" connector-ref="jettyConnector"/>
+            </inbound>
+            <test:component appendString=" Received"/>
+        </custom-service>
+    </model>
+</mule>

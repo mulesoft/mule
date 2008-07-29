@@ -20,11 +20,9 @@ import java.beans.ExceptionListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.util.InetAddrPort;
 
 public class AxisServletWithSecurityTestCase extends FunctionalTestCase
 {
@@ -41,17 +39,15 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         httpServer = new Server();
-        SocketListener socketListener = new SocketListener(new InetAddrPort(HTTP_PORT));
-        httpServer.addListener(socketListener);
-
-        HttpContext context = httpServer.getContext("/");
-        context.setRequestLog(null);
+        SelectChannelConnector conn = new SelectChannelConnector();
+        conn.setPort(HTTP_PORT);
+        httpServer.addConnector(conn);
 
         ServletHandler handler = new ServletHandler();
-        handler.addServlet("MuleReceiverServlet", "/services/*",
-            MuleReceiverServlet.class.getName());
-
-        context.addHandler(handler);
+        handler.addServletWithMapping(MuleReceiverServlet.class, "/services/*");
+        
+        httpServer.addHandler(handler);
+        
         httpServer.start();
     }
 
@@ -60,7 +56,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
     {
         if (httpServer != null)
         {
-            httpServer.stop(false);
+            httpServer.stop();
             httpServer.destroy();
         }
     }

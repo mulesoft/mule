@@ -45,7 +45,15 @@
             <xsd:extension base="mule:abstractConnectorType">
                 <xsd:attribute name="configFile" type="xsd:string">
                     <xsd:annotation>
-                        <xsd:documentation>The location of the Jetty config file to configure this connector with.
+                        <xsd:documentation>
+                            The location of the Jetty config file to configure this connector with.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="useContinuations" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Continuations can free up connections in high load situations. 
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -53,6 +61,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>Allows a Mule service to receive requests over Http using a Jetty server.

@@ -12,14 +12,18 @@ package org.mule.routing.filters.xml;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.module.xml.filters.JXPathFilter;
+import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.DocumentHelper;
@@ -225,4 +229,23 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         doTestBooleanFilter2NS(w3cDocumentInputNS);
     }
 
+    public void testSimpleFilterXmlMessageVariants() throws Exception
+    {
+        simpleFilter.setPattern("catalog/cd[3]/title");
+        simpleFilter.setExpectedValue("Greatest Hits");
+        
+        List list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
+        Iterator it = list.iterator();
+        
+        Object msg;
+        while (it.hasNext())
+        {
+            msg = it.next();
+            // TODO Not working for XMLStreamReader
+            if (!(msg instanceof XMLStreamReader))
+            {
+                assertTrue("Test failed for message type: " + msg.getClass(), simpleFilter.accept(new DefaultMuleMessage(msg)));
+            }
+        }
+    }
 }

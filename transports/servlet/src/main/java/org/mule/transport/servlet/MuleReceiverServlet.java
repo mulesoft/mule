@@ -12,6 +12,7 @@ package org.mule.transport.servlet;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RegistryContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -73,8 +74,6 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 throw new ServletException(ServletMessages.noServletConnectorFound(servletConnectorName).toString());
             }
         }
-
-
     }
 
     protected void doHead(HttpServletRequest request, HttpServletResponse response)
@@ -82,12 +81,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MessageReceiver receiver = getReceiverForURI(request);
-            MuleMessage responseMessage = null;
-            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request));
-            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "HEAD");
-            setupRequestMessage(request, requestMessage);
-            receiver.routeMessage(requestMessage, true);
+            MuleMessage responseMessage = doMethod(request, "HEAD");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
@@ -108,13 +102,12 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MessageReceiver receiver = getReceiverForURI(request);
-            MuleMessage responseMessage;
-            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request));
-            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-            setupRequestMessage(request, requestMessage);
-            responseMessage = receiver.routeMessage(requestMessage, true);
+            MuleMessage responseMessage = doMethod(request, "GET");
             writeResponse(response, responseMessage);
+        }
+        catch (RuntimeException e)
+        {
+            throw e;
         }
         catch (Exception e)
         {
@@ -122,7 +115,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
     }
 
-    private void setupRequestMessage(HttpServletRequest request, MuleMessage requestMessage)
+    protected void setupRequestMessage(HttpServletRequest request, MuleMessage requestMessage)
     {
         requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, request.getRequestURI());
     }
@@ -132,16 +125,15 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MessageReceiver receiver = getReceiverForURI(request);
-            MuleMessage responseMessage;
-            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request));
-            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
-            setupRequestMessage(request, requestMessage);
-            responseMessage = receiver.routeMessage(requestMessage, true);
+            MuleMessage responseMessage = doMethod(request, "POST");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
             }
+        }
+        catch (RuntimeException e)
+        {
+            throw e;
         }
         catch (Exception e)
         {
@@ -149,17 +141,31 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
     }
 
+    protected MuleMessage doMethod(HttpServletRequest request, String method)
+        throws MuleException
+    {
+        MessageReceiver receiver = getReceiverForURI(request);
+        
+        MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request));
+        requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
+        
+        setupRequestMessage(request, requestMessage);
+        
+        return routeMessage(receiver, requestMessage, request);
+    }
+
+    protected MuleMessage routeMessage(MessageReceiver receiver, MuleMessage requestMessage, HttpServletRequest request)
+        throws MuleException
+    {
+        return receiver.routeMessage(requestMessage, true);
+    }
+
     protected void doOptions(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
         try
         {
-            MessageReceiver receiver = getReceiverForURI(request);
-            MuleMessage responseMessage;
-            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request));
-            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "OPTIONS");
-            setupRequestMessage(request, requestMessage);
-            responseMessage = receiver.routeMessage(requestMessage, true);
+            MuleMessage responseMessage = doMethod(request, "OPTIONS");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
@@ -176,17 +182,13 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MessageReceiver receiver = getReceiverForURI(request);
-            MuleMessage responseMessage;
-            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request));
-            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "PUT");
-            setupRequestMessage(request, requestMessage);
-            responseMessage = receiver.routeMessage(requestMessage, true);
+            MuleMessage responseMessage = doMethod(request, "PUT");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
             }
         }
+
         catch (Exception e)
         {
             handleException(e, e.getMessage(), response);
@@ -198,12 +200,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MessageReceiver receiver = getReceiverForURI(request);
-            MuleMessage responseMessage;
-            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request));
-            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "DELETE");
-            setupRequestMessage(request, requestMessage);
-            responseMessage = receiver.routeMessage(requestMessage, true);
+            MuleMessage responseMessage = doMethod(request, "DELETE");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
@@ -220,12 +217,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MessageReceiver receiver = getReceiverForURI(request);
-            MuleMessage responseMessage;
-            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request));
-            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "TRACE");
-            setupRequestMessage(request, requestMessage);
-            responseMessage = receiver.routeMessage(requestMessage, true);
+            MuleMessage responseMessage = doMethod(request, "TRACE");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
@@ -242,12 +234,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MessageReceiver receiver = getReceiverForURI(request);
-            MuleMessage responseMessage;
-            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request));
-            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "CONNECT");
-            setupRequestMessage(request, requestMessage);
-            responseMessage = receiver.routeMessage(requestMessage, true);
+            MuleMessage responseMessage = doMethod(request, "CONNECT");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);

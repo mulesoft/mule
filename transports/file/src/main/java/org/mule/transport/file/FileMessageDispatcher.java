@@ -38,6 +38,11 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     {
         super(endpoint);
         this.connector = (FileConnector) endpoint.getConnector();
+
+        if (endpoint.getProperty("outputAppend") != null)
+        {
+            throw new IllegalArgumentException("configuring outputAppend on the file endpoint is no longer support. You can configure a the File connector instead.");
+        }
     }
 
     /*
@@ -52,14 +57,14 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         MuleMessage message = new DefaultMuleMessage(data, event.getMessage());
 
         FileOutputStream fos = (FileOutputStream) connector.getOutputStream(event.getEndpoint(), message);
-        try 
+        try
         {
             if (event.getMessage().getStringProperty(FileConnector.PROPERTY_FILENAME, null) == null)
             {
                 event.getMessage().setStringProperty(FileConnector.PROPERTY_FILENAME,
-                    message.getStringProperty(FileConnector.PROPERTY_FILENAME, ""));
+                        message.getStringProperty(FileConnector.PROPERTY_FILENAME, ""));
             }
-            
+
             if (data instanceof byte[])
             {
                 fos.write((byte[]) data);
@@ -85,10 +90,10 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
             fos.close();
         }
     }
-    
+
     /**
      * There is no associated session for a file connector
-     * 
+     *
      * @throws MuleException
      */
     public Object getDelegateSession() throws MuleException

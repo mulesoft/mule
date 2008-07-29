@@ -47,6 +47,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>com.springsource.javax.servlet</artifactId>
+            <scope>provided</scope>
         </dependency>
         
         <!-- Unit tests -->

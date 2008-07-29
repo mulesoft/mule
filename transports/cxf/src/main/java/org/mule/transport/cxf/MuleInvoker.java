@@ -25,6 +25,7 @@ import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
+import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -122,7 +123,7 @@ public class MuleInvoker implements Invoker
             }
             else if (message.getPayload() instanceof NullPayload)
             {
-                return null;
+                return new MessageContentsList((Object)null);
             }
             else
             {
@@ -131,7 +132,7 @@ public class MuleInvoker implements Invoker
         }
         else
         {
-            return null;
+            return new MessageContentsList((Object)null);
         }
     }
 

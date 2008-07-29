@@ -10,17 +10,15 @@
 package org.mule.transport.servlet.jetty;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.transport.servlet.jetty.JettyHttpConnector;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><jetty:connector></code> elements.
+ * Registers a Bean Definition Parser for handling <code><jetty:connector></code> elements.
  */
 public class JettyNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public void init()
     {
-
         registerMetaTransportEndpoints(JettyHttpConnector.JETTY);
         registerConnectorDefinitionParser(JettyHttpConnector.class);
     }

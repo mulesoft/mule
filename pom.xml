@@ -1,4 +1,4 @@
- <?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -256,6 +256,11 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>com.springsource.javax.servlet</artifactId>
                 <version>2.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-servlet_2.5_spec</artifactId>
+                <version>${geronimoSpecsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -974,12 +979,6 @@
             <id>com.springsource.repository.bundles.external</id>
             <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
             <url>http://repository.springsource.com/maven/bundles/external</url>
-        </repository>
-        <!-- TODO: This has been replaced with SSEBR.  Remove if possible -->
-        <repository>
-            <id>spring-osgi</id>
-            <name>Spring OSGi Artifacts Repo</name>
-            <url>http://s3.amazonaws.com/maven.springframework.org/osgi</url>
         </repository>
         <!-- for activemq -->
         <repository>

@@ -154,21 +154,11 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             {
                 servletResponse.setStatus(httpResponse.getStatusCode());
             }
-            if (!contentType.startsWith("text"))
-            {
-                servletResponse.setContentType(contentType);
-                OutputHandler outputHandler = httpResponse.getBody();
-                
-                outputHandler.write(RequestContext.getEvent(), servletResponse.getOutputStream());
-            }
-            else
-            {
-                servletResponse.setContentType(contentType);
-                String s = httpResponse.getBodyAsString();
-                // Encoding: this method will check the charset on the content type
-                servletResponse.getWriter().write(s);
-
-            }
+            
+            servletResponse.setContentType(contentType);
+            OutputHandler outputHandler = httpResponse.getBody();
+            
+            outputHandler.write(RequestContext.getEvent(), servletResponse.getOutputStream());
         }
         servletResponse.flushBuffer();
     }

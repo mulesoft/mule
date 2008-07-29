@@ -11,12 +11,15 @@
 package org.mule.routing.filters.xml;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.module.xml.filters.IsXmlFilter;
+import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.List;
 
 public class IsXmlFilterTestCase extends AbstractMuleTestCase
 {
@@ -57,22 +60,30 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase
 
     public void testFilterLargeXml() throws Exception
     {
-        final String xml = loadFromClasspath("cdcatalog.xml");
+        InputStream is = IOUtils.getResourceAsStream("cdcatalog.xml", getClass());
+        assertNotNull("Test resource not found.", is);
+        final String xml = IOUtils.toString(is);
         assertTrue(filter.accept(new DefaultMuleMessage(xml)));
     }
 
-    public void testFilterLargeXmlFalse() throws Exception
+    public void testFilterLargeXmlCompliantHtml() throws Exception
     {
-        final String html = loadFromClasspath("cdcatalog.html");
+        InputStream is = IOUtils.getResourceAsStream("cdcatalog.html", getClass());
+        assertNotNull("Test resource not found.", is);
+        final String html = IOUtils.toString(is);
         assertTrue(filter.accept(new DefaultMuleMessage(html)));
     }
 
-    private String loadFromClasspath(final String name) throws IOException
+    public void testFilterXmlMessageVariants() throws Exception
     {
-        InputStream is = IOUtils.getResourceAsStream(name, getClass());
-        assertNotNull("Test resource not found.", is);
-
-        return IOUtils.toString(is);
+        List list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
+        Iterator it = list.iterator();
+        
+        Object msg;
+        while (it.hasNext())
+        {
+            msg = it.next();
+            assertTrue(filter.accept(new DefaultMuleMessage(msg)));
+        }
     }
-
 }

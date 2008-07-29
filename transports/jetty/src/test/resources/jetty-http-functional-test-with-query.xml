@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+       xmlns:jetty="http://www.mulesource.org/schema/mule/jetty/2.0"
+    xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/jetty/2.0 http://www.mulesource.org/schema/mule/jetty/2.0/mule-jetty.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
+
+    <http:endpoint name="clientEndpoint1" host="localhost" port="60199" path="test1?foo=boo&amp;far=bar" synchronous="true"/>
+    <http:endpoint name="clientEndpoint2" host="localhost" port="60199" path="test1?foo=${header:foo}&amp;far=${header:far}" synchronous="true"/>
+
+    <jetty:endpoint name="serverEndpoint1" address="http://localhost:60199/test1" synchronous="true">
+        <expression-transformer>
+            <return-argument evaluator="header" expression="foo"/>
+            <return-argument evaluator="header" expression="far"/>
+        </expression-transformer>
+    </jetty:endpoint>
+
+    <model name="main">
+        <service name="testComponent">
+            <inbound>
+                <inbound-endpoint ref="serverEndpoint1"/>
+            </inbound>
+            <component class="org.mule.tck.services.MultiParamComponent"/>
+        </service>
+    </model>
+
+</mule>

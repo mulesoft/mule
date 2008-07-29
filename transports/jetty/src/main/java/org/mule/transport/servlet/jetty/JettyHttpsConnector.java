@@ -25,6 +25,9 @@ import java.security.Provider;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.mortbay.jetty.AbstractConnector;
+import org.mortbay.jetty.security.SslSocketConnector;
+
 /**
  * The <code>JettyHttpsConnector</code> can be using to embed a Jetty server to receive requests on an http inbound endpoint.
  * One server is created for each connector declared, Many Jetty endpoints can share the same connector.
@@ -33,11 +36,18 @@ import javax.net.ssl.TrustManagerFactory;
 public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
 {
 
+    public static final String JETTY_SSL = "jetty-ssl";
     public static final String HTTPS = "https";
     public static final String PEER_CERTIFICATES = "PEER_CERTIFICATES";
     public static final String LOCAL_CERTIFICATES = "LOCAL_CERTIFICATES";
 
     private TlsConfiguration tls = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+
+    public JettyHttpsConnector()
+    {
+        super();
+        registerSupportedProtocol("https");
+    }
 
     protected void doInitialise() throws InitialisationException
     {
@@ -54,7 +64,7 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
 
     public String getProtocol()
     {
-        return HTTPS;
+        return JETTY_SSL;
     }
 
     public String getClientKeyStore()
@@ -252,19 +262,19 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         tls.setTrustStoreType(trustStoreType);
     }
 
-    //TODO @Override
-//    protected Connector createJettyConnector()
-//    {
-//        SslSocketConnector cnn = new SslSocketConnector();
-//        if(tls.getKeyStore() !=null) cnn.setKeystore(tls.getKeyStore());
-//        if(tls.getKeyPassword() !=null) cnn.setKeyPassword(tls.getKeyPassword());
-//        if(tls.getKeyStoreType() !=null) cnn.setKeystoreType(tls.getKeyStoreType());
-//        if(tls.getKeyManagerAlgorithm() !=null) cnn.setSslKeyManagerFactoryAlgorithm(tls.getKeyManagerAlgorithm());
-//        if(tls.getProvider() !=null) cnn.setProvider(tls.getProvider().getName());
-//        if(tls.getTrustStorePassword() !=null) cnn.setTrustPassword(tls.getTrustStorePassword());
-//        if(tls.getTrustStore() !=null) cnn.setTruststore(tls.getTrustStore());
-//        if(tls.getTrustStoreType() !=null) cnn.setTruststoreType(tls.getTrustStoreType());
-//        if(tls.getTrustManagerAlgorithm() !=null) cnn.setSslTrustManagerFactoryAlgorithm(tls.getTrustManagerAlgorithm());
-//        return cnn;
-//    }
+    protected AbstractConnector createJettyConnector()
+    {
+        SslSocketConnector cnn = new SslSocketConnector();
+       
+        if(tls.getKeyStore() !=null) cnn.setKeystore(tls.getKeyStore());
+        if(tls.getKeyPassword() !=null) cnn.setKeyPassword(tls.getKeyPassword());
+        if(tls.getKeyStoreType() !=null) cnn.setKeystoreType(tls.getKeyStoreType());
+        if(tls.getKeyManagerAlgorithm() !=null) cnn.setSslKeyManagerFactoryAlgorithm(tls.getKeyManagerAlgorithm());
+        if(tls.getProvider() !=null) cnn.setProvider(tls.getProvider().getName());
+        if(tls.getTrustStorePassword() !=null) cnn.setTrustPassword(tls.getTrustStorePassword());
+        if(tls.getTrustStore() !=null) cnn.setTruststore(tls.getTrustStore());
+        if(tls.getTrustStoreType() !=null) cnn.setTruststoreType(tls.getTrustStoreType());
+        if(tls.getTrustManagerAlgorithm() !=null) cnn.setSslTrustManagerFactoryAlgorithm(tls.getTrustManagerAlgorithm());
+        return cnn;
+    }
 }

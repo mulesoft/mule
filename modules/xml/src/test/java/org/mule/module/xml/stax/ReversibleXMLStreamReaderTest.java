@@ -39,6 +39,9 @@ public class ReversibleXMLStreamReaderTest extends TestCase
 
         assertEquals(XMLStreamConstants.START_ELEMENT, xsr.next());
         assertEquals(start, xsr.getName());
+        assertEquals(start.getPrefix(), xsr.getPrefix());
+        assertEquals(start.getLocalPart(), xsr.getLocalName());
+        assertEquals(start.getNamespaceURI(), xsr.getNamespaceURI());
         assertEquals(XMLStreamConstants.CHARACTERS, xsr.next()); // this is the last event we saved
         assertEquals(text, xsr.getText());
         assertEquals(XMLStreamConstants.END_ELEMENT, xsr.next());  

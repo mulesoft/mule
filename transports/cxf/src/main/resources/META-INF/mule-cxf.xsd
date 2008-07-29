@@ -111,7 +111,7 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="commonEndpointAttributes">
-        <xsd:attribute name="proxy" type="xsd:boolean">
+        <xsd:attribute name="proxy" type="mule:substitutableBoolean">
             <xsd:annotation>
     			<xsd:documentation>
     				Whether or not this outbound endpoint is acting as a web service proxy. If so,
@@ -119,7 +119,7 @@
     			</xsd:documentation>
     		</xsd:annotation>
         </xsd:attribute>
-    	<xsd:attribute name="mtomEnabled" type="xsd:boolean">
+    	<xsd:attribute name="mtomEnabled" type="mule:substitutableBoolean">
     		<xsd:annotation>
     			<xsd:documentation>
     				Whether or not MTOM (attachment support) is enabled for this endpoint.
@@ -137,7 +137,7 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="inboundEndpointAttributes">
-        <xsd:attribute name="frontend" type="xsd:string">
+        <xsd:attribute name="frontend">
             <xsd:annotation>
     			<xsd:documentation>
     				The CXF frontend that is used to build an internal service representation
@@ -145,6 +145,12 @@
                     also supported.  
     			</xsd:documentation>
     		</xsd:annotation>
+    		<xsd:simpleType>
+               <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="jaxws"/>
+                    <xsd:enumeration value="simple"/>
+                </xsd:restriction>
+            </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="bindingUri" type="xsd:string">
             <xsd:annotation>

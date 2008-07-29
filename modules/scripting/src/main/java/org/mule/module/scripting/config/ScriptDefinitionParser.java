@@ -43,6 +43,12 @@ public class ScriptDefinitionParser extends OptionalChildDefinitionParser
         if (node != null)
         {
             String value = node.getNodeValue();
+            //Support CDATA for script text
+            if(node.getNextSibling()!=null && node.getNextSibling().getNodeType()== Node.CDATA_SECTION_NODE)
+            {
+                value = node.getNextSibling().getNodeValue();
+            }
+
             if (!StringUtils.isBlank(value))
             {
                 assembler.getBean().addPropertyValue("scriptText", value);

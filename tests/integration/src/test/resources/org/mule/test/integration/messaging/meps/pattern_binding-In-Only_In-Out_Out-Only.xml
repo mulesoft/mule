@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+      xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.0"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+
+    <!--// START SNIPPET: full-config -->
+    <description>
+        Receives a message from another party but will not return a result. The service component will call out to another
+        service before sending the result out on the the outbound router. Bindings provide a way to orchestrate flows
+        between services.
+    </description>
+
+    <vm:connector name="vmConnector" queueEvents="true"/>
+
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="false"/>
+    <vm:endpoint path="addition.service" name="additionEndpoint" synchronous="true"/>
+    <vm:endpoint path="test.received" name="receivedEndpoint" synchronous="false"/>
+
+    <model>
+        <service name="In-Only_In-Out_Out-Only-Service">
+            <inbound>
+                <vm:inbound-endpoint ref="inboundEndpoint"/>
+            </inbound>
+            <script:component>
+                <script:script engine="groovy">
+                    return "Total: " + AdditionService.add(payload)
+                </script:script>
+                <script:java-interface-binding interface="org.mule.tck.services.AdditionService" method="add">
+                    <outbound-endpoint ref="additionEndpoint"/>
+                </script:java-interface-binding>
+            </script:component>
+            <outbound>
+                <filtering-router>
+                    <vm:outbound-endpoint ref="receivedEndpoint"/>
+                </filtering-router>
+            </outbound>
+        </service>
+
+        <service name="Addition-Service">
+            <inbound>
+                <vm:inbound-endpoint ref="additionEndpoint"/>
+            </inbound>
+            <component class="org.mule.tck.services.SimpleMathsComponent"/>
+        </service>
+    </model>
+    <!--// END SNIPPET: full-config -->
+</mule>

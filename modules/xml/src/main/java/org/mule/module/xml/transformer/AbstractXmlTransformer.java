@@ -10,23 +10,17 @@
 
 package org.mule.module.xml.transformer;
 
-import org.mule.RequestContext;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
-import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractTransformer;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -35,14 +29,11 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentResult;
-import org.dom4j.io.DocumentSource;
 
 /**
  * <code>AbstractXmlTransformer</code> offers some XSLT transform on a DOM (or
@@ -71,104 +62,6 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlOutputFactory = XMLOutputFactory.newInstance();
-    }
-
-    public Source getXmlSource(Object src) throws TransformerException
-    {
-        try
-        {
-            // Convert our object to a Source type efficiently.
-            if (src instanceof Source)
-            {
-                return (Source) src;
-            }
-            else if (src instanceof byte[])
-            {
-                ByteArrayInputStream stream = new ByteArrayInputStream((byte[]) src);
-                return createStreamSource(stream);
-            }
-            else if (src instanceof InputStream)
-            {
-                return createStreamSource((InputStream) src);
-            }
-            else if (src instanceof String)
-            {
-                if (useStaxSource)
-                {
-                    return new StaxSource(xmlInputFactory.createXMLStreamReader(new StringReader((String) src)));
-                }
-                else
-                {
-                    return new StreamSource(new StringReader((String) src));
-                }
-            }
-            else if (src instanceof Document)
-            {
-                return new DocumentSource((Document) src);
-            }
-            else if (src instanceof XMLStreamReader)
-            {
-                XMLStreamReader xsr = (XMLStreamReader) src;
-                
-                // StaxSource requires that we advance to a start element/document event
-                if (!xsr.isStartElement() && 
-                                xsr.getEventType() != XMLStreamConstants.START_DOCUMENT) 
-                {
-                    xsr.nextTag();
-                }
-                
-                return new StaxSource((XMLStreamReader) src);
-            }
-            else if (src instanceof org.w3c.dom.Document || src instanceof org.w3c.dom.Element)
-            {
-                return new DOMSource((org.w3c.dom.Node) src);
-            }
-            else if (src instanceof DelayedResult) 
-            {
-                DelayedResult result = ((DelayedResult) src);
-                DOMResult domResult = new DOMResult();
-                result.write(domResult);
-                return new DOMSource(domResult.getNode());
-            }
-            else if (src instanceof OutputHandler) 
-            {
-                OutputHandler handler = ((OutputHandler) src);
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
-                
-                handler.write(RequestContext.getEvent(), output);
-                
-                return createStreamSource(new ByteArrayInputStream(output.toByteArray()));
-            }
-            else
-            {
-                return null;
-            }
-        }
-        catch (XMLStreamException e)
-        {
-            throw new TransformerException(this, e);
-        }
-        catch (Exception e)
-        {
-            if (e instanceof TransformerException)
-            {
-                throw (TransformerException) e;
-            }
-            
-            throw new TransformerException(this, e);
-        }
-    }
-
-    private Source createStreamSource(InputStream stream) throws XMLStreamException
-    {
-        if (useStaxSource)
-        {
-            return new StaxSource(xmlInputFactory.createXMLStreamReader(stream));
-        }
-        else 
-        {
-            return new StreamSource(stream);
-        }
     }
 
     /** Result callback interface used when processing XML through JAXP */
@@ -334,10 +227,23 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
             return ((Document) obj).asXML();
         }
         // No easy fix, so use the transformer.
-        Source src = getXmlSource(obj);
-        if (src == null)
+        Source src;
+        try
         {
-            return null;
+            src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
+            if (src == null)
+            {
+                return null;
+            }
+        }
+        catch (Exception e)
+        {
+            if (e instanceof TransformerException)
+            {
+                throw (TransformerException) e;
+            }
+            
+            throw new TransformerException(this, e);
         }
 
         StringWriter writer = new StringWriter();
@@ -370,10 +276,23 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
             throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException, TransformerException
     {
         // Always use the transformer, even for byte[] (to get the encoding right!)
-        Source src = getXmlSource(obj);
-        if (src == null)
+        Source src;
+        try
         {
-            return null;
+            src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
+            if (src == null)
+            {
+                return null;
+            }
+        }
+        catch (Exception e)
+        {
+            if (e instanceof TransformerException)
+            {
+                throw (TransformerException) e;
+            }
+            
+            throw new TransformerException(this, e);
         }
 
         StringWriter writer = new StringWriter();
@@ -390,10 +309,23 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         TransformerException
     {
         // Always use the transformer, even for byte[] (to get the encoding right!)
-        Source src = getXmlSource(obj);
-        if (src == null)
+        Source src;
+        try
         {
-            return;
+            src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
+            if (src == null)
+            {
+                return;
+            }
+        }
+        catch (Exception e)
+        {
+            if (e instanceof TransformerException)
+            {
+                throw (TransformerException) e;
+            }
+            
+            throw new TransformerException(this, e);
         }
 
         StreamResult result = new StreamResult(output);

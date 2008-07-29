@@ -30,7 +30,7 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
     {
         try
         {
-            Source sourceDoc = getXmlSource(src);
+            Source sourceDoc = XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), src);
             if (sourceDoc == null)
             {
                 return null;

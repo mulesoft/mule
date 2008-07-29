@@ -10,16 +10,18 @@
 
 package org.mule.module.xml.util;
 
+import org.mule.RequestContext;
+import org.mule.api.transport.OutputHandler;
 import org.mule.module.xml.stax.StaxSource;
+import org.mule.module.xml.transformer.DelayedResult;
+import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -29,16 +31,16 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.DocumentException;
 import org.dom4j.io.DOMReader;
-import org.dom4j.io.SAXReader;
+import org.dom4j.io.DocumentSource;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * General utility methods for working with XML.
@@ -94,7 +96,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
         }
     }
 
-    public static org.dom4j.Document toDocument(Object obj) throws DocumentException, SAXException, IOException
+    public static org.dom4j.Document toDocument(Object obj) throws Exception
     {
         return toDocument(obj, null);
     }
@@ -104,9 +106,9 @@ public class XMLUtils extends org.mule.util.XMLUtils
      * @return null if object cannot be converted
      * @throws DocumentException if an error occurs while parsing
      */
-    public static org.dom4j.Document toDocument(Object obj, String externalSchemaLocation) throws DocumentException, SAXException, IOException
+    public static org.dom4j.Document toDocument(Object obj, String externalSchemaLocation) throws Exception
     {
-        SAXReader reader = new SAXReader();
+        org.dom4j.io.SAXReader reader = new org.dom4j.io.SAXReader();
         if (externalSchemaLocation != null)
         {
             reader.setValidation(true);
@@ -131,10 +133,25 @@ public class XMLUtils extends org.mule.util.XMLUtils
         {
             return (org.dom4j.Document) obj;
         }
-//        else if (obj instanceof org.w3c.dom.Document)
-//        {
-//            TODO
-//        }
+        else if (obj instanceof org.w3c.dom.Document)
+        {
+            org.dom4j.io.DOMReader domReader = new org.dom4j.io.DOMReader();
+            return domReader.read((org.w3c.dom.Document) obj);
+        }
+        else if (obj instanceof org.xml.sax.InputSource)
+        {                
+            return reader.read((org.xml.sax.InputSource) obj);
+        }
+        else if (obj instanceof javax.xml.transform.Source || obj instanceof XMLStreamReader)
+        {                
+            XmlToDomDocument tr = new XmlToDomDocument();
+            tr.setReturnClass(org.dom4j.Document.class);
+            return (org.dom4j.Document) tr.transform(obj);
+        }
+        else if (obj instanceof java.io.InputStream)
+        {                
+            return reader.read((java.io.InputStream) obj);
+        }
         else if (obj instanceof String)
         {
             return reader.read(new StringReader((String) obj));
@@ -144,22 +161,10 @@ public class XMLUtils extends org.mule.util.XMLUtils
             // TODO Handle encoding/charset somehow
             return reader.read(new StringReader(new String((byte[]) obj)));
         }
-        else if (obj instanceof InputStream)
-        {                
-            return reader.read((InputStream) obj);
-        }
-        else if (obj instanceof InputSource)
-        {                
-            return reader.read((InputSource) obj);
-        }
         else if (obj instanceof File)
         {                
             return reader.read((File) obj);
         }
-//        else if (obj instanceof XMLStreamReader)
-//        {                
-//            TODO
-//        }
         else
         {
             return null;
@@ -170,27 +175,35 @@ public class XMLUtils extends org.mule.util.XMLUtils
      * @return null if no XMLStreamReader can be created for the object type
      * @throws XMLStreamException
      */
-    public static XMLStreamReader toXMLStreamReader(XMLInputFactory factory, Object obj) throws XMLStreamException
+    public static javax.xml.stream.XMLStreamReader toXMLStreamReader(javax.xml.stream.XMLInputFactory factory, Object obj) throws XMLStreamException
     {
-        if (obj instanceof XMLStreamReader)
+        if (obj instanceof javax.xml.stream.XMLStreamReader)
         {
-            return (XMLStreamReader) obj;
+            return (javax.xml.stream.XMLStreamReader) obj;
         }
-        else if (obj instanceof StaxSource)
+        else if (obj instanceof org.mule.module.xml.stax.StaxSource)
         {
-            return ((StaxSource) obj).getXMLStreamReader();
+            return ((org.mule.module.xml.stax.StaxSource) obj).getXMLStreamReader();
         }
-        else if (obj instanceof Source)
+        else if (obj instanceof javax.xml.transform.Source)
         {
-            return factory.createXMLStreamReader((Source) obj);
+            return factory.createXMLStreamReader((javax.xml.transform.Source) obj);
         }
-        else if (obj instanceof Document)
+        else if (obj instanceof org.xml.sax.InputSource)
         {
-            return factory.createXMLStreamReader(new DOMSource((Node) obj));
+            return factory.createXMLStreamReader(((org.xml.sax.InputSource) obj).getByteStream());
         }
-        else if (obj instanceof InputStream)
+        else if (obj instanceof org.w3c.dom.Document)
         {
-            return factory.createXMLStreamReader((InputStream) obj);
+            return factory.createXMLStreamReader(new javax.xml.transform.dom.DOMSource((org.w3c.dom.Document) obj));
+        }
+        else if (obj instanceof org.dom4j.Document)
+        {
+            return factory.createXMLStreamReader(new org.dom4j.io.DocumentSource((org.dom4j.Document) obj));
+        }
+        else if (obj instanceof java.io.InputStream)
+        {
+            return factory.createXMLStreamReader((java.io.InputStream) obj);
         }
         else if (obj instanceof String)
         {
@@ -204,6 +217,90 @@ public class XMLUtils extends org.mule.util.XMLUtils
         else
         {
             return null;
+        }
+    }
+    
+    /**
+     * Convert our object to a Source type efficiently.
+     */ 
+    public static javax.xml.transform.Source toXmlSource(javax.xml.stream.XMLInputFactory xmlInputFactory, boolean useStaxSource, Object src) throws Exception
+    {
+        if (src instanceof Source)
+        {
+            return (Source) src;
+        }
+        else if (src instanceof byte[])
+        {
+            ByteArrayInputStream stream = new ByteArrayInputStream((byte[]) src);
+            return toStreamSource(xmlInputFactory, useStaxSource, stream);
+        }
+        else if (src instanceof InputStream)
+        {
+            return toStreamSource(xmlInputFactory, useStaxSource, (InputStream) src);
+        }
+        else if (src instanceof String)
+        {
+            if (useStaxSource)
+            {
+                return new StaxSource(xmlInputFactory.createXMLStreamReader(new StringReader((String) src)));
+            }
+            else
+            {
+                return new StreamSource(new StringReader((String) src));
+            }
+        }
+        else if (src instanceof org.dom4j.Document)
+        {
+            return new DocumentSource((org.dom4j.Document) src);
+        }
+        else if (src instanceof XMLStreamReader)
+        {
+            XMLStreamReader xsr = (XMLStreamReader) src;
+            
+            // StaxSource requires that we advance to a start element/document event
+            if (!xsr.isStartElement() && 
+                            xsr.getEventType() != XMLStreamConstants.START_DOCUMENT) 
+            {
+                xsr.nextTag();
+            }
+            
+            return new StaxSource((XMLStreamReader) src);
+        }
+        else if (src instanceof org.w3c.dom.Document || src instanceof org.w3c.dom.Element)
+        {
+            return new DOMSource((org.w3c.dom.Node) src);
+        }
+        else if (src instanceof DelayedResult) 
+        {
+            DelayedResult result = ((DelayedResult) src);
+            DOMResult domResult = new DOMResult();
+            result.write(domResult);
+            return new DOMSource(domResult.getNode());
+        }
+        else if (src instanceof OutputHandler) 
+        {
+            OutputHandler handler = ((OutputHandler) src);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            
+            handler.write(RequestContext.getEvent(), output);
+            
+            return toStreamSource(xmlInputFactory, useStaxSource, new ByteArrayInputStream(output.toByteArray()));
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public static javax.xml.transform.Source toStreamSource(javax.xml.stream.XMLInputFactory xmlInputFactory, boolean useStaxSource, InputStream stream) throws XMLStreamException
+    {
+        if (useStaxSource)
+        {
+            return new org.mule.module.xml.stax.StaxSource(xmlInputFactory.createXMLStreamReader(stream));
+        }
+        else 
+        {
+            return new javax.xml.transform.stream.StreamSource(stream);
         }
     }
     

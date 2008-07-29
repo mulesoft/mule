@@ -64,6 +64,6 @@ public class FileAppendConnectorTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config.xml";
+        return "org/mule/test/integration/providers/file/mule-fileappend-connector-config.xml";
     }
 }

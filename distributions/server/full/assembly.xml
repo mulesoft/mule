@@ -172,7 +172,7 @@ Assembly descriptor for the full Mule distribution.
             <include>loanbroker.bat</include>
         </includes>
     </fileSet>
-    <!-- Common classes -->      
+    <!-- Common classes -->
     <fileSet>
         <directory>../../../examples/loanbroker/common/dist</directory>
         <outputDirectory>examples/loanbroker/common</outputDirectory>
@@ -181,12 +181,12 @@ Assembly descriptor for the full Mule distribution.
         <directory>../../../examples/loanbroker/common-tests/dist</directory>
         <outputDirectory>examples/loanbroker/common-tests</outputDirectory>
     </fileSet>
-    <!-- Credit Agency EJB -->      
+    <!-- Credit Agency EJB -->
     <fileSet>
         <directory>../../../examples/loanbroker/credit-agency/dist</directory>
         <outputDirectory>examples/loanbroker/credit-agency</outputDirectory>
     </fileSet>
-    <!-- LoanBroker ESB -->      
+    <!-- LoanBroker ESB -->
     <fileSet>
         <directory>../../../examples/loanbroker/esb/dist</directory>
         <outputDirectory>examples/loanbroker/esb</outputDirectory>
@@ -200,12 +200,12 @@ Assembly descriptor for the full Mule distribution.
             <include>castor.properties</include>
         </includes>
     </fileSet>
-    <!-- LoanBroker ESN -->      
+    <!-- LoanBroker ESN -->
     <fileSet>
         <directory>../../../examples/loanbroker/esn/dist</directory>
         <outputDirectory>examples/loanbroker/esn</outputDirectory>
     </fileSet>
-    <!-- LoanBroker BPM -->      
+    <!-- LoanBroker BPM -->
     <fileSet>
         <directory>../../../examples/loanbroker/bpm/dist</directory>
         <outputDirectory>examples/loanbroker/bpm</outputDirectory>
@@ -372,6 +372,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-http</include>
         <include>org.mule.transports:mule-transport-jbpm</include>
         <include>org.mule.transports:mule-transport-jdbc</include>
+        <include>org.mule.transports:mule-transport-jetty</include>
         <include>org.mule.transports:mule-transport-jms</include>
         <include>org.mule.transports:mule-transport-multicast</include>
         <include>org.mule.transports:mule-transport-quartz</include>
@@ -398,6 +399,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-spring-config</include>
         <include>org.mule.modules:mule-module-spring-extras</include>
         <include>org.mule.modules:mule-module-spring-osgi</include>
+        <include>org.mule.modules:mule-module-sxc</include>
         <include>org.mule.modules:mule-module-xml</include>
       </includes>
       <excludes>
@@ -427,6 +429,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.transports:mule-transport-http</exclude>
         <exclude>org.mule.transports:mule-transport-jbpm</exclude>
         <exclude>org.mule.transports:mule-transport-jdbc</exclude>
+        <exclude>org.mule.transports:mule-transport-jetty</exclude>
         <exclude>org.mule.transports:mule-transport-jms</exclude>
         <exclude>org.mule.transports:mule-transport-multicast</exclude>
         <exclude>org.mule.transports:mule-transport-quartz</exclude>
@@ -455,6 +458,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-module-scripting</exclude>
         <exclude>org.mule.modules:mule-module-spring-config</exclude>
         <exclude>org.mule.modules:mule-module-spring-extras</exclude>
+        <exclude>org.mule.modules:mule-module-sxc</exclude>
         <exclude>org.mule.modules:mule-module-xml</exclude>
         <!-- Examples -->
         <exclude>org.mule.examples:mule-examples-all</exclude>

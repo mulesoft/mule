@@ -43,7 +43,13 @@
             </plugin>
         </plugins>
     </build>
-
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_2.5_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

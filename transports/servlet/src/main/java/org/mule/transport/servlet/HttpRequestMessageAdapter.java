@@ -14,8 +14,6 @@ import org.mule.api.MessagingException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.MessageTypeNotSupportedException;
-import org.mule.api.transport.UniqueIdNotSupportedException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.UUID;
@@ -47,6 +45,8 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         if (message instanceof HttpServletRequest)
         {
             setPayload((HttpServletRequest)message);
+            setContentEncoding((HttpServletRequest)message);
+
             final Map parameterMap = request.getParameterMap();
             if (parameterMap != null && parameterMap.size() > 0)
             {
@@ -92,6 +92,27 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         }
     }
 
+    protected void setContentEncoding(HttpServletRequest request)
+    {
+        String contentType = request.getContentType();
+        if (contentType != null)
+        {
+            int i = contentType.indexOf("charset");
+            if (i > -1)
+            {
+                int x = contentType.lastIndexOf(";");
+                if (x > i)
+                {
+                    setEncoding(contentType.substring(i + 8, x));
+                }
+                else
+                {
+                    setEncoding(contentType.substring(i + 8));
+                }
+            }
+        }
+    }
+
     protected HttpRequestMessageAdapter(HttpRequestMessageAdapter template)
     {
         super(template);
@@ -127,63 +148,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
      */
     private void setPayload(HttpServletRequest message) throws MessagingException
     {
-//        try
-//        {
-
-            request = message;
-            // String httpRequest = null;
-            // httpRequest = request.getScheme() + "://" + request.getServerName() +
-            // ":" + request.getServerPort() + request.getServletPath();
-            // httpRequest += request.getPathInfo();
-            // if(StringUtils.isNotBlank(request.getQueryString())) {
-            // httpRequest += "?" + request.getQueryString();
-            // }
-            // setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, httpRequest);
-            // this.message = httpRequest;
-
-            // Check if a payload parameter has been set, if so use it
-            // otherwise we'll use the request payload
-//            String payloadParam = (String)request
-//                .getAttribute(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME);
-//
-//            if (payloadParam == null)
-//            {
-//                payloadParam = AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME;
-//            }
-//
-//            String payload = request.getParameter(payloadParam);
-//            if (payload == null)
-//            {
-//                if (isText(request.getContentType()))
-//                {
-//                    BufferedReader reader = request.getReader();
-//                    StringBuffer buffer = new StringBuffer(8192);
-//                    String line = reader.readLine();
-//                    while (line != null)
-//                    {
-//                        buffer.append(line);
-//                        line = reader.readLine();
-//                        if (line != null) buffer.append(SystemUtils.LINE_SEPARATOR);
-//                    }
-//                    this.message = buffer.toString();
-//                }
-//                else
-//                {
-//                    ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
-//                    IOUtils.copy(request.getInputStream(), baos);
-//                    this.message = baos.toByteArray();
-//                }
-//            }
-//            else
-//            {
-//                this.message = payload;
-//            }
-//        }
-//        catch (IOException e)
-//        {
-//            throw new MessagingException(
-//                ServletMessages.failedToReadPayload(request.getRequestURL().toString()), e);
-//        }
+        request = message;
     }
 
     public HttpServletRequest getRequest()
@@ -199,7 +164,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         {
             // We wrap this call as on some App Servers (Websfear) it can cause an
             // NPE
-            session = getRequest().getSession();
+            session = getRequest().getSession(false);
         }
         catch (Exception e)
         {
@@ -208,7 +173,8 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         }
         if (session == null)
         {
-            throw new UniqueIdNotSupportedException(this, CoreMessages.objectIsNull("Http session"));
+            //throw new UniqueIdNotSupportedException(this, CoreMessages.objectIsNull("Http session"));
+            return UUID.getUUID();
         }
         return session.getId();
     }
@@ -227,7 +193,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         {
             setProperty(HttpConstants.HEADER_LOCATION, replyTo);
         }
-        setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, replyTo);
+        setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
     }
 
     /**
@@ -240,10 +206,10 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
      */
     public Object getReplyTo()
     {
-        String replyto = (String)getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+        Object replyto = getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
         if (replyto == null)
         {
-            replyto = (String)getProperty(HttpConstants.HEADER_LOCATION);
+            replyto = getProperty(HttpConstants.HEADER_LOCATION);
         }
         return replyto;
     }

@@ -13,6 +13,7 @@ package org.mule.transformer.compression;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.IOUtils;
+import org.mule.util.compression.GZipCompression;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,27 +21,31 @@ import java.io.InputStream;
 import org.apache.commons.lang.SerializationUtils;
 
 /**
- * <code>GZipCompressTransformer</code> TODO
+ * <code>GZipCompressTransformer</code> will uncompress a byte[] or InputStream
  */
-public class GZipUncompressTransformer extends GZipCompressTransformer
+public class GZipUncompressTransformer extends AbstractCompressionTransformer
 {
 
     public GZipUncompressTransformer()
     {
         super();
+        this.setStrategy(new GZipCompression());
+        this.registerSourceType(byte[].class);
+        this.registerSourceType(InputStream.class);
+        this.setReturnClass(byte[].class);
     }
 
     // @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        byte[] buffer = null;
+        byte[] buffer;
 
         try
         {
             byte[] input = null;
             if (src instanceof InputStream)
             {
-                InputStream inputStream = (InputStream)src;
+                InputStream inputStream = (InputStream) src;
                 try
                 {
                     input = IOUtils.toByteArray(inputStream);
@@ -52,7 +57,7 @@ public class GZipUncompressTransformer extends GZipCompressTransformer
             }
             else
             {
-                input = (byte[])src;
+                input = (byte[]) src;
             }
 
             buffer = getStrategy().uncompressByteArray(input);
@@ -60,7 +65,7 @@ public class GZipUncompressTransformer extends GZipCompressTransformer
         catch (IOException e)
         {
             throw new TransformerException(
-                MessageFactory.createStaticMessage("Failed to uncompress message."), this, e);
+                    MessageFactory.createStaticMessage("Failed to uncompress message."), this, e);
         }
 
         if (!getReturnClass().equals(byte[].class))

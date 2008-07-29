@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamResult;
 
 import org.dom4j.Document;
 
@@ -77,6 +78,13 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
                     writer.close();
                     reader.close();
                 }
+            }
+            else if (src instanceof DelayedResult)
+            {
+                DelayedResult result = (DelayedResult) src;
+                
+                StreamResult streamResult = new StreamResult(out);
+                result.write(streamResult);
             }
             else
             {
