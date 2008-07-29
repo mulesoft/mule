@@ -14,7 +14,7 @@
     <properties>
         <muleVersion>2.1.0-M2-SNAPSHOT</muleVersion>
         <webappName>mule-examples</webappName>
-        <jettyVersion>6.1.6</jettyVersion>
+        <jettyVersion>6.1.11</jettyVersion>
     </properties>
 
     <build>
