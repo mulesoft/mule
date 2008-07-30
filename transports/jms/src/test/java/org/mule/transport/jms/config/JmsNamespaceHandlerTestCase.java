@@ -167,15 +167,5 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
             endpoint.getTransactionConfig().getFactory().getClass());
         assertEquals(MuleTransactionConfig.ACTION_ALWAYS_JOIN, endpoint.getTransactionConfig().getAction());
     }
-    
-    public void testEndpointSpecificXaTransactions() throws Exception
-    {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("endpoint5").buildInboundEndpoint();
-        assertNotNull(endpoint);
-        assertEquals(XaTransactionFactory.class,
-            endpoint.getTransactionConfig().getFactory().getClass());
-        assertEquals(MuleTransactionConfig.ACTION_ALWAYS_BEGIN, endpoint.getTransactionConfig().getAction());
-    }
-
 
 }

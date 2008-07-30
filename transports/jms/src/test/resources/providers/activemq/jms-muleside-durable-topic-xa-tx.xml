@@ -40,13 +40,13 @@
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorTestDriver">
-                        <jms:xa-transaction action="BEGIN_OR_JOIN"/> 
+                        <xa-transaction action="BEGIN_OR_JOIN"/> 
                     </jms:outbound-endpoint>
                     <!--
                         There's no inbound TX, so make sure XA is happy by starting it via router
                         on the outbound. Such problems are now nicely detected and reported via an error.
                     -->
-                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
                 </outbound-pass-through-router>
             </outbound>
         </service>
@@ -54,7 +54,7 @@
         <service name="Part1">
             <inbound>
                 <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC1">
-                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component>
@@ -73,7 +73,7 @@
         <service name="Part3">
             <inbound>
                 <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC2">
-                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component>

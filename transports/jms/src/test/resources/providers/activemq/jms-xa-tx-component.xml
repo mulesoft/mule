@@ -33,7 +33,7 @@
                     <jms:outbound-endpoint queue="q1">
                         <jms:transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
-                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
                 </outbound-pass-through-router>
             </outbound>
         </service>
@@ -41,14 +41,14 @@
         <service name="Part1">
             <inbound>
                 <jms:inbound-endpoint queue="q1">
-                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q2">
-                        <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                        <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>
@@ -57,14 +57,14 @@
         <service name="Part2">
             <inbound>
                 <jms:inbound-endpoint queue="q2">
-                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q3">
-                        <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                        <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>
@@ -73,14 +73,14 @@
         <service name="Part3">
             <inbound>
                 <jms:inbound-endpoint queue="q3">
-                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q4">
-                        <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                        <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>
@@ -89,16 +89,16 @@
         <service name="Part4">
             <inbound>
                 <jms:inbound-endpoint queue="q4">
-                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q5">
-                        <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                        <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
-                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
                 </outbound-pass-through-router>
             </outbound>
         </service>
@@ -106,7 +106,7 @@
         <service name="Outbound">
             <inbound>
                 <jms:inbound-endpoint queue="q5">
-                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component>

@@ -91,7 +91,7 @@
         <service name="JmsToJdbc">
             <inbound>
                 <jms:inbound-endpoint address="jms://my.queue?frequency=60000&amp;reuseSession=false">
-                    <jms:xa-transaction action="ALWAYS_BEGIN"/>
+                    <xa-transaction action="ALWAYS_BEGIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <component class="org.mule.test.integration.transaction.XABridgeComponent"/>

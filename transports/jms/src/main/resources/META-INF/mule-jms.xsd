@@ -94,10 +94,6 @@
  
     <xsd:element name="transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
     <xsd:element name="client-ack-transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
-    <!-- 
-        This element is deprecated in favor of the global xa-transaction element. Remove in Mule 2.1 
-    -->
-    <xsd:element name="xa-transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
 
     <xsd:element name="jmsmessage-to-object-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:element name="object-to-jmsmessage-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>

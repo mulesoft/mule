@@ -26,7 +26,7 @@
         <service name="Part1">
             <inbound>
                 <jms:inbound-endpoint queue="in">
-                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
                     <properties>
                         <spring:entry key="reuseConsumer" value="true"/>
                         <spring:entry key="reuseSession" value="true"/>
@@ -40,7 +40,7 @@
             <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="out">
-                        <jms:xa-transaction action="ALWAYS_BEGIN"/>
+                        <xa-transaction action="ALWAYS_BEGIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>

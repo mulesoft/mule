@@ -21,7 +21,6 @@ import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.endpoint.URIBuilder;
-import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.jms.JmsClientAcknowledgeTransactionFactory;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsTransactionFactory;
@@ -59,9 +58,6 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(JmsTransactionFactory.class));
         registerBeanDefinitionParser("client-ack-transaction", new TransactionDefinitionParser(JmsClientAcknowledgeTransactionFactory.class));
         
-        // this is the legacy, transport specific xa-transaction element. Can be removed in Mule 2.1
-        registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));        
-
         registerBeanDefinitionParser("jmsmessage-to-object-transformer", new TransformerDefinitionParser(JMSMessageToObject.class));
 
         registerBeanDefinitionParser("object-to-jmsmessage-transformer", new TransformerDefinitionParser(ObjectToJMSMessage.class));
