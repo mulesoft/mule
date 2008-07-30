@@ -39,13 +39,11 @@
                 <module>jboss-transactions</module>
                 <module>jca</module>
                 <module>management</module>
-		<module>osgi</module>
                 <module>ognl</module>
                 <module>pgp</module>
                 <module>scripting</module>
                 <module>spring-extras</module>
                 <module>spring-config</module>
-		<module>spring-osgi</module>
                 <module>xml</module>
             </modules>
         </profile>
@@ -56,12 +54,6 @@
             </activation>
             <modules>
                 <module>sxc</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>osgi</id>
-            <modules>
-                <module>osgi</module>
             </modules>
         </profile>
     </profiles>

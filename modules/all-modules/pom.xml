@@ -18,16 +18,6 @@
 
     <profiles>
         <profile>
-            <id>osgi</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-osgi</artifactId>
-                    <version>${version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>jdk14</id>
             <activation>
                 <property>
@@ -94,11 +84,6 @@
                 </dependency>
                 <dependency>
                     <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-osgi</artifactId>
-                    <version>${version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.mule.modules</groupId>
                     <artifactId>mule-module-pgp</artifactId>
                     <version>${version}</version>
                 </dependency>
@@ -115,11 +100,6 @@
                 <dependency>
                     <groupId>org.mule.modules</groupId>
                     <artifactId>mule-module-spring-extras</artifactId>
-                    <version>${version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-spring-osgi</artifactId>
                     <version>${version}</version>
                 </dependency>
                 <dependency>
