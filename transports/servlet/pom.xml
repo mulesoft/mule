@@ -8,7 +8,7 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-servlet</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>Servlet Transport</name>
     <description>
         A Mule transport for Servlet containers.
