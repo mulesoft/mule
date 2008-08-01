@@ -31,6 +31,12 @@ import org.apache.commons.logging.LogFactory;
 
 public final class JarUtils
 {
+    private static final String MULE_MODULE_FILENAME = "lib" + File.separator + "module";
+    private static final String MULE_LIB_FILENAME = "lib" + File.separator + "mule";
+    private static final String MULE_HOME = System.getProperty("mule.home");
+    
+    public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
+
     private static final Log logger = LogFactory.getLog(JarUtils.class);
 
     private JarUtils()
@@ -198,4 +204,24 @@ public final class JarUtils
             }
         }
     }
+
+    public static File getMuleHomeFile()
+    {
+        return new File(MULE_HOME);
+    }
+    
+    public static File getMuleLibDir()
+    {   
+        return new File(MULE_HOME + File.separator + MULE_LIB_FILENAME);
+    }
+    
+    public static File getMuleModuleDir()
+    {   
+        return new File(MULE_HOME + File.separator + MULE_MODULE_FILENAME);
+    }
+    
+    public static File getMuleLocalJarFile()
+    {
+        return new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME);
+    }    
 }

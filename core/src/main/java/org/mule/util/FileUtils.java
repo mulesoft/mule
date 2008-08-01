@@ -18,6 +18,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -769,4 +770,50 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         return success;
     }
 
+    /**
+     * Copy in file to out file
+     * 
+     * Don't use java.nio as READ_ONLY memory mapped files cannot be deleted
+     * 
+     * @param in
+     * @param out
+     */
+    public static void safeCopyFile(File in, File out) throws IOException
+    {
+        try
+        {
+            FileInputStream fis = new FileInputStream(in);
+            FileOutputStream fos = new FileOutputStream(out);
+            try
+            {
+                byte[] buf = new byte[1024];
+                int i = 0;
+                while ((i = fis.read(buf)) != -1)
+                {
+                    fos.write(buf, 0, i);
+                }
+            }
+            catch (IOException e)
+            {
+                throw e;
+            }
+            finally
+            {
+                try
+                {
+                    if (fis != null) fis.close();
+                    if (fos != null) fos.close();
+                }
+                catch (IOException e)
+                {
+                    throw e;
+                }
+
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            throw e;
+        }
+    }
 }
