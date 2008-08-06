@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>tanukisoft</groupId>
-            <artifactId>wrapper</artifactId>
+            <artifactId>wrapper.osgi</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>

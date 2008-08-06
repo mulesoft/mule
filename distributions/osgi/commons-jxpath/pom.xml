@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.distributions</groupId>
-        <artifactId>mule-osgi</artifactId>
+        <artifactId>osgi-libs</artifactId>
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
 
@@ -20,6 +20,7 @@
             <groupId>commons-jxpath</groupId>
             <artifactId>commons-jxpath</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
                 <exclusions>
                     <!-- we want newer collections via core -->
                     <exclusion>

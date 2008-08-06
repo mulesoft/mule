@@ -5,22 +5,32 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.distributions</groupId>
-        <artifactId>mule-osgi</artifactId>
+        <artifactId>osgi-libs</artifactId>
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.apache.geronimo.specs</groupId>
-    <artifactId>geronimo-j2ee-management.osgi</artifactId>
-    <version>${geronimoSpecsVersion}</version>
+    <properties>
+        <!-- ***************************************************** -->
+        <!-- EDIT THESE PROPERTIES, THE REST OF THE POM IS GENERIC -->
+        <libGroupId>org.apache.geronimo.specs</libGroupId>
+        <libArtifactId>geronimo-j2ee-management_1.0_spec</libArtifactId>
+        <libVersion>${geronimoSpecsVersion}</libVersion>
+        <!-- ***************************************************** -->
+    </properties>
+    
+    <groupId>${libGroupId}</groupId>
+    <artifactId>${libArtifactId}.osgi</artifactId>
+    <version>${libVersion}</version>
     <packaging>bundle</packaging>
-    <name>geronimo-j2ee-connector spec. repackaged for OSGi</name>
+    <name>${libArtifactId} repackaged for OSGi</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
-            <version>${geronimoSpecsVersion}</version>
-            <scope>compile</scope>
-         </dependency>
+            <groupId>${libGroupId}</groupId>
+            <artifactId>${libArtifactId}</artifactId>
+            <version>${libVersion}</version>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 </project>
+

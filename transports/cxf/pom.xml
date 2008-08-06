@@ -95,24 +95,49 @@
             <version>${version}</version>
         </dependency>
 
-        <!-- CXF dependencies -->
-        <!--
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-bundle</artifactId>
-            <version>${cxfVersion}</version>
-        </dependency>
-        -->
         <!-- CXF libs + all required dependencies not already needed for soap transport or xml module --> 
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>cxf-libs.osgi</artifactId>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-all.osgi</artifactId>
             <version>${cxfVersion}</version>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>com.springsource.javax.mail</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>com.springsource.javax.xml.ws</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.wsdl</groupId>
+            <artifactId>com.springsource.javax.wsdl</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <!-- For dynamic client, which compiles stuff on the fly 
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.6.5</version>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        -->
 
         <!-- Unit tests -->
         <dependency>
@@ -120,29 +145,6 @@
             <artifactId>cxf-testutils</artifactId>
             <version>${cxfVersion}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-	        <groupId>org.apache.cxf</groupId>
-	        <artifactId>cxf-rt-bindings-http</artifactId>
-	        <version>${cxfVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.jra</groupId>
-                    <artifactId>jra</artifactId>
-                </exclusion>
-            </exclusions>
-	    </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-security</artifactId>
-            <version>${cxfVersion}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>xalan</groupId>
-                    <artifactId>xalan</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
