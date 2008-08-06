@@ -95,6 +95,7 @@
         <jbpmVersion>3.2.2</jbpmVersion>
         <jettyVersion>6.1.11</jettyVersion>
         <jugVersion>2.0.0</jugVersion>
+        <mqSeriesVersion>6.0</mqSeriesVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <oroVersion>2.0.8</oroVersion>
         <paxLoggingVersion>1.1.1</paxLoggingVersion>   
