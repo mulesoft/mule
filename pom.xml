@@ -39,7 +39,6 @@
         <module>ear</module>
         <module>embedded</module>
         <module>jca</module>
-        <module>osgi</module>
         <module>profiler</module>
         <module>scripting</module>
         <module>server</module>
