@@ -4,22 +4,52 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule.distributions</groupId>
-        <artifactId>mule-distributions</artifactId>
+        <groupId>org.mule</groupId>
+        <artifactId>mule</artifactId>
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-osgi</artifactId>
+    <groupId>org.mule.distributions</groupId>
+    <artifactId>osgi-libs</artifactId>
     <packaging>pom</packaging>
-    <name>Artifacts needed for Mule's OSGi support</name>
+    <name>3rd-party libs repackaged for OSGi</name>
+
+    <distributionManagement>
+        <repository>
+            <id>mule-libs</id>
+            <name>3rd-party Libraries</name>
+            <url>dav:https://dav.codehaus.org/mule/dependencies/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <!-- This would be nice to use but it creates cyclic dependencies in the OSGification POMs 
+                    <classifier>osgi</classifier>
+                    -->
+                    <instructions>
+                        <!-- Negate Mule info. from parent POM because these libs are not ours -->
+                        <Bundle-License/>
+                        <Bundle-Description/>
+                        <Bundle-Vendor/>
+                        <Bundle-DocURL>&nbsp;</Bundle-DocURL>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <modules>
         <module>commons-cli</module>
+        <module>commons-codec</module>
         <module>commons-dbutils</module>
-        <module>commons-discovery</module>
         <module>commons-io</module>
         <module>commons-jxpath</module>
         <module>commons-lang</module>
-        <module>cxf-libs</module>
+        <module>cxf</module>
         <module>geronimo-ejb</module>
         <module>geronimo-j2ee-connector</module>
         <module>geronimo-j2ee-management</module>
@@ -27,9 +57,12 @@
         <module>geronimo-jms</module>
         <module>geronimo-jta</module>
         <module>groovy</module>
-        <module>jbpm-libs</module>
+        <module>jbpm</module>
         <module>jug</module>
+        <module>mx4j</module>
         <module>smack</module>
+        <module>wrapper</module>
+        <module>yourkit</module>
         <module>xapool</module>
     </modules>
 </project>

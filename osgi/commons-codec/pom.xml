@@ -12,9 +12,9 @@
     <properties>
         <!-- ***************************************************** -->
         <!-- EDIT THESE PROPERTIES, THE REST OF THE POM IS GENERIC -->
-        <libGroupId>commons-cli</libGroupId>
-        <libArtifactId>commons-cli</libArtifactId>
-        <libVersion>${commonsCliVersion}</libVersion>
+        <libGroupId>commons-codec</libGroupId>
+        <libArtifactId>commons-codec</libArtifactId>
+        <libVersion>${commonsCodecVersion}</libVersion>
         <!-- ***************************************************** -->
     </properties>
     

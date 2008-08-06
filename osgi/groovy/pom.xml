@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.distributions</groupId>
-        <artifactId>mule-osgi</artifactId>
+        <artifactId>osgi-libs</artifactId>
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
 
@@ -20,6 +20,7 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
             <exclusions>
                 <!--  Exclude openejb-loader as it is not needed and there are currently version inconsistancies in openejb-core pom-->
                 <exclusion>
@@ -135,6 +136,7 @@
             <groupId>net.sf.retrotranslator</groupId>
             <artifactId>retrotranslator-runtime</artifactId>
             <version>1.2.1</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>javax.script</groupId>
@@ -142,6 +144,7 @@
             <version>1.0</version>
             <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
+            <optional>true</optional>
         </dependency>
         <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
         <dependency>
@@ -150,6 +153,7 @@
             <version>1.1</version>
             <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

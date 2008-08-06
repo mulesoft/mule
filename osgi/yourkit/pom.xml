@@ -12,9 +12,9 @@
     <properties>
         <!-- ***************************************************** -->
         <!-- EDIT THESE PROPERTIES, THE REST OF THE POM IS GENERIC -->
-        <libGroupId>commons-cli</libGroupId>
-        <libArtifactId>commons-cli</libArtifactId>
-        <libVersion>${commonsCliVersion}</libVersion>
+        <libGroupId>com.yourkit</libGroupId>
+        <libArtifactId>yjp-controller-api-redist</libArtifactId>
+        <libVersion>${yourKitVersion}</libVersion>
         <!-- ***************************************************** -->
     </properties>
     
@@ -33,4 +33,3 @@
         </dependency>
     </dependencies>
 </project>
-

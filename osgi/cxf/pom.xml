@@ -5,22 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.distributions</groupId>
-        <artifactId>mule-osgi</artifactId>
+        <artifactId>osgi-libs</artifactId>
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.mule.transports</groupId>
-    <artifactId>cxf-libs.osgi</artifactId>
+    <groupId>org.apache.cxf</groupId>
+    <artifactId>cxf-all.osgi</artifactId>
     <version>${cxfVersion}</version>
     <packaging>bundle</packaging>
-    <name>cxf-libs repackaged for OSGi</name>
+    <name>cxf repackaged for OSGi</name>
 
     <dependencies>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-core</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
             <exclusions>
                 <!-- We use javax.activation -->
                 <exclusion>
@@ -48,6 +48,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-simple</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
             <exclusions>
                 <!-- We use javax.activation -->
                 <exclusion>
@@ -75,6 +76,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
             <exclusions>
                 <!-- We use javax.activation -->
                 <exclusion>
@@ -102,6 +104,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-aegis</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
             <exclusions>
                 <!-- We use javax.activation -->
                 <exclusion>
@@ -129,6 +132,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
             <exclusions>
                 <!-- We use javax.activation -->
                 <exclusion>
@@ -156,6 +160,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-local</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
             <exclusions>
                 <!-- We use javax.activation -->
                 <exclusion>
@@ -183,6 +188,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
             <exclusions>
                 <!-- We use javax.activation -->
                 <exclusion>
@@ -206,111 +212,29 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!-- For dynamic client, which compiles stuff on the fly -->
         <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.6.5</version>
+	        <groupId>org.apache.cxf</groupId>
+	        <artifactId>cxf-rt-bindings-http</artifactId>
+            <version>${version}</version>
+            <optional>true</optional>
             <exclusions>
                 <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
+                    <groupId>org.codehaus.jra</groupId>
+                    <artifactId>jra</artifactId>
                 </exclusion>
+            </exclusions>
+	    </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-security</artifactId>
+            <version>${version}</version>
+            <optional>true</optional>
+            <exclusions>
                 <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-    
-        <dependency>
-            <groupId>javax.xml.ws</groupId>
-            <artifactId>com.springsource.javax.xml.ws</artifactId>
-            <version>2.1.1</version>
-            <scope>runtime</scope>
-        </dependency>
-
     </dependencies>
-    
-    
-    
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.4.1</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <obrRepository>NONE</obrRepository>
-                    <instructions>
-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Version>${pom.version}</Bundle-Version>
-                        <Bundle-DocURL>${pom.url}</Bundle-DocURL>
-                        <!-- Each module can override these defaults in their osgi.properties file -->
-                        <_include>-osgi.properties</_include>
-                        <!-- OSGi R4 -->
-                        <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
-                        <!-- Non-OSGi manifest entries -->
-                        <More-Info>For more information go to ${productUrl}</More-Info>
-                        <Support>Get commercial support: ${pom.organization.url}/support</Support>
-                        <Description>Mule ESB and Integration Platform</Description>
-                        <License>CPAL v1.0 http://www.mulesource.com/CPAL/</License>
-                        <Vendor-Url>${pom.organization.url}</Vendor-Url>
-                        <Product-Url>${productUrl}</Product-Url>
-                        <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
-                        <!--Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date-->
-                        <!-- include repository revision from buildnumber plugin -->
-                        <Build-Revision>${buildNumber}</Build-Revision>
-                        <Build-Date>${timestamp}</Build-Date>
-                        <Embed-Transitive>true</Embed-Transitive>
-                        <Embed-Dependency>*;scope=compile|runtime;artifactId=!commons-*|spring-*|wsdl4j|wstx-asl|saaj-api|stax-*|jaxen</Embed-Dependency>
-                        <Import-Package>!org.apache.cxf.*,
-                            antlr*;resolution:=optional,
-                            com.ibm*;resolution:=optional,
-                            com.sun*;resolution:=optional,
-                            com.werken.xpath*;resolution:=optional,
-                            javanet.staxutils*;resolution:=optional,
-                            javax.jms*;resolution:=optional,
-                            javax.ws.rs*;resolution:=optional,
-                            repackage;resolution:=optional,
-                            javax.xml.soap,
-                            junit.framework*;resolution:=optional,
-                            kaffe.rmi*;resolution:=optional,
-                            oracle.xml.parser*;resolution:=optional,
-                            org.apache.abdera*;resolution:=optional,
-                            org.apache.axiom*;resolution:=optional,
-                            org.apache.bcel*;resolution:=optional,
-                            org.apache.bsf*;resolution:=optional,
-                            org.apache.commons.lang*;resolution:=optional,
-                            org.apache.commons.codec*;resolution:=optional,
-                            org.apache.log4j*;resolution:=optional,
-                            org.apache.tools.ant.launch*;resolution:=optional,
-                            org.apache.tools.ant.util.optional*;resolution:=optional,
-                            org.apache.tools.ant.taskdefs.optional*;resolution:=optional,                            
-                            org.apache.xmlbeans*;resolution:=optional,
-                            org.apache.ws.security*;resolution:=optional,
-                            org.codehaus.jra*;resolution:=optional,
-                            org.codehaus.jettison*;resolution:=optional,
-                            org.iso_relax*;resolution:=optional,
-                            org.objectweb.asm*;resolution:=optional,
-                            org.jaxen*;resolution:=optional,
-                            org.junit*;resolution:=optional,
-                            org.jvnet*;resolution:=optional,
-                            org.mortbay*;resolution:=optional,
-                            org.mozilla.javascript*;resolution:=optional,
-                            org.springframework*;resolution:=optional,
-                            *</Import-Package>
-                        <_exportcontents>org.apache.cxf.*, org.xmlsoap.schemas.*, javax.xml.bind.*, javax.jws.*, javax.xml.ws.*;version=2.1.1 </_exportcontents>
-                        <!--
-                        <Embed-Dependency>*;scope=compile|runtime;artifactId=!cxf-*</Embed-Dependency>
-                        <_exportcontents>!org.apache.cxf.*, *</_exportcontents>
-                        -->
-                        <_failok>true</_failok>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

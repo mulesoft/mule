@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.distributions</groupId>
-        <artifactId>mule-osgi</artifactId>
+        <artifactId>osgi-libs</artifactId>
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
 
@@ -22,6 +22,7 @@
             <groupId>org.jbpm</groupId>
             <artifactId>jbpm-jpdl</artifactId>
             <version>${version}</version>
+            <optional>true</optional>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -34,15 +35,18 @@
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
             <version>2.1_3</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>javax.jcr</groupId>
             <artifactId>jcr</artifactId>
             <version>1.0</version>
+            <optional>true</optional>
         </dependency>        
 
         <!-- Only needed for Spring-based configuration -->
@@ -50,14 +54,17 @@
             <groupId>org.springmodules</groupId>
             <artifactId>spring-modules-jbpm31</artifactId>
             <version>0.9</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Hibernate --> 
