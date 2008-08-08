@@ -29,18 +29,6 @@
     </build>
     
     <dependencies>
-        <!-- OSGI: Available from SSEBR
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.7.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
@@ -72,10 +60,6 @@
             <artifactId>commons-cli.osgi</artifactId>
         </dependency>
         <dependency>
-            <!--
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            -->
             <groupId>org.apache.commons</groupId>
             <artifactId>com.springsource.org.apache.commons.collections</artifactId>
         </dependency>
@@ -92,22 +76,16 @@
             <artifactId>commons-pool</artifactId>
         </dependency>
         <dependency>
-            <!--
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            -->
             <groupId>javax.activation</groupId>
             <artifactId>com.springsource.javax.activation</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <!--<artifactId>geronimo-jta_1.0.1B_spec</artifactId>-->
-            <artifactId>geronimo-jta.osgi</artifactId>
+            <artifactId>geronimo-jta_1.0.1B_spec.osgi</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <!--<artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>-->
-            <artifactId>geronimo-j2ee-connector.osgi</artifactId>
+            <artifactId>geronimo-j2ee-connector_1.5_spec.osgi</artifactId>
         </dependency>
     </dependencies>
 </project>

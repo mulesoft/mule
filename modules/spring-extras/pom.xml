@@ -70,7 +70,7 @@
         <!-- Used by SpringTransactionFactory -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jms_1.1_spec</artifactId>
+            <artifactId>geronimo-jms_1.1_spec.osgi</artifactId>
         </dependency>
 
         <dependency>

@@ -45,7 +45,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jms.osgi</artifactId>
+            <artifactId>geronimo-jms_1.1_spec.osgi</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -72,7 +72,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-management.osgi</artifactId>
+            <artifactId>geronimo-j2ee-management_1.0_spec.osgi</artifactId>
         </dependency>
     </dependencies>
 </project>

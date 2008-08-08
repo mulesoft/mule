@@ -20,7 +20,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-ejb.osgi</artifactId>
+            <artifactId>geronimo-ejb_2.1_spec.osgi</artifactId>
         </dependency>
 
         <!-- Unit tests -->

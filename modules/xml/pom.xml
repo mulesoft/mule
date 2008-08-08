@@ -28,15 +28,14 @@
         </dependency>
 
         <dependency>
-            <!-- Used by Xml based filters and transformers -->
             <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
+            <artifactId>dom4j.osgi</artifactId>
         </dependency>
 
         <!-- JXPath filtering of events -->
         <dependency>
             <groupId>commons-jxpath</groupId>
-            <artifactId>commons-jxpath</artifactId>
+            <artifactId>commons-jxpath.osgi</artifactId>
         </dependency>
 
         <!-- Used for de/serialising objects -->
@@ -64,7 +63,7 @@
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
+            <artifactId>jaxen.osgi</artifactId>
         </dependency>
 
         <!-- Who uses this? -->
@@ -88,14 +87,7 @@
         </dependency>
         <dependency>
             <groupId>net.java.dev.stax-utils</groupId>
-            <artifactId>stax-utils</artifactId>
-            <version>20080702</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.bea.xml</groupId>
-                    <artifactId>jsr173-ri</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>stax-utils.osgi</artifactId>
         </dependency>
         <!-- XSLT Support -->
         <dependency>

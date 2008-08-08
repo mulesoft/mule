@@ -117,8 +117,11 @@
         </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.1</version>
+            <artifactId>com.springsource.javax.xml.bind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.stax-utils</groupId>
+            <artifactId>stax-utils.osgi</artifactId>
         </dependency>
         <!-- For dynamic client, which compiles stuff on the fly 
         <dependency>
