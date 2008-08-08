@@ -27,6 +27,9 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
+                    <!-- By default, the bundle-plugin does not put anything in the target directory, which  
+                    means that osgi-libs cannot be built in the same step as the rest of the Mule build. -->
+                    <unpackBundle>true</unpackBundle>
                     <!-- This would be nice to use but it creates cyclic dependencies in the OSGification POMs 
                     <classifier>osgi</classifier>
                     -->
@@ -50,6 +53,7 @@
         <module>commons-jxpath</module>
         <module>commons-lang</module>
         <module>cxf</module>
+        <module>dom4j</module>
         <module>geronimo-ejb</module>
         <module>geronimo-j2ee-connector</module>
         <module>geronimo-j2ee-management</module>
@@ -57,10 +61,13 @@
         <module>geronimo-jms</module>
         <module>geronimo-jta</module>
         <module>groovy</module>
+        <module>jaxen</module>
         <module>jbpm</module>
+        <module>jdom</module>
         <module>jug</module>
         <module>mx4j</module>
         <module>smack</module>
+        <module>staxutils</module>
         <module>wrapper</module>
         <module>yourkit</module>
         <module>xapool</module>

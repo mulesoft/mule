@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.distributions</groupId>
+        <artifactId>osgi-libs</artifactId>
+        <version>2.1.0-M2-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <!-- ***************************************************** -->
+        <!-- EDIT THESE PROPERTIES, THE REST OF THE POM IS GENERIC -->
+        <libGroupId>jaxen</libGroupId>
+        <libArtifactId>jaxen</libArtifactId>
+        <libVersion>${jaxenVersion}</libVersion>
+        <!-- ***************************************************** -->
+    </properties>
+    
+    <groupId>${libGroupId}</groupId>
+    <artifactId>${libArtifactId}.osgi</artifactId>
+    <version>${libVersion}</version>
+    <packaging>bundle</packaging>
+    <name>${libArtifactId} repackaged for OSGi</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>${libGroupId}</groupId>
+            <artifactId>${libArtifactId}</artifactId>
+            <version>${libVersion}</version>
+            <optional>true</optional>
+            <!-- see http://jira.codehaus.org/browse/MNG-3007
+                 depending on whether jaxen is resolved via dist.codehaus.org
+                 or the central repo we get transitive dependencies that we
+                 don't want here
+                 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>com.ibm.icu</groupId>
+                    <artifactId>icu4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+                <!-- no !"�$ XML parsers whatsoever -->
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xom</groupId>
+                    <artifactId>xom</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+</project>
+
