@@ -8,7 +8,7 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-spring-extras</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>Spring Extras</name>
     <description>
         Non-core functionality provided by Spring such as transactions, remoting, data sources, etc.
@@ -74,9 +74,8 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>com.springsource.org.apache.commons.collections</artifactId>
         </dependency>
 
         <!-- For test cases only -->

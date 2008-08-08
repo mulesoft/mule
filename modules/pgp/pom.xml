@@ -9,7 +9,7 @@
  <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-pgp</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>PGP Security</name>
     <description>A Mule implementation of PGP security using cryptix libraries.</description>
 
@@ -27,44 +27,9 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>cryptix-jce</groupId>
-            <artifactId>cryptix-jce-api</artifactId>
-            <version>20050328</version>
-        </dependency>
-        <dependency>
-            <groupId>cryptix-jce</groupId>
-            <artifactId>cryptix-jce-provider</artifactId>
-            <version>20050328</version>
-        </dependency>
-        <dependency>
-            <groupId>cryptix-openpgp</groupId>
-            <artifactId>cryptix-message-api</artifactId>
-            <version>20050405</version>
-        </dependency>
-        <dependency>
-            <groupId>cryptix-openpgp</groupId>
-            <artifactId>cryptix-openpgp-provider</artifactId>
-            <version>20050405</version>
-        </dependency>
-        <dependency>
-            <groupId>cryptix-openpgp</groupId>
-            <artifactId>cryptix-pki-api</artifactId>
-            <version>20050405</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-file</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring-extras</artifactId>
-            <version>${version}</version>
+            <groupId>cryptix</groupId>
+            <artifactId>cryptix-all.osgi</artifactId>
+            <version>${cryptixVersion}</version>
         </dependency>
 
         <!-- Unit tests -->
@@ -88,6 +53,11 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
 </project>

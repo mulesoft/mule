@@ -9,7 +9,7 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-jbossts</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>JBoss Transactions Integration</name>
     <description>Provides access to the JBoss Transaction Service for User and Xa transactions.</description>
 
@@ -27,19 +27,9 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jbossts-common</artifactId>
-            <version>4.2.3-SP5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jbossts-jta</artifactId>
-            <version>4.2.3-SP5-patched</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jbossts-jta-integration</artifactId>
-            <version>4.2.3-SP5</version>
+            <groupId>jboss.jbossts</groupId>
+            <artifactId>jbossts-all.osgi</artifactId>
+            <version>${jbossTsVersion}</version>
         </dependency>
 
         <!-- Unit tests -->

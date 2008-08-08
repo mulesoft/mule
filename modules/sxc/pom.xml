@@ -9,6 +9,7 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-sxc</artifactId>
+    <packaging>bundle</packaging>
     <name>SXC Module</name>
     <description>Efficiently route messages using streaming XPath.</description>
 
@@ -19,22 +20,28 @@
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.envoisolutions.sxc</groupId>
+            <artifactId>sxc-xpath.osgi</artifactId>
+            <version>${sxcVersion}</version>
+        </dependency>
+
+        <!-- For unit tests only -->
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -60,11 +67,6 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.envoisolutions.sxc</groupId>
-            <artifactId>sxc-xpath</artifactId>
-            <version>0.7.2</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -87,6 +89,4 @@
             <layout>legacy</layout>
         </repository>
     </repositories>
-
-
 </project>
