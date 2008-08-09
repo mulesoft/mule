@@ -46,12 +46,16 @@
     </build>
 
     <modules>
+        <module>acegi</module>
+        <module>bsh</module>
+        <module>cglib</module>
         <module>commons-cli</module>
         <module>commons-codec</module>
         <module>commons-dbutils</module>
         <module>commons-io</module>
         <module>commons-jxpath</module>
         <module>commons-lang</module>
+        <module>cryptix</module>
         <module>cxf</module>
         <module>dom4j</module>
         <module>geronimo-ejb</module>
@@ -61,13 +65,19 @@
         <module>geronimo-jms</module>
         <module>geronimo-jta</module>
         <module>groovy</module>
+        <module>hibernate</module>
         <module>jaxen</module>
+        <module>jcr</module>
+        <module>jbossts</module>
         <module>jbpm</module>
         <module>jdom</module>
         <module>jug</module>
         <module>mx4j</module>
+        <module>ognl</module>
         <module>smack</module>
+        <module>smjbpm</module>
         <module>staxutils</module>
+        <module>sxc</module>
         <module>wrapper</module>
         <module>yourkit</module>
         <module>xapool</module>

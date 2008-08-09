@@ -20,17 +20,54 @@
             <artifactId>mule-transport-bpm</artifactId>
             <version>${version}</version>
         </dependency>
-
         <!-- jBPM --> 
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>jbpm-libs.osgi</artifactId>
+            <groupId>org.jbpm</groupId>
+            <artifactId>jbpm-jpdl.osgi</artifactId>
             <version>${jbpmVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate.osgi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep.osgi</artifactId>
+            <version>${cglibVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>com.springsource.antlr</artifactId>
+            <version>${antlrVersion}</version>
+        </dependency>        
+        <dependency>
+            <groupId>javax.jcr</groupId>
+            <artifactId>jcr.osgi</artifactId>
+            <version>${jcrVersion}</version>
+        </dependency>        
+        <dependency>
+            <groupId>bsh</groupId>
+            <artifactId>bsh.osgi</artifactId>
+            <version>${bshVersion}</version>
         </dependency>
         <!-- Needed for org.mule.transport.bpm.jbpm.actions.SendMuleEvent -->
         <dependency>
             <groupId>commons-jxpath</groupId>
             <artifactId>commons-jxpath.osgi</artifactId>
+        </dependency>
+        <!-- Only needed for Spring-based configuration -->
+        <dependency>
+            <groupId>org.springmodules</groupId>
+            <artifactId>spring-modules-jbpm31.osgi</artifactId>
+            <version>${springModulesVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
         </dependency>
         
         <!-- Simple Java DB for persistence -->

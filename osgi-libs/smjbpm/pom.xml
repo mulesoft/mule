@@ -12,9 +12,9 @@
     <properties>
         <!-- ***************************************************** -->
         <!-- EDIT THESE PROPERTIES, THE REST OF THE POM IS GENERIC -->
-        <libGroupId>org.jbpm</libGroupId>
-        <libArtifactId>jbpm-jpdl</libArtifactId>
-        <libVersion>${jbpmVersion}</libVersion>
+        <libGroupId>org.springmodules</libGroupId>
+        <libArtifactId>spring-modules-jbpm31</libArtifactId>
+        <libVersion>${springModulesVersion}</libVersion>
         <!-- ***************************************************** -->
     </properties>
     

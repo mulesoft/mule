@@ -12,9 +12,9 @@
     <properties>
         <!-- ***************************************************** -->
         <!-- EDIT THESE PROPERTIES, THE REST OF THE POM IS GENERIC -->
-        <libGroupId>org.jbpm</libGroupId>
-        <libArtifactId>jbpm-jpdl</libArtifactId>
-        <libVersion>${jbpmVersion}</libVersion>
+        <libGroupId>javax.jcr</libGroupId>
+        <libArtifactId>jcr</libArtifactId>
+        <libVersion>${jcrVersion}</libVersion>
         <!-- ***************************************************** -->
     </properties>
     
