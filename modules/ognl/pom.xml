@@ -27,8 +27,8 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>ognl</groupId>
-            <artifactId>ognl.osgi</artifactId>
+            <groupId>org.ognl</groupId>
+            <artifactId>com.springsource.org.ognl</artifactId>
             <version>${ognlVersion}</version>
         </dependency>
         <dependency>

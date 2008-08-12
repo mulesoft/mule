@@ -46,8 +46,8 @@
             <version>${jcrVersion}</version>
         </dependency>        
         <dependency>
-            <groupId>bsh</groupId>
-            <artifactId>bsh.osgi</artifactId>
+            <groupId>org.beanshell</groupId>
+            <artifactId>com.springsource.bsh</artifactId>
             <version>${bshVersion}</version>
         </dependency>
         <!-- Needed for org.mule.transport.bpm.jbpm.actions.SendMuleEvent -->
@@ -70,8 +70,9 @@
             <artifactId>spring-jdbc</artifactId>
         </dependency>
         
-        <!-- Simple Java DB for persistence -->
+        <!-- Unit tests only -->
         <dependency>
+            <!-- Simple Java DB for persistence -->
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
             <scope>test</scope>
@@ -93,26 +94,6 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!--
-            Bind log4j statically, but preserve
-            the clogging API compatibility.
-         -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl104-over-slf4j</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

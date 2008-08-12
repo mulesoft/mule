@@ -45,6 +45,7 @@
             <version>7.0.10</version>
         </dependency>
 
+        <!-- Unit tests only -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>

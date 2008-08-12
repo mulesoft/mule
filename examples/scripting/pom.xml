@@ -28,7 +28,6 @@
             <artifactId>mule-transport-stdio</artifactId>
             <version>${version}</version>
         </dependency>
-
         <dependency>
             <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
             <groupId>javax.script</groupId>
@@ -43,6 +42,7 @@
             <scope>provided</scope>
         </dependency>
         
+        <!-- Unit tests only -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>

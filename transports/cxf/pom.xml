@@ -95,11 +95,10 @@
             <version>${version}</version>
         </dependency>
 
-        <!-- CXF libs + all required dependencies not already needed for soap transport or xml module --> 
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-all.osgi</artifactId>
-            <version>${cxfVersion}</version>
+            <artifactId>cxf-bundle</artifactId>    
+            <version>${cxfVersion}</version>    
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
@@ -108,12 +107,12 @@
         <dependency>
             <groupId>javax.xml.ws</groupId>
             <artifactId>com.springsource.javax.xml.ws</artifactId>
-            <version>2.1.1</version>
+            <version>${javaXmlWsVersion}</version>
         </dependency>
         <dependency>
             <groupId>javax.wsdl</groupId>
             <artifactId>com.springsource.javax.wsdl</artifactId>
-            <version>1.6.1</version>
+            <version>${javaWsdlVersion}</version>
         </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>
@@ -123,24 +122,56 @@
             <groupId>net.java.dev.stax-utils</groupId>
             <artifactId>stax-utils.osgi</artifactId>
         </dependency>
-        <!-- For dynamic client, which compiles stuff on the fly 
         <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.6.5</version>
-            <optional>true</optional>
+            <groupId>xml-resolver</groupId>
+            <artifactId>xml-resolver.osgi</artifactId>    
+            <version>${xmlResolverVersion}</version>    
+        </dependency>
+        <dependency>
+            <!-- OSGi-ready -->
+            <groupId>org.apache.ws.commons.schema</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>${wsCommonsSchemaVersion}</version>
+        </dependency>
+        <dependency>
+            <!-- OSGi-ready -->
+            <groupId>org.apache.neethi</groupId>
+            <artifactId>neethi</artifactId>
+            <version>${neethiVersion}</version>
             <exclusions>
+                <!-- We include these explicitly below -->
                 <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
+                    <groupId>org.apache.ws.commons.axiom</groupId>
+                    <artifactId>axiom-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
+                    <groupId>org.apache.ws.commons.axiom</groupId>
+                    <artifactId>axiom-impl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-        -->
+        <dependency>
+            <!-- OSGi-ready -->
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-api</artifactId>
+            <version>${wsCommonsAxiomVersion}</version>
+        </dependency>
+        <dependency>
+            <!-- OSGi-ready -->
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-impl</artifactId>
+            <version>${wsCommonsAxiomVersion}</version>
+        </dependency>
+        <dependency>  
+            <groupId>org.objectweb.asm</groupId>  
+            <artifactId>com.springsource.org.objectweb.asm</artifactId>  
+            <version>${asmVersion}</version> 
+        </dependency>        
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-all.osgi</artifactId>
+            <version>${mx4jVersion}</version>
+        </dependency>
 
         <!-- Unit tests -->
         <dependency>

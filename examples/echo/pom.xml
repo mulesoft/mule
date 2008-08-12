@@ -53,6 +53,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <!-- OSGi-ready -->
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
         </dependency>

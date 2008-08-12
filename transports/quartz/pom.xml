@@ -9,7 +9,7 @@
         <version>2.1.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-quartz</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>Quartz Transport</name>
     <description>A Mule transport for Quartz. This transport supplies a receiver for jobs scheduled with Quartz.</description>
 
@@ -17,20 +17,15 @@
         <dependency>
             <groupId>com.opensymphony.quartz</groupId>
             <artifactId>com.springsource.org.quartz</artifactId>
-            <version>1.6.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jgroups</groupId>
-                    <artifactId>com.springsource.org.jgroups</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>        
-        
+        </dependency>                
         <!-- The Mule client is needed for EndpointPollingJob and ScheduledDispatchJob -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <!-- Unit tests only -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
@@ -38,18 +33,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-        </dependency>
-
-        <!-- Unit tests -->
-        <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

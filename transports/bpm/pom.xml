@@ -36,5 +36,4 @@
             <artifactId>mule-module-client</artifactId>
         </dependency>
     </dependencies>
-
 </project>

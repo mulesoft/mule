@@ -35,11 +35,17 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
         </dependency>
-        <!-- What's this used for? -->
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>script-api.osgi</artifactId>
+            <version>${scriptVersion}</version>
+        </dependency>        
+        <!-- What's this used for? 
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
         </dependency>
+        -->
         <!-- Used by ScriptConfigurationBuilder -->
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -53,15 +59,16 @@
         </dependency>
         <!-- This is the actual language implementation -->
         <dependency>
+            <!-- OSGi-ready -->
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all.osgi</artifactId>
-            <version>1.5.6</version>
+            <artifactId>groovy-all</artifactId>
         </dependency>
         <!-- Annoying: we need to override retrotranslated dependencies -->
         <dependency>
             <groupId>edu.emory.mathcs.backport</groupId>
             <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
         </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>

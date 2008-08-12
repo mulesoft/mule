@@ -19,6 +19,7 @@
             <artifactId>com.springsource.javax.mail</artifactId>
         </dependency>
 
+        <!-- Unit tests only -->
         <dependency>
             <groupId>com.icegreen</groupId>
             <artifactId>greenmail</artifactId>
@@ -37,25 +38,5 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-        <!--
-            Bind log4j statically, but preserve
-            the clogging API compatibility.
-         -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl104-over-slf4j</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
 </project>

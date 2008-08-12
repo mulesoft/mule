@@ -63,11 +63,11 @@
       <version>${muleVersion}</version>
     </dependency>
     <dependency>
-      <groupId>javax.mail</groupId>
-      <artifactId>mail</artifactId>
-      <version>1.4</version>
+        <groupId>javax.mail</groupId>
+        <artifactId>com.springsource.javax.mail</artifactId>
     </dependency>
     <dependency>
+        <!-- OSGi-ready -->
         <groupId>org.apache.geronimo.specs</groupId>
         <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
     </dependency>

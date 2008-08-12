@@ -68,37 +68,42 @@
         <acegiVersion>1.0.7</acegiVersion>
         <antlrVersion>2.7.7</antlrVersion>
         <aopAllianceVersion>1.0.0</aopAllianceVersion>
+        <asmVersion>3.1.0</asmVersion>
         <axisVersion>1.4.0</axisVersion>
         <backportUtilConcurrentVersion>3.1.0</backportUtilConcurrentVersion>
-        <bshVersion>1.3.0</bshVersion>
+        <bshVersion>2.0.0.b4</bshVersion>
         <cglibVersion>2.1_3</cglibVersion>
         <commonsBeanUtilsVersion>1.7.0</commonsBeanUtilsVersion>
         <commonsCliVersion>1.0</commonsCliVersion>
-        <commonsCodecVersion>1.3</commonsCodecVersion>
+        <commonsCodecVersion>1.3.0</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.0</commonsCollectionsVersion>
         <commonsDbUtilsVersion>1.1</commonsDbUtilsVersion>
         <commonsDiscoveryVersion>0.4.0</commonsDiscoveryVersion>
         <commonsHttpClientVersion>3.1.0</commonsHttpClientVersion>
         <commonsIoVersion>1.3.1</commonsIoVersion>
         <commonsJxpathVersion>1.2</commonsJxpathVersion>
-        <commonsLangVersion>2.3</commonsLangVersion>
+        <commonsLangVersion>2.4.0</commonsLangVersion>
+        <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
         <commonsNetVersion>1.4.1</commonsNetVersion>
         <commonsPoolVersion>1.4</commonsPoolVersion>
         <!-- TODO There is a more modern version of cryptix available: 
         http://mirrors.ibiblio.org/pub/mirrors/maven2/cryptix/cryptix/3.2.0/cryptix-3.2.0.jar
         but the PGP module would need some work in order to use it -->
         <cryptixVersion>20050405</cryptixVersion>
-        <cxfVersion>2.0.6</cxfVersion>
+        <cxfVersion>2.0.8</cxfVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
-        <geronimoSpecsOsgiVersion>1.1.2</geronimoSpecsOsgiVersion>
+        <geronimoSpecsAnnotationVersion>1.1.1</geronimoSpecsAnnotationVersion>
+        <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
         <groovyVersion>1.5.6</groovyVersion>
         <hibernateVersion>3.2.2.ga</hibernateVersion>
-        <javassistVersion>3.4.ga</javassistVersion>
+        <javassistVersion>3.6.ga</javassistVersion>
         <javaActivationVersion>1.1.0</javaActivationVersion>
+        <javaElVersion>2.1.0</javaElVersion>
         <javaMailVersion>1.4.0</javaMailVersion>
         <javaServletVersion>2.4.0</javaServletVersion>
+        <javaServletJspVersion>2.1.0</javaServletJspVersion>
         <javaWsdlVersion>1.6.1</javaWsdlVersion>
         <javaXmlBindVersion>2.1.7</javaXmlBindVersion>
         <javaXmlRpcVersion>1.1.0</javaXmlRpcVersion>
@@ -109,17 +114,20 @@
         <jbossTsVersion>4.3.0.GA</jbossTsVersion>
         <jbpmVersion>3.2.2</jbpmVersion>
         <jcrVersion>1.0</jcrVersion>
-        <jdomVersion>1.0</jdomVersion>
+        <jdomVersion>1.0.0</jdomVersion>
         <jettyVersion>6.1.11</jettyVersion>
         <jugVersion>2.0.0</jugVersion>
         <jxlVersion>2.6.3</jxlVersion>
         <mqSeriesVersion>6.0</mqSeriesVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
+        <neethiVersion>2.0.4</neethiVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
+        <osgiSpecVersion>1.0</osgiSpecVersion>
         <paxLoggingVersion>1.1.1</paxLoggingVersion>   
         <quartzVersion>1.6.0</quartzVersion>
         <saajVersion>1.3.0</saajVersion>
+        <scriptVersion>1.0</scriptVersion>
         <slf4jVersion>1.5.0</slf4jVersion>     
         <smackVersion>2.2.1</smackVersion>
         <springOsgiVersion>1.0.2</springOsgiVersion>
@@ -128,6 +136,11 @@
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <sxcVersion>0.7.2</sxcVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
+        <wsCommonsAxiomVersion>1.2.7</wsCommonsAxiomVersion>
+        <wsCommonsSchemaVersion>1.4.2</wsCommonsSchemaVersion>
+        <xmlPullVersion>1.1.3.4-O</xmlPullVersion>
+        <xmlResolverVersion>1.2</xmlResolverVersion>
+        <xstreamVersion>1.2.2</xstreamVersion>
         <yourKitVersion>7.0.10</yourKitVersion>
         <xaPoolVersion>1.4</xaPoolVersion>
     </properties>
@@ -210,15 +223,17 @@
                 <artifactId>mule-transport-stdio</artifactId>
                 <version>${muleCEVersion}</version>
             </dependency>
+            
             <dependency>
                 <groupId>edu.emory.mathcs.backport</groupId>
                 <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
                 <version>${backportUtilConcurrentVersion}</version>
             </dependency>
              <dependency>
+                <!-- OSGi-ready -->
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-annotation_1.0_spec</artifactId>
-                <version>${geronimoSpecsVersion}</version>
+                <version>${geronimoSpecsAnnotationVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -254,38 +269,28 @@
                 <!-- OSGi-ready -->
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
-                <version>${geronimoSpecsOsgiVersion}</version>
+                <version>${geronimoSpecsWsMetadataVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>com.springsource.javax.servlet</artifactId>
-                <version>2.4.0</version>
+                <version>${javaServletVersion}</version>
             </dependency>
-            
-             <!-- OSGI: Available from SSEBR --> 
-            <dependency>
-                <groupId>javax.activation</groupId>
-                <artifactId>activation</artifactId>
-                <version>1.1</version>
-            </dependency>
+            <dependency>  
+                <groupId>javax.servlet</groupId>  
+                <artifactId>com.springsource.javax.servlet.jsp</artifactId>  
+                <version>${javaServletJspVersion}</version> 
+            </dependency>            
             <dependency>
                 <groupId>javax.activation</groupId>
                 <artifactId>com.springsource.javax.activation</artifactId>
                 <version>1.1.0</version>
-            </dependency>
-            
-            <!-- OSGI: Available from SSEBR -->
-            <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
-                <version>1.4</version>
             </dependency>
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>com.springsource.javax.mail</artifactId>
                 <version>1.4.0</version>
             </dependency>
-
             <dependency>
                 <groupId>javax.xml.ws</groupId>
                 <artifactId>com.springsource.javax.xml.ws</artifactId>
@@ -300,11 +305,6 @@
                 <groupId>net.java.dev.stax-utils</groupId>
                 <artifactId>stax-utils.osgi</artifactId>
                 <version>${staxUtilsVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>3.8.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -395,6 +395,14 @@
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
                     </exclusion>
+                    <exclusion>
+                        <artifactId>commons-pool</artifactId>
+                        <groupId>commons-pool</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-support</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -458,45 +466,14 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>mx4j</groupId>
-                <artifactId>mx4j-jmx</artifactId>
-                <version>${mx4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <version>1.1</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.14</version>
-                <scope>provided</scope>
-            </dependency>
-            <!-- commons-codec is used by the http transport and commons-httpclient
-                 in different versions.
-            -->
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec.osgi</artifactId>
-                <version>1.3</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-httpclient</groupId>
-                <artifactId>commons-httpclient</artifactId>
-                <version>3.1</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
+                <groupId>org.apache.commons</groupId>  
+                <artifactId>com.springsource.org.apache.commons.codec</artifactId>
+                <version>${commonsCodecVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>com.springsource.org.apache.commons.httpclient</artifactId>
-                <version>3.1.0</version>
+                <version>${commonsHttpClientVersion}</version>
                 <exclusions>
                     <!-- we like slf4j -->
                     <exclusion>
@@ -505,8 +482,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            
-            <!-- OSGI: Wrapped for mule ("osgi" suffix) -->
             <dependency>
                 <groupId>commons-cli</groupId>
                 <artifactId>commons-cli.osgi</artifactId>
@@ -517,154 +492,82 @@
                         <groupId>commons-logging</groupId>
                         <artifactId>commons-logging</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>commons-lang</groupId>
+                        <artifactId>commons-lang</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
-            
-            <!-- OSGI: Headers in maven repo -->
             <dependency>
+                <!-- OSGi-ready -->
                 <groupId>commons-pool</groupId>
                 <artifactId>commons-pool</artifactId>
                 <version>1.4</version>
             </dependency>
-            
-            <!-- OSGI: Wrapped for mule ("osgi" suffix) -->
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io.osgi</artifactId>
                 <version>1.3.1</version>
-            </dependency>
-            
-            <!-- OSGI: Available from SSEBR -->
-            <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>3.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>com.springsource.org.apache.commons.collections</artifactId>
                 <version>${commonsCollectionsVersion}</version>
             </dependency>
-            
-            <!-- OSGI: Wrapped for mule ("osgi" suffix) -->
             <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang.osgi</artifactId>
-                <version>2.3</version>
-            </dependency>            
-
-            <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derby</artifactId>
-                <version>10.3.1.4</version>
-            </dependency>
-            <dependency>
-                <groupId>jaxen</groupId>
-                <artifactId>jaxen.osgi</artifactId>
-                <version>${jaxenVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>dom4j</groupId>
-                <artifactId>dom4j.osgi</artifactId>
-                <version>${dom4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-jxpath</groupId>
-                <artifactId>commons-jxpath</artifactId>
-                <version>1.2</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
+                <version>${commonsBeanUtilsVersion}</version>
                 <exclusions>
-                    <!-- we want newer collections via core -->
-                    <exclusion>
-                        <groupId>commons-collections</groupId>
-                        <artifactId>commons-collections</artifactId>
-                    </exclusion>
-                    <!-- we want newer beanutils via core -->
-                    <exclusion>
-                        <groupId>commons-beanutils</groupId>
-                        <artifactId>commons-beanutils</artifactId>
-                    </exclusion>
                     <!-- we like slf4j -->
                     <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <!-- no XML -->
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                    <!-- totally outdated and wrong too -->
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xerces</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <!-- not required; likely a m1 POM conversion bug -->
-                        <groupId>ant</groupId>
-                        <artifactId>ant-optional</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <!-- exclude older jdom-b9 -->
-                        <groupId>jdom</groupId>
-                        <artifactId>jdom</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <!-- exclude older Servlet 2.2 spec jar -->
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <!-- not required either -->
-                    <exclusion>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>com.springsource.org.apache.commons.logging</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.lang</artifactId>
+                <version>${commonsLangVersion}</version>
+            </dependency>            
+            <dependency>
+                <groupId>org.jaxen</groupId>
+                <artifactId>com.springsource.org.jaxen</artifactId>
+                <version>${jaxenVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dom4j</groupId>  
+                <artifactId>com.springsource.org.dom4j</artifactId>
+                <version>${dom4jVersion}</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-jxpath</groupId>
                 <artifactId>commons-jxpath.osgi</artifactId>
-                <version>1.2</version>
+                <version>${commonsJxpathVersion}</version>
+            </dependency>            
+            <!-- This has a dependency on javax.servlet.jsp which causes problems  
+            <dependency>
+                <groupId>org.apache.commons</groupId>  
+                <artifactId>com.springsource.org.apache.commons.jxpath</artifactId>
+                <version>${commonsJxpathVersion}</version>
             </dependency>
+            -->
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate.osgi</artifactId>
                 <version>${hibernateVersion}</version>
             </dependency>
-            <dependency>
-                <groupId>xmlunit</groupId>
-                <artifactId>xmlunit</artifactId>
-                <version>1.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jcl104-over-slf4j</artifactId>
-                <version>${slf4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>${slf4jVersion}</version>
-            </dependency>
             <!-- OSGi Specification -->
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_core</artifactId>
-                <version>1.0</version>
+                <version>${osgiSpecVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_compendium</artifactId>
-                <version>1.0</version>
+                <version>${osgiSpecVersion}</version>
             </dependency>
             <!-- Spring OSGi -->
             <dependency>
@@ -677,13 +580,98 @@
                 <artifactId>spring-osgi-io</artifactId>
                 <version>${springOsgiVersion}</version>
             </dependency>
-            <!-- We package this one ourselves 
+            <!-- We package this one ourselves in mule-module-spring-osgi
             <dependency>
                 <groupId>org.springframework.osgi</groupId>
                 <artifactId>spring-osgi-extender</artifactId>
                 <version>${springOsgiVersion}</version>
             </dependency>
             -->
+            <dependency>
+                <groupId>tanukisoft</groupId>
+                <artifactId>wrapper.osgi</artifactId>
+                <version>${wrapperVersion}</version>
+            </dependency>
+            <dependency>
+                <!-- OSGi-ready -->
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty</artifactId>
+                <version>${jettyVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>servlet-api-2.5</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <!-- OSGi-ready -->
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>${jettyVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>servlet-api-2.5</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <!-- OSGi-ready -->
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>servlet-api-2.5</artifactId>
+                <version>${jettyVersion}</version>
+            </dependency>
+            <dependency>
+                <!-- OSGi-ready -->
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${groovyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis</groupId>
+                <artifactId>com.springsource.org.apache.axis</artifactId>
+                <version>${axisVersion}</version>
+                <exclusions>
+                    <!-- we like slf4j -->
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.opensymphony.quartz</groupId>
+                <artifactId>com.springsource.org.quartz</artifactId>
+                <version>${quartzVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.jgroups</groupId>
+                        <artifactId>com.springsource.org.jgroups</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>                
+            
+            <!-- For unit tests only -->
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>10.3.1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>3.8.2</version>
+            </dependency>
+            <dependency>
+                <groupId>xmlunit</groupId>
+                <artifactId>xmlunit</artifactId>
+                <version>1.1</version>
+            </dependency>
             <!-- 
                  This dependency is used in the axis transport, but needs to be
                  excluded from the various distros as we use the newer version from
@@ -785,11 +773,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>tanukisoft</groupId>
-                <artifactId>wrapper.osgi</artifactId>
-                <version>${wrapperVersion}</version>
-            </dependency>
             <!-- Python for scripting -->
             <dependency>
                 <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
@@ -804,33 +787,6 @@
                 <groupId>org.python</groupId>
                 <artifactId>jython</artifactId>
                 <version>2.2.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty</artifactId>
-                <version>${jettyVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>servlet-api-2.5</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty-util</artifactId>
-                <version>${jettyVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>servlet-api-2.5</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>servlet-api-2.5</artifactId>
-                <version>${jettyVersion}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -1512,10 +1468,23 @@
     <!-- *******************************************************************
          Global dependencies - these will be available for all Mule modules
          ******************************************************************* -->
-    <dependencies>    
+    <dependencies>
+        <!-- PAX Logging -->
         <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
+              <groupId>org.ops4j.pax.logging</groupId>
+              <artifactId>pax-logging-api</artifactId>
+              <version>${paxLoggingVersion}</version>
+        </dependency>
+        <dependency>
+              <groupId>org.ops4j.pax.logging</groupId>
+              <artifactId>pax-logging-service</artifactId>
+              <version>${paxLoggingVersion}</version>
+        </dependency>
+        <!--    
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+            <version>${commonsLoggingVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
@@ -1523,6 +1492,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        -->
         
         <!-- 
         We cannot add apache commons, activation of j2ee specs jars here because child
@@ -1541,5 +1511,27 @@
             <version>0.09</version>
             <scope>test</scope>
         </dependency>
+        <!--
+            Bind log4j statically, but preserve
+            the clogging API compatibility.
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl104-over-slf4j</artifactId>
+            <version>${slf4jVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4jVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4jVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        -->
     </dependencies>    
 </project>

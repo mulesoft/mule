@@ -65,12 +65,8 @@
         </dependency>
         <dependency>
             <groupId>mx4j</groupId>
-            <artifactId>mx4j-jmx</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+            <artifactId>mx4j-all.osgi</artifactId>
+            <version>${mx4jVersion}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
