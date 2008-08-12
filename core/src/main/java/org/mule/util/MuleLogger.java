@@ -159,4 +159,8 @@ public class MuleLogger implements Log
         boilerPlate(Arrays.asList(messages), c, maxlength);
     }
 
+    public int getLogLevel()
+    {
+        return logger.getLogLevel();
+    }
 }
