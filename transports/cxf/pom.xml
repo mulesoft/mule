@@ -172,6 +172,11 @@
             <artifactId>mx4j-all.osgi</artifactId>
             <version>${mx4jVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon-all.osgi</artifactId>
+            <version>${saxonVersion}</version>
+        </dependency>
 
         <!-- Unit tests -->
         <dependency>
