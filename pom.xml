@@ -95,6 +95,7 @@
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
         <geronimoSpecsAnnotationVersion>1.1.1</geronimoSpecsAnnotationVersion>
+        <geronimoSpecsStaxVersion>1.0.1</geronimoSpecsStaxVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
         <groovyVersion>1.5.6</groovyVersion>
         <hibernateVersion>3.2.2.ga</hibernateVersion>
@@ -127,6 +128,7 @@
         <paxLoggingVersion>1.1.1</paxLoggingVersion>   
         <quartzVersion>1.6.0</quartzVersion>
         <saajVersion>1.3.0</saajVersion>
+        <saxonVersion>8.9.0.4</saxonVersion>
         <scriptVersion>1.0</scriptVersion>
         <slf4jVersion>1.5.0</slf4jVersion>     
         <smackVersion>2.2.1</smackVersion>
@@ -135,6 +137,7 @@
         <springModulesVersion>0.9</springModulesVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <sxcVersion>0.7.2</sxcVersion>
+        <woodstoxVersion>3.2.6</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <wsCommonsAxiomVersion>1.2.7</wsCommonsAxiomVersion>
         <wsCommonsSchemaVersion>1.4.2</wsCommonsSchemaVersion>
@@ -270,6 +273,12 @@
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
                 <version>${geronimoSpecsWsMetadataVersion}</version>
+            </dependency>
+            <dependency>
+                <!-- OSGi-ready -->
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-stax-api_1.0_spec</artifactId>            
+                <version>${geronimoSpecsStaxVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
