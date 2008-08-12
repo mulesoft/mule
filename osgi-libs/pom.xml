@@ -70,11 +70,13 @@
         <!-- SSEBR has 1.1.2, we use 2.0.0 -->
         <module>jug</module>
         <module>mx4j</module>
+        <module>saxon</module>
         <module>script</module>
         <module>smack</module>
         <module>smjbpm</module>
         <module>staxutils</module>
         <module>sxc</module>
+        <module>woodstox</module>
         <module>wrapper</module>
         <module>xml-resolver</module>
         <module>yourkit</module>
