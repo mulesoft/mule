@@ -14,7 +14,7 @@
         <!-- EDIT THESE PROPERTIES, THE REST OF THE POM IS GENERIC -->
         <libGroupId>javax.script</libGroupId>
         <libArtifactId>script-api</libArtifactId>
-        <libVersion>${scriptVersion}</libVersion>
+        <libVersion>${javaScriptVersion}</libVersion>
         <!-- ***************************************************** -->
     </properties>
     
