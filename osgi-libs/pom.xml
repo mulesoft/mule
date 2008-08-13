@@ -45,6 +45,15 @@
                 </configuration>
             </plugin>
         </plugins>
+        <!-- Don't pull in someone else's MANIFEST.MF file, we're going to generate it ourselves -->
+        <resources>
+            <resource>
+                <directory>${project.basedir}</directory>
+                <excludes>
+                    <exclude>MANIFEST.MF</exclude>
+                </excludes>                
+            </resource>
+        </resources>
     </build>
 
     <modules>
