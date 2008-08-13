@@ -1479,18 +1479,6 @@
          Global dependencies - these will be available for all Mule modules
          ******************************************************************* -->
     <dependencies>
-        <!-- PAX Logging 
-        <dependency>
-              <groupId>org.ops4j.pax.logging</groupId>
-              <artifactId>pax-logging-api</artifactId>
-              <version>${paxLoggingVersion}</version>
-        </dependency>
-        <dependency>
-              <groupId>org.ops4j.pax.logging</groupId>
-              <artifactId>pax-logging-service</artifactId>
-              <version>${paxLoggingVersion}</version>
-        </dependency>
-        -->
         <!--
             Bind log4j statically, but preserve
             the clogging API compatibility.
@@ -1499,30 +1487,20 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl104-over-slf4j</artifactId>
             <version>${slf4jVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4jVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4jVersion}</version>
+            <scope>provided</scope>
         </dependency>
-        <!--    
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-            <version>${commonsLoggingVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        -->
         
         <!-- 
         We cannot add apache commons, activation of j2ee specs jars here because child
