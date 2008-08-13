@@ -35,17 +35,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
         </dependency>
-        <dependency>
-            <groupId>javax.script</groupId>
-            <artifactId>script-api.osgi</artifactId>
-            <version>${scriptVersion}</version>
-        </dependency>        
-        <!-- What's this used for? 
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-        </dependency>
-        -->
         <!-- Used by ScriptConfigurationBuilder -->
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -56,6 +45,17 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>script-api.osgi</artifactId>
+            <version>${javaScriptVersion}</version>
+        </dependency>        
+        <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>groovy-engine.osgi</artifactId>
+            <version>${groovyEngineVersion}</version>
         </dependency>
         <!-- This is the actual language implementation -->
         <dependency>

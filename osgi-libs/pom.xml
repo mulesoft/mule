@@ -34,6 +34,8 @@
                     <classifier>osgi</classifier>
                     -->
                     <instructions>
+                        <!-- Include all resources which are not java classes in the jar -->
+                        <Private-Package>!org.*, !com.*, !net.*, !edu.*, !javax.*, *</Private-Package>
                         <!-- Negate Mule info. from parent POM because these libs are not ours -->
                         <Bundle-License/>
                         <Bundle-Description/>
@@ -61,6 +63,7 @@
         <module>geronimo-jaxrpc</module>
         <module>geronimo-jms</module>
         <module>geronimo-jta</module>
+        <module>groovy-engine</module>
         <module>hibernate</module>
         <!-- SSEBR has 3.3.0.ga, we use 3.6.ga -->
         <module>javassist</module>

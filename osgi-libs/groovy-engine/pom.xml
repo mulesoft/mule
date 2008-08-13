@@ -12,14 +12,14 @@
     <properties>
         <!-- ***************************************************** -->
         <!-- EDIT THESE PROPERTIES, THE REST OF THE POM IS GENERIC -->
-        <libGroupId>org.jboss</libGroupId>
-        <libArtifactId>jbossts</libArtifactId>
-        <libVersion>${jbossTsVersion}</libVersion>
+        <libGroupId>javax.script</libGroupId>
+        <libArtifactId>groovy-engine</libArtifactId>
+        <libVersion>${groovyEngineVersion}</libVersion>
         <!-- ***************************************************** -->
     </properties>
     
     <groupId>${libGroupId}</groupId>
-    <artifactId>${libArtifactId}-all.osgi</artifactId>
+    <artifactId>${libArtifactId}.osgi</artifactId>
     <version>${libVersion}</version>
     <packaging>bundle</packaging>
     <name>${libArtifactId} repackaged for OSGi</name>
@@ -27,20 +27,10 @@
     <dependencies>
         <dependency>
             <groupId>${libGroupId}</groupId>
-            <artifactId>jbossts-common</artifactId>
+            <artifactId>${libArtifactId}</artifactId>
             <version>${libVersion}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>${libGroupId}</groupId>
-            <artifactId>jbossts-jta</artifactId>
-            <version>${libVersion}-patched</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>${libGroupId}</groupId>
-            <artifactId>jbossts-jta-integration</artifactId>
-            <version>${libVersion}</version>
+            <!-- we use our own retrotranslated version -->
+            <classifier>jdk14</classifier>
             <optional>true</optional>
         </dependency>
     </dependencies>

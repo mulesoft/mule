@@ -27,7 +27,7 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>jboss.jbossts</groupId>
+            <groupId>org.jboss</groupId>
             <artifactId>jbossts-all.osgi</artifactId>
             <version>${jbossTsVersion}</version>
         </dependency>
