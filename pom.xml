@@ -1478,7 +1478,7 @@
          Global dependencies - these will be available for all Mule modules
          ******************************************************************* -->
     <dependencies>
-        <!-- PAX Logging -->
+        <!-- PAX Logging 
         <dependency>
               <groupId>org.ops4j.pax.logging</groupId>
               <artifactId>pax-logging-api</artifactId>
@@ -1488,6 +1488,26 @@
               <groupId>org.ops4j.pax.logging</groupId>
               <artifactId>pax-logging-service</artifactId>
               <version>${paxLoggingVersion}</version>
+        </dependency>
+        -->
+        <!--
+            Bind log4j statically, but preserve
+            the clogging API compatibility.
+        -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl104-over-slf4j</artifactId>
+            <version>${slf4jVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4jVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4jVersion}</version>
         </dependency>
         <!--    
         <dependency>
@@ -1520,27 +1540,5 @@
             <version>0.09</version>
             <scope>test</scope>
         </dependency>
-        <!--
-            Bind log4j statically, but preserve
-            the clogging API compatibility.
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl104-over-slf4j</artifactId>
-            <version>${slf4jVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4jVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4jVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        -->
     </dependencies>    
 </project>

@@ -100,6 +100,8 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
                 PropertyConfigurator.configure(logConfigFile);
             }
         }
+        /* TODO PAX Logging's Log4J version does not have the method Logger.addAppender()
+            and does not export the package org.apache.log4j.net 
         else
         {
             try
@@ -115,13 +117,11 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
                     Appender file = new RollingFileAppender(new PatternLayout("%5p %m%n"), logFile, true);
                     eventLogger.addAppender(file);
                 }
-                /* Disable for now since the org.apache.log4j.net package is not
-                    exported by the PAX Logging Log4J bundle.
                 if (chainsawPort > -1)
                 {
                     Appender chainsaw = new SocketAppender(chainsawHost, chainsawPort);
                     eventLogger.addAppender(chainsaw);
-                } */
+                } 
             }
             catch (IOException e)
             {
@@ -129,6 +129,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
                     CoreMessages.failedToLoad("Log4j configuration"), e, this);
             }
         }
+        */
     }
 
     protected void logEvent(ServerNotification e)
