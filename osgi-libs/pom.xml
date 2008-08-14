@@ -35,7 +35,7 @@
                     -->
                     <instructions>
                         <!-- Include all resources which are not java classes in the jar -->
-                        <Private-Package>!org.*, !com.*, !net.*, !edu.*, !javax.*, *</Private-Package>
+                        <Private-Package>!org.*, !com.*, !net.*, !edu.*, !javax.*, !1.0*, *</Private-Package>
                         <!-- Negate Mule info. from parent POM because these libs are not ours -->
                         <Bundle-License/>
                         <Bundle-Description/>
@@ -51,6 +51,7 @@
                 <directory>${project.basedir}</directory>
                 <excludes>
                     <exclude>MANIFEST.MF</exclude>
+                    <exclude>INDEX.LIST</exclude>
                 </excludes>                
             </resource>
         </resources>
@@ -66,6 +67,7 @@
         <module>commons-io</module>
         <module>commons-jxpath</module>
         <module>cryptix</module>
+        <module>cxf</module>
         <module>geronimo-ejb</module>
         <module>geronimo-j2ee-connector</module>
         <module>geronimo-j2ee-management</module>

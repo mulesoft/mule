@@ -95,11 +95,19 @@
             <version>${version}</version>
         </dependency>
 
-        <dependency>
+         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-all.osgi</artifactId>
+            <version>${cxfVersion}</version>
+         </dependency>
+         <!-- CXF itself comes in bundle form, but I couldn't quite get it to 
+              work with Mule so we re-package it for the time being
+         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-bundle</artifactId>    
             <version>${cxfVersion}</version>    
         </dependency>
+        -->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>com.springsource.javax.mail</artifactId>
@@ -117,6 +125,11 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>com.springsource.javax.xml.bind</artifactId>
+        </dependency>
+        <dependency>  
+            <groupId>com.sun.xml</groupId>  
+            <artifactId>com.springsource.com.sun.xml.bind</artifactId>  
+            <version>${javaXmlBindVersion}</version> 
         </dependency>
         <dependency>
             <groupId>net.java.dev.stax-utils</groupId>
@@ -155,12 +168,32 @@
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
             <version>${wsCommonsAxiomVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <!-- OSGi-ready -->
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-impl</artifactId>
             <version>${wsCommonsAxiomVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>  
             <groupId>org.objectweb.asm</groupId>  
@@ -176,6 +209,11 @@
             <groupId>net.sf.saxon</groupId>
             <artifactId>saxon-all.osgi</artifactId>
             <version>${saxonVersion}</version>
+        </dependency>
+        <dependency>  
+            <groupId>org.jdom</groupId>  
+            <artifactId>com.springsource.org.jdom</artifactId>  
+            <version>${jdomVersion}</version> 
         </dependency>
 
         <!-- Unit tests -->
