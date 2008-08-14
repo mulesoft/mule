@@ -63,6 +63,8 @@ org.mule.test.integration.util.ObjectNameHelperTestCase
 # TODO MULE-2903
 org.mule.context.notification.ServerNotificationManagerTestCase
 
+org.mule.transport.tcp.integration.MuleMessageProtocolChunkingTestCase
+
 ##########################################################################
 # Low priority
 ##########################################################################
