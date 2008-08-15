@@ -215,6 +215,10 @@
             <artifactId>com.springsource.org.jdom</artifactId>  
             <version>${jdomVersion}</version> 
         </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-annotation_1.0_spec</artifactId>
+        </dependency>
 
         <!-- Unit tests -->
         <dependency>
