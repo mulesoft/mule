@@ -128,10 +128,5 @@
             <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>axis</groupId>
-            <artifactId>axis-wsdl4j</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 </project>
