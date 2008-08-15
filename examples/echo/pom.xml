@@ -45,6 +45,11 @@
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
         </dependency>
+        <!-- Needed for CXF -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-annotation_1.0_spec</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.mule.transports</groupId>

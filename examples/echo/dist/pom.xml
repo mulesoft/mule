@@ -30,6 +30,11 @@
             <artifactId>mule-transport-cxf</artifactId>
             <version>${muleVersion}</version>
         </dependency>
+        <!-- Needed for CXF -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-annotation_1.0_spec</artifactId>
+        </dependency>
 
         <!-- Better testing of XML -->
         <dependency>
