@@ -1,6 +1,4 @@
-<!--
-Assembly descriptor for the full Mule distribution.
--->
+<!-- Assembly descriptor for the full Mule distribution. -->
 <assembly>
   <id>full</id>
   <formats>
@@ -314,13 +312,8 @@ Assembly descriptor for the full Mule distribution.
     ============================
     -->
 
-  <!--
-       TODO: http://jira.codehaus.org/browse/MASSEMBLY-41 is now fixed.
-       Update to use wildcards.
-
-       Unfortunately we still cannot use wildcards, see
-       http://jira.codehaus.org/browse/MASSEMBLY-220
-  -->
+  <!-- TODO: Update to use wildcards once this issue is fixed:
+       http://jira.codehaus.org/browse/MASSEMBLY-220 -->
   <dependencySets>
 
     <!-- Bootstrap -->
@@ -330,20 +323,16 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-boot</include>
         <include>commons-cli:commons-cli.osgi</include>
         <include>tanukisoft:wrapper.osgi</include>
+        <include>org.slf4j:slf4j-api</include>
+        <include>org.slf4j:jcl104-over-slf4j</include>
+        <include>org.slf4j:slf4j-log4j12</include>
+        <include>log4j:log4j</include>
       </includes>
-      <!-- no XML -->
-      <excludes>
-          <exclude>xml-apis:xml-apis</exclude>
-          <exclude>xerces:xercesImpl</exclude>
-          <exclude>xerces:xml-serializer</exclude>
-          <exclude>xalan:xalan</exclude>
-      </excludes>
     </dependencySet>
 
     <!-- Mule libraries -->
     <dependencySet>
       <outputDirectory>lib/mule</outputDirectory>
-      <scope>runtime</scope>
       <includes>
         <!-- Core -->
         <include>org.mule:mule-core</include>
@@ -386,22 +375,20 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-sxc</include>
         <include>org.mule.modules:mule-module-xml</include>
       </includes>
-      <excludes>
-        <!-- no XML -->
-        <exclude>xml-apis:xml-apis</exclude>
-        <exclude>xerces:xercesImpl</exclude>
-        <exclude>xerces:xml-serializer</exclude>
-        <exclude>xalan:xalan</exclude>
-    </excludes>
     </dependencySet>
 
     <!-- 3rd-party libraries -->
     <dependencySet>
       <outputDirectory>lib/opt</outputDirectory>
+
+      <!-- Since we don't define any "includes" here, this will suck in the whole 
+      universe of transitive dependencies.  Therefore, we need to explicitly 
+      _exclude_ all libs which should _not_ go into this directory (usually 
+      because they are already in a different directory). -->
       <excludes>
-        <!-- Core -->
+
+        <!-- lib/mule -->
         <exclude>org.mule:mule-core</exclude>
-        <!-- Transports -->
         <exclude>org.mule.transports:mule-transports-all</exclude>
         <exclude>org.mule.transports:mule-transport-axis</exclude>
         <exclude>org.mule.transports:mule-transport-bpm</exclude>
@@ -427,7 +414,6 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.transports:mule-transport-vm</exclude>
         <exclude>org.mule.transports:mule-transport-xfire</exclude>
         <exclude>org.mule.transports:mule-transport-xmpp</exclude>
-        <!-- Modules -->
         <exclude>org.mule.modules:mule-module-acegi</exclude>
         <exclude>org.mule.modules:mule-modules-all</exclude>
         <exclude>org.mule.modules:mule-module-boot</exclude>
@@ -444,7 +430,6 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-module-spring-extras</exclude>
         <exclude>org.mule.modules:mule-module-sxc</exclude>
         <exclude>org.mule.modules:mule-module-xml</exclude>
-        <!-- Examples -->
         <exclude>org.mule.examples:mule-examples-all</exclude>
         <exclude>org.mule.examples:mule-example-echo</exclude>
         <exclude>org.mule.examples:mule-example-errorhandler</exclude>
@@ -457,29 +442,26 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-scripting</exclude>
         <exclude>org.mule.examples:mule-example-stockquote</exclude>
         <exclude>org.mule.examples:mule-example-bookstore</exclude>
-        <!-- TODO The following exclusions shouldn't be necessary here if they are kept 
-        out in their originating POMs, need to do some transitive dependency debugging
-        to figure out who is dragging them into the distro. -->
+        
+        <!-- lib/user -->
+        <exclude>junit:junit</exclude>
+        <exclude>xmlunit:xmlunit</exclude>
         <exclude>org.mule.tests:mule-tests-functional</exclude>
-        <exclude>commons-logging:commons-logging</exclude>
-        <!-- these two are already in lib/boot -->
+        
+        <!-- lib/boot -->
         <exclude>commons-cli:commons-cli.osgi</exclude>
         <exclude>tanukisoft:wrapper.osgi</exclude>
+        <exclude>org.slf4j:slf4j-api</exclude>
+        <exclude>org.slf4j:jcl104-over-slf4j</exclude>
+        <exclude>org.slf4j:slf4j-log4j12</exclude>
+        <exclude>log4j:log4j</exclude>
 
-        <exclude>org.apache.activemq:activemq-core</exclude>
-        <exclude>org.apache.activemq:activeio-core</exclude>
-
-        <!-- this lib is provided separately in 'profiler' distribution -->
-        <exclude>com.yourkit:yjp-controller-api-redist</exclude>
-
-        <!-- no XML -->
+        <!-- lib/endorsed -->
         <exclude>xml-apis:xml-apis</exclude>
         <exclude>xerces:xercesImpl</exclude>
         <exclude>xerces:xml-serializer</exclude>
         <exclude>xalan:xalan</exclude>
 
-        <!-- MULE-3044: exclude the wsdl4j artifact from the axis transport -->
-        <exclude>axis:axis-wsdl4j</exclude>
       </excludes>
     </dependencySet>
 
@@ -488,22 +470,15 @@ Assembly descriptor for the full Mule distribution.
       <outputDirectory>lib/user</outputDirectory>
       <scope>test</scope>
       <includes>
-        <include>org.mule.tests:mule-tests-core</include>
+        <include>junit:junit</include>
+        <include>xmlunit:xmlunit</include>
         <include>org.mule.tests:mule-tests-functional</include>
       </includes>
-      <!-- no XML -->
-      <excludes>
-          <exclude>xml-apis:xml-apis</exclude>
-          <exclude>xerces:xercesImpl</exclude>
-          <exclude>xerces:xml-serializer</exclude>
-          <exclude>xalan:xalan</exclude>
-      </excludes>
     </dependencySet>
 
     <!-- Mule examples -->
     <dependencySet>
       <outputDirectory>lib/user</outputDirectory>
-      <scope>runtime</scope>
       <!-- Don't put the version number in the examples. -->
       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
@@ -519,13 +494,6 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.examples:mule-example-stockquote</include>
         <include>org.mule.examples:mule-example-bookstore</include>
       </includes>
-      <!-- no XML -->
-      <excludes>
-          <exclude>xml-apis:xml-apis</exclude>
-          <exclude>xerces:xercesImpl</exclude>
-          <exclude>xerces:xml-serializer</exclude>
-          <exclude>xalan:xalan</exclude>
-      </excludes>
     </dependencySet>
 
     <!--
