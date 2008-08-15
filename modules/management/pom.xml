@@ -43,6 +43,8 @@
             <groupId>com.yourkit</groupId>
             <artifactId>yjp-controller-api-redist.osgi</artifactId>
             <version>7.0.10</version>
+            <!-- This lib is provided separately in 'profiler' distribution -->
+            <scope>provided</scope>
         </dependency>
 
         <!-- Unit tests only -->

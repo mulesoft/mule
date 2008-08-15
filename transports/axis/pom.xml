@@ -68,7 +68,6 @@
         <dependency>
             <groupId>javax.wsdl</groupId>
             <artifactId>com.springsource.javax.wsdl</artifactId>
-            <version>${javaWsdlVersion}</version>
         </dependency>
         <!-- needed by the Axis Service component -->
         <dependency>

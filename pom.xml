@@ -311,6 +311,12 @@
                 <artifactId>com.springsource.javax.xml.bind</artifactId>
                 <version>${javaXmlBindVersion}</version>
             </dependency>
+            <!-- This one is compatible with both Axis and CXF -->
+            <dependency>
+                <groupId>javax.wsdl</groupId>
+                <artifactId>com.springsource.javax.wsdl</artifactId>
+                <version>${javaWsdlVersion}</version>
+            </dependency>
             <dependency>
                 <groupId>net.java.dev.stax-utils</groupId>
                 <artifactId>stax-utils.osgi</artifactId>
@@ -681,16 +687,6 @@
                 <groupId>xmlunit</groupId>
                 <artifactId>xmlunit</artifactId>
                 <version>1.1</version>
-            </dependency>
-            <!-- 
-                 This dependency is used in the axis transport, but needs to be
-                 excluded from the various distros as we use the newer version from
-                 the cxf transport.
-            -->
-            <dependency>
-                <groupId>axis</groupId>
-                <artifactId>axis-wsdl4j</artifactId>
-                <version>1.5.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
