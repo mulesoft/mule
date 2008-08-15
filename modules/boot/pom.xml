@@ -27,17 +27,6 @@
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli.osgi</artifactId>
         </dependency>
-        <!-- Needed for 3rd-party library download. 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>com.springsource.org.apache.commons.httpclient</artifactId>
-        </dependency>
-        -->
-        <dependency>
-             <groupId>org.knopflerfish</groupId>
-             <artifactId>framework</artifactId>
-             <version>2.0.4</version>
-        </dependency>
 
         <dependency>
             <groupId>org.mule</groupId>

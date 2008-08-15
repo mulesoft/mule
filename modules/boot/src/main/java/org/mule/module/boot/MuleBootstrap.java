@@ -36,8 +36,6 @@ public class MuleBootstrap
  
      public static final String CLI_OPTIONS[][] = {
             {"main", "true", "Main Class"},
-            {"osgi", "false", "Run in an OSGi framework"},
-             {"nogui", "false", "Suppress graphical console"},
              {"version", "false", "Show product and version information"}
      };
 
@@ -45,7 +43,7 @@ public class MuleBootstrap
     {
         // Parse any command line options based on the list above.
         CommandLine commandLine = parseCommandLine(args);
-        // Any unrecognized arguments get passed through to the next class (e.g., to Knopflerfish).
+        // Any unrecognized arguments get passed through to the next class (e.g., to the OSGi Framework).
         String[] remainingArgs = commandLine.getArgs();
 
         String mainClassName = commandLine.getOptionValue("main");
@@ -53,13 +51,6 @@ public class MuleBootstrap
         {
             prepareBootstrapPhase();
             WrapperManager.start(new VersionWrapper(), remainingArgs);
-        }
-        else if (commandLine.hasOption("osgi"))
-        {
-            prepareBootstrapPhase(false);
-            boolean startGui = !commandLine.hasOption("nogui");
-            System.out.println("Starting the OSGi Framework...");
-            WrapperManager.start(new KnopflerfishFrameworkWrapper(startGui), remainingArgs);
         }
         else if (mainClassName == null || mainClassName.equals(MuleServerWrapper.class.getName()))
         {

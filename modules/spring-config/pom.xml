@@ -25,11 +25,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
-        <!-- Spring OSGi -->
-        <dependency>
-          <groupId>org.springframework.osgi</groupId>
-          <artifactId>spring-osgi-core</artifactId>
-        </dependency>
 
         <!-- Unit tests -->
         <dependency>
