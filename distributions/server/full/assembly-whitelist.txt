@@ -66,6 +66,7 @@ jcr.osgi-1.0
 jetty-6.1.11
 jetty-util-6.1.11
 jug.osgi-2.0.0
+junit-3.8.2
 log4j-1.2.14
 mule-core
 mule-core-tests
@@ -143,4 +144,5 @@ wrapper.osgi-3.2.3
 wstx-asl.osgi-3.2.6
 xapool.osgi-1.4
 xml-resolver.osgi-1.2
+xmlunit-1.1
 XmlSchema-1.4.2
