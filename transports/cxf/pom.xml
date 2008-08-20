@@ -100,6 +100,11 @@
             <artifactId>cxf-all.osgi</artifactId>
             <version>${cxfVersion}</version>
          </dependency>
+         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-http.osgi</artifactId>
+            <version>${cxfVersion}</version>
+         </dependency>
          <!-- CXF itself comes in bundle form, but I couldn't quite get it to 
               work with Mule so we re-package it for the time being
          <dependency>
@@ -139,6 +144,53 @@
             <groupId>xml-resolver</groupId>
             <artifactId>xml-resolver.osgi</artifactId>    
             <version>${xmlResolverVersion}</version>    
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j.osgi</artifactId>
+            <version>${wss4jVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec.osgi</artifactId>
+            <version>${xmlSecurityVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Used by xml-security 
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.3.03</version>
+            <scope>provided</scope>
+        </dependency>
+        -->
+        <dependency>  
+            <groupId>org.opensaml</groupId>  
+            <artifactId>com.springsource.org.opensaml</artifactId>  
+            <version>${openSamlVersion}</version> 
+            <exclusions>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <!-- OSGi-ready -->

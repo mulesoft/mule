@@ -68,6 +68,7 @@
         <module>commons-jxpath</module>
         <module>cryptix</module>
         <module>cxf</module>
+        <module>cxf-http</module>
         <module>geronimo-ejb</module>
         <module>geronimo-j2ee-connector</module>
         <module>geronimo-j2ee-management</module>
@@ -93,9 +94,12 @@
         <module>woodstox</module>
         <module>wrapper</module>
         <module>xml-resolver</module>
+        <!-- SSEBR has 1.0.5.D2, we use 1.4.0 -->        
+        <module>xml-security</module>
         <module>yourkit</module>
         <!-- SSEBR has 1.5.0, we use 1.4 -->
         <module>xapool</module>
+        <module>wss4j</module>
     </modules>
 </project>
 

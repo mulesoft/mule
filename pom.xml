@@ -126,6 +126,7 @@
         <mx4jVersion>2.1.1</mx4jVersion>
         <neethiVersion>2.0.4</neethiVersion>
         <ognlVersion>2.7.3</ognlVersion>
+        <openSamlVersion>1.1.0</openSamlVersion>
         <oroVersion>2.0.8</oroVersion>
         <osgiSpecVersion>1.0</osgiSpecVersion>
         <paxLoggingVersion>1.1.1</paxLoggingVersion>   
@@ -145,6 +146,8 @@
         <wsCommonsSchemaVersion>1.4.2</wsCommonsSchemaVersion>
         <xmlPullVersion>1.1.3.4-O</xmlPullVersion>
         <xmlResolverVersion>1.2</xmlResolverVersion>
+        <xmlSecurityVersion>1.4.0</xmlSecurityVersion>
+        <wss4jVersion>1.5.4</wss4jVersion>
         <xstreamVersion>1.2.2</xstreamVersion>
         <yourKitVersion>7.0.10</yourKitVersion>
         <xaPoolVersion>1.4</xaPoolVersion>
