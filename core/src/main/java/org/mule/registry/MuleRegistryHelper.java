@@ -11,6 +11,7 @@
 package org.mule.registry;
 
 import org.mule.api.MuleException;
+import org.mule.api.NamedObject;
 import org.mule.api.agent.Agent;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -38,6 +39,8 @@ import org.mule.transformer.TransformerWeighting;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.util.SpiUtils;
+import org.mule.util.StringUtils;
+import org.mule.util.UUID;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -359,7 +362,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
             throw new RegistrationException(CoreMessages.objectAlreadyRegistered("transformer: " +
                     transformer.getName(), lookupTransformer(transformer.getName()), transformer).getMessage());
         }
-        registry.registerObject(transformer.getName(), transformer, Transformer.class);
+        registry.registerObject(getName(transformer), transformer, Transformer.class);
     }
 
     /**
@@ -477,19 +480,19 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     //@java.lang.Override
     public void registerAgent(Agent agent) throws MuleException
     {
-        registry.registerObject(agent.getName(), agent, Agent.class);
+        registry.registerObject(getName(agent), agent, Agent.class);
     }
 
     //@java.lang.Override
     public void registerConnector(Connector connector) throws MuleException
     {
-        registry.registerObject(connector.getName(), connector, Connector.class);
+        registry.registerObject(getName(connector), connector, Connector.class);
     }
 
     //@java.lang.Override
     public void registerEndpoint(ImmutableEndpoint endpoint) throws MuleException
     {
-        registry.registerObject(endpoint.getName(), endpoint, ImmutableEndpoint.class);
+        registry.registerObject(getName(endpoint), endpoint, ImmutableEndpoint.class);
     }
 
     public void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException
@@ -500,13 +503,13 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     //@java.lang.Override
     public void registerModel(Model model) throws MuleException
     {
-        registry.registerObject(model.getName(), model, Model.class);
+        registry.registerObject(getName(model), model, Model.class);
     }
 
     //@java.lang.Override
     public void registerService(Service service) throws MuleException
     {
-        registry.registerObject(service.getName(), service, Service.class);
+        registry.registerObject(getName(service), service, Service.class);
     }
 
     //@java.lang.Override
@@ -621,6 +624,20 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     public void unregisterObject(String key) throws RegistrationException
     {
         registry.unregisterObject(key);
+    }
+    
+    protected String getName(Object obj)
+    {
+        String name = null;
+        if (obj instanceof NamedObject)
+        {
+            name = ((NamedObject) obj).getName();
+        }
+        if (StringUtils.isBlank(name))
+        {
+            name = obj.getClass().getName() + ":" + UUID.getUUID();
+        }
+        return name;
     }
 
     ////////////////////////////////////////////////////////////////////////////

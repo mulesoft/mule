@@ -37,13 +37,16 @@ import org.apache.commons.collections.functors.InstanceofPredicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * @ThreadSafe Use synchronized(registry) when reading/writing/iterating over the contents of the registry hashmap.
+ */
 public class TransientRegistry extends AbstractRegistry
 {
     /** logger used by this class */
     protected transient final Log logger = LogFactory.getLog(TransientRegistry.class);
     public static final String REGISTRY_ID = "org.mule.Registry.Transient";
 
-    //@Synchronized(registry)
+    //@ThreadSafe synchronized(registry)
     private Map registry = new HashMap();
 
     public TransientRegistry()
@@ -187,8 +190,7 @@ public class TransientRegistry extends AbstractRegistry
     {
         if (StringUtils.isBlank(key))
         {
-            logger.warn("Attempt to register object with no key");
-            return;
+            throw new RegistrationException("Attempt to register object with no key");
         }
         
         logger.debug("registering object");
@@ -209,14 +211,19 @@ public class TransientRegistry extends AbstractRegistry
             }
             registry.put(key, object);
         }
-        try
-        {
             MuleContext mc = MuleServer.getMuleContext();
             logger.debug("context: " + mc);
             if (mc != null)
             {
                 logger.debug("applying lifecycle");
-                mc.getLifecycleManager().applyCompletedPhases(object);
+                try
+                {
+                    mc.getLifecycleManager().applyCompletedPhases(object);
+                }
+                catch (MuleException e)
+                {
+                    throw new RegistrationException(e);
+                }
             }
             else
             {
@@ -224,11 +231,6 @@ public class TransientRegistry extends AbstractRegistry
                         + key + ":" + ClassUtils.getSimpleName(object.getClass())
                         + "\") because MuleContext has not yet been created.");
             }
-        }
-        catch (MuleException e)
-        {
-            throw new RegistrationException(e);
-        }
     }
 
     public void unregisterObject(String key, Object metadata) throws RegistrationException
