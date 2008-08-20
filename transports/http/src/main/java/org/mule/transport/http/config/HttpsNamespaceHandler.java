@@ -10,14 +10,13 @@
 package org.mule.transport.http.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.http.HttpsConnector;
-import org.mule.transport.http.HttpPollingConnector;
 import org.mule.transport.http.HttpsPollingConnector;
 
 /**

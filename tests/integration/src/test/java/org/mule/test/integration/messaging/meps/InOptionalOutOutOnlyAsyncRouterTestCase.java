@@ -10,7 +10,6 @@
 package org.mule.test.integration.messaging.meps;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;

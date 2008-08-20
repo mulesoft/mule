@@ -152,7 +152,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         BindingProvider bp = wrapper.getClientProxy();
         bp.getRequestContext().putAll(props);
         
-        Object response = method.invoke(wrapper.getClientProxy(), (Object[]) getArgs(event));
+        Object response = method.invoke(wrapper.getClientProxy(), getArgs(event));
         
         // TODO: handle holders
         

@@ -205,6 +205,24 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertFalse(ClassUtils.hash(new Object[]{a, b, a, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
         assertFalse(ClassUtils.hash(new Object[]{b, a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
     }
+    
+    public void testClassTypesWithNullInArray()
+    {
+        Object[] array = new Object[] { "hello", null, "world" };
+        Class[] classTypes = ClassUtils.getClassTypes(array);
+        assertEquals(3, classTypes.length);
+        assertEquals(String.class, classTypes[0]);
+        assertEquals(null, classTypes[1]);
+        assertEquals(String.class, classTypes[2]);
+    }
+    
+    public void testCompareWithNull()
+    {
+        Class[] c1 = new Class[] { String.class, Integer.class };
+        Class[] c2 = new Class[] { String.class, null };
+        assertFalse(ClassUtils.compare(c1, c2, true));
+        assertFalse(ClassUtils.compare(c2, c1, true));
+    }
 
     private void simpleNameHelper(String target, Class clazz)
     {

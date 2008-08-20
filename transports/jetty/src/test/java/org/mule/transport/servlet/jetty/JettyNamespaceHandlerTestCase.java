@@ -11,7 +11,6 @@
 package org.mule.transport.servlet.jetty;
 
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.servlet.jetty.JettyHttpConnector;
 
 public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -27,5 +26,17 @@ public class JettyNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(connector.getConfigFile());
         assertEquals("jetty-config.xml", connector.getConfigFile());
     }
+
+    /* See MULE-3603
+    public void testEndpointConfig() throws MuleException
+    {
+        InboundEndpoint endpoint = 
+            muleContext.getRegistry().lookupEndpointBuilder("endpoint").buildInboundEndpoint();
+        assertNotNull(endpoint);
+        // is the following test correct? 
+        // Can't test it now, the config for the endpoint isn't even valid
+        assertEquals("http://localhost:60223/", endpoint.getEndpointURI().getAddress());
+    }
+    */
 
 }

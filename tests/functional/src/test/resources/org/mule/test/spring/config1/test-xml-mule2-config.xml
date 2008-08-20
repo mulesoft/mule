@@ -39,6 +39,7 @@
     <custom-connector name="dummyConnector" class="org.mule.tck.testmodels.mule.TestConnector">
         <dispatcher-threading-profile maxBufferSize="2"/>
         <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
+        <service-overrides xaTransactedMessageReceiver="org.mule.tck.testmodels.mule.TestMessageReceiver"/>
     </custom-connector>
 
     <custom-transformer name="TestCompressionTransformer"

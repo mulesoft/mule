@@ -9,7 +9,6 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.config.MuleProperties;
 
 import java.util.Properties;

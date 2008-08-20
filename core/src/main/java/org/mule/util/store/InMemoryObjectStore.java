@@ -10,13 +10,12 @@
 package org.mule.util.store;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.monitor.ExpiryMonitor;
 
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
 
 /**
  * <code>InMemoryObjectStore</code> implements an optionally bounded

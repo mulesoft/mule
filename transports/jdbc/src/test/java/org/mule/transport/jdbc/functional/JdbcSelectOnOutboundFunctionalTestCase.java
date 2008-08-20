@@ -31,20 +31,20 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunction
         doSelectOnOutbound("vm://jdbc.test");
     }
 
-//    public void testSelectOnOutboundByExpression() throws Exception
-//    {
-//        MuleClient client = new MuleClient();
-//        MyMessage payload = new MyMessage(2);
-//        MuleMessage reply = client.send("vm://terra", new DefaultMuleMessage(payload));
-//        assertNotNull(reply.getPayload());
-//        assertTrue(reply.getPayload() instanceof List);
-//        List resultList = (List) reply.getPayload();
-//        assertTrue(resultList.size() == 1);
-//        assertTrue(resultList.get(0) instanceof Map);
-//        Map resultMap = (Map) resultList.get(0);
-//        assertEquals(new Integer(2), resultMap.get("TYPE"));
-//        assertEquals(TEST_VALUES[1], resultMap.get("DATA"));
-//    }
+    public void testSelectOnOutboundByExpression() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        MyMessage payload = new MyMessage(2);
+        MuleMessage reply = client.send("vm://terra", new DefaultMuleMessage(payload));
+        assertNotNull(reply.getPayload());
+        assertTrue(reply.getPayload() instanceof List);
+        List resultList = (List)reply.getPayload();
+        assertTrue(resultList.size() == 1);
+        assertTrue(resultList.get(0) instanceof Map);
+        Map resultMap = (Map) resultList.get(0);
+        assertEquals(new Integer(2), resultMap.get("TYPE"));
+        assertEquals(TEST_VALUES[1], resultMap.get("DATA"));
+    }
 
     public void testChain2SelectAlwaysBegin() throws Exception 
     { 

@@ -15,8 +15,6 @@ import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -45,51 +43,36 @@ public class SessionInvocationHandler implements InvocationHandler
     private XAResource xaResource;
     private volatile boolean enlisted = false;
     private volatile boolean reuseObject = false;
-    private final Reference underlyingObject;
-    private static final Method SESSION_CLOSE_METHOD;
+    private final Session session;
 
-    static
+    private SessionInvocationHandler(XASession xaSession, Session session)
     {
-        try
-        {
-            SESSION_CLOSE_METHOD = Session.class.getMethod("close", (Class[])null);
-        }
-        catch (NoSuchMethodException e)
-        {
-            throw new RuntimeException(e);
-        }
+        super();
+        this.xaSession = xaSession;
+        this.session = session;
+        this.xaResource = new XAResourceWrapper(xaSession.getXAResource(), this);
     }
-
+    
     public SessionInvocationHandler(XASession xaSession) throws JMSException
     {
-        this.xaSession = xaSession;
-        underlyingObject = new WeakReference(xaSession.getSession());
-        this.xaResource = new XAResourceWrapper(xaSession.getXAResource(), this);
+        this(xaSession, xaSession.getSession());
     }
 
     public SessionInvocationHandler(XAQueueSession xaSession) throws JMSException
     {
-        this.xaSession = xaSession;
-        underlyingObject = new WeakReference(xaSession.getQueueSession());
-        this.xaResource = new XAResourceWrapper(xaSession.getXAResource(), this);
+        this(xaSession, xaSession.getQueueSession());
     }
 
     public SessionInvocationHandler(XATopicSession xaSession) throws JMSException
     {
-        this.xaSession = xaSession;
-        underlyingObject = new WeakReference(xaSession.getTopicSession());
-        this.xaResource = new XAResourceWrapper(xaSession.getXAResource(), this);
+        this(xaSession, xaSession.getTopicSession());
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Invoking " + method);
-        }
-        if (underlyingObject.get() == null)
-        {
-            throw new IllegalStateException("Underlying session is null, XASession " + xaSession);
+            logger.debug(this + " Invoking " + method);
         }
 
         // processing method from MuleXaObject
@@ -116,11 +99,12 @@ public class SessionInvocationHandler implements InvocationHandler
         }
         else if (XaTransaction.MuleXaObject.CLOSE_METHOD_NAME.equals(method.getName()))
         {
-            return SESSION_CLOSE_METHOD.invoke(underlyingObject.get(), args);
+            //close will be directly called on session object
+            session.close();
+            return null;
         }
-        //close will be directly called on session object
-
-        Object result = method.invoke(underlyingObject.get(), args);
+        
+        Object result = method.invoke(session, args);
 
         if (result instanceof TopicSubscriber)
         {

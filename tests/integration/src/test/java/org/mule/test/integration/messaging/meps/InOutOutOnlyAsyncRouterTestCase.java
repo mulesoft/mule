@@ -10,12 +10,8 @@
 package org.mule.test.integration.messaging.meps;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 // START SNIPPET: full-class

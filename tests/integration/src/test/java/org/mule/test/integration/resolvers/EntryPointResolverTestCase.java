@@ -25,7 +25,7 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
     {
         doTest("array", new String[]{"hello", "world"}, "array");
     }
-
+    
     public void testArrayEntryPointResolverOnComponent() throws Exception
     {
         doTest("array2", new String[]{"hello", "world"}, "array");
@@ -107,4 +107,14 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
         doTest("legacy2", "hello world", "callable");
     }
 
+    public void testReflectionEntryPointResolverWithNullElementInArray() throws Exception
+    {
+        // see MULE-3565
+        
+        // This first case causes an exception in the flow because the ReflectionEntryPointResolver
+        // will take the argument types literally and it doesn't know how to handle the null as class
+        doTest("reflection", new Object[] { new Integer(42), null }, "{NullPayload}");
+        
+        doTest("array", new String[] { "hello", null, "world" }, "array");
+    }
 }

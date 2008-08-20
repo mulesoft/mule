@@ -18,7 +18,7 @@ import org.mule.util.ClassUtils;
  * i.e.
  * <code>public Object eat(Fruit[] fruit)</code>
  * <p/>
- * This resolver will NOT resolver method endtry points such as -
+ * This resolver will NOT resolve method entry points such as -
  * <code>public Object eat(Fruit[] fruit, Banana banana)</code>
  * <p/>
  * If you require to mix an array type with complex types you need to specify an inbound transformer that return a

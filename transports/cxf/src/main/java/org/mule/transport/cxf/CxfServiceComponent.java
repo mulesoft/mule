@@ -124,7 +124,8 @@ public class CxfServiceComponent implements Callable, Lifecycle
         String ctxUri;
         String uriBase = (String) eventContext.getMessage().getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
         
-        if (uriBase == null) {
+        if (uriBase == null) 
+        {
             EndpointURI epUri = eventContext.getEndpointURI();
             String host = (String) eventContext.getMessage().getProperty("Host", epUri.getHost());
             
@@ -132,19 +133,23 @@ public class CxfServiceComponent implements Callable, Lifecycle
         }
         
         // This is the case of the HTTP message receiver. The servlet one sends different info
-        if (req != null && req.length() > 0) {
+        if (req != null && req.length() > 0) 
+        {
             int qIdx = uriBase.indexOf('?');
-            if (qIdx > -1) {
+            if (qIdx > -1) 
+            {
                 uriBase = uriBase.substring(0, qIdx);
             }
             
             qIdx = req.indexOf('?');
-            if (qIdx > -1) {
+            if (qIdx > -1) 
+            {
                 req = req.substring(qIdx);
             }
             
             qIdx = req.indexOf('&');
-            if (qIdx > -1) {
+            if (qIdx > -1) 
+            {
                 req = req.substring(0, qIdx);
             }
             
@@ -155,10 +160,12 @@ public class CxfServiceComponent implements Callable, Lifecycle
         
         EndpointInfo ei = receiver.getServer().getEndpoint().getEndpointInfo();
 
-        if (uriBase != null) {
+        if (uriBase != null) 
+        {
             ei.setAddress(uriBase);
             
-            if (ei.getExtensor(AddressType.class) != null) {
+            if (ei.getExtensor(AddressType.class) != null) 
+            {
                 ei.getExtensor(AddressType.class).setLocation(uriBase);
             }
         }

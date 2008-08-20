@@ -47,7 +47,7 @@
             <!--
                 An outbound router can have one or more router configurations that can be
                 invoked depending on business rules, message contents, headers or any other
-                criteria. The pass-through-router is a router that automically passes
+                criteria. The pass-through-router is a router that automatically passes
                 on every message it receives
             -->
             <outbound>

@@ -36,6 +36,7 @@ public class ServiceOverridesDefinitionParser extends ChildDefinitionParser
         Map overrides = new HashMap();
         addOverride(overrides, element, "messageReceiver", MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
         addOverride(overrides, element, "transactedMessageReceiver", MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS);
+        addOverride(overrides, element, "xaTransactedMessageReceiver", MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS);
         addOverride(overrides, element, "dispatcherFactory", MuleProperties.CONNECTOR_DISPATCHER_FACTORY);
         addOverride(overrides, element, "messageAdapter", MuleProperties.CONNECTOR_MESSAGE_ADAPTER);
         addOverride(overrides, element, "inboundTransformer", MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);

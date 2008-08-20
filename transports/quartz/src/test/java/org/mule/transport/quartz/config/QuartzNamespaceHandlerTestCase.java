@@ -9,21 +9,20 @@
  */
 package org.mule.transport.quartz.config;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.quartz.QuartzConnector;
-import org.mule.transport.quartz.jobs.EventGeneratorJobConfig;
-import org.mule.transport.quartz.jobs.CustomJobConfig;
-import org.mule.transport.quartz.jobs.CustomJobFromMessageConfig;
-import org.mule.transport.quartz.jobs.EventGeneratorJob;
-import org.mule.transport.quartz.jobs.EndpointPollingJobConfig;
-import org.mule.transport.quartz.jobs.EndpointPollingJob;
-import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
-import org.mule.transport.quartz.jobs.ScheduledDispatchJob;
-import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.api.service.Service;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.quartz.QuartzConnector;
+import org.mule.transport.quartz.jobs.CustomJobConfig;
+import org.mule.transport.quartz.jobs.CustomJobFromMessageConfig;
+import org.mule.transport.quartz.jobs.EndpointPollingJob;
+import org.mule.transport.quartz.jobs.EndpointPollingJobConfig;
+import org.mule.transport.quartz.jobs.EventGeneratorJob;
+import org.mule.transport.quartz.jobs.EventGeneratorJobConfig;
+import org.mule.transport.quartz.jobs.ScheduledDispatchJob;
+import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 import org.quartz.impl.StdScheduler;
 

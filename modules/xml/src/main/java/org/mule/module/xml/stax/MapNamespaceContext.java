@@ -16,8 +16,6 @@ import java.util.Map;
 
 import javax.xml.namespace.NamespaceContext;
 
-import org.w3c.dom.Node;
-
 public final class MapNamespaceContext implements NamespaceContext
 {
     private Map namespaces = new HashMap();

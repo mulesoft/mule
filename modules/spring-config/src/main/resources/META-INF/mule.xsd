@@ -4196,6 +4196,7 @@
     <xsd:complexType name="serviceOverridesType">
         <xsd:attribute name="messageReceiver" type="xsd:NMTOKEN"/>
         <xsd:attribute name="transactedMessageReceiver" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="xaTransactedMessageReceiver" type="xsd:NMTOKEN"/>
         <xsd:attribute name="dispatcherFactory" type="xsd:NMTOKEN"/>
         <xsd:attribute name="inboundTransformer" type="xsd:NMTOKEN"/>
         <xsd:attribute name="outboundTransformer" type="xsd:NMTOKEN"/>

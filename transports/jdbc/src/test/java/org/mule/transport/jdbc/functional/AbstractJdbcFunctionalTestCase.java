@@ -13,11 +13,14 @@ package org.mule.transport.jdbc.functional;
 import org.mule.api.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.jdbc.JdbcConnector;
+import org.mule.transport.jdbc.JdbcUtils;
 import org.mule.transport.jdbc.util.MuleDerbyUtils;
 
+import java.sql.Connection;
 import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ArrayListHandler;
 
 public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
 {
@@ -127,6 +130,35 @@ public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
     {
         this.populateTestData = populateTestData;
     }
+    
+    protected List execSqlQuery(String sql) throws Exception
+    {
+        Connection con = null;
+        try
+        {
+            con = jdbcConnector.getConnection();
+            return (List)new QueryRunner().query(con, sql, new ArrayListHandler());
+        }
+        finally
+        {
+            JdbcUtils.close(con);
+        }
+    }
+
+    protected int execSqlUpdate(String sql) throws Exception
+    {
+        Connection con = null;
+        try
+        {
+            con = jdbcConnector.getConnection();
+            return new QueryRunner().update(con, sql);
+        }
+        finally
+        {
+            JdbcUtils.close(con);
+        }
+    }
+    
 }
 
 

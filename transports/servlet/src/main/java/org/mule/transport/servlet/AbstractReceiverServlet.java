@@ -140,6 +140,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             }
 
             Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
+            
             String contentType = null;
             if (contentTypeHeader == null)
             {
@@ -149,7 +150,8 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             {
                 contentType = contentTypeHeader.getValue();
             }
-
+            servletResponse = setHttpHeadersOnServletResponse(httpResponse, servletResponse);
+            
             if (!servletResponse.isCommitted())
             {
                 servletResponse.setStatus(httpResponse.getStatusCode());
@@ -163,6 +165,17 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         servletResponse.flushBuffer();
     }
 
+    protected HttpServletResponse setHttpHeadersOnServletResponse(HttpResponse httpResponse, HttpServletResponse servletResponse)
+    {
+        Header[] headers = httpResponse.getHeaders();
+        
+        for (int i = 0; i < headers.length; i++)
+        {
+            servletResponse.setHeader(headers[i].getName(), headers[i].getValue());
+        }
+        return servletResponse;
+    }
+    
     protected void handleException(Throwable exception, String message, HttpServletResponse response)
     {
         logger.error("message: " + exception.getMessage(), exception);

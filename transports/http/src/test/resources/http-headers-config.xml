@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?> 
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jetty="http://www.mulesource.org/schema/mule/jetty/2.0"
+      xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
+       http://www.mulesource.org/schema/mule/jetty/2.0 http://www.mulesource.org/schema/mule/jetty/2.0/mule-jetty.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+
+    <http:endpoint name="clientEndpoint" host="localhost" port="60203" synchronous="true"/>
+    <http:endpoint name="serverEndpoint" host="localhost" port="60203" synchronous="true"/>
+
+    <model name="Test">
+        <service name="ProductDataSourceRepository">
+            <inbound>            
+                <http:inbound-endpoint ref="serverEndpoint" synchronous="true">
+                    <properties>
+                        <spring:entry key="Content-Disposition" value="attachment; filename=foo.zip"/>
+                        <spring:entry key="Content-Type" value="application/x-download"/>
+                    </properties>
+                </http:inbound-endpoint>
+            </inbound>
+        </service>
+    </model>
+</mule>

@@ -9,7 +9,13 @@
  */
 package org.mule.test.spring;
 
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.AbstractConfigBuilderTestCase;
+import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.tck.testmodels.mule.TestMessageReceiver;
+import org.mule.transaction.MuleTransactionConfig;
+import org.mule.transaction.XaTransactionFactory;
 
 public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {
@@ -23,6 +29,23 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderT
     {
         return "org/mule/test/spring/config1/test-xml-mule2-config.xml," +
                 "org/mule/test/spring/config1/test-xml-mule2-config-split.xml";
+    }
+
+    public void testServiceOverrides() throws Exception
+    {
+        TestConnector connector = (TestConnector) muleContext.getRegistry().lookupConnector("dummyConnector");
+        assertNotNull(connector);
+        
+        // create an xa-transacted endpoint (this triggers the cration of an 
+        // xaTransactedMessageReceiver in the service descriptor impl
+        InboundEndpoint endpoint = getTestInboundEndpoint("foo");
+        endpoint.getTransactionConfig().setAction(MuleTransactionConfig.ACTION_ALWAYS_BEGIN);
+        endpoint.getTransactionConfig().setFactory(new XaTransactionFactory());
+        
+        // see if we get the overridden message receiver
+        MessageReceiver receiver = connector.getServiceDescriptor().createMessageReceiver(connector, 
+            getTestService(), endpoint);
+        assertEquals(TestMessageReceiver.class, receiver.getClass());
     }
 
 }

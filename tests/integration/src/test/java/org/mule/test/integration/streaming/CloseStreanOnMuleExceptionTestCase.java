@@ -112,7 +112,7 @@ public class CloseStreanOnMuleExceptionTestCase extends FunctionalTestCase
     {
         client.send("vm://dispatcherExceptionBridge?connector=vm", inputStream, null);
 
-        assertTrue(((TestByteArrayInputStream) inputStream).isClosed());
+        assertTrue(inputStream.isClosed());
     }
 
     // TODO MULE-3558 Streams are not closed if there are exceptions in the message

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd">
+    
+    <spring:bean id="databaseConnection" class="java.lang.String">
+        <spring:constructor-arg value="jdbc:derby:muleEmbeddedDB;sql.enforce_strict_size=true"/>
+    </spring:bean>
+       
+    <spring:bean id="jdbcDataSource1" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
+        <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+        <spring:property name="url" ref="databaseConnection"/>
+    </spring:bean>
+    
+    <spring:bean id="jdbcDataSource2" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
+        <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+        <spring:property name="url" ref="databaseConnection"/>
+    </spring:bean>
+    
+    <!-- 
+        Do not change the name of this connector, AbstractJdbcFunctionalTestCase relies on the 
+        existence of a JDBC connector with this name.
+     -->
+    <jdbc:connector name="jdbcConnector" dataSource-ref="jdbcDataSource1" pollingFrequency="1000">
+        <jdbc:query key="read" value="SELECT id, type, data FROM test WHERE type=1"/>
+        <jdbc:query key="read.ack" value="UPDATE test SET type=2 WHERE id=${map-payload:id}"/>
+    </jdbc:connector>
+
+    <jdbc:connector name="jdbcOUTConnector" dataSource-ref="jdbcDataSource2" pollingFrequency="10000">
+        <jdbc:query key="write" value="INSERT INTO test_out(id, type, data) VALUES(${map-payload:id}, ${map-payload:type}, ${map-payload:data})"/>
+    </jdbc:connector>
+    
+    <model name="testing">
+        <service name="bridge">
+            <inbound>
+                <jdbc:inbound-endpoint queryKey="read" connector-ref="jdbcConnector">
+                    <jdbc:transaction action="ALWAYS_BEGIN"/>
+                </jdbc:inbound-endpoint>                
+            </inbound>
+            <outbound>
+                <outbound-pass-through-router>
+                    <jdbc:outbound-endpoint queryKey="write" connector-ref="jdbcOUTConnector">
+                        <jdbc:transaction action="NONE"/>
+                    </jdbc:outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

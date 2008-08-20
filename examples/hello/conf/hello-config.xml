@@ -15,7 +15,7 @@
     1. The Greeter component that adds a greeting to the event it receives
     2. The ChitChater component that adds some additional conversation to the event it receives
     An event is triggered by input through the system console and the outbound event is
-    aslo written out through the system console.
+    also written out through the system console.
     This configuration also demonstrates user and system error handling. User error handling returns
     an error message to the end user. System error handling logs errors.
     </description>
@@ -46,7 +46,7 @@
     <custom-transformer name="ExceptionToString" class="org.mule.example.hello.ExceptionToString"/>
 
     <!--
-        An interceptor is a piece of code that can be configued to execute
+        An interceptor is a piece of code that can be configured to execute
         before and/or after an event is received for a component.
         You can define a stack of interceptors that will be executed in sequence.
         You can then configure the stack on your components.
@@ -57,7 +57,7 @@
     -->
     <model name="helloSample">
         <!--
-            A Mule descriptor defines all the necessary information about how your components will
+            A Mule service defines all the necessary information about how your components will
             interact with the framework, other components in the system and external sources.
             Please refer to the Configuration Guide for a full description of all the parameters.
         -->

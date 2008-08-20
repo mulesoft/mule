@@ -74,7 +74,7 @@ public class JettyHttpConnector extends AbstractConnector
     {
         httpServer = new Server();
 
-        if(getReceiverServlet()==null)
+        if (getReceiverServlet() == null)
         {
             setServletClass((useContinuations ? JettyContinuationsReceiverServlet.class :
                     JettyReceiverServlet.class));
@@ -122,7 +122,7 @@ public class JettyHttpConnector extends AbstractConnector
         try
         {
             httpServer.start();
-            receiverServlet = (JettyReceiverServlet)holder.getServlet();
+            receiverServlet = (JettyReceiverServlet) holder.getServlet();
             for (Iterator iter = receivers.values().iterator(); iter.hasNext();)
             {
                 MessageReceiver receiver = (MessageReceiver) iter.next();
@@ -209,7 +209,6 @@ public class JettyHttpConnector extends AbstractConnector
 
         try
         {
-
             cnn.start();
         }
         catch (Exception e)
@@ -228,7 +227,6 @@ public class JettyHttpConnector extends AbstractConnector
     {
         return receiverServlet.removeReceiver(receiver);
     }
-
 
     public Server getHttpServer()
     {
@@ -278,7 +276,7 @@ public class JettyHttpConnector extends AbstractConnector
     //@Override
     public ReplyToHandler getReplyToHandler()
     {
-        if(isUseContinuations())
+        if (isUseContinuations())
         {
             return new JettyContinuationsReplyToHandler(getDefaultResponseTransformers());
         }

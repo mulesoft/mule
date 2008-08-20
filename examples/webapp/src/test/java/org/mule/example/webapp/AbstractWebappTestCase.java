@@ -44,7 +44,7 @@ public abstract class AbstractWebappTestCase extends AbstractMuleTestCase
     public void testStockQuoteExample() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage response = client.send("vm://stockquote", "HRB", null);
+        MuleMessage response = client.send("vm://stockquote", "CSCO", null);
     
         if (null == response)
         { 
@@ -56,7 +56,7 @@ public abstract class AbstractWebappTestCase extends AbstractMuleTestCase
             {
                 String text = response.getPayloadAsString();
                 assertNotNull("Null response", text);
-                assertTrue("Stock quote should contain \"BLOCK\": " + text, StringUtils.contains(text, "BLOCK"));
+                assertTrue("Stock quote should contain \"CISCO\": " + text, StringUtils.contains(text, "CISCO"));
                 assertTrue("Stock quote should start with \"StockQuote[\":" + text, text.startsWith("StockQuote["));
                 logger.debug("**********");
                 logger.debug(response.getPayload());

@@ -11,8 +11,6 @@ package org.mule.util.store;
 
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.util.FileUtils;
 
 import java.io.File;

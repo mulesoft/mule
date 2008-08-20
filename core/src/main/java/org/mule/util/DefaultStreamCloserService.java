@@ -122,17 +122,16 @@ public class DefaultStreamCloserService implements StreamCloserService
 
         private void closeInputSourceStream(InputSource payload) throws IOException
         {
-            InputSource sourcePayload = (InputSource) payload;
-            if (sourcePayload.getByteStream() != null)
+            if (payload.getByteStream() != null)
             {
-                sourcePayload.getByteStream().close();
+                payload.getByteStream().close();
             }
-            else if (sourcePayload.getCharacterStream() != null)
+            else if (payload.getCharacterStream() != null)
             {
-                sourcePayload.getCharacterStream().close();
+                payload.getCharacterStream().close();
             }
         }
-
+        
     }
 
 }

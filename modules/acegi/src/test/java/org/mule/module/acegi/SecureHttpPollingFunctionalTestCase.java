@@ -14,9 +14,8 @@ import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.util.concurrent.Latch;
-import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpConnector;
+import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 

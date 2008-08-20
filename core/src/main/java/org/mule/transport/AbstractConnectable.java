@@ -12,7 +12,6 @@ package org.mule.transport;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.Connectable;
 import org.mule.api.transport.ConnectionStrategy;

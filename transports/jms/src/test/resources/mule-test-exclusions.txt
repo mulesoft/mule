@@ -1,3 +1,6 @@
 #
 # Test cases listed in this file are not run.
 #
+
+# make the test work properly or remove when redesigning the reconnection strategies
+org.mule.transport.jms.issues.ConnectWithThreadingTestCase

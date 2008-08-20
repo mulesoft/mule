@@ -11,7 +11,6 @@
 package org.mule.routing.filters.xml;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
 import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.tck.AbstractMuleTestCase;

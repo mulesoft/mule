@@ -17,7 +17,6 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.mule.TestSedaService;
 import org.mule.transport.http.HttpConstants;
-import org.mule.transport.http.HttpsConnector;
 import org.mule.transport.http.functional.HttpFunctionalTestCase;
 
 import java.util.HashMap;

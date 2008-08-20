@@ -22,7 +22,9 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
+import org.mule.transport.jdbc.sqlstrategy.SQLStrategyFactory;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
+import org.mule.util.StringUtils;
 import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.sql.Connection;
@@ -47,8 +49,10 @@ public class JdbcConnector extends AbstractConnector
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
 
-    private static final Pattern STATEMENT_ARGS = Pattern.compile("\\$\\{[^\\}]*\\}");
+    protected static final Pattern STATEMENT_ARGS = Pattern.compile("\\$\\{[^\\}]*\\}");
+    protected SQLStrategyFactory sqlStrategyFactory = new SQLStrategyFactory();
 
+    
     /* Register the SQL Exception reader if this class gets loaded */
     static
     {
@@ -58,9 +62,9 @@ public class JdbcConnector extends AbstractConnector
     protected long pollingFrequency = 0;
     protected Map queries;
     
-    private DataSource dataSource;
-    private ResultSetHandler resultSetHandler;
-    private QueryRunner queryRunner;
+    protected DataSource dataSource;
+    protected ResultSetHandler resultSetHandler;
+    protected QueryRunner queryRunner;
     protected boolean transactionPerMessage = true;
     
     protected void doInitialise() throws InitialisationException
@@ -274,7 +278,7 @@ public class JdbcConnector extends AbstractConnector
         for (int i = 0; i < paramNames.size(); i++)
         {
             String param = (String)paramNames.get(i);
-            String name = param.substring(2, param.length() - 1);
+            String name = getNameFromParam(param);
             Object value = null;
             // If we find a value and it happens to be null, thats acceptable
             boolean foundValue = false;
@@ -300,6 +304,11 @@ public class JdbcConnector extends AbstractConnector
             params[i] = value;
         }
         return params;
+    }
+    
+    protected String getNameFromParam(String param)
+    {
+    	return param.substring(2, param.length() - 1);
     }
 
     protected void doDispose()
@@ -403,5 +412,26 @@ public class JdbcConnector extends AbstractConnector
     public void setQueries(Map queries)
     {
         this.queries = queries;
+    }
+	public SQLStrategyFactory getSqlStrategyFactory() 
+	{
+		return sqlStrategyFactory;
+	}
+	
+    public String getStatement(ImmutableEndpoint endpoint)
+    {
+        String writeStmt = endpoint.getEndpointURI().getAddress();
+        String str;
+        if ((str = getQuery(endpoint, writeStmt)) != null)
+        { 
+            writeStmt = str;
+        }
+        writeStmt = StringUtils.trimToEmpty(writeStmt);
+        if (StringUtils.isBlank(writeStmt))
+        {
+            throw new IllegalArgumentException("Missing statement");
+        }
+        
+        return writeStmt;
     }
 }

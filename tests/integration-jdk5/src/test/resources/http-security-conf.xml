@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+       xmlns:acegi="http://www.mulesource.org/schema/mule/acegi/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd
+       http://www.mulesource.org/schema/mule/acegi/2.0 http://www.mulesource.org/schema/mule/acegi/2.0/mule-acegi.xsd">
+
+    <description>Basic Cxf Tests</description>
+
+    <spring:bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
+        <spring:property name="userMap">
+            <spring:value>
+                admin=admin,ROLE_ADMIN                
+            </spring:value>
+        </spring:property>
+    </spring:bean>
+
+    <spring:bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
+    </spring:bean>
+
+    <acegi:security-manager>
+        <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
+    </acegi:security-manager>
+
+    <model name="TestCxf">
+        <service name="echoService">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/Echo" 
+                    frontend="simple" applySecurityToProtocol="true">
+                    <acegi:http-security-filter realm="mule-realm"/>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <echo-component/>
+        </service>
+    </model>
+</mule>

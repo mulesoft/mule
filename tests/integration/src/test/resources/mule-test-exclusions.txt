@@ -43,15 +43,6 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # Mule 2.0.x failures
 ##########################################################################
 
-# MULE-2736
-# Hangs for a long, long time
-org.mule.test.integration.transaction.XAJdbcMule1479TestCase
-
-# MULE-2734
-# Error registering bean with name 'jdbcConnector' defined in null: Could not resolve placeholder 'function:NOW'
-#	at org.springframework.beans.factory.config.PropertyPlaceholderConfigurer.processProperties(PropertyPlaceholderConfigurer.java:249)
-org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
-
 # MULE-2733
 # @ in URI is not getting replaced (1 of 3 tests fails)
 org.mule.test.integration.util.ObjectNameHelperTestCase

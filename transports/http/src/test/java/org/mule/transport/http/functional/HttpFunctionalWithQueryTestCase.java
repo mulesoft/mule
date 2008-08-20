@@ -51,7 +51,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
         props.put("har", "nar");
         try
         {
-            MuleMessage result = client.send("clientEndpoint2", null, props);
+            client.send("clientEndpoint2", null, props);
             fail("Parameters on the request do not match up");
         }
         catch (MuleException e)

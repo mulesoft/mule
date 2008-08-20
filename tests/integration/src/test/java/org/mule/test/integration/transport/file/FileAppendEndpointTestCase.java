@@ -15,7 +15,6 @@ import org.mule.module.client.MuleClient;
 import org.mule.util.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 
 public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 {
@@ -23,7 +22,6 @@ public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
     {
         String myDirName = "myout";
         String myFileName = "out.txt";
-        FileInputStream myFileStream = null;
 
         // make sure there is no directory and file
         File myDir = FileUtils.newFile(myDirName);

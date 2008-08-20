@@ -19,7 +19,9 @@ import org.mule.api.security.SecurityException;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.security.SecurityProvider;
 import org.mule.api.security.SecurityProviderNotFoundException;
+import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
+import org.mule.config.i18n.CoreMessages;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -81,7 +83,18 @@ public class MuleSecurityManager implements SecurityManager
                     logger.debug("Authentication attempt using " + provider.getClass().getName());
                 }
 
-                Authentication result = provider.authenticate(authentication);
+                Authentication result = null;
+                try
+                {
+                    result = provider.authenticate(authentication);
+                }
+                catch (Exception e)
+                {
+                    if (!iter.hasNext())
+                    {
+                        throw new UnauthorisedException(CoreMessages.authorizationAttemptFailed(), e);
+                    }
+                }
 
                 if (result != null)
                 {

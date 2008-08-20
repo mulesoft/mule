@@ -15,12 +15,16 @@ import org.mule.transaction.TransactionCoordination;
 
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Simple service that receives messages from jdbc or jms and just forward the
  * interesting part.
  */
 public class XABridgeComponent
 {
+    private static Log log = LogFactory.getLog(XABridgeComponent.class);
 
     public static boolean mayRollback = false;
 
@@ -39,7 +43,7 @@ public class XABridgeComponent
             {
                 if (Math.random() < 0.3)
                 {
-                    System.err.println("Marking transaction for rollback");
+                    log.info("Marking transaction for rollback");
                     tx.setRollbackOnly();
                 }
             }

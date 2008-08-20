@@ -52,7 +52,7 @@
     
     <model name="helloSample">
         <!--
-            This component receives input from 3 different endpoints (http, servlet, vm) and routes 
+            This service receives input from 3 different endpoints (http, servlet, vm) and routes 
             them all to the same place.
         -->
         <service name="GreeterUMO">

@@ -112,7 +112,7 @@ public class XMLStreamReaderToContentHandler implements StAXReaderToContentHandl
                             break;
                     }
                     event = staxStreamReader.next();
-                };
+                }
             }
 
             if (event != XMLStreamConstants.START_ELEMENT)

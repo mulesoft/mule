@@ -15,9 +15,7 @@
 
          See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4496398
     -->
-    <!--<settings>
-        <localRepository>c:/.m2/repository</localRepository>
-    </settings>-->
+    <!-- localRepository>c:/.m2/repository</localRepository -->
 
     <!-- Enable this if your machine is behind a firewall.
     <proxies>

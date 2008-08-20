@@ -271,7 +271,7 @@ public class XaTransaction extends AbstractTransaction
         
         if (key == null)
         {
-            logger.error("Key for binded resource " + resource + " is null");
+            logger.error("Key for bound resource " + resource + " is null");
         }
         
         if (resource instanceof MuleXaObject)
@@ -281,7 +281,7 @@ public class XaTransaction extends AbstractTransaction
         }
         else
         {
-            logger.error("Binded resource " + resource + " is not MuleXaObject ");
+            logger.error("Bound resource " + resource + " is not a MuleXaObject ");
         }
     }
 

@@ -46,7 +46,7 @@
 
         <variable>
             <name>hasDispatcher</name>
-            <description>Can the transport dispatch outbound requests?</description>
+            <description>Can the transport dispatch outbound requests? [y] or [n]</description>
             <defvalue>y</defvalue>
 
             <variables>

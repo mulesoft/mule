@@ -24,6 +24,7 @@ import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.AbstractMessageDispatcherFactory;
 import org.mule.transport.AbstractMessageReceiver;
+import org.mule.transport.service.TransportServiceDescriptor;
 
 /**
  * <code>TestConnector</code> use a mock connector
@@ -133,6 +134,14 @@ public class TestConnector extends AbstractConnector
             }
         };
         return receiver;
+    }
+
+    /**
+     * Open up the access to the service descriptor for testing purposes.
+     */
+    public TransportServiceDescriptor getServiceDescriptor()
+    {
+        return super.getServiceDescriptor();
     }
 
     public void destroyReceiver(MessageReceiver receiver, InboundEndpoint endpoint) throws Exception

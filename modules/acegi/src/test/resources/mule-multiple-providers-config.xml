@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0" 
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+      xmlns:acegi="http://www.mulesource.org/schema/mule/acegi/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
+       http://www.mulesource.org/schema/mule/acegi/2.0 http://www.mulesource.org/schema/mule/acegi/2.0/mule-acegi.xsd      
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+    
+    <spring:bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
+        <spring:property name="userMap">
+            <spring:value>
+                ross=ross,ROLE_ADMIN
+                anon=anon,ROLE_ANONYMOUS
+                admin1=admin1,ROLE_ADMIN          
+            </spring:value>
+        </spring:property>
+    </spring:bean>
+    
+    <spring:bean id="inMemoryDaoImpl2" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
+        <spring:property name="userMap">
+            <spring:value>
+                admin2=admin2,ROLE_ADMIN                
+            </spring:value>
+        </spring:property>
+    </spring:bean>
+    
+    <spring:bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
+    </spring:bean>
+    
+    <spring:bean id="daoAuthenticationProvider2" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+        <spring:property name="userDetailsService" ref="inMemoryDaoImpl2"/>
+    </spring:bean>
+              
+    <!-- 
+        Mule configuration
+    -->
+    <configuration defaultSynchronousEndpoints="false" defaultRemoteSync="false"/>
+    
+    <acegi:security-manager>
+        <acegi:delegate-security-provider name="daoAuthenticationSecurityProvider2" delegate-ref="daoAuthenticationProvider2"/>
+    </acegi:security-manager>
+
+    <acegi:security-manager>
+        <acegi:delegate-security-provider name="daoAuthenticationSecurityProvider1" delegate-ref="daoAuthenticationProvider"/>
+    </acegi:security-manager>
+    
+    <model name="sample-mule-app">
+        <service name="flow">
+            <inbound>
+                <http:inbound-endpoint address="http://localhost:4445" synchronous="true">
+                    <acegi:http-security-filter realm="mule-realm" 
+                        securityProviders="daoAuthenticationSecurityProvider1"/>
+                </http:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint path="vmtest" synchronous="true"/>
+                </outbound-pass-through-router>    
+            </outbound>
+        </service>
+        
+        <service name="flow2">
+            <inbound>
+                <http:inbound-endpoint address="http://localhost:4446" synchronous="true">
+                    <acegi:http-security-filter realm="mule-realm" 
+                        securityProviders="daoAuthenticationSecurityProvider2"/>
+                </http:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint path="vmtest" synchronous="true"/>
+                </outbound-pass-through-router>    
+            </outbound>
+        </service>
+        
+        <service name="flow3">
+            <inbound>
+                <http:inbound-endpoint address="http://localhost:4447" synchronous="true">
+                    <acegi:http-security-filter realm="mule-realm" 
+                        securityProviders="daoAuthenticationSecurityProvider2,daoAuthenticationSecurityProvider1"/>
+                </http:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint path="vmtest" synchronous="true"/>
+                </outbound-pass-through-router>    
+            </outbound>
+        </service>
+    </model>
+    
+    <model name="vm-model">
+        <service name="vm-service">
+            <inbound>
+                <vm:inbound-endpoint path="vmtest" synchronous="true"/>
+            </inbound>
+            <echo-component/>
+        </service>
+    </model>
+</mule>
