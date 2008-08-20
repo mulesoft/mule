@@ -26,12 +26,12 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
+import org.mule.util.StringUtils;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.functors.InstanceofPredicate;
 import org.apache.commons.logging.Log;
@@ -43,12 +43,16 @@ public class TransientRegistry extends AbstractRegistry
     protected transient final Log logger = LogFactory.getLog(TransientRegistry.class);
     public static final String REGISTRY_ID = "org.mule.Registry.Transient";
 
-    private Map registry = new ConcurrentHashMap(8);
+    //@Synchronized(registry)
+    private Map registry = new HashMap();
 
     public TransientRegistry()
     {
         super(REGISTRY_ID);
-        registry.put("_mulePropertyExtractorProcessor", new ExpressionEvaluatorProcessor());
+        synchronized(registry)
+        {
+            registry.put("_mulePropertyExtractorProcessor", new ExpressionEvaluatorProcessor());
+        }
     }
 
     //@java.lang.Override
@@ -62,30 +66,36 @@ public class TransientRegistry extends AbstractRegistry
         applyProcessors(lookupObjects(Service.class));
         applyProcessors(lookupObjects(Object.class));
 
-        Collection allObjects = lookupObjects(Object.class);
-        Object obj;
-        for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
+        synchronized(registry)
         {
-            obj = iterator.next();
-            if (obj instanceof Initialisable)
+            Collection allObjects = lookupObjects(Object.class);
+            Object obj;
+            for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
             {
-                ((Initialisable) obj).initialise();
-            }        
+                obj = iterator.next();
+                if (obj instanceof Initialisable)
+                {
+                    ((Initialisable) obj).initialise();
+                }        
+            }
         }
     }
 
     //@Override
     protected void doDispose()
     {
-        Collection allObjects = lookupObjects(Object.class);
-        Object obj;
-        for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
+        synchronized(registry)
         {
-            obj = iterator.next();
-            if (obj instanceof Disposable)
+            Collection allObjects = lookupObjects(Object.class);
+            Object obj;
+            for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
             {
-                ((Disposable) obj).dispose();
-            }        
+                obj = iterator.next();
+                if (obj instanceof Disposable)
+                {
+                    ((Disposable) obj).dispose();
+                }        
+            }
         }
     }
 
@@ -98,6 +108,7 @@ public class TransientRegistry extends AbstractRegistry
         for (Iterator iterator = objects.values().iterator(); iterator.hasNext();)
         {
             Object o = iterator.next();
+            // Is synchronization necessary here?  I don't think so
             Collection processors = lookupObjects(ObjectProcessor.class);
             for (Iterator iterator2 = processors.iterator(); iterator2.hasNext();)
             {
@@ -124,12 +135,18 @@ public class TransientRegistry extends AbstractRegistry
 
     public Object lookupObject(String key)
     {
-        return registry.get(key);
+        synchronized(registry)
+        {
+            return registry.get(key);
+        }
     }
 
     public Collection lookupObjects(Class returntype)
     {
-        return CollectionUtils.select(registry.values(), new InstanceofPredicate(returntype));
+        synchronized(registry)
+        {
+            return CollectionUtils.select(registry.values(), new InstanceofPredicate(returntype));
+        }
     }
 
     protected Object applyProcessors(Object object)
@@ -140,6 +157,7 @@ public class TransientRegistry extends AbstractRegistry
         // this may have originally been called while creating objects in spring...  so we prevent that by
         // only doing the full lookup once everything is stable.  ac.
         Collection processors = lookupObjects(ObjectProcessor.class);
+        // Is synchronization necessary here?  I don't think so
         for (Iterator iterator = processors.iterator(); iterator.hasNext();)
         {
             ObjectProcessor o = (ObjectProcessor) iterator.next();
@@ -167,6 +185,12 @@ public class TransientRegistry extends AbstractRegistry
      */
     public void registerObject(String key, Object object, Object metadata) throws RegistrationException
     {
+        if (StringUtils.isBlank(key))
+        {
+            logger.warn("Attempt to register object with no key");
+            return;
+        }
+        
         logger.debug("registering object");
         if (MuleServer.getMuleContext().isInitialised() || MuleServer.getMuleContext().isInitialising())
         {
@@ -174,14 +198,17 @@ public class TransientRegistry extends AbstractRegistry
             object = applyProcessors(object);
         }
 
-        if (registry.containsKey(key))
+        synchronized(registry)
         {
-            // registry.put(key, value) would overwrite a previous entity with the same name.  Is this really what we want?
-            // Not sure whether to throw an exception or log a warning here.
-            //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
-            logger.warn("TransientRegistry already contains an object named '" + key + "'.  The previous object will be overwritten.");
+            if (registry.containsKey(key))
+            {
+                // registry.put(key, value) would overwrite a previous entity with the same name.  Is this really what we want?
+                // Not sure whether to throw an exception or log a warning here.
+                //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
+                logger.warn("TransientRegistry already contains an object named '" + key + "'.  The previous object will be overwritten.");
+            }
+            registry.put(key, object);
         }
-        registry.put(key, object);
         try
         {
             MuleContext mc = MuleServer.getMuleContext();
@@ -206,7 +233,11 @@ public class TransientRegistry extends AbstractRegistry
 
     public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
-        Object obj = registry.remove(key);
+        Object obj;
+        synchronized(registry)
+        {
+            obj = registry.remove(key);
+        }
         if (obj instanceof Stoppable)
         {
             try
