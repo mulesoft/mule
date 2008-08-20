@@ -28,9 +28,10 @@ import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.functors.InstanceofPredicate;
 import org.apache.commons.logging.Log;
@@ -42,7 +43,7 @@ public class TransientRegistry extends AbstractRegistry
     protected transient final Log logger = LogFactory.getLog(TransientRegistry.class);
     public static final String REGISTRY_ID = "org.mule.Registry.Transient";
 
-    private Map registry = new HashMap(8);
+    private Map registry = new ConcurrentHashMap(8);
 
     public TransientRegistry()
     {
@@ -53,22 +54,13 @@ public class TransientRegistry extends AbstractRegistry
     //@java.lang.Override
     protected void doInitialise() throws InitialisationException
     {
-        //int oldScope = getDefaultScope();
-        //setDefaultScope(Registry.SCOPE_IMMEDIATE);
-        try
-        {
-            applyProcessors(lookupObjects(Connector.class));
-            applyProcessors(lookupObjects(Transformer.class));
-            applyProcessors(lookupObjects(ImmutableEndpoint.class));
-            applyProcessors(lookupObjects(Agent.class));
-            applyProcessors(lookupObjects(Model.class));
-            applyProcessors(lookupObjects(Service.class));
-            applyProcessors(lookupObjects(Object.class));
-        }
-        finally
-        {
-            //setDefaultScope(oldScope);
-        }
+        applyProcessors(lookupObjects(Connector.class));
+        applyProcessors(lookupObjects(Transformer.class));
+        applyProcessors(lookupObjects(ImmutableEndpoint.class));
+        applyProcessors(lookupObjects(Agent.class));
+        applyProcessors(lookupObjects(Model.class));
+        applyProcessors(lookupObjects(Service.class));
+        applyProcessors(lookupObjects(Object.class));
 
         Collection allObjects = lookupObjects(Object.class);
         Object obj;
@@ -135,7 +127,6 @@ public class TransientRegistry extends AbstractRegistry
         return registry.get(key);
     }
 
-    // TODO MULE-3479 This is not threadsafe!
     public Collection lookupObjects(Class returntype)
     {
         return CollectionUtils.select(registry.values(), new InstanceofPredicate(returntype));

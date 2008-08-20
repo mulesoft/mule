@@ -2,6 +2,3 @@
 # Test cases listed in this file are not run.
 #
 
-# TODO MULE-3479
-# http://bamboo.mulesource.org/browse/MULE-MULE2JDK5-366
-org.mule.example.loanbroker.esn.AxisLoanBrokerAsynchronousFunctionalTestCase

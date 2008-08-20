@@ -2,12 +2,3 @@
 # Test cases listed in this file are not run.
 #
 
-# TODO MULE-3479
-# java.lang.RuntimeException: java.util.ConcurrentModificationException
-# 	at com.icegreen.greenmail.smtp.SmtpServer.quit(SmtpServer.java:33)
-# 	at com.icegreen.greenmail.util.Service.stopService(Service.java:56)
-# 	at com.icegreen.greenmail.util.Service.stopService(Service.java:73)
-# 	at com.icegreen.greenmail.util.GreenMail.stop(GreenMail.java:82)
-# 	at org.mule.transport.email.connectors.AbstractMailConnectorFunctionalTestCase.stopServers
-# 	at org.mule.transport.email.connectors.AbstractMailConnectorFunctionalTestCase.doTearDown
-org.mule.transport.email.connectors.SmtpConnectorTestCase
