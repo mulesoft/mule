@@ -96,6 +96,12 @@
                 <include name="**/*.jar"/>
                 <exclude name="**/geronimo-servlet*.jar"/>
             </lib>
+            <!-- This libs decl is needed for building the example on Mule EE -->
+            <lib dir="${dir.mule.home}/lib/boot">
+                <include name="*slf4j*"/>
+                <include name="log4j-*.jar"/>
+                <include name="commons-codec-*"/>
+            </lib>
             <fileset dir="${dir.webapp}"/>
             <classes dir="${dir.classes}"/>
             <classes dir="${dir.conf}"/>
