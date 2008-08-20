@@ -21,10 +21,3 @@ org.mule.transport.cxf.jaxws.ClientTestCase
 
 # MULE-3475
 org.mule.transport.cxf.WSProxyTestCase
-
-# Fails for 2.1
-org.mule.transport.cxf.MtomTestCase
-org.mule.transport.cxf.employee.MtomClientTestCase
-
-# Test hangs for 2.1
-org.mule.transport.cxf.wssec.UsernameTokenTestCase 
