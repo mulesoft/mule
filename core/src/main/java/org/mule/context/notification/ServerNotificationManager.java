@@ -186,7 +186,16 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
 
     public boolean isNotificationEnabled(Class type)
     {
-        return configuration.getPolicy().isNotificationEnabled(type);
+        boolean enabled = false;
+        if (configuration != null)
+        {
+            Policy policy = configuration.getPolicy();
+            if (policy != null)
+            {
+                enabled = policy.isNotificationEnabled(type);
+            }
+        }
+        return enabled;
     }
 
     public void dispose()
