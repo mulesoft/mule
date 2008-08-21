@@ -1120,6 +1120,6 @@ public class CoreMessages extends MessageFactory
     
     public static Message authorizationAttemptFailed()
     {
-        return createMessage(BUNDLE_PATH, 271);
+        return factory.createMessage(BUNDLE_PATH, 271);
     }
 }
