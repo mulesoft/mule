@@ -79,6 +79,8 @@
         <module>hibernate</module>
         <!-- SSEBR has 3.3.0.ga, we use 3.6.ga -->
         <module>javassist</module>
+        <!-- SSEBR has this but it doesn't include jaxb-xjc -->
+        <module>jaxb</module>
         <module>jcr</module>
         <module>jbossts</module>
         <module>jbpm</module>

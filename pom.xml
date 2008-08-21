@@ -66,6 +66,7 @@
         <jdk5Name>jdk5</jdk5Name>
         
         <acegiVersion>1.0.7</acegiVersion>
+        <antVersion>1.7.0</antVersion>
         <antlrVersion>2.7.7</antlrVersion>
         <aopAllianceVersion>1.0.0</aopAllianceVersion>
         <asmVersion>3.1.0</asmVersion>
@@ -108,7 +109,7 @@
         <javaServletVersion>2.4.0</javaServletVersion>
         <javaServletJspVersion>2.1.0</javaServletJspVersion>
         <javaWsdlVersion>1.6.1</javaWsdlVersion>
-        <javaXmlBindVersion>2.1.7</javaXmlBindVersion>
+        <javaXmlBindVersion>2.1.6</javaXmlBindVersion>
         <javaXmlRpcVersion>1.1.0</javaXmlRpcVersion>
         <javaXmlSoapVersion>1.3.0</javaXmlSoapVersion>
         <javaXmlStreamVersion>1.0.1</javaXmlStreamVersion>
@@ -309,11 +310,6 @@
                 <groupId>javax.xml.ws</groupId>
                 <artifactId>com.springsource.javax.xml.ws</artifactId>
                 <version>${javaXmlWsVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>com.springsource.javax.xml.bind</artifactId>
-                <version>${javaXmlBindVersion}</version>
             </dependency>
             <!-- This one is compatible with both Axis and CXF -->
             <dependency>
