@@ -11,7 +11,6 @@ commons-logging-1.1.1
 commons-pool-1.4
 com.springsource.antlr-2.7.7
 com.springsource.bsh-2.0.0.b4
-com.springsource.com.sun.xml.fastinfoset-1.2.2
 com.springsource.com.sun.xml.messaging.saaj-1.3.0
 com.springsource.com.thoughtworks.xstream-1.2.2
 com.springsource.edu.emory.mathcs.backport-3.1.0
@@ -37,7 +36,6 @@ com.springsource.org.apache.tools.ant-1.7.0
 com.springsource.org.dom4j-1.6.1
 com.springsource.org.jaxen-1.1.1
 com.springsource.org.jdom-1.0.0
-com.springsource.org.jvnet.staxex-1.0.0
 com.springsource.org.objectweb.asm-3.1.0
 com.springsource.org.ognl-2.7.3
 com.springsource.org.opensaml-1.1.0
