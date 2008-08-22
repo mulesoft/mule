@@ -128,5 +128,18 @@
             <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <!-- OSGi-ready -->
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Distributed separately in profiler pack -->
+        <dependency>
+            <groupId>com.yourkit</groupId>
+            <artifactId>yjp-controller-api-redist.osgi</artifactId>
+            <version>${yourKitVersion}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>
