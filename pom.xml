@@ -127,7 +127,7 @@
         <mx4jVersion>2.1.1</mx4jVersion>
         <neethiVersion>2.0.4</neethiVersion>
         <ognlVersion>2.7.3</ognlVersion>
-        <openSamlVersion>1.1.0</openSamlVersion>
+        <openSamlVersion>1.1</openSamlVersion>
         <oroVersion>2.0.8</oroVersion>
         <osgiSpecVersion>1.0</osgiSpecVersion>
         <paxLoggingVersion>1.1.1</paxLoggingVersion>   
@@ -687,6 +687,12 @@
                 <groupId>xmlunit</groupId>
                 <artifactId>xmlunit</artifactId>
                 <version>1.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>

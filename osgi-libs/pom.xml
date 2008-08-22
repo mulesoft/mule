@@ -87,6 +87,8 @@
         <!-- SSEBR has 1.1.2, we use 2.0.0 -->
         <module>jug</module>
         <module>mx4j</module>
+        <!-- SSEBR has this but it depends on a newer version of log4j -->
+        <module>opensaml</module>
         <module>saxon</module>
         <module>script</module>
         <module>smack</module>

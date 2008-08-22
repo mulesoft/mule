@@ -160,18 +160,8 @@
         </dependency>
         <dependency>  
             <groupId>org.opensaml</groupId>  
-            <artifactId>com.springsource.org.opensaml</artifactId>  
+            <artifactId>opensaml.osgi</artifactId>  
             <version>${openSamlVersion}</version> 
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.log4j</groupId>
-                    <artifactId>com.springsource.org.apache.log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.xml</groupId>
-                    <artifactId>com.springsource.org.apache.xml.security</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <!-- OSGi-ready -->
@@ -226,6 +216,10 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -245,6 +239,10 @@
                 <exclusion>
                     <groupId>org.codehaus.woodstox</groupId>
                     <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
