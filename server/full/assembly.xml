@@ -462,6 +462,8 @@
         <exclude>xerces:xml-serializer</exclude>
         <exclude>xalan:xalan</exclude>
 
+        <!-- Distributed separately in profiler pack -->
+        <exclude>com.yourkit:yjp-controller-api-redist.osgi</exclude>
       </excludes>
     </dependencySet>
 
