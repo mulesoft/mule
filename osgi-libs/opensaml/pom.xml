@@ -12,7 +12,7 @@
     <properties>
         <!-- ***************************************************** -->
         <!-- EDIT THESE PROPERTIES, THE REST OF THE POM IS GENERIC -->
-        <libGroupId>org.opensaml</libGroupId>
+        <libGroupId>opensaml</libGroupId>
         <libArtifactId>opensaml</libArtifactId>
         <libVersion>${openSamlVersion}</libVersion>
         <!-- ***************************************************** -->

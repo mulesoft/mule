@@ -159,7 +159,7 @@
             <version>${xmlSecurityVersion}</version>
         </dependency>
         <dependency>  
-            <groupId>org.opensaml</groupId>  
+            <groupId>opensaml</groupId>  
             <artifactId>opensaml.osgi</artifactId>  
             <version>${openSamlVersion}</version> 
         </dependency>
