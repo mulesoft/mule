@@ -12,7 +12,6 @@ package org.mule.component;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.component.LifecycleAdapterFactory;
@@ -70,18 +69,18 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         }
     }
 
-    protected MuleMessage doOnCall(MuleEvent event) throws Exception
+    protected Object doInvoke(MuleEvent event) throws Exception
     {
         return invokeComponentInstance(event);
     }
 
-    protected MuleMessage invokeComponentInstance(MuleEvent event) throws Exception
+    protected Object invokeComponentInstance(MuleEvent event) throws Exception
     {
         LifecycleAdapter componentLifecycleAdapter = null;
         try
         {
             componentLifecycleAdapter = borrowComponentLifecycleAdaptor();
-            return componentLifecycleAdapter.intercept(null);
+            return componentLifecycleAdapter.invoke(event);
         }
         finally
         {

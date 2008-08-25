@@ -109,6 +109,7 @@
             <xsd:element ref="abstract-transformer"/>
             <xsd:element ref="abstract-filter"/>
             <xsd:element ref="abstract-model"/>
+            <xsd:element ref="abstract-interceptor-stack"/>
         </xsd:choice>
     </xsd:group>
 
@@ -1191,9 +1192,7 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractComponentType">
-        <xsd:sequence>
-            <xsd:group ref="entryPointResolvers"/>
-        </xsd:sequence>
+        <xsd:group ref="interceptorGroup" minOccurs="0"/>
     </xsd:complexType>
 
     <xsd:element name="component" type="defaultJavaComponentType" substitutionGroup="abstract-component">
@@ -1209,6 +1208,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractComponentType">
                 <xsd:sequence>
+                    <xsd:group ref="entryPointResolvers"/>
                     <xsd:element ref="abstract-object-factory" minOccurs="0"/>
                     <xsd:element ref="abstract-lifecycle-adapter-factory" minOccurs="0"/>
                     <xsd:element name="binding" type="pojoBindingType" minOccurs="0" maxOccurs="unbounded">
@@ -2082,6 +2082,97 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             An implementation of the Filter interface.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <!--==============================================================-->
+    <!--   Interceptor elements                                       -->
+    <!--==============================================================-->
+    <xsd:element name="abstract-interceptor-stack" abstract="true" type="abstractInterceptorStackType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for interceptor stack elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractInterceptorStackType">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element ref="abstract-interceptor"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="nonBlankString" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The name used to identify this interceptor stack.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+    <xsd:element name="interceptor-stack" type="abstractInterceptorStackType" substitutionGroup="abstract-interceptor-stack"/>
+    
+
+    <xsd:element name="abstract-interceptor" abstract="true" type="abstractInterceptorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for an interceptor element.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractInterceptorType"/>
+
+    <xsd:group name="interceptorGroup">
+        <xsd:sequence>
+            <xsd:choice maxOccurs="unbounded">
+                <xsd:element ref="abstract-interceptor"/>
+                <xsd:element name="interceptor-stack" type="refInterceptorStackType"/>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:group>
+    
+    <xsd:complexType name="refInterceptorStackType">
+        <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The name of the interceptor stack to use.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+    
+    <xsd:element name="timer-interceptor" type="abstractInterceptorType" substitutionGroup="abstract-interceptor">
+        <xsd:annotation>
+            <xsd:documentation>
+                The timer interceptor ported from 1.x.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="logging-interceptor" type="abstractInterceptorType" substitutionGroup="abstract-interceptor">
+        <xsd:annotation>
+            <xsd:documentation>
+                The logging interceptor ported from 1.x.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="custom-interceptor" type="customInterceptorType" substitutionGroup="abstract-interceptor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A user-implemented interceptor.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customInterceptorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInterceptorType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An implementation of the Interceptor interface.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

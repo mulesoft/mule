@@ -142,6 +142,8 @@ public abstract class AbstractService implements Service
     // It would be beneficial to differenciate between component invocations and
     // events that are bridged but currently everything is an invocation.
     protected Component component = new PassThroughComponent();
+    
+    protected List interceptors = new ArrayList();
 
     /**
      * For Spring only
@@ -923,6 +925,11 @@ public abstract class AbstractService implements Service
             result = getResponseRouter().getResponse(result);
         }
         return result;
+    }
+    
+    protected MuleMessage invokeComponent(MuleEvent event) throws MuleException
+    {
+        return component.invoke(event);
     }
 
     public MuleContext getMuleContext()

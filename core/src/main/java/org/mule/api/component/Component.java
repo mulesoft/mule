@@ -37,7 +37,7 @@ public interface Component extends Lifecycle
      * @return the return event from the component
      * @throws MuleException if the call fails
      */
-    MuleMessage onCall(MuleEvent event) throws MuleException;
+    MuleMessage invoke(MuleEvent event) throws MuleException;
 
     /**
      * Component statistics are used to gather component statistics such as

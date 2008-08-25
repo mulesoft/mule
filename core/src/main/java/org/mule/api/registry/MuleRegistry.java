@@ -48,7 +48,7 @@ public interface MuleRegistry extends Registry
 
     Transformer lookupTransformer(String name);
 
-    Service lookupService(String component);
+    Service lookupService(String name);
 
     /**
      * This method will return a list of {@link org.mule.api.transformer.Transformer} objects that accept the given

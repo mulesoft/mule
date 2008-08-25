@@ -10,7 +10,9 @@
 
 package org.mule.component;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
+import org.mule.VoidResult;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -18,15 +20,24 @@ import org.mule.api.MuleMessage;
 import org.mule.api.component.Component;
 import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.interceptor.Interceptor;
+import org.mule.api.interceptor.Invocation;
 import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ComponentMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.management.stats.ComponentStatistics;
+import org.mule.transformer.TransformerTemplate;
+import org.mule.transport.NullPayload;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -36,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Abstract {@link Component} to be used by all {@link Component} implementations.
  */
-public abstract class AbstractComponent implements Component
+public abstract class AbstractComponent implements Component, Interceptor
 {
 
     /**
@@ -52,14 +63,27 @@ public abstract class AbstractComponent implements Component
     protected final AtomicBoolean disposing = new AtomicBoolean(false);
     protected final AtomicBoolean disposed = new AtomicBoolean(false);
     protected ServerNotificationHandler notificationHandler;
+    protected List interceptors = new ArrayList();
+
+    public List getInterceptors()
+    {
+        return interceptors;
+    }
+
+    public void setInterceptors(List interceptors)
+    {
+        this.interceptors = interceptors;
+    }
 
     public AbstractComponent()
     {
         statistics = new ComponentStatistics();
     }
 
-    public MuleMessage onCall(MuleEvent event) throws MuleException
+    public MuleMessage intercept(Invocation invocation) throws MuleException
     {
+        MuleEvent event = invocation.getEvent();
+        
         // Ensure we have event in ThreadLocal
         OptimizedRequestContext.unsafeSetEvent(event);
 
@@ -93,16 +117,18 @@ public abstract class AbstractComponent implements Component
                 startTime = System.currentTimeMillis();
             }
 
-            MuleMessage result = doOnCall(event);
+            Object result = doInvoke(event);
 
             if (statistics.isEnabled())
             {
                 statistics.addExecutionTime(System.currentTimeMillis() - startTime);
             }
 
-            fireComponentNotification(result, ComponentMessageNotification.COMPONENT_POST_INVOKE);
+            MuleMessage resultMessage = createResultMessage(event, result);
 
-            return result;
+            fireComponentNotification(resultMessage, ComponentMessageNotification.COMPONENT_POST_INVOKE);
+
+            return resultMessage;
         }
         catch (MuleException me)
         {
@@ -110,11 +136,41 @@ public abstract class AbstractComponent implements Component
         }
         catch (Exception e)
         {
-            throw new ServiceException(CoreMessages.failedToInvoke(this.toString()), event.getMessage(), service, e);
+            throw new ServiceException(CoreMessages.failedToInvoke(this.toString()), event.getMessage(),
+                service, e);
+        }
+    }
+    
+    public MuleMessage invoke(MuleEvent event) throws MuleException
+    {
+        return new ComponentInterceptorInvoker(this, interceptors, event).invoke();
+    }
+
+    protected MuleMessage createResultMessage(MuleEvent event, Object result) throws TransformerException
+    {
+        if (result instanceof MuleMessage)
+        {
+            return (MuleMessage) result;
+        }
+        else if (result instanceof VoidResult)
+        {
+            event.transformMessage();
+            return event.getMessage();
+        }
+        else if (result != null)
+        {
+            event.getMessage().applyTransformers(
+                Collections.singletonList(new TransformerTemplate(
+                    new TransformerTemplate.OverwitePayloadCallback(result))));
+            return event.getMessage();
+        }
+        else
+        {
+            return new DefaultMuleMessage(NullPayload.getInstance());
         }
     }
 
-    protected abstract MuleMessage doOnCall(MuleEvent event) throws Exception;
+    protected abstract Object doInvoke(MuleEvent event) throws Exception;
 
     public String toString()
     {

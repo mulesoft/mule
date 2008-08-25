@@ -36,7 +36,7 @@ public class PipelineService extends DirectService
     {
         try
         {
-            MuleMessage result = component.onCall(event);
+            MuleMessage result = invokeComponent(event);
             MuleMessage returnMessage = result;
 
             if (!event.isStopFurtherProcessing())

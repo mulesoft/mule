@@ -10,15 +10,14 @@
 
 package org.mule.component;
 
+import org.mule.DefaultMuleEventContext;
 import org.mule.RequestContext;
-import org.mule.VoidResult;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
-import org.mule.api.interceptor.Invocation;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -33,12 +32,10 @@ import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.model.resolvers.NoSatisfiableMethodsException;
 import org.mule.model.resolvers.TooManySatisfiableMethodsException;
 import org.mule.routing.nested.NestedInvocationHandler;
-import org.mule.transformer.TransformerTemplate;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -187,24 +184,22 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         return disposed;
     }
 
-    // Note: Invocation argument is not even used!
-    public MuleMessage intercept(Invocation invocation) throws MuleException
+    public Object invoke(MuleEvent event) throws MuleException
     {
         // Invoke method
+        MuleEventContext eventContext = new DefaultMuleEventContext(event);
         Object result;
-        MuleEvent event = RequestContext.getEvent();
-
         try
         {
             // Use the overriding entrypoint resolver if one is set
             if (component.getEntryPointResolverSet() != null)
             {
-                result = component.getEntryPointResolverSet().invoke(componentObject, RequestContext.getEventContext());
+                result = component.getEntryPointResolverSet().invoke(componentObject, eventContext);
 
             }
             else
             {
-                result = entryPointResolver.invoke(componentObject, RequestContext.getEventContext());
+                result = entryPointResolver.invoke(componentObject, eventContext);
             }
         }
         catch (Exception e)
@@ -214,28 +209,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
             throw new ServiceException(RequestContext.getEventContext().getMessage(), component.getService(), e);
         }
 
-        MuleMessage resultMessage = null;
-        if (result instanceof VoidResult)
-        {
-            // This will rewire the current message
-            event.transformMessage();
-            resultMessage = event.getMessage();
-        }
-        else if (result != null)
-        {
-            if (result instanceof MuleMessage)
-            {
-                resultMessage = (MuleMessage) result;
-            }
-            else
-            {
-                event.getMessage().applyTransformers(
-                    Collections.singletonList(new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(
-                        result))));
-                resultMessage = event.getMessage();
-            }
-        }
-        return resultMessage;
+        return result;
     }
 
     /**

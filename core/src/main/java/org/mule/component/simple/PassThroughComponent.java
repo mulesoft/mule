@@ -23,7 +23,7 @@ public class PassThroughComponent extends AbstractComponent
 {
 
     // @Override
-    protected MuleMessage doOnCall(MuleEvent event) throws Exception
+    protected MuleMessage doInvoke(MuleEvent event) throws Exception
     {
         event.transformMessage();
         return event.getMessage();

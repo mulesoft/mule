@@ -10,27 +10,20 @@
 
 package org.mule.module.scripting.component;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.NestedRouter;
 import org.mule.api.routing.NestedRouterCollection;
 import org.mule.component.AbstractComponent;
 import org.mule.routing.nested.DefaultNestedRouterCollection;
 import org.mule.routing.nested.NestedInvocationHandler;
-import org.mule.transformer.TransformerTemplate;
-import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Proxy;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import javax.script.Bindings;
 
 /**
  * A Script service backed by a JSR-223 compliant script engine such as
@@ -60,7 +53,7 @@ public class ScriptComponent extends AbstractComponent
 
     }
 
-    protected MuleMessage doOnCall(MuleEvent event) throws Exception
+    protected Object doInvoke(MuleEvent event) throws Exception
     {
         // Set up initial script variables.
         Bindings bindings = script.getScriptEngine().createBindings();
@@ -69,25 +62,7 @@ public class ScriptComponent extends AbstractComponent
             bindings.putAll(proxies);
         }
         script.populateBindings(bindings, event);
-        Object result = script.runScript(bindings);
-
-        if (result != null)
-        {
-            if (result instanceof MuleMessage)
-            {
-                return (MuleMessage) result;
-            }
-            else
-            {
-                event.getMessage().applyTransformers(Collections.singletonList(new TransformerTemplate(
-                        new TransformerTemplate.OverwitePayloadCallback(result))));
-                return event.getMessage();
-            }
-        }
-        else
-        {
-            return new DefaultMuleMessage(NullPayload.getInstance());
-        }
+        return script.runScript(bindings);
     }
 
 

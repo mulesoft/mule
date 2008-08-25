@@ -92,6 +92,12 @@
     	</mule:properties>
     </mule:endpoint>
 
+    <mule:interceptor-stack name="testInterceptorStack">
+        <mule:logging-interceptor/>
+        <mule:timer-interceptor/>
+        <mule:custom-interceptor class="org.mule.interceptor.LoggingInterceptor"/>
+    </mule:interceptor-stack>
+
     </mule:mule>
 
     <bean name="orange" class="org.mule.tck.testmodels.fruit.Orange">
@@ -151,6 +157,9 @@
                 </mule:inbound>
 
                 <mule:component>
+                    <mule:logging-interceptor />
+                    <mule:interceptor-stack ref="testInterceptorStack" />
+                    <mule:timer-interceptor />
                     <mule:spring-object bean="orange"/>
                     <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
                         <mule:outbound-endpoint address="test://do.wash"/>
@@ -159,7 +168,7 @@
                         <mule:outbound-endpoint address="test://do.polish"/>
                     </mule:binding>
                 </mule:component>
-
+                
                 <mule:outbound>
                     <mule:outbound-pass-through-router>
                         <mule:outbound-endpoint ref="appleInEndpoint"

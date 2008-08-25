@@ -27,9 +27,13 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
+import org.mule.component.AbstractComponent;
 import org.mule.component.PooledJavaComponent;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
+import org.mule.interceptor.InterceptorStack;
+import org.mule.interceptor.LoggingInterceptor;
+import org.mule.interceptor.TimerInterceptor;
 import org.mule.model.seda.SedaService;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -350,4 +354,27 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertTrue(muleContext.getConfiguration().isDefaultSynchronousEndpoints());
     }
 
+    public void testGlobalInterceptorStack()
+    {
+        InterceptorStack interceptorStack = (InterceptorStack) muleContext.getRegistry().lookupObject(
+            "testInterceptorStack");
+        assertNotNull(interceptorStack);
+        assertEquals(3, interceptorStack.getInterceptors().size());
+        assertEquals(LoggingInterceptor.class, interceptorStack.getInterceptors().get(0).getClass());
+        assertEquals(TimerInterceptor.class, interceptorStack.getInterceptors().get(1).getClass());
+        assertEquals(LoggingInterceptor.class, interceptorStack.getInterceptors().get(2).getClass());
+    }
+
+    public void testInterceptors()
+    {
+        Service service = muleContext.getRegistry().lookupService("orangeComponent");
+        InterceptorStack globalInterceptorStack = (InterceptorStack) muleContext.getRegistry().lookupObject(
+            "testInterceptorStack");
+        AbstractComponent component = (AbstractComponent) service.getComponent();
+        assertEquals(3, component.getInterceptors().size());
+        assertEquals(LoggingInterceptor.class, component.getInterceptors().get(0).getClass());
+        assertEquals(globalInterceptorStack, component.getInterceptors().get(1));
+        assertEquals(TimerInterceptor.class, component.getInterceptors().get(2).getClass());
+    }
+    
 }

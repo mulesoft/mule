@@ -37,12 +37,12 @@ public class DirectService extends AbstractService
 
     protected MuleMessage doSend(MuleEvent event) throws MuleException
     {
-        return component.onCall(event);
+        return invokeComponent(event);
     }
 
     protected void doDispatch(MuleEvent event) throws MuleException
     {
-        component.onCall(event);
+        invokeComponent(event);
     }
 
 }

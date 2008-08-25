@@ -124,6 +124,12 @@
         </spring:property>
     </spring:bean>
     
+    <interceptor-stack name="testInterceptorStack">
+        <logging-interceptor/>
+        <timer-interceptor/>
+        <custom-interceptor class="org.mule.interceptor.LoggingInterceptor"/>
+    </interceptor-stack>
+    
     <model name="main">
         <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
             <outbound-endpoint address=" test://component.exceptions "/>
@@ -145,6 +151,9 @@
             </inbound>
 
             <component>
+                <logging-interceptor/>
+                <interceptor-stack ref="testInterceptorStack"/>
+                <timer-interceptor/>
                 <spring-object bean="orange"/>
                 <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
                     <outbound-endpoint address="test://do.wash"/>
@@ -169,6 +178,7 @@
             <default-service-exception-strategy>
                 <outbound-endpoint address="test://orange.exceptions"/>
             </default-service-exception-strategy>
+            
         </service>
 
         <service name="appleComponent">
