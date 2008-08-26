@@ -38,7 +38,7 @@ public abstract class EnvelopeInterceptor implements Interceptor
     public final MuleMessage intercept(Invocation invocation) throws MuleException
     {
         before(invocation);
-        MuleMessage message = (MuleMessage) invocation.invoke();
+        MuleMessage message = invocation.invoke();
         invocation.setMessage(message);
         after(invocation);
         return invocation.getMessage();
