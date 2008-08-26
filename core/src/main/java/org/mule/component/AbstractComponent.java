@@ -64,7 +64,6 @@ public abstract class AbstractComponent implements Component, Interceptor
     protected final AtomicBoolean disposed = new AtomicBoolean(false);
     protected ServerNotificationHandler notificationHandler;
     protected List interceptors = new ArrayList();
-    protected ComponentInterceptorInvoker interceptorInvoker;
 
     public List getInterceptors()
     {
@@ -83,8 +82,12 @@ public abstract class AbstractComponent implements Component, Interceptor
 
     public MuleMessage intercept(Invocation invocation) throws MuleException
     {
-        MuleEvent event = invocation.getEvent();
+        return invokeInternal(invocation.getEvent());
+    }
 
+    private MuleMessage invokeInternal(MuleEvent event)
+        throws DisposeException, DefaultMuleException, MuleException, ServiceException
+    {
         // Ensure we have event in ThreadLocal
         OptimizedRequestContext.unsafeSetEvent(event);
 
@@ -145,11 +148,14 @@ public abstract class AbstractComponent implements Component, Interceptor
 
     public MuleMessage invoke(MuleEvent event) throws MuleException
     {
-        if (interceptorInvoker == null)
+        if (interceptors.isEmpty())
         {
-            interceptorInvoker = new ComponentInterceptorInvoker(this, interceptors, event);
+            return invokeInternal(event);
         }
-        return interceptorInvoker.invoke();
+        else
+        {
+            return new ComponentInterceptorInvoker(this, interceptors, event).invoke();
+        }
     }
 
     protected MuleMessage createResultMessage(MuleEvent event, Object result) throws TransformerException

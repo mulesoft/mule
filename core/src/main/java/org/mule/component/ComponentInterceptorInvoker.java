@@ -44,19 +44,13 @@ public class ComponentInterceptorInvoker implements Invocation
     {
         if (cursor < interceptors.size())
         {
-            Interceptor interceptor = (Interceptor) interceptors.get(cursor);
-            incCursor();
+            Interceptor interceptor = (Interceptor) interceptors.get(cursor++);
             return interceptor.intercept(this);
         }
         else
         {
             return component.intercept(this);
         }
-    }
-
-    private synchronized void incCursor()
-    {
-        cursor++;
     }
 
     public MuleEvent getEvent()
@@ -74,7 +68,7 @@ public class ComponentInterceptorInvoker implements Invocation
         return event.getMessage();
     }
 
-    public synchronized void setMessage(MuleMessage message)
+    public void setMessage(MuleMessage message)
     {
         synchronized (event)
         {
