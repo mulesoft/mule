@@ -160,7 +160,8 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         // no-op
     }
 
-    protected MuleMessage invokeComponentInstance(MuleEvent event) throws Exception
+    // @Override
+    protected Object invokeComponentInstance(MuleEvent event) throws Exception
     {
         Object result = ((Callable) objectFactory.getInstance()).onCall(new DefaultMuleEventContext(event));
         if (result instanceof VoidResult)

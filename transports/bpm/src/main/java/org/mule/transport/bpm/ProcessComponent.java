@@ -11,7 +11,6 @@
 package org.mule.transport.bpm;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.component.AbstractComponent;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -20,7 +19,7 @@ import org.apache.commons.lang.NotImplementedException;
 public class ProcessComponent extends AbstractComponent
 {
     //@Override
-    protected MuleMessage doInvoke(MuleEvent event) throws Exception
+    protected Object doInvoke(MuleEvent event) throws Exception
     {
         throw new NotImplementedException();
     }

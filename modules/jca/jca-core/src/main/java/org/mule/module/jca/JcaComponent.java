@@ -15,7 +15,6 @@ import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolverSet;
@@ -61,7 +60,8 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
         return messageEndpointFactory.createEndpoint(null);
     }
 
-    public MuleMessage doInvoke(MuleEvent event)
+    // @Override
+    public Object doInvoke(MuleEvent event)
     {
         try
         {
