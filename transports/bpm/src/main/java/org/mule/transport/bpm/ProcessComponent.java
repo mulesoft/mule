@@ -20,7 +20,7 @@ import org.apache.commons.lang.NotImplementedException;
 public class ProcessComponent extends AbstractComponent
 {
     //@Override
-    protected MuleMessage doOnCall(MuleEvent event) throws Exception
+    protected MuleMessage doInvoke(MuleEvent event) throws Exception
     {
         throw new NotImplementedException();
     }

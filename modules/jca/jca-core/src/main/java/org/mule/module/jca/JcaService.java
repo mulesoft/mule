@@ -68,7 +68,7 @@ public class JcaService extends AbstractService
 
     protected void doDispatch(MuleEvent event) throws MuleException
     {
-        component.onCall(event);
+        component.invoke(event);
     }
 
     /**

@@ -61,7 +61,7 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
         return messageEndpointFactory.createEndpoint(null);
     }
 
-    public MuleMessage doOnCall(MuleEvent event)
+    public MuleMessage doInvoke(MuleEvent event)
     {
         try
         {

@@ -37,7 +37,6 @@ public class ComponentInterceptorInvoker implements Invocation
     {
         this.component = component;
         this.interceptors = interceptors;
-        this.interceptors.add(component);
         this.event = event;
     }
 
@@ -51,7 +50,7 @@ public class ComponentInterceptorInvoker implements Invocation
         }
         else
         {
-            return getMessage();
+            return component.intercept(this);
         }
     }
 

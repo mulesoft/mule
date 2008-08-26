@@ -25,7 +25,7 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
     private String wsdlPort;
     private String operation;
 
-    protected MuleMessage doOnCall(MuleEvent event) throws Exception
+    protected MuleMessage doInvoke(MuleEvent event) throws Exception
     {
         MuleContext muleContext = event.getMuleContext();
 

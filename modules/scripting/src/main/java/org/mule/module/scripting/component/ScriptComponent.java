@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.script.Bindings;
+
 /**
  * A Script service backed by a JSR-223 compliant script engine such as
  * Groovy, JavaScript, or Rhino.

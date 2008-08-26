@@ -13,7 +13,6 @@ package org.mule.transport.http.components;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.filter.Filter;
@@ -162,7 +161,7 @@ public class RestServiceWrapper extends AbstractComponent
         }
     }
 
-    public MuleMessage doOnCall(MuleEvent event) throws Exception
+    public MuleMessage doInvoke(MuleEvent event) throws Exception
     {
         Object requestBody;
 
@@ -333,34 +332,4 @@ public class RestServiceWrapper extends AbstractComponent
         throw e;
     }
 
-    // @Override
-    protected void doOnEvent(MuleEvent event)
-    {
-        try
-        {
-            onCall(event);
-        }
-        catch (MuleException e)
-        {
-            logger.error(e);
-        }
-    }
-
-    // @Override
-    protected void doDispose()
-    {
-        // no-op
-    }
-
-    // @Override
-    protected void doStart() throws MuleException
-    {
-        // no-op
-    }
-
-    // @Override
-    protected void doStop() throws MuleException
-    {
-        // no-op
-    }
 }

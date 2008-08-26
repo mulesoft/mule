@@ -64,6 +64,7 @@ public abstract class AbstractComponent implements Component, Interceptor
     protected final AtomicBoolean disposed = new AtomicBoolean(false);
     protected ServerNotificationHandler notificationHandler;
     protected List interceptors = new ArrayList();
+    protected ComponentInterceptorInvoker interceptorInvoker;
 
     public List getInterceptors()
     {
@@ -83,13 +84,14 @@ public abstract class AbstractComponent implements Component, Interceptor
     public MuleMessage intercept(Invocation invocation) throws MuleException
     {
         MuleEvent event = invocation.getEvent();
-        
+
         // Ensure we have event in ThreadLocal
         OptimizedRequestContext.unsafeSetEvent(event);
 
         if (logger.isTraceEnabled())
         {
-            logger.trace("Invoking " + this.getClass().getName() + "component for service " + service.getName());
+            logger.trace("Invoking " + this.getClass().getName() + "component for service "
+                         + service.getName());
         }
 
         // Do some checks: i) check component is not disposed, ii) that it is started
@@ -98,7 +100,7 @@ public abstract class AbstractComponent implements Component, Interceptor
         if (!(event.getEndpoint() instanceof InboundEndpoint))
         {
             throw new IllegalStateException(
-                    "Unable to process outbound event, components only process incoming events.");
+                "Unable to process outbound event, components only process incoming events.");
         }
         if (stopping.get() || !started.get())
         {
@@ -140,10 +142,14 @@ public abstract class AbstractComponent implements Component, Interceptor
                 service, e);
         }
     }
-    
+
     public MuleMessage invoke(MuleEvent event) throws MuleException
     {
-        return new ComponentInterceptorInvoker(this, interceptors, event).invoke();
+        if (interceptorInvoker == null)
+        {
+            interceptorInvoker = new ComponentInterceptorInvoker(this, interceptors, event);
+        }
+        return interceptorInvoker.invoke();
     }
 
     protected MuleMessage createResultMessage(MuleEvent event, Object result) throws TransformerException
@@ -208,8 +214,8 @@ public abstract class AbstractComponent implements Component, Interceptor
             if (service == null)
             {
                 throw new InitialisationException(
-                        MessageFactory.createStaticMessage("Component has not been initialized properly, no service."),
-                        this);
+                    MessageFactory.createStaticMessage("Component has not been initialized properly, no service."),
+                    this);
             }
             doInitialise();
             initialised.set(true);
@@ -303,7 +309,8 @@ public abstract class AbstractComponent implements Component, Interceptor
     {
         if (disposed.get())
         {
-            throw new DisposeException(CoreMessages.createStaticMessage("Cannot use a disposed component"), this);
+            throw new DisposeException(CoreMessages.createStaticMessage("Cannot use a disposed component"),
+                this);
         }
     }
 
