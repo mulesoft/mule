@@ -7,7 +7,7 @@
     <link><item>mule:outbound</item><page>Configuring+Models</page></link>
     <link><item>mule:async-reply</item><page>Configuring+Models</page></link>
     <link><item>mule:component</item><page>Configuring+Models</page></link>
-    <link><item>mule:component-threading-profile</item><page>Configuring+Models</page></link>
+    <link><item>mule:threading-profile</item><page>Configuring+Models</page></link>
     <link><item>mule:bridge-component</item><page>Configuring+Models</page></link>
     <link><item>mule:echo-component</item><page>Configuring+Models</page></link>
     <link><item>mule:log-component</item><page>Configuring+Models</page></link>

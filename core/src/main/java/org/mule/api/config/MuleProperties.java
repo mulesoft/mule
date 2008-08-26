@@ -104,7 +104,7 @@ public interface MuleProperties
     String OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE = "_defaultMessageDispatcherThreadingProfile";
     String OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE = "_defaultMessageRequesterThreadingProfile";
     String OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE = "_defaultMessageReceiverThreadingProfile";
-    String OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE = "_defaultComponentThreadingProfile";
+    String OBJECT_DEFAULT_SERVICE_THREADING_PROFILE = "_defaultServiceThreadingProfile";
     String OBJECT_DEFAULT_CONNECTION_STRATEGY = "_defaultConnectionStrategy";
     String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
 

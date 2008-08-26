@@ -549,9 +549,9 @@ public class DefaultMuleContext implements MuleContext
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE);
     }
 
-    public ThreadingProfile getDefaultComponentThreadingProfile()
+    public ThreadingProfile getDefaultServiceThreadingProfile()
     {
-        return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE);
+        return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE);
     }
 
     public ThreadingProfile getDefaultThreadingProfile()

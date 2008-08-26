@@ -106,7 +106,7 @@
         <constructor-arg ref="_defaultThreadingProfile"/>
     </bean>
 
-    <bean name="_defaultComponentThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+    <bean name="_defaultServiceThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
         <constructor-arg ref="_defaultThreadingProfile"/>
     </bean>
 

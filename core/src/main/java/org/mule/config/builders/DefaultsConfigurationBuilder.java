@@ -80,7 +80,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
             new ChainedThreadingProfile(defaultThreadingProfile));
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE,
             new ChainedThreadingProfile(defaultThreadingProfile));
-        registry.registerObject(MuleProperties.OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE,
+        registry.registerObject(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE,
             new ChainedThreadingProfile(defaultThreadingProfile));
         
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_CONNECTION_STRATEGY, new SingleAttemptConnectionStrategy());

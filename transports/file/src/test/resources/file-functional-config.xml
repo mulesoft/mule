@@ -36,7 +36,7 @@
                 </file:inbound-endpoint>
             </inbound>
             <test:component/>
-            <component-threading-profile maxThreadsActive="1"/>
+            <threading-profile maxThreadsActive="1"/>
         </service>
     </model>
 

@@ -189,7 +189,7 @@ public interface MuleContext extends Lifecycle
 
     ThreadingProfile getDefaultMessageReceiverThreadingProfile();
 
-    ThreadingProfile getDefaultComponentThreadingProfile();
+    ThreadingProfile getDefaultServiceThreadingProfile();
 
     ThreadingProfile getDefaultThreadingProfile();
 

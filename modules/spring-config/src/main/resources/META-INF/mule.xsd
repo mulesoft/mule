@@ -394,10 +394,10 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element name="default-component-threading-profile" type="threadingProfileType" minOccurs="0">
+            <xsd:element name="default-service-threading-profile" type="threadingProfileType" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The default component threading profile, modifies the default-threading-profile
+                        The default service threading profile, modifies the default-threading-profile
                         values and is used if no more specific configuration is given.
                     </xsd:documentation>
                 </xsd:annotation>
@@ -1132,7 +1132,7 @@
         <xsd:complexContent>
             <xsd:extension base="baseServiceType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-component-threading-profile" minOccurs="0"/>
+                    <xsd:element ref="abstract-service-threading-profile" minOccurs="0"/>
                     <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="queueTimeout" type="substitutableInt">
@@ -1168,16 +1168,16 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-component-threading-profile" abstract="true"
-                 type="abstractComponentThreadingProfileType">
+    <xsd:element name="abstract-service-threading-profile" abstract="true"
+                 type="abstractServiceThreadingProfileType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for component threading profile element.
-                Threading profils define how thread pools interact with the component.
+                A placeholder for service threading profile element.
+                Threading profiles define how thread pools interact with the component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractComponentThreadingProfileType"/>
+    <xsd:complexType name="abstractServiceThreadingProfileType"/>
 
     <!--==============================================================-->
     <!-- Components                                              -->
@@ -2811,11 +2811,11 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="component-threading-profile" type="threadingProfileType"
-                 substitutionGroup="abstract-component-threading-profile">
+    <xsd:element name="threading-profile" type="threadingProfileType"
+                 substitutionGroup="abstract-service-threading-profile">
         <xsd:annotation>
             <xsd:documentation>
-                The threading profile to use on the component.
+                The threading profile to use for the service.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2824,7 +2824,7 @@
         <xsd:complexContent>
             <!-- this is a hack that allows us to use this general threading profile as a component threading profile
                  without retyping everything -->
-            <xsd:extension base="abstractComponentThreadingProfileType">
+            <xsd:extension base="abstractServiceThreadingProfileType">
                 <xsd:attribute name="maxThreadsActive" type="substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>

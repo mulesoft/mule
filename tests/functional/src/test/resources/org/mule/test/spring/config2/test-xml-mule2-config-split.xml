@@ -49,7 +49,7 @@
                 </router>
             </outbound-router -->
 
-                <mule:component-threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
+                <mule:threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
                 <mule:queue-profile maxOutstandingMessages="102" persistent="true"/>
             </mule:service>
         </mule:model>

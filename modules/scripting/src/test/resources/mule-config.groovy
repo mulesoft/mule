@@ -57,7 +57,7 @@ defaultThreadingProfile.setMaxThreadsIdle(10);
 defaultThreadingProfile.setMaxBufferSize(0);
 defaultThreadingProfile.setThreadTTL(60000);
 defaultThreadingProfile.setPoolExhaustedAction(ThreadingProfile.WHEN_EXHAUSTED_RUN);
-muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE,
+muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE,
             new ChainedThreadingProfile(defaultThreadingProfile));
 muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE,
             new ChainedThreadingProfile(defaultThreadingProfile));

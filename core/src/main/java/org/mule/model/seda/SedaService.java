@@ -100,7 +100,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
         if (threadingProfile == null)
         {
             // TODO MULE-2102 This should be configured in the default template.
-            threadingProfile = muleContext.getDefaultComponentThreadingProfile();
+            threadingProfile = muleContext.getDefaultServiceThreadingProfile();
         }
         // Create thread pool
         workManager = threadingProfile.createWorkManager(getName());

@@ -226,7 +226,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(defaultThreadTTL, tp.getThreadTTL());
 
         // test service threading profile defaults
-        tp = muleContext.getDefaultComponentThreadingProfile();
+        tp = muleContext.getDefaultServiceThreadingProfile();
         assertEquals(defaultMaxBufferSize, tp.getMaxBufferSize());
         assertEquals(defaultMaxThreadsActive, tp.getMaxThreadsActive());
         assertEquals(defaultMaxThreadsIdle, tp.getMaxThreadsIdle());
