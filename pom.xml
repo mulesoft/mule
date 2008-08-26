@@ -1270,7 +1270,6 @@
             </activation>
             <modules>
                 <module>buildtools</module>
-                <module>osgi-libs</module> 
                 <module>core</module>
                 <module>modules</module>
                 <module>transports</module>
@@ -1360,6 +1359,23 @@
             <id>distributions</id>
             <modules>
                 <module>distributions</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>osgi-libs</id>
+            <activation>
+                <property>
+                    <!--
+                        This profile is activated if NO system property
+                        'skipOsgiLibs' is found. Disable this profile
+                        by specifying -DskipOsgiLibs=true on the commandline
+                        -->
+                    <name>!skipOsgiLibs</name>
+                </property>
+            </activation>
+            <modules>
+                <module>osgi-libs</module> 
             </modules>
         </profile>
 
