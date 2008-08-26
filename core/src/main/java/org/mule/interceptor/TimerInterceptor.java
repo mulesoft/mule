@@ -29,17 +29,19 @@ public class TimerInterceptor implements Interceptor
      */
     private static Log logger = LogFactory.getLog(TimerInterceptor.class);
 
-    /*
-     * (non-Javadoc)
-     * @see org.mule.umo.UMOInterceptor#intercept(org.mule.umo.UMOEvent)
-     */
     public MuleMessage intercept(Invocation invocation) throws MuleException
     {
         long startTime = System.currentTimeMillis();
-        MuleMessage result = (MuleMessage) invocation.invoke();
-        long executionTime = System.currentTimeMillis() - startTime;
-        logger.info(invocation.getService().getName() + " took " + executionTime + "ms to process event ["
-                    + invocation.getEvent().getId() + "]");
+        
+        MuleMessage result = invocation.invoke();
+        
+        if (logger.isInfoEnabled())
+        {
+            long executionTime = System.currentTimeMillis() - startTime;
+            logger.info(invocation.getService().getName() + " took " + executionTime + "ms to process event ["
+                        + invocation.getEvent().getId() + "]");
+        }
+        
         return result;
     }
 }

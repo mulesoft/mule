@@ -195,7 +195,6 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
             if (component.getEntryPointResolverSet() != null)
             {
                 result = component.getEntryPointResolverSet().invoke(componentObject, eventContext);
-
             }
             else
             {

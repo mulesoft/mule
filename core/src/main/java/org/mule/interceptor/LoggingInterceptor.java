@@ -26,23 +26,21 @@ public class LoggingInterceptor extends EnvelopeInterceptor
      */
     private static Log logger = LogFactory.getLog(LoggingInterceptor.class);
 
-    /*
-     * (non-Javadoc)
-     * @see org.mule.interceptors.EnvelopeInterceptor#before(org.mule.umo.Invocation)
-     */
     public void before(Invocation event)
     {
-        logger.info("About to process event for " + event.getService().getName());
+        if (logger.isInfoEnabled())
+        {
+            logger.info("About to process event for " + event.getService().getName());
+        }
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.mule.interceptors.EnvelopeInterceptor#after(org.mule.umo.Invocation)
-     */
     public void after(Invocation event)
     {
-        logger.info("Processed event for " + event.getService().getName());
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Processed event for " + event.getService().getName());
+        }
     }
 
 }
