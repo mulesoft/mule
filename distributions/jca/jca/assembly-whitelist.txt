@@ -94,7 +94,7 @@ mule-transport-vm
 mule-transport-xmpp
 mx4j-all.osgi-2.1.1
 neethi-2.0.4
-opensaml.osgi-1.1
+opensaml.osgi-1.1b
 saxon-all.osgi-8.9.0.4
 script-api.osgi-1.0
 smack.osgi-2.2.1
