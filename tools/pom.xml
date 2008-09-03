@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>2.1.0-M2-SNAPSHOT</version>
+        <version>2.1.0-M3-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.tools</groupId>
     <artifactId>mule-tools</artifactId>
@@ -20,7 +20,7 @@
         <module>mule-project-archetype</module>
         <!-- Disable schemadocs module for now because it is causing CI to fail 
              with a meaningless error message: 
-               "Error for project: Schema Docs (during install)... null... org/​apache/​commons/​logging/​LogFactory"
+               "Error for project: Schema Docs (during install)... null... org/?apache/?commons/?logging/?LogFactory"
              See for example, http://dev.mulesource.com/bamboo/browse/MULE-MULE2JDK5-219/log
         <module>schemadocs</module>
         -->
