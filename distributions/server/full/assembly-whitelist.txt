@@ -7,7 +7,6 @@ commons-cli.osgi-1.0
 commons-dbutils.osgi-1.1
 commons-io.osgi-1.3.1
 commons-jxpath.osgi-1.2
-commons-logging-1.1.1
 commons-pool-1.4
 com.springsource.antlr-2.7.7
 com.springsource.bsh-2.0.0.b4
