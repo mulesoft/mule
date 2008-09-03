@@ -221,6 +221,10 @@
                     <artifactId>xml-apis</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
