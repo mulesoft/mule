@@ -12,7 +12,8 @@ package org.mule.transport;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.transport.DispatchException;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.ReceiveException;
 import org.mule.context.notification.EndpointMessageNotification;
@@ -41,22 +42,33 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
      */
     public final MuleMessage request(long timeout) throws Exception
     {
+        // Variable needs to be final in order to use it inside callback
+        final long finalTimeout = timeout;
         try
         {
-            // Make sure we are connected
-            connectionStrategy.connect(this);
-            MuleMessage result = doRequest(timeout);
-            if (result != null && connector.isEnableMessageEvents())
+            RetryContext context = retryTemplate.execute(new RetryCallback()
             {
-                connector.fireNotification(new EndpointMessageNotification(result, endpoint, null,
-                    EndpointMessageNotification.MESSAGE_REQUESTED));
-            }
-            return result;
-        }
-        catch (DispatchException e)
-        {
-            disposeAndLogException();
-            throw e;
+                public void doWork(RetryContext context) throws Exception
+                {
+                    // Make sure we are connected
+                    connect();
+                    MuleMessage result = doRequest(finalTimeout);
+                    if (result != null && connector.isEnableMessageEvents())
+                    {
+                        connector.fireNotification(new EndpointMessageNotification(result, endpoint, null,
+                            EndpointMessageNotification.MESSAGE_REQUESTED));
+                    }
+                    context.addReturnMessage(result);
+                    // Is there any difference ?
+                    //context.setReturnMessages(new MuleMessage[]{result});
+                }
+
+                public String getWorkDescription()
+                {
+                    return getConnectionDescription();
+                }
+            });
+            return context.getFirstReturnMessage();
         }
         catch (Exception e)
         {

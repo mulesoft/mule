@@ -15,10 +15,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 
@@ -70,9 +70,9 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         endpoint.dispatch(event);
     }
 
-    public ConnectionStrategy getConnectionStrategy()
+    public RetryPolicyTemplate getRetryPolicyTemplate()
     {
-        return endpoint.getConnectionStrategy();
+        return endpoint.getRetryPolicyTemplate();
     }
 
     public Connector getConnector()

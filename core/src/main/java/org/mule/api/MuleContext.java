@@ -21,7 +21,6 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
@@ -192,8 +191,6 @@ public interface MuleContext extends Lifecycle
     ThreadingProfile getDefaultServiceThreadingProfile();
 
     ThreadingProfile getDefaultThreadingProfile();
-
-    ConnectionStrategy getDefaultConnectionStrategy();
 
     // TODO This should ideally only be available via an Admin interface
     void addRegistry(long id, Registry registry);

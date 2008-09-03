@@ -13,8 +13,8 @@ package org.mule.api.transport;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 
@@ -31,18 +31,13 @@ import java.io.OutputStream;
  * data from the external system. For example, the file endpoint will poll a
  * specified directory for its data.
  */
-public interface MessageReceiver extends Lifecycle, Connectable
+public interface MessageReceiver extends Connectable
 {
     /**
      * @return the receivers endpoint
      */
     InboundEndpoint getEndpoint();
 
-    /**
-     * @param message
-     * @param exception
-     */
-    // void handleException(Object message, Throwable exception);
     /**
      * @return the service associated with the receiver
      */
@@ -60,11 +55,9 @@ public interface MessageReceiver extends Lifecycle, Connectable
      *            <code>sendEvent</code> is used to dispatch the data to the
      *            relivant UMO.
      */
-    void setService(Service service);
+    //void setService(Service service);
 
-    void setConnector(Connector connector);
-
-    Connector getConnector();
+    //Connector getConnector();
 
     /**
      * The endpointUri that this receiver listens on

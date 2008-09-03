@@ -26,7 +26,6 @@ org.mule.test.usecases.sync.TcpToFileTestCase
 ##########################################################################
 
 # MULE-2749
-org.mule.test.integration.transport.jdbc.JdbcConnectionTestCase
 org.mule.test.integration.transport.jdbc.JdbcTransactionalJdbcFunctionalTestCase
 org.mule.test.integration.transport.jdbc.JdbcTransactionalXaFunctionalTestCase
 

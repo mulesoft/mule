@@ -26,7 +26,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
     /**
      * Called from Spring
      * 
-     * @param global The global endpoint "template"
+     * @param global The global endpoint "Policy"
      * @throws EndpointException
      */
     public EndpointURIEndpointBuilder(EndpointURIEndpointBuilder global) throws EndpointException
@@ -49,7 +49,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         remoteSync = global.remoteSync;
         remoteSyncTimeout = global.remoteSyncTimeout;
         encoding = global.encoding;
-        connectionStrategy = global.connectionStrategy;
+        retryPolicyTemplate = global.retryPolicyTemplate;
     }
 
     public EndpointURIEndpointBuilder(URIBuilder URIBuilder, MuleContext muleContext)
@@ -90,7 +90,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setRemoteSync(source.isRemoteSync());
         setFilter(source.getFilter());
         setSecurityFilter(source.getSecurityFilter());
-        setConnectionStrategy(source.getConnectionStrategy());
+        setRetryPolicyTemplate(source.getRetryPolicyTemplate());
         setSynchronous(source.isSynchronous());
         setMuleContext(source.getMuleContext());
     }

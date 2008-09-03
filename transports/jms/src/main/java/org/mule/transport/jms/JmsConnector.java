@@ -21,13 +21,13 @@ import org.mule.api.lifecycle.StartException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
+import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
@@ -224,7 +224,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         // Register a JMS exception listener to detect failed connections.
         // Existing connection strategy will be used to recover.
 
-        if (recoverJmsConnections && connectionStrategy != null && connection != null)
+        if (recoverJmsConnections && !(getRetryPolicyTemplate() instanceof NoRetryPolicyTemplate) && connection != null)
         {
             connection.setExceptionListener(new ExceptionListener()
             {
@@ -912,10 +912,5 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
    public boolean isHonorQosHeaders()
    {
        return honorQosHeaders;
-   }
-   
-   public ConnectionStrategy getConnectionStrategy()
-   {
-       return connectionStrategy;
    }
 }

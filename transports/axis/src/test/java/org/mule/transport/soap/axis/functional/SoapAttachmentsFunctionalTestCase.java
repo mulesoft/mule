@@ -47,6 +47,7 @@ public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
             "axis:http://localhost:60198/mule/services/testComponent?method=receiveMessageWithAttachments");
 
         AxisMessageDispatcher client = new AxisMessageDispatcher(ep);
+        client.initialise();
         for (int i = 0; i < iterations; i++)
         {
             MuleMessage msg = new DefaultMuleMessage("testPayload");

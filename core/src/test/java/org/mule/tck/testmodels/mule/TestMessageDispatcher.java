@@ -24,6 +24,11 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
         super(endpoint);
     }
 
+    protected void doInitialise()
+    {
+        // template method
+    }
+
     protected void doDispose()
     {
         // template method
@@ -56,4 +61,13 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
         // no op
     }
 
+    protected void doStart() 
+    {
+        // no op
+    }
+
+    protected void doStop() 
+    {
+        // no op
+    }
 }

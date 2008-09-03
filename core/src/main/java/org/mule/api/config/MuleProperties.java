@@ -105,7 +105,7 @@ public interface MuleProperties
     String OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE = "_defaultMessageRequesterThreadingProfile";
     String OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE = "_defaultMessageReceiverThreadingProfile";
     String OBJECT_DEFAULT_SERVICE_THREADING_PROFILE = "_defaultServiceThreadingProfile";
-    String OBJECT_DEFAULT_CONNECTION_STRATEGY = "_defaultConnectionStrategy";
+    String OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE = "_defaultRetryPolicyTemplate";
     String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
 
     // Not currently used as these need to be instance variables of the MuleContext.

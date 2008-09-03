@@ -16,7 +16,7 @@ import org.mule.api.lifecycle.Disposable;
  * Combine {@link MessageDispatching} with
  * various lifecycle methods for the actual instances doing message sending.
  */
-public interface MessageDispatcher extends Disposable, Connectable, MessageDispatching
+public interface MessageDispatcher extends Connectable, MessageDispatching
 {
 
     /**

@@ -26,6 +26,11 @@ public final class UnsupportedMessageRequester extends AbstractMessageRequester
         throw new UnsupportedOperationException("Request not supported for this transport");
     }
 
+    protected void doInitialise()
+    {
+        // empty
+    }
+
     protected void doDispose()
     {
         // empty
@@ -41,4 +46,13 @@ public final class UnsupportedMessageRequester extends AbstractMessageRequester
         // empty
     }
 
+    protected void doStart() 
+    {
+        // empty
+    }
+
+    protected void doStop() 
+    {
+        // empty
+    }
 }

@@ -10,13 +10,12 @@
 
 package org.mule.api.transport;
 
-import org.mule.api.lifecycle.Disposable;
 
 /**
  * Combine {@link org.mule.api.transport.MessageRequesting} with
  * various lifecycle methods for the actual instances doing message sending.
  */
-public interface MessageRequester extends Disposable, Connectable, MessageRequesting
+public interface MessageRequester extends Connectable, MessageRequesting
 {
 
     /**

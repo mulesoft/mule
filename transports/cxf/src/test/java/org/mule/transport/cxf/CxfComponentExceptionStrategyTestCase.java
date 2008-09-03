@@ -13,6 +13,7 @@ package org.mule.transport.cxf;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.FatalConnectException;
 import org.mule.transport.cxf.testmodels.CustomFault;
 import org.mule.transport.cxf.testmodels.CxfEnabledFaultMessage;
 
@@ -31,9 +32,8 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
         }
         catch (DispatchException ex)
         {
-            final Throwable t = ex.getCause();
-            assertNotNull("Cause should've been filled in.", t);
-            assertTrue(t instanceof CxfEnabledFaultMessage);
+            assertTrue(ex.getCause() instanceof FatalConnectException);
+            assertTrue(ex.getCause().getCause() instanceof CxfEnabledFaultMessage);
         }
     }
 
@@ -77,10 +77,8 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
         }
         catch (DispatchException ex)
         {
-            final Throwable t = ex.getCause();
-            assertNotNull("Cause should've been filled in.", t);
-            assertTrue(t instanceof Fault);
-            t.printStackTrace();
+            assertTrue(ex.getCause() instanceof FatalConnectException);
+            assertTrue(ex.getCause().getCause() instanceof Fault);
         }
     }
 

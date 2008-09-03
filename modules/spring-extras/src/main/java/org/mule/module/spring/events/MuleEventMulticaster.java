@@ -288,7 +288,10 @@ public class MuleEventMulticaster
         }
         else if (e instanceof ContextClosedEvent)
         {
-            muleContext.dispose();
+            if (!muleContext.isDisposing() && !muleContext.isDisposed())
+            {
+                muleContext.dispose();
+            }
             return;
         }
         else if (e instanceof MuleApplicationEvent)

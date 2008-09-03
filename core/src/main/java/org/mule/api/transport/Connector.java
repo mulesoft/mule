@@ -17,9 +17,11 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.service.Service;
 
 import java.beans.ExceptionListener;
@@ -59,6 +61,10 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      */
     boolean isStarted();
 
+    boolean isConnected();
+
+    boolean isConnecting();
+    
     /**
      * @return false if the connector is alive and well or true if the connector is
      *         being destroyed
@@ -217,4 +223,6 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
     OutputStream getOutputStream(OutboundEndpoint endpoint, MuleMessage message) throws MuleException;
 
     MuleContext getMuleContext();
+
+    RetryPolicyTemplate getRetryPolicyTemplate();
 }

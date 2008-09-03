@@ -21,7 +21,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -29,55 +28,29 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.SecurityException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.InternalMessageListener;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.concurrent.WaitableBoolean;
 
 import java.io.OutputStream;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all Message
  * Receivers provided with Mule. A message receiver enables an endpoint to receive a
  * message from an external system.
  */
-public abstract class AbstractMessageReceiver implements MessageReceiver
+public abstract class AbstractMessageReceiver extends AbstractConnectable implements MessageReceiver
 {
-    /** logger used by this class */
-    protected final Log logger = LogFactory.getLog(getClass());
-
     /** The Service with which this receiver is associated with */
     protected Service service = null;
 
-    /** The endpoint descriptor which is associated with this receiver */
-    protected InboundEndpoint endpoint = null;
-
     private InternalMessageListener listener;
-
-    /** the connector associated with this receiver */
-    protected AbstractConnector connector = null;
-
-    protected final AtomicBoolean disposing = new AtomicBoolean(false);
-
-    protected final WaitableBoolean connected = new WaitableBoolean(false);
-
-    protected final WaitableBoolean stopped = new WaitableBoolean(true);
-
-    protected final AtomicBoolean connecting = new AtomicBoolean(false);
 
     /**
      * Stores the key to this receiver, as used by the Connector to
@@ -93,13 +66,8 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
      */
     private EndpointURI endpointUri;
 
-    private WorkManager workManager;
-
-    protected ConnectionStrategy connectionStrategy;
-
     protected boolean responseEndpoint = false;
-
-    
+        
     /**
      * Creates the Message Receiver
      *
@@ -115,12 +83,11 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
      * @see Service
      * @see InboundEndpoint
      */
-    public AbstractMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
-            throws CreateException
+    public AbstractMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint) throws CreateException
     {
-        setConnector(connector);
+        super(endpoint);
+        
         setService(service);
-        setEndpoint(endpoint);
         if (service.getResponseRouter() != null && service.getResponseRouter().getEndpoints().contains(endpoint))
         {
             responseEndpoint = true;
@@ -141,32 +108,19 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
      * @throws org.mule.api.lifecycle.RecoverableException
      *          if an error occurs that can be recovered from
      */
-    public void initialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         listener = new DefaultInternalMessageListener();
         endpointUri = endpoint.getEndpointURI();
 
         try
         {
-            workManager = this.connector.getReceiverWorkManager("receiver");
+            setWorkManager(connector.getReceiverWorkManager("receiver"));
         }
         catch (MuleException e)
         {
             throw new InitialisationException(e, this);
         }
-
-        connectionStrategy = this.endpoint.getConnectionStrategy();
-        doInitialise();
-    }
-
-    /*
-    * (non-Javadoc)
-    *
-    * @see org.mule.api.transport.MessageReceiver#getEndpointName()
-    */
-    public InboundEndpoint getEndpoint()
-    {
-        return endpoint;
     }
 
     /*
@@ -189,18 +143,6 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
             }
         }
         connector.getExceptionListener().exceptionThrown(exception);
-        if (exception instanceof ConnectException)
-        {
-            try
-            {
-                logger.warn("Reconnecting after exception: " + exception.getMessage(), exception);
-                connectionStrategy.connect(this);
-            }
-            catch (MuleException e)
-            {
-                connector.getExceptionListener().exceptionThrown(e);
-            }
-        }
     }
 
     /**
@@ -224,31 +166,6 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
                         + code);
             }
             message.setProperty(propName, code);
-        }
-    }
-
-    public Connector getConnector()
-    {
-        return connector;
-    }
-
-    public void setConnector(Connector connector)
-    {
-        if (connector != null)
-        {
-            if (connector instanceof AbstractConnector)
-            {
-                this.connector = (AbstractConnector) connector;
-            }
-            else
-            {
-                throw new IllegalArgumentException(CoreMessages.propertyIsNotSupportedType(
-                        "connector", AbstractConnector.class, connector.getClass()).getMessage());
-            }
-        }
-        else
-        {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("connector").getMessage());
         }
     }
 
@@ -363,20 +280,6 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.api.transport.MessageReceiver#setEndpoint(org.mule.api.endpoint.Endpoint)
-     */
-    public void setEndpoint(InboundEndpoint endpoint)
-    {
-        if (endpoint == null)
-        {
-            throw new IllegalArgumentException("Endpoint cannot be null");
-        }
-        this.endpoint = endpoint;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see org.mule.api.transport.MessageReceiver#setSession(org.mule.api.MuleSession)
      */
     public void setService(Service service)
@@ -388,11 +291,9 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
         this.service = service;
     }
 
-    public final void dispose()
+    protected void doDispose()
     {
         stop();
-        disposing.set(true);
-        doDispose();
     }
 
     public EndpointURI getEndpointURI()
@@ -400,133 +301,9 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
         return endpointUri;
     }
 
-    protected WorkManager getWorkManager()
-    {
-        return workManager;
-    }
-
-    protected void setWorkManager(WorkManager workManager)
-    {
-        this.workManager = workManager;
-    }
-
-    public void connect() throws Exception
-    {
-        if (connected.get())
-        {
-            return;
-        }
-
-        if (connecting.compareAndSet(false, true))
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Connecting: " + this);
-            }
-
-            connectionStrategy.connect(this);
-
-            logger.info("Connected: " + this);
-            return;
-        }
-
-        try
-        {
-            //Make sure the connector has connected. If it is connected, this method does nothing
-            connectionStrategy.connect(connector);
-
-            this.doConnect();
-            connected.set(true);
-            connecting.set(false);
-
-            connector.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-                    ConnectionNotification.CONNECTION_CONNECTED));
-        }
-        catch (Exception e)
-        {
-            connected.set(false);
-            connecting.set(false);
-
-            connector.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-                    ConnectionNotification.CONNECTION_FAILED));
-
-            if (e instanceof ConnectException)
-            {
-                throw (ConnectException) e;
-            }
-            else
-            {
-                throw new ConnectException(e, this);
-            }
-        }
-    }
-
-    public void disconnect() throws Exception
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Disconnecting: " + this);
-        }
-
-        this.doDisconnect();
-        connected.set(false);
-
-        logger.info("Disconnected: " + this);
-
-        connector.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-                ConnectionNotification.CONNECTION_DISCONNECTED));
-    }
-
     public String getConnectionDescription()
     {
         return endpoint.getEndpointURI().toString();
-    }
-
-    public final void start() throws MuleException
-    {
-        if (stopped.compareAndSet(true, false))
-        {
-            if (!connected.get())
-            {
-                connectionStrategy.connect(this);
-            }
-            doStart();
-        }
-    }
-
-    public final void stop()
-    {
-        try
-        {
-            if (connected.get())
-            {
-                disconnect();
-            }
-        }
-        catch (Exception e)
-        {
-            // TODO MULE-863: What should we really do?
-            logger.error(e.getMessage(), e);
-        }
-
-        if (stopped.compareAndSet(false, true))
-        {
-            try
-            {
-                doStop();
-            }
-            catch (MuleException e)
-            {
-                // TODO MULE-863: What should we really do?
-                logger.error(e.getMessage(), e);
-            }
-
-        }
-    }
-
-    public final boolean isConnected()
-    {
-        return connected.get();
     }
 
     public InternalMessageListener getListener()
@@ -630,6 +407,16 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
         return receiverKey;
     }
 
+    public InboundEndpoint getEndpoint()
+    {
+        return (InboundEndpoint) super.getEndpoint();
+    }
+    
+    public void setEndpoint(InboundEndpoint endpoint)
+    {
+        super.setEndpoint(endpoint);
+    }
+    
     public String toString()
     {
         final StringBuffer sb = new StringBuffer(80);
@@ -640,23 +427,4 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
         sb.append('}');
         return sb.toString();
     }
-
-    protected void doInitialise() throws InitialisationException
-    {
-        //nothing to do
-        //TODO this was addd to complete the lifecycle phases on the message receivers however, we ened to
-        //review each receiver to move logic from the contstructor to the init method. The Connector will
-        //call this method when the receiver is created. see MULE-2113 for more information about lifecycle clean up
-    }
-
-    protected abstract void doStart() throws MuleException;
-
-    protected abstract void doStop() throws MuleException;
-
-    protected abstract void doConnect() throws Exception;
-
-    protected abstract void doDisconnect() throws Exception;
-
-    protected abstract void doDispose();
-
 }

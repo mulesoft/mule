@@ -13,11 +13,11 @@ package org.mule.endpoint;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
 import org.mule.util.ClassUtils;
 
@@ -30,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.emory.mathcs.backport.java.util.Collections;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -132,8 +133,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     private final MuleContext muleContext;
 
-    private final ConnectionStrategy connectionStrategy;
-
+    protected RetryPolicyTemplate retryPolicyTemplate;
+    
     public AbstractEndpoint(Connector connector,
                             EndpointURI endpointUri,
                             List transformers,
@@ -150,7 +151,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             String initialState,
                             String endpointEncoding,
                             MuleContext muleContext,
-                            ConnectionStrategy connectionStrategy)
+                            RetryPolicyTemplate retryPolicyTemplate)
     {
         this.connector = connector;
         this.endpointUri = endpointUri;
@@ -171,7 +172,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         {
             updateTransformerEndpoints(responseTransformers);
             this.responseTransformers = Collections.unmodifiableList(responseTransformers);
-        }
+        }   
         this.name = name;
         // TODO Properties should be immutable. See MULE-3105
         // this.properties = Collections.unmodifiableMap(properties);
@@ -190,7 +191,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         this.initialState = initialState;
         this.endpointEncoding = endpointEncoding;
         this.muleContext = muleContext;
-        this.connectionStrategy = connectionStrategy;
+        this.retryPolicyTemplate = retryPolicyTemplate;
     }
 
     public EndpointURI getEndpointURI()
@@ -294,7 +295,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         if (obj == null || getClass() != obj.getClass()) return false;
 
         final AbstractEndpoint other = (AbstractEndpoint) obj;
-        return equal(connectionStrategy, other.connectionStrategy)
+        return equal(retryPolicyTemplate, other.retryPolicyTemplate)
                && equal(connector, other.connector)
                && deleteUnacceptedMessages == other.deleteUnacceptedMessages
                && equal(endpointEncoding, other.endpointEncoding)
@@ -312,7 +313,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     public int hashCode()
     {
-        return ClassUtils.hash(new Object[]{this.getClass(), connectionStrategy, connector,
+        return ClassUtils.hash(new Object[]{this.getClass(), retryPolicyTemplate, connector,
             deleteUnacceptedMessages ? Boolean.TRUE : Boolean.FALSE,
             endpointEncoding,
             endpointUri,
@@ -420,14 +421,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return muleContext;
     }
 
-    /**
-     * Getter for property 'connectionStrategy'.
-     * 
-     * @return Value for property 'connectionStrategy'.
-     */
-    public ConnectionStrategy getConnectionStrategy()
+    public RetryPolicyTemplate getRetryPolicyTemplate()
     {
-        return connectionStrategy;
+        return retryPolicyTemplate;
     }
-
 }

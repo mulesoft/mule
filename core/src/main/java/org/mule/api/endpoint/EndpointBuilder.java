@@ -13,11 +13,11 @@ package org.mule.api.endpoint;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.URIBuilder;
 
@@ -86,7 +86,7 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     void setMuleContext(MuleContext muleContext);
 
-    void setConnectionStrategy(ConnectionStrategy connectionStrategy);
+    void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate);
 
     void setURIBuilder(URIBuilder URIBuilder);
 

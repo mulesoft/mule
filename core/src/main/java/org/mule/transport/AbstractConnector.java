@@ -20,20 +20,25 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryContext;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connectable;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.ConnectorException;
 import org.mule.api.transport.DispatchException;
@@ -57,7 +62,6 @@ import org.mule.transformer.TransformerUtils;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.transport.service.TransportServiceException;
-import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.ObjectNameHelper;
@@ -213,8 +217,7 @@ public abstract class AbstractConnector
      */
     protected volatile int numberOfConcurrentTransactedReceivers = DEFAULT_NUM_CONCURRENT_TX_RECEIVERS;
 
-
-    protected volatile ConnectionStrategy connectionStrategy;
+    private RetryPolicyTemplate retryPolicyTemplate;
     
     /**
      * If doThreading is used in ReconnectingStrategy receivers must wait for 
@@ -288,8 +291,6 @@ public abstract class AbstractConnector
         supportedProtocols = new ArrayList();
         supportedProtocols.add(getProtocol().toLowerCase());
 
-        connectionStrategy = new SingleAttemptConnectionStrategy();
-
         // TODO dispatcher pool configuration should be extracted, maybe even
         // moved into the factory?
         // NOTE: testOnBorrow MUST be FALSE. this is a bit of a design bug in
@@ -346,6 +347,11 @@ public abstract class AbstractConnector
             logger.info("Initialising: " + this);
         }
 
+        if (retryPolicyTemplate == null)
+        {
+            retryPolicyTemplate = (RetryPolicyTemplate) muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
+        }
+
         // Use lazy-init (in get() methods) for this instead.
         //dispatcherThreadingProfile = muleContext.getDefaultMessageDispatcherThreadingProfile();
         //requesterThreadingProfile = muleContext.getDefaultMessageRequesterThreadingProfile();
@@ -382,60 +388,53 @@ public abstract class AbstractConnector
     {
         this.checkDisposed();
 
-        if (!this.isStarted())
+        if (!this.isConnected())
         {
-            //TODO: Not sure about this.  Right now the connector will connect only once
-            // there is an endpoint associated with it and that endpoint is connected.
-            // Do we also need the option of connecting the connector without any endpoints?
-//            if (!this.isConnected())
-//            {
-//                startOnConnect.set(true);
-//                this.getConnectionStrategy().connect(this);
-//                // Only start once we are connected
-//                return;
-//            }
-            if (!this.isConnected())
+            startOnConnect.set(true);
+            
+            // Make sure we are connected
+            try
             {
-                startOnConnect.set(true);
-                // Don't call getConnectionStrategy(), it clones the connection strategy.
-                // Connectors should have a single reconnection thread, unlike per receiver/dispatcher
-                connectionStrategy.connect(this);
-                // Only start once we are connected
-                return;
+                connect();
             }
-
-            if (logger.isInfoEnabled())
+            catch (Exception e)
             {
-                logger.info("Starting: " + this);
+                throw new LifecycleException(e, this);
             }
+            return;
+        }
 
-            // the scheduler is recreated after stop()
-            ScheduledExecutorService currentScheduler = (ScheduledExecutorService) scheduler.get();
-            if (currentScheduler == null || currentScheduler.isShutdown())
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Starting: " + this);
+        }
+
+        // the scheduler is recreated after stop()
+        ScheduledExecutorService currentScheduler = (ScheduledExecutorService) scheduler.get();
+        if (currentScheduler == null || currentScheduler.isShutdown())
+        {
+            scheduler.set(this.getScheduler());
+        }
+
+        this.doStart();
+        started.set(true);
+
+        if (receivers != null)
+        {
+            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
             {
-                scheduler.set(this.getScheduler());
-            }
-
-            this.doStart();
-            started.set(true);
-
-            if (receivers != null)
-            {
-                for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
+                MessageReceiver mr = (MessageReceiver) iterator.next();
+                if (logger.isDebugEnabled())
                 {
-                    MessageReceiver mr = (MessageReceiver) iterator.next();
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Starting receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
-                    }
-                    mr.start();
+                    logger.debug("Starting receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
                 }
+                mr.start();
             }
+        }
 
-            if (logger.isInfoEnabled())
-            {
-                logger.info("Started: " + this);
-            }
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Started: " + this);
         }
     }
 
@@ -444,7 +443,7 @@ public abstract class AbstractConnector
      *
      * @see org.mule.api.transport.Connector#isStarted()
      */
-    public boolean isStarted()
+    public final boolean isStarted()
     {
         return started.get();
     }
@@ -814,6 +813,7 @@ public abstract class AbstractConnector
             }
 
             dispatcher = (MessageDispatcher)dispatchers.borrowObject(endpoint);
+            dispatcher.initialise();
 
             if (logger.isDebugEnabled())
             {
@@ -928,6 +928,7 @@ public abstract class AbstractConnector
             }
 
             requester = (MessageRequester)requesters.borrowObject(endpoint);
+            requester.initialise();
 
             if (logger.isDebugEnabled())
             {
@@ -1163,7 +1164,7 @@ public abstract class AbstractConnector
         this.receiverThreadingProfile = receiverThreadingProfile;
     }
 
-    public void destroyReceiver(MessageReceiver receiver, InboundEndpoint endpoint) throws Exception
+    public void destroyReceiver(MessageReceiver receiver, ImmutableEndpoint endpoint) throws Exception
     {
         receiver.dispose();
     }
@@ -1234,37 +1235,6 @@ public abstract class AbstractConnector
     public void fireNotification(ServerNotification notification)
     {
         cachedNotificationHandler.fireNotification(notification);
-    }
-
-    /**
-     * Getter for property 'connectionStrategy'.
-     *
-     * @return Value for property 'connectionStrategy'.
-     */
-    //TODO RM* REMOVE
-    public ConnectionStrategy getConnectionStrategy()
-    {
-        // not happy with this but each receiver needs its own instance
-        // of the connection strategy and using a factory just introduces extra
-        // implementation
-        try
-        {
-            return (ConnectionStrategy) BeanUtils.cloneBean(connectionStrategy);
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(CoreMessages.failedToClone("connectionStrategy"), e);
-        }
-    }
-
-    /**
-     * Setter for property 'connectionStrategy'.
-     *
-     * @param connectionStrategy Value to set for property 'connectionStrategy'.
-     */
-    public void setConnectionStrategy(ConnectionStrategy connectionStrategy)
-    {
-        this.connectionStrategy = connectionStrategy;
     }
 
     /** {@inheritDoc} */
@@ -1349,88 +1319,45 @@ public abstract class AbstractConnector
     {
         this.checkDisposed();
 
-        if (connected.get())
+        if (isConnected() || isConnecting())
         {
             return;
         }
 
-        /*
-            Until the recursive startConnector() -> connect() -> doConnect() -> connect()
-            calls are unwound between a connector and connection strategy, this call has
-            to be here, and not below (commented out currently). Otherwise, e.g. WebspherMQ
-            goes into an endless reconnect thrashing loop, see MULE-1150 for more details.
-        */
-        try
+        retryPolicyTemplate.execute(new RetryCallback()
         {
-            if (connecting.get())
+            public void doWork(RetryContext context) throws Exception
             {
-                this.doConnect();
+                setConnecting(true);
+                doConnect();
+                setConnected(true);
+                setConnecting(false);
+
+                if(startOnConnect.get())
+                {
+                    start();
+                }
             }
-            if (connecting.compareAndSet(false, true))
+
+            public String getWorkDescription()
             {
+                return getConnectionDescription();
+            }
+        });
+
+        if (receivers != null)
+        {
+            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
+            {
+                MessageReceiver receiver = (MessageReceiver) iterator.next();
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Connecting: " + this);
+                    logger.debug("Connecting receiver on endpoint: "
+                            + receiver.getEndpoint().getEndpointURI());
                 }
-
-                connectionStrategy.connect(this);
-
-                logger.info("Connected: " + getConnectionDescription());
-                // This method calls itself so the connecting flag is set first, then
-                // the connection is made on the second call
-                return;
-            }
-
-
-            // see the explanation above
-            //this.doConnect();
-            connected.set(true);
-            connecting.set(false);
-            connectedSemaphore.release(getNumberOfConcurrentTransactedReceivers()+1);
-            
-            this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-                ConnectionNotification.CONNECTION_CONNECTED));
-        }
-        catch (Exception e)
-        {
-            connected.set(false);
-            connecting.set(false);
-
-            this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-                ConnectionNotification.CONNECTION_FAILED));
-
-            if (e instanceof ConnectException || e instanceof FatalConnectException)
-            {
-                // rethrow
-                throw e;
-            }
-            else
-            {
-                throw new ConnectException(e, this);
+                receiver.connect();
             }
         }
-
-        if (startOnConnect.get())
-        {
-            this.start();
-        }
-        //TODO RM*. If the connection strategy is called on the receivers, the connector strategy gets called too,
-        //to ensure its connected. Therefore the connect method on the connector needs to be idempotent and not try
-        //and connect dispatchers or receivers
-
-//        else
-//        {
-//            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
-//            {
-//                MessageReceiver receiver = (MessageReceiver)iterator.next();
-//                if (logger.isDebugEnabled())
-//                {
-//                    logger.debug("Connecting receiver on endpoint: "
-//                                    + receiver.getEndpoint().getEndpointURI());
-//                }
-//                receiver.connect();
-//            }
-//        }
     }
 
     public void disconnect() throws Exception
@@ -1463,6 +1390,21 @@ public abstract class AbstractConnector
     public final boolean isConnected()
     {
         return connected.get();
+    }
+
+    public final void setConnected(boolean flag)
+    {
+        connected.set(flag);
+    }
+
+    public final boolean isConnecting()
+    {
+        return connecting.get();
+    }
+
+    protected final void setConnecting(boolean flag)
+    {
+        connecting.set(flag);
     }
 
     /**
@@ -1845,6 +1787,7 @@ public abstract class AbstractConnector
     {
         MessageRequester requester = null;
         MuleMessage result = null;
+
         try
         {
             requester = this.getRequester(endpoint);
@@ -2175,5 +2118,15 @@ public abstract class AbstractConnector
     public Semaphore getConnectedSemaphore()
     {
         return connectedSemaphore;
+    }
+
+    public RetryPolicyTemplate getRetryPolicyTemplate()
+    {
+        return retryPolicyTemplate;
+    }
+
+    public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
+    {
+        this.retryPolicyTemplate = retryPolicyTemplate;
     }
 }

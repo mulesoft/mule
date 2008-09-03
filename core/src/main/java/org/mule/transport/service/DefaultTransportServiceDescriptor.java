@@ -202,7 +202,9 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                                                     InboundEndpoint endpoint) throws MuleException
     {
 
-        return createMessageReceiver(connector, service, endpoint, null);
+        MessageReceiver mr = createMessageReceiver(connector, service, endpoint, null);
+        mr.initialise();
+        return mr;
     }
 
     /* (non-Javadoc)
@@ -254,7 +256,9 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
             try
             {
-                return (MessageReceiver) ClassUtils.instanciateClass(receiverClass, newArgs, classLoader);
+                MessageReceiver mr = (MessageReceiver) ClassUtils.instanciateClass(receiverClass, newArgs, classLoader);
+                mr.initialise();
+                return mr;
             }
             catch (Exception e)
             {

@@ -22,7 +22,6 @@ import java.util.HashMap;
 
 public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
-
     private String prefix;
     private String config;
 
@@ -91,10 +90,11 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         }
         catch (MuleException e)
         {
-            assertTrue(e instanceof DispatchException);
+            assertTrue(e.getCause() instanceof FatalConnectException);
+            assertTrue(e.getCause().getCause() instanceof DispatchException);
 
             Message message = RmiMessages.messageParamServiceMethodNotSet();
-            assertTrue(e.getMessage().startsWith(message.toString()));
+            assertTrue(e.getCause().getCause().getMessage().startsWith(message.toString()));
         }
     }
 
@@ -107,7 +107,8 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         }
         catch (MuleException e)
         {
-            assertTrue(e.getCause() instanceof NoSuchMethodException);
+            assertTrue(e.getCause() instanceof FatalConnectException);
+            assertTrue(e.getCause().getCause() instanceof NoSuchMethodException);
         }
     }
 
@@ -125,7 +126,8 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         }
         catch (MuleException e)
         {
-            assertTrue(e.getCause() instanceof NoSuchMethodException);
+            assertTrue(e.getCause() instanceof FatalConnectException);
+            assertTrue(e.getCause().getCause() instanceof NoSuchMethodException);
         }
     }
 
@@ -134,6 +136,5 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         MuleMessage message = new MuleClient().send("GoodType", "hello", null);
         assertNotNull(message);
         assertEquals("olleh", message.getPayloadAsString());
-    }
-    
+    }   
 }

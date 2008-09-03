@@ -11,12 +11,17 @@
 package org.mule.tck.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.endpoint.URIBuilder;
+import org.mule.tck.testmodels.mule.TestConnector;
 
 public class TestNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public void init()
     {
+        registerStandardTransportEndpoints(TestConnector.TEST, URIBuilder.PATH_ATTRIBUTES);
+        registerConnectorDefinitionParser(TestConnector.class);
+        
         registerBeanDefinitionParser("component", new TestComponentDefinitionParser());
         //This is handled by the TestComponentDefinitionParser
         registerIgnoredElement("return-data");

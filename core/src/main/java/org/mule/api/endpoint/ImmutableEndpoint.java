@@ -11,10 +11,10 @@
 package org.mule.api.endpoint;
 
 import org.mule.api.MuleContext;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
 
 import java.io.Serializable;
@@ -196,8 +196,12 @@ public interface ImmutableEndpoint extends Serializable
     MuleContext getMuleContext();
 
     /**
-     * Returns the connection strategy this endpoint should use when connecting to the underlying resource
-     * @return the connection strategy this endpoint should use when connecting to the underlying resource
+     * The retry policy on the endpoint configures how retries are handled. The behaviour is slightly different
+     * for inbound and outbound endpoints.
+     * For inbound endpoints the Retry Policy determines how the connection to the underlying transport will be
+     * managed if the connection is lost.
+     * For outbound endpoints, the Retry Policy will attempt to retry dispatching, sending and receiving an event
+     * @return the Policy factory to use when retrying a connection or dispatching an event
      */
-    ConnectionStrategy getConnectionStrategy();
+    RetryPolicyTemplate getRetryPolicyTemplate();
 }

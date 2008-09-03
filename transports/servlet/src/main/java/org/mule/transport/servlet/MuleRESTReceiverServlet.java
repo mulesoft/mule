@@ -80,7 +80,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             {
                 MessageReceiver receiver = getReceiverForURI(httpServletRequest);
                 httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
-                MuleMessage message = new DefaultMuleMessage(receiver.getConnector().getMessageAdapter(
+                MuleMessage message = new DefaultMuleMessage(receiver.getEndpoint().getConnector().getMessageAdapter(
                     httpServletRequest));
                 MuleMessage returnMessage = receiver.routeMessage(message, true);
                 writeResponse(httpServletResponse, returnMessage);
@@ -99,7 +99,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         {
             MessageReceiver receiver = getReceiverForURI(httpServletRequest);
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
-            MuleMessage message = new DefaultMuleMessage(receiver.getConnector()
+            MuleMessage message = new DefaultMuleMessage(receiver.getEndpoint().getConnector()
                 .getMessageAdapter(httpServletRequest));
             MuleMessage returnMessage = receiver.routeMessage(message, true);
             writeResponse(httpServletResponse, returnMessage);
@@ -118,7 +118,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         {
             MessageReceiver receiver = getReceiverForURI(httpServletRequest);
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
-            MuleMessage message = new DefaultMuleMessage(receiver.getConnector()
+            MuleMessage message = new DefaultMuleMessage(receiver.getEndpoint().getConnector()
                 .getMessageAdapter(httpServletRequest));
             receiver.routeMessage(message, MuleServer.getMuleContext().getConfiguration().isDefaultSynchronousEndpoints());
 

@@ -78,6 +78,8 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        super.doInitialise();
+        
         try
         {
             Map endpointProps = getEndpoint().getProperties();
@@ -362,13 +364,10 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    protected void doDispose()
-    {
-        // template method
-    }
-
     public void doConnect() throws Exception
     {
+        super.doConnect();
+        
         // Start the CXF Server
         server.start();
         connector.registerReceiverWithMuleService(this, endpoint.getEndpointURI());
@@ -376,17 +375,9 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
 
     public void doDisconnect() throws Exception
     {
+        super.doDisconnect();
+        
         server.stop();
-    }
-
-    public void doStart() throws MuleException
-    {
-        // nothing to do
-    }
-
-    public void doStop() throws MuleException
-    {
-        // nothing to do
     }
 
     public Server getServer()
@@ -413,5 +404,4 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     {
         return applyFiltersToProtocol;
     }
-
 }

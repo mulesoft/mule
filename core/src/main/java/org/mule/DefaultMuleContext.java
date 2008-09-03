@@ -30,7 +30,6 @@ import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryBroker;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.transaction.TransactionManagerFactory;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
@@ -49,7 +48,6 @@ import java.util.Collection;
 import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -557,27 +555,6 @@ public class DefaultMuleContext implements MuleContext
     public ThreadingProfile getDefaultThreadingProfile()
     {
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE);
-    }
-
-    /**
-     * Returns a clone of the default Connection strategy. The clone ensures that the
-     * connection strategy can be manipulated without affecting other connectors
-     * using the same strategy
-     * 
-     * @return a clone of the default Connection strategy
-     */
-    public ConnectionStrategy getDefaultConnectionStrategy()
-    {
-        ConnectionStrategy defaultConnectionStrategy = 
-            (ConnectionStrategy) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_CONNECTION_STRATEGY);
-        try
-        {
-            return (ConnectionStrategy) BeanUtils.cloneBean(defaultConnectionStrategy);
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(CoreMessages.failedToClone("Connection Strategy"), e);
-        }
     }
 
     // TODO This should ideally only be available via an Admin interface

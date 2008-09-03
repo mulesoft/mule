@@ -13,12 +13,12 @@
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
     <jms:activemq-connector name="jmsConnector">
-        <spring:property name="connectionStrategy" ref="SimpleRetryConnectionStrategy"/>
+        <spring:property name="retryPolicyFactory" ref="SimpleRetryPolicyFactory"/>
     </jms:activemq-connector>
 
-    <spring:bean name="SimpleRetryConnectionStrategy" class="org.mule.transport.SimpleRetryConnectionStrategy">
+    <spring:bean name="SimpleRetryPolicyFactory" class="org.mule.retry.policies.SimpleRetryPolicyFactory">
         <spring:property name="retryCount" value="5"/>
-        <spring:property name="retryFrequency" value="1000"/>
+        <spring:property name="frequency" value="1000"/>
     </spring:bean>
 
     <model name="test">
@@ -26,10 +26,7 @@
             <inbound>
                 <jms:inbound-endpoint queue="in"/>
             </inbound>
-            
-            <component>
-            	<singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
+            <test:component/>
         </service>
     </model>
 </mule>

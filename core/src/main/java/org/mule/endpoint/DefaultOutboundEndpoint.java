@@ -15,10 +15,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.MuleManifest;
@@ -47,11 +47,11 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    String initialState,
                                    String endpointEncoding,
                                    MuleContext muleContext,
-                                   ConnectionStrategy connectionStrategy)
+                                   RetryPolicyTemplate retryPolicyTemplate)
     {
         super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
             deleteUnacceptedMessage, securityFilter, synchronous, remoteSync, remoteSyncTimeout, initialState,
-            endpointEncoding, muleContext, connectionStrategy);
+            endpointEncoding, muleContext, retryPolicyTemplate);
     }
 
     public void dispatch(MuleEvent event) throws DispatchException

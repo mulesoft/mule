@@ -14,10 +14,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
 import org.mule.config.MuleManifest;
 
@@ -45,11 +45,11 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                   String initialState,
                                   String endpointEncoding,
                                   MuleContext muleContext,
-                                  ConnectionStrategy connectionStrategy)
+                                  RetryPolicyTemplate retryPolicyTemplate)
     {
         super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
             deleteUnacceptedMessage, securityFilter, synchronous, remoteSync, remoteSyncTimeout, initialState,
-            endpointEncoding, muleContext, connectionStrategy);
+            endpointEncoding, muleContext, retryPolicyTemplate);
     }
 
     public MuleMessage request(long timeout) throws Exception

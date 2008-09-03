@@ -34,7 +34,6 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
         MessageReceiver receiver = getMessageReceiver();
 
         assertNotNull(receiver.getEndpoint());
-        assertNotNull(receiver.getConnector());
 
         try
         {
@@ -46,18 +45,6 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
             // expected
         }
 
-        try
-        {
-            receiver.setService(null);
-            fail("service cannot be set to null");
-        }
-        catch (IllegalArgumentException e)
-        {
-            // expected
-        }
-
-        receiver.setService(service);
-        assertNotNull(receiver.getService());
         receiver.setEndpoint(endpoint);
         assertNotNull(receiver.getEndpoint());
 

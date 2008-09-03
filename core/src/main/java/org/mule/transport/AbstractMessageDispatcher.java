@@ -18,6 +18,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryContext;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -35,7 +37,6 @@ import javax.resource.spi.work.WorkManager;
  */
 public abstract class AbstractMessageDispatcher extends AbstractConnectable implements MessageDispatcher
 {
-
     public AbstractMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
@@ -80,31 +81,16 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         try
         {
             Transaction tx = TransactionCoordination.getInstance().getTransaction();
+            Worker worker = new Worker(event);
             if (isDoThreading() && !event.isSynchronous() && tx == null)
             {
                 connector.getDispatcherWorkManager().scheduleWork(new Worker(event), WorkManager.INDEFINITE, null, connector);
             }
             else
             {
-                // Make sure we are connected
-                connectionStrategy.connect(this);
-                doDispatch(event);
-                if (connector.isEnableMessageEvents())
-                {
-                    String component = null;
-                    if (event.getService() != null)
-                    {
-                        component = event.getService().getName();
-                    }
-                    connector.fireNotification(new EndpointMessageNotification(event.getMessage(), event
-                        .getEndpoint(), component, EndpointMessageNotification.MESSAGE_DISPATCHED));
-                }
+                // Execute within this thread
+                worker.run();
             }
-        }
-        catch (DispatchException e)
-        {
-            disposeAndLogException();
-            throw e;
         }
         catch (Exception e)
         {
@@ -149,38 +135,37 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             }
         }
 
+        // Variable needs to be final in order to use it inside callback
+        final MuleEvent finalEvent = event;
         try
         {
-            // Make sure we are connected
-            connectionStrategy.connect(this);
-
-            MuleMessage result = doSend(event);
-            if (connector.isEnableMessageEvents())
+            RetryContext context = retryTemplate.execute(new RetryCallback()
             {
-                String component = null;
-                if (event.getService() != null)
+                public void doWork(RetryContext context) throws Exception
                 {
-                    component = event.getService().getName();
-                }
-                connector.fireNotification(new EndpointMessageNotification(event.getMessage(), event.getEndpoint(),
-                    component, EndpointMessageNotification.MESSAGE_SENT));
-            }
+                    // Make sure we are connected
+                    connect();
 
-            //TODO: This chunk can be removed since there is no need to remove any properites since they are now scoped
-            // Once a dispatcher has done its work we need to remove this property
-            // so that it is not propagated to the next request
-//            if (result != null
-//                    && result.getPropertyNames().contains(MuleProperties.MULE_REMOTE_SYNC_PROPERTY))
-            //{
-//                result = RequestContext.safeMessageCopy(result);
-            //    result.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
-            //}
-            return result;
-        }
-        catch (DispatchException e)
-        {
-            disposeAndLogException();
-            throw e;
+                    MuleMessage result = doSend(finalEvent);
+                    if (connector.isEnableMessageEvents())
+                    {
+                        String component = null;
+                        if (finalEvent.getService() != null)
+                        {
+                            component = finalEvent.getService().getName();
+                        }
+                        connector.fireNotification(new EndpointMessageNotification(finalEvent.getMessage(), finalEvent.getEndpoint(),
+                                component, EndpointMessageNotification.MESSAGE_SENT));
+                    }
+                    context.addReturnMessage(result);
+                }
+
+                public String getWorkDescription()
+                {
+                    return getConnectionDescription();
+                }
+            });
+            return context.getFirstReturnMessage();
         }
         catch (Exception e)
         {
@@ -256,22 +241,35 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         {
             try
             {
-                event = RequestContext.setEvent(event);
-                // Make sure we are connected
-                connectionStrategy.connect(AbstractMessageDispatcher.this);
-                AbstractMessageDispatcher.this.doDispatch(event);
-
-                if (connector.isEnableMessageEvents())
+                retryTemplate.execute(new RetryCallback()
                 {
-                    String component = null;
-                    if (event.getService() != null)
+
+                    public void doWork(RetryContext context) throws Exception
                     {
-                        component = event.getService().getName();
+
+                        final MuleEvent finalEvent = RequestContext.setEvent(event);
+                        // Make sure we are connected
+                        connect();
+                        doDispatch(finalEvent);
+
+                        if (connector.isEnableMessageEvents())
+                        {
+                            String component = null;
+                            if (finalEvent.getService() != null)
+                            {
+                                component = finalEvent.getService().getName();
+                            }
+
+                            connector.fireNotification(new EndpointMessageNotification(finalEvent.getMessage(),
+                                finalEvent.getEndpoint(), component, EndpointMessageNotification.MESSAGE_DISPATCHED));
+                        }
                     }
 
-                    connector.fireNotification(new EndpointMessageNotification(event.getMessage(), event
-                        .getEndpoint(), component, EndpointMessageNotification.MESSAGE_DISPATCHED));
-                }
+                    public String getWorkDescription()
+                    {
+                        return getConnectionDescription();
+                    }
+                });
             }
             catch (Exception e)
             {

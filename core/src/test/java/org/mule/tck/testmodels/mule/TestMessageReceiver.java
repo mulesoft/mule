@@ -20,8 +20,7 @@ import org.mule.transport.AbstractMessageReceiver;
 public class TestMessageReceiver extends AbstractMessageReceiver
 {
 
-    public TestMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
-        throws CreateException
+    public TestMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint) throws CreateException
     {
         super(connector, service, endpoint);
     }
@@ -34,6 +33,11 @@ public class TestMessageReceiver extends AbstractMessageReceiver
     protected void doDisconnect() throws Exception
     {
         // no op
+    }
+
+    protected void doInitialise()
+    {
+        // template method
     }
 
     protected void doDispose()

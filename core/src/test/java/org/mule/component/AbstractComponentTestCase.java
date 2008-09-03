@@ -12,7 +12,7 @@ package org.mule.component;
 
 import org.mule.tck.AbstractMuleTestCase;
 
-public class AbstractComponentTestCase extends AbstractMuleTestCase
+public abstract class AbstractComponentTestCase extends AbstractMuleTestCase
 {
 
 }

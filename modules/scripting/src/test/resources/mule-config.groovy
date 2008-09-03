@@ -38,8 +38,7 @@ import org.mule.endpoint.DefaultEndpointFactory
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.config.ChainedThreadingProfile;
-import org.mule.transport.SingleAttemptConnectionStrategy;
-import org.mule.transport.SimpleRetryConnectionStrategy;
+import org.mule.retry.policies.NoRetryPolicyTemplate;
 
 // Set up defaults / system objects
 QueueManager queueManager = new TransactionalQueueManager();
@@ -63,7 +62,7 @@ muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIV
             new ChainedThreadingProfile(defaultThreadingProfile));
 muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE,
             new ChainedThreadingProfile(defaultThreadingProfile));
-muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_CONNECTION_STRATEGY, new SingleAttemptConnectionStrategy());
+muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, new NoRetryPolicyTemplate());
 
 muleContext.registry.registerObject("doCompression", "true")
 
@@ -127,10 +126,6 @@ muleContext.registry.registerEndpointBuilder("orangeEndpoint", epBuilder);
 
 epBuilder = new EndpointURIEndpointBuilder("test://test.queue2", muleContext);
 epBuilder.name = "testEPWithCS";
-connectionStrategy = new SimpleRetryConnectionStrategy();
-connectionStrategy.retryCount = 4
-connectionStrategy.retryFrequency = 3000;
-epBuilder.connectionStrategy = connectionStrategy;
 muleContext.registry.registerEndpointBuilder("testEPWithCS", epBuilder);
 
 // Concrete Endpoints
