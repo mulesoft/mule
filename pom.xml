@@ -802,7 +802,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    
+
     <ciManagement>
         <system>bamboo</system>
         <url>http://bamboo.mulesource.org/bamboo</url>
@@ -1492,7 +1492,7 @@
             </build>
         </profile>
     </profiles>
-    
+
     <!-- *******************************************************************
          Global dependencies - these will be available for all Mule modules
          ******************************************************************* -->
@@ -1525,7 +1525,7 @@
             <version>${log4jVersion}</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- 
         We cannot add apache commons, activation of j2ee specs jars here because child
         projects create the osgi ready versions of these and this causes cyclic dependencies
@@ -1543,5 +1543,5 @@
             <version>0.09</version>
             <scope>test</scope>
         </dependency>
-    </dependencies>    
+    </dependencies>
 </project>

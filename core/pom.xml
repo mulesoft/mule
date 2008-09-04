@@ -27,13 +27,13 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
         </dependency>
-        
+
         <!-- UUID generator, only called directly by mule-core -->
         <dependency>
             <groupId>org.safehaus.jug</groupId>
@@ -41,7 +41,7 @@
             <version>${jugVersion}</version>
         </dependency>
 
-		<!--  OTHERS.  group/artifact id only, version and exclusions are specified via dependency management -->
+        <!--  OTHERS.  group/artifact id only, version and exclusions are specified via dependency management -->
         <dependency>
             <groupId>edu.emory.mathcs.backport</groupId>
             <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
