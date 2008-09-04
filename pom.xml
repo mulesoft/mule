@@ -26,11 +26,11 @@
     <url>http://mule.mulesource.org</url>
     <inceptionYear>2003</inceptionYear>
     <licenses>
-      <license>
-        <name>CPAL v1.0</name>
-        <url>http://www.mulesource.com/CPAL</url>
-      </license>
-    </licenses>    
+        <license>
+            <name>CPAL v1.0</name>
+            <url>http://www.mulesource.com/CPAL</url>
+        </license>
+    </licenses>
     <mailingLists>
         <!-- Refer to http://mule.mulesource.org/Mailing+Lists -->
     </mailingLists>
@@ -53,7 +53,7 @@
     </scm>
 
     <properties>
-        <muleCEVersion>2.1.0-M2-SNAPSHOT</muleCEVersion>
+        <muleCEVersion>2.1.0-M3-SNAPSHOT</muleCEVersion>
         <!--
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
@@ -64,7 +64,7 @@
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <jdk14Name>jdk1.4</jdk14Name>
         <jdk5Name>jdk5</jdk5Name>
-        
+
         <acegiVersion>1.0.7</acegiVersion>
         <antVersion>1.7.0</antVersion>
         <antlrVersion>2.7.7</antlrVersion>
