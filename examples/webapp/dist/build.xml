@@ -94,7 +94,8 @@
             </lib>
             <lib dir="${dir.mule.home}/lib/opt">
                 <include name="**/*.jar"/>
-                <exclude name="**/geronimo-servlet*.jar"/>
+                <exclude name="**/com.springsource.javax.servlet*.jar"/>
+                <exclude name="**/servlet-api*.jar"/>
             </lib>
             <!-- This libs decl is needed for building the example on Mule EE -->
             <lib dir="${dir.mule.home}/lib/boot">
