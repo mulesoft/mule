@@ -57,14 +57,25 @@ public class SchemaDocsMain
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    public static void main(String[] args)
-            throws IOException, TransformerException, ParserConfigurationException
+    public static void main(String[] args) throws Exception
     {
         if (null == args || args.length != 3)
         {
             throw new IllegalArgumentException("Needs 3 arguments: prefix, postfix and destination");
         }
-        new SchemaDocsMain(args[0], args[1], args[2]);
+
+        try
+        {
+            new SchemaDocsMain(args[0], args[1], args[2]);
+        }
+        catch (Exception ex)
+        {
+            // using System.err on purpose here so that errors appear in the build
+            // process and are not swallowed by the logging config
+            ex.printStackTrace(System.err);
+
+            throw ex;
+        }
     }
 
     public SchemaDocsMain(String prefix, String postfix, String normalizedPath)

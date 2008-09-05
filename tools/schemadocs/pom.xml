@@ -14,12 +14,25 @@
     <description>These are the tools used to generate docs from schema</description>
 
     <dependencies>
-
         <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl104-over-slf4j</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
         </dependency>
 
         <dependency>
@@ -189,47 +202,50 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>schemadocs</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <!-- 
-                                     The choice of phase is sensitive here. Since we use a class
-                                     that's compiled in this module we must chose a phase 
-                                     later than 'compile'.  We also need a phase earlier than
-                                     'package' since our results are in target.
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <!-- 
+                                The choice of phase is sensitive here. Since we use a class
+                                that's compiled in this module we must chose a phase 
+                                later than 'compile'.  We also need a phase earlier than
+                                'package' since our results are in target.
                                 -->
-                                <phase>process-classes</phase>
-                                <configuration>
-                                    <mainClass>org.mule.tools.schemadocs.SchemaDocsMain</mainClass>
-                                    <arguments>
-                                        <!-- first two args are the header/footer for the file -->
-                                        <argument>schemadoc-prefix.txt</argument>
-                                        <argument>schemadoc-postfix.txt</argument>
-                                        <!-- this is the destination of the final composite schema
-                                             relative paths are relative to maven's target directory
-                                             absolute paths are absolute.
-                                             in either case, directories are created as needed. -->
-                                        <!-- argument>normalized/normalized.xsd</argument -->
-                                        <argument>/var/www/html/docs/xsd-doc/normalized.xsd</argument>
-                                    </arguments>
-                                </configuration>
-                                <goals>
-                                    <goal>java</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.mule.tools.schemadocs.SchemaDocsMain</mainClass>
+                            <arguments>
+                                <!-- first two args are the header/footer for the file -->
+                                <argument>schemadoc-prefix.txt</argument>
+                                <argument>schemadoc-postfix.txt</argument>
+                                <!-- this is the destination of the final composite schema
+                                        relative paths are relative to maven's target directory
+                                        absolute paths are absolute.
+                                        in either case, directories are created as needed. -->
+                                <!-- argument>normalized/normalized.xsd</argument -->
+                                <argument>/var/www/html/docs/xsd-doc/normalized.xsd</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
