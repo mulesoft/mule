@@ -50,7 +50,7 @@ public class AxisExceptionTestCase extends FunctionalTestCase
         }
         catch (DispatchException dispatchExc)
         {
-            Throwable t = dispatchExc.getCause();
+            Throwable t = dispatchExc.getCause().getCause();
 
             assertNotNull(t);
             assertEquals(TestComponentException.class.getName() + ": "
