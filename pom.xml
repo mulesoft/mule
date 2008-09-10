@@ -32,13 +32,13 @@
         </license>
     </licenses>
     <mailingLists>
-        <!-- Refer to http://mule.mulesource.org/Mailing+Lists -->
+        <!-- Refer to http://www.mulesource.org/display/MULE/Mailing+Lists -->
     </mailingLists>
     <developers>
-        <!-- Refer to http://mule.mulesource.org/Team -->
+        <!-- Refer to http://www.mulesource.org/display/MULE/Team -->
     </developers>
     <contributors>
-        <!-- Refer to http://mule.mulesource.org/Team -->
+        <!-- Refer to http://www.mulesource.org/display/MULE/Team -->
     </contributors>
     <issueManagement>
         <system>jira</system>
@@ -232,7 +232,7 @@
                 <artifactId>mule-transport-stdio</artifactId>
                 <version>${muleCEVersion}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>edu.emory.mathcs.backport</groupId>
                 <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
@@ -283,7 +283,7 @@
             <dependency>
                 <!-- OSGi-ready -->
                 <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-stax-api_1.0_spec</artifactId>            
+                <artifactId>geronimo-stax-api_1.0_spec</artifactId>
                 <version>${geronimoSpecsStaxVersion}</version>
             </dependency>
             <dependency>
@@ -291,11 +291,11 @@
                 <artifactId>com.springsource.javax.servlet</artifactId>
                 <version>${javaServletVersion}</version>
             </dependency>
-            <dependency>  
+            <dependency>
                 <groupId>javax.servlet</groupId>  
                 <artifactId>com.springsource.javax.servlet.jsp</artifactId>  
                 <version>${javaServletJspVersion}</version> 
-            </dependency>            
+            </dependency>
             <dependency>
                 <groupId>javax.activation</groupId>
                 <artifactId>com.springsource.javax.activation</artifactId>
@@ -561,7 +561,7 @@
                 <groupId>commons-jxpath</groupId>
                 <artifactId>commons-jxpath.osgi</artifactId>
                 <version>${commonsJxpathVersion}</version>
-            </dependency>            
+            </dependency>
             <!-- This has a dependency on javax.servlet.jsp which causes problems  
             <dependency>
                 <groupId>org.apache.commons</groupId>  
@@ -670,8 +670,8 @@
                         <artifactId>com.springsource.org.jgroups</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>                
-            
+            </dependency>
+
             <!-- For unit tests only -->
             <dependency>
                 <groupId>org.apache.derby</groupId>
@@ -1152,7 +1152,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.5</version>
                 <configuration>
                     <minmemory>128m</minmemory>
                     <maxmemory>512m</maxmemory>
@@ -1526,7 +1526,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- 
+        <!--
         We cannot add apache commons, activation of j2ee specs jars here because child
         projects create the osgi ready versions of these and this causes cyclic dependencies
         -->
