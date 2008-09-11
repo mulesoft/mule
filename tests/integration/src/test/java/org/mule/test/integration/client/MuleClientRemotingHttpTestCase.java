@@ -20,6 +20,6 @@ public class MuleClientRemotingHttpTestCase extends AbstractClientRemotingTestCa
 
     public String getRemoteEndpointUri()
     {
-        return "http://localhost:60504";
+        return "http://localhost:60505";
     }
 }
