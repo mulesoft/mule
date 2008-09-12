@@ -14,8 +14,8 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.transport.Connectable;
 
 /**
- * Is fired by a connector when a connection is made, or disconnected of the
- * connection fails.
+ * Is fired by a connector when a connection is made or disconnected.
+ * A disconnection can be caused by network failure, JMX, or the server shutting down.
  */
 public class ConnectionNotification extends ServerNotification
 {

@@ -62,11 +62,17 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
         if (config == null)
         {
             config = getDefaultConfigResource();
-            System.out.println("No Mule config file(s) specified, using default: " + config);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("No Mule config file(s) specified, using default: " + config);
+            }
         }
         else
         {
-            System.out.println("Mule config file(s): " + config);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Mule config file(s): " + config);
+            }
         }
 
         try

@@ -49,6 +49,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
     public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
 
+    private static final File[] NO_FILES = new File[0];
+
     private String readDir = null;
     private String moveDir = null;
     private File readDirectory = null;
@@ -403,7 +405,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             }
             // logger.trace("Reading directory " + readDirectory.getAbsolutePath() +
             // " -> " + TODOFiles.length + " file(s)");
-            return (todoFiles == null ? new File[0] : todoFiles);
+            return (todoFiles == null ? NO_FILES : todoFiles);
         }
         catch (Exception e)
         {
