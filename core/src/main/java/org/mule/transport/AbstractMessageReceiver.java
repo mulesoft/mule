@@ -108,8 +108,11 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
      * @throws org.mule.api.lifecycle.RecoverableException
      *          if an error occurs that can be recovered from
      */
-    protected void doInitialise() throws InitialisationException
+    //@Override
+    public final void initialise() throws InitialisationException
     {
+        super.initialise();
+        
         listener = new DefaultInternalMessageListener();
         endpointUri = endpoint.getEndpointURI();
 
@@ -120,6 +123,23 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         catch (MuleException e)
         {
             throw new InitialisationException(e, this);
+        }
+        
+        doInitialise();
+    }
+
+    //@Override
+    public final synchronized void dispose()
+    {
+        super.dispose();
+        try
+        {
+            disposing.set(true);
+            doDispose();
+        }
+        finally
+        {
+            disposed.set(true);
         }
     }
 
@@ -289,11 +309,6 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
             throw new IllegalArgumentException("Service cannot be null");
         }
         this.service = service;
-    }
-
-    protected void doDispose()
-    {
-        stop();
     }
 
     public EndpointURI getEndpointURI()

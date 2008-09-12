@@ -16,8 +16,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.routing.ResponseRouterCollection;
@@ -30,7 +32,6 @@ import org.mule.context.notification.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
 
 import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkManager;
 
 /**
  * Provide a default dispatch (client) support for handling threads lifecycle and validation.
@@ -40,6 +41,28 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     public AbstractMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
+    }
+
+    //@Override
+    public final void initialise() throws InitialisationException
+    {
+        super.initialise();
+        doInitialise();
+    }
+
+    //@Override
+    public final synchronized void dispose()
+    {
+        super.dispose();
+        try
+        {
+            disposing.set(true);
+            doDispose();
+        }
+        finally
+        {
+            disposed.set(true);
+        }
     }
 
     /*

@@ -51,7 +51,7 @@ org.mule.test.integration.util.ObjectNameHelperTestCase
 ##########################################################################
 
 # TODO MULE-2903
-org.mule.context.notification.ServerNotificationManagerTestCase
+#org.mule.context.notification.ServerNotificationManagerTestCase
 
 ##########################################################################
 # Low priority

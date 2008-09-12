@@ -12,6 +12,7 @@ package org.mule.transport;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.MessageRequester;
@@ -27,6 +28,28 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
     public AbstractMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
+    }
+
+    //@Override
+    public final void initialise() throws InitialisationException
+    {
+        super.initialise();
+        doInitialise();
+    }
+
+    //@Override
+    public final synchronized void dispose()
+    {
+        super.dispose();
+        try
+        {
+            disposing.set(true);
+            doDispose();
+        }
+        finally
+        {
+            disposed.set(true);
+        }
     }
 
     /**

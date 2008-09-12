@@ -107,7 +107,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         // nothing to do by default
     }
     
-    public final void initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (endpoint.getRetryPolicyTemplate() != null)
         {
@@ -117,35 +117,24 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         {
             retryTemplate = connector.getRetryPolicyTemplate();
         }
-        
-        doInitialise();
     }
 
     /**
      * Template method to destroy any resources held by the Message Dispatcher
      */
-    public final synchronized void dispose()
+    public synchronized void dispose()
     {
         if (!disposed.get())
         {
             try
             {
-                try
-                {
-                    this.disconnect();
-                }
-                catch (Exception e)
-                {
-                    // TODO MULE-863: What should we really do?
-                    logger.warn(e.getMessage(), e);
-                }
-
-                disposing.set(true);
-                this.doDispose();
+                this.disconnect();
+                this.stop();
             }
-            finally
+            catch (Exception e)
             {
-                disposed.set(true);
+                // TODO MULE-863: What should we really do?
+                logger.warn(e.getMessage(), e);
             }
         }
     }
