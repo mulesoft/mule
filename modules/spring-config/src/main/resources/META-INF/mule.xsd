@@ -402,6 +402,14 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
+            <xsd:element ref="abstract-retry-policy" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        The default retry policy, used by connectors and endpoints if no more 
+                        specific policy is configured for them.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="defaultSynchronousEndpoints" type="substitutableBoolean" default="false">
             <xsd:annotation>

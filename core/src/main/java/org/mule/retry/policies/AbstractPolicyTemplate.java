@@ -133,4 +133,10 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
     {
         this.notifier = retryNotifier;
     }
+
+    // For Spring IoC only
+    public void setId(String id)
+    {
+        // ignore
+    }
 }
