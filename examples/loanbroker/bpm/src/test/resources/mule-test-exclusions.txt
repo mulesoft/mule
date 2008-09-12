@@ -3,4 +3,4 @@
 #
 
 # MULE-3240
-org.mule.example.loanbroker.bpm.JBpmFunctionalTestCase
+#org.mule.example.loanbroker.bpm.JBpmFunctionalTestCase

@@ -224,20 +224,4 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
 
         return process;
     }
-
-    protected void doConnect() throws Exception
-    {
-        /* nop */
-    }
-
-    protected void doDisconnect() throws Exception
-    {
-        /* nop */
-    }
-
-    protected void doDispose()
-    {
-        /* nop */
-    }
-
 }

@@ -13,11 +13,13 @@ package org.mule.transport.bpm;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.ConnectorException;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.AbstractMessageReceiver;
 
 import java.util.Map;
@@ -53,7 +55,15 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         logger.debug("Executing process is dispatching an event (asynchronously) to Mule endpoint = " + endpoint);
         try
         {
-            getWorkManager().scheduleWork(new Worker(endpoint, payload, messageProperties));
+            WorkManager workManager = getWorkManager();
+            if (workManager != null)
+            {
+                workManager.scheduleWork(new Worker(endpoint, payload, messageProperties));
+            }
+            else
+            {
+                throw new ConnectorException(MessageFactory.createStaticMessage("WorkManager not available"), getConnector());
+            }
         }
         catch (Exception e)
         {
@@ -122,35 +132,4 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         public void release()
         { /*nop*/ }
     }
-
-    protected void doInitialise() throws InitialisationException
-    {
-        //nothing to do
-    }
-
-    protected void doConnect() throws Exception
-    {
-        // nothing to do
-    }
-
-    protected void doDisconnect() throws Exception
-    {
-        // nothing to do
-    }
-
-    protected void doStart() throws MuleException
-    {
-        // nothing to do
-    }
-
-    protected void doStop() throws MuleException
-    {
-        // nothing to do
-    }
-
-    protected void doDispose()
-    {
-        // nothing to do               
-    }
-
 }
