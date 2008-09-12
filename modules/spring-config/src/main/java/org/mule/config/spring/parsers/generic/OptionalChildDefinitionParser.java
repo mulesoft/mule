@@ -50,12 +50,16 @@ public class OptionalChildDefinitionParser extends ChildDefinitionParser
     // @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        String parentBean = getParentBeanName(element);
-        isChild = !(StringUtils.isBlank(parentBean));
-
+        isChild = isChild(element, parserContext, builder);
         super.parseChild(element, parserContext, builder);
     }
 
+    protected boolean isChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
+    {
+        String parentBean = getParentBeanName(element);
+        return !(StringUtils.isBlank(parentBean));
+    }
+    
     public BeanDefinition getParentBeanDefinition(Element element)
     {
         if (isChild)
