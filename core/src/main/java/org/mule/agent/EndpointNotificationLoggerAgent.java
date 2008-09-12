@@ -49,8 +49,6 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         super("Endpoint Logger Agent");
         // List of notifications to ignore, because when these notifications are
         // received the notification endpoint is no longer available
-        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSING_CONNECTORS));
-        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSED_CONNECTORS));
         ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_STOPPED));
         ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSING));   
         ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSED));

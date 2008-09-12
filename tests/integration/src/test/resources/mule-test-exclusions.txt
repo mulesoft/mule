@@ -47,13 +47,6 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 org.mule.test.integration.util.ObjectNameHelperTestCase
 
 ##########################################################################
-# Mule 2.1.x failures
-##########################################################################
-
-# TODO MULE-2903
-#org.mule.context.notification.ServerNotificationManagerTestCase
-
-##########################################################################
 # Low priority
 ##########################################################################
 

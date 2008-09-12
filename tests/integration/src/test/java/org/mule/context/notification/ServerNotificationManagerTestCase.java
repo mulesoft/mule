@@ -70,9 +70,7 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
                                 .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPING, MULE_SYSTEM_MODEL)
                                         .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPED, MULE_SYSTEM_MODEL))))
                         .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STOPPED_MODELS))
-                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STOPPED))
-                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_DISPOSING_CONNECTORS))
-                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_DISPOSED_CONNECTORS)
+                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STOPPED)
                                 // parallel because we don't know which model
                                 .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSING, MODEL)
                                         .serial(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MODEL)))
