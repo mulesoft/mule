@@ -65,7 +65,7 @@
     </resources>
 
     <!-- For ANT actions -->
-    <jar src="../distribution/lib/opt/ant-1.6.5.jar" stage="postinstall" />
+<!--     <jar src="../distribution/lib/opt/ant-1.6.5.jar" stage="postinstall" /> -->
     <!-- jar src="../distribution/lib/opt/ant-launcher-1.7.0.jar" stage="postinstall" /-->
     <jar src="../distribution/lib/endorsed/xercesImpl-2.9.1.jar" stage="postinstall" />
     <jar src="../distribution/lib/endorsed/xml-apis-1.3.04.jar" stage="postinstall" />
@@ -156,7 +156,6 @@
         <pack name="Scripting" required="no">
             <description>Scripting Package</description>
             <fileset dir="../distribution" targetdir="$INSTALL_PATH">
-                <include name="lib/user/yjp-controller-api-redist.jar"/>
                 <include name="lib/user/js-engine-1.1-jdk14.jar"/>
                 <include name="lib/user/js-1.6R5.jar"/>
                 <include name="lib/user/jython-engine-1.1-jdk14.jar"/>
