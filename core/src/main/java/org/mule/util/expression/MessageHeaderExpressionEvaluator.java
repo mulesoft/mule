@@ -10,14 +10,12 @@
 
 package org.mule.util.expression;
 
+import org.mule.RequestContext;
 import org.mule.api.transport.MessageAdapter;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 /**
- * Looks up the property on the message using the property name given.
+ * Looks up the property on the message using the property name given.  If the call on the messgae returns null,
+ * parameters on the inbound endpoint will also be checked.
  *
  * @see MessageHeadersListExpressionEvaluator
  * @see MessageHeadersExpressionEvaluator
@@ -30,20 +28,32 @@ public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
 
     public Object evaluate(String expression, Object message)
     {
+        Object result = null;
         if (message instanceof MessageAdapter)
         {
-            return ((MessageAdapter) message).getProperty(expression);
+            result = ((MessageAdapter) message).getProperty(expression);
+            //Should this fallback be in its own expression evaluator i.e. ${endpoint-param:foo} ??
+            //I'm not sure becaus ethis way there is a fallback where the message doesn't have a value the
+            //endpoint can define a default
+            if (result == null && RequestContext.getEventContext() != null)
+            {
+                result = RequestContext.getEventContext().getEndpointURI().getParams().get(expression);
+            }
         }
-        return null;
+        return result;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public String getName()
     {
         return NAME;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void setName(String name)
     {
         throw new UnsupportedOperationException("setName");

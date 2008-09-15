@@ -47,21 +47,24 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     /**
      * Make sure the evaluator gets registered properly
+     *
      * @throws Exception if the test fails
      */
     public void testSimpleUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test");
 
-        Object result = ExpressionEvaluatorManager.evaluate("${payload}", message);
+        assertTrue(ExpressionEvaluatorManager.isValidExpression("${payload:}"));
+
+        Object result = ExpressionEvaluatorManager.evaluate("${payload:}", message);
         assertNotNull(result);
         assertEquals("test", result);
 
-        result = ExpressionEvaluatorManager.evaluate("${payload}", new ArrayList(1));
+        result = ExpressionEvaluatorManager.evaluate("${payload:}", new ArrayList(1));
         assertNotNull(result);
         assertTrue(result instanceof List);
 
-        result = ExpressionEvaluatorManager.evaluate("${payload}", null);
+        result = ExpressionEvaluatorManager.evaluate("${payload:}", null);
         assertNull(result);
     }
 
@@ -74,7 +77,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
         Object result = eval.evaluate("byte[]", message);
         assertNotNull(result);
         assertTrue(result instanceof byte[]);
-        assertEquals("test", new String((byte[])result));
+        assertEquals("test", new String((byte[]) result));
 
         ByteArrayInputStream bais = new ByteArrayInputStream("test2".getBytes());
         //i.e. ${payload:java.lang.String}
@@ -95,7 +98,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
         Object result = eval.evaluate("org.mule.tck.testmodels.fruit.FruitBasket", message);
         assertNotNull(result);
         assertTrue(result instanceof FruitBasket);
-        FruitBasket fb = (FruitBasket)result;
+        FruitBasket fb = (FruitBasket) result;
         assertEquals(2, fb.getFruit().size());
         assertTrue(fb.hasBanana());
         assertTrue(fb.hasApple());

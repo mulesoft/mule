@@ -36,6 +36,10 @@ public final class TemplateParser
      */
     protected static final Log logger = LogFactory.getLog(TemplateParser.class);
 
+    public static final Pattern ANT_TEMPLATE_PATTERN = Pattern.compile("\\$\\{[^\\}]+\\}");
+    public static final Pattern SQUARE_TEMPLATE_PATTERN = Pattern.compile("\\[[^\\]]+\\]");
+    public static final Pattern CURLY_TEMPLATE_PATTERN = Pattern.compile("\\{[^\\}]+\\}");
+
     private final Pattern pattern;
     private final int pre;
     private final int post;
@@ -61,19 +65,19 @@ public final class TemplateParser
     {
         if (ANT_TEMPLATE_STYLE.equals(style))
         {
-            pattern = Pattern.compile("\\$\\{[^\\}]+\\}");
+            pattern = ANT_TEMPLATE_PATTERN;
             pre = 2;
             post = 1;
         }
         else if (SQUARE_TEMPLATE_STYLE.equals(style))
         {
-            pattern = Pattern.compile("\\[[^\\]]+\\]");
+            pattern = SQUARE_TEMPLATE_PATTERN;
             pre = 1;
             post = 1;
         }
         else if (CURLY_TEMPLATE_STYLE.equals(style))
         {
-            pattern = Pattern.compile("\\{[^\\}]+\\}");
+            pattern = CURLY_TEMPLATE_PATTERN;
             pre = 1;
             post = 1;
         }
@@ -88,10 +92,10 @@ public final class TemplateParser
      * Matches one or more templates against a Map of key value pairs. If a value for
      * a template is not found in the map the template is left as is in the return
      * String
-     * 
-     * @param props the key/value pairs to match against
+     *
+     * @param props    the key/value pairs to match against
      * @param template the string containing the template place holders i.e. My name
-     *            is ${name}
+     *                 is ${name}
      * @return the parsed String
      */
     public String parse(Map props, String template)
@@ -103,10 +107,10 @@ public final class TemplateParser
      * Matches one or more templates against a Map of key value pairs. If a value for
      * a template is not found in the map the template is left as is in the return
      * String
-     * 
+     *
      * @param callback a callback used to resolve the property name
      * @param template the string containing the template place holders i.e. My name
-     *            is ${name}
+     *                 is ${name}
      * @return the parsed String
      */
     public String parse(TemplateCallback callback, String template)
@@ -162,8 +166,8 @@ public final class TemplateParser
      * Matches one or more templates against a Map of key value pairs. If a value for
      * a template is not found in the map the template is left as is in the return
      * String
-     * 
-     * @param props the key/value pairs to match against
+     *
+     * @param props     the key/value pairs to match against
      * @param templates A List of templates
      * @return the parsed String
      */
@@ -185,15 +189,16 @@ public final class TemplateParser
      * Matches one or more templates against a Map of key value pairs. If a value for
      * a template is not found in the map the template is left as is in the return
      * String
-     * 
-     * @param props the key/value pairs to match against
+     *
+     * @param props     the key/value pairs to match against
      * @param templates A Map of templates. The values for each map entry will be
-     *            parsed
+     *                  parsed
      * @return the parsed String
      */
     public Map parse(final Map props, Map templates)
     {
-        return parse(new TemplateCallback(){
+        return parse(new TemplateCallback()
+        {
             public Object match(String token)
             {
                 return props.get(token);
@@ -233,14 +238,14 @@ public final class TemplateParser
                 char currentCharacter = string.charAt(i);
                 switch (currentCharacter)
                 {
-                    case '[' :
-                    case ']' :
-                    case '{' :
-                    case '}' :
-                    case '$' :
+                    case '[':
+                    case ']':
+                    case '{':
+                    case '}':
+                    case '$':
                         buffer.append("\\");
                         // fall through to append original character
-                    default :
+                    default:
                         buffer.append(currentCharacter);
                 }
             }
@@ -255,7 +260,10 @@ public final class TemplateParser
 
     public boolean isContainsTemplate(String value)
     {
-        if(value==null) return false;
+        if (value == null)
+        {
+            return false;
+        }
 
         Matcher m = pattern.matcher(value);
         return m.find();

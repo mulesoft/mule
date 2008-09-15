@@ -10,10 +10,10 @@
 package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.util.expression.ExpressionEvaluatorManager;
-import org.mule.util.expression.MapPayloadExpressionEvaluator;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.expression.ExpressionEvaluatorManager;
+import org.mule.util.expression.MapPayloadExpressionEvaluator;
 
 import java.sql.Timestamp;
 
@@ -52,5 +52,15 @@ public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
         }
         assertNull(ExpressionEvaluatorManager.unregisterEvaluator(null));
 
+    }
+
+
+    public void testValidator() throws Exception
+    {
+        assertTrue(ExpressionEvaluatorManager.isValidExpression("http://${bean:user}:${bean:password}@${header:host}:${header:port}/foo/bar"));
+        assertTrue(ExpressionEvaluatorManager.isValidExpression("${bean:user}"));
+        assertFalse(ExpressionEvaluatorManager.isValidExpression("{bean:user}"));
+        assertFalse(ExpressionEvaluatorManager.isValidExpression("${bean:user"));
+        assertFalse(ExpressionEvaluatorManager.isValidExpression("user"));
     }
 }
