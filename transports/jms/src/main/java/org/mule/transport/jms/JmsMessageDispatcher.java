@@ -14,9 +14,9 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageAdapter;
@@ -40,7 +40,6 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.lang.BooleanUtils;
 
 /**
@@ -58,7 +57,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     public JmsMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
-        this.connector = (JmsConnector)endpoint.getConnector();
+        this.connector = (JmsConnector) endpoint.getConnector();
     }
 
     protected void doDispatch(MuleEvent event) throws Exception
@@ -89,8 +88,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         if (logger.isDebugEnabled())
         {
             logger.debug("dispatching on endpoint: " + event.getEndpoint().getEndpointURI()
-                         + ". MuleEvent id is: " + event.getId()
-                         + ". Outbound transformers are: " + event.getEndpoint().getTransformers());
+                    + ". MuleEvent id is: " + event.getId()
+                    + ". Outbound transformers are: " + event.getEndpoint().getTransformers());
         }
 
         try
@@ -105,13 +104,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 if (remoteSync)
                 {
                     throw new IllegalTransactionStateException(
-                        JmsMessages.connectorDoesNotSupportSyncReceiveWhenTransacted());
+                            JmsMessages.connectorDoesNotSupportSyncReceiveWhenTransacted());
                 }
             }
             // Should we be caching sessions? Note this is not part of the JMS spec.
             // and is turned off by default.
             else if (event.getMessage().getBooleanProperty(JmsConstants.CACHE_JMS_SESSIONS_PROPERTY,
-                connector.isCacheJmsSessions()))
+                    connector.isCacheJmsSessions()))
             {
                 cached = true;
                 if (cachedSession != null)
@@ -138,18 +137,18 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             boolean topic = connector.getTopicResolver().isTopic(event.getEndpoint(), true);
 
             Destination dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(),
-                topic);
+                    topic);
             producer = connector.getJmsSupport().createProducer(session, dest, topic);
 
             Object message = event.transformMessage();
             if (!(message instanceof Message))
             {
                 throw new DispatchException(
-                    JmsMessages.checkTransformer("JMS message", message.getClass(), connector.getName()),
-                    event.getMessage(), event.getEndpoint());
+                        JmsMessages.checkTransformer("JMS message", message.getClass(), connector.getName()),
+                        event.getMessage(), event.getEndpoint());
             }
 
-            Message msg = (Message)message;
+            Message msg = (Message) message;
             if (event.getMessage().getCorrelationId() != null)
             {
                 msg.setJMSCorrelationID(event.getMessage().getCorrelationId());
@@ -161,20 +160,20 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             if (connector.supportsProperty(JmsConstants.JMS_REPLY_TO))
             {
                 Object tempReplyTo = eventMsg.removeProperty(JmsConstants.JMS_REPLY_TO);
-                if(tempReplyTo==null)
+                if (tempReplyTo == null)
                 {
                     //It may be a Mule URI or global endpoint Ref
                     tempReplyTo = eventMsg.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-                    if(tempReplyTo!=null)
+                    if (tempReplyTo != null)
                     {
-                        if(tempReplyTo.toString().startsWith("jms://"))
+                        if (tempReplyTo.toString().startsWith("jms://"))
                         {
                             tempReplyTo = tempReplyTo.toString().substring(6);
                         }
                         else
                         {
                             EndpointBuilder epb = event.getMuleContext().getRegistry().lookupEndpointBuilder(tempReplyTo.toString());
-                            if(epb != null)
+                            if (epb != null)
                             {
                                 tempReplyTo = epb.buildOutboundEndpoint().getEndpointURI().getAddress();
                             }
@@ -185,7 +184,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 {
                     if (tempReplyTo instanceof Destination)
                     {
-                        replyTo = (Destination)tempReplyTo;
+                        replyTo = (Destination) tempReplyTo;
                     }
                     else
                     {
@@ -232,19 +231,19 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             }
 
             // QoS support
-            String ttlString = (String)eventMsg.removeProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
-            String priorityString = (String)eventMsg.removeProperty(JmsConstants.PRIORITY_PROPERTY);
-            String persistentDeliveryString = (String)eventMsg.removeProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
+            String ttlString = (String) eventMsg.removeProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
+            String priorityString = (String) eventMsg.removeProperty(JmsConstants.PRIORITY_PROPERTY);
+            String persistentDeliveryString = (String) eventMsg.removeProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
 
             long ttl = StringUtils.isNotBlank(ttlString)
-                                ? NumberUtils.toLong(ttlString)
-                                : Message.DEFAULT_TIME_TO_LIVE;
+                    ? NumberUtils.toLong(ttlString)
+                    : Message.DEFAULT_TIME_TO_LIVE;
             int priority = StringUtils.isNotBlank(priorityString)
-                                ? NumberUtils.toInt(priorityString)
-                                : Message.DEFAULT_PRIORITY;
+                    ? NumberUtils.toInt(priorityString)
+                    : Message.DEFAULT_PRIORITY;
             boolean persistent = StringUtils.isNotBlank(persistentDeliveryString)
-                                ? BooleanUtils.toBoolean(persistentDeliveryString)
-                                : connector.isPersistentDelivery();
+                    ? BooleanUtils.toBoolean(persistentDeliveryString)
+                    : connector.isPersistentDelivery();
 
             if (connector.isHonorQosHeaders())
             {
@@ -294,8 +293,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 else
                 {
                     MessageAdapter adapter = connector.getMessageAdapter(result);
-                    return new DefaultMuleMessage(JmsMessageUtils.toObject(result, connector.getSpecification()),
-                        adapter);
+                    return new DefaultMuleMessage(JmsMessageUtils.toObject(result, connector.getSpecification(), endpoint.getEncoding()),
+                            adapter);
                 }
             }
             else
@@ -320,7 +319,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     {
                         MessageAdapter adapter = connector.getMessageAdapter(result);
                         return new DefaultMuleMessage(
-                            JmsMessageUtils.toObject(result, connector.getSpecification()), adapter);
+                                JmsMessageUtils.toObject(result, connector.getSpecification(), endpoint.getEncoding()), adapter);
                     }
                 }
             }
@@ -336,13 +335,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             {
                 if (replyTo instanceof TemporaryQueue)
                 {
-                    connector.closeQuietly((TemporaryQueue)replyTo);
+                    connector.closeQuietly((TemporaryQueue) replyTo);
                 }
                 else
                 {
                     // hope there are no more non-standard tricks from JMS vendors
                     // here ;)
-                    connector.closeQuietly((TemporaryTopic)replyTo);
+                    connector.closeQuietly((TemporaryTopic) replyTo);
                 }
             }
 

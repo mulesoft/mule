@@ -55,7 +55,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
     public void setSpecification(String newSpec)
     {
         if (JmsConstants.JMS_SPECIFICATION_11.equals(newSpec)
-            || (JmsConstants.JMS_SPECIFICATION_102B.equals(newSpec)))
+                || (JmsConstants.JMS_SPECIFICATION_102B.equals(newSpec)))
         {
             this.jmsSpec = newSpec;
         }
@@ -63,15 +63,15 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
 
         {
             throw new IllegalArgumentException(
-                "JMS specification needs to be one of the defined values in JmsConstants but was: " + newSpec);
+                    "JMS specification needs to be one of the defined values in JmsConstants but was: " + newSpec);
         }
     }
 
     /**
      * Converts the message implementation into a String representation
-     * 
+     *
      * @param encoding The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte array
+     *                 necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
@@ -82,13 +82,13 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     * 
+     *
      * @return String representation of the message
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return JmsMessageUtils.toByteArray(jmsMessage, jmsSpec);
+        return JmsMessageUtils.toByteArray(jmsMessage, jmsSpec, getEncoding());
     }
 
     /**
@@ -106,7 +106,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
     {
         if (message instanceof Message)
         {
-            this.jmsMessage = (Message)message;
+            this.jmsMessage = (Message) message;
         }
         else
         {
@@ -233,7 +233,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
             Enumeration e = this.jmsMessage.getPropertyNames();
             while (e.hasMoreElements())
             {
-                String key = (String)e.nextElement();
+                String key = (String) e.nextElement();
                 try
                 {
                     Object value = this.jmsMessage.getObjectProperty(key);
@@ -256,7 +256,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
 
     public String getUniqueId()
     {
-        return (String)getProperty(JmsConstants.JMS_MESSAGE_ID);
+        return (String) getProperty(JmsConstants.JMS_MESSAGE_ID);
     }
 
     /**
@@ -267,7 +267,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      * message where it's up to developer to keep the association with the message.
      * For example if the message is serialised to xml the correlationId will be
      * available in the message.
-     * 
+     *
      * @param id the Id reference for this relationship
      */
     public void setCorrelationId(String id)
@@ -284,12 +284,12 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      * where it's up to developer to keep the association with the message. For
      * example if the message is serialised to xml the correlationId will be
      * available in the message.
-     * 
+     *
      * @return the correlationId for this message or null if one hasn't been set
      */
     public String getCorrelationId()
     {
-        return (String)getProperty(JmsConstants.JMS_CORRELATION_ID);
+        return (String) getProperty(JmsConstants.JMS_CORRELATION_ID);
     }
 
     /**
@@ -297,7 +297,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      * environment where the caller doesn't wait for a response and the response
      * needs to be routed somewhere for further processing. The value of this field
      * can be any valid endpointUri url.
-     * 
+     *
      * @param replyTo the endpointUri url to reply to
      */
     public void setReplyTo(Object replyTo)
@@ -317,7 +317,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      * environment where the caller doesn't wait for a response and the response
      * needs to be routed somewhere for further processing. The value of this field
      * can be any valid endpointUri url.
-     * 
+     *
      * @return the endpointUri url to reply to or null if one has not been set
      */
     public Object getReplyTo()

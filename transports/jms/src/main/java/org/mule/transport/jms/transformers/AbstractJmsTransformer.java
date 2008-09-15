@@ -120,7 +120,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
         }
     }
 
-    protected Object transformFromMessage(Message source) throws TransformerException
+    protected Object transformFromMessage(Message source, String encoding) throws TransformerException
     {
         try
         {
@@ -143,7 +143,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
                 }
             }
 
-            return JmsMessageUtils.toObject(source, jmsSpec);
+            return JmsMessageUtils.toObject(source, jmsSpec, encoding);
         }
         catch (Exception e)
         {

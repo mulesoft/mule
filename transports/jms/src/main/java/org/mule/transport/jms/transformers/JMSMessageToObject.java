@@ -14,12 +14,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.util.ClassUtils;
 
-import javax.jms.Message;
-import javax.jms.TextMessage;
-import javax.jms.ObjectMessage;
 import javax.jms.BytesMessage;
 import javax.jms.MapMessage;
+import javax.jms.Message;
+import javax.jms.ObjectMessage;
 import javax.jms.StreamMessage;
+import javax.jms.TextMessage;
 
 /**
  * <code>JMSMessageToObject</code> Will convert a <code>javax.jms.Message</code>
@@ -60,7 +60,7 @@ public class JMSMessageToObject extends AbstractJmsTransformer
                 logger.debug("Source object is " + ClassUtils.getSimpleName(message.getPayload().getClass()));
             }
 
-            Object result = transformFromMessage((Message) message.getPayload());
+            Object result = transformFromMessage((Message) message.getPayload(), outputEncoding);
 
             //We need to handle String / byte[] explicitly since this transformer does not nefine a single return type
             //TODO I don't think we should allow a null return class

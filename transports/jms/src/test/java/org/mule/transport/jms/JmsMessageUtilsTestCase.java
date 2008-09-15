@@ -11,8 +11,6 @@
 package org.mule.transport.jms;
 
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.jms.JmsConstants;
-import org.mule.transport.jms.JmsMessageUtils;
 
 import com.mockobjects.constraint.IsInstanceOf;
 import com.mockobjects.dynamic.Mock;
@@ -22,6 +20,7 @@ import javax.jms.TextMessage;
 
 public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
 {
+    public static final String ENCODING = "UTF-8";
 
     public void testHeaders()
     {
@@ -43,9 +42,9 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         Mock mockMessage = new Mock(TextMessage.class);
         mockMessage.expectAndReturn("getText", null);
 
-        TextMessage mockTextMessage = (TextMessage)mockMessage.proxy();
+        TextMessage mockTextMessage = (TextMessage) mockMessage.proxy();
 
-        byte[] result = JmsMessageUtils.toByteArray(mockTextMessage, JmsConstants.JMS_SPECIFICATION_102B);
+        byte[] result = JmsMessageUtils.toByteArray(mockTextMessage, JmsConstants.JMS_SPECIFICATION_102B, ENCODING);
         assertNotNull(result);
         assertEquals("Should return an empty byte array.", 0, result.length);
 
@@ -58,9 +57,9 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         Mock mockMessage = new Mock(BytesMessage.class);
         mockMessage.expect("reset");
         mockMessage.expectAndReturn("readBytes", new IsInstanceOf(byte[].class), -1);
-        BytesMessage mockBytesMessage = (BytesMessage)mockMessage.proxy();
+        BytesMessage mockBytesMessage = (BytesMessage) mockMessage.proxy();
 
-        byte[] result = JmsMessageUtils.toByteArray(mockBytesMessage, JmsConstants.JMS_SPECIFICATION_102B);
+        byte[] result = JmsMessageUtils.toByteArray(mockBytesMessage, JmsConstants.JMS_SPECIFICATION_102B, ENCODING);
         assertNotNull(result);
         assertEquals("Should return an empty byte array.", 0, result.length);
         mockMessage.verify();
@@ -69,9 +68,9 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         mockMessage = new Mock(BytesMessage.class);
         mockMessage.expect("reset");
         mockMessage.expectAndReturn("getBodyLength", new Long(0));
-        mockBytesMessage = (BytesMessage)mockMessage.proxy();
+        mockBytesMessage = (BytesMessage) mockMessage.proxy();
 
-        result = JmsMessageUtils.toByteArray(mockBytesMessage, JmsConstants.JMS_SPECIFICATION_11);
+        result = JmsMessageUtils.toByteArray(mockBytesMessage, JmsConstants.JMS_SPECIFICATION_11, ENCODING);
         assertNotNull(result);
         assertEquals("Should return an empty byte array.", 0, result.length);
         mockMessage.verify();

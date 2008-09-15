@@ -10,6 +10,10 @@
 
 package org.mule.transport.jms;
 
+import org.mule.util.ArrayUtils;
+import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
@@ -35,9 +39,6 @@ import javax.jms.TextMessage;
 import javax.jms.Topic;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.mule.util.ArrayUtils;
-import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
 
 /**
  * <code>JmsMessageUtils</code> contains helper method for dealing with JMS
@@ -49,7 +50,7 @@ public class JmsMessageUtils
 
     /**
      * Encode a String so that is is a valid JMS header name
-     * 
+     *
      * @param name the String to encode
      * @return a valid JMS header name
      */
@@ -59,14 +60,14 @@ public class JmsMessageUtils
         {
             throw new IllegalArgumentException("Header name to encode must not be null or empty");
         }
-    
+
         int i = 0, length = name.length();
         while (i < length && Character.isJavaIdentifierPart(name.charAt(i)))
         {
             // zip through
             i++;
         }
-    
+
         if (i == length)
         {
             // String is already valid
@@ -91,20 +92,20 @@ public class JmsMessageUtils
     {
         if (object instanceof Message)
         {
-            return (Message)object;
+            return (Message) object;
         }
         else if (object instanceof String)
         {
-            return session.createTextMessage((String)object);
+            return session.createTextMessage((String) object);
         }
         else if (object instanceof Map)
         {
             MapMessage mMsg = session.createMapMessage();
-            Map src = (Map)object;
+            Map src = (Map) object;
 
             for (Iterator i = src.entrySet().iterator(); i.hasNext();)
             {
-                Map.Entry entry = (Map.Entry)i.next();
+                Map.Entry entry = (Map.Entry) i.next();
                 mMsg.setObject(entry.getKey().toString(), entry.getValue());
             }
 
@@ -112,8 +113,8 @@ public class JmsMessageUtils
         }
         else if (object instanceof InputStream)
         {
-            StreamMessage sMsg = session.createStreamMessage();	
-            InputStream temp = (InputStream)object;
+            StreamMessage sMsg = session.createStreamMessage();
+            InputStream temp = (InputStream) object;
 
             byte[] buffer = new byte[4096];
             int len;
@@ -145,37 +146,37 @@ public class JmsMessageUtils
         else if (object instanceof byte[])
         {
             BytesMessage bMsg = session.createBytesMessage();
-            bMsg.writeBytes((byte[])object);
+            bMsg.writeBytes((byte[]) object);
             return bMsg;
         }
         else if (object instanceof Serializable)
         {
             ObjectMessage oMsg = session.createObjectMessage();
-            oMsg.setObject((Serializable)object);
+            oMsg.setObject((Serializable) object);
             return oMsg;
         }
         else
         {
             throw new JMSException(
-                "Source was not of a supported type, data must be Serializable, String, byte[], Map or InputStream, " +
-                "but was " + ClassUtils.getShortClassName(object, "<null>"));
+                    "Source was not of a supported type, data must be Serializable, String, byte[], Map or InputStream, " +
+                            "but was " + ClassUtils.getShortClassName(object, "<null>"));
         }
     }
 
-    public static Object toObject(Message source, String jmsSpec) throws JMSException, IOException
+    public static Object toObject(Message source, String jmsSpec, String encoding) throws JMSException, IOException
     {
         if (source instanceof ObjectMessage)
         {
-            return ((ObjectMessage)source).getObject();
+            return ((ObjectMessage) source).getObject();
         }
         else if (source instanceof MapMessage)
         {
             Hashtable map = new Hashtable();
-            MapMessage m = (MapMessage)source;
+            MapMessage m = (MapMessage) source;
 
             for (Enumeration e = m.getMapNames(); e.hasMoreElements();)
             {
-                String name = (String)e.nextElement();
+                String name = (String) e.nextElement();
                 Object obj = m.getObject(name);
                 map.put(name, obj);
             }
@@ -184,18 +185,18 @@ public class JmsMessageUtils
         }
         else if (source instanceof TextMessage)
         {
-            return ((TextMessage)source).getText();
+            return ((TextMessage) source).getText();
         }
         else if (source instanceof BytesMessage)
         {
-            return toByteArray(source, jmsSpec);
+            return toByteArray(source, jmsSpec, encoding);
         }
         else if (source instanceof StreamMessage)
         {
             Vector result = new Vector();
             try
             {
-                StreamMessage sMsg = (StreamMessage)source;
+                StreamMessage sMsg = (StreamMessage) source;
                 Object obj;
                 while ((obj = sMsg.readObject()) != null)
                 {
@@ -219,23 +220,23 @@ public class JmsMessageUtils
 
     /**
      * @param message the message to receive the bytes from. Note this only works for
-     *            TextMessge, ObjectMessage, StreamMessage and BytesMessage.
+     *                TextMessge, ObjectMessage, StreamMessage and BytesMessage.
      * @param jmsSpec indicates the JMS API version, either
-     *            {@link JmsConstants#JMS_SPECIFICATION_102B} or
-     *            {@link JmsConstants#JMS_SPECIFICATION_11}. Any other value
-     *            including <code>null</code> is treated as fallback to
-     *            {@link JmsConstants#JMS_SPECIFICATION_102B}.
+     *                {@link JmsConstants#JMS_SPECIFICATION_102B} or
+     *                {@link JmsConstants#JMS_SPECIFICATION_11}. Any other value
+     *                including <code>null</code> is treated as fallback to
+     *                {@link JmsConstants#JMS_SPECIFICATION_102B}.
      * @return a byte array corresponding with the message payload
-     * @throws JMSException if the message can't be read or if the message passed is
-     *             a MapMessage
+     * @throws JMSException        if the message can't be read or if the message passed is
+     *                             a MapMessage
      * @throws java.io.IOException if a failure occurs while reading the stream and
-     *             converting the message data
+     *                             converting the message data
      */
-    public static byte[] toByteArray(Message message, String jmsSpec) throws JMSException, IOException
+    public static byte[] toByteArray(Message message, String jmsSpec, String encoding) throws JMSException, IOException
     {
         if (message instanceof BytesMessage)
         {
-            BytesMessage bMsg = (BytesMessage)message;
+            BytesMessage bMsg = (BytesMessage) message;
             bMsg.reset();
 
             if (JmsConstants.JMS_SPECIFICATION_11.equals(jmsSpec))
@@ -244,12 +245,12 @@ public class JmsMessageUtils
                 if (bmBodyLength > Integer.MAX_VALUE)
                 {
                     throw new JMSException("Size of BytesMessage exceeds Integer.MAX_VALUE; "
-                                           + "please consider using JMS StreamMessage instead");
+                            + "please consider using JMS StreamMessage instead");
                 }
 
                 if (bmBodyLength > 0)
                 {
-                    byte[] bytes = new byte[(int)bmBodyLength];
+                    byte[] bytes = new byte[(int) bmBodyLength];
                     bMsg.readBytes(bytes);
                     return bytes;
                 }
@@ -281,7 +282,7 @@ public class JmsMessageUtils
         }
         else if (message instanceof StreamMessage)
         {
-            StreamMessage sMsg = (StreamMessage)message;
+            StreamMessage sMsg = (StreamMessage) message;
             sMsg.reset();
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
@@ -297,7 +298,7 @@ public class JmsMessageUtils
         }
         else if (message instanceof ObjectMessage)
         {
-            ObjectMessage oMsg = (ObjectMessage)message;
+            ObjectMessage oMsg = (ObjectMessage) message;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream os = new ObjectOutputStream(baos);
             os.writeObject(oMsg.getObject());
@@ -307,7 +308,7 @@ public class JmsMessageUtils
         }
         else if (message instanceof TextMessage)
         {
-            TextMessage tMsg = (TextMessage)message;
+            TextMessage tMsg = (TextMessage) message;
             String tMsgText = tMsg.getText();
 
             if (null == tMsgText)
@@ -318,7 +319,7 @@ public class JmsMessageUtils
             }
             else
             {
-                return tMsgText.getBytes();
+                return tMsgText.getBytes(encoding);
             }
         }
         else
@@ -331,11 +332,11 @@ public class JmsMessageUtils
     {
         if (dest instanceof Queue)
         {
-            return ((Queue)dest).getQueueName();
+            return ((Queue) dest).getQueueName();
         }
         else if (dest instanceof Topic)
         {
-            return ((Topic)dest).getTopicName();
+            return ((Topic) dest).getTopicName();
         }
         else
         {
@@ -344,7 +345,7 @@ public class JmsMessageUtils
     }
 
     public static Message copyJMSProperties(Message from, Message to, JmsConnector connector)
-        throws JMSException
+            throws JMSException
     {
         if (connector.supportsProperty(JmsConstants.JMS_CORRELATION_ID))
         {
