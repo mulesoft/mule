@@ -25,6 +25,7 @@ import org.mule.transport.AbstractConnector;
 import org.mule.transport.jdbc.sqlstrategy.SQLStrategyFactory;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
 import org.mule.util.StringUtils;
+import org.mule.util.TemplateParser;
 import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.sql.Connection;
@@ -39,6 +40,7 @@ import javax.sql.XADataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 
 public class JdbcConnector extends AbstractConnector
 {
@@ -49,10 +51,11 @@ public class JdbcConnector extends AbstractConnector
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
 
-    protected static final Pattern STATEMENT_ARGS = Pattern.compile("\\$\\{[^\\}]*\\}");
+    private static final Pattern STATEMENT_ARGS = TemplateParser.ANT_TEMPLATE_PATTERN;
+
     protected SQLStrategyFactory sqlStrategyFactory = new SQLStrategyFactory();
 
-    
+
     /* Register the SQL Exception reader if this class gets loaded */
     static
     {
@@ -61,23 +64,23 @@ public class JdbcConnector extends AbstractConnector
 
     protected long pollingFrequency = 0;
     protected Map queries;
-    
+
     protected DataSource dataSource;
     protected ResultSetHandler resultSetHandler;
     protected QueryRunner queryRunner;
     protected boolean transactionPerMessage = true;
-    
+
     protected void doInitialise() throws InitialisationException
     {
         createMultipleTransactedReceivers = false;
-        
+
         if (dataSource == null)
         {
             throw new InitialisationException(MessageFactory.createStaticMessage("Missing data source"), this);
         }
         if (resultSetHandler == null)
         {
-            resultSetHandler = new MapListHandler();
+            resultSetHandler = new org.apache.commons.dbutils.handlers.MapListHandler();
         }
         if (queryRunner == null)
         {
@@ -107,12 +110,12 @@ public class JdbcConnector extends AbstractConnector
     }
 
     public String[] getReadAndAckStatements(ImmutableEndpoint endpoint)
-    {       
+    {
         String str;
 
         // Find read statement
         String readStmt;
-        if ((str = (String)endpoint.getProperty("sql")) != null)
+        if ((str = (String) endpoint.getProperty("sql")) != null)
         {
             readStmt = str;
         }
@@ -120,10 +123,10 @@ public class JdbcConnector extends AbstractConnector
         {
             readStmt = endpoint.getEndpointURI().getAddress();
         }
-        
+
         // Find ack statement
         String ackStmt;
-        if ((str = (String)endpoint.getProperty("ack")) != null)
+        if ((str = (String) endpoint.getProperty("ack")) != null)
         {
             ackStmt = str;
             if ((str = getQuery(endpoint, ackStmt)) != null)
@@ -144,7 +147,7 @@ public class JdbcConnector extends AbstractConnector
                 ackStmt = null;
             }
         }
-        
+
         // Translate both using queries map
         if ((str = getQuery(endpoint, readStmt)) != null)
         {
@@ -159,7 +162,7 @@ public class JdbcConnector extends AbstractConnector
             // MULE-3109: trim the readStatement for better user experience
             readStmt = readStmt.trim();
         }
-        
+
         if (!"select".equalsIgnoreCase(readStmt.substring(0, 6)) && !"call".equalsIgnoreCase(readStmt.substring(0, 4)))
         {
             throw new IllegalArgumentException("Read statement should be a select sql statement or a stored procedure");
@@ -167,11 +170,11 @@ public class JdbcConnector extends AbstractConnector
         if (ackStmt != null)
         {
             if (!"insert".equalsIgnoreCase(ackStmt.substring(0, 6))
-                && !"update".equalsIgnoreCase(ackStmt.substring(0, 6))
-                && !"delete".equalsIgnoreCase(ackStmt.substring(0, 6)))
+                    && !"update".equalsIgnoreCase(ackStmt.substring(0, 6))
+                    && !"delete".equalsIgnoreCase(ackStmt.substring(0, 6)))
             {
                 throw new IllegalArgumentException(
-                    "Ack statement should be an insert / update / delete sql statement");
+                        "Ack statement should be an insert / update / delete sql statement");
             }
         }
         return new String[]{readStmt, ackStmt};
@@ -185,7 +188,7 @@ public class JdbcConnector extends AbstractConnector
             Object queries = endpoint.getProperties().get("queries");
             if (queries instanceof Map)
             {
-                query = ((Map)queries).get(stmt);
+                query = ((Map) queries).get(stmt);
             }
         }
         if (query == null)
@@ -206,7 +209,7 @@ public class JdbcConnector extends AbstractConnector
             if (tx.hasResource(dataSource))
             {
                 logger.debug("Retrieving connection from current transaction");
-                return (Connection)tx.getResource(dataSource);
+                return (Connection) tx.getResource(dataSource);
             }
         }
         logger.debug("Retrieving new connection from data source");
@@ -228,22 +231,22 @@ public class JdbcConnector extends AbstractConnector
         return con;
     }
 
-    public boolean isTransactionPerMessage() 
+    public boolean isTransactionPerMessage()
     {
         return transactionPerMessage;
     }
-    
-    public void setTransactionPerMessage(boolean transactionPerMessage) 
+
+    public void setTransactionPerMessage(boolean transactionPerMessage)
     {
         this.transactionPerMessage = transactionPerMessage;
         if (!transactionPerMessage)
         {
             logger.warn("transactionPerMessage property is set to false so setting createMultipleTransactedReceivers " +
-                "to false also to prevent creation of multiple JdbcMessageReceivers");
+                    "to false also to prevent creation of multiple JdbcMessageReceivers");
             setCreateMultipleTransactedReceivers(transactionPerMessage);
         }
     }
-    
+
     /**
      * Parse the given statement filling the parameter list and return the ready to
      * use statement.
@@ -264,6 +267,13 @@ public class JdbcConnector extends AbstractConnector
         {
             String key = m.group();
             m.appendReplacement(sb, "?");
+            //Special legacy handling for ${payload}
+            if (key.equals("${payload}"))
+            {
+                //MULE-3597
+                logger.error("invalid expression template ${payload}. It should be replaced with ${payload:} to conform with the correct expression syntax. Mule has replacedthis for you, but may not in future versions.");
+                key = "${payload:}";
+            }
             params.add(key);
         }
         m.appendTail(sb);
@@ -271,25 +281,28 @@ public class JdbcConnector extends AbstractConnector
     }
 
     public Object[] getParams(ImmutableEndpoint endpoint, List paramNames, Object message, String query)
-        throws Exception
+            throws Exception
     {
 
         Object[] params = new Object[paramNames.size()];
         for (int i = 0; i < paramNames.size(); i++)
         {
-            String param = (String)paramNames.get(i);
-            String name = getNameFromParam(param);
+            String param = (String) paramNames.get(i);
             Object value = null;
             // If we find a value and it happens to be null, thats acceptable
             boolean foundValue = false;
             //There must be an expression namespace to use the ExpresionEvaluator i.e. header:type
-            if (message != null && ExpressionEvaluatorManager.isValidExpression(name))
+            if (message != null && ExpressionEvaluatorManager.isValidExpression(param))
             {
-                value = ExpressionEvaluatorManager.evaluate(name, message);
-                foundValue = value!=null;
+                value = ExpressionEvaluatorManager.evaluate(param, message);
+                foundValue = value != null;
             }
             if (!foundValue)
             {
+                String name = param.substring(2, param.length() - 1);
+                //MULE-3597
+                logger.warn("Config is using the legacy param format " + param +
+                        " (no evaluator defined).  This expression can be replaced with ${header:" + name + "}");
                 value = endpoint.getProperty(name);
             }
 
@@ -305,10 +318,10 @@ public class JdbcConnector extends AbstractConnector
         }
         return params;
     }
-    
+
     protected String getNameFromParam(String param)
     {
-    	return param.substring(2, param.length() - 1);
+        return param.substring(2, param.length() - 1);
     }
 
     protected void doDispose()
@@ -339,7 +352,7 @@ public class JdbcConnector extends AbstractConnector
     //////////////////////////////////////////////////////////////////////////////////////
     // Getters and Setters
     //////////////////////////////////////////////////////////////////////////////////////
-    
+
     public String getProtocol()
     {
         return JDBC;
@@ -354,7 +367,7 @@ public class JdbcConnector extends AbstractConnector
     {
         if (dataSource instanceof XADataSource)
         {
-            this.dataSource = new DataSourceWrapper((XADataSource) dataSource); 
+            this.dataSource = new DataSourceWrapper((XADataSource) dataSource);
         }
         else
         {
@@ -413,17 +426,18 @@ public class JdbcConnector extends AbstractConnector
     {
         this.queries = queries;
     }
-	public SQLStrategyFactory getSqlStrategyFactory() 
-	{
-		return sqlStrategyFactory;
-	}
-	
+
+    public SQLStrategyFactory getSqlStrategyFactory()
+    {
+        return sqlStrategyFactory;
+    }
+
     public String getStatement(ImmutableEndpoint endpoint)
     {
         String writeStmt = endpoint.getEndpointURI().getAddress();
         String str;
         if ((str = getQuery(endpoint, writeStmt)) != null)
-        { 
+        {
             writeStmt = str;
         }
         writeStmt = StringUtils.trimToEmpty(writeStmt);
@@ -431,7 +445,7 @@ public class JdbcConnector extends AbstractConnector
         {
             throw new IllegalArgumentException("Missing statement");
         }
-        
+
         return writeStmt;
     }
 }
