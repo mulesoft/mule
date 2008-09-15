@@ -30,7 +30,7 @@ import java.util.List;
  * endpoint by name and then by address.
  * The endpoints to use can be set on the router itself or be global endpoint definitions.
  * <pre>
- *
+ * <p/>
  * &lt;outbound&gt;
  *      &lt;endpoint-selector-router evaluator="xpath" expression="/MSG/HEADER/NEXT-ADDRESS"&gt;
  *          &lt;endpoint name="dest1" address="jms://queue1" /&gt;
@@ -38,7 +38,7 @@ import java.util.List;
  *          &lt;endpoint name="dest3" address="jms://queue3" /&gt;
  *      &lt;/endpoint-selector-router&gt;
  * &lt;/outbound&gt;
- *
+ * <p/>
  * </pre>
  */
 public class EndpointSelector extends FilteringOutboundRouter
@@ -52,20 +52,20 @@ public class EndpointSelector extends FilteringOutboundRouter
     private String fullExpression;
 
     public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
-        throws RoutingException
+            throws RoutingException
     {
         List endpoints;
         String endpointName;
 
         String prop = getFullExpression();
-        if(!ExpressionEvaluatorManager.isValidExpression(prop))
+        if (!ExpressionEvaluatorManager.isValidExpression(prop))
         {
             throw new CouldNotRouteOutboundMessageException(
                     CoreMessages.expressionInvalidForProperty("expression", prop), message, null);
         }
 
         Object property = ExpressionEvaluatorManager.evaluate(prop, message);
-        if(property ==null)
+        if (property == null)
         {
             throw new CouldNotRouteOutboundMessageException(
                     CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), message, null);
@@ -76,9 +76,9 @@ public class EndpointSelector extends FilteringOutboundRouter
             endpoints = new ArrayList(1);
             endpoints.add(property);
         }
-        else if(property instanceof List)
+        else if (property instanceof List)
         {
-            endpoints = (List)property;
+            endpoints = (List) property;
         }
         else
         {
@@ -91,7 +91,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         {
             endpointName = iterator.next().toString();
 
-            if(StringUtils.isEmpty(endpointName))
+            if (StringUtils.isEmpty(endpointName))
             {
                 throw new CouldNotRouteOutboundMessageException(
                         CoreMessages.objectIsNull("Endpoint Name: " + getFullExpression()), message, null);
@@ -103,7 +103,7 @@ public class EndpointSelector extends FilteringOutboundRouter
                 if (ep == null)
                 {
                     throw new CouldNotRouteOutboundMessageException(CoreMessages.objectNotFound("Endpoint",
-                        endpointName), message, ep);
+                            endpointName), message, ep);
                 }
                 if (synchronous)
                 {
@@ -150,16 +150,16 @@ public class EndpointSelector extends FilteringOutboundRouter
 
     public String getFullExpression()
     {
-        if(fullExpression==null)
+        if (fullExpression == null)
         {
-            if(evaluator.equalsIgnoreCase("custom"))
+            if (evaluator.equalsIgnoreCase("custom"))
             {
                 evaluator = customEvaluator;
             }
-                fullExpression = evaluator + ":" + expression;
+            fullExpression = evaluator + ":" + expression;
             logger.debug("Full expression for EndpointSelector is: " + fullExpression);
         }
-        return fullExpression;
+        return ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX + fullExpression + ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX;
     }
 
     public String getExpression()
