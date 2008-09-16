@@ -24,8 +24,7 @@ public class CxfLoanBrokerAsynchronousFunctionalTestCase extends AbstractAsynchr
     @Override
     protected int getNumberOfRequests()
     {
-        // MULE-3016
-        return 1;
+        return 10;
     }
 
     @Override

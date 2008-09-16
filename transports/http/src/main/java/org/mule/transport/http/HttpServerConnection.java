@@ -81,7 +81,7 @@ public class HttpServerConnection
                 {
                     logger.debug("Closing: " + socket);
                 }
-
+                
                 try
                 {
                     socket.shutdownOutput();
@@ -262,6 +262,10 @@ public class HttpServerConnection
             writer.print(header.toExternalForm());
         }
 
+        if (!isKeepAlive()) {
+            writer.print(new Header("Connection", "close").toExternalForm());
+        }
+        
         writer.println();
         writer.flush();
 

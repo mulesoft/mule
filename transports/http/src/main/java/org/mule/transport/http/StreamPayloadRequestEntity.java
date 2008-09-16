@@ -31,12 +31,13 @@ public class StreamPayloadRequestEntity implements RequestEntity
 
     public boolean isRepeatable()
     {
-        return true;
+        return false;
     }
 
     public void writeRequest(OutputStream outputStream) throws IOException
     {
         outputHandler.write(event, outputStream);
+        outputStream.flush();
     }
 
     public long getContentLength()
