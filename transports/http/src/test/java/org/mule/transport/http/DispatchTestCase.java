@@ -27,25 +27,26 @@ public class DispatchTestCase extends FunctionalTestCase
         final MuleClient client = new MuleClient();
         
         final byte[] buf = new byte[8192];
-        for (int b = 0; b < buf.length; b++) {
+        for (int b = 0; b < buf.length; b++) 
+        {
             buf[b] = 'a';
         }
         
         client.send("http://localhost:63081/services/Echo", 
             new DefaultMuleMessage(new ByteArrayInputStream(buf)));
 
-        for (int t = 0; t < 10; t++) {
-            new Thread(new Runnable() {
-
+        for (int t = 0; t < 10; t++)
+        {
+            new Thread(new Runnable() 
+            {
                 public void run()
                 {
-                    
                     Map<String,Object> props = new HashMap<String, Object>();
                     props.put(MuleProperties.MULE_REPLY_TO_PROPERTY, "vm://queue");
                     try
                     {
-                        for (int i = 0; i < 20; i++) {
-                            
+                        for (int i = 0; i < 20; i++) 
+                        {
                                 client.dispatch("http://localhost:63081/services/Echo", 
                                     new DefaultMuleMessage(buf),
                                     props);
@@ -62,7 +63,8 @@ public class DispatchTestCase extends FunctionalTestCase
         }
         
         int count = 0;
-        while (count < 200 && client.request("vm://queue", 5000) != null) {
+        while (count < 200 && client.request("vm://queue", 5000) != null) 
+        {
             count++;
         }
         

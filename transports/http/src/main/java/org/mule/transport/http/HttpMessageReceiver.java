@@ -171,7 +171,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     conn.setKeepAlive(false);
                     
                     // Only add a monitor if the timeout has been set
-                    if(keepAliveTimeout > 0)
+                    if (keepAliveTimeout > 0)
                     {
                         ((HttpConnector) connector).getKeepAliveMonitor().addExpirable(
                             keepAliveTimeout, TimeUnit.MILLISECONDS, this);
@@ -283,13 +283,39 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 // ObjectToHttpResponse in their config
                 if (tempResponse instanceof HttpResponse)
                 {
-                    response = (HttpResponse)tempResponse;
+                    response = (HttpResponse) tempResponse;
                 }
                 else
                 {
                     response = transformResponse(returnMessage);
                 }
-                response.disableKeepAlive(!((HttpConnector)connector).isKeepAlive());
+                response.disableKeepAlive(!((HttpConnector) connector).isKeepAlive());
+                
+                //TODO: Set Keep-Alive header?
+                response.removeHeaders("Connection");
+                
+                // Check if endpoint has a keep-alive property configured. Note the translation from
+                // keep-alive in the schema to keepAlive here.
+                boolean endpointOverride = Boolean.parseBoolean((String) endpoint.getProperty("keepAlive"));
+                
+                Header connectionHeader = request.getFirstHeader("Connection");
+                if (connectionHeader != null)
+                {
+                    if ("keep-alive".equalsIgnoreCase(connectionHeader.getValue()) 
+                        && ((HttpConnector) connector).isKeepAlive() && !endpointOverride) 
+                    {
+                        Header header = new Header(HttpConstants.HEADER_CONNECTION, "keep-alive");
+                        response.addHeader(header);
+                        header = new Header(HttpConstants.HEADER_KEEP_ALIVE, "timeout=" 
+                            + ((HttpConnector) connector).getKeepAliveTimeout());
+                        response.addHeader(header);   
+                    }
+                    else
+                    {
+                        Header header = new Header(HttpConstants.HEADER_CONNECTION, "close");
+                        response.addHeader(header);     
+                    }
+                }
             }
             else
             {
@@ -388,7 +414,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
             for (Iterator rhi = request.getHeaderIterator(); rhi.hasNext();)
             {
-                Header header = (Header)rhi.next();
+                Header header = (Header) rhi.next();
                 String headerName = header.getName();
                 Object headerValue = header.getValue();
 
@@ -466,7 +492,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
 
         StringBuffer requestUri = new StringBuffer(80);
-        if (path.indexOf("://")==-1)
+        if (path.indexOf("://") == -1)
         {
             requestUri.append(endpoint.getProtocol()).append("://");
             requestUri.append(endpoint.getEndpointURI().getHost());
@@ -508,8 +534,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
             if (receiver == null)
             {
-				receiver = findReceiverByStem(connector.getReceivers(), uriStr);
-			}
+                receiver = findReceiverByStem(connector.getReceivers(), uriStr);
+            }
 
             if (receiver == null && logger.isWarnEnabled())
             {
@@ -526,9 +552,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     protected HttpResponse transformResponse(Object response) throws TransformerException
     {
         MuleMessage message;
-        if(response instanceof MuleMessage)
+        if (response instanceof MuleMessage)
         {
-            message = (MuleMessage)response;
+            message = (MuleMessage) response;
         }
         else
         {
@@ -546,9 +572,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         MessageReceiver receiver = null;
         for (Iterator itr = receivers.entrySet().iterator(); itr.hasNext();)
         {
-            Map.Entry e = (Map.Entry)itr.next();
-            String key = (String)e.getKey();
-            MessageReceiver candidate = (MessageReceiver)e.getValue();
+            Map.Entry e = (Map.Entry) itr.next();
+            String key = (String) e.getKey();
+            MessageReceiver candidate = (MessageReceiver) e.getValue();
             if (uriStr.startsWith(key) && match < key.length())
             {
                 match = key.length();

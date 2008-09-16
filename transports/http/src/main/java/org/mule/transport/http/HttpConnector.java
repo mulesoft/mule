@@ -101,6 +101,7 @@ public class HttpConnector extends TcpConnector
 
     protected HttpConnectionManager clientConnectionManager;
 
+    private boolean followRedirects = false;
 
     //@Override
     protected void doInitialise() throws InitialisationException
@@ -149,7 +150,7 @@ public class HttpConnector extends TcpConnector
                 Map newProperties = new HashMap(endpointProperties.size());
                 for (Iterator entries = endpointProperties.entrySet().iterator(); entries.hasNext();)
                 {
-                    Map.Entry entry = (Map.Entry)entries.next();
+                    Map.Entry entry = (Map.Entry) entries.next();
                     Object key = entry.getKey();
                     Object normalizedKey = HttpConstants.ALL_HEADER_NAMES.get(key);
                     if (normalizedKey != null)
@@ -299,6 +300,16 @@ public class HttpConnector extends TcpConnector
         this.clientConnectionManager = clientConnectionManager;
     }
 
+    public boolean isFollowRedirects()
+    {
+        return followRedirects;
+    }
+    
+    public void setFollowRedirects(boolean followRedirects)
+    {
+        this.followRedirects = followRedirects;
+    }
+    
     protected HttpClient doClientConnect() throws Exception
     {
         HttpState state = new HttpState();
@@ -350,7 +361,6 @@ public class HttpConnector extends TcpConnector
             // don't use preemptive if there are no credentials to send
             client.getParams().setAuthenticationPreemptive(false);
         }
-
     }
 
 }

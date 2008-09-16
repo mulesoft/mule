@@ -261,10 +261,6 @@ public class HttpServerConnection
             Header header = (Header) item.next();
             writer.print(header.toExternalForm());
         }
-
-        if (!isKeepAlive()) {
-            writer.print(new Header("Connection", "close").toExternalForm());
-        }
         
         writer.println();
         writer.flush();

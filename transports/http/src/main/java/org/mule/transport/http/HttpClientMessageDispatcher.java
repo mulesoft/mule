@@ -170,24 +170,25 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
         if (body instanceof HttpMethod)
         {
-            httpMethod = (HttpMethod)body;
+            httpMethod = (HttpMethod) body;
         }
         else 
         {
             httpMethod = (HttpMethod) sendTransformer.transform(msg);
         }
         
-        
+        httpMethod.setFollowRedirects(connector.isFollowRedirects());
         return httpMethod;
     }
 
     protected void setPropertyFromEndpoint(MuleEvent event, MuleMessage msg, String prop)
     {
         Object o = msg.getProperty(prop, null);
-        if (o == null) {
-            
+        if (o == null) 
+        {
             o = event.getEndpoint().getProperty(prop);
-            if (o != null) {
+            if (o != null)
+            {
                 msg.setProperty(prop, o);
             }
         }
@@ -200,7 +201,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         if (body instanceof String)
         {
             ObjectToHttpClientMethodRequest trans = new ObjectToHttpClientMethodRequest();
-            httpMethod = (HttpMethod)trans.transform(body.toString());
+            httpMethod = (HttpMethod) trans.transform(body.toString());
         }
         else if (body instanceof byte[])
         {
@@ -215,7 +216,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 body = event.transformMessage(OutputHandler.class);
             }
             
-            OutputHandler outputHandler = (OutputHandler)body;
+            OutputHandler outputHandler = (OutputHandler) body;
             postMethod.setRequestEntity(new StreamPayloadRequestEntity(outputHandler, event));
             postMethod.setContentChunked(true);
             httpMethod = postMethod;
@@ -224,11 +225,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return httpMethod;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.Connector#send(org.mule.api.MuleEvent)
-     */
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {        
         HttpMethod httpMethod = getMethod(event);
@@ -318,4 +314,5 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         // template method
     }
+    
 }

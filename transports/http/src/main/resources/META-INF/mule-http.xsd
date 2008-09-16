@@ -346,6 +346,13 @@
                 <xsd:documentation>The http method to use.</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="keep-alive" type="mule:substitutableBoolean">
+            <xsd:annotation>
+                <xsd:documentation>Controls if the socket connection is kept alive. If set to true,
+                a keep-alive header with the connection timeout specified in the connector will be
+                returned. If set to false, a "Connection: close" header will be returned.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:simpleType name="httpMethodTypes">
