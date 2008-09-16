@@ -44,22 +44,22 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
     {
         if (message instanceof HttpServletRequest)
         {
-            setPayload((HttpServletRequest)message);
-            setContentEncoding((HttpServletRequest)message);
+            setPayload((HttpServletRequest) message);
+            setContentEncoding((HttpServletRequest) message);
 
             final Map parameterMap = request.getParameterMap();
             if (parameterMap != null && parameterMap.size() > 0)
             {
                 for (Iterator iterator = parameterMap.entrySet().iterator(); iterator.hasNext();)
                 {
-                    Map.Entry entry = (Map.Entry)iterator.next();
-                    String key = (String)entry.getKey();
+                    Map.Entry entry = (Map.Entry) iterator.next();
+                    String key = (String) entry.getKey();
                     Object value = entry.getValue();
                     if (value != null)
                     {
-                        if (value.getClass().isArray() && ((Object[])value).length == 1)
+                        if (value.getClass().isArray() && ((Object[]) value).length == 1)
                         {
-                            setProperty(key, ((Object[])value)[0]);
+                            setProperty(key, ((Object[]) value)[0]);
                         }
                         else
                         {
@@ -71,13 +71,13 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
             String key;
             for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();)
             {
-                key = (String)e.nextElement();
+                key = (String) e.nextElement();
                 properties.setProperty(key, request.getAttribute(key));
             }
             String realKey;
             for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();)
             {
-                key = (String)e.nextElement();
+                key = (String) e.nextElement();
                 realKey = key;
                 if (key.startsWith(HttpConstants.X_PROPERTY_PREFIX))
                 {
@@ -162,18 +162,15 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
 
         try
         {
-            // We wrap this call as on some App Servers (Websfear) it can cause an
-            // NPE
+            // We wrap this call as on some App Servers (Websfear) it can cause an NPE
             session = getRequest().getSession(false);
         }
         catch (Exception e)
         {
             return UUID.getUUID();
-            //throw new UniqueIdNotSupportedException(this, CoreMessages.objectIsNull("Http session"));
         }
         if (session == null)
         {
-            //throw new UniqueIdNotSupportedException(this, CoreMessages.objectIsNull("Http session"));
             return UUID.getUUID();
         }
         return session.getId();
