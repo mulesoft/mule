@@ -166,7 +166,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
         // forward the normal call on the outbound router without any modification
         {
             logger.debug("Forwarding SOAP message");
-            return eventContext.getMessage();
+            return eventContext.transformMessage();
         }
     }
 
