@@ -36,6 +36,7 @@ import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 
 import java.text.MessageFormat;
+import java.util.Map;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -231,7 +232,20 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                 public void onException(JMSException jmsException)
                 {
                     final JmsConnector jmsConnector = JmsConnector.this;
-                    int expectedReceiverCount = jmsConnector.getReceivers().size() * jmsConnector.getNumberOfConcurrentTransactedReceivers();
+                    Map receivers = jmsConnector.getReceivers();
+                    boolean isMultiConsumerReceiver = false;
+                    
+                    if (!receivers.isEmpty()) 
+                    {
+                        Map.Entry entry = (Map.Entry) receivers.entrySet().iterator().next();
+                        if (entry.getValue() instanceof MultiConsumerJmsMessageReceiver)
+                        {
+                            isMultiConsumerReceiver = true;
+                        }
+                    }
+                    
+                    int expectedReceiverCount = isMultiConsumerReceiver ? 1 : 
+                        (jmsConnector.getReceivers().size() * jmsConnector.getNumberOfConcurrentTransactedReceivers());
                     
                     if (logger.isDebugEnabled())
                     {
@@ -240,7 +254,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                             + (receiverReportedExceptionCount.get() + 1) + '/' + expectedReceiverCount);
                     }
                     
-                    if (receiverReportedExceptionCount.incrementAndGet() == expectedReceiverCount)
+                    if (receiverReportedExceptionCount.incrementAndGet() >= expectedReceiverCount)
                     {
                         receiverReportedExceptionCount.set(0);
                     
