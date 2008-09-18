@@ -76,18 +76,18 @@
         <!-- <module>antlr</module> -->
         <!-- <module>asm</module> -->
         <module>axis</module> 
-        <!-- <module>backport</module> -->
+        <module>backport</module>
         <module>cglib</module>
-        <!-- <module>commons-beanutils</module> -->
+        <module>commons-beanutils</module>
         <module>commons-cli</module>
         <!-- <module>commons-codec</module> -->
-        <!-- <module>commons-collections</module> -->
+        <module>commons-collections</module>
         <module>commons-dbutils</module>
         <module>commons-discovery</module>
         <module>commons-httpclient</module>
         <module>commons-io</module>
         <module>commons-jxpath</module>
-        <!-- <module>commons-lang</module> -->
+        <module>commons-lang</module>
         <!-- <module>commons-net</module> -->
         <module>cryptix</module>
         <module>cxf</module>

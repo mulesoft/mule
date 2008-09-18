@@ -79,8 +79,9 @@
         </dependency>
         <!-- Annoying: we need to override retrotranslated dependencies -->
         <dependency>
-            <groupId>edu.emory.mathcs.backport</groupId>
-            <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent.osgi</artifactId>
+            <version>${backportUtilConcurrentVersion}</version>
         </dependency>
 
         <!-- Test dependencies -->

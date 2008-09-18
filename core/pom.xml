@@ -30,8 +30,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils.osgi</artifactId>
+            <version>${commonsBeanUtilsVersion}</version>
         </dependency>
 
         <!-- UUID generator, only called directly by mule-core -->
@@ -43,8 +44,9 @@
 
         <!--  OTHERS.  group/artifact id only, version and exclusions are specified via dependency management -->
         <dependency>
-            <groupId>edu.emory.mathcs.backport</groupId>
-            <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent.osgi</artifactId>
+            <version>${backportUtilConcurrentVersion}</version>
         </dependency>
         <!-- TODO MULE-1947 Remove this since command-line parsing is limited to mule-module-boot -->
         <dependency>
@@ -52,16 +54,18 @@
             <artifactId>commons-cli.osgi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>com.springsource.org.apache.commons.collections</artifactId>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections.osgi</artifactId>
+            <version>${commonsCollectionsVersion}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io.osgi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>com.springsource.org.apache.commons.lang</artifactId>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang.osgi</artifactId>
+            <version>${commonsLangVersion}</version>
         </dependency>
         <dependency>
             <!-- OSGi-ready -->

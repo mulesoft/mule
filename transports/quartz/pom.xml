@@ -15,8 +15,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.opensymphony.quartz</groupId>
-            <artifactId>com.springsource.org.quartz</artifactId>
+            <groupId>quartz</groupId>
+            <artifactId>quartz-all.osgi</artifactId>
+            <version>${quartzVersion}</version>
         </dependency>                
         <!-- The Mule client is needed for EndpointPollingJob and ScheduledDispatchJob -->
         <dependency>
