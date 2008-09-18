@@ -3,7 +3,7 @@
 #
 
 # Skip these until the tests-external profile works
-org.mule.transport.soap.axis.AxisExternalServerTest
+# MULE-3674
 org.mule.transport.soap.axis.VmToAxisProxyTestCase
 
 # MULE-2607
