@@ -3,6 +3,9 @@
 #
 
 # these fail unless a security patch is applied to JAVA_HOME/lib
+# MULE-3671
 org.mule.module.pgp.KeyBasedEncryptionStrategyTestCase
+# MULE-3672
 org.mule.module.pgp.PGPSecurityFilterTestCase
+# MULE-3672
 org.mule.module.pgp.KBEStrategyUsingEncryptionTransformerTestCase
