@@ -9,12 +9,13 @@
 org.mule.endpoint.MuleCopiedEndpointURITestCase
 
 # Duplicate registration doesn't currently produce an exception, should it?
-# See comment in TransientRegistry.doRegisterObject()
-# Blocked by MULE-2162 since the MuleConfiguration is being registered more than once.
+# See MULE-1759
+# See comment in TransientRegistry.registerObject()
 org.mule.registry.DuplicateRegistrationTestCase
 
 # MULE-2964: MuleMessage does not serialize attachments
 org.mule.MuleMessageTestCase
 
 # Broke after EE-734, no idea what this is about
+# MULE-3670
 org.mule.util.store.TextFileStoreTestCase
