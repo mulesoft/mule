@@ -1,5 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-org.mule.module.sxc.HttpRoutingTestCase
-org.mule.module.sxc.SxcFilterTestCase
