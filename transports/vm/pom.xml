@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
-            <artifactId>com.springsource.javax.activation</artifactId>
+            <artifactId>activation.osgi</artifactId>
         </dependency>
 
         <!-- Unit tests -->

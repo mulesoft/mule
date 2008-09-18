@@ -71,6 +71,7 @@
 
     <modules>
         <module>acegi</module>
+        <module>activation</module>
         <module>cglib</module>
         <!-- SSEBR has 1.1.0, we use 1.0 -->
         <module>commons-cli</module>

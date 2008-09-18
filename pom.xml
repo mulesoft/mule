@@ -102,7 +102,7 @@
         <groovyVersion>1.5.6</groovyVersion>
         <hibernateVersion>3.2.2.ga</hibernateVersion>
         <javassistVersion>3.6.ga</javassistVersion>
-        <javaActivationVersion>1.1.0</javaActivationVersion>
+        <javaActivationVersion>1.1</javaActivationVersion>
         <javaElVersion>2.1.0</javaElVersion>
         <javaMailVersion>1.4.0</javaMailVersion>
         <javaScriptVersion>1.0</javaScriptVersion>
@@ -298,8 +298,8 @@
             </dependency>
             <dependency>
                 <groupId>javax.activation</groupId>
-                <artifactId>com.springsource.javax.activation</artifactId>
-                <version>1.1.0</version>
+                <artifactId>activation.osgi</artifactId>
+                <version>${javaActivationVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.mail</groupId>
