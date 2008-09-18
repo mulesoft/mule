@@ -25,3 +25,5 @@ org.mule.transport.cxf.WSProxyTestCase
 # Possibly related to MULE-2903
 org.mule.transport.cxf.issues.MultipleWsdlCxfCallsTestCase
 
+# EE-682
+org.mule.transport.cxf.ServletTestCase

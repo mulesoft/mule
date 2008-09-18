@@ -19,6 +19,7 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -36,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractReceiverServlet extends HttpServlet
 {
+    
     /**
      * logger used by this class
      */
@@ -128,15 +130,24 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             else
             {
                 httpResponse = new HttpResponse();
+                
+                if (message.getPayload() instanceof InputStream) 
+                {
+                    httpResponse.setBody((OutputHandler) message.getPayload(OutputHandler.class));
+                }
+                else
+                {
+                    httpResponse.setBody(message.getPayloadAsString());
+                }
+                
                 String ct = message.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
-                if(ct!=null)
+                if (ct != null)
                 {
                     httpResponse.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, ct));
                 }
                 httpResponse.setStatusLine(httpResponse.getHttpVersion(), 
                     message.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpServletResponse.SC_OK));
                 httpResponse.setBody(message);
-                
             }
 
             Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);

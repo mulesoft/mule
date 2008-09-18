@@ -10,20 +10,16 @@
 
 package org.mule.transport.cxf;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
 import org.mule.transport.servlet.MuleReceiverServlet;
 
-import java.util.HashMap;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
@@ -38,6 +34,7 @@ public class WsdlCallTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
+        
         httpServer = new Server();
         SelectChannelConnector conn = new SelectChannelConnector();
         conn.setPort(HTTP_PORT);
@@ -45,68 +42,55 @@ public class WsdlCallTestCase extends FunctionalTestCase
 
         ServletHandler handler = new ServletHandler();
         handler.addServletWithMapping(MuleReceiverServlet.class, "/services/*");
-        
         httpServer.addHandler(handler);
         
         httpServer.start();
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
-        super.doTearDown();
         if (httpServer != null && httpServer.isStarted())
         {
             httpServer.stop();
         }
-    }
 
-    public void xtestRequestWsdlWithServlets() throws Exception
+        super.doTearDown();
+    }
+    
+    /*
+    public void testRequestWsdlWithServlets() throws Exception
     {
-        Map<String, String> props = new HashMap<String, String>();
-        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-        MuleClient client = new MuleClient();
-        MuleMessage result = client.send("http://localhost:" + HTTP_PORT + "/services/mycomponent?wsdl", null,
-            props);
-
-        assertNotNull(result);
-        if (logger.isDebugEnabled())
-        {
-            logger.debug(result.getPayloadAsString());
-        }
-
-        String location = "http://localhost:" + HTTP_PORT + "/services/mycomponent?wsdl";
-        location = location.substring(0, location.length() - 5);
-
-        assertTrue(result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "").startsWith("text/xml"));
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug(result.getPayloadAsString());
-        }
-
-        Document document = DocumentHelper.parseText(result.getPayloadAsString());
-        List<?> nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
+        InputStream wsdlStream = new URL("http://localhost:" + HTTP_PORT
+            + "/services/mycomponent?wsdl").openStream();
+        
+        String location = "http://localhost:" + HTTP_PORT + "/services/mycomponent";
+        
+        Document document = new SAXReader().read(wsdlStream);
+        List nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
         assertEquals(((Element) nodes.get(0)).attribute("name").getStringValue(), "mycomponent");
+        System.err.println(document.asXML());
+        nodes = document.selectNodes("//wsdl:definitions/wsdl:service/wsdl:port/soap:address");
+        assertEquals(location, ((Element) nodes.get(0)).attribute("location").getStringValue());
     }
+    */
 
     public void testRequestWsdlWithHttp() throws Exception
     {
-        MuleClient client = new MuleClient();
-        Map<String, String> props = new HashMap<String, String>();
-        props.put("http.method", "GET");
-        MuleMessage reply = client.send("http://localhost:63082/cxfService?wsdl", null, props);
-
-        assertNotNull(reply);
-        assertNotNull(reply.getPayload());
-
-        Document document = DocumentHelper.parseText(reply.getPayloadAsString());
-        List<?> nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
+        String location = "http://localhost:63082/cxfService";
+        InputStream wsdlStream = new URL(location + "?wsdl").openStream();
+        
+        Document document = new SAXReader().read(wsdlStream);
+        List nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
         assertEquals(((Element) nodes.get(0)).attribute("name").getStringValue(), "TestServiceComponent");
+        
+        nodes = document.selectNodes("//wsdl:definitions/wsdl:service/wsdl:port/soap:address");
+        assertEquals(location, ((Element) nodes.get(0)).attribute("location").getStringValue());
     }
 
     protected String getConfigResources()
     {
         return "wsdl-conf.xml";
     }
+    
 }

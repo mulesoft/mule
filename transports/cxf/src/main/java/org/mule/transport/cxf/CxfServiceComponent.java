@@ -82,17 +82,13 @@ public class CxfServiceComponent implements Callable, Lifecycle
 
     private CxfMessageReceiver receiver;
 
-    private final CxfConnector connector;
-
     public CxfServiceComponent(CxfConnector connector,
                                CxfMessageReceiver receiver) throws ConfigurationException
     {
         super();
-        this.connector = connector;
         this.receiver = receiver;
         this.bus = receiver.connector.getCxfBus();
     }
-
 
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
@@ -102,71 +98,58 @@ public class CxfServiceComponent implements Callable, Lifecycle
         }
 
         // if http request
-        String request = eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY,
-            StringUtils.EMPTY);
-        String uri = eventContext.getEndpointURI().toString();
+        String requestPath = parseHttpRequestProperty(
+            eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY,
+                StringUtils.EMPTY));
+        
 
-        if (request.indexOf('?') > -1 || uri.indexOf('?') > -1)
+        if (requestPath.indexOf('?') > -1)
         {
-            return generateWSDLOrXSD(eventContext, request, uri);
+            return generateWSDLOrXSD(eventContext, requestPath);
         }
         else
         {
-            return sendToDestination(eventContext, uri);
+            return sendToDestination(eventContext);
         }
     }
 
-    protected Object generateWSDLOrXSD(MuleEventContext eventContext, String req, String uri)
+    private String parseHttpRequestProperty(String request)
+    {
+        String uriBase = "";
+        
+        if (!(request.contains("?wsdl")) && (!(request.contains("?xsd"))))
+        {
+            int qIdx = request.indexOf('?');
+            if (qIdx > -1)
+            {
+                uriBase = request.substring(0, qIdx);
+            }
+        }
+        else
+        {
+            uriBase = request;
+        }
+        
+        return uriBase;
+    }
+    
+    protected Object generateWSDLOrXSD(MuleEventContext eventContext, String req)
         throws EndpointNotFoundException, IOException
     {
-        
-        // TODO: Is there a way to make this not so ugly?
-        String ctxUri;
-        String uriBase = (String) eventContext.getMessage().getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
-        
-        if (uriBase == null) 
-        {
-            EndpointURI epUri = eventContext.getEndpointURI();
-            String host = (String) eventContext.getMessage().getProperty("Host", epUri.getHost());
-            
-            uriBase = epUri.getScheme() + "://" + host + epUri.getPath();
-        }
-        
-        // This is the case of the HTTP message receiver. The servlet one sends different info
-        if (req != null && req.length() > 0) 
-        {
-            int qIdx = uriBase.indexOf('?');
-            if (qIdx > -1) 
-            {
-                uriBase = uriBase.substring(0, qIdx);
-            }
-            
-            qIdx = req.indexOf('?');
-            if (qIdx > -1) 
-            {
-                req = req.substring(qIdx);
-            }
-            
-            qIdx = req.indexOf('&');
-            if (qIdx > -1) 
-            {
-                req = req.substring(0, qIdx);
-            }
-            
-            uri = uriBase + req;
-        }
-       
-        ctxUri = eventContext.getEndpointURI().getPath();
+        // TODO: Is there a way to make this not so ugly?       
+        String ctxUri = eventContext.getEndpointURI().getPath();
+        String wsdlUri = getWsdlUri(eventContext, req);
+        String serviceUri = wsdlUri.substring(0, wsdlUri.indexOf('?'));
         
         EndpointInfo ei = receiver.getServer().getEndpoint().getEndpointInfo();
 
-        if (uriBase != null) 
+        if (serviceUri != null) 
         {
-            ei.setAddress(uriBase);
+            ei.setAddress(serviceUri);
             
             if (ei.getExtensor(AddressType.class) != null) 
             {
-                ei.getExtensor(AddressType.class).setLocation(uriBase);
+                ei.getExtensor(AddressType.class).setLocation(serviceUri);
             }
         }
 
@@ -175,10 +158,10 @@ public class CxfServiceComponent implements Callable, Lifecycle
 
         for (QueryHandler qh : bus.getExtension(QueryHandlerRegistry.class).getHandlers())
         {
-            if (qh.isRecognizedQuery(uri, ctxUri, ei))
+            if (qh.isRecognizedQuery(wsdlUri, ctxUri, ei))
             {
-                ct = qh.getResponseContentType(uri, ctxUri);
-                qh.writeResponse(uri, ctxUri, ei, out);
+                ct = qh.getResponseContentType(wsdlUri, ctxUri);
+                qh.writeResponse(wsdlUri, ctxUri, ei, out);
                 out.flush();
             }
         }
@@ -200,7 +183,15 @@ public class CxfServiceComponent implements Callable, Lifecycle
         return result;
     }
 
-    protected Object sendToDestination(MuleEventContext ctx, String uri) throws MuleException, IOException
+    private String getWsdlUri(MuleEventContext eventContext, String reqPath) 
+    {
+        EndpointURI epUri = eventContext.getEndpointURI();
+        String host = (String) eventContext.getMessage().getProperty("Host", epUri.getHost());
+        
+        return epUri.getScheme() + "://" + host + reqPath;
+    }
+    
+    protected Object sendToDestination(MuleEventContext ctx) throws MuleException, IOException
     {
         try
         {
@@ -209,7 +200,8 @@ public class CxfServiceComponent implements Callable, Lifecycle
             String method = (String) muleReqMsg.getProperty(HttpConnector.HTTP_METHOD_PROPERTY);
             
             String ct = (String) muleReqMsg.getProperty(HttpConstants.HEADER_CONTENT_TYPE);
-            if (ct != null) {
+            if (ct != null) 
+            {
                 m.put(Message.CONTENT_TYPE, ct);
             }
             
@@ -239,15 +231,9 @@ public class CxfServiceComponent implements Callable, Lifecycle
             String soapAction = getSoapAction(ctx.getMessage());
             m.put(org.mule.transport.soap.SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
 
-            EndpointURI epUri = ctx.getEndpointURI();
-            Server server = connector.getServer(epUri.toString());
-            if (server == null)
-            {
-                // TODO is this the right Mule exception?
-                throw new EndpointNotFoundException(uri);
-            }
-
+            Server server = receiver.getServer();
             org.apache.cxf.transport.Destination d = server.getDestination();
+            
             // Set up a listener for the response
             m.put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
             m.put(MuleProperties.MULE_EVENT_PROPERTY, RequestContext.getEvent());
