@@ -37,5 +37,4 @@
             <component class="org.mule.component.simple.EchoComponent"/>
         </service>
     </model>
-
 </mule>

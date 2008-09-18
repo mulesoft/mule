@@ -10,7 +10,15 @@
 
 package org.mule.module.acegi;
 
+import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.security.SecurityProvider;
+import org.mule.api.service.Service;
+import org.mule.module.acegi.filters.http.HttpBasicAuthenticationFilter;
+import org.mule.security.MuleSecurityManager;
 import org.mule.tck.FunctionalTestCase;
+
+import java.util.Collection;
 
 public class AcegiAuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -20,17 +28,27 @@ public class AcegiAuthenticationNamespaceHandlerTestCase extends FunctionalTestC
         return "acegi-authentication-config.xml";
     }
 
-    public void testAcegi()
+    public void testSecurityManagerConfigured()
     {
-        // this code doesn't test anything and uses a deprecated api.  was this a joke?
-//        Collection endpoints = muleContext.getRegistry().getEndpoints();
-//        Iterator it = endpoints.iterator();
-//        while (it.hasNext())
-//        {
-//            Endpoint endpoint = (Endpoint) it.next();
-//            logger.debug(endpoint.getName() + " : " + endpoint);
-//        }
+        MuleSecurityManager securityManager = 
+            (MuleSecurityManager) muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
+        assertNotNull(securityManager);
         
+        Collection providers = securityManager.getProviders();
+        assertEquals(1, providers.size());
+        SecurityProvider provider = (SecurityProvider) providers.iterator().next();
+        assertEquals(AcegiProviderAdapter.class, provider.getClass());
+    }
+    
+    public void testEndpointConfiguration()
+    {
+        Service service = muleContext.getRegistry().lookupService("echo");
+        assertNotNull(service);
+        assertEquals(1, service.getInboundRouter().getEndpoints().size());
+
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getInboundRouter().getEndpoints().get(0);
+        assertNotNull(endpoint.getSecurityFilter());
+        assertEquals(HttpBasicAuthenticationFilter.class, endpoint.getSecurityFilter().getClass());
     }
 
 }
