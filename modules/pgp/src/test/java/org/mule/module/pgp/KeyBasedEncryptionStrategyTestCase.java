@@ -20,11 +20,6 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractMuleTestCase
 {
     private KeyBasedEncryptionStrategy kbStrategy;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractMuleTestCase#setUp()
-     */
     protected void doSetUp() throws Exception
     {
         PGPKeyRingImpl keyM = new PGPKeyRingImpl();
@@ -45,11 +40,6 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractMuleTestCase
         kbStrategy.initialise();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractMuleTestCase#tearDown()
-     */
     protected void doTearDown() throws Exception
     {
         kbStrategy = null;
