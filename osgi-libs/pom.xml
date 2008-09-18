@@ -72,36 +72,54 @@
     <modules>
         <module>acegi</module>
         <module>activation</module>
+        <module>ant</module>
+        <module>antlr</module>
+        <!-- <module>asm</module> -->
+        <module>axis</module>
+        <module>backport</module>
         <module>cglib</module>
-        <!-- SSEBR has 1.1.0, we use 1.0 -->
+        <module>commons-beanutils</module>
         <module>commons-cli</module>
+        <module>commons-codec</module>
+        <module>commons-collections</module>
         <module>commons-dbutils</module>
-        <!-- SSEBR has 1.4.0, we use 1.3.1 -->
+        <module>commons-discovery</module>
+        <module>commons-httpclient</module>
         <module>commons-io</module>
         <module>commons-jxpath</module>
+        <module>commons-lang</module>
+        <module>commons-net</module>
         <module>cryptix</module>
         <module>cxf</module>
         <module>cxf-http</module>
+        <module>dom4j</module>
         <module>geronimo-ejb</module>
         <module>geronimo-j2ee-connector</module>
         <module>geronimo-j2ee-management</module>
         <module>geronimo-jaxrpc</module>
         <module>geronimo-jms</module>
         <module>geronimo-jta</module>
+        <module>geronimo-servlet</module>
         <module>groovy-engine</module>
         <module>hibernate</module>
-        <!-- SSEBR has 3.3.0.ga, we use 3.6.ga -->
         <module>javassist</module>
-        <!-- SSEBR has this but it doesn't include jaxb-xjc -->
         <module>jaxb</module>
+        <module>jaxen</module>
+        <module>jaxws</module>
         <module>jcr</module>
         <module>jbossts</module>
         <module>jbpm</module>
-        <!-- SSEBR has 1.1.2, we use 2.0.0 -->
+        <!-- JDOM is tricky because it has a few classes in the "." package, 
+             so we use someone else's OSGification of it
+        <module>jdom</module> -->
         <module>jug</module>
+        <module>mail</module>
         <module>mx4j</module>
-        <!-- SSEBR has this but it depends on a newer version of log4j -->
         <module>opensaml</module>
+        <module>ognl</module>
+        <module>oro</module>
+        <module>quartz</module>
+        <module>saaj</module>
         <module>saxon</module>
         <module>script</module>
         <module>smack</module>
@@ -110,11 +128,12 @@
         <module>sxc</module>
         <module>woodstox</module>
         <module>wrapper</module>
+        <module>wsdl</module>        
         <module>xml-resolver</module>
-        <!-- SSEBR has 1.0.5.D2, we use 1.4.0 -->        
         <module>xml-security</module>
+        <module>xmlpull</module>
+        <module>xstream</module>        
         <module>yourkit</module>
-        <!-- SSEBR has 1.5.0, we use 1.4 -->
         <module>xapool</module>
         <module>wss4j</module>
     </modules>

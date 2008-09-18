@@ -12,9 +12,9 @@
     <properties>
         <!-- ***************************************************** -->
         <!-- EDIT THESE PROPERTIES, THE REST OF THE POM IS GENERIC -->
-        <libGroupId>jdom</libGroupId>
-        <libArtifactId>jdom</libArtifactId>
-        <libVersion>${jdomVersion}</libVersion>
+        <libGroupId>ant</libGroupId>
+        <libArtifactId>ant</libArtifactId>
+        <libVersion>${antVersion}</libVersion>
         <!-- ***************************************************** -->
     </properties>
     
@@ -27,8 +27,7 @@
     <dependencies>
         <dependency>
             <groupId>${libGroupId}</groupId>
-            <!-- JDOM is tricky because it has a few classes in the "." package, so we use someone else's OSGifaction of it -->
-            <artifactId>jdom-osgi</artifactId>
+            <artifactId>${libArtifactId}</artifactId>
             <version>${libVersion}</version>
             <optional>true</optional>
         </dependency>
