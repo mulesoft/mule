@@ -17,7 +17,7 @@ org.mule.transport.tcp.integration.TcpFunctionalLegacyTestCase
 org.mule.transport.tcp.issues.SynchStreamingMule1687TestCase
 
 # Disable this long-running test to speed up testing during development
-#org.mule.transport.tcp.integration.StreamingCapacityTestCase
+org.mule.transport.tcp.integration.StreamingCapacityTestCase
 
 # testCustomObject() fails sporadically? for 2.1
 # http://bamboo.mulesource.org/browse/MULE-MULE2JDK5-368

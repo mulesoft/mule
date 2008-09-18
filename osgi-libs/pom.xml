@@ -72,10 +72,10 @@
     <modules>
         <module>acegi</module>
         <module>activation</module>
-        <!-- <module>ant</module> -->
+        <module>ant</module>
         <!-- <module>antlr</module> -->
         <!-- <module>asm</module> -->
-        <!-- <module>axis</module> -->
+        <module>axis</module> 
         <!-- <module>backport</module> -->
         <module>cglib</module>
         <!-- <module>commons-beanutils</module> -->
@@ -83,8 +83,8 @@
         <!-- <module>commons-codec</module> -->
         <!-- <module>commons-collections</module> -->
         <module>commons-dbutils</module>
-        <!-- <module>commons-discovery</module> -->
-        <!-- <module>commons-httpclient</module> -->
+        <module>commons-discovery</module>
+        <module>commons-httpclient</module>
         <module>commons-io</module>
         <module>commons-jxpath</module>
         <!-- <module>commons-lang</module> -->
@@ -105,7 +105,7 @@
         <module>javassist</module>
         <module>jaxb</module>
         <!-- <module>jaxen</module> -->
-        <!-- <module>jaxws</module> -->
+        <module>jaxws</module>
         <module>jcr</module>
         <module>jbossts</module>
         <module>jbpm</module>
@@ -113,7 +113,7 @@
              so we use someone else's OSGification of it
         <module>jdom</module> -->
         <module>jug</module>
-        <!-- <module>mail</module> -->
+        <module>mail</module>
         <module>mx4j</module>
         <module>opensaml</module>
         <!-- <module>ognl</module> -->
@@ -128,7 +128,7 @@
         <module>sxc</module>
         <module>woodstox</module>
         <module>wrapper</module>
-        <!-- <module>wsdl</module> -->        
+        <module>wsdl</module>       
         <module>xml-resolver</module>
         <module>xml-security</module>
         <!-- <module>xmlpull</module> -->

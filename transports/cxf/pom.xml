@@ -122,16 +122,17 @@
         -->
         <dependency>
             <groupId>javax.mail</groupId>
-            <artifactId>com.springsource.javax.mail</artifactId>
+            <artifactId>mail.osgi</artifactId>
+            <version>${javaMailVersion}</version>
         </dependency>
         <dependency>
             <groupId>javax.xml.ws</groupId>
-            <artifactId>com.springsource.javax.xml.ws</artifactId>
+            <artifactId>jaxws-api.osgi</artifactId>
             <version>${javaXmlWsVersion}</version>
         </dependency>
         <dependency>
-            <groupId>javax.wsdl</groupId>
-            <artifactId>com.springsource.javax.wsdl</artifactId>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j.osgi</artifactId>
             <version>${javaWsdlVersion}</version>
         </dependency>
         <dependency>
@@ -199,10 +200,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>javax.wsdl</groupId>
-            <artifactId>com.springsource.javax.wsdl</artifactId>
-        </dependency>
-        <dependency>
             <!-- OSGi-ready -->
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
@@ -258,11 +255,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Who uses this?
         <dependency>  
-            <groupId>org.objectweb.asm</groupId>  
-            <artifactId>com.springsource.org.objectweb.asm</artifactId>  
+            <groupId>asm</groupId>  
+            <artifactId>asm.osgi</artifactId>  
             <version>${asmVersion}</version> 
         </dependency>        
+        -->
         <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-all.osgi</artifactId>
@@ -274,8 +273,8 @@
             <version>${saxonVersion}</version>
         </dependency>
         <dependency>  
-            <groupId>org.jdom</groupId>  
-            <artifactId>com.springsource.org.jdom</artifactId>  
+            <groupId>jdom</groupId>  
+            <artifactId>jdom-osgi</artifactId>  
             <version>${jdomVersion}</version> 
         </dependency>
         <dependency>
@@ -284,8 +283,8 @@
         </dependency>
         <!-- For dynamic client, which compiles stuff on the fly -->
         <dependency>  
-            <groupId>org.apache.ant</groupId>  
-            <artifactId>com.springsource.org.apache.tools.ant</artifactId>  
+            <groupId>ant</groupId>  
+            <artifactId>ant.osgi</artifactId>  
             <version>${antVersion}</version> 
         </dependency>
 

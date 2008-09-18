@@ -43,7 +43,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.axis</groupId>
-            <artifactId>com.springsource.org.apache.axis</artifactId>
+            <artifactId>axis.osgi</artifactId>
+            <version>${axisVersion}</version>
         </dependency>
         <!-- 
              org.apache.axis:axis does not declare its dependencies properly. The
@@ -51,23 +52,25 @@
              POMs. The duplication here seems to be the lesser evil.
              -->
         <dependency>
-            <groupId>javax.xml.rpc</groupId>
-            <artifactId>com.springsource.javax.xml.rpc</artifactId>
-            <version>${javaXmlRpcVersion}</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jaxrpc_1.1_spec.osgi</artifactId>
         </dependency>
         <!-- This library causes conflicts with the SAAJ library used by CXF,
           and the decision was made to make CXF work OOTB.  Therefore the 
           axis-saaj library must be provided manually on the classpath -->
+        <!-- Who uses this?
         <dependency>
             <groupId>javax.xml.soap</groupId>
             <artifactId>com.springsource.javax.xml.soap</artifactId>
             <version>${javaXmlSoapVersion}</version>
             <scope>provided</scope>
         </dependency>
+        -->
         <!-- Use the latest version of WSDL4J as it is compatible with CXF -->
         <dependency>
-            <groupId>javax.wsdl</groupId>
-            <artifactId>com.springsource.javax.wsdl</artifactId>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j.osgi</artifactId>
+            <version>${javaWsdlVersion}</version>
         </dependency>
         <!-- needed by the Axis Service component -->
         <dependency>
@@ -76,13 +79,21 @@
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
-            <artifactId>com.springsource.javax.mail</artifactId>
+            <artifactId>mail.osgi</artifactId>
+            <version>${javaMailVersion}</version>
+        </dependency>
+        <!-- Used by org.apache.axis.components.logger.LogFactory -->
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery.osgi</artifactId>
+            <version>${commonsDiscoveryVersion}</version>
         </dependency>
 
         <!-- Unit tests -->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>com.springsource.org.apache.commons.httpclient</artifactId>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient.osgi</artifactId>
+            <version>${commonsHttpClientVersion}</version>
             <scope>test</scope>
         </dependency>
         <!-- Needed for common SOAP test classes -->
