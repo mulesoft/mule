@@ -69,8 +69,8 @@
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-xjc</artifactId>
-            <version>2.1.6</version>
+            <artifactId>jaxb-all.osgi</artifactId>
+            <version>${javaXmlBindVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
