@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.http.components;
+package org.mule.transport.servlet;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -20,7 +20,7 @@ public class RESTTestCase extends FunctionalTestCase
     
     protected String getConfigResources()
     {
-        return "/rest-functional-test.xml";
+        return "rest-functional-test.xml";
     }
     
     public void testRest1ParamPost() throws Exception
