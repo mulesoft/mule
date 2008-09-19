@@ -93,7 +93,7 @@
         <module>cryptix</module>
         <module>cxf</module>
         <module>cxf-http</module>
-        <!-- <module>dom4j</module> -->
+        <module>dom4j</module>
         <module>geronimo-ejb</module>
         <module>geronimo-j2ee-connector</module>
         <module>geronimo-j2ee-management</module>
@@ -105,7 +105,7 @@
         <module>hibernate</module>
         <module>javassist</module>
         <module>jaxb</module>
-        <!-- <module>jaxen</module> -->
+        <module>jaxen</module>
         <module>jaxws</module>
         <module>jcr</module>
         <module>jbossts</module>
@@ -132,8 +132,8 @@
         <module>wsdl</module>       
         <module>xml-resolver</module>
         <module>xml-security</module>
-        <!-- <module>xmlpull</module> -->
-        <!-- <module>xstream</module>  -->       
+        <module>xmlpull</module>
+        <module>xstream</module>       
         <module>yourkit</module>
         <module>xapool</module>
         <module>wss4j</module>
