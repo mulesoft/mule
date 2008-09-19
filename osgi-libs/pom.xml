@@ -100,7 +100,7 @@
         <module>geronimo-jaxrpc</module>
         <module>geronimo-jms</module>
         <module>geronimo-jta</module>
-        <!-- <module>geronimo-servlet</module> -->
+        <module>geronimo-servlet</module>
         <module>groovy-engine</module>
         <module>hibernate</module>
         <module>javassist</module>
@@ -117,7 +117,7 @@
         <module>mail</module>
         <module>mx4j</module>
         <module>opensaml</module>
-        <!-- <module>ognl</module> -->
+        <module>ognl</module>
         <module>oro</module> 
         <module>quartz</module> 
         <!-- <module>saaj</module> -->

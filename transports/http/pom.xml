@@ -47,8 +47,9 @@
             <version>${commonsHttpClientVersion}</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>com.springsource.javax.servlet</artifactId>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_2.4_spec.osgi</artifactId>
+            <version>${geronimoSpecsVersion}</version>
             <scope>provided</scope>
         </dependency>
         
