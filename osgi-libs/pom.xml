@@ -110,9 +110,7 @@
         <module>jcr</module>
         <module>jbossts</module>
         <module>jbpm</module>
-        <!-- JDOM is tricky because it has a few classes in the "." package, 
-             so we use someone else's OSGification of it
-        <module>jdom</module> -->
+        <module>jdom</module> 
         <module>jug</module>
         <module>mail</module>
         <module>mx4j</module>

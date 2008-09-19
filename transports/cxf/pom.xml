@@ -274,7 +274,7 @@
         </dependency>
         <dependency>  
             <groupId>jdom</groupId>  
-            <artifactId>jdom-osgi</artifactId>  
+            <artifactId>jdom.osgi</artifactId>  
             <version>${jdomVersion}</version> 
         </dependency>
         <dependency>
