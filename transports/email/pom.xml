@@ -16,7 +16,8 @@
     <dependencies>
         <dependency>
             <groupId>javax.mail</groupId>
-            <artifactId>com.springsource.javax.mail</artifactId>
+            <artifactId>mail.osgi</artifactId>
+            <version>${javaMailVersion}</version>
         </dependency>
 
         <!-- Unit tests only -->

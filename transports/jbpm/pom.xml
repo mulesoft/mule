@@ -36,8 +36,8 @@
             <version>${cglibVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>com.springsource.antlr</artifactId>
+            <groupId>antlr</groupId>
+            <artifactId>antlr.osgi</artifactId>
             <version>${antlrVersion}</version>
         </dependency>        
         <dependency>
@@ -46,8 +46,8 @@
             <version>${jcrVersion}</version>
         </dependency>        
         <dependency>
-            <groupId>org.beanshell</groupId>
-            <artifactId>com.springsource.bsh</artifactId>
+            <groupId>bsh</groupId>
+            <artifactId>bsh.osgi</artifactId>
             <version>${bshVersion}</version>
         </dependency>
         <!-- Needed for org.mule.transport.bpm.jbpm.actions.SendMuleEvent -->

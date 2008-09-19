@@ -31,13 +31,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>com.springsource.org.apache.commons.net</artifactId>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net.osgi</artifactId>
             <version>${commonsNetVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.oro</groupId>
-            <artifactId>com.springsource.org.apache.oro</artifactId>
+            <groupId>oro</groupId>
+            <artifactId>oro.osgi</artifactId>
             <version>${oroVersion}</version>
         </dependency>
         <dependency>
