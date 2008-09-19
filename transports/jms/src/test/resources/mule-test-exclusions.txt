@@ -3,9 +3,9 @@
 #
 
 # make the test work properly or remove when redesigning the reconnection strategies
+# MULE-3681
 org.mule.transport.jms.issues.ConnectWithThreadingTestCase
 
 # Broken by EE-734, most likely related to the Retry code in org.mule.transport.jms.XaTransactedJmsMessageReceiver
-org.mule.transport.jms.integration.JmsXATransactionComponentTestCase
-
-org.mule.transport.jms.JmsReconnectTestCase
+# MULE-3682
+#org.mule.transport.jms.integration.JmsXATransactionComponentTestCase
