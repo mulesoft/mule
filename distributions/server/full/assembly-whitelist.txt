@@ -46,7 +46,7 @@ jbossts-all.osgi-4.2.3-SP5
 jbpm-jpdl.osgi-3.2.2
 jcl104-over-slf4j-1.5.0
 jcr.osgi-1.0
-jdom.osgi-1.1.0
+jdom.osgi-1.0
 jetty-6.1.11
 jetty-util-6.1.11
 jug.osgi-2.0.0
