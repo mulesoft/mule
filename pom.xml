@@ -79,7 +79,7 @@
         <commonsCodecVersion>1.3</commonsCodecVersion>
         <commonsCollectionsVersion>3.2</commonsCollectionsVersion>
         <commonsDbUtilsVersion>1.1</commonsDbUtilsVersion>
-        <commonsDiscoveryVersion>0.2</commonsDiscoveryVersion>
+        <commonsDiscoveryVersion>0.4</commonsDiscoveryVersion>
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
         <commonsIoVersion>1.3.1</commonsIoVersion>
         <commonsJxpathVersion>1.2</commonsJxpathVersion>
