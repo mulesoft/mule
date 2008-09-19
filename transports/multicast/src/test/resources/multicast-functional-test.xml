@@ -16,7 +16,6 @@
     <multicast:endpoint host="224.0.0.1" port="60131" name="serverEndpoint"/>
 
     <model name="main">
-
         <service name="Component1">
             <inbound>
                 <inbound-endpoint ref="serverEndpoint"/>
@@ -52,7 +51,5 @@
                 </outbound-pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

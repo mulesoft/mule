@@ -1,8 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-
-# Disable Multicast tests unless configured
-# acooke - since this runs ok on CI, leaving enabled
-org.mule.transport.multicast.MulticastConnectorFunctionalTestCase
-

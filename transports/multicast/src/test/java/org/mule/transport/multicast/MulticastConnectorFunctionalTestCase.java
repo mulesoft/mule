@@ -68,10 +68,10 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
     protected void checkBroadcastMessagesForComponent(int numberOfMessages,
                                                       Set receivedMessages, String name)
     {
-        //Check all broadcasts were received from Component2
+        //Check all broadcasts were received from component <name>
         for (int x = 0; x < numberOfMessages; x++)
         {
-            String expected = MESSAGE + x + " Received " + name;
+            String expected = MESSAGE + x +  name;
 
             assertTrue(receivedMessages.contains(expected));
             assertTrue(receivedMessages.remove(expected));
