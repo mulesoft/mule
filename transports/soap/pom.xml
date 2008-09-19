@@ -61,10 +61,12 @@
             <artifactId>dom4j.osgi</artifactId>
             <version>${dom4jVersion}</version>
         </dependency>
-       <dependency>
+        <!-- Who uses this?
+        <dependency>
             <groupId>javax.xml.stream</groupId>
             <artifactId>com.springsource.javax.xml.stream</artifactId>
             <version>${javaXmlStreamVersion}</version>
-    </dependency> 
+        </dependency>
+        --> 
     </dependencies>
 </project>
