@@ -118,7 +118,7 @@
         <jbossTsVersion>4.2.3-SP5</jbossTsVersion>
         <jbpmVersion>3.2.2</jbpmVersion>
         <jcrVersion>1.0</jcrVersion>
-        <jdomVersion>1.1.0</jdomVersion>
+        <jdomVersion>1.0</jdomVersion>
         <jettyVersion>6.1.11</jettyVersion>
         <jugVersion>2.0.0</jugVersion>
         <jxlVersion>2.6.3</jxlVersion>
