@@ -47,13 +47,8 @@
             <artifactId>geronimo-jaxrpc_1.1_spec.osgi</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.xml.soap</groupId>
-            <artifactId>com.springsource.javax.xml.soap</artifactId>
-            <version>${javaXmlSoapVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml</groupId>
-            <artifactId>com.springsource.com.sun.xml.messaging.saaj</artifactId>
+            <groupId>saaj</groupId>
+            <artifactId>saaj-all.osgi</artifactId>
             <version>${saajVersion}</version>
         </dependency>
         <dependency>
@@ -61,12 +56,5 @@
             <artifactId>dom4j.osgi</artifactId>
             <version>${dom4jVersion}</version>
         </dependency>
-        <!-- Who uses this?
-        <dependency>
-            <groupId>javax.xml.stream</groupId>
-            <artifactId>com.springsource.javax.xml.stream</artifactId>
-            <version>${javaXmlStreamVersion}</version>
-        </dependency>
-        --> 
     </dependencies>
 </project>

@@ -21,6 +21,12 @@
             <artifactId>saaj-api</artifactId>
             <version>${saajVersion}</version>
             <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.messaging.saaj</groupId>

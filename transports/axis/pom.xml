@@ -55,17 +55,6 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jaxrpc_1.1_spec.osgi</artifactId>
         </dependency>
-        <!-- This library causes conflicts with the SAAJ library used by CXF,
-          and the decision was made to make CXF work OOTB.  Therefore the 
-          axis-saaj library must be provided manually on the classpath -->
-        <!-- Who uses this?
-        <dependency>
-            <groupId>javax.xml.soap</groupId>
-            <artifactId>com.springsource.javax.xml.soap</artifactId>
-            <version>${javaXmlSoapVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        -->
         <!-- Use the latest version of WSDL4J as it is compatible with CXF -->
         <dependency>
             <groupId>wsdl4j</groupId>

@@ -74,7 +74,6 @@
         <module>activation</module>
         <module>ant</module>
         <module>antlr</module> 
-        <!-- <module>asm</module> -->
         <module>axis</module> 
         <module>backport</module>
         <module>bsh</module>
@@ -118,7 +117,7 @@
         <module>ognl</module>
         <module>oro</module> 
         <module>quartz</module> 
-        <!-- <module>saaj</module> -->
+        <module>saaj</module>
         <module>saxon</module>
         <module>script</module>
         <module>smack</module>
