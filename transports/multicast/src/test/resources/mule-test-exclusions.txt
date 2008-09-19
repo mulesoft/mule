@@ -1,3 +1,7 @@
 #
 # Test cases listed in this file are not run.
 #
+
+# MULE-3686
+# Disable Multicast tests unless configured
+org.mule.transport.multicast.MulticastConnectorFunctionalTestCase
