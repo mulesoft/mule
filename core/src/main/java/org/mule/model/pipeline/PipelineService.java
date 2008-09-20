@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.component.Component;
+import org.mule.api.service.ServiceException;
 import org.mule.api.transport.DispatchException;
 import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.config.i18n.CoreMessages;
@@ -71,6 +72,14 @@ public class PipelineService extends DirectService
 
     protected void doDispatch(MuleEvent event) throws MuleException
     {
+        try
+        {
+            waitIfPaused(event);
+        }
+        catch (InterruptedException e)
+        {
+            throw new ServiceException(event.getMessage(), this, e);
+        }
         sendEvent(event);
     }
 

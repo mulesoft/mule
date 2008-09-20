@@ -13,6 +13,7 @@ package org.mule.model.direct;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.service.ServiceException;
 import org.mule.service.AbstractService;
 
 import java.util.List;
@@ -42,6 +43,14 @@ public class DirectService extends AbstractService
 
     protected void doDispatch(MuleEvent event) throws MuleException
     {
+        try
+        {
+            waitIfPaused(event);
+        }
+        catch (InterruptedException e)
+        {
+            throw new ServiceException(event.getMessage(), this, e);
+        }
         invokeComponent(event);
     }
 

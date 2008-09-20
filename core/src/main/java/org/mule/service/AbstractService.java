@@ -439,15 +439,6 @@ public abstract class AbstractService implements Service
                     event.getMessage(), this);
         }
 
-        try
-        {
-            waitIfPaused(event);
-        }
-        catch (InterruptedException e)
-        {
-            throw new ServiceException(event.getMessage(), this, e);
-        }
-
         // Dispatching event to an inbound endpoint
         // in the DefaultMuleSession#dispatchEvent
         ImmutableEndpoint endpoint = event.getEndpoint();
