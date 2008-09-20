@@ -632,7 +632,14 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         s = mgr.getQueueSession();
         q = s.getQueue("warmRecoverQueue");
 
-        assertEquals(toPopulate, q.size());
+        if (isPersistent())
+        {
+            assertEquals(toPopulate, q.size());
+        }
+        else
+        {
+            assertEquals(0, q.size());
+        }
 
     }
     
