@@ -57,7 +57,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
      */
     private static final long serialVersionUID = 7711976708670893015L;
     
-    private static final String QUEUE_NAME_SUFFIX = ".component";
+    private static final String QUEUE_NAME_SUFFIX = ".service";
 
     protected WorkManager workManager;
 
@@ -124,8 +124,8 @@ public class SedaService extends AbstractService implements Work, WorkListener
                 throw new InitialisationException(MessageFactory.createStaticMessage("Service has no name to identify it"), this);
             }
             // Setup event Queue (used for VM execution).  The queue has the same name as the service.
-            queueProfile.configureQueue(name, muleContext.getQueueManager());
-            queue = muleContext.getQueueManager().getQueueSession().getQueue(name + QUEUE_NAME_SUFFIX);
+            queueProfile.configureQueue(getQueueName(), muleContext.getQueueManager());
+            queue = muleContext.getQueueManager().getQueueSession().getQueue(getQueueName());
             if (queue == null)
             {
                 throw new InitialisationException(MessageFactory.createStaticMessage("Queue not created for service " + name), this);
@@ -281,6 +281,11 @@ public class SedaService extends AbstractService implements Work, WorkListener
             return -1;
         }
         return queue.size();
+    }
+    
+    private String getQueueName()
+    {
+        return name + QUEUE_NAME_SUFFIX;
     }
 
     /**
