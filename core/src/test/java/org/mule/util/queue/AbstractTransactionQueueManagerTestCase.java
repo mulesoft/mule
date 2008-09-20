@@ -580,4 +580,60 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         assertEquals("Queue must be fully consumed after successful test run. Queue size:", 0, queue.size());
     }
 
+    public void testRecoverWarmRestart() throws Exception
+    {
+        TransactionalQueueManager mgr = createQueueManager();
+        mgr.start();
+        QueueSession s = mgr.getQueueSession();
+        Queue q = s.getQueue("warmRecoverQueue");
+
+        int toPopulate = 500;
+
+        // Populate queue
+        Random rnd = new Random();
+        for (int j = 0; j < toPopulate; j++)
+        {
+            byte[] o = new byte[2048];
+            rnd.nextBytes(o);
+            q.put(o);
+        }
+        assertEquals(q.size(), toPopulate);
+
+        // Stop and start TransactionalQueueManager
+        mgr.stop();
+        mgr.start();
+
+        assertEquals(toPopulate, q.size());
+    }
+
+    public void testRecoverColdRestart() throws Exception
+    {
+        TransactionalQueueManager mgr = createQueueManager();
+        mgr.start();
+        QueueSession s = mgr.getQueueSession();
+        Queue q = s.getQueue("warmRecoverQueue");
+
+        int toPopulate = 500;
+
+        // Populate queue
+        Random rnd = new Random();
+        for (int j = 0; j < toPopulate; j++)
+        {
+            byte[] o = new byte[2048];
+            rnd.nextBytes(o);
+            q.put(o);
+        }
+        assertEquals(toPopulate, q.size());
+
+        // Stop and recreate TransactionalQueueManager simulating a cold restart
+        mgr.stop();
+        mgr = createQueueManager();
+        mgr.start();
+        s = mgr.getQueueSession();
+        q = s.getQueue("warmRecoverQueue");
+
+        assertEquals(toPopulate, q.size());
+
+    }
+    
 }
