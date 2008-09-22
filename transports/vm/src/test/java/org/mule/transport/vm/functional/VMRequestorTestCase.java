@@ -9,22 +9,24 @@
  */
 package org.mule.transport.vm.functional;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.module.client.MuleClient;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
 
 public class VMRequestorTestCase extends FunctionalTestCase
 {
+    
     protected String getConfigResources()
-        {
-            return "vm/vm-functional-test.xml";
-        }
+    {
+        return "vm/vm-functional-test.xml";
+    }
 
     public void testRequestorWithUpdateonMessage() throws Exception
     {
         final MuleClient client = new MuleClient();
-        Thread t = new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() 
+        {
             public void run()
             {
                 try
@@ -38,13 +40,13 @@ public class VMRequestorTestCase extends FunctionalTestCase
                 }
             }
         }, "test-thread");
-
         t.start();
+        
         MuleMessage result = client.request("vm://out", 3000L);
-
         assertNotNull(result);
 
         //This would fail if the owner thread info was not updated
         result.setProperty("foo", "bar");
     }
+    
 }
