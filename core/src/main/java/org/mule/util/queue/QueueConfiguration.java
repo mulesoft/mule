@@ -82,14 +82,28 @@ public class QueueConfiguration
     // @Override
     public boolean equals(Object obj)
     {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
         QueueConfiguration other = (QueueConfiguration) obj;
-        if (capacity != other.capacity) return false;
-        if (persistent != other.persistent) return false;
+        if (capacity != other.capacity)
+        {
+            return false;
+        }
+        if (persistent != other.persistent)
+        {
+            return false;
+        }
         return true;
     }
-
     
 }
