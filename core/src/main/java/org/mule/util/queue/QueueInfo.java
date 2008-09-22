@@ -40,12 +40,7 @@ public class QueueInfo
     {
         synchronized (list)
         {
-        	// Only add event id's to list if it doesn't already exist otherwise starting and stopping muleContext without disposing it results in duplicates.
-            // See MULE-3678
-            if (!list.contains(o))
-            {
-                list.addLast(o);
-            }
+            list.addLast(o);
             list.notifyAll();
         }
     }

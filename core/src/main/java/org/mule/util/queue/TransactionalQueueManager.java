@@ -115,6 +115,8 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             // TODO MULE-863: What should we really do?
             logger.error("Error closing persistent store", e);
         }
+        // Clear queues on shutdown to avoid duplicate entries on warm restarts (MULE-3678)
+        queues = new HashMap();
         return super.shutdown(mode, timeoutMSecs);
     }
 
