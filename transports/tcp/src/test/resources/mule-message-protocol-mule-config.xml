@@ -39,7 +39,5 @@
                 </outbound-pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>
