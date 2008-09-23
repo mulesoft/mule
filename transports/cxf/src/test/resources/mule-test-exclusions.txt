@@ -4,15 +4,13 @@
 
 # This class matches surefire's include pattern by accident.
 # Don't execute it as it's not a unit test.
-org.mule.transport.cxf.testmodels.testxfirecomponent
+org.mule.transport.cxf.testmodels.TestXFireComponent
 
 # tests with external dependencies
+# MULE-3693
 org.mule.transport.cxf.CxfWsdlTestCase
 
-# Cyclic dependency with axis ... hold for now
-org.mule.transport.cxf.ServiceUsingAxisEndpointTestCase
-
-# Not working yet...
+# MULE-3257
 org.mule.transport.cxf.client.GeneratedClientTestCase
 
 # Doesn't work on build server for some reason?
@@ -22,11 +20,9 @@ org.mule.transport.cxf.jaxws.ClientTestCase
 # MULE-3475
 org.mule.transport.cxf.WSProxyTestCase
 
-# Possibly related to MULE-2903
-org.mule.transport.cxf.issues.MultipleWsdlCxfCallsTestCase
-
-# EE-682
+# MULE-3685
 org.mule.transport.cxf.ServletTestCase
 
 # Broken by r12671, CI build MULE-MULE2JDK5-429
+# MULE-3694
 org.mule.transport.cxf.CxfConnectorVMFunctionalTestCase

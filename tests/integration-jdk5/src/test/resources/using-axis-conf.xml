@@ -25,7 +25,6 @@
             <inbound>
                 <inbound-endpoint address="vm://cxf.in"/>
             </inbound>
-            <component class="org.mule.component.simple.BridgeComponent"/>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="axis:http://localhost:63382/services/CxfService?method=receive">

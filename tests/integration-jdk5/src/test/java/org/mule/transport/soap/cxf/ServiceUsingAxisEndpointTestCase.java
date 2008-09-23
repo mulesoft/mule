@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.cxf;
+package org.mule.transport.soap.cxf;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -26,14 +26,14 @@ import org.dom4j.Element;
 public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
 {
 
-    public void testXFire() throws Exception
+    public void testCXF() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage reply = client.send("vm://xfire.in", new DefaultMuleMessage("Testing String"));
+        MuleMessage reply = client.send("vm://cxf.in", new DefaultMuleMessage("Testing String"));
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
-        assertEquals(reply.getPayloadAsString(), "Received: Testing String");
+        assertEquals("Received: Testing String", reply.getPayloadAsString());
     }
 
     public void testRequestWsdl() throws Exception
@@ -41,8 +41,8 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Map<String, String> props = new HashMap<String, String>();
         props.put("http.method", "GET");
-        MuleMessage reply = client.send("http://localhost:33382/services/XfireService?wsdl",
-            "/services/Hello_Xfire?wsdl", props);
+        MuleMessage reply = client.send("http://localhost:63382/services/CxfService?wsdl",
+            "/services/CxfService?wsdl", props);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
@@ -50,7 +50,7 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
         Document document = DocumentHelper.parseText(reply.getPayloadAsString());
         
         List nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
-        assertEquals(((Element) nodes.get(0)).attribute("name").getStringValue(), "XfireService");
+        assertEquals("CxfService", ((Element) nodes.get(0)).attribute("name").getStringValue());
     }
 
     protected String getConfigResources()

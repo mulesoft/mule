@@ -18,8 +18,7 @@ import org.mule.tck.FunctionalTestCase;
 
 public class MultipleWsdlCxfCallsTestCase extends FunctionalTestCase
 {
-    
-    
+
     public void testMultipleAsynchronousCalls() throws Exception
     {
         final MuleClient client = new MuleClient();
@@ -46,6 +45,7 @@ public class MultipleWsdlCxfCallsTestCase extends FunctionalTestCase
         for (int i = 0; i < 5; i++)
         {
             MuleMessage result = client.request("vm://output", 20000L);
+            assertNotNull(result);
             assertNotNull(result.getPayload());
         }
     }
