@@ -24,7 +24,7 @@ org.mule.test.integration.transport.jdbc.JdbcTransactionalXaFunctionalTestCase
 org.mule.test.integration.message.AttachmentsPropagationTestCase
 org.mule.test.integration.transaction.XATransactionsWithSpringDAO
 # Convert transacted endpoint to XML config
-#org.mule.test.integration.client.MuleClientTransactionTestCase
+org.mule.test.integration.client.MuleClientTransactionTestCase
 
 ##########################################################################
 # Mule 2.0.x failures
