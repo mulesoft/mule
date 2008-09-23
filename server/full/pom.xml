@@ -125,6 +125,7 @@
                                 ant.unjar(dest: tempDir) {
                                     fileset(dir: muleRoot) {
                                         include(name: '**/*-sources.jar')
+                                        exclude(name: 'osgi-libs/**-sources.jar')
                                     }
                                 }
 
