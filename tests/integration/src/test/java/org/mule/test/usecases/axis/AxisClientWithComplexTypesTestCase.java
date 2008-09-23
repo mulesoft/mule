@@ -23,8 +23,14 @@ import java.util.Map;
  */
 public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
 {
+    
     private Trade trade = null;
     private String uri = "axis:http://localhost:8081/services/BackOfficeImplBindingImplUMO?method=submitTrade";
+
+    protected String getConfigResources()
+    {
+        return "org/mule/test/usecases/routing/axis/axis-client-test.xml";
+    }
 
     // @Override
     protected void doSetUp() throws Exception
@@ -35,17 +41,10 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
         trade.setCurrency(22);
         trade.setTradeID(22);
         trade.setTransaction(11);
-
-    }
-
-    protected String getConfigResources()
-    {
-        return "org/mule/test/usecases/routing/axis/axis-client-test.xml";
     }
 
     public void testSendComplexDOCLIT() throws Exception
     {
-
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         props.put(AxisConnector.STYLE, "Document");
@@ -76,4 +75,5 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
         TradeStatus status = (TradeStatus)result.getPayload();
         assertEquals("RECEIVED", status.getStatus());
     }
+
 }

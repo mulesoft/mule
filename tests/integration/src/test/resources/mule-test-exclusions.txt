@@ -2,24 +2,16 @@
 # Mule 1.x failures
 ##########################################################################
 
-# These tests hang if you're behind a firewall.
-# Figure out how to use proxy settings here.
-org.mule.test.integration.client.MuleClientAxisExternalTestCase
-org.mule.test.integration.client.MuleClientWsdlSoapExternalTestCase
-org.mule.test.integration.transport.xmpp.XmppFunctionalTestCase
-
 # Require updated config?
+# MULE-3696
 org.mule.test.integration.routing.replyto.ReplytoChainIntegration2TestCase
-org.mule.test.integration.routing.replyto.ReplytoChainIntegration3TestCase
-org.mule.test.integration.routing.replyto.ReplytoChainIntegration4TestCase
 
-# More testing on these: not recorded in Jira yet
+# MULE-3697
 org.mule.test.usecases.axis.AxisClientWithComplexTypesTestCase
 
-org.mule.test.integration.transaction.OutboundTransactionsTestCase
-
 # MULE-2258: fails on the build server
-org.mule.test.usecases.sync.TcpToFileTestCase
+# leaving this commented out to check if the test still fails on the CI server
+#org.mule.test.usecases.sync.TcpToFileTestCase
 
 ##########################################################################
 # Convert to XML-based config
@@ -29,14 +21,10 @@ org.mule.test.usecases.sync.TcpToFileTestCase
 org.mule.test.integration.transport.jdbc.JdbcTransactionalJdbcFunctionalTestCase
 org.mule.test.integration.transport.jdbc.JdbcTransactionalXaFunctionalTestCase
 
-# MULE-2747
-org.mule.test.integration.transport.xmpp.XmppFunctionalTestCase
-
-#org.mule.test.integration.EventMetaDataPropagationTestCase
 org.mule.test.integration.message.AttachmentsPropagationTestCase
 org.mule.test.integration.transaction.XATransactionsWithSpringDAO
 # Convert transacted endpoint to XML config
-org.mule.test.integration.client.MuleClientTransactionTestCase
+#org.mule.test.integration.client.MuleClientTransactionTestCase
 
 ##########################################################################
 # Mule 2.0.x failures

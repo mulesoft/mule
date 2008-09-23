@@ -31,4 +31,5 @@ public class ReplytoChainIntegration4TestCase extends FunctionalTestCase
         assertNotNull(result);
         assertEquals("Received: " + message, result.getPayload());
     }
+
 }

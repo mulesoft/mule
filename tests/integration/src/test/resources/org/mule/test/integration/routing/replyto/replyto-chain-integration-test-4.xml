@@ -1,72 +1,48 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-<mule-configuration id="InjectionProblem" version="1.0">
+    <jms:activemq-connector name="jmsConnector" specification="1.1"/>
 
-     <!-- embed Spring configuration to create a Jms Connection factory -->
-    <container-context className="org.mule.module.spring.SpringContainerContext">
-        <properties>
-            <text-property name="configuration">
-                <![CDATA[
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-                <beans>
-                <bean id="jmsConnectionFactory"
-        class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost?broker.persistent=false</value></property>
-    </bean>
-                </beans>
-                ]]>
-            </text-property>
-        </properties>
-    </container-context>
-
-    <!-- Testing with ActiveMq -->
-    <connector name="jmsConnector" className="org.mule.transport.jms.JmsConnector">
-        <properties>
-            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
-            <property name="specification" value="1.1"/>
-        </properties>
-    </connector>
-
-    <!--
-        The Mule model initialises and manages your UMO components
-    -->
     <model name="InjectionProblem">
-        <mule-descriptor name="pojo1"
-            implementation="org.mule.component.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="vm://pojo1" remoteSync="true" remoteSyncTimeout="10000" />
-            </inbound-router>
-
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter" >
-                    <endpoint address="jms://pojo2" />
-                </router>
-            </outbound-router>
-        </mule-descriptor>
-
-        <mule-descriptor name="pojo2"
-            implementation="org.mule.component.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="jms://pojo2"/>
-            </inbound-router>
-
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://pojo3"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
-
-
-        <!-- This component will append " Received" to the message so we know we're getting the correct one -->
-        <mule-descriptor name="pojo3"
-            implementation="org.mule.tck.testmodels.services.TestReceiver">
-            <inbound-router>
-                <endpoint address="vm://pojo3"/>
-            </inbound-router>
-        </mule-descriptor>
+        <service name="pojo1">
+            <inbound>
+                <vm:inbound-endpoint path="pojo1" remoteSync="true" remoteSyncTimeout="10000"/>
+            </inbound>
+            <echo-component/>
+            <outbound>
+                <outbound-pass-through-router>
+                    <jms:outbound-endpoint queue="pojo2"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="pojo2">
+            <inbound>
+                <jms:inbound-endpoint queue="pojo2"/>
+            </inbound>
+            <echo-component/>
+            <outbound>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint path="pojo3"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+        
+        <!-- This service will append " Received" to the message so we know we're getting the correct one -->
+        <service name="pojo3">
+            <inbound>
+                <vm:inbound-endpoint path="pojo3"/>
+            </inbound>
+            <component class="org.mule.tck.testmodels.services.TestReceiver"/>
+        </service>
     </model>
-
-</mule-configuration>
+</mule>

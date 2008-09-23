@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
+       xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+           http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
+           http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
-<mule-configuration id="test" version="1.0">
-
-    <model name="model">
-        <mule-descriptor name="TcpReceiver"
-            implementation="org.mule.component.simple.NullComponent">
-            <inbound-router>
-                <endpoint address="tcp://localhost:4444"/>
-                <router className="org.mule.routing.inbound.ForwardingConsumer"/>
-               </inbound-router>
-
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="file://temp/tests/mule"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+    <model>
+        <service name="TcpReceiver">
+            <inbound>
+                <tcp:inbound-endpoint host="localhost" port="4444"/>            
+                <forwarding-router/>
+            </inbound>
+            <null-component/>
+            <outbound>
+                <outbound-pass-through-router>
+                    <file:outbound-endpoint path="temp/tests/mule"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>    
     </model>
-
-</mule-configuration>
+</mule>

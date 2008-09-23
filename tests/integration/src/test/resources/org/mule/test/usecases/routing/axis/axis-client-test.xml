@@ -1,30 +1,27 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" 
+    xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <axis:connector name="axisConnector" doAutoTypes="false"/>
 
-<mule-configuration id="axis_test" version="1.0">
-    <model name="test">
-        <mule-descriptor name="BackOfficeImplBindingImplUMO"
-            implementation="org.mule.test.usecases.axis.BackOfficeImplBindingImpl">
-            <inbound-router>
-                <endpoint address="axis:http://localhost:8081/services"/>
-            </inbound-router>
-            <properties>
-                <property name="style" value="Document"/>
-                <property name="use" value="Literal"/>
-                <map name="axisOptions">
-                    <property name="wsdlServiceElement" value="BackOfficeImplService"/>
-                    <property name="wsdlPortType" value="BackOfficeImplPortType"/>
-                </map>
-                <list name="beanTypes">
-                    <entry value="org.mule.test.usecases.axis.Trade"/>
-                    <entry value="org.mule.test.usecases.axis.TradeStatus"/>
-                    <entry value="org.mule.test.usecases.axis.SubmitTrade"/>
-                </list>
-                <property name="doAutoTypes" value="false"/>
-            </properties>
-        </mule-descriptor>
-
+    <model>
+        <service name="BackOfficeImplBindingImplUMO">
+            <inbound>
+                <axis:inbound-endpoint address="http://localhost:8081/services" 
+                    style="DOCUMENT" use="LITERAL">
+                    <axis:options wsdlServiceElement="BackOfficeImplService" wsdlPortType="BackOfficeImplPortType"/>
+                    <axis:bean-type interface="org.mule.test.usecases.axis.Trade"/>
+                    <axis:bean-type interface="org.mule.test.usecases.axis.TradeStatus"/>
+                    <axis:bean-type interface="org.mule.test.usecases.axis.SubmitTrade"/>
+                </axis:inbound-endpoint>
+            </inbound>
+            <component class="org.mule.test.usecases.axis.BackOfficeImplBindingImpl"/>
+        </service>
     </model>
-</mule-configuration>
+</mule>

@@ -1,72 +1,60 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
+       xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+           http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+           http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd
+           http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+           http://www.mulesource.org/schema/mule/jbossts/2.0 http://www.mulesource.org/schema/mule/jbossts/2.0/mule-jbossts.xsd">
 
-<mule-configuration id="test" version="1.0">
 
-    <mule-environment-properties synchronous="false" synchronousEventTimeout="5000" />
-
-    <!-- Embed Spring configuration to create a Jms Connection factory -->
-    <container-context className="org.mule.module.spring.SpringContainerContext">
-        <properties>
-            <text-property name="configuration">
-                <![CDATA[
-                <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-                <beans>
-                    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-                        <property name="brokerURL"><value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value></property>
-                    </bean>
-                </beans>
-                ]]>
-            </text-property>
-        </properties>
-    </container-context>
-
-    <!-- Transaction manager -->
-    <transaction-manager
-        factory="org.mule.module.jotm.JotmTransactionManagerFactory"/>
-
-    <connector name="jmsConnector" className="org.mule.transport.jms.activemq.ActiveMqJmsConnector">
-        <properties>
-            <!-- The ActiveMQ ConnectionFactory is configured as a Spring bean. -->
-            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
-            <property name="specification" value="1.1"/>
-        </properties>
-    </connector>
-
-    <model name="model">
-
-        <mule-descriptor name="component1"
-            implementation="org.mule.tck.testmodels.services.TestReceiver">
-            <inbound-router>
-                <endpoint address="vm://component1"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <endpoint address="jms://my.queue1">
-                        <transaction action="ALWAYS_JOIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>
-                    </endpoint>
-                    <endpoint address="jms://my.queue2">
-                        <transaction action="ALWAYS_JOIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>
-                    </endpoint>
-                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
-
-        <mule-descriptor name="component2"
-            implementation="org.mule.tck.testmodels.services.TestReceiver">
-            <inbound-router>
-                <endpoint address="jms://component2">
-                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>
-                </endpoint>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <endpoint address="jms://my.queue3"/>
-                    <endpoint address="jms://my.queue4"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+    <configuration defaultSynchronousEndpoints="false" defaultSynchronousEventTimeout="5000"/>
+    
+    <jms:activemq-connector name="jmsConnector" specification="1.1"/>
+    
+    <model>
+        <service name="component1">
+            <inbound>
+                <vm:inbound-endpoint path="component1"/>
+            </inbound>
+            <component class="org.mule.tck.testmodels.services.TestReceiver"/>
+            <outbound>
+                <multicasting-router>
+                    <jms:outbound-endpoint queue="my.queue1">
+                        <jms:transaction action="ALWAYS_JOIN"/>
+                    </jms:outbound-endpoint>
+                    <jms:outbound-endpoint queue="my.queue2">
+                        <jms:transaction action="ALWAYS_JOIN"/>
+                    </jms:outbound-endpoint>
+                    <jms:transaction action="ALWAYS_BEGIN"/>
+                </multicasting-router>
+            </outbound>
+        </service>
+        
+        <service name="component2">
+            <inbound>
+                <jms:inbound-endpoint queue="component2">
+                    <jms:transaction action="ALWAYS_BEGIN"/>
+                </jms:inbound-endpoint>
+            </inbound>
+            <component class="org.mule.tck.testmodels.services.TestReceiver"/>
+            <outbound>
+                <multicasting-router>
+                    <jms:outbound-endpoint queue="my.queue3">
+                        <jms:transaction action="NONE"/>
+                    </jms:outbound-endpoint>
+                    <jms:outbound-endpoint queue="my.queue4">
+                        <jms:transaction action="NONE"/>
+                    </jms:outbound-endpoint>
+                </multicasting-router>
+            </outbound>
+        </service>
     </model>
-</mule-configuration>
+</mule>
