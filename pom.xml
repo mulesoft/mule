@@ -996,6 +996,8 @@
                 </configuration>
             </plugin>
 
+            <!-- The maven-bundle-plugin generates the MANIFEST.MF for all modules 
+                where <packaging>bundle</packaging> is used. -->  
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -1015,6 +1017,44 @@
                         <Build-Revision>${buildNumber}</Build-Revision>
                         <Build-Date>${timestamp}</Build-Date>
                     </instructions>
+                </configuration>
+            </plugin>
+            
+            <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules 
+                where <packaging>jar</packaging> is used (i.e., those which are 
+                not OSGi bundles). -->  
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <!--
+                            Disabled for http://mule.mulesource.org/jira/browse/MULE-1153
+                            and http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4408526
+                         -->
+                        <index>false</index>
+                        <!-- List dependencies in the MANIFEST.MF -->
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <!-- Custom Entries -->
+                        <manifestEntries>
+                            <More-Info>For more information go to ${productUrl}</More-Info>
+                            <Support>Get commercial support: ${pom.organization.url}/support</Support>
+                            <Description>Mule ESB and Integration Platform</Description>
+                            <License>CPAL v1.0 http://www.mulesource.com/CPAL/</License>
+                            <Vendor-Url>${pom.organization.url}</Vendor-Url>
+                            <Product-Url>${productUrl}</Product-Url>
+                            <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
+                            <!--Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date-->
+                            <!-- include repository revision from buildnumber plugin -->
+                            <Build-Revision>${buildNumber}</Build-Revision>
+                            <Build-Date>${timestamp}</Build-Date>
+                            <Dev-List-Email>dev@mule.codehaus.org</Dev-List-Email>
+                        </manifestEntries>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>
