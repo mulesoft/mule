@@ -47,7 +47,6 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     public final void initialise() throws InitialisationException
     {
         super.initialise();
-        
         doInitialise();
     }
 
@@ -92,13 +91,13 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
                 connector.fireNotification(new SecurityNotification(e,
                     SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                handleException(e);
+                connector.handleException(e);
                 return;
             }
             catch (MuleException e)
             {
-                handleException(new DispatchException(event.getMessage(), event.getEndpoint(), e));
-                return;
+                disposeAndLogException();
+                throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
         }
 
@@ -118,7 +117,8 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
         catch (Exception e)
         {
-            handleException(new DispatchException(event.getMessage(), event.getEndpoint(), e));
+            disposeAndLogException();
+            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
     }
 
@@ -148,7 +148,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
                 connector.fireNotification(new SecurityNotification(e,
                     SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                handleException(e);
+                connector.handleException(e);
                 return event.getMessage();
             }
             catch (MuleException e)
@@ -296,7 +296,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             }
             catch (Exception e)
             {
-                handleException(e);
+                AbstractMessageDispatcher.this.getConnector().handleException(e);
             }
         }
 
@@ -329,21 +329,8 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         return false;
     }
 
-    //@Override
-    protected WorkManager getWorkManager()
-    {
-        try
-        {
-            return connector.getDispatcherWorkManager();
-        }
-        catch (MuleException e)
-        {
-            logger.error(e);
-            return null;
-        }
-    }
-    
     protected abstract void doDispatch(MuleEvent event) throws Exception;
 
-    protected abstract MuleMessage doSend(MuleEvent event) throws Exception;                                             
+    protected abstract MuleMessage doSend(MuleEvent event) throws Exception;
+                                             
 }

@@ -10,52 +10,35 @@
 
 package org.mule.transport;
 
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryContext;
-
+import org.mule.api.context.WorkManager;
 
 public class PollingReceiverWorkerSchedule implements Runnable
 {
+    protected final PollingReceiverWorker worker;
+    protected final WorkManager workManager;
     protected final AbstractPollingMessageReceiver receiver;
 
-    protected PollingReceiverWorkerSchedule(AbstractPollingMessageReceiver receiver)
+    protected PollingReceiverWorkerSchedule(PollingReceiverWorker work)
     {
         super();
-        this.receiver = receiver;
+        worker = work;
+        receiver = work.getReceiver();
+        workManager = receiver.getWorkManager();
     }
 
     public void run()
     {
-        final RetryCallback callback = new RetryCallback()
-        {
-            public void doWork(RetryContext context) throws Exception
-            {
-                // Make sure we are connected
-                receiver.connect();
-                try
-                {
-                    receiver.poll();
-                }
-                catch (InterruptedException e)
-                {
-                    // stop polling
-                    receiver.stop();
-                }
-            }
-
-            public String getWorkDescription()
-            {
-                return receiver.getConnectionDescription();
-            }
-        };
-        
         try
         {
-            receiver.getConnector().getRetryPolicyTemplate().execute(callback);
+            if (!worker.isRunning())
+            {
+                workManager.scheduleWork(worker);
+            }
         }
         catch (Exception e)
         {
             receiver.handleException(e);
         }
     }
+
 }

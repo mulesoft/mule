@@ -10,9 +10,7 @@
 
 package org.mule.transport;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryCallback;
@@ -97,25 +95,11 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
         }
         catch (Exception e)
         {
-            handleException(new ReceiveException(endpoint, timeout, e));
-            return null;
+            disposeAndLogException();
+            throw new ReceiveException(endpoint, timeout, e);
         }
     }
 
-    //@Override
-    protected WorkManager getWorkManager()
-    {
-        try
-        {
-            return connector.getRequesterWorkManager();
-        }
-        catch (MuleException e)
-        {
-            handleException(e);
-            return null;
-        }
-    }
-    
     /**
      * Make a specific request to the underlying transport
      *

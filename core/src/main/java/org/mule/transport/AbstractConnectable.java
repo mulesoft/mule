@@ -45,6 +45,8 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
 
     protected RetryPolicyTemplate retryTemplate;
     
+    private WorkManager workManager = null;    
+
     protected final AtomicBoolean connecting = new AtomicBoolean(false);
     protected final WaitableBoolean connected = new WaitableBoolean(false);
 
@@ -87,24 +89,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         {
             dispose();
         }
-    }
-
-    // TODO How does this method relate to exceptionThrown(Exception e) ?
-    public void handleException(Exception exception)
-    {
-        if (exception instanceof ConnectException)
-        {
-            logger.info("Exception caught is a ConnectException, disconnecting receiver and invoking Retry Policy");
-            try
-            {
-                disconnect();
-            }
-            catch (Exception e)
-            {
-                connector.getExceptionListener().exceptionThrown(e);
-            }
-        }
-        connector.getExceptionListener().exceptionThrown(exception);
     }
 
     public boolean validate()
@@ -336,6 +320,16 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         return sb.toString();
     }
 
+    protected WorkManager getWorkManager()
+    {
+        return workManager;
+    }
+
+    protected void setWorkManager(WorkManager workManager)
+    {
+        this.workManager = workManager;
+    }
+
     public void setEndpoint(ImmutableEndpoint endpoint)
     {
         if (endpoint == null)
@@ -344,6 +338,4 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         }
         this.endpoint = endpoint;
     }
-    
-    abstract protected WorkManager getWorkManager();
 }

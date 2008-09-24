@@ -92,7 +92,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
             // polled database or network is slow or returns large amounts of
             // data.
             ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(
-                createWorkerSchedule(), DEFAULT_STARTUP_DELAY,
+                new PollingReceiverWorkerSchedule(this.createWork()), DEFAULT_STARTUP_DELAY,
                 this.getFrequency(), this.getTimeUnit());
             schedules.add(schedule);
 
@@ -130,9 +130,9 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
         }
     }
 
-    protected Runnable createWorkerSchedule()
+    protected PollingReceiverWorker createWork()
     {
-        return new PollingReceiverWorkerSchedule(this);
+        return new PollingReceiverWorker(this);
     }
 
     public long getFrequency()
