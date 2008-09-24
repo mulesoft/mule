@@ -16,6 +16,8 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.DisposeException;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryContext;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -132,50 +134,41 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         {
             if (connector.isStarted() && !disposing.get())
             {
-                Socket socket = null;
                 try
                 {
-                    socket = serverSocket.accept();
+                    retryTemplate.execute(new RetryCallback()
+                    {
+                        public void doWork(RetryContext context) throws Exception
+                        {
+                            Socket socket = null;
+                            try
+                            {
+                                socket = serverSocket.accept();
+                            }
+                            catch (Exception e)
+                            {
+                                if (!connector.isDisposed() && !disposing.get())
+                                {
+                                    throw new ConnectException(e, null);
+                                }
+                            }
 
-                    if (logger.isTraceEnabled())
-                    {
-                        logger.trace("Accepted: " + serverSocket);
-                    }
-                }
-                catch (java.io.InterruptedIOException iie)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Interupted IO doing serverSocket.accept: " + iie.getMessage());
-                    }
+                            if (socket != null)
+                            {
+                                Work work = createWork(socket);
+                                getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, connector);
+                            }
+                        }
+
+                        public String getWorkDescription()
+                        {
+                            return getConnectionDescription();
+                        }
+                    });
                 }
                 catch (Exception e)
                 {
-                    if (!connector.isDisposed() && !disposing.get())
-                    {
-                        logger.warn("Accept failed on socket: " + e, e);
-                        handleException(new ConnectException(e, this));
-                    }
-                }
-
-                if (socket != null)
-                {
-                    try
-                    {
-                        Work work = createWork(socket);
-                        try
-                        {
-                            getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, connector);
-                        }
-                        catch (WorkException e)
-                        {
-                            logger.error("Tcp Server receiver Work was not processed: " + e.getMessage(), e);
-                        }
-                    }
-                    catch (IOException e)
-                    {
-                        handleException(e);
-                    }
+                    handleException(e);
                 }
             }
         }
