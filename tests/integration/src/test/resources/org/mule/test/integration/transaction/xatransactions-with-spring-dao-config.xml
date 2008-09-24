@@ -1,47 +1,45 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
+       xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.0"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+           http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+           http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+           http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd
+           http://www.mulesource.org/schema/mule/jbossts/2.0 http://www.mulesource.org/schema/mule/jbossts/2.0/mule-jbossts.xsd">
 
-<mule-configuration id="test" version="1.0">
-    
-    <!-- Container context -->
-    <container-context name="spring" className="org.mule.module.spring.SpringContainerContext">
-        <properties>
-            <property name="configFile" value="org/mule/test/integration/transaction/xatransaction-with-spring-datasource.xml"/>
-        </properties>
-    </container-context>
+    <spring:beans>
+        <spring:import resource="xatransaction-with-spring-datasource.xml"/>
+    </spring:beans>
 
-    <transaction-manager factory="org.mule.module.jotm.JotmTransactionManagerFactory"/>
+    <jbossts:transaction-manager/>
 
-    <connector name="jmsXAConnector" className="org.mule.transport.jms.activemq.ActiveMqJmsConnector">
-        <properties>
-            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
-            <property name="specification" value="1.1"/>
-        </properties>
-    </connector>
+    <jms:activemq-xa-connector name="jmsXAConnector" specification="1.1"/>
 
-    <connector name="VMQueue" className="org.mule.transport.vm.VMConnector">
-        <properties>
-            <property value="true" name="queueEvents"/>
-        </properties>
-    </connector>
+    <vm:connector name="VMQueue" queueEvents="true"/>
 
     <model name="model">
-
-        <mule-descriptor name="JmsToJdbc" implementation="MyComponent" singleton="true">
-            <inbound-router>
-                <endpoint address="jms://my.queue" connector="jmsXAConnector" remoteSync="true">
-                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transaction.XaTransactionFactory"/>
-                </endpoint>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://output"/>
-                </router>
-            </outbound-router>
-            <properties>
-                <container-property name="library" reference="libraryDao"/>
-            </properties>
-        </mule-descriptor>
+        <service name="JmsToJdbc">
+            <inbound>
+                <jms:inbound-endpoint queue="my.queue" connector-ref="jmsXAConnector" remoteSync="true">
+                    <xa-transaction action="ALWAYS_BEGIN"/>
+                </jms:inbound-endpoint>
+            </inbound>
+            <component>
+                <spring-object bean="MyComponent"/>
+            </component>
+            <outbound>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint path="output"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>    
     </model>
-</mule-configuration>
+</mule>

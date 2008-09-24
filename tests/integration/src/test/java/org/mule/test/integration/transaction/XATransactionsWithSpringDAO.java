@@ -26,8 +26,7 @@ import org.apache.commons.dbutils.handlers.ArrayListHandler;
 
 public class XATransactionsWithSpringDAO extends FunctionalTestCase
 {
-    /** TODO This is insane, make it 10 seconds max. */
-    private static final int RECEIVE_TIMEOUT = 50000;
+    private static final int RECEIVE_TIMEOUT = 10000;
     private static String connectionString;
 
     protected String getConfigResources()
@@ -45,7 +44,7 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
         super.suitePreSetUp();
     }
 
-    protected void doPostFunctionalSetUp() throws Exception
+    protected void doSetUp() throws Exception
     {
         emptyTable();
     }
@@ -134,4 +133,5 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
         // from log file, it is
         assertNull(result);
     }
+    
 }
