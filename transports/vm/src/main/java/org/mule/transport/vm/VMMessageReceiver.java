@@ -17,7 +17,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.transport.PollingReceiverWorker;
+import org.mule.transport.PollingReceiverWorkerSchedule;
 import org.mule.transport.TransactedPollingMessageReceiver;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
@@ -195,9 +195,9 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
      * We create our own "polling" worker here since we need to evade the standard scheduler.
      */
     // @Override
-    protected PollingReceiverWorker createWork()
+    protected Runnable createWorkerSchedule()
     {
-        return new VMReceiverWorker(this);
+        return new VmReceiverWorkerSchedule(this);
     }
     
     /*
@@ -205,10 +205,9 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
      * a good reason to not use the regular scheduling mechanism in order to both minimize latency and
      * maximize throughput.
      */
-    protected static class VMReceiverWorker extends PollingReceiverWorker
+    protected static class VmReceiverWorkerSchedule extends PollingReceiverWorkerSchedule
     {
-
-        public VMReceiverWorker(VMMessageReceiver pollingMessageReceiver)
+        protected VmReceiverWorkerSchedule(VMMessageReceiver pollingMessageReceiver)
         {
             super(pollingMessageReceiver);
         }
@@ -220,8 +219,9 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
              * blocking wait defined by VMConnector.getQueueTimeout() will prevent this worker's receiver
              * thread from busy-waiting.
              */
-            while (this.getReceiver().isConnected())
+            while (receiver.isConnected())
             {
+                // TODO Is this really "evading the standard scheduler"??  It seems to just be calling it...
                 super.run();
             }
         }
