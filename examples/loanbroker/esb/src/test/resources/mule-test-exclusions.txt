@@ -3,4 +3,5 @@
 #
 
 # Fails because it can't find axis transport! Classloading issue when loading axis.properties.
+# MULE-3711
 org.mule.example.loanbroker.esb.LoanBrokerEsbProgramaticTestCase

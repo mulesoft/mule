@@ -17,7 +17,8 @@ public class LoanBrokerEsbProgramaticTestCase extends AbstractLoanBrokerTestCase
 {
     protected String getConfigResources()
     {
-        return "loan-broker-esb-mule-config.xml";
+        // this method is never invoked as we override getBuilder here
+        return null;
     }
 
     @Override
