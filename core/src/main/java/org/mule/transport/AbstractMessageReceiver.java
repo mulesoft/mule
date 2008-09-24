@@ -21,6 +21,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -116,15 +117,6 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         listener = new DefaultInternalMessageListener();
         endpointUri = endpoint.getEndpointURI();
 
-        try
-        {
-            setWorkManager(connector.getReceiverWorkManager("receiver"));
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-        
         doInitialise();
     }
 
@@ -141,28 +133,6 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         {
             disposed.set(true);
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.MessageReceiver#getExceptionListener()
-     */
-    public void handleException(Exception exception)
-    {
-        if (exception instanceof ConnectException)
-        {
-            logger.info("Exception caught is a ConnectException, disconnecting receiver and invoking ReconnectStrategy");
-            try
-            {
-                disconnect();
-            }
-            catch (Exception e)
-            {
-                connector.getExceptionListener().exceptionThrown(e);
-            }
-        }
-        connector.getExceptionListener().exceptionThrown(exception);
     }
 
     /**
@@ -430,6 +400,20 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     public void setEndpoint(InboundEndpoint endpoint)
     {
         super.setEndpoint(endpoint);
+    }
+    
+    //@Override
+    protected WorkManager getWorkManager()
+    {
+        try
+        {
+            return connector.getReceiverWorkManager("receiver");
+        }
+        catch (MuleException e)
+        {
+            logger.error(e);
+            return null;
+        }
     }
     
     public String toString()
