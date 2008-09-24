@@ -15,9 +15,9 @@ import org.mule.tck.AbstractMuleTestCase;
 
 public class ObjectNameHelperTestCase extends AbstractMuleTestCase
 {
+    
     public void testEndpointAutomaticNames() throws Exception
     {
-
         ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://cn=foo,name=queue");
         muleContext.getRegistry().registerEndpoint(ep);
@@ -39,7 +39,7 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
         ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://cn=foo,name=queue?endpointName=foo");
         muleContext.getRegistry().registerEndpoint(ep);
-        assertEquals("foo", ep.getName());
+        assertEquals("endpoint.test.cn.foo.name.queue", ep.getName());
 
         ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://cn=foo,name=queue?endpointName=this_is@aWierd-Name:x");
@@ -62,4 +62,5 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerEndpoint(ep);
         assertEquals("endpoint.test.exception.listener", ep.getName());
     }
+
 }

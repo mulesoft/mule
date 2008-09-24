@@ -18,6 +18,7 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.URIBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transaction.MuleTransactionConfig;
@@ -35,7 +36,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
     {
         return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
     }
-
+    
     public void testTransactionsWithSetRollbackOnly() throws Exception
     {
         final MuleClient client = new MuleClient();
@@ -56,14 +57,14 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", muleContext);
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(
+            new URIBuilder("jms://test.queue"), muleContext);
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
         ImmutableEndpoint inboundEndpoint = muleContext.getRegistry()
                 .lookupEndpointFactory()
                 .getOutboundEndpoint(endpointBuilder);
         client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
-
 
         TransactionTemplate tt = new TransactionTemplate(tc, null, muleContext);
         tt.execute(new TransactionCallback()
@@ -72,7 +73,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             {
                 for (int i = 0; i < 100; i++)
                 {
-                    client.send("TransactedTest.Queue", "Test Client Dispatch message " + i, props);
+                    client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
                 }
                 Transaction tx = TransactionCoordination.getInstance().getTransaction();
                 assertNotNull(tx);
@@ -105,7 +106,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", muleContext);
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(
+            new URIBuilder("jms://test.queue"), muleContext);
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
         ImmutableEndpoint inboundEndpoint = muleContext.getRegistry()
@@ -122,7 +124,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
                 {
                     for (int i = 0; i < 100; i++)
                     {
-                        client.send("TransactedTest.Queue", "Test Client Dispatch message " + i, props);
+                        client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
                     }
                     throw new Exception();
                 }
@@ -159,7 +161,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", muleContext);
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(
+            new URIBuilder("jms://test.queue"), muleContext);
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
         ImmutableEndpoint inboundEndpoint = muleContext.getRegistry()
@@ -175,7 +178,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             {
                 for (int i = 0; i < 100; i++)
                 {
-                    client.send("TransactedTest.Queue", "Test Client Dispatch message " + i, props);
+                    client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
                 }
                 return null;
             }

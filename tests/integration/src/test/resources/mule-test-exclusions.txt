@@ -21,9 +21,14 @@ org.mule.test.usecases.axis.AxisClientWithComplexTypesTestCase
 org.mule.test.integration.transport.jdbc.JdbcTransactionalJdbcFunctionalTestCase
 org.mule.test.integration.transport.jdbc.JdbcTransactionalXaFunctionalTestCase
 
+# MULE-3704
 org.mule.test.integration.message.AttachmentsPropagationTestCase
+
+# MULE-3593
 org.mule.test.integration.transaction.XATransactionsWithSpringDAO
+
 # Convert transacted endpoint to XML config
+# MULE-3705
 org.mule.test.integration.client.MuleClientTransactionTestCase
 
 ##########################################################################
@@ -44,17 +49,12 @@ org.mule.test.integration.models.ConfigureModelTestCase
 
 # MULE-2741
 org.mule.test.integration.models.OptimisedSedaPipelineTestCase
-org.mule.test.integration.models.SedaPipelineComponentPerRequestTestCase
-org.mule.test.integration.models.SedaPipelineNoPoolingTestCase
 org.mule.test.integration.models.SedaPipelineTestCase
 
-# MULE-1789
-org.mule.test.integration.config.MultiContainerTestCase
-
-# MULE-2996
+# MULE-3707
 org.mule.config.spring.VmSchemaValidationTestCase
 
-# MULE-2999
+# MULE-3709
 org.mule.config.spring.ComponentInterceptorTestCase
 
 # MULE-3000
