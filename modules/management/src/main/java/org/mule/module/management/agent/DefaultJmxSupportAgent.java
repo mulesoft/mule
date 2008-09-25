@@ -56,7 +56,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
      */
     public String getDescription()
     {
-        return "Default Jmx Agent Support";
+        return "Default Jmx Support Agent";
     }
 
     /** {@inheritDoc} */
