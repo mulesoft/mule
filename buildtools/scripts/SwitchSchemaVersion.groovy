@@ -10,16 +10,13 @@ def root = "."
 
 sourceSchemaVersion = "2.0"
 destSchemaVersion = "2.1"
-schemaBase = "http://www.mulesource.org/schema/mule/"
+schemaBases = [ "http://www.mulesource.org/schema/mule/", "http://www.mulesource.com/schema/mule/" ]
 
 if (args.length > 0)
 {
     root = args[0]
 }
 
-//
-// first pass: convert all schema files
-//
 AntBuilder ant = new AntBuilder()
 FileScanner scanner = ant.fileScanner 
 {
@@ -32,6 +29,7 @@ FileScanner scanner = ant.fileScanner
         exclude(name: "**/test-data/out/**")
     }
 }
+
 scanner.each 
 {
     println "switching schema version on $it"
@@ -48,10 +46,11 @@ def switchSchemaVersion(File inFile)
     {
         line ->
 
-        def schemaName = findSchemaName(line)
-        if (schemaName != null)
+        def matchingSchemaBase = findMatchingSchema(line)
+        if (matchingSchemaBase != null)
         {
-            updateSchema(line, schemaName, outWriter)            
+            def schemaName = findSchemaName(line, matchingSchemaBase)
+            updateSchema(line, matchingSchemaBase, schemaName, outWriter)            
         }
         else
         {
@@ -66,25 +65,33 @@ def switchSchemaVersion(File inFile)
     move(outFile, inFile)
 }
 
-def findSchemaName(String line)
+def findMatchingSchema(String line)
+{
+    for (String schema : schemaBases)
+    {
+        if ((line.indexOf(schema) > -1) && (line.indexOf(sourceSchemaVersion) >= -1))
+        {
+            return schema
+        }
+    }
+    
+    return null
+}
+
+def findSchemaName(String line, String schemaBase)
 {
     def schemaBaseIndex = line.indexOf(schemaBase)
     if (schemaBaseIndex == -1)
     {
-        return null
+        throw new IllegalArgumentException("$schemaBase not found in $line")
     }
-    
-    if (line.indexOf(sourceSchemaVersion) == -1)
-    {
-        return null
-    }
-        
+            
     def startSearchIndex = schemaBaseIndex + schemaBase.length()
     def schemaNameEndIndex = line.indexOf("/", startSearchIndex)
     return line.substring(startSearchIndex, schemaNameEndIndex)
 }
 
-def updateSchema(String line, String schemaName, PrintWriter writer)
+def updateSchema(String line, String schemaBase, String schemaName, PrintWriter writer)
 {    
     def urlBase = schemaBase + schemaName + "/"
     def originalUrl = urlBase + sourceSchemaVersion
