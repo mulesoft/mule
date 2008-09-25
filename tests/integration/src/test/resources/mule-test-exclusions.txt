@@ -10,8 +10,7 @@ org.mule.test.integration.routing.replyto.ReplytoChainIntegration2TestCase
 org.mule.test.usecases.axis.AxisClientWithComplexTypesTestCase
 
 # MULE-2258: fails on the build server
-# leaving this commented out to check if the test still fails on the CI server
-#org.mule.test.usecases.sync.TcpToFileTestCase
+org.mule.test.usecases.sync.TcpToFileTestCase
 
 ##########################################################################
 # Convert to XML-based config
