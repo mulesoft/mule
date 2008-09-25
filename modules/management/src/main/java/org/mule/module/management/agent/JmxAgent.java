@@ -190,7 +190,7 @@ public class JmxAgent extends AbstractAgent
         {
             public void onNotification(ServerNotification notification)
             {
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED_MODELS)
                 {
                     try
                     {
