@@ -198,6 +198,16 @@ public class JmxAgent extends AbstractAgent
                         registerStatisticsService();
                         registerMuleService();
                         registerConfigurationService();
+                    }
+                    catch (Exception e)
+                    {
+                        throw new MuleRuntimeException(CoreMessages.objectFailedToInitialise("MBeans"), e);
+                    }
+                }
+                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+                {
+                    try
+                    {
                         registerModelServices();
                         registerServiceServices();
                         registerEndpointServices();
