@@ -20,6 +20,7 @@ import org.mule.module.management.mbean.MuleService;
 import org.mule.module.management.mbean.RouterStats;
 import org.mule.module.management.mbean.ServiceService;
 import org.mule.module.management.mbean.StatisticsService;
+import org.mule.module.management.support.JmxSupport;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.ArrayList;
@@ -39,13 +40,15 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
 {
     private MBeanServer mBeanServer;
     private String domainName;
-    
+    private JmxSupport jmxSupport;
+
     //@Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         JmxAgent jmxAgent = (JmxAgent) muleContext.getRegistry().lookupAgent("jmx-agent");
-        domainName = jmxAgent.getJmxSupportFactory().getJmxSupport().getDomainName(muleContext);
+        jmxSupport = jmxAgent.getJmxSupportFactory().getJmxSupport();
+        domainName = jmxSupport.getDomainName(muleContext);
         mBeanServer = jmxAgent.getMBeanServer();
     }
 
@@ -59,7 +62,7 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
      */
     public void testDefaultMBeansRegistration() throws Exception
     {
-        List<String> mbeanClasses = getMBeanClasses();
+        List/*<String>*/ mbeanClasses = getMBeanClasses();
         
         assertTrue(mbeanClasses.contains(JmxServerNotificationAgent.class.getName() + "$BroadcastNotificationService"));
         assertTrue(mbeanClasses.contains(JmxServerNotificationAgent.class.getName() + "$NotificationListener"));
@@ -77,7 +80,7 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
      */
     public void testServiceMBeansRegistration() throws Exception
     {
-        List<String> mbeanClasses = getMBeanClasses();
+        List/*<String>*/ mbeanClasses = getMBeanClasses();
         
         assertTrue(mbeanClasses.contains(ConnectorService.class.getName()));
         assertTrue(mbeanClasses.contains(ModelService.class.getName()));
@@ -95,11 +98,11 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
         assertEquals("No MBeans should be registered after disposal of MuleContext", 0, getMBeanClasses().size());
     }
     
-    protected List<String> getMBeanClasses() throws MalformedObjectNameException
+    protected List/*<String>*/ getMBeanClasses() throws MalformedObjectNameException
     {
-        Set<ObjectInstance> mbeans = getMBeans();
+        Set/*<ObjectInstance>*/ mbeans = getMBeans();
         Iterator it = mbeans.iterator();
-        List<String> mbeanClasses = new ArrayList();
+        List/*<String>*/ mbeanClasses = new ArrayList/*<String>*/();
         while (it.hasNext())
         {
             mbeanClasses.add(((ObjectInstance) it.next()).getClassName());
@@ -107,8 +110,8 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
         return mbeanClasses;
     }
     
-    protected Set<ObjectInstance> getMBeans() throws MalformedObjectNameException
+    protected Set/*<ObjectInstance>*/ getMBeans() throws MalformedObjectNameException
     {
-        return mBeanServer.queryMBeans(ObjectName.getInstance(domainName + ":*"), null);        
+        return mBeanServer.queryMBeans(jmxSupport.getObjectName(domainName + ":*"), null);        
     }
 }
