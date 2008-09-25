@@ -10,7 +10,6 @@
 
 package org.mule.lifecycle.phases;
 
-import org.mule.agent.AgentSorter;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.Initialisable;
@@ -20,14 +19,10 @@ import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.DefaultLifecyclePhase;
-import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 
-import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -54,16 +49,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
         Set startOrderedObjects = new LinkedHashSet();
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        try
-        {
-            startOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class,
-                    MuleContextNotification.CONTEXT_STARTING_MODELS, MuleContextNotification.CONTEXT_STARTED_MODELS));
-        }
-        catch (IllegalStateException e)
-        {
-            // TODO MULE-2903 Fix again for OSGi: The hack for MULE-2903 (in NotificationLifecycleObject()) 
-            // throws an IllegalStateException when calling ClassUtils.initializeClass()            
-        }
+        startOrderedObjects.add(new NotificationLifecycleObject(Model.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Service.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
 

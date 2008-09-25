@@ -190,7 +190,7 @@ public class JmxAgent extends AbstractAgent
         {
             public void onNotification(ServerNotification notification)
             {
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED_MODELS)
+                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
                 {
                     try
                     {
@@ -198,16 +198,6 @@ public class JmxAgent extends AbstractAgent
                         registerStatisticsService();
                         registerMuleService();
                         registerConfigurationService();
-                    }
-                    catch (Exception e)
-                    {
-                        throw new MuleRuntimeException(CoreMessages.objectFailedToInitialise("MBeans"), e);
-                    }
-                }
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
-                {
-                    try
-                    {
                         registerModelServices();
                         registerServiceServices();
                         registerEndpointServices();

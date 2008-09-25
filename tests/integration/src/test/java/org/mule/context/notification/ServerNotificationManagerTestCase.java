@@ -53,23 +53,21 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
                         .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISING, MODEL)
                                 .serial(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISED, MODEL)))
                         .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STARTING))
-                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STARTING_MODELS)
+                        .serial(new Node()
                                 // parallel because we don't know which model
                                 .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STARTING, MODEL)
                                         .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STARTED, MODEL)))
                                 .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STARTING, MULE_SYSTEM_MODEL)
                                         .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STARTED, MULE_SYSTEM_MODEL))))
-                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STARTED_MODELS))
                         .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STARTED))
                         .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_DISPOSING))
                         .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STOPPING))
-                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STOPPING_MODELS)
+                        .serial(new Node()
                                 // parallel because we don't know which model
                                 .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPING, MODEL)
                                         .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPED, MODEL)))
                                 .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPING, MULE_SYSTEM_MODEL)
                                         .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPED, MULE_SYSTEM_MODEL))))
-                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STOPPED_MODELS))
                         .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STOPPED)
                                 // parallel because we don't know which model
                                 .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSING, MODEL)
@@ -90,7 +88,7 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
                 ServiceNotification.SERVICE_INITIALISED, ServiceNotification.SERVICE_STOPPING);
         // no manager initialising or initialised
         verifyAllNotifications(spec, MuleContextNotification.class,
-                MuleContextNotification.CONTEXT_STARTING, MuleContextNotification.CONTEXT_STOPPED_MODELS);
+                MuleContextNotification.CONTEXT_STARTING, MuleContextNotification.CONTEXT_STOPPED);
     }
 
 }

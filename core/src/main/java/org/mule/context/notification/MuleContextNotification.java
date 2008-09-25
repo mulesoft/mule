@@ -35,13 +35,6 @@ public class MuleContextNotification extends ServerNotification implements Block
     public static final int CONTEXT_DISPOSING = CONTEXT_EVENT_ACTION_START_RANGE + 7;
     public static final int CONTEXT_DISPOSED = CONTEXT_EVENT_ACTION_START_RANGE + 8;
     
-    // The following events are not context events, but rather more general global
-    // mule events.
-    public static final int CONTEXT_STARTING_MODELS = CONTEXT_EVENT_ACTION_START_RANGE + 9;
-    public static final int CONTEXT_STARTED_MODELS = CONTEXT_EVENT_ACTION_START_RANGE + 10;
-    public static final int CONTEXT_STOPPING_MODELS = CONTEXT_EVENT_ACTION_START_RANGE + 11;
-    public static final int CONTEXT_STOPPED_MODELS = CONTEXT_EVENT_ACTION_START_RANGE + 12;
-
     static {
         registerAction("mule context initialising", CONTEXT_INITIALISING);
         registerAction("mule context initialised", CONTEXT_INITIALISED);
@@ -51,10 +44,6 @@ public class MuleContextNotification extends ServerNotification implements Block
         registerAction("mule context stopped", CONTEXT_STOPPED);
         registerAction("mule context disposing", CONTEXT_DISPOSING);
         registerAction("mule context disposed", CONTEXT_DISPOSED);
-        registerAction("starting models", CONTEXT_STARTING_MODELS);
-        registerAction("started models", CONTEXT_STARTED_MODELS);
-        registerAction("stopping models", CONTEXT_STOPPING_MODELS);
-        registerAction("stopped models", CONTEXT_STOPPED_MODELS);
     }
 
     private String clusterId;

@@ -48,16 +48,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
         Set stopOrderedObjects = new LinkedHashSet();
         stopOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        try
-        {
-            stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class,
-                    MuleContextNotification.CONTEXT_STOPPING_MODELS,MuleContextNotification.CONTEXT_STOPPED_MODELS));
-        }
-        catch (IllegalStateException e)
-        {
-            // TODO MULE-2903 Fix again for OSGi: The hack for MULE-2903 (in NotificationLifecycleObject()) 
-            // throws an IllegalStateException when calling ClassUtils.initializeClass()            
-        }
+        stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Service.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
 
