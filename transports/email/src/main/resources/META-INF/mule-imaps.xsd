@@ -16,6 +16,8 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/imap/2.0/mule-imap.xsd"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/email/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd"/>
+    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.0"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.0/mule-schemadoc.xsd"/>
 
    <xsd:annotation>
         <xsd:documentation>The IMAPS transport is similar to the [IMAP Transport] but uses secure connections over SSL/TLS.</xsd:documentation>
