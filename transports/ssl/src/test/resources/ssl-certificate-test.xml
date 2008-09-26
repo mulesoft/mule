@@ -14,7 +14,7 @@
         <ssl:server path="trustStore" storePassword="mulepassword"/>
     </ssl:connector>
 
-    <endpoint name="in" address="ssl://localhost:60195" synchronous="true"/>
+    <ssl:endpoint name="in" host="localhost" port="60195" synchronous="true"/>
 
     <model name="main">
 
