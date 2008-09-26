@@ -9,6 +9,8 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
         schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
+    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.0"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.0/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
             <xsd:documentation>The JDBC transport allows data to be retrieved from and written to any database that supports a JDBC driver. It also supports invoking stored precedures.  
