@@ -250,7 +250,7 @@ public abstract class AbstractConnector
     private final AtomicReference/*<WorkManager>*/ receiverWorkManager = new AtomicReference();
 
     /**
-     * A shared work manager for all dispatchers created for this connector.
+     * A shared work manager for all requesters created for this connector.
      */
     private final AtomicReference/*<WorkManager>*/ dispatcherWorkManager = new AtomicReference();
 
@@ -361,7 +361,6 @@ public abstract class AbstractConnector
         this.initFromServiceDescriptor();
 
         setMaxDispatchersActive(getDispatcherThreadingProfile().getMaxThreadsActive());
-        setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
         
         this.doInitialise();
 
