@@ -79,9 +79,9 @@
             <xsd:element name="global-property" type="globalPropertyType">
                 <xsd:annotation>
                     <xsd:documentation>
-                        An global property is a named string.
-                        It can be used inserted in most attribute values using the ${...} syntax.
-                        So the attribute value "${foo}" would be replaced by the value associated with
+                        A global property is a named string.
+                        It can be used inserted in most attribute values using the $\{...\} syntax.
+                        So the attribute value "$\{foo\}" would be replaced by the value associated with
                         the property named "foo".
                     </xsd:documentation>
                 </xsd:annotation>

@@ -27,8 +27,9 @@
             service integration via Apache CXF. The Mule CXF connector also provides support for WS-Security,
             WS-Addressing and WS-Reliable-Messaging.
         </xsd:documentation>
+        
         <xsd:appinfo>
-            <schemadoc:short-name>cxf</schemadoc:short-name>
+            <schemadoc:short-name>CXF</schemadoc:short-name>
             <schemadoc:page-title>CXF Transport</schemadoc:page-title>
 
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"

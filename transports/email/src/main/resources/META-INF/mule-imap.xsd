@@ -3,6 +3,7 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:email="http://www.mulesource.org/schema/mule/email/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"    
             targetNamespace="http://www.mulesource.org/schema/mule/imap/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -12,10 +13,27 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
     <xsd:import namespace="http://www.mulesource.org/schema/mule/email/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd"/>
-
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
-
-    <xsd:element name="connector" type="imapConnectorType" substitutionGroup="mule:abstract-connector"/>
+        
+    <xsd:annotation>
+        <xsd:documentation>The IMAP transport can be used for receiving messages from IMAP inboxes using the {{javax.mail}} API. The [IMAPS Transport] is similar but uses secure connections over SSL/TLS.</xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>IMAP</schemadoc:short-name>
+            <schemadoc:page-title>IMAP Transport</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false" responseEvents="false"
+                                          requestEvents="false"
+                                          transactions="false" streaming="false">
+                <schemadoc:inboundMEPs in-only="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
+        
+    <xsd:element name="connector" type="imapConnectorType" substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allows Mule to communicate over IMAP. 
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="imapConnectorType">
         <xsd:complexContent>
             <xsd:extension base="email:emailDownloadConnectorType"/>

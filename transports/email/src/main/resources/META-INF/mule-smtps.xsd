@@ -4,6 +4,7 @@
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.0"
             xmlns:email="http://www.mulesource.org/schema/mule/email/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/smtps/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -15,6 +16,18 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/smtp/2.0/mule-smtp.xsd"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/email/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd"/>
+     <xsd:annotation>
+        <xsd:documentation>The SMTPS transport is similar to the [SMTP Transport] but uses secure connections over SSL/TLS.</xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>SMTPS</schemadoc:short-name>
+            <schemadoc:page-title>SMTPS Transport</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="false" dispatchEvents="true" responseEvents="false"
+                                          requestEvents="true"
+                                          transactions="false" streaming="false">
+                <schemadoc:outboundMEPs out-only="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
 
     <xsd:element name="connector" type="smtpsConnectorType" substitutionGroup="mule:abstract-connector"/>
 

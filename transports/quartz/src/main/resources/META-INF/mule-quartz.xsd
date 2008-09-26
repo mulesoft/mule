@@ -18,28 +18,20 @@
     <!--schemaLocation="http://www.mulesource.org/schema/mule/schemadoc/2.0/mule-schemadoc.xsd"/>-->
 
     <xsd:annotation>
-        <xsd:documentation>The Quartz transport provides support for scheduling events and for triggering new events. An
-            inbound quartz endpoint can be used to trigger inbound events that can be repeated i.e. every second.
-            Outbound quartz endpoints can be used to schedule an existing event to fire at a later date. Users can
-            create schedules using cron expressions and events can be persisted in a database.
+        <xsd:documentation>The Quartz transport provides support for scheduling events and for triggering new events. An inbound quartz endpoint can be used to trigger inbound events that can be repeated, such as every second. Outbound quartz endpoints can be used to schedule an existing event to fire at a later date. Users can create schedules using cron expressions, and events can be persisted in a database.
             \\
-            This transport makes use of the [Quartz Project|http://www.opensymphony.com/quartz/] at [Open
-            Symphony|http://www.opensymphony.com/]. The Quartz site has more generic information about how to work with
-            Quartz.
+            This transport makes use of the [Quartz Project|http://www.opensymphony.com/quartz/] at [Open Symphony|http://www.opensymphony.com/]. The Quartz site has more generic information about how to work with Quartz.
             \\
-            This transport becomes very powerful when using cron expressions to trigger events and some of the examples
-            below provide examples of cron expressions. If you are not familiar with cron syntax, there is a [good
+            This transport becomes very powerful when using cron expressions to trigger events, and some of the examples below provide examples of cron expressions. If you are not familiar with cron syntax, here is a [good
             tutorial|http://www.opensymphony.com/quartz/wikidocs/CronTriggers%20Tutorial.html].
         </xsd:documentation>
         <xsd:appinfo>
-            <schemadoc:short-name>quartz</schemadoc:short-name>
+            <schemadoc:short-name>Quartz</schemadoc:short-name>
             <schemadoc:page-title>Quartz Transport</schemadoc:page-title>
             <schemadoc:additional-documentation where="before-specific-elements">
                 h1. Jobs
 
-                Jobs are used to perform an action when a time trigger occurs from the Quartz transport. Mule provides a
-                number of Jobs for generating and scheduling events. These are detailed below. Users can also write
-                their own jobs and hook them in using the custom-job type that ships with Mule.
+                Jobs are used to perform an action when a time trigger occurs from the Quartz transport. Mule provides a number of jobs for generating and scheduling events. These are detailed below. Users can also write their own jobs and hook them in using the custom-job type included with Mule.
             </schemadoc:additional-documentation>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="false" requestEvents="false"
                                           transactions="false" streaming="false">
@@ -51,9 +43,8 @@
 
     <xsd:element name="connector" type="quartzConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
-            <xsd:documentation>The Quartz connector is used to configure the default behaviour for quartz endpoints that
-                reference the connector. Note if there is only one Quartz connector configured, all Quartz endpoints
-                will use that connector.
+            <xsd:documentation>
+                The Quartz connector is used to configure the default behavior for Quartz endpoints that reference the connector. Note if there is only one Quartz connector configured, all Quartz endpoints will use that connector.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -73,11 +64,7 @@
                 <xsd:attribute name="scheduler-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Provide an implementation of the Quartz Scheduler interface.
-                            If no value is given here a scheduler is retrieved from the StdSchedulerFactory:
-                            if no properties are given the getDefaultScheduler method is called,
-                            otherwise a new factory instance is created using the given properties and
-                            a scheduler retrieved using the getScheduler method.
+                            Provides an implementation of the Quartz Scheduler interface. If no value is provided, a scheduler is retrieved from the StdSchedulerFactory. If no properties are provided, the getDefaultScheduler method is called. Otherwise, a new factory instance is created using the given properties, and a scheduler is retrieved using the getScheduler method.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -88,10 +75,8 @@
     <xsd:element name="outbound-endpoint" type="outboundEndpointType"
                  substitutionGroup="mule:abstract-outbound-endpoint">
         <xsd:annotation>
-            <xsd:documentation>A outbound quartz endpoint allows existing events to be stored and fired at a later
-                time/date. not if you are using a persistent event store, the payload of the event must implement
-                {{java.io.Serializable}}. You will need to configure a {{org.quartz.Job}} implementation on the endpoint
-                to tell it what action to take. Mule has some default Jobs but you can also write your own.
+            <xsd:documentation>
+                An outbound Quartz endpoint allows existing events to be stored and fired at a later time/date. If you are using a persistent event store, the payload of the event must implement {{java.io.Serializable}}. You configure an {{org.quartz.Job}} implementation on the endpoint to tell it what action to take. Mule has some default jobs, but you can also write your own.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -108,9 +93,8 @@
 
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
-            <xsd:documentation>A Quartz inbound endpoint can be used to generate events. It's most useful when you want
-                to trigger a service at a given interval (or cron expression) rather than have an external event trigger
-                the service.
+            <xsd:documentation>
+                A Quartz inbound endpoint can be used to generate events. It is most useful when you want to trigger a service at a given interval (or cron expression) rather than have an external event trigger the service.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -127,10 +111,8 @@
 
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
         <xsd:annotation>
-            <xsd:documentation>A global endpoint that can be used a 'template' to create inbound and outbound Quartz
-                endpoints. Common configuration can be set on a global endpoint and then referenced using the @ref
-                attribute on the local endpoint. Not that since Jobs sometime will only work on inbound or outbound
-                endpoints they have to be set on the local endpoint.
+            <xsd:documentation>
+                A global endpoint that can be used as a template to create inbound and outbound Quartz endpoints. Common configuration can be set on a global endpoint and then referenced using the @ref attribute on the local endpoint. Note that because jobs sometimes only work on inbound or outbound endpoints, they have to be set on the local endpoint.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -149,7 +131,7 @@
     <xsd:element name="abstract-job" abstract="true" type="abstractJobType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for quartz jobs that can be set on the endpoint.
+                A placeholder for Quartz jobs that can be set on the endpoint.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -157,16 +139,15 @@
     <xsd:element name="abstract-inbound-job" abstract="true" type="abstractJobType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for quartz jobs that can be set on inbound endpoints only.
+                A placeholder for Quartz jobs that can be set on inbound endpoints only.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
     <xsd:element name="event-generator-job" type="eventGenerateJobType" substitutionGroup="abstract-job">
         <xsd:annotation>
-            <xsd:documentation>An inbound endpoint job that will trigger a new event for the service according to the
-                schedule on the endpoint. This is useful for periodically triggering a service without the need for an
-                external event to occur.
+            <xsd:documentation>
+                An inbound endpoint job that will trigger a new event for the service according to the schedule on the endpoint. This is useful for periodically triggering a service without the need for an external event to occur.
             </xsd:documentation>
             <xsd:appinfo>
                 <schemadoc:snippet lang="xml" id="example-1"
@@ -182,9 +163,8 @@
                 <xsd:sequence>
                     <xsd:element name="payload" type="mule:dataReferenceType" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
-                            <xsd:documentation>The payload of the newly created event. The payload can be a reference to
-                                a file, fixed string or object configured as a spring bean. If this value is not set an
-                                event will be generated with a {{org.mule.transport.NullPayload}} instance.
+                            <xsd:documentation>
+                                The payload of the newly created event. The payload can be a reference to a file, fixed string, or object configured as a Spring bean. If this value is not set, an event will be generated with an {{org.mule.transport.NullPayload}} instance.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -195,9 +175,8 @@
 
     <xsd:element name="endpoint-polling-job" type="endpointPollingJobType" substitutionGroup="abstract-job">
         <xsd:annotation>
-            <xsd:documentation>An inbound endpoint job that can be used to periodically read from an external source
-                (via another endpoint). This can be useful for triggering time-based events from sources that do not
-                support polling or simply controlling the rate in which events are received from the source.
+            <xsd:documentation>
+                An inbound endpoint job that can be used to periodically read from an external source (via another endpoint). This can be useful for triggering time-based events from sources that do not support polling or for simply controlling the rate in which events are received from the source.
             </xsd:documentation>
             <xsd:appinfo>
                 <schemadoc:snippet lang="xml" id="example-5"
@@ -211,8 +190,8 @@
                 <xsd:sequence minOccurs="1" maxOccurs="1">
                     <xsd:element name="job-endpoint" type="endpointRefType">
                         <xsd:annotation>
-                            <xsd:documentation>A reference to another configured endpoint that will be used to receive
-                                events from.
+                            <xsd:documentation>
+                                A reference to another configured endpoint from which events will be received.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -223,8 +202,8 @@
 
     <xsd:element name="scheduled-dispatch-job" type="scheduledDispatchJobType" substitutionGroup="abstract-job">
         <xsd:annotation>
-            <xsd:documentation>An outbound job that will schedule a job for dispatch at a later time/date. The event
-                will get dispatched using the configured endpoint reference.
+            <xsd:documentation>
+                An outbound job that will schedule a job for dispatch at a later time/date. The event will get dispatched using the configured endpoint reference.
             </xsd:documentation>
             <xsd:appinfo>
                 <schemadoc:snippet lang="xml" id="example-6"
@@ -248,9 +227,8 @@
 
     <xsd:element name="custom-job" type="customJobType" substitutionGroup="abstract-job">
         <xsd:annotation>
-            <xsd:documentation>A custom job can be configured on inbound or outbound endpoints. It allows the user to
-                create and configure their own job implementation and use it on a Quartz endpoint. A custom job can be
-                configured as a bean in the XML configuration and referenced using this Job.
+            <xsd:documentation>
+                A custom job can be configured on inbound or outbound endpoints. You can create and configure your own job implementation and use it on a Quartz endpoint. A custom job can be configured as a bean in the XML configuration and referenced using this job.
             </xsd:documentation>
             <xsd:appinfo>
                 <schemadoc:snippet lang="xml" id="example-4"
@@ -264,7 +242,8 @@
             <xsd:extension base="abstractJobType">
                 <xsd:attribute name="job-ref" type="xsd:string" use="required">
                     <xsd:annotation>
-                        <xsd:documentation>The bean name or id of the custom job to use when this job gets executed.
+                        <xsd:documentation>
+                            The bean name or ID of the custom job to use when this job gets executed.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -274,12 +253,8 @@
 
     <xsd:element name="custom-job-from-message" type="customFromMessageJobType" substitutionGroup="abstract-job">
         <xsd:annotation>
-            <xsd:documentation>This can only be used on outbound endpoints and allows a Job to be stored on the current
-                message. When the message is received, the Job is read of the message and the Job will be added to the
-                scheduler with the current message. This allows for custom scheduling behaviour determined by the
-                message itself. Usually the service or a transformer would do create the job on the message based on
-                application-specific logic. Any of Mule's supported Expressions can be used to read the Job from the
-                message. Typically, user add the job as a header, but an attachment could also be used.
+            <xsd:documentation>
+                Allows a job to be stored on the current message. This can only be used on outbound endpoints. When the message is received, the job is read and the job is added to the scheduler with the current message. This allows for custom scheduling behavior determined by the message itself. Usually the service or a transformer would create the job on the message based on application-specific logic. Any Mule-supported expressions can be used to read the job from the message. Typically, you add the job as a header, but an attachment could also be used.
             </xsd:documentation>
             <xsd:appinfo>
                 <schemadoc:snippet lang="xml" id="example-3"
@@ -297,7 +272,9 @@
 
     <xsd:complexType name="abstractJobType">
         <xsd:annotation>
-            <xsd:documentation>The base element type for all quartz jobs</xsd:documentation>
+            <xsd:documentation>
+                The base element type for all Quartz jobs
+            </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="groupName" type="xsd:string">
             <xsd:annotation>
@@ -320,20 +297,14 @@
         <xsd:attribute name="jobName" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The name to associate with the job on the endpoint. This is only really used internally when storing
-                    events.
+                    The name to associate with the job on the endpoint. This is only really used internally when storing events.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="cronExpression" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The cron expression to schedule events at specified dates / times.
-                    This or repeatInterval is required.
-
-                    A cron expression is a string comprised of 6 or 7 fields separated by white space. Fields can contain
-                    any of the allowed values, along with various combinations of the allowed special characters for that
-                    field. The fields are as follows:
+                    The cron expression to schedule events at specified dates/times. This attribute or repeatInterval is required. A cron expression is a string comprised by 6 or 7 fields separated by white space. Fields can contain any of the allowed values, along with various combinations of the allowed special characters for that field. The fields are as follows:
                     {html}
                     <table>
                         <th>Field Name </th><th>Mandatory</th><th>Allowed Values</th><th>Allowed Special Chars</th>
@@ -346,7 +317,7 @@
                         <tr><td>Year</td><td>NO</td><td>empty, 1970-2099</td><td>, - * /</td></tr>
                     </table>
 
-                    So cron expressions can be as simple as this: <b>* * * * ? *</b><br></br>
+                    Cron expressions can be as simple as this: <b>* * * * ? *</b><br></br>
                     or more complex, like this: <b>0 0/5 14,18,3-39,52 ? JAN,MAR,SEP MON-FRI 2002-2010</b>
 
                     <h4>Some examples:</h4>
@@ -366,16 +337,14 @@
         <xsd:attribute name="repeatInterval" type="mule:substitutableLong">
             <xsd:annotation>
                 <xsd:documentation>
-                    The number of milliseconds between two events.
-                    This or cronExpression is required.
+                    The number of milliseconds between two events. This attribute or cronExpression is required.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="repeatCount" type="mule:substitutableInt">
             <xsd:annotation>
                 <xsd:documentation>
-                    The number of events to be scheduled.
-                    This value defaults to -1 which means that the events will be scheduled indefinitely.
+                    The number of events to be scheduled. This value defaults to -1, which means that the events will be scheduled indefinitely.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -390,29 +359,28 @@
 
     <xsd:complexType name="endpointRefType">
         <xsd:annotation>
-            <xsd:documentation>Defines an Endpoint reference. The preferred approach is to create a global endpoint and
-                reference that, however, you can also use the 'address' attribute to define a URI endpoint.
+            <xsd:documentation>
+                Defines an endpoint reference. The preferred approach is to create a global endpoint and reference that. However, you can also use the {{address}} attribute to define a URI endpoint.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="ref" type="xsd:NMTOKEN">
             <xsd:annotation>
-                <xsd:documentation>A reference (name) of an global endpoint configured in your Mule instance. This is
-                    the preferred way of configuring an endpoint.
+                <xsd:documentation>
+                    A reference (name) of a global endpoint configured in your Mule instance. This is the preferred way of configuring an endpoint.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="address" type="xsd:string">
             <xsd:annotation>
-                <xsd:documentation>A URI address string that will be used to construct a new endpoint for the quartz
-                    endpoint to use.
+                <xsd:documentation>
+                    A URI address string that will be used to construct a new endpoint for the Quartz endpoint to use.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="timeout" type="mule:substitutableInt">
             <xsd:annotation>
-                <xsd:documentation>An arbitrary time out value associated with the endpoint that can be used by jobs
-                    that
-                    block waiting to receive events.
+                <xsd:documentation>
+                    An arbitrary time-out value associated with the endpoint that can be used by jobs that block waiting to receive events.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

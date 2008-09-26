@@ -133,12 +133,8 @@
 
     <xsd:element name="xslt-transformer" type="xsltTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
-            <xsd:documentation>A transformer used to perform XSLT transforms on the current message payload. Transform
-                objects are pooled for better performance. Transform context properties can be set on the transformer,
-                these can be pulled from the current message using Expression Evaluators. This works in a very similar
-                way to the
-                <a href="http://www.muleforge.org/display/EXTENDEDXML/XQuery" target="_blank">XQuery Transformer</a>
-                on <a href="http://www.muleforge.org" target="_blank">MuleForge</a>.
+            <xsd:documentation>
+                A transformer used to perform XSLT transforms on the current message payload. Transform objects are pooled for better performance. You can set context properties on the transformer by pulling them from the current message using Expression Evaluators. 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

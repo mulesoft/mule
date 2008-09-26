@@ -9,6 +9,19 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+    <xsd:annotation>
+        <xsd:documentation>
+            The JMS transport provides JMS connectivity. Mule itself is not a JMS server but can use the services of any JMS 1.1 or 1.02b compliant server such as ActiveMq, OpenJms, Joram, JBossMQ, and commercial vendors such as WeblogicMQ, WebsphereMQ, SonicMQ, SeeBeyond, etc.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>JMS</schemadoc:short-name>
+            <schemadoc:page-title>JMS Transport</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true" requestEvents="true" transactions="true" streaming="false">
+                <schemadoc:inboundMEPs in-only="true" in-optional-out="true" in-out="true"/>
+                <schemadoc:outboundMEPs out-only="true" out-optional-in="true" out-in="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
 
     <!-- Generic JMS Connector -->    
     <xsd:element name="connector" type="genericConnectorType" substitutionGroup="mule:abstract-connector"/>
@@ -172,8 +185,7 @@
     <xsd:complexType name="jmsSelectorFilter">
         <xsd:annotation>
             <xsd:documentation>
-                This sets a selector on the underlying JMS transport.
-                It is not a standard Mule filter - it cannot be combined with other filters.
+                This sets a selector on the underlying JMS transport. It is not a standard Mule filter and cannot be combined with other filters.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="expression" type="xsd:string"/>

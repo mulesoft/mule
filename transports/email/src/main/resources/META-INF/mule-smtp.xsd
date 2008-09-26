@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/smtp/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0" 
             xmlns:email="http://www.mulesource.org/schema/mule/email/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/smtp/2.0"
             elementFormDefault="qualified"
@@ -12,6 +13,19 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
     <xsd:import namespace="http://www.mulesource.org/schema/mule/email/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd"/>
+    
+     <xsd:annotation>
+        <xsd:documentation>The SMTP transport can be used to connect to and send data to a SMTP mail server. The [SMTPS Transport] is similar but uses secure connections over SSL/TLS.</xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>SMTP</schemadoc:short-name>
+            <schemadoc:page-title>SMTP Transport</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="false" dispatchEvents="true" responseEvents="false"
+                                          requestEvents="true"
+                                          transactions="false" streaming="false">
+                <schemadoc:outboundMEPs out-only="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
 
     <xsd:element name="connector" type="smtpConnectorType" substitutionGroup="mule:abstract-connector"/>
 

@@ -22,7 +22,7 @@
         <xsl:variable name="temp" select="translate(@name, '-', ' ')"/>
         <xsl:variable name="t" select="concat( translate( substring( $temp, 1, 1 ),'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ), substring( $temp, 2, string-length( $temp )))"/>
 
-        h2. <xsl:value-of select="$t"/>
+        h1. <xsl:value-of select="$t"/>
         <xsl:value-of select="xsd:annotation/xsd:documentation"/>
 
         <xsl:variable name="type"><xsl:value-of select="@type"/> </xsl:variable>

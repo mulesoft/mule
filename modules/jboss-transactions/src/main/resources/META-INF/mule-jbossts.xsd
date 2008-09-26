@@ -15,9 +15,7 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
 
     <xsd:annotation>
-        <xsd:documentation>This module enables Mule to use the JBoss transaction manager (previously Arjuna). Developers
-            can configure one Transaction Manger per Mule instance. For more information, see the [Transaction Management]
-            page.
+        <xsd:documentation>This module enables Mule to use the JBoss transaction manager (previously Arjuna) to configure [XA transactions|Transaction Management#XA Transactions]. Developers can configure one Transaction Manger per Mule instance. For more information, see [JBoss Transactions|http://www.jboss.org/jbosstm/].
         </xsd:documentation>
         <xsd:appinfo>
             <schemadoc:short-name>jbossts</schemadoc:short-name>
@@ -28,15 +26,15 @@
     <xsd:element name="transaction-manager" type="transactionManagerType"
                  substitutionGroup="mule:abstract-transaction-manager">
         <xsd:annotation>
-            <xsd:documentation>By adding this element to a Mule XML configuration, you will enable Mule to use the JBoss
-                Transaction Manager. You can configure arbitrary properties on the transaction manager that will be
-                passed on to the underlying transaction manager. For example:
-
+            <xsd:documentation>
+                To configure an instance of the JBoss transaction manager within Mule, add this element to your Mule XML config file. You can configure arbitrary properties on the transaction manager that will be passed on to the underlying transaction manager. For example: 
 {code:xml}
 &lt;jbossts:transaction-manager&gt;
    &lt;property key="test" value="TEST"/&gt;
 &lt;/jbossts:transaction-manager&gt;
 {code}
+
+You can then declare XA transactions on endpoints supporting XA transactions, and all those transactions will be managed by the JBoss transaction manager.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

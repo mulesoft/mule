@@ -16,21 +16,15 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd"/>
 
     <xsd:annotation>
-        <xsd:documentation>The Http transport provides support for exposing services over http and making http client
-            requests from Mule services, to external services as part of service event flows. Mule supports inbound,
-            outbound and
-            polling http endpooints. These endpoints support all common features of the http spec such as ETag
-            processing,
-            cookies and keepalive. Both Http 1.0 and 1.1 are supported.
-        </xsd:documentation>
+        <xsd:documentation>The HTTP transport provides support for exposing services over HTTP and making HTTP client requests from Mule services to external services as part of service event flows. Mule supports inbound, outbound, and polling HTTP endpooints. These endpoints support all common features of the HTTP spec, such as ETag processing, cookies, and keepalive. Both HTTP 1.0 and 1.1 are supported.</xsd:documentation>
         <xsd:appinfo>
-            <schemadoc:short-name>http</schemadoc:short-name>
-            <schemadoc:page-title>Http Transport</schemadoc:page-title>
+            <schemadoc:short-name>HTTP</schemadoc:short-name>
+            <schemadoc:page-title>HTTP Transport</schemadoc:page-title>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
                                           requestEvents="true"
                                           transactions="false" streaming="true">
-                <schemadoc:inboundMEPs in-only="true" in-optional-out="true" in-out="true"/>
-                <schemadoc:outboundMEPs out-only="true" out-in="true" out-optional-in="true"/>
+                <schemadoc:inboundMEPs in-out="true" in-optional-out="true"/>
+                <schemadoc:outboundMEPs out-in="true" out-optional-in="true"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
@@ -38,8 +32,7 @@
     <xsd:element name="connector" type="httpConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                Allows Mule to communicate over Http. All parts of the Http spec are covered by Mule so you can expect
-                ETags to be honoured as well as keep alive semantics and cookies.
+                Allows Mule to communicate over HTTP. All parts of the HTTP spec are covered by Mule, so you can expect ETags to be honored as well as keep alive semantics and cookies.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -47,8 +40,7 @@
     <xsd:element name="polling-connector" type="httpPollingConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                Allows Mule to poll an external Http server and generate events from the result This is useful for
-                'pull-only' web services.
+                Allows Mule to poll an external HTTP server and generate events from the result. This is useful for pull-only web services.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -105,7 +97,7 @@
                 <xsd:attribute name="enableCookies" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether or not to support cookies.
+                            Whether to support cookies.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -118,24 +110,19 @@
             <xsd:extension base="httpConnectorType">
                 <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
                     <xsd:annotation>
-                        <xsd:documentation>The time in milliseconds to wait between each request to the remote http
-                            server.
+                        <xsd:documentation>The time in milliseconds to wait between each request to the remote HTTP server.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="checkEtag" type="mule:substitutableBoolean">
                     <xsd:annotation>
-                        <xsd:documentation>Whether or not the ETag header from the remote server is processed or not if
-                            the header is present.
+                        <xsd:documentation>Whether the ETag header from the remote server is processed if the header is present.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="discardEmptyContent" type="mule:substitutableBoolean">
                     <xsd:annotation>
-                        <xsd:documentation>Whether Mule should discard any messages from the remote server that have a
-                            zero content length. For many services a zero length would mean there was no data to return.
-                            If the remote http server does return conent to say that that the request is empty, users
-                            can configure a conent filter on the endpoint to filter these messages out.
+                        <xsd:documentation>Whether Mule should discard any messages from the remote server that have a zero content length. For many services a zero length would mean there was no data to return. If the remote HTTP server does return content to say that that the request is empty, users can configure a conent filter on the endpoint to filter these messages out.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -147,7 +134,7 @@
                  substitutionGroup="mule:abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                Built-in RestServiceWrapper can used to proxy REST style services as local Mule Components.
+                Built-in RestServiceWrapper can be used to proxy REST style services as local Mule components.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -157,8 +144,7 @@
                 <xsd:sequence>
                     <xsd:element name="error-filter" maxOccurs="1" minOccurs="0">
                         <xsd:annotation>
-                            <xsd:documentation>An error filter can be used to detect whether the response from the
-                                remote service resulted in an error.
+                            <xsd:documentation>An error filter can be used to detect whether the response from the remote service resulted in an error.
                             </xsd:documentation>
                         </xsd:annotation>
                         <xsd:complexType>
@@ -169,33 +155,26 @@
                     </xsd:element>
                     <xsd:element name="payloadParameterName" type="mule:valueType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>If the payload of the message is to be attached as a url parameter, this
-                                sohuld be set to the parameter name. If the message payload is an array of objects that
-                                multiple parameters can be set to use each element in the array.
+                            <xsd:documentation>If the payload of the message is to be attached as a URL parameter, this should be set to the parameter name. If the message payload is an array of objects that multiple parameters can be set to, use each element in the array.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:element name="requiredParameter" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>These are parameters that must be available on the current message for
-                                the request to be successful. The Key maps to the parameter name, the
-                                value can be any one of the valid [Expressions] supported by Mule.
+                            <xsd:documentation>These are parameters that must be available on the current message for the request to be successful. The Key maps to the parameter name, the value can be any one of the valid expressions supported by Mule.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:element name="optionalParameter" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>These are parameters that if they are on the current message will be
-                                added to the request, otherwise they will be ignored. The Key maps to the parameter
-                                name, the
-                                value can be any one of the valid [Expressions] supported by Mule.
+                            <xsd:documentation>These are parameters that if they are on the current message will be added to the request, otherwise they will be ignored. The Key maps to the parameter name, the value can be any one of the valid expressions supported by Mule.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="httpMethod" default="GET" use="optional">
                     <xsd:annotation>
-                        <xsd:documentation>The Http method to use when making the service request.</xsd:documentation>
+                        <xsd:documentation>The HTTP method to use when making the service request.</xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:NMTOKEN">
@@ -206,10 +185,7 @@
                 </xsd:attribute>
                 <xsd:attribute name="serviceUrl" use="required">
                     <xsd:annotation>
-                        <xsd:documentation>The service URL to use when making the request. This should not contain any
-                            parameters since these should be configured on the component. The service UR can contain
-                            Mule
-                            [Expressions] meaning the url can be dynamic for each messgae request.
+                        <xsd:documentation>The service URL to use when making the request. This should not contain any parameters, since these should be configured on the component. The service URL can contain Mule expressions, so the URL can be dynamic for each message request.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -221,16 +197,14 @@
     <xsd:element name="http-client-response-to-object-transformer" type="mule:abstractTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
-            <xsd:documentation>A transformer that converts an Http response to a Mule Message. The payload load may be a
-                String, stream or byte array.
+            <xsd:documentation>A transformer that converts an HTTP response to a Mule Message. The payload may be a String, stream, or byte array.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="http-response-to-string-transformer" type="mule:abstractTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
-            <xsd:documentation>Converts a Http response payload into a string. The headers of the response will be
-                preserved on the message.
+            <xsd:documentation>Converts an HTTP response payload into a string. The headers of the response will be preserved on the message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -238,8 +212,8 @@
     <xsd:element name="object-to-http-client-request-transformer" type="mule:abstractTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
-            <xsd:documentation>This transformer will creat a valid http request using the current message and any http
-                headers set on the current message.
+            <xsd:documentation>
+                This transformer will creat a valid HTTP request using the current message and any HTTP headers set on the current message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -247,17 +221,15 @@
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                This transformer will creat a valid http response using the current message and any http
-                headers set on the current message.
+                This transformer will creat a valid HTTP response using the current message and any HTTP headers set on the current message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
-            <xsd:documentation>An Inbound Http endpoints exposes a service over http, essentially making it an http
-                server. If polling of a remote http service is required, this endpoint should be configured with a
-                polling http connector.
+            <xsd:documentation>
+            An inbound HTTP endpoint exposes a service over HTTP, essentially making it an HTTP server. If polling of a remote HTTP service is required, this endpoint should be configured with a polling HTTP connector.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -273,8 +245,8 @@
     <xsd:element name="outbound-endpoint" type="outboundEndpointType"
                  substitutionGroup="mule:abstract-outbound-endpoint">
         <xsd:annotation>
-            <xsd:documentation>The Http outbound endpoint allows Mule to send requests to external servers or Mule
-                inbound http endpoints using the the Http protocol.
+            <xsd:documentation>
+                The HTTP outbound endpoint allows Mule to send requests to external servers or Mule inbound HTTP endpoints using the HTTP protocol.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -289,8 +261,8 @@
 
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
         <xsd:annotation>
-            <xsd:documentation>Configures a 'global' http endpoint that can be referenced by services. Services can
-                augment the configuration defined in the global endpoint with local configuration elements.
+            <xsd:documentation>
+                Configures a 'global' HTTP endpoint that can be referenced by services. Services can augment the configuration defined in the global endpoint with local configuration elements.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -307,7 +279,7 @@
     <xsd:attributeGroup name="addressAttributes">
         <xsd:attribute name="user" type="xsd:string">
             <xsd:annotation>
-                <xsd:documentation>The user name (if any) that willb e used to authenticate against.</xsd:documentation>
+                <xsd:documentation>The user name (if any) that will be used to authenticate against.</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="password" type="xsd:string">
@@ -317,8 +289,7 @@
         </xsd:attribute>
         <xsd:attribute name="host" type="xsd:string">
             <xsd:annotation>
-                <xsd:documentation>The host to connect to. For inbound endpoints this should be an address of a local
-                    network interface.
+                <xsd:documentation>The host to connect to. For inbound endpoints, this should be an address of a local network interface.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -329,7 +300,7 @@
         </xsd:attribute>
         <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
-                <xsd:documentation>The path for the http url.</xsd:documentation>
+                <xsd:documentation>The path for the HTTP URL.</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
@@ -338,12 +309,12 @@
         <!-- maybe we mant a more general mechanism, perhaps an element for header values? -->
         <xsd:attribute name="contentType" type="xsd:string">
             <xsd:annotation>
-                <xsd:documentation>The http ContentType to use.</xsd:documentation>
+                <xsd:documentation>The HTTP ContentType to use.</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="method" type="httpMethodTypes">
             <xsd:annotation>
-                <xsd:documentation>The http method to use.</xsd:documentation>
+                <xsd:documentation>The HTTP method to use.</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="keep-alive" type="mule:substitutableBoolean">

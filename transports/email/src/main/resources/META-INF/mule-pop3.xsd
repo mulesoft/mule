@@ -3,6 +3,7 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:email="http://www.mulesource.org/schema/mule/email/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0" 
             targetNamespace="http://www.mulesource.org/schema/mule/pop3/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -13,8 +14,20 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/email/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd"/>
 
+    <xsd:annotation>
+        <xsd:documentation>The POP3 transport can be used for receiving messages from POP3 mail boxes. The [POP3S Transport] is similar but uses secure connections over SSL/TLS.</xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>POP3</schemadoc:short-name>
+            <schemadoc:page-title>POP3 Transport</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false" responseEvents="false"
+                                          requestEvents="true"
+                                          transactions="false" streaming="false">
+                <schemadoc:inboundMEPs in-only="true"/>
+                <schemadoc:outboundMEPs out-only="false"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
     <xsd:element name="connector" type="pop3ConnectorType" substitutionGroup="mule:abstract-connector"/>
-
     <xsd:complexType name="pop3ConnectorType">
         <xsd:complexContent>
             <xsd:extension base="email:emailDownloadConnectorType">

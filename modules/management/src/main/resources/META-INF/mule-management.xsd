@@ -17,13 +17,49 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractAgentType">
                 <xsd:sequence>
-                    <xsd:element name="connector-server" type="connectorServerType" minOccurs="0" />
-                    <xsd:element name="credentials" type="mule:mapType" minOccurs="0" />
+                    <xsd:element name="connector-server" type="connectorServerType" minOccurs="0" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Configures the remote JMX connector server by specifying the URL and whether to rebind.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="credentials" type="mule:mapType" minOccurs="0" >
+                        <xsd:annotation>
+                            <xsd:documentation>
+                            A map of username/password entries used to authenticate remote JMX access. If not specified, remote access is not restricted.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="server-ref" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="locateServer" type="mule:substitutableBoolean" default="true" />
-                <xsd:attribute name="createServer" type="mule:substitutableBoolean" default="true" />
-                <xsd:attribute name="enableStatistics" type="mule:substitutableBoolean" default="true" />
+                <xsd:attribute name="server-ref" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The mBean server to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="locateServer" type="mule:substitutableBoolean" default="true" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the agent should try locating an MBeanServer instance before creating one.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="createServer" type="mule:substitutableBoolean" default="true" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the agent should create an MBean server if one couldn't be found or locateServer was set to false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enableStatistics" type="mule:substitutableBoolean" default="true" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether statistics reporting is enabled for the Mule instance.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -39,12 +75,41 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractAgentType">
                 <xsd:sequence>
-                    <xsd:element name="socketFactoryProperties" type="mule:mapType" minOccurs="0" />
+                    <xsd:element name="socketFactoryProperties" type="mule:mapType" minOccurs="0" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A map containing properties for SSL server socket factory configuration. If this element contains at least one property, the agent will switch to HTTPS connections. These properties will be delegated as is to the agent's HTTP/S adaptor. For a list of available properties, see the [MX4J API documentation|http://mx4j.sourceforge.net/docs/api/mx4j/tools/adaptor/ssl/SSLAdaptorServerSocketFactory.html].
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="jmxAdaptorUrl" type="xsd:string" />
-                <xsd:attribute name="login" type="xsd:string" />
-                <xsd:attribute name="password" type="xsd:string" />
+                <xsd:attribute name="jmxAdaptorUrl" type="xsd:string" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The URL of the JMX web console. The default is http://localhost:9999.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="login" type="xsd:string" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The login name for accessing the JMX web console.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="password" type="xsd:string" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The password for accessing the JMX web console.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="authenticationMethod" default="basic">
+                   <xsd:annotation>
+                        <xsd:documentation>
+                            The type of authentication to perform when the login and password are set: basic (the default), digest, or none.
+                        </xsd:documentation>
+                    </xsd:annotation>
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:NMTOKEN">
                             <xsd:enumeration value="none" />
@@ -53,9 +118,27 @@
                         </xsd:restriction>
                     </xsd:simpleType>
                 </xsd:attribute>
-                <xsd:attribute name="cacheXsl" type="xsd:string" default="true" />
-                <xsd:attribute name="xslFilePath" type="xsd:string" />
-                <xsd:attribute name="pathInJar" type="xsd:string" />
+                <xsd:attribute name="cacheXsl" type="xsd:string" default="true" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Indicates whether to cache the transformation objects, which speeds-up the process. It is usually set to true, but you can set it to false for easier testing. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="xslFilePath" type="xsd:string" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Specifies the path of the XSL files used to customize the adaptor's stylesheet. If you specify a directory, it assumes that XSL files are located in the directory. If you specify a .jar or .zip file, it assumes that the files are located inside. Specifying a file system is especially useful for testing. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="pathInJar" type="xsd:string" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If the xslFilePath is a JAR file, specifies the directory in the JAR where the XSL files are located.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -86,11 +169,35 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractAgentType">
                 <xsd:sequence>
-                    <xsd:element name="credentials" type="mule:mapType" minOccurs="0" />
+                    <xsd:element name="credentials" type="mule:mapType" minOccurs="0" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A map of username/password properties for remote JMX access. The configuration option delegates to the JmxAgent. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="registerMx4jAdapter" type="mule:substitutableBoolean" />
-                <xsd:attribute name="host" type="xsd:string" />
-                <xsd:attribute name="port" type="mule:substitutablePortNumber" />
+                <xsd:attribute name="registerMx4jAdapter" type="mule:substitutableBoolean" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to enable the MX4J adaptor.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="host" type="xsd:string" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The host to bind to. Normally, override this only for multi-NIC servers (default is localhost).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="port" type="mule:substitutablePortNumber" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The port on which the RMI registry will run. This is also used for remote JMX management. Default is 1099.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -101,15 +208,69 @@
     <xsd:complexType name="notificationLoggerAgentType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractAgentType">
-                <xsd:attribute name="ignoreManagerNotifications" type="mule:substitutableBoolean" default="false"/>
-                <xsd:attribute name="ignoreModelNotifications" type="mule:substitutableBoolean" default="false"/>
-                <xsd:attribute name="ignoreComponentNotifications" type="mule:substitutableBoolean" default="false"/>
-                <xsd:attribute name="ignoreConnectionNotifications" type="mule:substitutableBoolean" default="false"/>
-                <xsd:attribute name="ignoreSecurityNotifications" type="mule:substitutableBoolean" default="false"/>
-                <xsd:attribute name="ignoreManagementNotifications" type="mule:substitutableBoolean" default="false"/>
-                <xsd:attribute name="ignoreCustomNotifications" type="mule:substitutableBoolean" default="false"/>
-                <xsd:attribute name="ignoreAdminNotifications" type="mule:substitutableBoolean" default="false"/>
-                <xsd:attribute name="ignoreMessageNotifications" type="mule:substitutableBoolean" default="false"/>
+                <xsd:attribute name="ignoreManagerNotifications" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to ignore notifications for state changes on the Mule manager such as initializing, starting, and stopping.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreModelNotifications" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to ignore notifications for state changes on models such as models initializing, starting, and stopping or components being registered or unregistered.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreComponentNotifications" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to ignore notifications for state changes on components such as when a component is started, stopped, paused, or resumed..
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreConnectionNotifications" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to ignore notifications when a connector attempts to connect to its underlying resource. Notifications are fired when a connection is made, released, or the connection attempt fails.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreSecurityNotifications" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to ignore notifications about security.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreManagementNotifications" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to ignore notifications for when a request is denied security access.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreCustomNotifications" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to ignore notifications fired by objects to custom notification listeners.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreAdminNotifications" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to ignore administrative notifications about requests being received by the Mule Admin agent. These are usually trigged by MuleClient calls using the RemoteDispatcher, which proxies calls to a remote server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreMessageNotifications" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to ignore message notifications. These notifications are fired when an event is sent or received in the system. They are very good for tracing, but they create a performance impact, so they should only be used during testing. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -146,13 +307,37 @@
                 <xsd:sequence>
                     <xsd:element name="level-mapping" minOccurs="0" maxOccurs="unbounded">
                         <xsd:complexType>
-                            <xsd:attribute name="severity" type="serveritySimpleType" default="INFO" />
-                            <xsd:attribute name="eventId" type="xsd:string" use="required" />
+                            <xsd:attribute name="severity" type="serveritySimpleType" default="INFO" >
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                     Specifies the severity level of the notifications you want to send to the Chainsaw console for the corresponding event ID. The severity level can be DEBUG, INFO, WARN, ERROR, or FATAL.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                            <xsd:attribute name="eventId" type="xsd:string" use="required" >
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                     Specifies the type of event to send to the Chainsaw console. The event ID is the notification type plus the action, such as ModelNotification.stop.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="chainsawHost" type="xsd:string" use="required" />
-                <xsd:attribute name="chainsawPort" type="mule:substitutablePortNumber" use="required" />
+                <xsd:attribute name="chainsawHost" type="xsd:string" use="required" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        The host name of the Chainsaw console.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="chainsawPort" type="mule:substitutablePortNumber" use="required" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        The port of the Chainsaw console.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

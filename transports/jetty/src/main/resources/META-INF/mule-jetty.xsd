@@ -15,16 +15,14 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd"/>
 
     <xsd:annotation>
-        <xsd:documentation>The Jetty Http transport provides support for exposing services over http by embedding a
-            light-weight Jetty server. You can only define inbound endpoints with this transport.
+        <xsd:documentation>The Jetty transport provides support for exposing services over HTTP by embedding a light-weight Jetty server. You can only define inbound endpoints with this transport.
         </xsd:documentation>
         <xsd:appinfo>
-            <schemadoc:short-name>jetty</schemadoc:short-name>
-            <schemadoc:page-title>Jetty Http Transport</schemadoc:page-title>
+            <schemadoc:short-name>Jetty</schemadoc:short-name>
+            <schemadoc:page-title>Jetty Transport</schemadoc:page-title>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="false" responseEvents="true"
-                                          requestEvents="false" transactions="false" streaming="true">
+                                          requestEvents="true" transactions="false" streaming="true">
                 <schemadoc:inboundMEPs in-only="true" in-optional-out="true" in-out="true"/>
-                <schemadoc:outboundMEPs none="true"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
@@ -32,11 +30,7 @@
     <xsd:element name="connector" type="jettyConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                Allows Mule to expose Mule Services over http using a Jttp Http server. A single Jetty server is created
-                for each connector instance. One connector can serve many endpoints. Users should rarely need to
-                have more than one Jetty connector.
-                The Jetty connector can be configured using a Jetty Xml config file, but the default configuration
-                is sufficient for most scenarios.
+                Allows Mule to expose Mule Services over HTTP using a Jetty HTTP server. A single Jetty server is created for each connector instance. One connector can serve many endpoints. Users should rarely need to have more than one Jetty connector. The Jetty connector can be configured using a Jetty XML config file, but the default configuration is sufficient for most scenarios.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -53,7 +47,7 @@
                 <xsd:attribute name="useContinuations" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Continuations can free up connections in high load situations. 
+                            Whether to use continuations to free up connections in high load situations. 
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -64,7 +58,8 @@
     
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
-            <xsd:documentation>Allows a Mule service to receive requests over Http using a Jetty server.
+            <xsd:documentation>
+                Allows a Mule service to receive requests over HTTP using a Jetty server.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -76,8 +71,8 @@
 
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
         <xsd:annotation>
-            <xsd:documentation>Allows users to configure a global Jetty Http endpoint. Note that this can only ne used
-                as an inbound-endpoint reference.
+            <xsd:documentation>
+                Allows users to configure a global Jetty HTTP endpoint. Note that this can only be used as an inbound-endpoint reference.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

@@ -15,15 +15,15 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
 
     <xsd:annotation>
-        <xsd:documentation>The FTP connector provides connectivity to FTP servers to allow files to be read and written
-            as events in Mule.
+        <xsd:documentation>
+            The FTP transport provides connectivity to FTP servers to allow files to be read and written as messages in Mule.
         </xsd:documentation>
         <xsd:appinfo>
-            <schemadoc:short-name>ftp</schemadoc:short-name>
+            <schemadoc:short-name>FTP</schemadoc:short-name>
             <schemadoc:page-title>FTP Transport</schemadoc:page-title>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="false"
                                           requestEvents="true"
-                                          transactions="false" streaming="true">
+                                          transactions="false" streaming="false">
                 <schemadoc:inboundMEPs in-only="true"/>
                 <schemadoc:outboundMEPs out-only="true"/>
             </schemadoc:transport-features>
@@ -32,9 +32,8 @@
 
     <xsd:element name="connector" type="ftpConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
-            <xsd:documentation>The FTP connector is used to configure the default behaviour for FTP endpoints that
-                reference the connector. Note if there is only one FTP connector configured, all FTP endpoints
-                will use that connector.
+            <xsd:documentation>
+                The FTP connector is used to configure the default behavior for FTP endpoints that reference the connector. If there is only one FTP connector configured, all FTP endpoints will use that connector.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -45,10 +44,7 @@
                     <xsd:element ref="file:abstract-filenameParser">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The {{filenameParser}} is used when writing files to an FTP server. The parser will
-                                convert the _outputPattern_ attribute to a string using the parser and the current message. To add a
-                                parser to your configuration you need to import the *file* namespace into your Xml
-                                configuration. For more information about filenameParsers see the [File Transport].
+                                The {{filenameParser}} is used when writing files to an FTP server. The parser will convert the {{outputPattern}} attribute to a string using the parser and the current message. To add a parser to your configuration, you import the *file* namespace into your XML configuration. For more information about filenameParsers, see the [File Transport].
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -59,16 +55,14 @@
                 <xsd:attribute name="validateConnections" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Will cause Mule to validate connections before use.
+                            Causes Mule to validate connections before use.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="connectionFactoryClass" type="mule:substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A class that extends FtpConnectionFactory. The FtpConnectionFactory is responsible for
-                            creating a connection to the server usin the credentials provided by the endpoint. The
-                            default implementation supplied with MUle uses the Commons Net project from Apache.
+                            A class that extends FtpConnectionFactory. The FtpConnectionFactory is responsible for creating a connection to the server using the credentials provided by the endpoint. The default implementation supplied with Mule uses the Commons Net project from Apache.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -115,8 +109,7 @@
         <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
             <xsd:annotation>
                 <xsd:documentation>
-                    The frequency in milliseconds that the read directory should be checked.
-                    Note that the read directory is specified by the endpoint of the listening component.
+                    How frequently in milliseconds to check the read directory. Note that the read directory is specified by the endpoint of the listening component.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -126,8 +119,7 @@
         <xsd:attribute name="outputPattern" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The pattern to use when writing a file to disk.
-                    This can use the patterns supported by the filename-parser configured for this connector
+                    The pattern to use when writing a file to disk. This can use the patterns supported by the filename-parser configured for this connector
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -161,21 +153,21 @@
         <xsd:attribute name="user" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    If FTP is authenticated this is the username used for authenitcation
+                    If FTP is authenticated, this is the username used for authenitcation.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="password" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The password for the user being authenitcated.
+                    The password for the user being authenticated.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="host" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    An IP address (eg www.mulesource.com, localhost, 192.168.0.1).
+                    An IP address (such as www.mulesource.com, localhost, or 192.168.0.1).
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

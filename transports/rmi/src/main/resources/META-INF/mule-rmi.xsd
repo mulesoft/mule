@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/rmi/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0" 
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/rmi/2.0"
             elementFormDefault="qualified"
@@ -9,6 +10,20 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+
+    <xsd:annotation>
+            <xsd:documentation>The RMI transport can be used to send and receive Mule events over JRMP. This transport has a dispatcher that invokes an RMI method and a polling receiver that repeatedly does the same.
+            </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>RMI</schemadoc:short-name>
+            <schemadoc:page-title>RMI Transport</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+        requestEvents="true" transactions="false" streaming="false">
+                <schemadoc:inboundMEPs in-only="true"/>
+                <schemadoc:outboundMEPs out-only="true" out-in="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
 
     <xsd:element name="connector" type="rmiConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>

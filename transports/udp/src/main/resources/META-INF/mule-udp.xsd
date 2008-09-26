@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/udp/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/udp/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -10,18 +11,76 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
+        <xsd:annotation>
+            <xsd:documentation>
+            The UDP transport enables events to be sent and received as Datagram packets.
+            </xsd:documentation>
+            <xsd:appinfo>
+                <schemadoc:short-name>UDP</schemadoc:short-name>
+                <schemadoc:page-title>UDP Transport</schemadoc:page-title>
+                <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+                                          requestEvents="true"
+                                          transactions="false" streaming="true">
+                <schemadoc:inboundMEPs in-out="true" in-optional-out="true"/>
+                <schemadoc:outboundMEPs out-in="true" out-optional-in="true"/>
+            </schemadoc:transport-features>
+            </xsd:appinfo>
+	</xsd:annotation>
+            
     <xsd:element name="connector" type="udpConnectorType" substitutionGroup="mule:abstract-connector"/>
 
     <xsd:complexType name="udpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:attribute name="receiveBufferSize" type="mule:substitutableInt"/>
-                <xsd:attribute name="receiveTimeout" type="mule:substitutableLong"/>
-                <xsd:attribute name="sendBufferSize" type="mule:substitutableInt"/>
-                <xsd:attribute name="sendTimeout" type="mule:substitutableLong"/>
-                <xsd:attribute name="socketLinger" type="mule:substitutableLong"/>
-                <xsd:attribute name="broadcast" type="mule:substitutableBoolean"/>
-                <xsd:attribute name="keepSendSocketOpen" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="receiveBufferSize" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The size of the receiving buffer for the socket.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="receiveTimeout" type="mule:substitutableLong">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The amount of time after which a Receive call will time out.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sendBufferSize" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The size of the sending buffer for the socket.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sendTimeout" type="mule:substitutableLong">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The amount of time after which a Send call will time out.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="socketLinger" type="mule:substitutableLong">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The amount of time the socket will remain open after a closesocket call. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="broadcast" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to enable the socket to send broadcast data. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="keepSendSocketOpen" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to keep the Sending socket open. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

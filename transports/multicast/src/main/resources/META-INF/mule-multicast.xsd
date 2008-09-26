@@ -3,6 +3,7 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:udp="http://www.mulesource.org/schema/mule/udp/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/multicast/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -12,6 +13,21 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
     <xsd:import namespace="http://www.mulesource.org/schema/mule/udp/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/udp/2.0/mule-udp.xsd"/>
+              
+        <xsd:annotation>
+            <xsd:documentation>The Multicast transport can dispatch Mule events using IP multicasting.
+            </xsd:documentation>
+            <xsd:appinfo>
+                <schemadoc:short-name>Multicast</schemadoc:short-name>
+                <schemadoc:page-title>Multicast Transport</schemadoc:page-title>
+                <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+	requestEvents="true"
+	transactions="false" streaming="false">
+                    <schemadoc:inboundMEPs in-out="true" in-optional-out="true"/>
+                    <schemadoc:outboundMEPs out-in="true" out-optional-in="true"/>
+                </schemadoc:transport-features>
+            </xsd:appinfo>
+	</xsd:annotation>
 
     <xsd:element name="connector" substitutionGroup="mule:abstract-connector">
         <xsd:complexType>
@@ -20,17 +36,14 @@
                     <xsd:attribute name="timeToLive" type="mule:substitutableLong">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Set the time-to-live value for multicast packets to control their scope.
-                                It must be in the range 0 to 255 (inclusive).
+                                Set the time-to-live value for multicast packets to control their scope. It must be in the range 0 to 255 (inclusive).
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
                     <xsd:attribute name="loopback" type="mule:substitutableBoolean">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Enable local loopback of multicast datagrams.
-                                The option is used by the platform's networking code as a hint for setting
-                                whether multicast data will be looped back to the local socket.
+                                Enable local loopback of multicast datagrams. The option is used by the platform networking code as a hint for setting whether multicast data will be looped back to the local socket.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>

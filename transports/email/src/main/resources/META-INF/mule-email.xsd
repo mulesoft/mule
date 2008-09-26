@@ -11,6 +11,20 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
+    <xsd:annotation>
+            <xsd:documentation>The email transport supplies various email connectivity options.   
+            </xsd:documentation>
+            <xsd:appinfo>
+                <schemadoc:short-name>Email</schemadoc:short-name>
+                <schemadoc:page-title>Email Transport</schemadoc:page-title>
+                <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+	requestEvents="true" transactions="false" streaming="false">
+                    <schemadoc:inboundMEPs in-only="true"/>
+                    <schemadoc:outboundMEPs out-only="true"/>
+                </schemadoc:transport-features>
+            </xsd:appinfo>
+	</xsd:annotation>
+            
     <xsd:complexType name="emailDownloadConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
@@ -31,21 +45,21 @@
                 <xsd:attribute name="checkFrequency" type="mule:substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Period (ms) between poll connections to the server.
+                            Period (ms) between poll connections to the server. Default is 60000.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="mailboxFolder" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The folder to check for email.
+                            The remote folder to check for email. Default is INBOX.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="deleteReadMessages" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether to delete messages from the server when they have been downloaded.
+                            Whether to delete messages from the server when they have been downloaded. The default is true. If set to false, the messages are set to SEEN.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -60,10 +74,40 @@
         <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
     </xsd:attributeGroup>
 
-    <xsd:element name="email-to-string-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="string-to-email-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="object-to-mime-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="mime-to-bytes-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="bytes-to-mime-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="email-to-string-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts an email message to string format.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="string-to-email-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts a string message to email format.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="object-to-mime-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts an object to MIME format.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="mime-to-bytes-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts a MIME message to a byte array.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="bytes-to-mime-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts a byte array message to MIME format.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
 </xsd:schema>

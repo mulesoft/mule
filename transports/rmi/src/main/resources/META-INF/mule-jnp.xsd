@@ -3,6 +3,7 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:rmi="http://www.mulesource.org/schema/mule/rmi/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0" 
             targetNamespace="http://www.mulesource.org/schema/mule/jnp/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -16,6 +17,7 @@
     <xsd:element name="connector" type="rmi:rmiConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
+                The JNP connector is an extension of the RMI connector that uses the Java Naming protocol to bind to remote objects. 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

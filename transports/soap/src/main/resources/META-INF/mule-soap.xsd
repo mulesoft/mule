@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/ssl/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0" 
             targetNamespace="http://www.mulesource.org/schema/mule/soap/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -9,7 +10,21 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
-
+    
+     <xsd:annotation>
+        <xsd:documentation>The SOAP transport enables your components to be exposed as web services and to act as SOAP clients. The SOAP transport supports the Axis and CXF transports.</xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>SOAP</schemadoc:short-name>
+            <schemadoc:page-title>SOAP Transport</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+                                          requestEvents="true"
+                                          transactions="false" streaming="true">
+                <schemadoc:inboundMEPs in-only="true" in-out="true" in-optional-out="true"/>
+                <schemadoc:outboundMEPs out-only="true" out-in="true" out-optional-in="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
+       
     <xsd:element name="http-to-soap-request-transformer" type="mule:abstractTransformerType"
                  substitutionGroup="mule:abstract-transformer"/>
 

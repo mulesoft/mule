@@ -4,6 +4,7 @@
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:imap="http://www.mulesource.org/schema/mule/imap/2.0"
             xmlns:email="http://www.mulesource.org/schema/mule/email/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/imaps/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -15,6 +16,19 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/imap/2.0/mule-imap.xsd"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/email/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd"/>
+    
+   <xsd:annotation>
+        <xsd:documentation>The IMAPS transport is similar to the [IMAP Transport] but uses secure connections over SSL/TLS.</xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>IMAPS</schemadoc:short-name>
+            <schemadoc:page-title>IMAPS Transport</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false" responseEvents="false"
+                                          requestEvents="false"
+                                          transactions="false" streaming="false">
+                <schemadoc:inboundMEPs in-only="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
 
     <xsd:element name="connector" type="imapsConnectorType" substitutionGroup="mule:abstract-connector"/>
 

@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/tcp/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/tcp/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -9,11 +10,25 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
-
+    <xsd:annotation>
+        <xsd:documentation>
+            The TCP transport enables events to be sent and received over TCP sockets.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>TCP</schemadoc:short-name>
+            <schemadoc:page-title>TCP Transport</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+                                          requestEvents="true"
+                                          transactions="false" streaming="true">
+                <schemadoc:inboundMEPs in-out="true" in-optional-out="true"/>
+                <schemadoc:outboundMEPs out-in="true" out-optional-in="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
     <xsd:element name="connector" type="tcpConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                Connect Mule to a TCP socket, to send or receive data via the network.
+                Connects Mule to a TCP socket to send or receive data via the network.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -45,43 +60,35 @@
                 <xsd:attribute name="sendTcpNoDelay" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If set, transmitted data are not collected together for greater efficiency, but sent
-                            immediately.
+                            If set, transmitted data is not collected together for greater efficiency but sent immediately.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="reuseAddress" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If set (the default) then SO_REUSEADDRESS is set on server sockets before
-                            binding.  This helps reduce "address already in use" errors when a socket
-                            is re-used.
+                            If set (the default), SO_REUSEADDRESS is set on server sockets before binding. This helps reduce "address already in use" errors when a socket is re-used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="clientSoTimeout" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            This sets the socket's SO_TIMEOUT value when the socket is used as a client. Reading from
-                            the socket will block for up to this long (in milliseconds) before the read fails.  A value
-                            of 0 (the default) causes the read to wait indefinitely (if no data arrive).
+                            This sets the SO_TIMEOUT value when the socket is used as a client. Reading from the socket will block for up to this long (in milliseconds) before the read fails. A value of 0 (the default) causes the read to wait indefinitely (if no data arrives).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="serverSoTimeout" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            This sets the socket's SO_TIMEOUT value when the socket is used as a server. Reading from
-                            the socket will block for up to this long (in milliseconds) before the read fails.  A value
-                            of 0 (the default) causes the read to wait indefinitely (if no data arrive).
+                            This sets the SO_TIMEOUT value when the socket is used as a server. Reading from the socket will block for up to this long (in milliseconds) before the read fails. A value of 0 (the default) causes the read to wait indefinitely (if no data arrives).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="socketSoLinger" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            This sets the socket's SO_LINGER value.  This is related to how long (in milliseconds) the
-                            socket will take to close so that any remaining data are transmitted correctly.
+                            This sets the SO_LINGER value. This is related to how long (in milliseconds) the socket will take to close so that any remaining data is transmitted correctly.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -95,17 +102,14 @@
                 <xsd:attribute name="keepAlive" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Enables SO_KEEPALIVE behaviour on open sockets. This automatically checks socket connections
-                            which are open but unused for long periods and closes them if the connection becomes
-                            unavailable.
+                            Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but unused for long periods and closes them if the connection becomes unavailable.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="validateConnections" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            This "blips" the socket, opening and closing it to validate the connection, when first
-                            accessed.
+                            This "blips" the socket, opening and closing it to validate the connection when first accessed.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -120,10 +124,7 @@
                     <xsd:element ref="abstract-protocol" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The class name for the protocol handler. This controls how the raw data stream is converted
-                                into messages. By default messages are constructed as dara are received, with no correction
-                                for multiple packets or fragmentation. You nearly always want to change this (or use a
-                                transport that includes a protocol, like HTTP).
+                                The class name for the protocol handler. This controls how the raw data stream is converted into messages. By default, messages are constructed as dara is received, with no correction for multiple packets or fragmentation. Typically, change this value, or use a transport that includes a protocol like HTTP.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -138,9 +139,7 @@
     <xsd:element name="streaming-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
-                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
-                However, this is not an issue with streaming, so this is an alias for the "direct" (null) protocol.
+                TCP does not guarantee that data written to a socket is transmitted in a single packet, so if you want to transmit entire Mule messages reliably, you must specify an additional protocol. However, this is not an issue with streaming, so this is an alias for the "direct" (null) protocol.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -148,10 +147,7 @@
     <xsd:element name="xml-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
-                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
-                This protocol uses XML syntax to isolate messages from the stream of bytes received, so it
-                will only work with well-formed XML.
+                TCP does not guarantee that data written to a socket is transmitted in a single packet, so if you want to transmit entire Mule messages reliably, you must specify an additional protocol. This protocol uses XML syntax to isolate messages from the stream of bytes received, so it will only work with well-formed XML.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -159,10 +155,7 @@
     <xsd:element name="xml-eof-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
-                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
-                This protocol is similar to "xml-protocol", but will also use socket closure to terminate
-                a message (even if the XML is not well-formed).
+                Similar to "xml-protocol", but it will also use socket closure to terminate a message (even if the XML is not well-formed).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -170,10 +163,7 @@
     <xsd:element name="eof-protocol" type="byteOrMessageProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
-                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
-                This protocol simply accumulates all data until the socket closes and places it in a single
-                message.
+                TCP does not guarantee that data written to a socket is transmitted in a single packet, so if you want to transmit entire Mule messages reliably, you must specify an additional protocol. This protocol simply accumulates all data until the socket closes and places it in a single message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -181,12 +171,7 @@
     <xsd:element name="direct-protocol" type="byteOrMessageProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that a data written to a socket are transmitted in a single packet.
-                Using this "null" protocol does not change the normal TCP behaviour, so message fragmentation
-                may occur
-                (ie a single sent message may be received in several pieces, each as a separate received message).
-                This was the default behaviour in Mule 1.x - normally it is not a good choice for messaging
-                within Mule, but it may be necessary to interface with external TCP-based protocols.
+                TCP does not guarantee that data written to a socket is transmitted in a single packet. Using this "null" protocol does not change the normal TCP behavior, so message fragmentation may occur. For example, a single sent message may be received in several pieces, each as a separate received message. Typically, it is not a good choice for messaging within Mule, but it may be necessary to interface with external TCP-based protocols.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -197,9 +182,7 @@
                 <xsd:attribute name="payloadOnly" type="mule:substitutableBoolean" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Do not send the entire mule message object (including properties etc),
-                            just the payload (contents)?  This defaults to true when the protocol
-                            is not specified explicitly (when the safe protocol is used).
+                            Sends only the payload, not the entire Mule message object or its properties. This defaults to true when the protocol is not specified explicitly (when the safe protocol is used).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -210,12 +193,7 @@
     <xsd:element name="safe-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
-                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
-                This protocol is similar to "length-protocol", but also includes a prefix.
-                Verification of the prefix allows mis-matched protocols to be detected and avoids interpreting
-                "random" data as a message length (which may give out of memory errors).
-                This is the default protocol in Mule 2.x.
+                Similar to "length-protocol", but it also includes a prefix. Verification of the prefix allows mis-matched protocols to be detected and avoids interpreting "random" data as a message length (which may give out-of-memory errors). This is the default protocol in Mule 2.x.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -223,10 +201,7 @@
     <xsd:element name="length-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
-                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
-                This protocol precedes each message with the number of bytes sent so that an entire message
-                can be constructed on the received.
+                This protocol precedes each message with the number of bytes sent so that an entire message can be constructed on the received.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -237,9 +212,7 @@
                 <xsd:attribute name="maxMessageLength" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            An optional maximum length for the number of bytes in a single message.
-                            Messages larger than this will trigger an error in the receiver, but
-                            give an assurance that no out-of-memory error will occur.
+                            An optional maximum length for the number of bytes in a single message. Messages larger than this will trigger an error in the receiver, but it give an assurance that no out-of-memory error will occur.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -250,8 +223,6 @@
     <xsd:element name="custom-protocol" type="customProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that a data written to a socket are transmitted in a single packet,
-                so if we want to transmit entire Mule messages reliably we must specify an additional protocol.
                 The user may supply their own protocol implementation via this element.
             </xsd:documentation>
         </xsd:annotation>

@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/axis/2.0"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
     xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+    xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
     targetNamespace="http://www.mulesource.org/schema/mule/axis/2.0" 
     elementFormDefault="qualified"
     attributeFormDefault="unqualified">
@@ -9,11 +10,24 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
-
+    <xsd:annotation>
+            <xsd:documentation>The Axis transport allows Mule managed components to be published as Axis services and allows components to invoke web services using Axis client calls.  
+            </xsd:documentation>
+            <xsd:appinfo>
+                <schemadoc:short-name>Axis</schemadoc:short-name>
+                <schemadoc:page-title>Axis Transport</schemadoc:page-title>
+                <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+	requestEvents="true"
+	transactions="false" streaming="false">
+                    <schemadoc:inboundMEPs in-only="true" in-out="true" in-optional-out="true"/>
+                    <schemadoc:outboundMEPs out-only="true" out-in="true" out-optional-in="true"/>
+                </schemadoc:transport-features>
+            </xsd:appinfo>
+	</xsd:annotation>
     <xsd:element name="connector" type="axisConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                Consume and provide web services via axis.
+                The Axis connector consumes and provides web services via Axis. It supports all the [common connector attributes and properties|Configuring a Transport#commonConfig] as well as the following additional attributes: 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -27,56 +41,49 @@
                 <xsd:attribute name="axis-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Bean reference to the axis server that should be used.
+                            Bean reference to the Axis server.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="clientConfig" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Configuration file to use when building the axis client.
+                            Configuration file to use when building the Axis client.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="clientProvider-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Bean reference to the client provider that should be used to
-                            create the axis client.
+                            Bean reference to the client provider to use for creating the Axis client.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="doAutoTypes" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Use this property to configure whether AxisServer should automatically map types.
-                            This property has only effect if you don't provide your own axisServer via the
-                            'axisServer-ref' property.
+                            Use this property to configure whether the Axis server should automatically map types. This property only takes effect if you do not provide your own Axis server via the axis-ref property.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="serverConfig" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Configuration file to use when building the axis server.
+                            Configuration file to use when building the Axis server.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="serverProvider-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Bean reference to the server provider that should be used to create the
-                            AxisServer.
+                            Bean reference to the server provider that should be used to create the Axis server.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="treatMapAsNamedParams" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The AxisConnector treats a Map as container for named parameters, which 
-                            eventually will be unpacked. This will result into a problem if your exposed 
-                            service needs to take a Map as a parameter, because the actual Map will never 
-                            reach the service intact. In this case set this property to false.
+                            The Axis connector treats a Map as a container for named parameters and unpacks them from the map. If your exposed service needs to take a Map as a parameter, set this property to false to prevent the connector from unpacking the Map. 
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -131,7 +138,13 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="inboundPropertyAttributes">
-        <xsd:attribute name="wsdlFile" type="xsd:string"/>
+        <xsd:attribute name="wsdlFile" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                The location of a WSDL document to use for this service if you do not want the WSDL document autogenerated.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="generalPropertyAttributes">
@@ -139,14 +152,31 @@
         <xsd:attribute name="soapAction" type="xsd:string"/>
         <xsd:attribute name="SOAPAction" type="xsd:string"/>
         <xsd:attribute name="serviceNamespace" type="xsd:string"/>
-        <xsd:attribute name="style" type="styleType"/>
-        <xsd:attribute name="use" type="useType"/>
+        <xsd:attribute name="style" type="styleType">
+            <xsd:annotation>
+                <xsd:documentation>
+                Specifies the [SOAP binding style|Axis SOAP Styles]: RPC (default), DOCUMENT, MESSAGE, or WRAPPED.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="use" type="useType">
+            <xsd:annotation>
+                <xsd:documentation>
+                Specifies the [SOAP binding use|Axis SOAP Styles]: ENCODED (default) or LITERAL.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
     
 
     <xsd:group name="inboundPropertyElements">
         <xsd:sequence>
             <xsd:element name="options" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                    Allows you to set optional SOAP settings as attributes: allowedMethods, scope, wsdlPortType, wsdlServicePort, wsdlServiceElement, wsdlTargetNamespace, wsdlInputSchema, wsdlSoapActionMode, and extraClasses.
+                    </xsd:documentation>
+                </xsd:annotation>
                 <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="option" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded"/>
@@ -173,7 +203,13 @@
                     <xsd:attribute name="interface" type="xsd:string"/>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="soap-method" type="soapMethodType"  minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="soap-method" type="soapMethodType"  minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Allows you to specify a SOAP method and optionally parameters and a return. The parameter mode can be IN, OUT, or INOUT. 
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>    
         </xsd:sequence>
     </xsd:group>
     
@@ -212,8 +248,10 @@
     <xsd:element name="wrapper-component" type="wrapperComponentType" substitutionGroup="mule:abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                The WebServiceWrapperComponent class allows you to send 
-                the result of a web service call to another endpoint. 
+                The WebServiceWrapperComponent class allows you to send the result of a web service call to another endpoint. For example:
+                {code:xml}
+                &lt;axis:wrapper-component address="http://localhost:65081/services/TestUMO?method=receive" style="WRAPPED" use="LITERAL" /&gt; 
+                {code}
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -222,7 +260,13 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractComponentType">
                 <xsd:sequence>
-                    <xsd:element name="soap-method" type="soapMethodType"  minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="soap-method" type="soapMethodType"  minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                            Allows you to specify a SOAP method and optionally parameters and a return. The parameter mode can be IN, OUT, or INOUT. 
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>    
                 </xsd:sequence>
                 <xsd:attribute name="address" type="xsd:string">
                     <xsd:annotation>
@@ -238,8 +282,20 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="style" type="styleType"/>
-                <xsd:attribute name="use" type="useType"/>
+                <xsd:attribute name="style" type="styleType">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        Specifies the [SOAP binding style|Axis SOAP Styles]: RPC (default), DOCUMENT, MESSAGE, or WRAPPED.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="use" type="useType">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        Specifies the [SOAP binding use|Axis SOAP Styles]: ENCODED (default) or LITERAL.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
