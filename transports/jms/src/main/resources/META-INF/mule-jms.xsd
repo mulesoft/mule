@@ -2,29 +2,37 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/jms/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/jms/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+
     <xsd:annotation>
-        <xsd:documentation>
-            The JMS transport provides JMS connectivity. Mule itself is not a JMS server but can use the services of any JMS 1.1 or 1.02b compliant server such as ActiveMq, OpenJms, Joram, JBossMQ, and commercial vendors such as WeblogicMQ, WebsphereMQ, SonicMQ, SeeBeyond, etc.
-        </xsd:documentation>
+        <xsd:documentation>The JMS transport provides support for sending messages via JMS queues.</xsd:documentation>
         <xsd:appinfo>
-            <schemadoc:short-name>JMS</schemadoc:short-name>
+            <schemadoc:short-name>jms</schemadoc:short-name>
             <schemadoc:page-title>JMS Transport</schemadoc:page-title>
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true" requestEvents="true" transactions="true" streaming="false">
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+                                          requestEvents="true"
+                                          transactions="true" streaming="true">
                 <schemadoc:inboundMEPs in-only="true" in-optional-out="true" in-out="true"/>
-                <schemadoc:outboundMEPs out-only="true" out-optional-in="true" out-in="true"/>
+                <schemadoc:outboundMEPs out-only="true" out-in="true" out-optional-in="true"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
 
-    <!-- Generic JMS Connector -->    
-    <xsd:element name="connector" type="genericConnectorType" substitutionGroup="mule:abstract-connector"/>
+    <!-- Generic JMS Connector -->
+    <xsd:element name="connector" type="genericConnectorType" substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                A generic connector for sending and receiving messages over JMS queues.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="genericConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
@@ -35,7 +43,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <!-- Custom JMS Connector -->    
+    <!-- Custom JMS Connector -->
     <xsd:element name="custom-connector" substitutionGroup="mule:abstract-connector">
         <xsd:complexType>
             <xsd:complexContent>
@@ -81,7 +89,7 @@
 
 
     <!-- Vendor-specific JMS Connectors -->
-         
+
     <xsd:complexType name="vendorJmsConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
@@ -101,16 +109,16 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="weblogic-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:element name="websphere-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
- 
+
     <xsd:element name="transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
     <xsd:element name="client-ack-transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
 
     <xsd:element name="jmsmessage-to-object-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:element name="object-to-jmsmessage-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    
+
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
@@ -185,7 +193,8 @@
     <xsd:complexType name="jmsSelectorFilter">
         <xsd:annotation>
             <xsd:documentation>
-                This sets a selector on the underlying JMS transport. It is not a standard Mule filter and cannot be combined with other filters.
+                This sets a selector on the underlying JMS transport.
+                It is not a standard Mule filter and cannot be combined with other filters.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="expression" type="xsd:string"/>
