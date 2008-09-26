@@ -13,17 +13,20 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
     <xsd:import namespace="http://www.mulesource.org/schema/mule/tcp/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd"/>
-    <xsd:appinfo>
-        <schemadoc:short-name>SSL</schemadoc:short-name>
-        <schemadoc:page-title>SSL Transport</schemadoc:page-title>
+    <xsd:annotation>
+        <xsd:appinfo>
+            <schemadoc:short-name>SSL</schemadoc:short-name>
+            <schemadoc:page-title>SSL Transport</schemadoc:page-title>
 
-        <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
                                           requestEvents="true"
                                           transactions="false" streaming="true">
-            <schemadoc:inboundMEPs in-out="true" in-optional-out="true"/>
-            <schemadoc:outboundMEPs out-in="true" out-optional-in="true"/>
-        </schemadoc:transport-features>
-    </xsd:appinfo>
+                <schemadoc:inboundMEPs in-out="true" in-optional-out="true"/>
+                <schemadoc:outboundMEPs out-in="true" out-optional-in="true"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
+
 
     <xsd:element name="connector" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
