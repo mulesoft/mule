@@ -14,6 +14,11 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/tcp/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd"/>
     <xsd:annotation>
+        <xsd:documentation>
+        The SSL transport can be used for secure socket communication using SSL or TLS.
+
+        The Javadoc for this transport can be found {javadoc:mule/transport/ssl}here{javadoc}.
+        </xsd:documentation>
         <xsd:appinfo>
             <schemadoc:short-name>SSL</schemadoc:short-name>
             <schemadoc:page-title>SSL Transport</schemadoc:page-title>

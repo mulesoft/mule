@@ -12,100 +12,98 @@
 	<xsd:import namespace = "http://www.mulesource.org/schema/mule/rmi/2.0" schemaLocation = "http://www.mulesource.org/schema/mule/rmi/2.0/mule-rmi.xsd"/>
 	<xsd:import namespace = "http://www.w3.org/XML/1998/namespace"/>
 	<xsd:annotation>
-		<xsd:documentation>
-The EJB transport allows EJB session beans to be invoked as part of an event flow. Components can be given an EJB outbound endpoint, which will invoke the remote object and optionally return a result.
+	    <xsd:documentation>
+            The EJB transport allows EJB session beans to be invoked as part of an event flow. Components can be given an EJB outbound endpoint, which will invoke the remote object and optionally return a result.
 
-The Javadoc for this transport can be found {javadoc:mule/transport/ejb}here{javadoc}. 
-		</xsd:documentation>
-		<xsd:appinfo>
-			<schemadoc:short-name>EJB</schemadoc:short-name>
-			<schemadoc:page-title>EJB Transport</schemadoc:page-title>
-                        <schemadoc:transport-features receiveEvents = "true" dispatchEvents = "true" responseEvents = "true" requestEvents = "true" transactions = "false" streaming = "false">
-				<schemadoc:inboundMEPs in-only="true"/>
-				<schemadoc:outboundMEPs out-only = "true" out-in = "true" out-optional-in = "true"/> 
-			</schemadoc:transport-features>
-			<schemadoc:additional-documentation where="before-specific-elements">
-			h2. Using the EJB Connector
+            The Javadoc for this transport can be found {javadoc:mule/transport/ejb}here{javadoc}.
+	    </xsd:documentation>
+            <xsd:appinfo>
+		<schemadoc:short-name>EJB</schemadoc:short-name>
+		<schemadoc:page-title>EJB Transport</schemadoc:page-title>
+                <schemadoc:transport-features receiveEvents = "true" dispatchEvents = "true" responseEvents = "true" requestEvents = "true" transactions = "false" streaming = "false">
+		    <schemadoc:inboundMEPs in-only="true"/>
+		    <schemadoc:outboundMEPs out-only = "true" out-in = "true" out-optional-in = "true"/> 
+		</schemadoc:transport-features>
+		<schemadoc:additional-documentation where="before-specific-elements">
+		h2. Using the EJB Connector
 
-			EJB endpoints are configured the same way as [RMI endpoints|RMI Transport]. Note that only outbound endpoints can use the EJB transport. For a given endpoint, you must provide the following information:
+		EJB endpoints are configured the same way as [RMI endpoints|RMI Transport]. Note that only outbound endpoints can use the EJB transport. For a given endpoint, you must provide the following information:
 
-			- registry host
-			- registry port
-			- remote home name
-			- remote method name
+		- registry host
+		- registry port
+		- remote home name
+		- remote method name
 
-			These values will be used to establish the dispatcher connection. For example:
+		These values will be used to establish the dispatcher connection. For example:
+		{code:xml}
+		&lt;ejb:endpoint host="localhost" port="1099" object="SomeService" method="remoteMethod"/&gt;
+		{code}
 
-			{code:xml}
-			<ejb:endpoint host="localhost" port="1099" object="SomeService" method="remoteMethod"/>
-			{code}
+		Alternatively, you could use URI-based configuration:
+		{code:xml}
+		&lt;outbound-endpoint address="ejb://localhost:1099/SomeService?method=remoteMethod"/&gt;
+		{code}
 
-			Alternatively, you could use URI-based configuration:
-			{code:xml}
-			<outbound-endpoint address="ejb://localhost:1099/SomeService?method=remoteMethod"/>
-			{code}
-
-			If the {{remoteMethod}} can take one or more input arguments, you configure them on the endpoint as list properties. A recommended approach is to use a list of comma-separated values in the property methodArgumentTypes.
-			{code:xml}
-			<properties>
-			    <list name="methodArgumentTypes">
-			        <entry value="java.lang.String,java.lang.String,java.math.BigInteger"/>
-			    </list>
-			</properties>
-			{code}
+		If the {{remoteMethod}} can take one or more input arguments, you configure them on the endpoint as list properties. A recommended approach is to use a list of comma-separated values in the property methodArgumentTypes.
+		{code:xml}
+		&lt;properties&gt;
+		    &lt;list name="methodArgumentTypes"&gt;
+			&lt;entry value="java.lang.String,java.lang.String,java.math.BigInteger"/&gt;
+		    &lt;/list&gt;
+		&lt;/properties&gt;
+		{code}
 			
-			Multiple arguments are passed in as an array of objects as the payload of the Mule event.
+		Multiple arguments are passed in as an array of objects as the payload of the Mule event.
 
-			h2. Transformers
+		h2. Transformers
 
-			There are no specific transformers required for EJB.
-        
-			</schemadoc:additional-documentation>
-		</xsd:appinfo>
+		There are no specific transformers required for EJB.
+		</schemadoc:additional-documentation>
+	    </xsd:appinfo>
 	</xsd:annotation>
 	<xsd:element name = "connector" type = "ejbConnectorType" substitutionGroup = "mule:abstract-connector">
-		<xsd:annotation>
-        	    <xsd:documentation>
-                    The Mule EJB Connector provides connectivity for EJB beans.
-                    </xsd:documentation>
-                </xsd:annotation>
-        </xsd:element>
-    <xsd:complexType name="ejbConnectorType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:jndiConnectorType">
-                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                        Period (ms) between polling connections.
-			</xsd:documentation>
-                    </xsd:annotation>
-		</xsd:attribute>
-                <xsd:attribute name = "securityManager-ref" type = "xsd:NMTOKEN">
-                    <xsd:annotation>
-			<xsd:documentation>
-                            Bean reference to the security manager that should be used.
-                        </xsd:documentation>
-                    </xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name = "securityPolicy" type = "xsd:string">
-                    <xsd:annotation>
-			<xsd:documentation>
-                            The security policy (file name) used to enable connections.
-                	</xsd:documentation>
-                    </xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name = "serverClassName" type = "xsd:NMTOKEN">
-                    <xsd:annotation>
-			<xsd:documentation>
-                            The target class name.
-                	</xsd:documentation>
-                    </xsd:annotation>
-                    </xsd:attribute>
-                    <xsd:attribute name = "serverCodebase" type = "xsd:string">
+	    <xsd:annotation>
+		<xsd:documentation>
+                The Mule EJB Connector provides connectivity for EJB beans.
+		</xsd:documentation>
+	    </xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name = "ejbConnectorType">
+	    <xsd:complexContent>
+		<xsd:extension base = "mule:jndiConnectorType">
+		    <xsd:attribute name = "pollingFrequency" type = "mule:substitutableLong">
 			<xsd:annotation>
-                            <xsd:documentation>
-                                The target method.
-                            </xsd:documentation>
+			    <xsd:documentation>
+                            Period (ms) between polling connections.
+			    </xsd:documentation>
+			</xsd:annotation>
+		    </xsd:attribute>
+		    <xsd:attribute name = "securityManager-ref" type = "xsd:NMTOKEN">
+			<xsd:annotation>
+			    <xsd:documentation>
+                            Bean reference to the security manager that should be used.
+			    </xsd:documentation>
+			</xsd:annotation>
+		    </xsd:attribute>
+		    <xsd:attribute name = "securityPolicy" type = "xsd:string">
+                        <xsd:annotation>
+			    <xsd:documentation>
+                            The security policy (file name) used to enable connections.
+			    </xsd:documentation>
+			</xsd:annotation>
+                    </xsd:attribute>
+		    <xsd:attribute name = "serverClassName" type = "xsd:NMTOKEN">
+			<xsd:annotation>
+			    <xsd:documentation>
+                            The target class name.
+			    </xsd:documentation>
+			</xsd:annotation>
+		    </xsd:attribute>
+		    <xsd:attribute name = "serverCodebase" type = "xsd:string">
+			<xsd:annotation>
+			    <xsd:documentation>
+                            The target method.
+			    </xsd:documentation>
 			</xsd:annotation>
 		    </xsd:attribute>
 		</xsd:extension>
