@@ -13,6 +13,8 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
     <xsd:import namespace="http://www.mulesource.org/schema/mule/xmpp/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/xmpp/2.0/mule-xmpp.xsd" />
+    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.0"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.0/mule-schemadoc.xsd"/>
 
     <xsd:element name="connector" type="xmppsConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
