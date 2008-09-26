@@ -13,6 +13,8 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
     <xsd:import namespace="http://www.mulesource.org/schema/mule/email/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd"/>
+    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.0"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.0"/>
 
     <xsd:annotation>
         <xsd:documentation>The POP3 transport can be used for receiving messages from POP3 mail boxes. The [POP3S Transport] is similar but uses secure connections over SSL/TLS.</xsd:documentation>

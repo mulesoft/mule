@@ -10,7 +10,9 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
-    
+    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.0"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.0/mule-schemadoc.xsd"/>
+
     <xsd:annotation>
         <xsd:documentation>
             The BPM transport allows process engines to send and receive messages through Mule. 
@@ -102,10 +104,10 @@
         <xsd:attribute name="process" type="xsd:string"/>
     </xsd:attributeGroup>
 
-	<!-- 
-	This is merely a shortcut for:
-	     <endpoint-selector-router selectorExpression="header:MULE_BPM_ENDPOINT"> 
-	-->
+        <!-- 
+        This is merely a shortcut for:
+             <endpoint-selector-router selectorExpression="header:MULE_BPM_ENDPOINT"> 
+        -->
     <xsd:element name="outbound-router" type="bpmOutboundRouterType"
                  substitutionGroup="mule:abstract-outbound-router"/>
     <xsd:complexType name="bpmOutboundRouterType">
@@ -114,7 +116,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-	<!-- TODO MULE-3205
+        <!-- TODO MULE-3205
     <xsd:element name="component" type="bpmComponentType" substitutionGroup="mule:abstract-component">
         <xsd:annotation>
             <xsd:documentation>
@@ -127,5 +129,5 @@
             <xsd:extension base="mule:defaultComponentType"/>
         </xsd:complexContent>
     </xsd:complexType>
-	-->
+        -->
 </xsd:schema>

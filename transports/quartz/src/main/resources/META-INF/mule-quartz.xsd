@@ -13,11 +13,10 @@
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
+    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.0"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.0/mule-schemadoc.xsd"/>
 
-    <!--<xsd:import namespace="http://www.mulesource.org/schema/mule/schemadoc/2.0"-->
-    <!--schemaLocation="http://www.mulesource.org/schema/mule/schemadoc/2.0/mule-schemadoc.xsd"/>-->
-
-    <xsd:annotation>
+     <xsd:annotation>
         <xsd:documentation>The Quartz transport provides support for scheduling events and for triggering new events. An inbound quartz endpoint can be used to trigger inbound events that can be repeated, such as every second. Outbound quartz endpoints can be used to schedule an existing event to fire at a later date. Users can create schedules using cron expressions, and events can be persisted in a database.
             \\
             This transport makes use of the [Quartz Project|http://www.opensymphony.com/quartz/] at [Open Symphony|http://www.opensymphony.com/]. The Quartz site has more generic information about how to work with Quartz.
