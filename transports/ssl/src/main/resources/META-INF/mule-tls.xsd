@@ -18,7 +18,7 @@
         The SSL transport can be used for secure socket communication using SSL or TLS.
 
         The Javadoc for this transport can be found {javadoc:mule/transport/ssl}here{javadoc}. The Javadoc for the TLS connector can be found {javadoc:mule/transport/ssl|TlsConnector}here{javadoc}.
-	</xsd:documentation>    
+        </xsd:documentation>    
     <xsd:appinfo>
         <schemadoc:short-name>TLS</schemadoc:short-name>
         <schemadoc:page-title>TLS Connector</schemadoc:page-title>
