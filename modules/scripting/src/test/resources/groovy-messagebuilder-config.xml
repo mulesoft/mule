@@ -39,9 +39,9 @@
                 <inbound-endpoint ref="groovy2.endpoint"/>
             </inbound>
             <script:component>
-			    <script:script engine="groovy">
-			        return "A"
-			    </script:script>
+                <script:script engine="groovy">
+                    return "A"
+                </script:script>
             </script:component>
         </service>
 
@@ -50,9 +50,9 @@
                 <inbound-endpoint ref="groovy3.endpoint"/>
             </inbound>
             <script:component>
-			    <script:script engine="groovy">
-			        return "B"
-			    </script:script>
+                <script:script engine="groovy">
+                    return "B"
+                </script:script>
             </script:component>
         </service>
     </model>

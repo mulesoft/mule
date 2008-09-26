@@ -167,11 +167,11 @@ public class MuleActivationSpec implements ActivationSpec, Serializable
         this.resourceAdapter = (MuleResourceAdapter)resourceAdapter;
     }
 
-	public String getModelName() {
-		return modelName;
-	}
+    public String getModelName() {
+        return modelName;
+    }
 
-	public void setModelName(String modelName) {
-		this.modelName = modelName;
-	}
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
+    }
 }

@@ -63,7 +63,7 @@ public class SxcFilter implements Filter
 
     public void addEventHandler(SxcFilteringOutboundRouter router, XPathBuilder builder)
     {    
-    	builder.listen(pattern, new FilterEventHandler(router, this));
+        builder.listen(pattern, new FilterEventHandler(router, this));
     }
 }
 

@@ -51,12 +51,12 @@ public class SpiUtils
 
     public static Properties findServiceDescriptor(String path, String name, Class currentClass)
     {
-    	//Preferred name and preferred path - used to construct a URI for alternative or preferred 
-    	//property set.  This enables alternative implementations of a transport to exist side by side
-    	//in a single Mule VM.  Most transports will not have a preferred property set.
-    	String preferredName = null;
-    	String preferredPath = null;
-    	
+        //Preferred name and preferred path - used to construct a URI for alternative or preferred
+        //property set.  This enables alternative implementations of a transport to exist side by side
+        //in a single Mule VM.  Most transports will not have a preferred property set.
+        String preferredName = null;
+        String preferredPath = null;
+
         if (!name.endsWith(".properties"))
         {
             name += ".properties";
@@ -78,20 +78,20 @@ public class SpiUtils
         }
         else
         {
-        	preferredPath = SERVICE_ROOT + path + preferredName;
+            preferredPath = SERVICE_ROOT + path + preferredName;
             path = SERVICE_ROOT + path + name;
         }
         try
         {
-        	//get preferred path first
+            //get preferred path first
             InputStream is = IOUtils.getResourceAsStream(preferredPath, currentClass, false, false);
             
             //if no resource found, then go with default path
             if(is == null)
             {
-            	is = IOUtils.getResourceAsStream(path, currentClass, false, false);
+                is = IOUtils.getResourceAsStream(path, currentClass, false, false);
             }
-                      	
+
             if (is != null)
             {
                 Properties props = new Properties();

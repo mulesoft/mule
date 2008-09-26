@@ -26,9 +26,9 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-xml</artifactId>
-		</dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-xml</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>tanukisoft</groupId>

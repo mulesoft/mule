@@ -33,14 +33,14 @@ import org.mule.util.ArrayUtils;
 public  class SimpleUpdateSQLStrategy 
     implements SQLStrategy
 {
-	protected static Logger logger = Logger.getLogger(SelectSQLStrategy.class);
-	
+    protected static Logger logger = Logger.getLogger(SelectSQLStrategy.class);
+
     public MuleMessage executeStatement(JdbcConnector connector,
-			ImmutableEndpoint endpoint, MuleEvent event,long timeout) throws Exception
+            ImmutableEndpoint endpoint, MuleEvent event,long timeout) throws Exception
     {
         //Unparsed SQL statement (with ${foo} format parameters)
         String statement = connector.getStatement(endpoint);
-    	
+
         //Storage for parameters
         List paramNames = new ArrayList();
         
@@ -53,8 +53,8 @@ public  class SimpleUpdateSQLStrategy
         //Get parameter values from message
         Object[] paramValues = connector.getParams(endpoint, paramNames, new DefaultMuleMessage(
             event.transformMessage()), endpoint.getEndpointURI().getAddress());
-    	
-    	Transaction tx = TransactionCoordination.getInstance().getTransaction();
+
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
         Connection con = null;
             
         try
@@ -94,7 +94,7 @@ public  class SimpleUpdateSQLStrategy
     
     protected String escapeStatement(String statement)
     {
-    	//no escaping needed for normal SQL statement
-        return statement;	
+        //no escaping needed for normal SQL statement
+        return statement;
     }
 }

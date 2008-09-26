@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
-	xmlns:cxf-core="http://cxf.apache.org/core" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+    xmlns:cxf-core="http://cxf.apache.org/core"
     xmlns:spring="http://www.springframework.org/schema/beans"
-	xsi:schemaLocation="
+    xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd
                http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
                
-	<spring:beans>
-		<cxf-core:bus>
-			<cxf-core:features>
-	      		<cxf:stax xmlInputFactory="com.ctc.wstx.stax.WstxInputFactory" 
-	                      xmlOutputFactory="com.ctc.wstx.stax.WstxOutputFactory"/>
-	        </cxf-core:features>
-		</cxf-core:bus>
-	</spring:beans>
-	
-	<model name="BasicCxfTest">
-		<service name="echoService">
-			<inbound>
-				<cxf:inbound-endpoint address="http://localhost:63081/services/Echo"
-					                  frontend="simple" />
-			</inbound>
-			<component class="org.mule.component.simple.EchoComponent" />
-		</service>
-	</model>
+    <spring:beans>
+        <cxf-core:bus>
+            <cxf-core:features>
+                  <cxf:stax xmlInputFactory="com.ctc.wstx.stax.WstxInputFactory"
+                          xmlOutputFactory="com.ctc.wstx.stax.WstxOutputFactory"/>
+            </cxf-core:features>
+        </cxf-core:bus>
+    </spring:beans>
+
+    <model name="BasicCxfTest">
+        <service name="echoService">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/Echo"
+                                      frontend="simple" />
+            </inbound>
+            <component class="org.mule.component.simple.EchoComponent" />
+        </service>
+    </model>
 </mule>

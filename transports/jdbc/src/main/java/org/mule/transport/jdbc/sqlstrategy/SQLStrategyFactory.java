@@ -18,42 +18,42 @@ package org.mule.transport.jdbc.sqlstrategy;
 public class SQLStrategyFactory 
 {
 
-	
-	protected SimpleUpdateSQLStrategy simpleUpdateSQLStrategy;
-	protected SelectSQLStrategy selectSQLStrategy;
-	protected CallableSQLStrategy callableSQLStrategy;
-	
-	public SQLStrategyFactory()
-	{		
-		simpleUpdateSQLStrategy = new SimpleUpdateSQLStrategy();
-		selectSQLStrategy = new SelectSQLStrategy();
-		callableSQLStrategy = new CallableSQLStrategy();
-	}
-	
-	public SQLStrategy create(String sql,Object payload)
-	    throws Exception
-	{		
-		String sqlLowerCase = sql.toLowerCase();
-		
-		if( sqlLowerCase.startsWith("insert") ||
-			sqlLowerCase.startsWith("update") ||
-			sqlLowerCase.startsWith("delete") ||
-			sqlLowerCase.startsWith("merge"))
-		{
-			return simpleUpdateSQLStrategy;
-		}
 
-		if (sqlLowerCase.startsWith("select")) 
-		{
-			return selectSQLStrategy;
-		}
-		
-		if (sqlLowerCase.startsWith("call")) 
-		{
-			return callableSQLStrategy;
-		}
-		
-		throw new IllegalArgumentException("No SQL Strategy found for SQL statement: " + sql);
-	}
-	
+    protected SimpleUpdateSQLStrategy simpleUpdateSQLStrategy;
+    protected SelectSQLStrategy selectSQLStrategy;
+    protected CallableSQLStrategy callableSQLStrategy;
+
+    public SQLStrategyFactory()
+    {
+        simpleUpdateSQLStrategy = new SimpleUpdateSQLStrategy();
+        selectSQLStrategy = new SelectSQLStrategy();
+        callableSQLStrategy = new CallableSQLStrategy();
+    }
+
+    public SQLStrategy create(String sql,Object payload)
+        throws Exception
+    {
+        String sqlLowerCase = sql.toLowerCase();
+
+        if( sqlLowerCase.startsWith("insert") ||
+            sqlLowerCase.startsWith("update") ||
+            sqlLowerCase.startsWith("delete") ||
+            sqlLowerCase.startsWith("merge"))
+        {
+            return simpleUpdateSQLStrategy;
+        }
+
+        if (sqlLowerCase.startsWith("select"))
+        {
+            return selectSQLStrategy;
+        }
+
+        if (sqlLowerCase.startsWith("call"))
+        {
+            return callableSQLStrategy;
+        }
+
+        throw new IllegalArgumentException("No SQL Strategy found for SQL statement: " + sql);
+    }
+
 }

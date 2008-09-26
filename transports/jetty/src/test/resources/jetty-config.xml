@@ -2,10 +2,10 @@
 <!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
 
 <Configure id="Server" class="org.mortbay.jetty.Server">
-	<Set name="ThreadPool">
-	 <New class="org.mortbay.thread.QueuedThreadPool">
-	  <Set name="minThreads">10</Set>
-	  <Set name="maxThreads">255</Set>
-	 </New>
-	</Set>
+    <Set name="ThreadPool">
+     <New class="org.mortbay.thread.QueuedThreadPool">
+      <Set name="minThreads">10</Set>
+      <Set name="maxThreads">255</Set>
+     </New>
+    </Set>
 </Configure>

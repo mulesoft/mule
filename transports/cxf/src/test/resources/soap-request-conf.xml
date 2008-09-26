@@ -22,7 +22,7 @@
             <entry key="frontend" value="simple" />
           </mule:properties>
         </mule:inbound-endpoint>
-    	</mule:inbound>
+        </mule:inbound>
       <mule:component class="org.mule.tck.testmodels.services.TestComponent" />
     </mule:service>
   </mule:model>

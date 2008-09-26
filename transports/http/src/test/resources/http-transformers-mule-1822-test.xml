@@ -104,7 +104,7 @@
         <service name="bothService2">
             <inbound>
                 <vm:inbound-endpoint address="vm://echo3" synchronous="true"
-                				  responseTransformer-refs="appendResponse2">
+                                  responseTransformer-refs="appendResponse2">
                   <object-to-string-transformer />
                   <transformer ref="appendString2" />
                 </vm:inbound-endpoint>

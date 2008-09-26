@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
- 	 	    <artifactId>mule-module-jbossts</artifactId>
+              <artifactId>mule-module-jbossts</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>

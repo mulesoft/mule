@@ -47,7 +47,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     {
         try
         {
-        	PGPCryptInfo pgpCryptInfo;
+            PGPCryptInfo pgpCryptInfo;
             KeyBundle publicKey;
             
             if (cryptInfo == null)
@@ -145,11 +145,11 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         this.keyManager = keyManager;
     }
 
-	public CredentialsAccessor getCredentialsAccessor() {
-		return credentialsAccessor;
-	}
+    public CredentialsAccessor getCredentialsAccessor() {
+        return credentialsAccessor;
+    }
 
-	public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor) {
-		this.credentialsAccessor = credentialsAccessor;
-	}
+    public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor) {
+        this.credentialsAccessor = credentialsAccessor;
+    }
 }

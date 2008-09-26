@@ -10,7 +10,7 @@
        http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-	<cxf:connector name="cxf" defaultFrontend="simple"/>
+    <cxf:connector name="cxf" defaultFrontend="simple"/>
     
     <client:remote-dispatcher-agent>
         <client:remote-endpoint ref="remoteEndpoint"/>

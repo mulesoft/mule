@@ -49,8 +49,8 @@
             </exclusions>
         </dependency>
         <dependency>
-	        <groupId>org.apache.cxf</groupId>
-	        <artifactId>cxf-rt-bindings-http</artifactId>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-bindings-http</artifactId>
             <version>${version}</version>
             <optional>true</optional>
             <exclusions>
@@ -63,6 +63,6 @@
                   <artifactId>jdom</artifactId>
                 </exclusion>
             </exclusions>
-	    </dependency>
+        </dependency>
     </dependencies>
 </project>

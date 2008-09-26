@@ -38,7 +38,7 @@
     </bean>
 
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-	    <property name="location" value="classpath:derby.properties"/>
+        <property name="location" value="classpath:derby.properties"/>
     </bean>
         <!-- Data Source -->
     <bean id="innerDataSource" class="org.enhydra.jdbc.standard.StandardXADataSource"

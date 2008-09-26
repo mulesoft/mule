@@ -20,12 +20,12 @@ package org.mule.transport.jdbc.sqlstrategy;
 public  class CallableSQLStrategy 
     extends SimpleUpdateSQLStrategy
 {
-	
+
     protected static final String STORED_PROCEDURE_PREFIX = "{ ";
     protected static final String STORED_PROCEDURE_SUFFIX = " }";
     
     protected String escapeStatement(String statement)
     {
-        return STORED_PROCEDURE_PREFIX  + statement + STORED_PROCEDURE_SUFFIX;	
+        return STORED_PROCEDURE_PREFIX  + statement + STORED_PROCEDURE_SUFFIX;
     }
 }

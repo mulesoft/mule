@@ -71,7 +71,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     
                     if (result instanceof MuleMessage)
                     {
-                    	return (MuleMessage) result;
+                        return (MuleMessage) result;
                     }
                     
                     return new DefaultMuleMessage(connector.getMessageAdapter(result));

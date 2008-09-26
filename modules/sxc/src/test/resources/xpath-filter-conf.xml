@@ -75,10 +75,10 @@
                 <sxc:filtering-router>
                     <outbound-endpoint address="vm://log"/>
                     <and-filter>
-                    	<sxc:filter pattern="//purchaseOrder[@country]"/>
-                    	<not-filter>
-	                        <sxc:filter pattern="//purchaseOrder[@foo]"/>
-	                    </not-filter>
+                        <sxc:filter pattern="//purchaseOrder[@country]"/>
+                        <not-filter>
+                            <sxc:filter pattern="//purchaseOrder[@foo]"/>
+                        </not-filter>
                     </and-filter>
                 </sxc:filtering-router>
             </outbound>

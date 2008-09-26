@@ -40,7 +40,7 @@
             <inbound>
                 <inbound-endpoint address="http://localhost:63081/echo" synchronous="true"/>
             </inbound>
-			<echo-component/>
+            <echo-component/>
         </service>
     
     </model>

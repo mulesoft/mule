@@ -15,7 +15,7 @@ import org.mule.config.i18n.MessageFactory;
 public class ${TransportName}Messages extends MessageFactory
 {
     private static final String BUNDLE_PATH = getBundlePath("${TransportNameLower}");
-	
+
     /*
     public static Message exampleMessage()
     {

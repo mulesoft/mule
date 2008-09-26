@@ -118,7 +118,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         // Registers the listener
         try
         {
-        	muleContext.registerListener(this);
+            muleContext.registerListener(this);
         }
         catch (Exception e)
         {

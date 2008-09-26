@@ -15,7 +15,7 @@
         <spring:property name="secretPassphrase" value="TestingPassphrase"/>
     </spring:bean>
     <spring:bean id="fakeCredentialAccessor" class="org.mule.module.pgp.FakeCredentialAccessor" />
-	
+
     <pgp:security-manager>
         <pgp:security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>
         <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy" keyManager-ref="pgpKeyManager"/>

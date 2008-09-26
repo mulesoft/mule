@@ -18,12 +18,12 @@ public class SxcNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {        
-    	registerBeanDefinitionParser("filtering-router", 
-    			new RouterDefinitionParser(SxcFilteringOutboundRouter.class)	);
-    	 registerBeanDefinitionParser("namespace", 
-    	     new ChildMapEntryDefinitionParser("namespaces", "prefix", "uri"));
-    	 
+        registerBeanDefinitionParser("filtering-router",
+                new RouterDefinitionParser(SxcFilteringOutboundRouter.class)    );
+         registerBeanDefinitionParser("namespace",
+             new ChildMapEntryDefinitionParser("namespaces", "prefix", "uri"));
+
         registerBeanDefinitionParser("filter", 
-        		new ChildDefinitionParser("filter", SxcFilter.class));
+                new ChildDefinitionParser("filter", SxcFilter.class));
     }
 }

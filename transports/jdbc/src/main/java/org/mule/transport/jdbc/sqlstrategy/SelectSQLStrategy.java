@@ -35,12 +35,12 @@ public  class SelectSQLStrategy
     implements SQLStrategy
 {
 
-	protected static Logger logger = Logger.getLogger(SelectSQLStrategy.class);
+    protected static Logger logger = Logger.getLogger(SelectSQLStrategy.class);
 
-	
-	
+
+
     public MuleMessage executeStatement(JdbcConnector connector,
-			ImmutableEndpoint endpoint,MuleEvent event,long timeout) throws Exception
+            ImmutableEndpoint endpoint,MuleEvent event,long timeout) throws Exception
     {
             
         logger.debug("Trying to receive a message with a timeout of " + timeout);
@@ -77,7 +77,7 @@ public  class SelectSQLStrategy
             //do-while loop.  execute query until there's a result or timeout exceeded
             do
             {
-            	//Get the actual param values from the message. 
+                //Get the actual param values from the message.
                 Object[] params = connector.getParams(endpoint, readParams,
                     event!=null ? event.getMessage() : null,
                     endpoint.getEndpointURI().getAddress());

@@ -57,12 +57,12 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
 
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
-    	//Use a strategy pattern to choose a particular strategy to handle the SQL request
+        //Use a strategy pattern to choose a particular strategy to handle the SQL request
    
-    	ImmutableEndpoint endpoint = event.getEndpoint();
-    	JdbcConnector connector = (JdbcConnector) endpoint.getConnector();
-    	String statement = connector.getStatement(endpoint);
-    	
+        ImmutableEndpoint endpoint = event.getEndpoint();
+        JdbcConnector connector = (JdbcConnector) endpoint.getConnector();
+        String statement = connector.getStatement(endpoint);
+
         SQLStrategy strategy = connector.getSqlStrategyFactory().create(statement, event.getMessage().getPayload());
         return strategy.executeStatement(connector, endpoint, event, event.getTimeout());
       

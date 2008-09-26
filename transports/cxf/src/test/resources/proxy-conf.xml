@@ -5,7 +5,7 @@
        xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
        xmlns:cxf-core="http://cxf.apache.org/core"
        xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.0"
-  	   xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+         xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
@@ -20,31 +20,31 @@
     
         <service name="jaxwsProxy">
             <inbound>
-		        <cxf:inbound-endpoint address="http://localhost:63081/services/greeterProxy" 
-		        	serviceClass="org.apache.hello_world_soap_http.GreeterImpl"/>
-		        <forwarding-router/>
-		    </inbound>
-		    <outbound>
-		    	<outbound-pass-through-router>
-		    		<cxf:outbound-endpoint 
-					    name="clientEndpoint"
-						address="http://localhost:63081/services/greeter" 
-						clientClass="org.apache.hello_world_soap_http.SOAPService"
-						wsdlPort="SoapPort" 
-						operation="greetMe"
-						wsdlLocation="classpath:/wsdl/hello_world.wsdl"/>
-		    	</outbound-pass-through-router>
-		    </outbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/greeterProxy"
+                    serviceClass="org.apache.hello_world_soap_http.GreeterImpl"/>
+                <forwarding-router/>
+            </inbound>
+            <outbound>
+                <outbound-pass-through-router>
+                    <cxf:outbound-endpoint
+                        name="clientEndpoint"
+                        address="http://localhost:63081/services/greeter"
+                        clientClass="org.apache.hello_world_soap_http.SOAPService"
+                        wsdlPort="SoapPort"
+                        operation="greetMe"
+                        wsdlLocation="classpath:/wsdl/hello_world.wsdl"/>
+                </outbound-pass-through-router>
+            </outbound>
         </service>
         
         <service name="greeter">
             <inbound>
-		        <cxf:inbound-endpoint address="http://localhost:63081/services/greeter"/>
-		        <forwarding-router/>
-		    </inbound>
-		    <component>
-		        <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
-		    </component>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/greeter"/>
+                <forwarding-router/>
+            </inbound>
+            <component>
+                <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
+            </component>
         </service>
         
         <service name="serverEcho">
@@ -75,9 +75,9 @@
             </inbound>
             <outbound>
                 <outbound-pass-through-router>
-                	<cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
-                		proxy="true"
-                		remoteSync="true"/>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
+                        proxy="true"
+                        remoteSync="true"/>
                 </outbound-pass-through-router>
             </outbound>
         </service>
@@ -88,13 +88,13 @@
             </inbound>
             <outbound>
                 <outbound-pass-through-router>
-                	<cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
-                		proxy="true"
-                		remoteSync="true">
-                	 	<response-transformers>
-                	 		<transformer ref="TestXslt"/>
-                	 	</response-transformers>
-                	</cxf:outbound-endpoint>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
+                        proxy="true"
+                        remoteSync="true">
+                         <response-transformers>
+                             <transformer ref="TestXslt"/>
+                         </response-transformers>
+                    </cxf:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>
         </service>
@@ -110,18 +110,18 @@
             <outbound>
                 <filtering-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
-                		proxy="true"
-                		remoteSync="true"/>
+                        proxy="true"
+                        remoteSync="true"/>
                     <message-property-filter pattern="SOAPAction=http://acme.com/no-transform"/>
                 </filtering-router>
                 <filtering-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
-                		proxy="true"
-                		remoteSync="true">
-                	 	<response-transformers>
-                	 		<transformer ref="TestXslt"/>
-                	 	</response-transformers>
-                	</cxf:outbound-endpoint>
+                        proxy="true"
+                        remoteSync="true">
+                         <response-transformers>
+                             <transformer ref="TestXslt"/>
+                         </response-transformers>
+                    </cxf:outbound-endpoint>
                     <message-property-filter pattern="SOAPAction=http://acme.com/transform"/>
                 </filtering-router>
             </outbound>

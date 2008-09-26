@@ -36,8 +36,8 @@
         <filtering-router>
             <outbound-endpoint address="vm://echo" synchronous="true"/>
             <mule-xml:jaxen-filter pattern="/s:Envelope/s:Body/@foo" expectedValue="bar">
-	            <mule-xml:namespace prefix="s" uri="http://schemas.xmlsoap.org/soap/envelope/"/>
-	        </mule-xml:jaxen-filter>
+                <mule-xml:namespace prefix="s" uri="http://schemas.xmlsoap.org/soap/envelope/"/>
+            </mule-xml:jaxen-filter>
         </filtering-router>
       </outbound>
     </service>

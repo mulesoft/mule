@@ -102,11 +102,11 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
             Object o = payload[i];
             if (o != null)
             {
-            	key.append(o.getClass().getName());
+                key.append(o.getClass().getName());
             }
             else
             {
-            	key.append("null");
+                key.append("null");
             }
         }
         key.append(".").append(ClassUtils.getClassName(component.getClass()));

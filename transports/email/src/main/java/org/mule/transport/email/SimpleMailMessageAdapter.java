@@ -152,23 +152,23 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
             MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.BCC)));
         try 
         {
-	        setProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
-	            MailUtils.mailAddressesToString(message.getReplyTo()));
+            setProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
+                MailUtils.mailAddressesToString(message.getReplyTo()));
         } 
         catch (javax.mail.MessagingException me) 
         {
-        	logger.warn("Invalid address found in ReplyTo header:", me);
+            logger.warn("Invalid address found in ReplyTo header:", me);
         }
         
         try 
         {
-	        setProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
-	            MailUtils.mailAddressesToString(message.getFrom()));
-	    } 
+            setProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
+                MailUtils.mailAddressesToString(message.getFrom()));
+        }
         catch (javax.mail.MessagingException me) 
         {
-	    	logger.warn("Invalid address found in From header:", me);
-	    }
+            logger.warn("Invalid address found in From header:", me);
+        }
         
         setProperty(MailProperties.INBOUND_SUBJECT_PROPERTY, StringUtils.defaultIfEmpty(
             message.getSubject(),"(no subject)"));

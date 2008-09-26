@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
-	xmlns:cxf-core="http://cxf.apache.org/core" 
-	xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+    xmlns:cxf-core="http://cxf.apache.org/core"
+    xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
     xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.0"
-	xsi:schemaLocation="
+    xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd
                http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
                http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
-	
-	<mule-xml:xslt-transformer xsl-file="response.xsl" name="ResponseXslt" />
+
+    <mule-xml:xslt-transformer xsl-file="response.xsl" name="ResponseXslt" />
                
-	<model name="CXF">
-		<service name="echoService">
-			<inbound>
-				<cxf:inbound-endpoint 
-				    address="http://localhost:63081/services/Echo"
-					frontend="simple" 
-					responseTransformer-refs="ResponseXslt"
-					applyTransformersToProtocol="true">
-					<cxf:features>
-						<cxf-core:logging/>
-					</cxf:features>
-				</cxf:inbound-endpoint>
-			</inbound>
-			<component class="org.mule.component.simple.EchoComponent" />
-		</service>
-	</model>
+    <model name="CXF">
+        <service name="echoService">
+            <inbound>
+                <cxf:inbound-endpoint
+                    address="http://localhost:63081/services/Echo"
+                    frontend="simple"
+                    responseTransformer-refs="ResponseXslt"
+                    applyTransformersToProtocol="true">
+                    <cxf:features>
+                        <cxf-core:logging/>
+                    </cxf:features>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <component class="org.mule.component.simple.EchoComponent" />
+        </service>
+    </model>
 </mule>

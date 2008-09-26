@@ -265,7 +265,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
         public void release()
         {
-        	waitForStreams();
+            waitForStreams();
             releaseSocket();
         }
 
@@ -347,7 +347,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         {
             long keepAliveTimeout = ((TcpConnector)connector).getKeepAliveTimeout();
             
-        	Object readMsg = null;
+            Object readMsg = null;
             try
             {
                 // Create a monitor if expiry was set
@@ -375,13 +375,13 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             }
             finally
             {
-            	if (readMsg == null)
-            	{
-            		// Protocols can return a null object, which means we're done
+                if (readMsg == null)
+                {
+                    // Protocols can return a null object, which means we're done
                     // reading messages for now and can mark the stream for closing later.
-            		// Also, exceptions can be thrown, in which case we're done reading.
+                    // Also, exceptions can be thrown, in which case we're done reading.
                     dataIn.close();
-            	}
+                }
             }
             
             return null;

@@ -6,9 +6,9 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd">
 
-	<!-- This should produce an error, the "engine" attribute is required unless 
-	"file" is specified, in which case the file extension will be used to determine 
-	the appropriate script engine. -->
+    <!-- This should produce an error, the "engine" attribute is required unless
+    "file" is specified, in which case the file extension will be used to determine
+    the appropriate script engine. -->
     <script:script name="configError">
         return "$message Received"
     </script:script>

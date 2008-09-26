@@ -73,7 +73,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         EVENT_MAP.put("MODEL", ModelNotification.class.getName());
         EVENT_MAP.put("SERVICE", ServiceNotification.class.getName());
         EVENT_MAP.put("SECURITY", SecurityNotification.class.getName());
-	EVENT_MAP.put("ENDPOINT-MESSAGE", EndpointMessageNotification.class.getName());
+    EVENT_MAP.put("ENDPOINT-MESSAGE", EndpointMessageNotification.class.getName());
         EVENT_MAP.put("COMPONENT-MESSAGE", ComponentMessageNotification.class.getName());
         EVENT_MAP.put("MANAGEMENT", ManagementNotification.class.getName());
         EVENT_MAP.put("CONNECTION", ConnectionNotification.class.getName());

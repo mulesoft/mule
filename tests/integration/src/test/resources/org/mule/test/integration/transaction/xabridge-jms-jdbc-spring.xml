@@ -9,7 +9,7 @@
 
 
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-	    <property name="location">
+        <property name="location">
             <value>classpath:derby.properties</value>
         </property>
     </bean>

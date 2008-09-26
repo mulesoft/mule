@@ -18,13 +18,13 @@
                      promptMessage="How much more change do you need? (enter an amount such as 2.37)"
                      messageDelayTime="1000"/>
 
-	<custom-transformer name="StringToNumber" class="org.mule.example.scripting.StringToNumber"/>
+    <custom-transformer name="StringToNumber" class="org.mule.example.scripting.StringToNumber"/>
 
-	<custom-transformer name="DollarsToCents" class="org.mule.example.scripting.SimpleMathTransformer">
+    <custom-transformer name="DollarsToCents" class="org.mule.example.scripting.SimpleMathTransformer">
         <spring:property name="operation" value="multiply"/>
         <spring:property name="factor" value="100"/>
     </custom-transformer>
-                	
+
     <model name="main">
         <service name="Accumulator">
             <inbound>

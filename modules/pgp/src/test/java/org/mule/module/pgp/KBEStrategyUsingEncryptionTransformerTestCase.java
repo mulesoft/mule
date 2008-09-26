@@ -21,7 +21,7 @@ import org.mule.transformer.simple.ByteArrayToObject;
 
 public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractMuleTestCase
 {
-	private KeyBasedEncryptionStrategy kbStrategy;
+    private KeyBasedEncryptionStrategy kbStrategy;
     
     protected void doSetUp() throws Exception
     {

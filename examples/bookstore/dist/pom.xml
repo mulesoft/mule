@@ -5,14 +5,14 @@
         <muleVersion>2.1.0-M3-SNAPSHOT</muleVersion>
         <cxfVersion>2.0.6</cxfVersion>
     </properties>
-	
+
     <groupId>org.mule.examples</groupId>
-	<artifactId>mule-example-bookstore</artifactId>
+    <artifactId>mule-example-bookstore</artifactId>
     <version>2.1.0-M3-SNAPSHOT</version>
-	<name>Mule Bookstore Demo</name>
-	<description>
-		Demo for Mule's web service capabilities.
-	</description>
+    <name>Mule Bookstore Demo</name>
+    <description>
+        Demo for Mule's web service capabilities.
+    </description>
 
   <build>
     <plugins>
@@ -81,7 +81,7 @@
       <artifactId>mule-transport-email</artifactId>
       <version>${muleVersion}</version>
     </dependency>
-	<dependency>
+    <dependency>
       <groupId>org.mule.transports</groupId>
       <artifactId>mule-transport-http</artifactId>
       <version>${muleVersion}</version>

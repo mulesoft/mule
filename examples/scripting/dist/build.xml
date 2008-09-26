@@ -18,7 +18,7 @@
 
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
     <property name="url.maven.repo2" value="http://dist.codehaus.org/mule/dependencies/maven2"/>
-	
+    
     <target name="clean"
             description="Clean the output directory (start from scratch).">
         <delete dir="${dir.build}"/>

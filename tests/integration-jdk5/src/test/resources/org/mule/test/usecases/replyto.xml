@@ -8,9 +8,9 @@
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd
-       		   http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+                  http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-	<cxf:connector name="cxf" defaultFrontend="simple"/>
+    <cxf:connector name="cxf" defaultFrontend="simple"/>
     
     <!-- Asynchronous VM connector (uses in-memory queues) -->
     <vm:connector name="asyncVm" queueEvents="true"/>

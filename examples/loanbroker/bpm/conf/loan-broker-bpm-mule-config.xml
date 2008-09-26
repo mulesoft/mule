@@ -189,10 +189,10 @@
     <!-- JBPM Datasource -->
     <spring:bean id="jbpmDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <spring:property name="driverClassName">
-        	<spring:value>org.apache.derby.jdbc.EmbeddedDriver</spring:value>
-       	</spring:property>
+            <spring:value>org.apache.derby.jdbc.EmbeddedDriver</spring:value>
+           </spring:property>
         <spring:property name="url">
-        	<spring:value>${database.connection}</spring:value>
+            <spring:value>${database.connection}</spring:value>
         </spring:property>
     </spring:bean>
 
