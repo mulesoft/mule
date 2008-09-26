@@ -10,11 +10,13 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.0"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.0/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>The JMS transport provides support for sending messages via JMS queues.</xsd:documentation>
         <xsd:appinfo>
-            <schemadoc:short-name>jms</schemadoc:short-name>
+            <schemadoc:short-name>JMS</schemadoc:short-name>
             <schemadoc:page-title>JMS Transport</schemadoc:page-title>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
                                           requestEvents="true"
