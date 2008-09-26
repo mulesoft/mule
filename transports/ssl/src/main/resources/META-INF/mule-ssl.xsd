@@ -13,9 +13,6 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
     <xsd:import namespace="http://www.mulesource.org/schema/mule/tcp/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd"/>
-    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.0"
-                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.0/mule-schemadoc.xsd"/>
-
     <xsd:annotation>
         <xsd:documentation>
         The SSL transport can be used for secure socket communication using SSL or TLS.

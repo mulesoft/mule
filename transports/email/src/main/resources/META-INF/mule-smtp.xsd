@@ -13,8 +13,6 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
     <xsd:import namespace="http://www.mulesource.org/schema/mule/email/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd"/>
-    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.0"
-                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.0"/>
     
      <xsd:annotation>
         <xsd:documentation>The SMTP transport can be used to connect to and send data to a SMTP mail server. The [SMTPS Transport] is similar but uses secure connections over SSL/TLS.</xsd:documentation>
