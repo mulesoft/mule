@@ -21,13 +21,13 @@
                 <schemadoc:short-name>Multicast</schemadoc:short-name>
                 <schemadoc:page-title>Multicast Transport</schemadoc:page-title>
                 <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
-	requestEvents="true"
-	transactions="false" streaming="false">
+    requestEvents="true"
+    transactions="false" streaming="false">
                     <schemadoc:inboundMEPs in-out="true" in-optional-out="true"/>
                     <schemadoc:outboundMEPs out-in="true" out-optional-in="true"/>
                 </schemadoc:transport-features>
             </xsd:appinfo>
-	</xsd:annotation>
+    </xsd:annotation>
 
     <xsd:element name="connector" substitutionGroup="mule:abstract-connector">
         <xsd:complexType>

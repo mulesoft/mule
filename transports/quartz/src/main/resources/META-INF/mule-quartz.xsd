@@ -322,13 +322,13 @@
 
                     <h4>Some examples:</h4>
                     <ul>
-                    <li>0 0 12 * * ? 	    Fire at 12pm (noon) every day</li>
-                    <li>0 15 10 ? * * 	Fire at 10:15am every day</li>
-                    <li>0 15 10 * * ? 	Fire at 10:15am every day</li>
-                    <li>0 15 10 * * ? * 	Fire at 10:15am every day</li>
+                    <li>0 0 12 * * ?         Fire at 12pm (noon) every day</li>
+                    <li>0 15 10 ? * *     Fire at 10:15am every day</li>
+                    <li>0 15 10 * * ?     Fire at 10:15am every day</li>
+                    <li>0 15 10 * * ? *     Fire at 10:15am every day</li>
                     <li>0 15 10 * * ? 2005 Fire at 10:15am every day during the year 2005</li>
-                    <li>0 * 14 * * ? 	    Fire every minute starting at 2pm and ending at 2:59pm, every day</li>
-                    <li>0 0/5 14 * * ? 	Fire every 5 minutes starting at 2pm and ending at 2:55pm, every day</li>
+                    <li>0 * 14 * * ?         Fire every minute starting at 2pm and ending at 2:59pm, every day</li>
+                    <li>0 0/5 14 * * ?     Fire every 5 minutes starting at 2pm and ending at 2:55pm, every day</li>
                     </ul>
                     {html}
                 </xsd:documentation>

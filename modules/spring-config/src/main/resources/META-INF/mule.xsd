@@ -1111,7 +1111,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for a retry notifier element.
-	            The RetryNotifier interface is a callback that allows actions to be performed after each retry. 
+                The RetryNotifier interface is a callback that allows actions to be performed after each retry. 
                 For example, when retrying connections Mule will fire server notification events on success or failure.
             </xsd:documentation>
         </xsd:annotation>

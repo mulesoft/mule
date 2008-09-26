@@ -48,7 +48,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-	
+
     <xsd:complexType name="keyBasedEncryptionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="mule:encryptionStrategyType">

@@ -49,8 +49,8 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-	
-	<xsd:element name="jaas-security-filter" type="mule:abstractSecurityFilterType" substitutionGroup="mule:abstract-security-filter">
+
+    <xsd:element name="jaas-security-filter" type="mule:abstractSecurityFilterType" substitutionGroup="mule:abstract-security-filter">
         <xsd:annotation>
             <xsd:documentation>
                 This appears to authenticate users via information in standard HTTP headers.

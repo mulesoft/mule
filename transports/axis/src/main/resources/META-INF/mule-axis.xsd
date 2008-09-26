@@ -17,13 +17,13 @@
                 <schemadoc:short-name>Axis</schemadoc:short-name>
                 <schemadoc:page-title>Axis Transport</schemadoc:page-title>
                 <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
-	requestEvents="true"
-	transactions="false" streaming="false">
+    requestEvents="true"
+    transactions="false" streaming="false">
                     <schemadoc:inboundMEPs in-only="true" in-out="true" in-optional-out="true"/>
                     <schemadoc:outboundMEPs out-only="true" out-in="true" out-optional-in="true"/>
                 </schemadoc:transport-features>
             </xsd:appinfo>
-	</xsd:annotation>
+    </xsd:annotation>
     <xsd:element name="connector" type="axisConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>

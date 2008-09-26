@@ -18,12 +18,12 @@
                 <schemadoc:short-name>Email</schemadoc:short-name>
                 <schemadoc:page-title>Email Transport</schemadoc:page-title>
                 <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
-	requestEvents="true" transactions="false" streaming="false">
+    requestEvents="true" transactions="false" streaming="false">
                     <schemadoc:inboundMEPs in-only="true"/>
                     <schemadoc:outboundMEPs out-only="true"/>
                 </schemadoc:transport-features>
             </xsd:appinfo>
-	</xsd:annotation>
+    </xsd:annotation>
             
     <xsd:complexType name="emailDownloadConnectorType">
         <xsd:complexContent>

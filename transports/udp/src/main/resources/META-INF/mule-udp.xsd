@@ -25,7 +25,7 @@
                 <schemadoc:outboundMEPs out-in="true" out-optional-in="true"/>
             </schemadoc:transport-features>
             </xsd:appinfo>
-	</xsd:annotation>
+    </xsd:annotation>
             
     <xsd:element name="connector" type="udpConnectorType" substitutionGroup="mule:abstract-connector"/>
 
