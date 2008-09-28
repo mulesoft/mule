@@ -12,6 +12,9 @@
 
     <vm:connector name="vmConnector" queueEvents="true"/>
     
+    <!-- Initialize a static instance so we can use it with our client -->
+    <cxf:connector name="connector.cxf.0" initializeStaticBusInstance="true"/>
+    
     <model name="cxfout">
         <service name="CXFOut">
             <inbound>

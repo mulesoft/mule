@@ -10,14 +10,18 @@
 
 package org.mule.transport.cxf;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
+import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.config.spring.SpringRegistry;
@@ -37,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -62,7 +68,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
     private Bus bus;
     private String configurationLocation;
     private String defaultFrontend = CxfConstants.JAX_WS_FRONTEND;
-    private List<SedaService> services = new ArrayList<SedaService>();
+    private List<SedaService> services = Collections.synchronizedList(new ArrayList<SedaService>());
     private Map<String, Server> uriToServer = new HashMap<String, Server>();
     private boolean initializeStaticBusInstance = false;
     
@@ -79,6 +85,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         registerSupportedProtocol("jms");
         registerSupportedProtocol("vm");
         registerSupportedProtocol("servlet");
+        registerSupportedProtocol("jetty");
     }
 
     public String getProtocol()
@@ -108,6 +115,9 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", transport);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", transport);
+        dfm.registerDestinationFactory("http://cxf.apache.org/transports/http/configuration", transport);
+        dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/http/", transport);
+        dfm.registerDestinationFactory("http://www.w3.org/2003/05/soap/bindings/HTTP/", transport);
         dfm.registerDestinationFactory(MuleUniversalTransport.TRANSPORT_ID, transport);
 
         ConduitInitiatorManager extension = bus.getExtension(ConduitInitiatorManager.class);
@@ -268,6 +278,12 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         }             
         secFilterEndpoint.setSecurityFilter(originalEndpoint.getSecurityFilter());
 
+        String connectorName = (String) originalEndpoint.getProperty(CxfConstants.PROTOCOL_CONNECTOR);
+        if (connectorName != null) 
+        {
+            protocolEndpointBuilder.setConnector(muleContext.getRegistry().lookupConnector(connectorName));
+        }
+        
         InboundEndpoint protocolEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(protocolEndpointBuilder);
@@ -280,7 +296,6 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         
         c.setInboundRouter(new DefaultInboundRouterCollection());
         c.getInboundRouter().addEndpoint(protocolEndpoint);
-        
         services.add(c);
     }
 
@@ -295,7 +310,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
     @Override
     protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
-        if (endpoint.getEndpointURI().getPort() == -1)
+        if (service.getName().startsWith("_cxfServiceComponent"))
         {
             return service.getName();
         }

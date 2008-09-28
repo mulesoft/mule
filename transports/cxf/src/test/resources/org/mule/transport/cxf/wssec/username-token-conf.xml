@@ -13,6 +13,8 @@
         <quartz:event-generator-job/>
     </quartz:endpoint>
 
+    <cxf:connector name="connector.cxf.0" initializeStaticBusInstance="true"/>
+
     <spring:bean id="serverCallback" class="org.mule.transport.cxf.wssec.ServerPasswordCallback"/>
     <spring:bean id="clientCallback" class="org.mule.transport.cxf.wssec.ClientPasswordCallback"/>
     

@@ -60,6 +60,7 @@ public class JettyHttpConnector extends AbstractConnector
     {
         super();
         registerSupportedProtocol("http");
+        registerSupportedProtocol("jetty");
         registerSupportedProtocol(REST);
         serverPorts = new HashMap(4);
     }

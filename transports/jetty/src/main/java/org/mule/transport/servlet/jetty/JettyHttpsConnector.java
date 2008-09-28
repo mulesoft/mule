@@ -47,6 +47,7 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
     {
         super();
         registerSupportedProtocol("https");
+        registerSupportedProtocol("jetty-ssl");
     }
 
     protected void doInitialise() throws InitialisationException

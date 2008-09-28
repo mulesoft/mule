@@ -90,8 +90,6 @@
         <module>commons-lang</module>
         <module>commons-net</module> 
         <module>cryptix</module>
-        <module>cxf</module>
-        <module>cxf-http</module>
         <module>dom4j</module>
         <module>geronimo-ejb</module>
         <module>geronimo-j2ee-connector</module>

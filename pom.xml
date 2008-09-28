@@ -91,7 +91,7 @@
         http://mirrors.ibiblio.org/pub/mirrors/maven2/cryptix/cryptix/3.2.0/cryptix-3.2.0.jar
         but the PGP module would need some work in order to use it -->
         <cryptixVersion>20050405</cryptixVersion>
-        <cxfVersion>2.0.8</cxfVersion>
+        <cxfVersion>2.1.2</cxfVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
@@ -113,7 +113,7 @@
         <javaXmlRpcVersion>1.1.0</javaXmlRpcVersion>
         <javaXmlSoapVersion>1.3.0</javaXmlSoapVersion>
         <javaXmlStreamVersion>1.0.1</javaXmlStreamVersion>
-        <javaXmlWsVersion>2.0</javaXmlWsVersion>
+        <javaXmlWsVersion>2.1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jbossTsVersion>4.2.3-SP5</jbossTsVersion>
         <jbpmVersion>3.2.2</jbpmVersion>
@@ -848,7 +848,7 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
-
+        
         <extensions>
             <!-- WebDAV for remote deployment -->
             <extension>
@@ -1453,6 +1453,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4jVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
             <version>${slf4jVersion}</version>
             <scope>provided</scope>
         </dependency>

@@ -74,6 +74,638 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-core</artifactId>
+            <version>${cxfVersion}</version>
+            <exclusions>
+                <!-- We use javax.activation -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.mail -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.xml.ws:jaxws-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                </exclusion>
+                <!-- We use slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- We have OSGi enabled versions -->
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>commons-lang</groupId>
+                  <artifactId>commons-lang</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity-dep</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jdom</groupId>
+                  <artifactId>jdom</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>wsdl4j</groupId>
+                  <artifactId>wsdl4j</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>org.codehaus.woodstox</groupId>
+                  <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.bind</groupId>
+                  <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-xjc</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>xml-resolver</groupId>
+                  <artifactId>xml-resolver</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-simple</artifactId>
+            <version>${cxfVersion}</version>
+            <exclusions>
+                <!-- We use javax.activation -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.mail -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.xml.ws:jaxws-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                </exclusion>
+                <!-- We use slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- We have OSGi enabled versions -->
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>commons-lang</groupId>
+                  <artifactId>commons-lang</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity-dep</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jdom</groupId>
+                  <artifactId>jdom</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>wsdl4j</groupId>
+                  <artifactId>wsdl4j</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>org.codehaus.woodstox</groupId>
+                  <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.bind</groupId>
+                  <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-xjc</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.soap</groupId>
+                  <artifactId>saaj-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.messaging.saaj</groupId>
+                  <artifactId>saaj-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>xml-resolver</groupId>
+                  <artifactId>xml-resolver</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxfVersion}</version>
+            <exclusions>
+                <!-- We use javax.activation -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.mail -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.xml.ws:jaxws-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                </exclusion>
+                <!-- We use slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- We have OSGi enabled versions -->
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>commons-lang</groupId>
+                  <artifactId>commons-lang</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity-dep</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jaxen</groupId>
+                  <artifactId>jaxen</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jdom</groupId>
+                  <artifactId>jdom</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>wsdl4j</groupId>
+                  <artifactId>wsdl4j</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>org.codehaus.woodstox</groupId>
+                  <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.bind</groupId>
+                  <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-xjc</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.soap</groupId>
+                  <artifactId>saaj-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.messaging.saaj</groupId>
+                  <artifactId>saaj-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>xml-resolver</groupId>
+                  <artifactId>xml-resolver</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-aegis</artifactId>
+            <version>${cxfVersion}</version>
+            <exclusions>
+                <!-- We use javax.activation -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.mail -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.xml.ws:jaxws-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                </exclusion>
+                <!-- We use slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- We have OSGi enabled versions -->
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>commons-lang</groupId>
+                  <artifactId>commons-lang</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity-dep</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jaxen</groupId>
+                  <artifactId>jaxen</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jdom</groupId>
+                  <artifactId>jdom</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>wsdl4j</groupId>
+                  <artifactId>wsdl4j</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>org.codehaus.woodstox</groupId>
+                  <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.bind</groupId>
+                  <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-xjc</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.soap</groupId>
+                  <artifactId>saaj-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.messaging.saaj</groupId>
+                  <artifactId>saaj-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>xml-resolver</groupId>
+                  <artifactId>xml-resolver</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.java.dev.stax-utils</groupId>
+                    <artifactId>stax-utils</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jaxb</artifactId>
+            <version>${cxfVersion}</version>
+            <exclusions>
+                <!-- We use javax.activation -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.mail -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.xml.ws:jaxws-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                </exclusion>
+                <!-- We use slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- We have OSGi enabled versions -->
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>commons-lang</groupId>
+                  <artifactId>commons-lang</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity-dep</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jaxen</groupId>
+                  <artifactId>jaxen</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jdom</groupId>
+                  <artifactId>jdom</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>wsdl4j</groupId>
+                  <artifactId>wsdl4j</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>org.codehaus.woodstox</groupId>
+                  <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.bind</groupId>
+                  <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-xjc</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.soap</groupId>
+                  <artifactId>saaj-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.messaging.saaj</groupId>
+                  <artifactId>saaj-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>xml-resolver</groupId>
+                  <artifactId>xml-resolver</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-local</artifactId>
+            <version>${cxfVersion}</version>
+            <exclusions>
+                <!-- We use javax.activation -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.mail -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.xml.ws:jaxws-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                </exclusion>
+                <!-- We use slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- We have OSGi enabled versions -->
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>commons-lang</groupId>
+                  <artifactId>commons-lang</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity-dep</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jaxen</groupId>
+                  <artifactId>jaxen</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jdom</groupId>
+                  <artifactId>jdom</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>wsdl4j</groupId>
+                  <artifactId>wsdl4j</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>org.codehaus.woodstox</groupId>
+                  <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.bind</groupId>
+                  <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-xjc</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.soap</groupId>
+                  <artifactId>saaj-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.messaging.saaj</groupId>
+                  <artifactId>saaj-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>xml-resolver</groupId>
+                  <artifactId>xml-resolver</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-security</artifactId>
+            <version>${cxfVersion}</version>
+            <exclusions>
+                <!-- We use javax.activation -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.mail -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                </exclusion>
+                <!-- We use stax-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </exclusion>
+                <!-- We use javax.xml.ws:jaxws-api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                </exclusion>
+                <!-- We use slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- This should be endorsed -->
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+                <!-- We have OSGi enabled versions -->		
+                <exclusion>
+                    <groupId>opensaml</groupId>
+                    <artifactId>opensaml</artifactId>
+                </exclusion>		
+                <exclusion>
+                    <groupId>org.apache.ws.security</groupId>
+                    <artifactId>wss4j</artifactId>
+                </exclusion>		
+                <exclusion>
+                    <groupId>bouncycastle</groupId>
+                    <artifactId>bcprov-jdk14</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.santuario</groupId>
+                    <artifactId>xmlsec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>commons-lang</groupId>
+                  <artifactId>commons-lang</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>velocity</groupId>
+                  <artifactId>velocity-dep</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jaxen</groupId>
+                  <artifactId>jaxen</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jdom</groupId>
+                  <artifactId>jdom</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>wsdl4j</groupId>
+                  <artifactId>wsdl4j</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>org.codehaus.woodstox</groupId>
+                  <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.bind</groupId>
+                  <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.bind</groupId>
+                  <artifactId>jaxb-xjc</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>javax.xml.soap</groupId>
+                  <artifactId>saaj-api</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>com.sun.xml.messaging.saaj</groupId>
+                  <artifactId>saaj-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>xml-resolver</groupId>
+                  <artifactId>xml-resolver</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
@@ -101,25 +733,6 @@
             <artifactId>mule-transport-tcp</artifactId>
             <version>${version}</version>
         </dependency>
-
-         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-all.osgi</artifactId>
-            <version>${cxfVersion}</version>
-         </dependency>
-         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-http.osgi</artifactId>
-            <version>${cxfVersion}</version>
-         </dependency>
-         <!-- CXF itself comes in bundle form, but I couldn't quite get it to 
-              work with Mule so we re-package it for the time being
-         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-bundle</artifactId>    
-            <version>${cxfVersion}</version>    
-        </dependency>
-        -->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail.osgi</artifactId>
@@ -197,6 +810,10 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
+                <exclusion>
+                  <groupId>jaxen</groupId>
+                  <artifactId>jaxen</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -224,6 +841,10 @@
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>jaxen</groupId>
+                  <artifactId>jaxen</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -255,13 +876,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Who uses this?
+        <!--  We should reenable this as it makes CXF faster
         <dependency>  
             <groupId>asm</groupId>  
             <artifactId>asm.osgi</artifactId>  
             <version>${asmVersion}</version> 
-        </dependency>        
-        -->
+        </dependency>
+         -->
         <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-all.osgi</artifactId>
@@ -296,11 +917,31 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${cxfVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
             <scope>test</scope>
             <type>test-jar</type>
+        </dependency>
+        <!--  Used for the security test -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-acegi</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
         </dependency>
         <!-- Needed for common SOAP test classes -->
         <dependency>
@@ -310,9 +951,31 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+
+        <!-- for integration tests -->  
+        <!-- Maven classpath gets messed up and WsdlCallTestCase doesn't pass unless this is here -->      
+
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty</artifactId>
+            <version>6.1.11</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>servlet-api-2.5</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-servlet</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>

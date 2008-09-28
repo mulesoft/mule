@@ -60,9 +60,9 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
+import org.apache.cxf.wsdl.http.AddressType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xmlsoap.schemas.wsdl.http.AddressType;
 
 /**
  * The CXF receives messages from Mule, converts them into CXF messages and dispatches
@@ -265,9 +265,9 @@ public class CxfServiceComponent implements Callable, Lifecycle
                     out.write(((ByteArrayOutputStream) delegate.getOutputStream()).toByteArray());
                     delegate.setOutputStream(out);
                     
-                    contentMsg.getInterceptorChain().resume();
-                    
                     out.flush();
+                    
+                    contentMsg.getInterceptorChain().resume();
                 }
                 
             };
@@ -298,7 +298,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         }
         catch (MuleException e)
         {
-            logger.warn("Could not dispatch message to XFire!", e);
+            logger.warn("Could not dispatch message to CXF!", e);
             throw e;
         }
     }

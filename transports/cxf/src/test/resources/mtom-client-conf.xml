@@ -17,6 +17,9 @@
       Show how to use MTOM with CXF and Mule.
     </description>
 
+    <!-- Initialize a static instance so we can use it with our client -->
+    <cxf:connector name="connector.cxf.0" initializeStaticBusInstance="true"/>
+    
     <quartz:endpoint name="quartz.in" 
                      jobName="eventTimer" 
                      repeatInterval="1000" 

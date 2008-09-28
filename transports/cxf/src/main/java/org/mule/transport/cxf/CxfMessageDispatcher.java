@@ -77,7 +77,6 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDisconnect() throws Exception
     {
-        wrapper = null;
     }
 
     protected void doDispose()
@@ -146,7 +145,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         if (soapAction != null)
         {
             soapAction = parseSoapAction(soapAction, new QName(method.getName()), event);
-            props.put(org.apache.cxf.binding.soap.SoapConstants.SOAP_ACTION, soapAction);
+            props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
         }
         
         BindingProvider bp = wrapper.getClientProxy();
@@ -171,7 +170,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         if (soapAction != null)
         {
             soapAction = parseSoapAction(soapAction, bop.getName(), event);
-            props.put(org.apache.cxf.binding.soap.SoapConstants.SOAP_ACTION, soapAction);
+            props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
             event.getMessage().setProperty(SoapConstants.SOAP_ACTION_PROPERTY, soapAction);
         }
         

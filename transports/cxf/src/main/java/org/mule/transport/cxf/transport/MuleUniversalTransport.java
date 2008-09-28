@@ -38,8 +38,8 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.wsdl.http.AddressType;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
-import org.xmlsoap.schemas.wsdl.http.AddressType;
 
 public class MuleUniversalTransport extends AbstractTransportFactory
     implements ConduitInitiator, DestinationFactory, WSDLEndpointFactory
