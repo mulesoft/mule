@@ -13,6 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
@@ -62,6 +63,9 @@ public class ChainingRouter extends FilteringOutboundRouter
                                  + (intermediaryResult == null ? "null" : intermediaryResult.toString()));
                 }
 
+                // All endpoints registered on a chaining router need to use RemoteSync enabled. Setting this property now. MULE-3643
+                intermediaryResult.setProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
+                
                 if (!lastEndpointInChain)
                 {
                     MuleMessage localResult = send(session, intermediaryResult, endpoint);
