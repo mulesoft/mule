@@ -1,0 +1,141 @@
+/*
+ * $Id: EndpointBridgingTestCase.java 10662 2008-02-01 13:10:14Z romikk $
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.test.integration.service;
+
+import org.mule.api.service.Service;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.util.queue.FilePersistenceStrategy;
+import org.mule.util.queue.QueueSession;
+import org.mule.util.queue.TransactionalQueueManager;
+import org.mule.util.xa.ResourceManagerSystemException;
+
+public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
+{
+
+    protected String getConfigResources()
+    {
+        return "org/mule/test/integration/service/service-inflight-messages.xml";
+    }
+
+    public void testInFlightMessages() throws Exception
+    {
+        Service service = muleContext.getRegistry().lookupService("TestService");
+        int numMessage = 500;
+        for (int i = 0; i < numMessage; i++)
+        {
+            service.dispatchEvent(getTestEvent("test", service, getTestInboundEndpoint("test://test")));
+        }
+
+        // Stop rather than dispose so we still have access to the connector for this
+        // test.
+        muleContext.stop();
+
+        assertQueues(numMessage, "TestService");
+    }
+
+    public void testInFlightStopPersistentMessages() throws Exception
+    {
+
+        Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
+        int numMessage = 500;
+        for (int i = 0; i < numMessage; i++)
+        {
+            service.dispatchEvent(getTestEvent("test", service, getTestInboundEndpoint("test://test")));
+        }
+
+        // Stop service and give workers a chance to finnish up before insepcting
+        // queues
+        muleContext.stop();
+        Thread.sleep(100);
+
+        assertQueues(numMessage, "TestPersistentQueueService");
+
+        muleContext.start();
+        Thread.sleep(200);
+        muleContext.stop();
+        Thread.sleep(100);
+
+        assertQueues(numMessage, "TestPersistentQueueService");
+
+        // Let mule finnish up with the rest of the messages until seda queue is
+        // // empty
+        muleContext.start();
+        Thread.sleep(3000);
+        muleContext.stop();
+
+        assertQueues(numMessage, "TestPersistentQueueService");
+
+    }
+
+    public void testInFlightDisposePersistentMessages() throws Exception
+    {
+        Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
+        int numMessage = 500;
+        for (int i = 0; i < numMessage; i++)
+        {
+            service.dispatchEvent(getTestEvent("test", service, getTestInboundEndpoint("test://test")));
+        }
+
+        // 2) Stop service and give it's workers a chance to finish executing before
+        // inspecting
+        // queues.
+        muleContext.stop();
+        Thread.sleep(100);
+        assertQueues(numMessage, "TestPersistentQueueService");
+
+        // 3) Dispose and restart Mule and let it run for a short while
+        muleContext.dispose();
+        muleContext = createMuleContext();
+        muleContext.start();
+        Thread.sleep(200);
+
+        // Stop service and give workers a chance to finnish up before insepcting
+        // queues
+        muleContext.stop();
+        Thread.sleep(100);
+
+        assertQueues(numMessage, "TestPersistentQueueService");
+
+        // Let mule finnish up with the rest of the messages until seda queue is
+        // empty
+        muleContext.start();
+        Thread.sleep(3000);
+        muleContext.stop();
+        assertQueues(numMessage, "TestPersistentQueueService");
+    }
+
+    /**
+     * After each run the following should totoal 500 events: 1) Event still in SEDA
+     * queue 2) Events dispatched to outbound vm endpooint 3) Events that were unable
+     * to be sent to stopped service and raised exceptions
+     */
+    private void assertQueues(int numMessage, String service) throws ResourceManagerSystemException
+    {
+        QueueSession queueSession = getTestQueueSession();
+        System.out.println("SEDA Queue: " + queueSession.getQueue("out").size()
+                           + ", Outbound endpoint vm queue: "
+                           + queueSession.getQueue(service + ".service").size());
+        assertEquals(numMessage, queueSession.getQueue("out").size()
+                                 + queueSession.getQueue(service + ".service").size());
+    }
+
+    private QueueSession getTestQueueSession() throws ResourceManagerSystemException
+    {
+        TransactionalQueueManager tqm = new TransactionalQueueManager();
+        FilePersistenceStrategy fps = new FilePersistenceStrategy();
+        fps.setMuleContext(muleContext);
+        tqm.setPersistenceStrategy(fps);
+        tqm.start();
+        QueueSession queueSession = tqm.getQueueSession();
+        return queueSession;
+    }
+
+}

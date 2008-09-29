@@ -16,8 +16,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.service.ServiceException;
 import org.mule.service.AbstractService;
 
-import java.util.List;
-
 /**
  * A direct service invokes the service service directly without any threading, even
  * when the invocation is asynchronous
@@ -28,8 +26,6 @@ public class DirectService extends AbstractService
      * Serial version
      */
     private static final long serialVersionUID = -8590955440156945732L;
-
-    protected List interceptorList = null;
 
     public DirectService()
     {

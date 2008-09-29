@@ -38,11 +38,8 @@ import org.mule.transport.NullPayload;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
-import java.util.NoSuchElementException;
-
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 
 /**
@@ -308,7 +305,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
                 // before stopping
                 if (stopping.get())
                 {
-                    if (queueSession == null || getQueueSize() <= 0)
+                    if (queueProfile.isPersistent() || (queueSession == null || getQueueSize() <= 0))
                     {
                         stopping.set(false);
                         break;
@@ -333,43 +330,22 @@ public class SedaService extends AbstractService implements Work, WorkListener
             }
             catch (Exception e)
             {
-                if (isStopped() || isStopping())
-                {
-                    break;
-                }
-
                 if (e instanceof InterruptedException)
                 {
                     stopping.set(false);
                     break;
                 }
-                else if (e instanceof NoSuchElementException)
-                {
-                    handleException(new ServiceException(CoreMessages.proxyPoolTimedOut(),
-                        (event == null ? null : event.getMessage()), this, e));
-                }
-                else if (e instanceof MuleException)
+                if (e instanceof MuleException)
                 {
                     handleException(e);
                 }
-                else if (e instanceof WorkException)
+                else
                 {
                     handleException(
                         new ServiceException(
                             CoreMessages.eventProcessingFailedFor(name),
                             (event == null ? null : event.getMessage()), this, e));
                 }
-                else
-                {
-                    handleException(
-                        new ServiceException(
-                            CoreMessages.failedToGetPooledObject(),
-                            (event == null ? null : event.getMessage()), this, e));
-                }
-            }
-            finally
-            {
-                stopping.set(false);
             }
         }
     }

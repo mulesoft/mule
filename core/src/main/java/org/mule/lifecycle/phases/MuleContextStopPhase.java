@@ -46,10 +46,11 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
         super(Stoppable.PHASE_NAME, Stoppable.class, Startable.PHASE_NAME);
 
         Set stopOrderedObjects = new LinkedHashSet();
-        stopOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
-        stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class));
+        // Stop in the opposite order to start
         stopOrderedObjects.add(new NotificationLifecycleObject(Service.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
 
         setIgnoredObjectTypes(ignorredObjects);

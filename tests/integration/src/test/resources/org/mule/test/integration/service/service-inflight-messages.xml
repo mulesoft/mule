@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+        xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+
+    <vm:connector name="vmIn" queueEvents="false"/>
+
+    <vm:connector name="vmOut" queueEvents="true" />
+
+    <vm:connector name="vmOutPersistent" queueEvents="true">
+        <vm:queueProfile persistent="true"/>
+    </vm:connector>
+
+
+    <vm:endpoint name="in" path="in" connector-ref="vmIn" />
+    <vm:endpoint name="in2" path="in2" connector-ref="vmIn" />
+    <vm:endpoint name="out" path="out" connector-ref="vmOutPersistent"/>
+
+
+    <model name="TestModel">
+
+        <service name="TestService">
+            <inbound>
+                <vm:inbound-endpoint ref="in"/>
+            </inbound>
+            <test:component waitTime="30"/>
+            <outbound>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint ref="out"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="TestPersistentQueueService">
+            <inbound>
+                <vm:inbound-endpoint ref="in2"/>
+            </inbound>
+            <test:component waitTime="30"/>
+            <outbound>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint ref="out" />
+                </outbound-pass-through-router>
+            </outbound>
+            <queue-profile persistent="true"/>
+        </service>
+
+
+    </model>
+</mule>

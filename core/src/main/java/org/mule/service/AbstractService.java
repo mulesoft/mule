@@ -26,7 +26,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
 import org.mule.api.model.ModelException;
 import org.mule.api.routing.InboundRouterCollection;
-import org.mule.api.routing.NestedRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
@@ -41,7 +40,6 @@ import org.mule.context.notification.ServiceNotification;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.inbound.InboundPassThroughRouter;
-import org.mule.routing.nested.DefaultNestedRouterCollection;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.response.DefaultResponseRouterCollection;
@@ -119,8 +117,6 @@ public abstract class AbstractService implements Service
 
     protected OutboundRouterCollection outboundRouter = new DefaultOutboundRouterCollection();
 
-    protected NestedRouterCollection nestedRouter = new DefaultNestedRouterCollection();
-
     protected ResponseRouterCollection responseRouter = new DefaultResponseRouterCollection();
 
     /**
@@ -143,8 +139,6 @@ public abstract class AbstractService implements Service
     // events that are bridged but currently everything is an invocation.
     protected Component component = new PassThroughComponent();
     
-    protected List interceptors = new ArrayList();
-
     /**
      * For Spring only
      */
@@ -254,9 +248,11 @@ public abstract class AbstractService implements Service
             // Unregister Listeners for the service
             unregisterListeners();
             
-            component.stop();
-
             doStop();
+
+            // Stop component.  We do this here in case there are any queues that need to be consumed first.
+            component.stop();
+            
             stopped.set(true);
             fireServiceNotification(ServiceNotification.SERVICE_STOPPED);
             logger.info("Mule Service " + name + " has been stopped successfully");
