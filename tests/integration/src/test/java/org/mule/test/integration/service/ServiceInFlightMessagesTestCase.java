@@ -41,6 +41,26 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertQueues(numMessage, "TestService");
     }
 
+    public void testInFlightMessagesPausedService() throws Exception
+    {
+        Service service = muleContext.getRegistry().lookupService("PausedTestService");
+        int numMessage = 500;
+        for (int i = 0; i < numMessage; i++)
+        {
+            service.dispatchEvent(getTestEvent("test", service, getTestInboundEndpoint("test://test")));
+        }
+
+        Thread.sleep(100);
+
+        // Stop rather than dispose so we still have access to the connector for this
+        // test.
+        muleContext.stop();
+
+        // Messages are lost when paused service is stopped
+        assertEquals(0, getTestQueueSession().getQueue("out").size());
+        assertEquals(0, getTestQueueSession().getQueue("PausedTestService.service").size());
+    }
+
     public void testInFlightStopPersistentMessages() throws Exception
     {
 
@@ -72,6 +92,51 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         muleContext.stop();
 
         assertQueues(numMessage, "TestPersistentQueueService");
+
+    }
+
+    public void testInFlightStopPersistentMessagesPausedService() throws Exception
+    {
+
+        Service service = muleContext.getRegistry().lookupService("PausedTestPersistentQueueService");
+        int numMessage = 500;
+        for (int i = 0; i < numMessage; i++)
+        {
+            service.dispatchEvent(getTestEvent("test", service, getTestInboundEndpoint("test://test")));
+        }
+
+        // Stop service and give workers a chance to finnish up before insepcting
+        // queues
+        muleContext.stop();
+        Thread.sleep(100);
+
+        // Paused service does not process messages before or during stop().
+        assertEquals(0, getTestQueueSession().getQueue("out").size());
+        assertQueues(numMessage, "PausedTestPersistentQueueService");
+
+        muleContext.start();
+        Thread.sleep(200);
+        muleContext.stop();
+        Thread.sleep(100);
+
+        // Paused service process messages before or during stop().
+        assertTrue(getTestQueueSession().getQueue("out").size() > 1);
+        assertQueues(numMessage, "PausedTestPersistentQueueService");
+
+        service.resume();
+        Thread.sleep(100);
+
+        // Paused service processes messages when resumed.
+        assertTrue(getTestQueueSession().getQueue("out").size() > 0);
+        assertQueues(numMessage, "PausedTestPersistentQueueService");
+
+        // Let mule finnish up with the rest of the messages until seda queue is
+        // // empty
+        muleContext.start();
+        Thread.sleep(3000);
+        muleContext.stop();
+
+        assertQueues(numMessage, "PausedTestPersistentQueueService");
 
     }
 
@@ -120,9 +185,8 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
     private void assertQueues(int numMessage, String service) throws ResourceManagerSystemException
     {
         QueueSession queueSession = getTestQueueSession();
-        System.out.println("SEDA Queue: " + queueSession.getQueue("out").size()
-                           + ", Outbound endpoint vm queue: "
-                           + queueSession.getQueue(service + ".service").size());
+        logger.info("SEDA Queue: " + queueSession.getQueue("out").size() + ", Outbound endpoint vm queue: "
+                    + queueSession.getQueue(service + ".service").size());
         assertEquals(numMessage, queueSession.getQueue("out").size()
                                  + queueSession.getQueue(service + ".service").size());
     }

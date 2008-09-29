@@ -247,9 +247,16 @@ public abstract class AbstractService implements Service
 
             // Unregister Listeners for the service
             unregisterListeners();
-            
-            doStop();
 
+            // Resume if paused. (This is required so that stop() doesn't hand and so
+            // message aren't lost in SedaQueue when service is stopped.
+            if (isPaused())
+            {
+                resume();
+            }
+
+            doStop();
+            
             // Stop component.  We do this here in case there are any queues that need to be consumed first.
             component.stop();
             

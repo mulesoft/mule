@@ -1133,4 +1133,9 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 273, what);
     }
+    
+    public static Message stopPausedSedaServiceNonPeristentQueueMessageLoss(int num, Service service)
+    {
+        return factory.createMessage(BUNDLE_PATH, 274, num, service.getName());
+    }
 }

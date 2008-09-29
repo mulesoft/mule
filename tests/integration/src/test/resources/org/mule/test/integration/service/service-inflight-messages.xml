@@ -21,6 +21,8 @@
 
     <vm:endpoint name="in" path="in" connector-ref="vmIn" />
     <vm:endpoint name="in2" path="in2" connector-ref="vmIn" />
+    <vm:endpoint name="in3" path="in3" connector-ref="vmIn" />
+    <vm:endpoint name="in4" path="in4" connector-ref="vmIn" />
     <vm:endpoint name="out" path="out" connector-ref="vmOutPersistent"/>
 
 
@@ -37,10 +39,35 @@
                 </outbound-pass-through-router>
             </outbound>
         </service>
+        
+        <service name="PausedTestService" initialState="paused">
+            <inbound>
+                <vm:inbound-endpoint ref="in3"/>
+            </inbound>
+            <test:component waitTime="30"/>
+            <outbound>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint ref="out"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
 
         <service name="TestPersistentQueueService">
             <inbound>
                 <vm:inbound-endpoint ref="in2"/>
+            </inbound>
+            <test:component waitTime="30"/>
+            <outbound>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint ref="out" />
+                </outbound-pass-through-router>
+            </outbound>
+            <queue-profile persistent="true"/>
+        </service>
+
+        <service name="PausedTestPersistentQueueService" initialState="paused">
+            <inbound>
+                <vm:inbound-endpoint ref="in4"/>
             </inbound>
             <test:component waitTime="30"/>
             <outbound>
