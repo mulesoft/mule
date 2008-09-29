@@ -26,3 +26,6 @@ org.mule.transport.cxf.ServletTestCase
 # Broken by r12671, CI build MULE-MULE2JDK5-429
 # MULE-3694
 org.mule.transport.cxf.CxfConnectorVMFunctionalTestCase
+
+# MULE-3710
+org.mule.transport.cxf.HttpSecurityTestCase
