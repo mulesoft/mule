@@ -47,23 +47,22 @@ class Package {
   }
 
   void parse(File file) {
-//    println "# " + file.name
+    // println "# parsing " + file.name
     try {
       Node doc = new XmlParser().parse(file)
-      String name = doc.name
-      if (name.equals("{http://www.springframework.org/schema/beans}beans")) {
+      String name = doc.name().localPart
+      // println "# schema name: $name"
+      if (name.equals("beans")) {
         addSpringConfig(file, doc)
-      } else if (name.equals("beans")) {
-        addSpringConfig(file, doc)
-      } else if (name.equals("{http://www.mulesource.org/schema/mule/core/2.0}mule")) {
+      } else if (name.equals("mule")) {
         addNewMuleConfig(file, doc)
-      } else if (name.equals("{http://www.mulesource.org/schema/mule/core/2.0}mule-unsafe")) {
+      } else if (name.equals("mule-unsafe")) {
         addNewMuleConfig(file, doc)
       } else if (name.equals("mule-configuration")) {
         addOldMuleConfig(file, doc)
       } else if (name.equals("project")) {
         addOtherConfig(file, doc, true) // ant build file
-      } else if (name.equals("{http://schemas.xmlsoap.org/soap/envelope/}Envelope")) {
+      } else if (name.equals("Envelope")) {
         addOtherConfig(file, doc, true) // soap envelope
       } else if (name.equals("process-definition")) {
         addOtherConfig(file, doc, true) // loan broker process defn
@@ -71,7 +70,7 @@ class Package {
         addOtherConfig(file, doc, true) // eh cache
       } else if (name.equals("ejb-jar")) {
         addOtherConfig(file, doc, true) // ejb jar
-      } else if (name.equals("{http://www.openejb.org/openejb-jar/1.1}openejb-jar")) {
+      } else if (name.equals("openejb-jar")) {
         addOtherConfig(file, doc, true) // ejb jar
       } else if (name.equals("jbpm-configuration")) {
         addOtherConfig(file, doc, true) // jbpm
