@@ -135,6 +135,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     protected RetryPolicyTemplate retryPolicyTemplate;
     
+    private String endpointBuilderName;
+    
     public AbstractEndpoint(Connector connector,
                             EndpointURI endpointUri,
                             List transformers,
@@ -150,6 +152,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             int remoteSyncTimeout,
                             String initialState,
                             String endpointEncoding,
+                            String endpointBuilderName,
                             MuleContext muleContext,
                             RetryPolicyTemplate retryPolicyTemplate)
     {
@@ -190,6 +193,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         this.remoteSyncTimeout = remoteSyncTimeout;
         this.initialState = initialState;
         this.endpointEncoding = endpointEncoding;
+        this.endpointBuilderName = endpointBuilderName;
         this.muleContext = muleContext;
         this.retryPolicyTemplate = retryPolicyTemplate;
     }
@@ -424,5 +428,10 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     public RetryPolicyTemplate getRetryPolicyTemplate()
     {
         return retryPolicyTemplate;
+    }
+    
+    public String getEndpointBuilderName()
+    {
+        return endpointBuilderName;
     }
 }

@@ -11,9 +11,13 @@
 package org.mule;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.filter.Filter;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.AbstractTransformer;
@@ -207,6 +211,103 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals(trans1.getName(), ((Transformer) deserializedTransformers.get(0)).getName());
         assertEquals(trans2.getName(), ((Transformer) deserializedTransformers.get(1)).getName());
         assertEquals(PayloadTypeFilter.class, deserialized.getEndpoint().getFilter().getClass());
+    }
+    
+    public void testEventSerializationRestart() throws Exception
+    {
+        // Create and register artifacts
+        MuleEvent event = createEventToSerialize();
+        muleContext.start();
+        List transformers = event.getEndpoint().getTransformers();
+        ImmutableEndpoint endpoint = event.getEndpoint();
+
+        //Serialize
+        Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
+        assertNotNull(serialized);
+
+        // Simulate mule cold restart
+        muleContext.dispose();
+        muleContext = createMuleContext();
+        muleContext.start();
+
+        // Recreate and register artifacts (this would happen if using any kind of static config e.g. XML)
+        createAndRegisterTransformersEndpointBuilderService();
+
+        //Deserialize
+        MuleEvent deserialized = (MuleEvent) new ByteArrayToObject().transform(serialized);
+
+        // Assert that deserialized event is not null and has muleContext
+        assertNotNull(deserialized);
+        assertNotNull(deserialized.getMuleContext());
+
+        // Assert that deserialized event has session with same id
+        assertNotNull(deserialized.getSession());
+        assertEquals(event.getSession().getId(), deserialized.getSession().getId());
+
+        // Assert that deserialized event has service and that the service is the
+        // same instance
+        assertNotNull(deserialized.getSession().getService());
+        // Unable to test services for equality because of need for equals() everywhere.  See MULE-3720
+        // assertEquals(event.getSession().getService(), deserialized.getSession().getService());
+        assertEquals(event.getSession().getService().getName(), deserialized.getSession().getService().getName());
+        assertEquals(event.getSession().getService().getInitialState(), deserialized.getSession().getService().getInitialState());
+        assertEquals(event.getSession().getService().getExceptionListener().getClass(), deserialized.getSession().getService().getExceptionListener().getClass());
+        assertEquals(event.getSession().getService().getComponent().getClass(), deserialized.getSession().getService().getComponent().getClass());
+        
+        // Assert that deserialized event has endpoint and that the endpoint is the
+        // same instance
+        assertNotNull(deserialized.getEndpoint());
+        // Unable to test endpoint for equality because of need for equals() everywhere.  See MULE-3720
+        // assertEquals(endpoint, deserialized.getEndpoint());
+        // Test some individual attributes instead
+        assertEquals(endpoint.getEncoding(), deserialized.getEndpoint().getEncoding());
+        assertEquals(endpoint.getEndpointBuilderName(), deserialized.getEndpoint().getEndpointBuilderName());
+        assertEquals(endpoint.getEndpointURI(), deserialized.getEndpoint().getEndpointURI());
+        assertEquals(endpoint.getProtocol(), deserialized.getEndpoint().getProtocol());
+        assertEquals(endpoint.getRemoteSyncTimeout(), deserialized.getEndpoint().getRemoteSyncTimeout());
+        assertEquals(endpoint.getConnector().getClass(), deserialized.getEndpoint().getConnector().getClass());
+        
+        List deserializedTransformers = deserialized.getEndpoint().getTransformers();
+        assertEquals(2, deserializedTransformers.size());
+        assertEquals(((Transformer) transformers.get(0)).getName(),
+            ((Transformer) deserializedTransformers.get(0)).getName());
+        assertEquals(((Transformer) transformers.get(1)).getName(),
+            ((Transformer) deserializedTransformers.get(1)).getName());
+        assertEquals(PayloadTypeFilter.class, deserialized.getEndpoint().getFilter().getClass());
+    }
+    
+    private MuleEvent createEventToSerialize() throws Exception
+    {
+        createAndRegisterTransformersEndpointBuilderService();
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            muleContext.getRegistry().lookupEndpointBuilder("epBuilderTest"));
+        Service service = muleContext.getRegistry().lookupService("appleService");
+        return RequestContext.setEvent(getTestEvent("payload", service, endpoint));
+    }
+
+    private void createAndRegisterTransformersEndpointBuilderService() throws Exception
+    {
+        Transformer trans1 = new TestEventTransformer();
+        trans1.setName("OptimusPrime");
+        muleContext.getRegistry().registerTransformer(trans1);
+
+        Transformer trans2 = new TestEventTransformer();
+        trans2.setName("Bumblebee");
+        muleContext.getRegistry().registerTransformer(trans2);
+
+        List transformers = new ArrayList();
+        transformers.add(trans1);
+        transformers.add(trans2);
+
+        Filter filter = new PayloadTypeFilter(Object.class);
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://serializationTest",
+            muleContext);
+        endpointBuilder.setTransformers(transformers);
+        endpointBuilder.setName("epBuilderTest");
+        endpointBuilder.setFilter(filter);
+        muleContext.getRegistry().registerEndpointBuilder("epBuilderTest", endpointBuilder);
+
+        getTestService();
     }
 
 

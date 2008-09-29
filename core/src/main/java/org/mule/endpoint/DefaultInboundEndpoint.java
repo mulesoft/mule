@@ -44,12 +44,13 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                   int remoteSyncTimeout,
                                   String initialState,
                                   String endpointEncoding,
+                                  String endpointBuilderName,
                                   MuleContext muleContext,
                                   RetryPolicyTemplate retryPolicyTemplate)
     {
         super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
             deleteUnacceptedMessage, securityFilter, synchronous, remoteSync, remoteSyncTimeout, initialState,
-            endpointEncoding, muleContext, retryPolicyTemplate);
+            endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate);
     }
 
     public MuleMessage request(long timeout) throws Exception

@@ -333,7 +333,9 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     protected void closeStream(MuleMessage message)
     {
-        if (muleContext != null)
+        if (muleContext != null
+            && message != null
+            && muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE) != null)
         {
             ((StreamCloserService) muleContext.getRegistry().lookupObject(
                 MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).closeStream(message.getPayload());
@@ -516,6 +518,6 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * @param e the top level exception thrown
      */
     public abstract void handleStandardException(Throwable e);
-
-
+    
+    
 }

@@ -166,8 +166,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return new DefaultInboundEndpoint(connector, endpointURI, transformers, responseTransformers,
             getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
             getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous, remoteSync,
-            getRemoteSyncTimeout(connector), getInitialState(connector), getEndpointEncoding(connector), muleContext,
-            getRetryPolicyTemplate(connector));
+            getRemoteSyncTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
+            name, muleContext, getRetryPolicyTemplate(connector));
     }
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
@@ -210,8 +210,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return new DefaultOutboundEndpoint(connector, endpointURI, transformers, responseTransformers,
             getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
             getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous, remoteSync,
-            getRemoteSyncTimeout(connector), getInitialState(connector), getEndpointEncoding(connector), muleContext,
-            getRetryPolicyTemplate(connector));
+            getRemoteSyncTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
+            name, muleContext, getRetryPolicyTemplate(connector));
 
     }
 

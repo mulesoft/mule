@@ -204,4 +204,12 @@ public interface ImmutableEndpoint extends Serializable
      * @return the Policy factory to use when retrying a connection or dispatching an event
      */
     RetryPolicyTemplate getRetryPolicyTemplate();
+    
+    /**
+     * The name of the endpoint builder used to create this endpoint. May be used to
+     * an endpoints builder for example to recreate endpoints for deserialized events.
+     * 
+     * @return
+     */
+    String getEndpointBuilderName();
 }

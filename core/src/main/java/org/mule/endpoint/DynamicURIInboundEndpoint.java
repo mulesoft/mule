@@ -162,6 +162,11 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return endpoint.request(timeout);
     }
 
+    public String getEndpointBuilderName()
+    {
+        return endpoint.getEndpointBuilderName();
+    }
+    
     public int hashCode()
     {
         final int prime = 31;
@@ -173,20 +178,41 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
 
     public boolean equals(Object obj)
     {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
         final DynamicURIInboundEndpoint other = (DynamicURIInboundEndpoint) obj;
         if (dynamicEndpointURI == null)
         {
-            if (other.dynamicEndpointURI != null) return false;
+            if (other.dynamicEndpointURI != null)
+            {
+                return false;
+            }
         }
-        else if (!dynamicEndpointURI.equals(other.dynamicEndpointURI)) return false;
+        else if (!dynamicEndpointURI.equals(other.dynamicEndpointURI))
+        {
+            return false;
+        }
         if (endpoint == null)
         {
-            if (other.endpoint != null) return false;
+            if (other.endpoint != null)
+            {
+                return false;
+            }
         }
-        else if (!endpoint.equals(other.endpoint)) return false;
+        else if (!endpoint.equals(other.endpoint))
+        {
+            return false;
+        }
         return true;
     }
 

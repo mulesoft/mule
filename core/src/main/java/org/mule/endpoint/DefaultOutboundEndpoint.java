@@ -46,12 +46,13 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    int remoteSyncTimeout,
                                    String initialState,
                                    String endpointEncoding,
+                                   String endpointBuilderName,
                                    MuleContext muleContext,
                                    RetryPolicyTemplate retryPolicyTemplate)
     {
         super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
             deleteUnacceptedMessage, securityFilter, synchronous, remoteSync, remoteSyncTimeout, initialState,
-            endpointEncoding, muleContext, retryPolicyTemplate);
+            endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate);
     }
 
     public void dispatch(MuleEvent event) throws DispatchException

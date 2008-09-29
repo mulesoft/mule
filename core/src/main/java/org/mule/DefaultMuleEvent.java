@@ -18,13 +18,17 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultEndpointFactory;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.security.MuleCredentials;
 import org.mule.util.MapUtils;
 import org.mule.util.UUID;
@@ -36,6 +40,8 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.EventObject;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.logging.Log;
@@ -591,14 +597,105 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     {
         out.defaultWriteObject();
         out.writeInt(endpoint.hashCode());
+        out.writeBoolean(endpoint instanceof InboundEndpoint);
+        out.writeObject(endpoint.getEndpointBuilderName());
+        out.writeObject(endpoint.getEndpointURI().getUri().toString());
+        marshallTransformers(endpoint.getTransformers(), out);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException, MuleException
     {
+        MuleContext muleContext = MuleServer.getMuleContext();
         in.defaultReadObject();
         int endpointHashCode = in.readInt();
-        endpoint = (ImmutableEndpoint) MuleServer.getMuleContext().getRegistry().lookupObject(
+        boolean isEndpointInbound = in.readBoolean();
+        String endpointbBuilderName = (String) in.readObject();
+        String endpointUri = (String) in.readObject();
+
+        // 1) First attempt to get same endpoint instance from registry using
+        // hashcode, this will work if registry hasn't been disposed.
+        endpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupObject(
             DefaultEndpointFactory.ENDPOINT_REGISTRY_PREFIX + endpointHashCode);
+
+        // Registry has been disposed so we need to recreate endpoint
+        if (endpoint == null)
+        {
+            // 2) If endpoint references it's builder and this is available then use
+            // the builder to recreate the endpoint
+            if (endpointbBuilderName != null
+                && muleContext.getRegistry().lookupEndpointBuilder(endpointbBuilderName) != null)
+            {
+                if (isEndpointInbound)
+                {
+                    endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+                        endpointbBuilderName);
+                }
+                else
+                {
+                    endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+                        endpointbBuilderName);
+                }
+            }
+            // 3) Otherwise recreate using endpoint uri string and transformers. (As in 1.4)
+            else
+            {
+
+                List transformers = unmarshallTransformers(in);
+                EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpointUri, muleContext);
+                endpointBuilder.setTransformers(transformers);
+
+                if (isEndpointInbound)
+                {
+                    endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+                        endpointBuilder);
+                }
+                else
+                {
+                    endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+                        endpointBuilder);
+                }
+            }
+        }
+    }
+
+
+    private void marshallTransformers(List transformers, ObjectOutputStream out) throws IOException
+    {
+        // write number
+        out.writeInt(transformers.size());
+
+        // write transformer names if necessary
+        if (transformers.size() > 0)
+        {
+            for (Iterator transIterator = transformers.iterator(); transIterator.hasNext();)
+            {
+                out.writeObject(((Transformer) transIterator.next()).getName());
+            }
+        }
+    }
+
+    private List unmarshallTransformers(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        List transformers = new LinkedList();
+        int count = in.readInt();
+
+        if (count > 0)
+        {
+            while (--count > 0)
+            {
+                String nextName = (String) in.readObject();
+                Transformer next = MuleServer.getMuleContext().getRegistry().lookupTransformer(nextName);
+                if (next == null)
+                {
+                    throw new IllegalStateException(CoreMessages.objectNotFound(nextName).toString());
+                }
+                else
+                {
+                    transformers.add(next);
+                }
+            }
+        }
+        return transformers;
     }
 
     /**
