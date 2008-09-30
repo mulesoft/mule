@@ -22,9 +22,9 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jdbc:outbound-endpoint queryKey="writeTest?type=2" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

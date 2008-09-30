@@ -30,9 +30,9 @@
                 </script:script>
             </script:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://out1"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -46,9 +46,9 @@
                 <script:script file="simple-script.groovy"/>
             </script:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://out2"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -58,9 +58,9 @@
             </inbound>
             <script:component script-ref="myScript"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://out3"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -78,9 +78,9 @@
                 </script:script>
             </script:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://out4"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

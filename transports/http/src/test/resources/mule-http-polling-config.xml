@@ -27,9 +27,9 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://toclient"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

@@ -38,11 +38,11 @@
                         class="org.mule.transport.jms.integration.JmsXAAlwaysBeginTestCase$TestRollbackComponent"/>
             </component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="out">
                         <xa-transaction action="ALWAYS_BEGIN"/>
                     </jms:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

@@ -16,9 +16,9 @@
                 <tcp:inbound-endpoint host="localhost" port="6161" remoteSync="true"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <tcp:outbound-endpoint host="localhost" port="6162"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -28,9 +28,9 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="sync"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

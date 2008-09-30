@@ -164,9 +164,9 @@
             </component>            
 
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="appleInEndpoint" transformer-refs="TestCompressionTransformer"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
 
             <async-reply timeout="10001">

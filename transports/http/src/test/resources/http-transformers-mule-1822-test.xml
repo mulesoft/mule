@@ -38,9 +38,9 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://echo1" synchronous="true"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -65,9 +65,9 @@
                 <inbound-endpoint ref="response" responseTransformer-refs="appendResponse"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="echo2" synchronous="true"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -95,9 +95,9 @@
                 </http:inbound-endpoint>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://echo3" synchronous="true"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

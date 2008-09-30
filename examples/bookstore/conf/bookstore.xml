@@ -44,11 +44,11 @@
                     <inbound-endpoint ref="orderEmailService" />
                </inbound>
                <outbound>
-                    <outbound-pass-through-router>
+                    <pass-through-router>
                          <smtps:outbound-endpoint user="username" password="password" host="smtp.gmail.com"
                               transformer-refs="OrderToEmail StringToMimeMessage" connector-ref="emailConnector"
                               from="bookstore@mulesource.com" subject="Your order has been placed!" />
-                    </outbound-pass-through-router>
+                    </pass-through-router>
                </outbound>
           </service>
 

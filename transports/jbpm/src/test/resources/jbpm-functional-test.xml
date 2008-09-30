@@ -29,9 +29,9 @@
             </inbound>
             <component class="org.mule.component.simple.LogComponent"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="echo"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

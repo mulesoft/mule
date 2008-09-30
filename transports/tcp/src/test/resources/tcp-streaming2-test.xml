@@ -22,9 +22,9 @@
                 <tcp:inbound-endpoint host="localhost" port="65432" synchronous="false"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <tcp:outbound-endpoint host="localhost" port="65433" synchronous="false"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

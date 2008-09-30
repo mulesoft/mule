@@ -18,9 +18,9 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="q1"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -30,9 +30,9 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="q2"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -44,9 +44,9 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

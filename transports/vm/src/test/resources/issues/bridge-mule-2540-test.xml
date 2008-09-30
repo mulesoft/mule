@@ -25,11 +25,11 @@
             </inbound>
             <bridge-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="echo">
                         <transformer ref="testTransformer"/>
                     </vm:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -40,9 +40,9 @@
                 <vm:inbound-endpoint path="echo"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

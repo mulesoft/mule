@@ -96,9 +96,9 @@
             <component class="org.mule.example.hello.ChitChatter"/>
 
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <stdio:outbound-endpoint system="OUT" transformer-refs="ChatStringToString" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
 
         </service>
@@ -111,9 +111,9 @@
             </inbound>
             
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <stdio:outbound-endpoint system="OUT"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
                 
@@ -125,9 +125,9 @@
             </inbound>
                 
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <stdio:outbound-endpoint system="ERR"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>        
     </model>

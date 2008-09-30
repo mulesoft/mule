@@ -27,9 +27,9 @@
                 </pop3:inbound-endpoint>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint connector-ref="default" path="sink"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

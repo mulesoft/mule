@@ -31,9 +31,9 @@
                 </binding>
             </component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://invoker.out" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

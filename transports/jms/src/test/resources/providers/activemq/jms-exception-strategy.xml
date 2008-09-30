@@ -20,11 +20,11 @@
             </inbound>
             <test:component throwException="true"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="out">
                         <jms:transaction action="ALWAYS_JOIN"/>
                     </jms:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
             <default-service-exception-strategy>
                 <commit-transaction exception-pattern="*"/>

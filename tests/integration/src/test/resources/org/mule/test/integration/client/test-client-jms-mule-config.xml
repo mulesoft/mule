@@ -17,9 +17,9 @@
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestReceiver"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

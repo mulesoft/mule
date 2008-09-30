@@ -24,9 +24,9 @@
             </test:component>
            
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="out" connector-ref="asynchVm"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

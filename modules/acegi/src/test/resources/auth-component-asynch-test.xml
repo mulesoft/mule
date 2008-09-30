@@ -39,9 +39,9 @@
                     <mule:spring-object bean="echoComponent"/>
                 </mule:component>
                 <mule:outbound>
-                    <mule:outbound-pass-through-router>
+                    <mule:pass-through-router>
                         <mule:outbound-endpoint address="vm://output"/>
-                    </mule:outbound-pass-through-router>
+                    </mule:pass-through-router>
                 </mule:outbound>
             </mule:service>
         </mule:model>

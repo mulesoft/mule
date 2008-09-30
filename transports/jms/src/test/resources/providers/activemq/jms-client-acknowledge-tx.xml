@@ -30,11 +30,11 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="middle" transformer-refs="ObjectToJMSMessage">
                         <jms:transaction action="NONE"/>
                     </outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -48,11 +48,11 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage">
                         <jms:transaction action="NONE"/>
                     </outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

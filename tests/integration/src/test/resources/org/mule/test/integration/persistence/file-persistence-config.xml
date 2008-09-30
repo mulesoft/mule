@@ -18,9 +18,9 @@
                 <inbound-endpoint address="vm://test.queue" connector-ref="vmQueue"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

@@ -36,9 +36,9 @@
                 <spring-object bean="MyComponent"/>
             </component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="output"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>    
     </model>

@@ -35,9 +35,9 @@
                 <vm:inbound-endpoint path="in-2" connector-ref="direct"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="out-2" connector-ref="queue"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         

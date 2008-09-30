@@ -22,9 +22,9 @@
                 <inbound-endpoint address="http://localhost:38900/services" />
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="queue" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

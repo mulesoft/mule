@@ -34,9 +34,9 @@
             </inbound>
             <test:component waitTime="30"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint ref="out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         
@@ -46,9 +46,9 @@
             </inbound>
             <test:component waitTime="30"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint ref="out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -58,9 +58,9 @@
             </inbound>
             <test:component waitTime="30"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint ref="out" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
             <queue-profile persistent="true"/>
         </service>
@@ -71,9 +71,9 @@
             </inbound>
             <test:component waitTime="30"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint ref="out" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
             <queue-profile persistent="true"/>
         </service>

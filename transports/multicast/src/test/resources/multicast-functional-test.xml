@@ -22,9 +22,9 @@
             </inbound>
             <test:component appendString="${mule:serviceName}"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://foo"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -34,9 +34,9 @@
             </inbound>
             <test:component appendString="${mule:serviceName}"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://foo"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -46,9 +46,9 @@
             </inbound>
             <test:component appendString="${mule:serviceName}"/>            
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://foo"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

@@ -18,9 +18,9 @@
             </inbound>
             <echo-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://pojo2"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
             <async-reply timeout="7000">
                 <inbound-endpoint address="jms://response"/>
@@ -34,10 +34,10 @@
             </inbound>
             <echo-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://pojo3"/>
                     <reply-to address="jms://response"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

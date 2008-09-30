@@ -21,9 +21,9 @@
             </inbound>
             <component class="org.mule.transport.soap.axis.functional.SoapAttachmentsFunctionalTestComponent"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="test://test" name="test1"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

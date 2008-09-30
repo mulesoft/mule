@@ -23,12 +23,12 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://out1" connector-ref="jmsConnector2">
                         <jms:transaction action="BEGIN_OR_JOIN"/>
                     </outbound-endpoint>
                     <jms:transaction action="ALWAYS_BEGIN"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         
@@ -42,11 +42,11 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://out2" connector-ref="jmsConnector2">
                         <jms:transaction action="ALWAYS_BEGIN"/>
                     </outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -61,11 +61,11 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://out3" connector-ref="jmsConnector2">
                         <jms:transaction action="ALWAYS_BEGIN"/>
                     </outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 -->

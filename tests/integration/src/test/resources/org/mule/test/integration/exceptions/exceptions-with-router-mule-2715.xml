@@ -24,9 +24,9 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="with-router-out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -35,9 +35,9 @@
                 <vm:inbound-endpoint path="without-router-in" transformer-refs="fail"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="without-router-out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
             <!-- need this instead -->
             <default-service-exception-strategy>

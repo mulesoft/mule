@@ -25,9 +25,9 @@
             </inbound>
             <component class="org.mule.providers.vm.functional.VmXATransactionTestCase$TestComponent"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="out" connector-ref="vm"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

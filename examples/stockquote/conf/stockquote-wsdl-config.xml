@@ -49,9 +49,9 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

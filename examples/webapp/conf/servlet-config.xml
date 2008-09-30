@@ -27,9 +27,9 @@
                 </prototype-object>
             </pooled-component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="restFileEndpoint"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

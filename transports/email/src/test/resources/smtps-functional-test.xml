@@ -22,9 +22,9 @@
                 <vm:inbound-endpoint path="send"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <smtps:outbound-endpoint host="localhost" port="65439" to="bob@example.com"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

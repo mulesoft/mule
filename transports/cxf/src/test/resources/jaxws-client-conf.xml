@@ -49,14 +49,14 @@
           <singleton-object class="org.mule.transport.cxf.jaxws.ClientMessageGenerator"/>
       </component>
       <outbound>
-        <outbound-pass-through-router>
+        <pass-through-router>
            <cxf:outbound-endpoint
              address="http://localhost:63081/services/greeter"
              clientClass="org.apache.hello_world_soap_http.SOAPService"
              wsdlPort="SoapPort"
              wsdlLocation="classpath:/wsdl/hello_world.wsdl"
              operation="greetMe"/>
-        </outbound-pass-through-router>
+        </pass-through-router>
       </outbound>
     </service>
   </model>

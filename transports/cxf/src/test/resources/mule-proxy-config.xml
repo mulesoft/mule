@@ -27,9 +27,9 @@
             </inbound>
             <component class="org.mule.transport.soap.WSProxyService"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="http://localhost:6065/WebService"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -41,9 +41,9 @@
                 <spring-object bean="WSProxyService" />
             </component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="http://localhost:6065/WebService" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

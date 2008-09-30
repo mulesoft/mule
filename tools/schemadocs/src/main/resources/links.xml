@@ -34,7 +34,6 @@
     <link><item>mule:forwarding-catch-all-strategy</item><page>Configuring+Models</page></link>
     <link><item>mule:custom-forwarding-catch-all-strategy</item><page>Configuring+Models</page></link>
     <link><item>mule:idempotent-secure-hash-receiver-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:inbound-pass-through-router</item><page>Configuring+Models</page></link>
     <link><item>mule:idempotent-receiver-router</item><page>Configuring+Models</page></link>
     <link><item>mule:wire-tap-router</item><page>Configuring+Models</page></link>
     <link><item>mule:forwarding-router</item><page>Configuring+Models</page></link>
@@ -49,7 +48,7 @@
     <link><item>mule:pooled-object</item><page>Configuring+Models</page></link>
     <link><item>mule:binding</item><page>Configuring+Models</page></link>
     <link><item>mule:pooling-profile</item><page>Configuring+Models</page></link>
-    <link><item>mule:outbound-pass-through-router</item><page>Configuring+Models</page></link>
+    <link><item>mule:pass-through-router</item><page>Configuring+Models</page></link>
     <link><item>mule:filtering-router</item><page>Configuring+Models</page></link>
     <link><item>mule:chaining-router</item><page>Configuring+Models</page></link>
     <link><item>mule:exception-based-router</item><page>Configuring+Models</page></link>

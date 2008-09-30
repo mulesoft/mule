@@ -18,9 +18,9 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://responder" synchronous="true"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

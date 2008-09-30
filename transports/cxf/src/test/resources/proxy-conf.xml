@@ -25,7 +25,7 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <cxf:outbound-endpoint
                         name="clientEndpoint"
                         address="http://localhost:63081/services/greeter"
@@ -33,7 +33,7 @@
                         wsdlPort="SoapPort"
                         operation="greetMe"
                         wsdlLocation="classpath:/wsdl/hello_world.wsdl"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         
@@ -56,9 +56,9 @@
                 </cxf:inbound-endpoint>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="test" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         
@@ -74,11 +74,11 @@
                 <cxf:inbound-endpoint address="http://localhost:63081/services/proxy" proxy="true"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
                         remoteSync="true"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         
@@ -87,7 +87,7 @@
                 <cxf:inbound-endpoint address="http://localhost:63081/services/proxyWithTransform" proxy="true"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
                         remoteSync="true">
@@ -95,7 +95,7 @@
                              <transformer ref="TestXslt"/>
                          </response-transformers>
                     </cxf:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
                 

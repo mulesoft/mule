@@ -170,10 +170,10 @@
                 </mule:component>
                 
                 <mule:outbound>
-                    <mule:outbound-pass-through-router>
+                    <mule:pass-through-router>
                         <mule:outbound-endpoint ref="appleInEndpoint"
                                                 transformer-refs="TestCompressionTransformer"/>
-                    </mule:outbound-pass-through-router>
+                    </mule:pass-through-router>
                 </mule:outbound>
 
                 <mule:async-reply timeout="10001">

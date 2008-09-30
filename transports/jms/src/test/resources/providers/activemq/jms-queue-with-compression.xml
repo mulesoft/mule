@@ -23,9 +23,9 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="q1" transformer-refs="Compress ObjectToJms"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -35,9 +35,9 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="q2" transformer-refs="Compress ObjectToJms"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -49,9 +49,9 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

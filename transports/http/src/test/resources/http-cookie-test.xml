@@ -18,7 +18,7 @@
                 <vm:inbound-endpoint path="vm-in" />
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <http:outbound-endpoint address="http://localhost:60212" method="POST">
                         <properties>
                             <spring:entry key="Content-Type" value="text/xml" />
@@ -29,7 +29,7 @@
                             </spring:entry>
                         </properties>
                     </http:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

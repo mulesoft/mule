@@ -17,9 +17,9 @@
             </inbound>
             <test:component appendString=" Received"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

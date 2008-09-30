@@ -15,11 +15,11 @@
             </inbound>
             <component class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyComponent"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="component2">
                         <custom-transformer class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyTransformer"/>
                     </vm:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

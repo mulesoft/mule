@@ -19,9 +19,9 @@
             </inbound>
             <echo-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="pojo2"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         
@@ -31,9 +31,9 @@
             </inbound>
             <echo-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="pojo3"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         
@@ -43,10 +43,10 @@
             </inbound>
             <echo-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="pojo4"/>
                     <reply-to address="jms://response"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         

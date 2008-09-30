@@ -54,9 +54,9 @@
                 <inbound-endpoint ref="vmEndpoint"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="httpEndpoint2" transformer-refs="SerializableToByteArray"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

@@ -20,9 +20,9 @@
                 </vm:inbound-endpoint>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="test1-out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>
@@ -41,9 +41,9 @@
                 </vm:inbound-endpoint>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="test2-out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>
@@ -58,13 +58,13 @@
                 </vm:inbound-endpoint>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="test3-out">
                         <append-string-transformer message="a"/>
                         <append-string-transformer message="b"/>
                         <append-string-transformer message="c"/>
                     </vm:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

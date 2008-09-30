@@ -27,9 +27,9 @@
                 <vm:inbound-endpoint path="chained"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="out" synchronous="true"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         <service name="testServiceChainedB">

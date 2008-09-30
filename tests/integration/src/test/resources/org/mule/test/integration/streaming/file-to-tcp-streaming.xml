@@ -18,9 +18,9 @@
                 <inbound-endpoint address="file://${mule.working.dir}/test-data/in"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="tcp://localhost:34561"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

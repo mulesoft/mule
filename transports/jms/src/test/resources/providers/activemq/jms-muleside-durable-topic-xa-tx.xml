@@ -38,7 +38,7 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorTestDriver">
                         <xa-transaction action="BEGIN_OR_JOIN"/> 
                     </jms:outbound-endpoint>
@@ -47,7 +47,7 @@
                         on the outbound. Such problems are now nicely detected and reported via an error.
                     -->
                     <xa-transaction action="BEGIN_OR_JOIN"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -61,12 +61,12 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="out">
                         <!-- MULE-3382 -->
                         <custom-transaction action="NONE" factory-class="org.mule.transaction.XaTransactionFactory"/>
                     </outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -80,12 +80,12 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="out">
                         <!-- MULE-3382 -->
                         <custom-transaction action="NONE" factory-class="org.mule.transaction.XaTransactionFactory"/>
                     </outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

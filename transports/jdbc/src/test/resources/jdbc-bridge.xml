@@ -43,11 +43,11 @@
                 </jdbc:inbound-endpoint>                
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jdbc:outbound-endpoint queryKey="write" connector-ref="jdbcOUTConnector">
                         <jdbc:transaction action="NONE"/>
                     </jdbc:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

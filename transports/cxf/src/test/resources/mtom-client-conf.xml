@@ -37,7 +37,7 @@
           <component class="org.mule.transport.cxf.employee.EmployeeMessageGenerator">
           </component>
           <outbound>
-              <outbound-pass-through-router>
+              <pass-through-router>
                   <cxf:outbound-endpoint 
                       name="outboundEmployeeDirectoryEndpoint" 
                       address="http://localhost:63081/services/employeeDirectory"
@@ -50,7 +50,7 @@
                         <spring:bean class="org.mule.transport.cxf.employee.AttachmentVerifyInterceptor"/>
                       </cxf:outInterceptors>
                   </cxf:outbound-endpoint>
-              </outbound-pass-through-router>
+              </pass-through-router>
           </outbound>
         </service>
         

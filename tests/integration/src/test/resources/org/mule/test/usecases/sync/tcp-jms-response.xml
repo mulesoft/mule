@@ -25,10 +25,10 @@
             </inbound>
             <component class="org.mule.component.simple.EchoComponent" />
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://queue_in" />
                     <reply-to address="jms://queue_out" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
             <async-reply>
                 <inbound-endpoint address="jms://queue_out" />

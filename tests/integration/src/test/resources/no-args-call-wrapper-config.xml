@@ -27,9 +27,9 @@
                 <singleton-object class="org.mule.tck.testmodels.fruit.Apple"/>
             </component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -44,13 +44,13 @@
                 <spring-object bean="containerDelegate"/>
             </component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <!--
                         don't reuse the output queue, ensure we're the only sender
                         for this one by providing a unique name
                     -->
                     <outbound-endpoint address="vm://outWithInjected"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

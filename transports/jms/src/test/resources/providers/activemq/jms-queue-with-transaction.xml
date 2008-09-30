@@ -26,9 +26,9 @@
                 <inbound-endpoint address="vm://in"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint ref="feederQueue" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         
@@ -37,9 +37,9 @@
                 <jms:inbound-endpoint queue="feeder.queue"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://out"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

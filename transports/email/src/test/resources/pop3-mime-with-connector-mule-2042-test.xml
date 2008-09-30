@@ -24,9 +24,9 @@
                                        transformer-refs="noActionTransformer" connector-ref="pop3Connector"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="receive"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

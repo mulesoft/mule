@@ -22,9 +22,9 @@
             </inbound>
             <echo-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://queue_in" responseTransformer-refs="responsetransformer" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

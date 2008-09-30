@@ -30,9 +30,9 @@
             </inbound>
             <component class="org.mule.test.cookbook.quartz.NoArgsMethodComponent"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint ref="resultQueue"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

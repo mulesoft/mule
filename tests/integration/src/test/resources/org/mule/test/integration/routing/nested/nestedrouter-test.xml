@@ -35,9 +35,9 @@
                 </binding>
             </component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://invoker.out" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -52,9 +52,9 @@
                 </binding>
             </component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://invoker.out" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -69,9 +69,9 @@
                 </binding>
             </component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://topic:tinvoker.out" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

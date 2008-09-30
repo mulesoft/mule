@@ -62,9 +62,9 @@
                 </http:inbound-endpoint>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="vmtest" synchronous="true"/>
-                </outbound-pass-through-router>    
+                </pass-through-router>    
             </outbound>
         </service>
         
@@ -76,9 +76,9 @@
                 </http:inbound-endpoint>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="vmtest" synchronous="true"/>
-                </outbound-pass-through-router>    
+                </pass-through-router>    
             </outbound>
         </service>
         
@@ -90,9 +90,9 @@
                 </http:inbound-endpoint>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="vmtest" synchronous="true"/>
-                </outbound-pass-through-router>    
+                </pass-through-router>    
             </outbound>
         </service>
     </model>

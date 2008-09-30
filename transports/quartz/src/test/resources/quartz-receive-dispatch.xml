@@ -26,9 +26,9 @@
                 <inbound-endpoint ref="schedulerEndpoint"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://quartz.in"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

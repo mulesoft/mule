@@ -41,10 +41,10 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint
                             address="wsdl-cxf:http://localhost:63381/services/AxisService?wsdl&amp;method=receive"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

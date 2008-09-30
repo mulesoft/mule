@@ -19,10 +19,10 @@
             </inbound>
             <echo-component />
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://echo" />
                     <reply-to address="vm://reply" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
             <async-reply>
                 <inbound-endpoint address="vm://reply"/>

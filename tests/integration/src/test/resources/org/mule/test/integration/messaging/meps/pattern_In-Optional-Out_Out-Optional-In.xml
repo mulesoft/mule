@@ -48,12 +48,12 @@
                 </script:script>
             </script:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="ExternalEndpoint"/>
                     <!-- Mule will automatically listen n this destination when Remote sync is set. If this is not se
                      a temprary destination is set up -->
                     <!--<reply-to address="jms://reply"/>-->
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

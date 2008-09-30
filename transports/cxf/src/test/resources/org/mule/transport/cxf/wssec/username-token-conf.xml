@@ -71,9 +71,9 @@
                 <singleton-object class="org.mule.transport.cxf.jaxws.ClientMessageGenerator" />
             </component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="clientEndpoint"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

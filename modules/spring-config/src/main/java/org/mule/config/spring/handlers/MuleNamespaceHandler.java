@@ -300,7 +300,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         //Inbound Routers
         registerBeanDefinitionParser("forwarding-router", new RouterDefinitionParser(ForwardingConsumer.class));
-        registerBeanDefinitionParser("inbound-pass-through-router", new RouterDefinitionParser(InboundPassThroughRouter.class));
         registerBeanDefinitionParser("idempotent-receiver-router", new RouterDefinitionParser(IdempotentReceiver.class));
         registerBeanDefinitionParser("idempotent-secure-hash-receiver-router", new RouterDefinitionParser(IdempotentSecureHashReceiver.class));
         registerBeanDefinitionParser("selective-consumer-router", new RouterDefinitionParser(SelectiveConsumer.class));
@@ -312,7 +311,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-inbound-router", new RouterDefinitionParser(null));
 
         //Outbound Routers
-        registerBeanDefinitionParser("outbound-pass-through-router", new RouterDefinitionParser(OutboundPassThroughRouter.class));
+        registerBeanDefinitionParser("pass-through-router", new RouterDefinitionParser(OutboundPassThroughRouter.class));
         registerBeanDefinitionParser("filtering-router", new RouterDefinitionParser(FilteringOutboundRouter.class));
         registerBeanDefinitionParser("chaining-router", new RouterDefinitionParser(ChainingRouter.class));
         registerBeanDefinitionParser("endpoint-selector-router", new RouterDefinitionParser(EndpointSelector.class));

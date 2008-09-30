@@ -98,12 +98,12 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <quartz:outbound-endpoint name="qEP3" repeatInterval="1000" jobName="job3"
                                               connector-ref="quartzConnector1">
                         <quartz:custom-job-from-message evaluator="header" expression="jobConfig"/>
                     </quartz:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         <!--// END SNIPPET: example-3 -->
@@ -122,12 +122,12 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <quartz:outbound-endpoint name="qEP4" repeatCount="0" cronExpression="0 11 1 8 * ?" jobName="job4"
                                               connector-ref="quartzConnector1">
                         <quartz:custom-job job-ref="custJob"/>
                     </quartz:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         <!--// END SNIPPET: example-4 -->
@@ -167,14 +167,14 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <quartz:outbound-endpoint name="qEP6" repeatCount="0" cronExpression="0 15 10 * * ? *"
                                               jobName="job6" connector-ref="quartzConnector1">
                         <quartz:scheduled-dispatch-job>
                             <quartz:job-endpoint ref="scheduledDispatchEndpoint"/>
                         </quartz:scheduled-dispatch-job>
                     </quartz:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         <!--// END SNIPPET: example-6 -->

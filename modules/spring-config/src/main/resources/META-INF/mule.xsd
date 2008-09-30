@@ -3108,17 +3108,6 @@
 
     <!-- Inbound Router implementations -->
 
-
-    <xsd:element name="inbound-pass-through-router" type="abstractInboundRouterType"
-                 substitutionGroup="abstract-inbound-router">
-        <xsd:annotation>
-            <xsd:documentation>
-                This router always matches and just simple passes on the incoming message to the service component.
-                This router is used implicitly when no inbound routers are configured.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    
     <xsd:complexType name="filteredInboundRouterType">
         <xsd:complexContent>
             <xsd:extension base="abstractInboundRouterType">
@@ -3486,7 +3475,7 @@
 
     <!--  Concrete Outbound Routers -->
 
-    <xsd:element name="outbound-pass-through-router" type="outboundRouterType"
+    <xsd:element name="pass-through-router" type="outboundRouterType"
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>

@@ -28,9 +28,9 @@
                 <vm:inbound-endpoint ref="VmReceiver2" connector-ref="Connector2"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint address="vm://out" connector-ref="Connector2"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

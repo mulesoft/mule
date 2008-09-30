@@ -18,9 +18,9 @@
             </inbound>
             <null-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <file:outbound-endpoint path="temp/tests/mule"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>    
     </model>

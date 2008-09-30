@@ -14,12 +14,12 @@
                 <inbound-endpoint address="vm://jdbc.test"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jdbc:outbound-endpoint queryKey="getTest">
                         <!-- this is substituted in the SQL template defined in jdbc-connector.xml -->
                         <property key="type" value="1"/>
                     </jdbc:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -28,9 +28,9 @@
                 <inbound-endpoint address="vm://terra"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jdbc:outbound-endpoint address="jdbc://getTestPayload"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
         

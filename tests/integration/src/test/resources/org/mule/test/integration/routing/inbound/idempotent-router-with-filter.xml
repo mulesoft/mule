@@ -25,9 +25,9 @@
                 </idempotent-receiver-router>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://ToTestCase" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

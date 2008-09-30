@@ -44,9 +44,9 @@
                 </axis:soap-method>
             </axis:wrapper-component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <vm:outbound-endpoint path="queue.out" connector-ref="VMQueue"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>  
         

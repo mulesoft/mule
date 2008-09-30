@@ -40,9 +40,9 @@
                 </script:java-interface-binding>
             </script:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="client_response"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

@@ -48,11 +48,11 @@
             </inbound>
             <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://my.queue">
                         <xa-transaction action="ALWAYS_JOIN"/>
                     </outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -64,11 +64,11 @@
             </inbound>
             <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jdbc://writeTest?type=2">
                         <xa-transaction action="ALWAYS_JOIN"/>
                     </outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

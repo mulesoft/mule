@@ -33,9 +33,9 @@
                 <http:inbound-endpoint ref="base"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://echo1" synchronous="true"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -60,9 +60,9 @@
             </inbound>
             <component class="org.mule.transport.http.issues.NoTransformPassThroughComponent"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://echo2" synchronous="true"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -86,9 +86,9 @@
             </inbound>
             <component class="org.mule.transport.http.issues.NoTransformPassThroughComponent"/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://echo3" synchronous="true"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -113,9 +113,9 @@
                 </inbound-endpoint>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://echo4" synchronous="true"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

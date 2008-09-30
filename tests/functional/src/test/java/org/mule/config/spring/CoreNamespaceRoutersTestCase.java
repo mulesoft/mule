@@ -68,12 +68,6 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
         assertNotNull(store.getScheduler());
     }
 
-    public void testInboundPassThroughRouter() throws Exception
-    {
-        Router r = lookupInboundRouterFromService("InboundPassThroughRouter");
-        assertTrue(r instanceof InboundPassThroughRouter);
-    }
-
     public void testSelectiveConsumerRouter() throws Exception
     {
         Router r = lookupInboundRouterFromService("SelectiveConsumerRouter");

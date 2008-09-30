@@ -21,9 +21,9 @@
                 <singleton-object class="org.mule.component.simple.BridgeComponent"/>
             </component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="http://localhost:60210"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

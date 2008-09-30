@@ -37,9 +37,9 @@
                  </component>
 
                  <outbound>
-                     <outbound-pass-through-router>
+                     <pass-through-router>
                          <outbound-endpoint ref="LenderService"/>
-                     </outbound-pass-through-router>
+                     </pass-through-router>
                  </outbound>
 
                  <async-reply timeout="1000000">
@@ -67,9 +67,9 @@
                  </inbound>
                  <component class="org.mule.example.loanbroker.lender.DefaultLender"/>
                  <outbound>
-                     <outbound-pass-through-router>
+                     <pass-through-router>
                          <outbound-endpoint ref="BankGateway" transformer-refs="SetLendersAsRecipients"/>
-                     </outbound-pass-through-router>
+                     </pass-through-router>
                  </outbound>
              </service>
 

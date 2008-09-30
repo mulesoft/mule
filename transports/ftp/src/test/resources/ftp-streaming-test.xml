@@ -25,9 +25,9 @@
                 <inbound-endpoint address="tcp://localhost:60196"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <ftp:outbound-endpoint user="anonymous" password="email" host="localhost" port="60197"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

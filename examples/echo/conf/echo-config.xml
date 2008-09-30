@@ -51,9 +51,9 @@
                 on every message it receives
             -->
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <stdio:outbound-endpoint system="OUT"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

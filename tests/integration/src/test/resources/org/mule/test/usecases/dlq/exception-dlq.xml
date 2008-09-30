@@ -31,9 +31,9 @@
                 throw an exception if invoked
             -->
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="out.queue"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
             <!-- this exception strategy will forward the current message to a jms queue
             and will do so in the current transaction if it is available

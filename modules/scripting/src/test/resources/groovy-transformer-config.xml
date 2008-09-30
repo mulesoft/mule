@@ -37,7 +37,7 @@
             </inbound>
             <echo-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://out1">
                         <script:transformer>
                             <script:script engine="groovy">
@@ -45,7 +45,7 @@
                             </script:script>
                         </script:transformer>
                     </outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -55,13 +55,13 @@
             </inbound>
             <echo-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://out2">
                         <script:transformer>
                             <script:script file="simple-transformer.groovy"/>
                         </script:transformer>
                     </outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -71,9 +71,9 @@
             </inbound>
             <echo-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://out3" transformer-refs="stringReplace"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -83,9 +83,9 @@
             </inbound>
             <echo-component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://out4" transformer-refs="stringReplaceWithParams"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

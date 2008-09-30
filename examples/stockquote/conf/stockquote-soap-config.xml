@@ -54,7 +54,7 @@
                                      responseTransformer-refs="ToString XmlDecoder Xslt XmlToObject"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <axis:outbound-endpoint
                             address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
                             responseTransformer-refs="XmlDecoder Xslt XmlToObject"
@@ -64,7 +64,7 @@
                             <axis:soap-parameter parameter="GetQuoteResult" type="string" mode="OUT"/>
                         </axis:soap-method>
                     </axis:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

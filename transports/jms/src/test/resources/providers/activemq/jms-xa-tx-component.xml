@@ -29,12 +29,12 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="q1">
                         <jms:transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                     <xa-transaction action="BEGIN_OR_JOIN"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -46,11 +46,11 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="q2">
                         <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -62,11 +62,11 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="q3">
                         <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -78,11 +78,11 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="q4">
                         <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -94,12 +94,12 @@
             </inbound>
             <test:component/>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="q5">
                         <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                     <xa-transaction action="BEGIN_OR_JOIN"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -113,11 +113,11 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="out">
                         <xa-transaction action="NONE"/>
                     </outbound-endpoint>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>

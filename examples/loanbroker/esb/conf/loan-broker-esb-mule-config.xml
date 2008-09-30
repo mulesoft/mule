@@ -84,9 +84,9 @@
             <component class="org.mule.example.loanbroker.AsynchronousLoanBroker" />
 
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint ref="CreditAgencyGateway" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
 
             <async-reply timeout="10000">

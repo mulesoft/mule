@@ -83,9 +83,9 @@
             </inbound>
             <echo-component />
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://echo" responseTransformer-refs="customResponse" synchronous="true" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -94,9 +94,9 @@
                 <inbound-endpoint address="vm://jmsSync" synchronous="true" />
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://echo" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -105,9 +105,9 @@
                 <inbound-endpoint address="vm://jmsSyncOutboundEndpointResponseTransformer" synchronous="true" />
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -116,10 +116,10 @@
                 <inbound-endpoint address="vm://jmsRemoteSyncOutboundEndpointResponseTransformer" remoteSync="true" />
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <!-- remoteSync shouldn't need to be set on outbound endpoint is it is set on inbound endpoint -->
                     <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" remoteSync="true" />
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

@@ -21,9 +21,9 @@
             <test:component/>
 
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <jms:outbound-endpoint queue="another.service" remoteSync="true" remoteSyncTimeout="5000"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
 

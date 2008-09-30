@@ -63,9 +63,9 @@
                 <inbound-endpoint address="http://localhost:63081/test" synchronous="true"/>
             </inbound>
             <outbound>
-                <outbound-pass-through-router>
+                <pass-through-router>
                     <outbound-endpoint address="vm://mycomponent"/>
-                </outbound-pass-through-router>
+                </pass-through-router>
             </outbound>
         </service>
     </model>
