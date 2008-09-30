@@ -29,12 +29,6 @@
             </inbound>
         </service>
         
-        <service name="InboundPassThroughRouter">
-            <inbound>
-                <inbound-pass-through-router/>
-            </inbound>
-        </service>
-        
         <service name="SelectiveConsumerRouter">
             <inbound>
                 <selective-consumer-router transformFirst="false"/>
