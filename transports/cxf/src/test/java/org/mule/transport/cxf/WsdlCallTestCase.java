@@ -58,7 +58,7 @@ public class WsdlCallTestCase extends FunctionalTestCase
         super.doTearDown();
     }
     
-    /*
+    
     public void testRequestWsdlWithServlets() throws Exception
     {
         InputStream wsdlStream = new URL("http://localhost:" + HTTP_PORT
@@ -67,13 +67,12 @@ public class WsdlCallTestCase extends FunctionalTestCase
         String location = "http://localhost:" + HTTP_PORT + "/services/mycomponent";
         
         Document document = new SAXReader().read(wsdlStream);
+        
         List nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
-        assertEquals(((Element) nodes.get(0)).attribute("name").getStringValue(), "mycomponent");
-        System.err.println(document.asXML());
+        assertEquals("TestServiceComponent", ((Element) nodes.get(0)).attribute("name").getStringValue());
         nodes = document.selectNodes("//wsdl:definitions/wsdl:service/wsdl:port/soap:address");
         assertEquals(location, ((Element) nodes.get(0)).attribute("location").getStringValue());
     }
-    */
 
     public void testRequestWsdlWithHttp() throws Exception
     {

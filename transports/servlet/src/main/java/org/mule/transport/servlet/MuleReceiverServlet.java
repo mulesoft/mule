@@ -117,7 +117,13 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
     protected void setupRequestMessage(HttpServletRequest request, MuleMessage requestMessage)
     {
-        requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, request.getRequestURI());
+        String reqUri = request.getRequestURI().toString();
+        String queryString = request.getQueryString();
+        if (queryString != null) {
+            reqUri += "?"+queryString;
+        }
+
+        requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, reqUri);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
