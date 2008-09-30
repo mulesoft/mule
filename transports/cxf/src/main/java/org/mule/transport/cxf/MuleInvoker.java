@@ -57,10 +57,11 @@ public class MuleInvoker implements Invoker
                 reqMsg);
             messageAdapter.setPayload(exchange.getInMessage());
 
+            BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
+            Service svc = exchange.get(Service.class);
+            
             if (!receiver.isProxy())
             {
-                BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
-                Service svc = exchange.get(Service.class);
                 MethodDispatcher md = (MethodDispatcher) svc.get(MethodDispatcher.class.getName());
                 Method m = md.getMethod(bop);
                 if (targetClass != null)
@@ -72,6 +73,13 @@ public class MuleInvoker implements Invoker
             }
             
             DefaultMuleMessage muleReq = new DefaultMuleMessage(messageAdapter);
+            
+            if (bop != null)
+            {
+                muleReq.setProperty("cxf.operation", bop.getOperationInfo().getName());
+                muleReq.setProperty("cxf.service", svc.getName());
+            }
+            
             String replyTo = (String) exchange.getInMessage().get(MuleProperties.MULE_REPLY_TO_PROPERTY);
             if (replyTo != null)
             {
