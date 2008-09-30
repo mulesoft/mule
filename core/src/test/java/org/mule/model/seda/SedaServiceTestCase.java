@@ -13,6 +13,7 @@ package org.mule.model.seda;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.service.Service;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.config.QueueProfile;
 import org.mule.object.PrototypeObjectFactory;
@@ -139,6 +140,21 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
         }
     }
 
+    /**
+     * SEE MULE-3684
+     * @throws Exception
+     */
+    public void testDispatchToPausedService() throws Exception
+    {
+        Service service = getTestService();
+        service.start();
+        service.pause();
+        service.dispatchEvent(getTestInboundEvent("test"));
+
+        // This test will timeout and fail if dispatch() blocks
+        
+    }
+    
     private WorkEvent getTestWorkEvent()
     {
         return new WorkEvent(this, // source
