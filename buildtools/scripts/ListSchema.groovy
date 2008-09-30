@@ -55,16 +55,6 @@ def servicexsd = /.*(\/|\\)spring-config(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 def testxsd = /.*(\/|\\)tests(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-test\.xsd/
 def otherxsd = /.*(\/|\\)(transports|modules)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 
-def checkGroovyVersion = {
-    def groovyVersion = InvokerHelper.getVersion()
-    if (groovyVersion.indexOf("1.5") == -1) {
-        println ""
-        println "WARNING: this script needs at least Groovy 1.5.x to run"
-        println ""
-        System.exit(1)
-    }
-}
-
 def checkCurrentDirectory = {
   if (! (new File("").getCanonicalFile().getName() == "scripts")) {
     println ""
@@ -201,7 +191,6 @@ def generateDeployCommand = {
   }
 }
 
-//checkGroovyVersion()
 checkCurrentDirectory()
 scanForSchemaAndInferDestinations()
 checkSchema()
