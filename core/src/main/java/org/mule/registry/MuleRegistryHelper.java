@@ -354,14 +354,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         {
             exactTransformerCache.clear();
             transformerListCache.clear();
-        }
-        
-        //TODO should we always throw an exception if an object already exists
-        if (lookupTransformer(transformer.getName()) != null)
-        {
-            throw new RegistrationException(CoreMessages.objectAlreadyRegistered("transformer: " +
-                    transformer.getName(), lookupTransformer(transformer.getName()), transformer).getMessage());
-        }
+        }        
         registry.registerObject(getName(transformer), transformer, Transformer.class);
     }
 
