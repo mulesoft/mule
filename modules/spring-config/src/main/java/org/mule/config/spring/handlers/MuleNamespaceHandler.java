@@ -97,7 +97,6 @@ import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.inbound.ForwardingConsumer;
 import org.mule.routing.inbound.IdempotentReceiver;
 import org.mule.routing.inbound.IdempotentSecureHashReceiver;
-import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.routing.inbound.MessageChunkingAggregator;
 import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.routing.inbound.SimpleCollectionAggregator;
@@ -107,6 +106,7 @@ import org.mule.routing.outbound.ChainingRouter;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.EndpointSelector;
 import org.mule.routing.outbound.ExceptionBasedRouter;
+import org.mule.routing.outbound.ExpressionRecipientList;
 import org.mule.routing.outbound.FilteringListMessageSplitter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.routing.outbound.MessageChunkingRouter;
@@ -312,14 +312,14 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         //Outbound Routers
         registerBeanDefinitionParser("pass-through-router", new RouterDefinitionParser(OutboundPassThroughRouter.class));
-        registerBeanDefinitionParser("filtering-router", new RouterDefinitionParser(FilteringOutboundRouter.class));
-        registerBeanDefinitionParser("chaining-router", new RouterDefinitionParser(ChainingRouter.class));
+        registerBeanDefinitionParser("filtering-router", new RouterDefinitionParser(FilteringOutboundRouter.class));        registerBeanDefinitionParser("chaining-router", new RouterDefinitionParser(ChainingRouter.class));
         registerBeanDefinitionParser("endpoint-selector-router", new RouterDefinitionParser(EndpointSelector.class));
         registerBeanDefinitionParser("exception-based-router", new RouterDefinitionParser(ExceptionBasedRouter.class));
         registerBeanDefinitionParser("list-message-splitter-router", new RouterDefinitionParser(FilteringListMessageSplitter.class));
         registerBeanDefinitionParser("message-chunking-router", new RouterDefinitionParser(MessageChunkingRouter.class));
         registerBeanDefinitionParser("multicasting-router", new RouterDefinitionParser(MulticastingRouter.class));
         registerBeanDefinitionParser("static-recipient-list-router", new RouterDefinitionParser(StaticRecipientList.class));
+        registerBeanDefinitionParser("expression-recipient-list-router", new RouterDefinitionParser(ExpressionRecipientList.class));
         registerBeanDefinitionParser("recipients", new ChildListDefinitionParser("recipients"));
         registerBeanDefinitionParser("template-endpoint-router", new RouterDefinitionParser(TemplateEndpointRouter.class));
         registerBeanDefinitionParser("custom-outbound-router", new RouterDefinitionParser(null));

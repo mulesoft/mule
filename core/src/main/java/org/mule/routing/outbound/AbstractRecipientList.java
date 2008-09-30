@@ -12,9 +12,11 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.MuleServer;
+import org.mule.DefaultMessageCollection;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.MuleMessageCollection;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.RegistrationException;
@@ -58,7 +60,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
         List recipients = this.getRecipients(message);
         List results = new ArrayList();
-
+        
         if (enableCorrelation != ENABLE_CORRELATION_NEVER)
         {
             boolean correlationSet = message.getCorrelationGroupSize() != -1;
@@ -93,7 +95,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
                     result = this.send(session, request, endpoint);
                     if (result != null)
                     {
-                        results.add(result.getPayload());
+                        results.add(result);
                     }
                     else
                     {
@@ -125,7 +127,9 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
         else
         {
-            return new DefaultMuleMessage(results, result);
+            DefaultMessageCollection collection = new DefaultMessageCollection();
+            collection.addMessages(results);
+            return collection;
         }
     }
 
@@ -201,6 +205,6 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         return true;
     }
 
-    protected abstract List getRecipients(MuleMessage message);
+    protected abstract List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException;
 
 }
