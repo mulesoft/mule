@@ -15,11 +15,9 @@ import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryNotifier;
 import org.mule.api.retry.RetryPolicy;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.retry.DefaultRetryContext;
 import org.mule.retry.PolicyStatus;
 import org.mule.retry.notifiers.ConnectNotifier;
-import org.mule.transport.FatalConnectException;
 
 import java.io.InterruptedIOException;
 
@@ -38,16 +36,16 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
     
     protected transient final Log logger = LogFactory.getLog(getClass());
     
-    public RetryContext execute(RetryCallback callback) throws FatalConnectException
+    public RetryContext execute(RetryCallback callback) throws Exception
     {
         PolicyStatus status = null;
         RetryPolicy policy = createRetryInstance();
         DefaultRetryContext context = new DefaultRetryContext(callback.getWorkDescription());
         try
         {
+            Exception cause = null;
             do
             {
-                Throwable cause;
                 try
                 {
                     callback.doWork(context);
@@ -55,7 +53,6 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
                     {
                         notifier.sucess(context);
                     }
-
                     break;
                 }
                 catch (Exception e)
@@ -63,27 +60,32 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
                     cause = e;
                     if (notifier != null)
                     {
-                        notifier.failed(context, e);
+                        notifier.failed(context, cause);
                     }
-                    if (e instanceof InterruptedException || e instanceof InterruptedIOException)
+                    if (cause instanceof InterruptedException || cause instanceof InterruptedIOException)
                     {
                         logger.error("Process was interrupted (InterruptedException), ceasing process");
                         break;
                     }
+                    else
+                    {
+                        status = policy.applyPolicy(cause);
+                    }
                 }
-                status = policy.applyPolicy(cause);
             }
             while (status.isOk());
 
-            if(status==null || status.isOk())
+            if (status == null || status.isOk())
             {
                 return context;
             }
             else
             {
-                throw new FatalConnectException(
-                        CoreMessages.failedToConnect(context.getDescription(), this),
-                        status.getThrowable(), this);
+                throw cause;
+                // TODO Do we really want to wrap the exception here or just bubble up the original exception?
+                //throw new FatalConnectException(
+                //        CoreMessages.failedToConnect(context.getDescription(), this),
+                //        status.getThrowable(), callback.getWorkDescription());
             }
         }
         finally

@@ -11,7 +11,6 @@
 package org.mule.transport;
 
 import org.mule.api.lifecycle.FatalException;
-import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.config.i18n.Message;
 
 /** TODO document */
@@ -20,17 +19,17 @@ public class FatalConnectException extends FatalException
     /** Serial version */
     private static final long serialVersionUID = 3300563235465630595L;
 
-    public FatalConnectException(Message message, RetryPolicyTemplate component)
+    public FatalConnectException(Message message, Object component)
     {
         super(message, component);
     }
 
-    public FatalConnectException(Message message, Throwable cause, RetryPolicyTemplate component)
+    public FatalConnectException(Message message, Throwable cause, Object component)
     {
         super(message, cause, component);
     }
 
-    public FatalConnectException(Throwable cause, RetryPolicyTemplate component)
+    public FatalConnectException(Throwable cause, Object component)
     {
         super(cause, component);
     }

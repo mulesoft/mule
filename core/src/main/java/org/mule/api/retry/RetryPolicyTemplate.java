@@ -10,7 +10,6 @@
 
 package org.mule.api.retry;
 
-import org.mule.transport.FatalConnectException;
 
 /**
  * A factory responsible for creating a retry policy.  Custom policies should
@@ -28,5 +27,5 @@ public interface RetryPolicyTemplate
 
     void setNotifier(RetryNotifier retryNotifier);
 
-    RetryContext execute(RetryCallback callback) throws FatalConnectException;
+    RetryContext execute(RetryCallback callback) throws Exception;
 }
