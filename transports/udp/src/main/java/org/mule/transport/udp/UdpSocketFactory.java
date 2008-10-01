@@ -104,7 +104,7 @@ public class UdpSocketFactory implements KeyedPoolableObjectFactory
 
     public void activateObject(Object key, Object object) throws Exception
     {
-        // nothing to do
+        // nothing to do        
     }
 
     public void passivateObject(Object key, Object object) throws Exception

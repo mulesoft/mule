@@ -21,6 +21,7 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
+import org.mule.config.MuleManifest;
 
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,17 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
 
     public void dispatch(MuleEvent event) throws DispatchException
     {
-        endpoint.dispatch(event);
+        if (getConnector() != null)
+        {
+            getConnector().dispatch(this, event);
+        }
+        else
+        {
+            // TODO Either remove because this should never happen or i18n the
+            // message
+            throw new IllegalStateException("The connector on the endpoint: " + toString()
+                                            + " is null. Please contact " + MuleManifest.getDevListEmail());
+        }
     }
 
     public RetryPolicyTemplate getRetryPolicyTemplate()
@@ -167,7 +178,17 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
 
     public MuleMessage send(MuleEvent event) throws DispatchException
     {
-        return endpoint.send(event);
+        if (getConnector() != null)
+        {
+            return getConnector().send(this, event);
+        }
+        else
+        {
+            // TODO Either remove because this should never happen or i18n the
+            // message
+            throw new IllegalStateException("The connector on the endpoint: " + toString()
+                                            + " is null. Please contact " + MuleManifest.getDevListEmail());
+        }
     }
 
     public String getEndpointBuilderName()

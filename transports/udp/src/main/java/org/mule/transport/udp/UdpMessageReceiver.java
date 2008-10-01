@@ -77,7 +77,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     {
         try
         {
-            socket = ((UdpConnector) connector).getSocket(endpoint);
+            socket = ((UdpConnector) connector).getServerSocket(endpoint);
         }
         catch (Exception e)
         {

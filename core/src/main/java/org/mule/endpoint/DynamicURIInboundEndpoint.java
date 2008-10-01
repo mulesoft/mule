@@ -19,6 +19,7 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
+import org.mule.config.MuleManifest;
 
 import java.util.List;
 import java.util.Map;
@@ -36,11 +37,16 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
 
     public DynamicURIInboundEndpoint(InboundEndpoint endpoint)
     {
-        this.endpoint = endpoint;
+        this(endpoint, null);
     }
 
     public DynamicURIInboundEndpoint(InboundEndpoint endpoint, EndpointURI dynamicEndpointURI)
     {
+        if (endpoint instanceof DynamicURIInboundEndpoint) 
+        {
+            throw new IllegalArgumentException("Dynamic endpoints can only wrap immuntable InboundEndpoint instances!");
+        }
+        
         this.endpoint = endpoint;
         setEndpointURI(dynamicEndpointURI);
     }
@@ -157,9 +163,20 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return endpoint.isSynchronous();
     }
 
+
     public MuleMessage request(long timeout) throws Exception
     {
-        return endpoint.request(timeout);
+        if (getConnector() != null)
+        {
+            return getConnector().request(this, timeout);
+        }
+        else
+        {
+            // TODO Either remove because this should never happen or i18n the
+            // message
+            throw new IllegalStateException("The connector on the endpoint: " + toString()
+                                            + " is null. Please contact " + MuleManifest.getDevListEmail());
+        }
     }
 
     public String getEndpointBuilderName()

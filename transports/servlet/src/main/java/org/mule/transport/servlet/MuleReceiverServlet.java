@@ -15,6 +15,7 @@ import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointException;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
@@ -318,8 +319,18 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 throw new NoReceiverForEndpointException("No receiver found for endpointUri: " + uri);
             }
         }
-        receiver.setEndpoint(new DynamicURIInboundEndpoint(receiver.getEndpoint(), new MuleEndpointURI(
-                getRequestUrl(httpServletRequest))));
+        InboundEndpoint endpoint = receiver.getEndpoint();
+        
+        // Ensure that this receiver is using a dynamic (mutable) endpoint
+        if (!(endpoint instanceof DynamicURIInboundEndpoint)) 
+        {
+            endpoint = new DynamicURIInboundEndpoint(receiver.getEndpoint());
+            receiver.setEndpoint(endpoint);
+        }
+        
+        // Tell the dynamic endpoint about our new URL
+        ((DynamicURIInboundEndpoint) endpoint).setEndpointURI(new MuleEndpointURI(getRequestUrl(httpServletRequest)));
+        
         try
         {
             receiver.getEndpointURI().initialise();

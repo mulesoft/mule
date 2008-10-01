@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:udp="http://www.mulesource.org/schema/mule/udp/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+               http://www.mulesource.org/schema/mule/udp/2.0 http://www.mulesource.org/schema/mule/udp/2.0/mule-udp.xsd">
+
+    <serializable-to-byte-array-transformer name="SerializableToByteArray"/>
+
+    <custom-connector name="connector.udp.0" class="org.mule.transport.udp.functional.CustomUdpConnector">
+       <spring:property name="keepSendSocketOpen" value="false"/>
+    </custom-connector>
+    
+    <model name="main">
+
+		<!-- use "netstat -a -p udp" and you will svn see the port leaking problem -->
+        <service name="DynamicEndpoint">
+            <inbound>
+                <udp:inbound-endpoint host="${hostname}" port="61000" />
+            </inbound>
+            <outbound>
+                <custom-outbound-router class="org.mule.transport.udp.functional.DynamicEndpointRouter">
+                    <udp:outbound-endpoint address="udp://dummy"/>
+                </custom-outbound-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

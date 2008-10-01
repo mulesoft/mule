@@ -39,11 +39,13 @@ public class UdpConnector extends AbstractConnector
     protected boolean keepSendSocketOpen = true;
     protected boolean broadcast;
     protected GenericKeyedObjectPool dispatcherSocketsPool = new GenericKeyedObjectPool();
+    protected UdpSocketFactory socketFactory;
 
 
     protected void doInitialise() throws InitialisationException
     {
-        dispatcherSocketsPool.setFactory(new UdpSocketFactory());
+        socketFactory = new UdpSocketFactory();
+        dispatcherSocketsPool.setFactory(socketFactory);
         dispatcherSocketsPool.setTestOnBorrow(true);
         dispatcherSocketsPool.setTestOnReturn(true);
         //There should only be one pooled instance per socket (key)
@@ -176,9 +178,22 @@ public class UdpConnector extends AbstractConnector
         return (DatagramSocket) dispatcherSocketsPool.borrowObject(endpoint);
     }
 
+    DatagramSocket getServerSocket(ImmutableEndpoint endpoint) throws Exception
+    {
+        return (DatagramSocket) socketFactory.makeObject(endpoint);
+    }
+    
     void releaseSocket(DatagramSocket socket, ImmutableEndpoint endpoint) throws Exception
     {
-        dispatcherSocketsPool.returnObject(endpoint, socket);
+        // Sockets can't be recycled if we close them at the end...
+        if (!keepSendSocketOpen)
+        {
+            dispatcherSocketsPool.clear(endpoint);
+        }
+        else
+        {
+            dispatcherSocketsPool.returnObject(endpoint, socket);
+        }
     }
 
 
