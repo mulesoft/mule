@@ -30,7 +30,7 @@
                    recoverJmsConnections="false"
                    eagerConsumer="false"
                    specification="1.1"
-                   numberOfConcurrentTransactedReceivers="7"
+                   numberOfConsumers="7"
                    connectionFactory-ref="connectionFactory"
                    redeliveryHandlerFactory-ref="redeliveryHandlerFactory"
                    username="myuser"
