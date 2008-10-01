@@ -113,7 +113,7 @@
         <javaXmlRpcVersion>1.1.0</javaXmlRpcVersion>
         <javaXmlSoapVersion>1.3.0</javaXmlSoapVersion>
         <javaXmlStreamVersion>1.0.1</javaXmlStreamVersion>
-        <javaXmlWsVersion>2.1</javaXmlWsVersion>
+        <javaXmlWsVersion>2.1-1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jbossTsVersion>4.2.3-SP5</jbossTsVersion>
         <jbpmVersion>3.2.2</jbpmVersion>

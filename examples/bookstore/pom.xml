@@ -62,18 +62,7 @@
       <artifactId>mule-transport-http</artifactId>
       <version>${muleVersion}</version>
     </dependency>
-    <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mail.osgi</artifactId>
-        <version>${javaMailVersion}</version>
-    </dependency>
-    <dependency>
-        <!-- OSGi-ready -->
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
-    </dependency>
-  </dependencies>
-  
+  </dependencies> 
   <repositories>
     <repository>
       <id>apache-incubating</id>
