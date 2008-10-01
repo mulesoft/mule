@@ -15,6 +15,7 @@ import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.assembly.configuration.PrefixValueMap;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
@@ -41,13 +42,20 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public static final String QUEUE = "queue";
     public static final String TOPIC = "topic";
+    public static final String NUMBER_OF_CONSUMERS_ATTRIBUTE = "numberOfConsumers";
+    public static final String NUMBER_OF_CONCURRENT_TRANSACTED_RECEIVERS_ATTRIBUTE = "numberOfConcurrentTransactedReceivers";
+    public static final String NUMBER_OF_CONSUMERS_PROPERTY = "numberOfConcurrentTransactedReceivers";
     public static final String[][] JMS_ATTRIBUTES = new String[][]{new String[]{QUEUE}, new String[]{TOPIC}};
 
     public void init()
     {
         registerJmsTransportEndpoints();
 
-        registerBeanDefinitionParser("connector", new JmsConnectorDefinitionParser());
+        registerMuleBeanDefinitionParser("connector", new JmsConnectorDefinitionParser()).addAlias(
+            NUMBER_OF_CONSUMERS_ATTRIBUTE, NUMBER_OF_CONSUMERS_PROPERTY).registerPreProcessor(
+            new CheckExclusiveAttributes(new String[][]{
+                new String[]{NUMBER_OF_CONCURRENT_TRANSACTED_RECEIVERS_ATTRIBUTE},
+                new String[]{NUMBER_OF_CONSUMERS_ATTRIBUTE}}));
         registerBeanDefinitionParser("custom-connector", new JmsConnectorDefinitionParser());
         registerBeanDefinitionParser("activemq-connector", new JmsConnectorDefinitionParser(ActiveMQJmsConnector.class));
         registerBeanDefinitionParser("activemq-xa-connector", new JmsConnectorDefinitionParser(ActiveMQXAJmsConnector.class));

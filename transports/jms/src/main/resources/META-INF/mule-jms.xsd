@@ -87,6 +87,14 @@
         </xsd:attribute>
         <xsd:attribute name="username" type="xsd:string"/>
         <xsd:attribute name="password" type="xsd:string"/>
+        <xsd:attribute name="numberOfConsumers" type="mule:substitutableInt">
+            <xsd:annotation>
+                <xsd:documentation>
+                         The configures the number of concurrent consumers that will be used to receive JMS messages.  
+                         (Note: If you use this attribute you should not configure the 'numberOfConcurrentTransactedReceivers' which has the same effect.)
+                      </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
 

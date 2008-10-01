@@ -67,6 +67,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertFalse(c.isCacheJmsSessions());
         assertTrue(c.isRecoverJmsConnections());
         assertTrue(c.isEagerConsumer());
+        assertEquals(4, c.getNumberOfConcurrentTransactedReceivers());
     }
     
     public void testConnectorConfig() throws Exception
@@ -95,9 +96,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
         //test properties, default is 4
-        assertEquals(c.getNumberOfConcurrentTransactedReceivers(),7);
-
-
+        assertEquals(7, c.getNumberOfConcurrentTransactedReceivers());
     }
 
     public void testCustomConnectorConfig() throws Exception
