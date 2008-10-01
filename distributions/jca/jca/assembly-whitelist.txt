@@ -44,7 +44,7 @@ hibernate.osgi-3.2.2.ga
 javassist.osgi-3.6.ga
 jaxb-all.osgi-2.1.6
 jaxen.osgi-1.1.1
-jaxws-api.osgi-2.1
+jaxws-api.osgi-2.1-1
 jbpm-jpdl.osgi-3.2.2
 jcr.osgi-1.0
 jdom.osgi-1.0
