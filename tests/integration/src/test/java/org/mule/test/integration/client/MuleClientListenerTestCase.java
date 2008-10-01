@@ -13,10 +13,10 @@ package org.mule.test.integration.client;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.service.Service;
+import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.FatalConnectException;
 
 
 public class MuleClientListenerTestCase extends FunctionalTestCase
@@ -39,8 +39,8 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
             }
             catch (Exception e)
             {
-                assertTrue(e.getCause() instanceof FatalConnectException);
-                assertTrue(e.getCause().getCause() instanceof NoReceiverForEndpointException);
+                assertTrue(e instanceof DispatchException);
+                assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
             }
         }
         
@@ -64,8 +64,8 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
             }
             catch (Exception e)
             {
-                assertTrue(e.getCause() instanceof FatalConnectException);
-                assertTrue(e.getCause().getCause() instanceof NoReceiverForEndpointException);
+                assertTrue(e instanceof DispatchException);
+                assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
             }
         }
     }

@@ -13,9 +13,9 @@ package org.mule.transport.ejb;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.transport.DispatchException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractFunctionalTestCase;
-import org.mule.transport.FatalConnectException;
 import org.mule.transport.rmi.RmiConnector;
 
 import java.util.Properties;
@@ -53,10 +53,10 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
         {
             ep.send(getTestEvent("hello", ep));
         }
-        catch (MuleException e)
+        catch (Exception e)
         {
-            assertTrue(e.getCause() instanceof FatalConnectException);
-            assertTrue(e.getCause().getCause() instanceof NoSuchMethodException);
+            assertTrue(e instanceof DispatchException);
+            assertTrue(e.getCause() instanceof NoSuchMethodException);
         }
     }
 
@@ -78,10 +78,10 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
         {
             ep.send(getTestEvent("hello", ep));
         }
-        catch (MuleException e)
+        catch (Exception e)
         {
-            assertTrue(e.getCause() instanceof FatalConnectException);
-            assertTrue(e.getCause().getCause() instanceof NoSuchMethodException);
+            assertTrue(e instanceof DispatchException);
+            assertTrue(e.getCause() instanceof NoSuchMethodException);
         }
     }
 

@@ -15,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.FatalConnectException;
 import org.mule.transport.NullPayload;
 
 import org.apache.axis.AxisFault;
@@ -53,8 +52,7 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
         }
         assertNotNull(exception);
         assertTrue(exception instanceof DispatchException);
-        assertTrue(exception.getCause() instanceof FatalConnectException);
-        Throwable rootCause = exception.getCause().getCause();
+        Throwable rootCause = exception.getCause();
         assertTrue(rootCause instanceof DispatchException);
         assertTrue(rootCause.getMessage().startsWith("Cannot invoke WS call without an Operation."));
     }
@@ -74,8 +72,7 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
         }
         assertNotNull(exception);
         assertTrue(exception instanceof DispatchException);
-        assertTrue(exception.getCause() instanceof FatalConnectException);
-        Throwable rootCause = exception.getCause().getCause();
+        Throwable rootCause = exception.getCause();
         assertTrue(rootCause instanceof AxisFault);
         assertTrue(rootCause.getMessage().startsWith("The AXIS engine could not find a target service to invoke!"));
     }

@@ -13,7 +13,6 @@ package org.mule.transport.cxf;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.FatalConnectException;
 import org.mule.transport.cxf.testmodels.CustomFault;
 import org.mule.transport.cxf.testmodels.CxfEnabledFaultMessage;
 
@@ -30,10 +29,9 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
             client.send("cxf:http://localhost:63181/services/CxfDefault?method=testXFireException", "TEST",
                 null);
         }
-        catch (DispatchException ex)
+        catch (DispatchException e)
         {
-            assertTrue(ex.getCause() instanceof FatalConnectException);
-            assertTrue(ex.getCause().getCause() instanceof CxfEnabledFaultMessage);
+            assertTrue(e.getCause() instanceof CxfEnabledFaultMessage);
         }
     }
 
@@ -75,10 +73,9 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
                 "cxf:http://localhost:63181/services/CxfWithExceptionStrategy?method=testNonXFireException",
                 "TEST", null);
         }
-        catch (DispatchException ex)
+        catch (DispatchException e)
         {
-            assertTrue(ex.getCause() instanceof FatalConnectException);
-            assertTrue(ex.getCause().getCause() instanceof Fault);
+            assertTrue(e.getCause() instanceof Fault);
         }
     }
 
