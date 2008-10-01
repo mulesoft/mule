@@ -30,6 +30,12 @@
             <artifactId>${libArtifactId}</artifactId>
             <version>${libVersion}</version>
             <optional>true</optional>
+            <exclusions>
+                <exclusion> 
+                    <groupId>javax.jws</groupId>
+                    <artifactId>jsr181</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>
