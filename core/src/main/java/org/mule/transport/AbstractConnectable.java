@@ -10,6 +10,7 @@
 
 package org.mule.transport;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -54,6 +55,15 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     
     protected boolean startOnConnect = false;
     
+    /**
+     * For the new retry policies to work properly, the transport's connection/disconnection 
+     * to/from the underlying resource must occur in the doConnect()/doDisconnect() methods 
+     * and not in doSend()/doDispatch()/doRequest()/getMessages(). This flag (false by default) 
+     * indicates whether this particular Receiver/Dispatcher/Requester complies with this requirement.
+     * @see MULE-3754
+     */
+    protected boolean useStrictConnectDisconnect = false;
+    
     public AbstractConnectable(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
@@ -89,22 +99,9 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         }
     }
 
-    // TODO How does this method relate to exceptionThrown(Exception e) ?
     public void handleException(Exception exception)
     {
-        if (exception instanceof ConnectException)
-        {
-            logger.info("Exception caught is a ConnectException, disconnecting receiver and invoking Retry Policy");
-            try
-            {
-                disconnect();
-            }
-            catch (Exception e)
-            {
-                connector.getExceptionListener().exceptionThrown(e);
-            }
-        }
-        connector.getExceptionListener().exceptionThrown(exception);
+        exceptionThrown(exception);
     }
 
     public boolean validate()
@@ -172,26 +169,34 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             throw new IllegalStateException("Requester/dispatcher has been disposed; cannot connect to resource");
         }
 
-        final RetryCallback callback = new RetryCallback()
+        retryTemplate.execute(new RetryCallback()
         {
             public void doWork(RetryContext context) throws Exception
             {
-                doConnect();
-                connected.set(true);
-                if (startOnConnect)
+                try
                 {
-                    start();
+                    doConnect();
                 }
+                catch (Exception e)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        e.printStackTrace();
+                    }
+                    throw e;
+                }
+                connected.set(true);
             }
 
             public String getWorkDescription()
             {
                 return getConnectionDescription();
             }
-        };
+        });
         
-        retryTemplate.execute(callback);
-        
+        // Wait until we are connected (or until the retry policy is exhausted and a final exception has been thrown).
+        connected.whenTrue(null);
+
         if (startOnConnect)
         {
             start();
@@ -304,6 +309,14 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         // nothing to do by default
     }
 
+    /** 
+     * Override this method to do any processing which needs to happen before connecting. 
+     */
+    protected void doPreConnect(MuleEvent event) throws Exception
+    {
+        // nothing to do by default
+    }
+    
     protected void doConnect() throws Exception
     {
         // nothing to do by default
@@ -323,7 +336,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     {
         // nothing to do by default
     }
-    
+
     //  @Override
     public String toString()
     {

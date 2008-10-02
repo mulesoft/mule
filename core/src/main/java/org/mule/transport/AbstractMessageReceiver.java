@@ -68,7 +68,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     private EndpointURI endpointUri;
 
     protected boolean responseEndpoint = false;
-        
+
     /**
      * Creates the Message Receiver
      *

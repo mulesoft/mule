@@ -15,8 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.ReceiveException;
 import org.mule.context.notification.EndpointMessageNotification;
@@ -26,7 +24,6 @@ import org.mule.context.notification.EndpointMessageNotification;
  */
 public abstract class AbstractMessageRequester extends AbstractConnectable implements MessageRequester
 {
-    
     public AbstractMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
@@ -67,38 +64,36 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
      */
     public final MuleMessage request(long timeout) throws Exception
     {
-        // Variable needs to be final in order to use it inside callback
-        final long finalTimeout = timeout;
         try
         {
-            RetryContext context = retryTemplate.execute(new RetryCallback()
+            // Make sure we are connected
+            connect();
+            MuleMessage result = null;
+            try
             {
-                public void doWork(RetryContext context) throws Exception
-                {
-                    // Make sure we are connected
-                    connect();
-                    MuleMessage result = doRequest(finalTimeout);
-                    if (result != null && connector.isEnableMessageEvents())
-                    {
-                        connector.fireNotification(new EndpointMessageNotification(result, endpoint, null,
-                            EndpointMessageNotification.MESSAGE_REQUESTED));
-                    }
-                    context.addReturnMessage(result);
-                    // Is there any difference ?
-                    //context.setReturnMessages(new MuleMessage[]{result});
-                }
+                result = doRequest(timeout);
+            }
+            finally
+            {
+                if (useStrictConnectDisconnect) disconnect();
+            }
 
-                public String getWorkDescription()
-                {
-                    return getConnectionDescription();
-                }
-            });
-            return context.getFirstReturnMessage();
+            if (result != null && connector.isEnableMessageEvents())
+            {
+                connector.fireNotification(new EndpointMessageNotification(result, endpoint, null,
+                    EndpointMessageNotification.MESSAGE_REQUESTED));
+            }
+            return result;
+        }
+        catch (ReceiveException e)
+        {
+            disposeAndLogException();
+            throw e;
         }
         catch (Exception e)
         {
-            handleException(new ReceiveException(endpoint, timeout, e));
-            return null;
+            disposeAndLogException();
+            throw new ReceiveException(endpoint, timeout, e);
         }
     }
 

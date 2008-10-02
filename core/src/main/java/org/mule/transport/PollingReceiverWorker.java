@@ -10,9 +10,6 @@
 
 package org.mule.transport;
 
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryContext;
-
 import javax.resource.spi.work.Work;
 
 public class PollingReceiverWorker implements Work
@@ -42,42 +39,22 @@ public class PollingReceiverWorker implements Work
     {
         if (!receiver.stopped.get())
         {
+            running = true;
             try
             {
-                running = true;
-                // make sure we are connected, wait if necessary
-                receiver.connected.whenTrue(null);
+               // Make sure we are connected
+               receiver.connect();
 
-                receiver.getConnector().getRetryPolicyTemplate().execute(new RetryCallback()
-                {
-                   public void doWork(RetryContext context) throws Exception
-                    {
-                       // Make sure we are connected
-                       receiver.connect();
-                       try
-                       {
-                           receiver.poll();
-                       }
-                       catch (InterruptedException e)
-                       {
-                           // stop polling
-                           receiver.stop();
-                       }
-                       catch (Exception e)
-                       {
-                           receiver.handleException(e);
-                       }
-                    }
-       
-                   public String getWorkDescription()
-                   {
-                       return receiver.getConnectionDescription();
-                   }
-               });
+               receiver.poll();
+            }
+            catch (InterruptedException e)
+            {
+               // stop polling
+               receiver.stop();
             }
             catch (Exception e)
             {
-                receiver.handleException(e);
+               receiver.handleException(e);
             }
             finally
             {

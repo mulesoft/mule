@@ -1332,11 +1332,6 @@ public abstract class AbstractConnector
                 doConnect();
                 setConnected(true);
                 setConnecting(false);
-
-                if(startOnConnect.get())
-                {
-                    start();
-                }
             }
 
             public String getWorkDescription()
@@ -1345,6 +1340,14 @@ public abstract class AbstractConnector
             }
         });
 
+        // Wait until we are connected (or until the retry policy is exhausted and a final exception has been thrown).
+        connected.whenTrue(null);
+
+        if(startOnConnect.get())
+        {
+            start();
+        }
+        
         if (receivers != null)
         {
             for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
