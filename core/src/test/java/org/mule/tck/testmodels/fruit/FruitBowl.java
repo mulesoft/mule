@@ -22,7 +22,9 @@ import org.apache.commons.logging.LogFactory;
 
 public class FruitBowl
 {
-    /** logger used by this class */
+    /**
+     * logger used by this class
+     */
     private static final Log logger = LogFactory.getLog(FruitBowl.class);
 
     private final Map bowl = Collections.synchronizedMap(new HashMap());
@@ -54,6 +56,11 @@ public class FruitBowl
     public boolean hasBanana()
     {
         return bowl.get(Banana.class) != null;
+    }
+
+    public void addFruit(Fruit fruit)
+    {
+        bowl.put(fruit.getClass(), fruit);
     }
 
     public Fruit[] addAppleAndBanana(Apple apple, Banana banana)

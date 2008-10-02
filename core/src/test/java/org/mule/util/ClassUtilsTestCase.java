@@ -33,7 +33,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     // we do not want to match these methods when looking for a service method to
     // invoke
     protected final Set ignoreMethods = new HashSet(Arrays.asList(new String[]{"equals",
-        "getInvocationHandler"}));
+            "getInvocationHandler"}));
 
     public void testIsConcrete() throws Exception
     {
@@ -78,11 +78,11 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertTrue(object instanceof Orange);
 
         object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Object[]{
-            new Apple(), new Banana()});
+                new Apple(), new Banana()});
         assertNotNull(object);
         assertTrue(object instanceof FruitBowl);
 
-        FruitBowl bowl = (FruitBowl)object;
+        FruitBowl bowl = (FruitBowl) object;
 
         assertTrue(bowl.hasApple());
         assertTrue(bowl.hasBanana());
@@ -136,40 +136,40 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     public void testGetSatisfiableMethods() throws Exception
     {
         List methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true,
-            true, ignoreMethods);
+                true, ignoreMethods);
         assertNotNull(methods);
-        assertEquals(1, methods.size());
+        assertEquals(2, methods.size());
 
         methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true,
-            ignoreMethods);
+                ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         // Test object param being unacceptible
         methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true,
-            false, ignoreMethods);
+                false, ignoreMethods);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
         // Test object param being acceptible
         methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true,
-            true, ignoreMethods);
+                true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(2, methods.size());
 
         // Test object param being acceptible but not void
         methods = ClassUtils.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, false,
-            true, ignoreMethods);
+                true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
-        assertEquals("doSomethingElse", ((Method)methods.get(0)).getName());
+        assertEquals("doSomethingElse", ((Method) methods.get(0)).getName());
 
         // Test object param being acceptible by interface Type
         methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{WaterMelon[].class}, true,
-            true, ignoreMethods);
+                true, ignoreMethods);
         assertNotNull(methods);
         assertEquals(1, methods.size());
-        assertEquals("setFruit", ((Method)methods.get(0)).getName());
+        assertEquals("setFruit", ((Method) methods.get(0)).getName());
     }
 
     public void testSimpleName()
@@ -205,21 +205,21 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertFalse(ClassUtils.hash(new Object[]{a, b, a, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
         assertFalse(ClassUtils.hash(new Object[]{b, a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
     }
-    
+
     public void testClassTypesWithNullInArray()
     {
-        Object[] array = new Object[] { "hello", null, "world" };
+        Object[] array = new Object[]{"hello", null, "world"};
         Class[] classTypes = ClassUtils.getClassTypes(array);
         assertEquals(3, classTypes.length);
         assertEquals(String.class, classTypes[0]);
         assertEquals(null, classTypes[1]);
         assertEquals(String.class, classTypes[2]);
     }
-    
+
     public void testCompareWithNull()
     {
-        Class[] c1 = new Class[] { String.class, Integer.class };
-        Class[] c2 = new Class[] { String.class, null };
+        Class[] c1 = new Class[]{String.class, Integer.class};
+        Class[] c2 = new Class[]{String.class, null};
         assertFalse(ClassUtils.compare(c1, c2, true));
         assertFalse(ClassUtils.compare(c2, c1, true));
     }
@@ -259,7 +259,10 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
         public boolean equals(Object other)
         {
-            if (null == other || !getClass().equals(other.getClass())) return false;
+            if (null == other || !getClass().equals(other.getClass()))
+            {
+                return false;
+            }
             return hash == ((HashBlob) other).hash;
         }
 
