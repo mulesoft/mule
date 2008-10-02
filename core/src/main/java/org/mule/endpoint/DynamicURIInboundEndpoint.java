@@ -42,11 +42,11 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
 
     public DynamicURIInboundEndpoint(InboundEndpoint endpoint, EndpointURI dynamicEndpointURI)
     {
-        if (endpoint instanceof DynamicURIInboundEndpoint) 
-        {
-            throw new IllegalArgumentException("Dynamic endpoints can only wrap immuntable InboundEndpoint instances!");
-        }
-        
+//        if (endpoint instanceof DynamicURIInboundEndpoint) 
+//        {
+//            throw new IllegalArgumentException("Dynamic endpoints can only wrap immuntable InboundEndpoint instances!");
+//        }
+//        
         this.endpoint = endpoint;
         setEndpointURI(dynamicEndpointURI);
     }
