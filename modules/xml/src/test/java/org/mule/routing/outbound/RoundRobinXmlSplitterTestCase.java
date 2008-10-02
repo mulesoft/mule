@@ -12,9 +12,10 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.module.xml.routing.RoundRobinXmlSplitter;
+import org.mule.module.xml.routing.XmlMessageSplitter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
@@ -34,31 +35,51 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     private OutboundEndpoint endpoint1;
     private OutboundEndpoint endpoint2;
     private OutboundEndpoint endpoint3;
-    private RoundRobinXmlSplitter xmlSplitter;
+    private OutboundEndpoint endpoint4;
+    private OutboundEndpoint endpoint5;
+    private OutboundEndpoint endpoint6;
+    private XmlMessageSplitter asyncXmlSplitter;
+    private XmlMessageSplitter syncXmlSplitter;
 
     // @Override
     protected void doSetUp() throws Exception
     {
-        // setup endpoints
+        // setup async endpoints
         endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
         endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2");
         endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
 
-        // setup splitter
-        xmlSplitter = new RoundRobinXmlSplitter();
-        xmlSplitter.setValidateSchema(true);
-        xmlSplitter.setExternalSchemaLocation("purchase-order.xsd");
+        // setup sync endpoints
+        endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?synchronous=true");
+        endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?synchronous=true");
+        endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?synchronous=true");
+
+        // setup async splitter
+        asyncXmlSplitter = new XmlMessageSplitter();
+        asyncXmlSplitter.setValidateSchema(true);
+        asyncXmlSplitter.setExternalSchemaLocation("purchase-order.xsd");
 
         // The xml document declares a default namespace, thus
         // we need to workaround it by specifying it both in
         // the namespaces and in the splitExpression
         Map namespaces = new HashMap();
         namespaces.put("e", "http://www.example.com");
-        xmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
-        xmlSplitter.setNamespaces(namespaces);
-        xmlSplitter.addEndpoint(endpoint1);
-        xmlSplitter.addEndpoint(endpoint2);
-        xmlSplitter.addEndpoint(endpoint3);
+        asyncXmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
+        asyncXmlSplitter.setNamespaces(namespaces);
+        asyncXmlSplitter.addEndpoint(endpoint1);
+        asyncXmlSplitter.addEndpoint(endpoint2);
+        asyncXmlSplitter.addEndpoint(endpoint3);
+
+        // setup sync splitter
+        syncXmlSplitter = new XmlMessageSplitter();
+        syncXmlSplitter.setValidateSchema(true);
+        syncXmlSplitter.setExternalSchemaLocation("purchase-order.xsd");
+        syncXmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
+
+        syncXmlSplitter.setNamespaces(namespaces);
+        syncXmlSplitter.addEndpoint(endpoint4);
+        syncXmlSplitter.addEndpoint(endpoint5);
+        syncXmlSplitter.addEndpoint(endpoint6);
     }
 
     public void testStringPayloadXmlMessageSplitter() throws Exception
@@ -87,24 +108,26 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage(payload);
 
-        assertTrue(xmlSplitter.isMatch(message));
+        assertTrue(asyncXmlSplitter.isMatch(message));
         final RoundRobinXmlSplitterTestCase.ItemNodeConstraint itemNodeConstraint = new RoundRobinXmlSplitterTestCase.ItemNodeConstraint();
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint3)));
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
-        xmlSplitter.route(message, (MuleSession)session.proxy(), false);
+        asyncXmlSplitter.route(message, (MuleSession) session.proxy(), false);
         session.verify();
 
         message = new DefaultMuleMessage(payload);
 
-        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint1)), message);
-        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint2)), message);
-        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint3)), message);
-        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint1)), message);
-        MuleMessage result = xmlSplitter.route(message, (MuleSession)session.proxy(), true);
+        assertTrue(syncXmlSplitter.isMatch(message));
+        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint4)), message);
+        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint5)), message);
+        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint6)), message);
+        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint4)), message);
+        MuleMessage result = syncXmlSplitter.route(message, (MuleSession) session.proxy(), true);
         assertNotNull(result);
-        assertEquals(message, result);
+        assertTrue(result instanceof MuleMessageCollection);
+        assertEquals(4, ((MuleMessageCollection) result).size());
         session.verify();
     }
 
@@ -114,7 +137,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getService", getTestService());
 
-        RoundRobinXmlSplitter splitter = new RoundRobinXmlSplitter();
+        XmlMessageSplitter splitter = new XmlMessageSplitter();
         splitter.setValidateSchema(true);
         splitter.setExternalSchemaLocation(invalidSchemaLocation);
 
@@ -125,55 +148,36 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         assertTrue(splitter.isMatch(message));
         try
         {
-            splitter.route(message, (MuleSession)session.proxy(), false);
+            splitter.route(message, (MuleSession) session.proxy(), false);
             fail("Should have thrown an exception, because XSD is not found.");
         }
         catch (IllegalArgumentException iaex)
         {
             assertTrue("Wrong exception?", iaex.getMessage().indexOf(
-                "Couldn't find schema at " + invalidSchemaLocation) != -1);
+                    "Couldn't find schema at " + invalidSchemaLocation) != -1);
         }
         session.verify();
     }
 
-    public void testUnsupportedTypePayloadIsIgnored() throws Exception
-    {
-        Exception unsupportedPayload = new Exception();
-
-        Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getService", getTestService());
-
-        MuleMessage message = new DefaultMuleMessage(unsupportedPayload);
-
-        assertTrue(xmlSplitter.isMatch(message));
-        xmlSplitter.route(message, (MuleSession)session.proxy(), false);
-        session.verify();
-
-        message = new DefaultMuleMessage(unsupportedPayload);
-
-        MuleMessage result = xmlSplitter.route(message, (MuleSession)session.proxy(), true);
-        assertNull(result);
-        session.verify();
-    }
 
     public void testInvalidXmlPayloadThrowsException() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getService", getTestService());
 
-        RoundRobinXmlSplitter splitter = new RoundRobinXmlSplitter();
+        XmlMessageSplitter splitter = new XmlMessageSplitter();
 
         MuleMessage message = new DefaultMuleMessage("This is not XML.");
 
         try
         {
-            splitter.route(message, (MuleSession)session.proxy(), false);
+            splitter.route(message, (MuleSession) session.proxy(), false);
             fail("No exception thrown.");
         }
         catch (IllegalArgumentException iaex)
         {
             assertTrue("Wrong exception message.", iaex.getMessage().startsWith(
-                "Failed to initialise the payload: "));
+                    "Failed to initialise the payload: "));
         }
 
     }
@@ -182,16 +186,16 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     {
         public boolean eval(Object o)
         {
-            final MuleMessage message = (MuleMessage)o;
+            final MuleMessage message = (MuleMessage) o;
             final Object payload = message.getPayload();
             assertTrue("Wrong class type for node.", payload instanceof Document);
 
-            Document node = (Document)payload;
+            Document node = (Document) payload;
 
             final String partNumber = node.getRootElement().attributeValue("partNum");
 
             return "872-AA".equals(partNumber) || "926-AA".equals(partNumber) || "126-AA".equals(partNumber)
-                   || "226-AA".equals(partNumber);
+                    || "226-AA".equals(partNumber);
         }
     }
 }

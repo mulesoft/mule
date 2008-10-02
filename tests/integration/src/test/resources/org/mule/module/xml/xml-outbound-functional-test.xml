@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
-       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
@@ -32,10 +32,9 @@
         <service name="service splitter">
             <inbound>
                 <inbound-endpoint ref="split"/>
-                <forwarding-router/>
             </inbound>
             <outbound>
-                <mxml:message-splitter splitExpression="/mule:mule/mule:model/mule:service">
+                <mxml:filter-based-splitter splitExpression="/mule:mule/mule:model/mule:service" failIfNoMatch="false">
                     <outbound-endpoint ref="service1">
                         <mxml:jxpath-filter pattern="/mule:service/@name" expectedValue="service splitter">
                             <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.0"/>
@@ -49,7 +48,7 @@
                     <!-- this is for the splitter; the element ordering is unfortunate -->
                     <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
                     <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.0"/>
-                </mxml:message-splitter>
+                </mxml:filter-based-splitter>
             </outbound>
         </service>
 
@@ -59,6 +58,7 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
+
                 <mxml:round-robin-splitter splitExpression="/mule:mule/mule:model/mule:service">
                     <outbound-endpoint ref="robin1"/>
                     <outbound-endpoint ref="robin2"/>

@@ -11,17 +11,15 @@
 package org.mule.module.xml.config;
 
 import org.mule.api.service.Service;
-import org.mule.module.xml.routing.FilteringXmlMessageSplitter;
-import org.mule.module.xml.routing.RoundRobinXmlSplitter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.module.xml.routing.XmlMessageSplitter;
 
 import java.util.List;
 import java.util.Map;
 
 public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     protected String getConfigResources()
     {
         return "org/mule/module/xml/xml-outbound-namespace-test.xml";
@@ -29,18 +27,19 @@ public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testMessageSplitter()
     {
-        FilteringXmlMessageSplitter splitter =
-                (FilteringXmlMessageSplitter) getRouter("fancy config splitter", FilteringXmlMessageSplitter.class);
-        assertOk(splitter, AbstractOutboundRouter.ENABLE_CORRELATION_ALWAYS);
+        XmlMessageSplitter splitter =
+                (XmlMessageSplitter) getRouter("fancy config splitter", XmlMessageSplitter.class);
+
+        assertEquals(AbstractOutboundRouter.ENABLE_CORRELATION_ALWAYS, splitter.getEnableCorrelation());
+        assertEquals("external", splitter.getExternalSchemaLocation());
+        assertEquals("/expression", splitter.getSplitExpression());
+        assertTrue(splitter.isDeterministic());
+        assertTrue(splitter.isValidateSchema());
+        Map namespaces = splitter.getNamespaces();
+        assertEquals(1, namespaces.size());
+        assertEquals("foo", namespaces.get("bar"));
     }
 
-    public void testRoundRobin()
-    {
-        RoundRobinXmlSplitter splitter =
-                (RoundRobinXmlSplitter) getRouter("fancy config round robin", RoundRobinXmlSplitter.class);
-        assertOk(splitter, AbstractOutboundRouter.ENABLE_CORRELATION_IF_NOT_SET);
-        assertTrue(splitter.isEnableEndpointFiltering());
-    }
 
     protected Object getRouter(String name, Class clazz)
     {
@@ -49,18 +48,6 @@ public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(1, routers.size());
         assertTrue(routers.get(0).getClass().getName(), clazz.isAssignableFrom(routers.get(0).getClass()));
         return routers.get(0);
-    }
-
-    protected void assertOk(FilteringXmlMessageSplitter splitter, int correln)
-    {
-        assertEquals(correln, splitter.getEnableCorrelation());
-        assertEquals("external", splitter.getExternalSchemaLocation());
-        assertEquals("/expression", splitter.getSplitExpression());
-        assertTrue(splitter.isHonorSynchronicity());
-        assertTrue(splitter.isValidateSchema());
-        Map namespaces = splitter.getNamespaces();
-        assertEquals(1, namespaces.size());
-        assertEquals("foo", namespaces.get("bar"));
     }
 
 }

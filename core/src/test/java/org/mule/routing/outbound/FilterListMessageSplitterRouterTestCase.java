@@ -39,7 +39,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2", null, new PayloadTypeFilter(Orange.class), null);
         OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
 
-        FilteringListMessageSplitter router = new FilteringListMessageSplitter();
+        ListMessageSplitter router = new ListMessageSplitter();
         router.setFilter(new PayloadTypeFilter(List.class));
         router.addEndpoint(endpoint1);
         router.addEndpoint(endpoint2);
@@ -60,19 +60,29 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         router.route(message, (MuleSession) session.proxy(), false);
         session.verify();
 
+        endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1?synchronous=true", null, new PayloadTypeFilter(Apple.class), null);
+        endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2?synchronous=true", null, new PayloadTypeFilter(Orange.class), null);
+        endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3?synchronous=true");
+        router = new ListMessageSplitter();
+        router.setFilter(new PayloadTypeFilter(List.class));
+        router.addEndpoint(endpoint1);
+        router.addEndpoint(endpoint2);
+        router.addEndpoint(endpoint3);
+
         message = new DefaultMuleMessage(payload);
 
         session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)),
-            message);
+                message);
         session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)),
-            message);
+                message);
         session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Orange.class), C.eq(endpoint2)),
-            message);
+                message);
         session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)),
-            message);
+                message);
         MuleMessage result = router.route(message, (MuleSession) session.proxy(), true);
         assertNotNull(result);
-        assertEquals(message, result);
+        assertTrue(result.getPayload() instanceof List);
+        assertEquals(((List) result.getPayload()).size(), 4);
         session.verify();
     }
 

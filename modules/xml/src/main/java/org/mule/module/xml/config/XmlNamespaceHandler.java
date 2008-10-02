@@ -18,15 +18,15 @@ import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.module.xml.filters.JaxenFilter;
-import org.mule.module.xml.routing.FilteringXmlMessageSplitter;
-import org.mule.module.xml.routing.RoundRobinXmlSplitter;
-import org.mule.module.xml.transformer.XmlToOutputHandler;
+import org.mule.module.xml.routing.FilterBasedXmlMessageSplitter;
+import org.mule.module.xml.routing.XmlMessageSplitter;
 import org.mule.module.xml.transformer.DomDocumentToXml;
 import org.mule.module.xml.transformer.JXPathExtractor;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlPrettyPrinter;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.transformer.XmlToObject;
+import org.mule.module.xml.transformer.XmlToOutputHandler;
 
 public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -36,8 +36,10 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("jxpath-filter", new ChildDefinitionParser("filter", JXPathFilter.class));
         registerBeanDefinitionParser("jaxen-filter", new ChildDefinitionParser("filter", JaxenFilter.class));
         registerBeanDefinitionParser("is-xml-filter", new ChildDefinitionParser("filter", IsXmlFilter.class));
-        registerBeanDefinitionParser("message-splitter", new RouterDefinitionParser(FilteringXmlMessageSplitter.class));
-        registerMuleBeanDefinitionParser("round-robin-splitter", new RouterDefinitionParser(RoundRobinXmlSplitter.class)).addAlias("endpointFiltering", "enableEndpointFiltering");
+
+        registerBeanDefinitionParser("round-robin-splitter", new RouterDefinitionParser(XmlMessageSplitter.class));
+        registerBeanDefinitionParser("filter-based-splitter", new RouterDefinitionParser(FilterBasedXmlMessageSplitter.class));
+
         registerBeanDefinitionParser("dom-to-xml-transformer", new TransformerDefinitionParser(DomDocumentToXml.class));
         registerBeanDefinitionParser("dom-to-output-handler-transformer", new TransformerDefinitionParser(XmlToOutputHandler.class));
         registerBeanDefinitionParser("jxpath-extractor-transformer", new TransformerDefinitionParser(JXPathExtractor.class));

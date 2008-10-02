@@ -45,7 +45,6 @@
     </xsd:complexType>
     <!-- xml outbound routers -->
 
-    <xsd:element name="message-splitter" type="messageSplitterType" substitutionGroup="mule:abstract-outbound-router"/>
     <xsd:complexType name="messageSplitterType">
         <xsd:complexContent>
             <xsd:extension base="mule:messageSplitterOutboundRouterType">
@@ -53,25 +52,52 @@
                 <xsd:sequence>
                     <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="splitExpression" type="xsd:string" use="required"/>
-                <xsd:attribute name="externalSchemaLocation" type="xsd:string"/>
-                <xsd:attribute name="validateSchema" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="splitExpression" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>The XPath expression used to split the message.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="externalSchemaLocation" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>The location of a schema location that should be used to validate the current
+                            message. This is not required if the message contains the location of the schema.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="validateSchema" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>Should schema validation be enabled when processing the XML message. Note
+                            that this can have serious performance hit on high throughput systems.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="round-robin-splitter" type="roundRobinSplitterType" substitutionGroup="mule:abstract-outbound-router"/>
-    <xsd:complexType name="roundRobinSplitterType">
+    <xsd:element name="filter-based-splitter" type="filterBasedSplitterType"
+                 substitutionGroup="mule:abstract-outbound-router"/>
+    <xsd:complexType name="filterBasedSplitterType">
         <xsd:complexContent>
             <xsd:extension base="messageSplitterType">
-                <xsd:attribute name="endpointFiltering" type="mule:substitutableBoolean">
+                <xsd:attribute name="failIfNoMatch" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If true then the message part is sent to the first endpoint whose
-                            filter accepts the part.  The default is false.
+                            Should this router fail if none of the endpoint filters match the payload. The default is
+                            true.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="round-robin-splitter" type="roundRobinSplitterType"
+                 substitutionGroup="mule:abstract-outbound-router"/>
+
+    <xsd:complexType name="roundRobinSplitterType">
+        <xsd:complexContent>
+            <xsd:extension base="messageSplitterType">
                 <xsd:attribute name="deterministic" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -133,8 +159,12 @@
 
     <xsd:element name="xslt-transformer" type="xsltTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
-            <xsd:documentation>
-                A transformer used to perform XSLT transforms on the current message payload. Transform objects are pooled for better performance. You can set context properties on the transformer by pulling them from the current message using Expression Evaluators. 
+            <xsd:documentation>A transformer used to perform XSLT transforms on the current message payload. Transform
+                objects are pooled for better performance. Transform context properties can be set on the transformer,
+                these can be pulled from the current message using Expression Evaluators. This works in a very similar
+                way to the
+                <a href="http://www.muleforge.org/display/EXTENDEDXML/XQuery" target="_blank">XQuery Transformer</a>
+                on<a href="http://www.muleforge.org" target="_blank">MuleForge</a>.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -189,9 +219,11 @@
                 </xsd:attribute>
                 <xsd:attribute name="transformerFactoryClass" type="xsd:NMTOKEN">
                     <xsd:annotation>
-                        <xsd:documentation>he fully qualified class name of the <i>javax.xml.TransformerFactory</i>
+                        <xsd:documentation>he fully qualified class name of the
+                            <i>javax.xml.TransformerFactory</i>
                             instance to use. If not specified the default JDK factory
-                            <i>TransformerFactory.newInstance()</i> will be used.
+                            <i>TransformerFactory.newInstance()</i>
+                            will be used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

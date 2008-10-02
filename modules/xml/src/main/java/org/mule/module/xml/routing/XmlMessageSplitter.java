@@ -10,16 +10,17 @@
 
 package org.mule.module.xml.routing;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.module.xml.util.XMLUtils;
-import org.mule.routing.outbound.AbstractMessageSplitter;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.routing.outbound.AbstractRoundRobinMessageSplitter;
 import org.mule.util.ExceptionUtils;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
+import java.io.InputStream;
+import java.io.StringReader;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.XPath;
+import org.dom4j.io.SAXReader;
 
 /**
  * <code>FilteringXmlMessageSplitter</code> will split a DOM4J document into nodes
@@ -42,10 +44,19 @@ import org.dom4j.XPath;
  * the <code>externalSchemaLocation</code> property. <p/> Note that each part
  * returned is actually returned as a new Document.
  */
-public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
+public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
 {
-    protected final ThreadLocal propertiesContext = new ThreadLocal();
-    protected final ThreadLocal nodesContext = new ThreadLocal();
+    // xml parser feature names for optional XSD validation
+    public static final String APACHE_XML_FEATURES_VALIDATION_SCHEMA = "http://apache.org/xml/features/validation/schema";
+    public static final String APACHE_XML_FEATURES_VALIDATION_SCHEMA_FULL_CHECKING = "http://apache.org/xml/features/validation/schema-full-checking";
+
+    // JAXP property for specifying external XSD location
+    public static final String JAXP_PROPERTIES_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
+
+    // JAXP properties for specifying external XSD language (as required by newer
+    // JAXP implementation)
+    public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+    public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema";
 
     protected volatile String splitExpression = "";
     protected volatile Map namespaces = null;
@@ -90,7 +101,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
     /**
      * Set classpath location of the XSD to check against. If the resource cannot be
      * found, an exception will be thrown at runtime.
-     * 
+     *
      * @param externalSchemaLocation location of XSD
      */
     public void setExternalSchemaLocation(String externalSchemaLocation)
@@ -98,14 +109,24 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
         this.externalSchemaLocation = externalSchemaLocation;
     }
 
+    //@Override
+    public void initialise() throws InitialisationException
+    {
+        if (StringUtils.isBlank(splitExpression))
+        {
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("splitExpression").getMessage());
+        }
+        super.initialise();
+    }
+
     /**
      * Template method can be used to split the message up before the getMessagePart
      * method is called .
-     * 
+     *
      * @param message the message being routed
      */
     // @Override
-    protected void initialise(MuleMessage message)
+    protected List splitMessage(MuleMessage message)
     {
         if (logger.isDebugEnabled())
         {
@@ -121,31 +142,33 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
 
         Object src = message.getPayload();
 
-        Document dom4jDoc;
         try
         {
-            if (validateSchema)
+            if (src instanceof byte[])
             {
-                dom4jDoc = XMLUtils.toDocument(src, getExternalSchemaLocation());
+                src = new String((byte[]) src);
+            }
+
+            Document dom4jDoc;
+
+            if (src instanceof String)
+            {
+                String xml = (String) src;
+                SAXReader reader = new SAXReader();
+                setDoSchemaValidation(reader, isValidateSchema());
+
+                dom4jDoc = reader.read(new StringReader(xml));
+            }
+            else if (src instanceof org.dom4j.Document)
+            {
+                dom4jDoc = (org.dom4j.Document) src;
             }
             else
             {
-                dom4jDoc = XMLUtils.toDocument(src);
+                throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(
+                        src.getClass(), new Class[]{Document.class, String.class, byte[].class}).getMessage());
             }
-            if (dom4jDoc == null)
-            {
-                logger.error("Non-XML message payload: " + src.getClass().toString());
-                return;
-            }
-        }
-        catch (Exception e)
-        {
-            throw new IllegalArgumentException("Failed to initialise the payload: "
-                + ExceptionUtils.getStackTrace(e));
-        }
 
-        if (splitExpression.length() > 0)
-        {
             XPath xpath = dom4jDoc.createXPath(splitExpression);
             if (namespaces != null)
             {
@@ -168,92 +191,57 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
             // We can also avoid parsing the Xml again altogether
             for (Iterator iterator = foundNodes.iterator(); iterator.hasNext();)
             {
-                Node node = (Node)iterator.next();
+                Node node = (Node) iterator.next();
                 if (node instanceof Element)
                 {
                     // Can't do detach here just in case the source object
                     // was a document.
-                    node = (Node)node.clone();
-                    parts.add(DocumentHelper.createDocument((Element)node));
+                    node = (Node) node.clone();
+                    parts.add(DocumentHelper.createDocument((Element) node));
                 }
                 else
                 {
                     logger.warn("Dcoument node: " + node.asXML()
-                                + " is not an element and thus is not a valid part");
+                            + " is not an element and thus is not a valid part");
                 }
             }
-            nodesContext.set(parts);
+            return parts;
         }
-
-        Map theProperties = new HashMap();
-        for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
+        catch (Exception ex)
         {
-            String propertyKey = (String)iterator.next();
-            theProperties.put(propertyKey, message.getProperty(propertyKey));
+            throw new IllegalArgumentException("Failed to initialise the payload: "
+                    + ExceptionUtils.getStackTrace(ex));
         }
-        propertiesContext.set(theProperties);
     }
 
-    // @Override
-    protected void cleanup()
-    {
-        nodesContext.set(null);
-        propertiesContext.set(null);
-    }
-    
-    /**
-     * Retrieves a specific message part for the given endpoint. the message will
-     * then be routed via the provider.
-     * 
-     * @param message the current message being processed
-     * @param endpoint the endpoint that will be used to route the resulting message
-     *            part
-     * @return the message part to dispatch
-     */
-    protected MuleMessage getMessagePart(MuleMessage message, OutboundEndpoint endpoint)
-    {
-        List nodes = (List)nodesContext.get();
 
-        if (nodes == null)
+    protected void setDoSchemaValidation(SAXReader reader, boolean validate) throws Exception
+    {
+        reader.setValidation(validate);
+        reader.setFeature(APACHE_XML_FEATURES_VALIDATION_SCHEMA, validate);
+        reader.setFeature(APACHE_XML_FEATURES_VALIDATION_SCHEMA_FULL_CHECKING, true);
+
+        /*
+        * By default we're not validating against an XSD. If this is the case,
+        * there's no need to continue here, so we bail.
+        */
+        if (!validate)
         {
-            logger.error("Error: nodes are null");
-            return null;
+            return;
         }
 
-        for (Iterator i = nodes.iterator(); i.hasNext();)
+        InputStream xsdAsStream = IOUtils.getResourceAsStream(getExternalSchemaLocation(), getClass());
+        if (xsdAsStream == null)
         {
-            Document doc = (Document)i.next();
-
-            try
-            {
-                Map theProperties = (Map)propertiesContext.get();
-                MuleMessage result = new DefaultMuleMessage(doc, new HashMap(theProperties));
-
-                if (endpoint.getFilter() == null || endpoint.getFilter().accept(result))
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Endpoint filter matched for node " + i + " of " + nodes.size()
-                                     + ". Routing message over: " + endpoint.getEndpointURI().toString());
-                    }
-                    i.remove();
-                    return result;
-                }
-                else
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Endpoint filter did not match, returning null");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.error("Unable to create message for node at position " + i, e);
-                return null;
-            }
+            throw new IllegalArgumentException("Couldn't find schema at "
+                    + getExternalSchemaLocation());
         }
 
-        return null;
+        // Set schema language property (must be done before the schemaSource
+        // is set)
+        reader.setProperty(JAXP_PROPERTIES_SCHEMA_LANGUAGE, JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE);
+
+        // Need this one to map schemaLocation to a physical location
+        reader.setProperty(JAXP_PROPERTIES_SCHEMA_SOURCE, xsdAsStream);
     }
 }

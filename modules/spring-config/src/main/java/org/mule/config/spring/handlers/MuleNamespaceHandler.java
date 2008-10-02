@@ -107,13 +107,15 @@ import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.EndpointSelector;
 import org.mule.routing.outbound.ExceptionBasedRouter;
 import org.mule.routing.outbound.ExpressionRecipientList;
-import org.mule.routing.outbound.FilteringListMessageSplitter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
+import org.mule.routing.outbound.ListMessageSplitter;
 import org.mule.routing.outbound.MessageChunkingRouter;
 import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.routing.outbound.TemplateEndpointRouter;
+import org.mule.routing.outbound.ExpressionMessageSplitter;
+import org.mule.routing.outbound.MultiExpressionMessageSplitter;
 import org.mule.routing.response.DefaultResponseRouterCollection;
 import org.mule.routing.response.SimpleCollectionResponseAggregator;
 import org.mule.routing.response.SingleResponseRouter;
@@ -150,6 +152,7 @@ import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
+import org.mule.util.expression.ExpressionConfig;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -260,7 +263,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("include-entry-point", new ParentDefinitionParser());
         registerMuleBeanDefinitionParser("exclude-entry-point", new ParentDefinitionParser()).addAlias("method", "ignoredMethod");
         registerMuleBeanDefinitionParser("exclude-object-methods", new IgnoreObjectMethodsDefinitionParser());
- 
+
         // Services
         registerBeanDefinitionParser("seda-service", new ServiceDefinitionParser(SedaService.class));
         registerBeanDefinitionParser("service", new ServiceDefinitionParser(SedaService.class));
@@ -276,8 +279,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("bridge-component", new ComponentDefinitionParser(PassThroughComponent.class));
         registerBeanDefinitionParser("pass-through-component", new ComponentDefinitionParser(PassThroughComponent.class));
         registerBeanDefinitionParser("log-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, LogComponent.class));
-        registerBeanDefinitionParser("null-component",new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, NullComponent.class));
-        
+        registerBeanDefinitionParser("null-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, NullComponent.class));
+
         // We need to use DefaultJavaComponent for the echo comonent because some tests invoke EchoComponent with method name and therefore we need an entry point resolver
         registerBeanDefinitionParser("echo-component", new SimpleComponentDefinitionParser(DefaultJavaComponent.class, EchoComponent.class));
 
@@ -315,7 +318,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("filtering-router", new RouterDefinitionParser(FilteringOutboundRouter.class));        registerBeanDefinitionParser("chaining-router", new RouterDefinitionParser(ChainingRouter.class));
         registerBeanDefinitionParser("endpoint-selector-router", new RouterDefinitionParser(EndpointSelector.class));
         registerBeanDefinitionParser("exception-based-router", new RouterDefinitionParser(ExceptionBasedRouter.class));
-        registerBeanDefinitionParser("list-message-splitter-router", new RouterDefinitionParser(FilteringListMessageSplitter.class));
+        registerBeanDefinitionParser("list-message-splitter-router", new RouterDefinitionParser(ListMessageSplitter.class));
+        registerBeanDefinitionParser("expression-splitter-router", new RouterDefinitionParser(ExpressionMessageSplitter.class));
         registerBeanDefinitionParser("message-chunking-router", new RouterDefinitionParser(MessageChunkingRouter.class));
         registerBeanDefinitionParser("multicasting-router", new RouterDefinitionParser(MulticastingRouter.class));
         registerBeanDefinitionParser("static-recipient-list-router", new RouterDefinitionParser(StaticRecipientList.class));
@@ -363,6 +367,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("jndi-provider-properties", new ChildMapDefinitionParser("jndiProviderProperties")).addCollection("jndiProviderProperties");
         registerMuleBeanDefinitionParser("jndi-provider-property", new ChildMapEntryDefinitionParser("jndiProviderProperties")).addCollection("jndiProviderProperties");
         registerBeanDefinitionParser("environment", new ChildMapDefinitionParser("environment"));
+        registerBeanDefinitionParser("expression", new ChildDefinitionParser("expression", ExpressionConfig.class));
 
         //Security
         registerMuleBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER)).addIgnored("type").addIgnored("name");
@@ -378,5 +383,5 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("timer-interceptor", new InterceptorDefinitionParser(TimerInterceptor.class));
         registerBeanDefinitionParser("logging-interceptor", new InterceptorDefinitionParser(LoggingInterceptor.class));
     }
-    
+
 }

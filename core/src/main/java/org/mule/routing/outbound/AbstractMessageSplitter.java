@@ -10,16 +10,19 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AbstractMessageSplitter</code> is an outbound Message Splitter used to split
@@ -29,137 +32,105 @@ import java.util.List;
  */
 public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 {
-    // Determines if the same endpoint will be matched multiple times until a
-    // match is not found. This should be set by overriding classes.
-    protected boolean multimatch = true;
-
     // flag which, if true, makes the splitter honour settings such as remoteSync and
     // synchronous on the endpoint
-    protected boolean honorSynchronicity = false;
+    //RM*: I am disabling public access for this property. I don't see why we wouldn't always honour
+    //outbound endpoint configuration. It's much clearer this way. I've raised MULE-3299 so that we may
+    //remove this property if everyone is happy :)
+    protected boolean honorSynchronicity = true;
 
     public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
-        throws RoutingException
+            throws RoutingException
     {
         String correlationId = messageInfoMapping.getCorrelationId(message);
 
-        this.initialise(message);
-
-        OutboundEndpoint endpoint;
-        MuleMessage result = null;
-        List list = getEndpoints();
+        List results = new java.util.ArrayList();
         int correlationSequence = 1;
-        for (Iterator iterator = list.iterator(); iterator.hasNext();)
+        SplitMessage splitMessage = getMessageParts(message, getEndpoints());
+
+        // Cache the properties here because for some message types getting the
+        // properties can be expensive
+        java.util.Map props = new java.util.HashMap();
+        for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
         {
-            endpoint = (OutboundEndpoint) iterator.next();
-            message = getMessagePart(message, endpoint);
-            // TODO MULE-1378
-            if (message == null)
+            String propertyKey = (String) iterator.next();
+            props.put(propertyKey, message.getProperty(propertyKey));
+        }
+
+        for (int i = 0; i < splitMessage.size(); i++)
+        {
+            SplitMessage.MessagePart part = splitMessage.getPart(i);
+
+            MuleMessage sendMessage;
+            if (part.getPart() instanceof MuleMessage)
             {
-                // Log a warning if there are no messages for a given endpoint
-                logger.warn("Message part is null for endpoint: " + endpoint.getEndpointURI().toString());
+                sendMessage = (MuleMessage) part.getPart();
+            }
+            else
+            {
+                sendMessage = new org.mule.DefaultMuleMessage(part.getPart(), props);
             }
 
-            // We'll keep looping to get all messages for the current endpoint
-            // before moving to the next endpoint
-            // This can be turned off by setting the multimatch flag to false
-            while (message != null)
+            try
             {
+                if (enableCorrelation != ENABLE_CORRELATION_NEVER)
+                {
+                    boolean correlationSet = message.getCorrelationId() != null;
+                    if (!correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET))
+                    {
+                        sendMessage.setCorrelationId(correlationId);
+                    }
+
+                    // take correlation group size from the message
+                    // properties, set by concrete message splitter
+                    // implementations
+                    //final int groupSize = sendMessage.getCorrelationGroupSize();
+                    //message.setCorrelationGroupSize(groupSize);
+                    sendMessage.setCorrelationGroupSize(splitMessage.size());
+                    sendMessage.setCorrelationSequence(correlationSequence++);
+                }
+
                 if (honorSynchronicity)
                 {
-                    synchronous = endpoint.isSynchronous();
+                    synchronous = part.getEndpoint().isSynchronous();
+                    sendMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY,
+                            part.getEndpoint().isRemoteSync());
                 }
-                try
+
+                if (synchronous)
                 {
-                    if (enableCorrelation != ENABLE_CORRELATION_NEVER)
-                    {
-                        boolean correlationSet = message.getCorrelationId() != null;
-                        if (!correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET))
-                        {
-                            message.setCorrelationId(correlationId);
-                        }
-
-                        // take correlation group size from the message
-                        // properties, set by concrete message splitter
-                        // implementations
-                        final int groupSize = message.getCorrelationGroupSize();
-                        message.setCorrelationGroupSize(groupSize);
-                        message.setCorrelationSequence(correlationSequence++);
-                    }
-
-                    if (honorSynchronicity)
-                    {
-                        message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY,
-                            endpoint.isRemoteSync());
-                    }
-
-                    if (synchronous)
-                    {
-                        result = send(session, message, endpoint);
-                    }
-                    else
-                    {
-                        dispatch(session, message, endpoint);
-                    }
+                    results.add(send(session, sendMessage, part.getEndpoint()));
                 }
-                catch (MuleException e)
+                else
                 {
-                    throw new CouldNotRouteOutboundMessageException(message, endpoint, e);
+                    dispatch(session, sendMessage, part.getEndpoint());
                 }
-
-                if (!multimatch)
-                {
-                    break;
-                }
-
-                message = this.getMessagePart(message, endpoint);
+            }
+            catch (MuleException e)
+            {
+                throw new CouldNotRouteOutboundMessageException(sendMessage, part.getEndpoint(), e);
             }
         }
 
-        // we are done with splitting & routing
-        this.cleanup();
-
-        return result;
+        return resultsHandler.aggregateResults(results, message);
     }
 
-    public boolean isHonorSynchronicity()
-    {
-        return honorSynchronicity;
-    }
 
     /**
-     * Sets the flag indicating whether the splitter honurs endpoint settings
-     * 
-     * @param honorSynchronicity flag setting
+     * Implementing classes should create a {@link org.mule.routing.outbound.SplitMessage} instance and for
+     * each part can associate an endpoint.
+     * Note that No state should be stored on the router itself. The {@link SplitMessage} provides the parts and
+     * endpoint mapping info in order for the correct dispatching to occur.
+     * <p/>
+     * If users do not want to associate a message part with an endpoint, but just dispatch parts over the endpoints in
+     * a round-robin way, they should use the {@link org.mule.routing.outbound.AbstractRoundRobinMessageSplitter} instead.
+     *
+     * @param message   the current message being processed
+     * @param endpoints A list of {@link org.mule.api.endpoint.OutboundEndpoint} that will be used to dispatch each of the parts
+     * @return a {@link org.mule.routing.outbound.SplitMessage} instance that contains the message parts and the
+     *         endpoint to associate with the message part.
+     * @see org.mule.routing.outbound.SplitMessage
+     * @see org.mule.routing.outbound.AbstractRoundRobinMessageSplitter
      */
-    public void setHonorSynchronicity(boolean honorSynchronicity)
-    {
-        this.honorSynchronicity = honorSynchronicity;
-    }
-
-    /**
-     * This method can be implemented to split the message up before
-     * {@link #getMessagePart(MuleMessage, OutboundEndpoint)} method is called.
-     * 
-     * @param message the message being routed
-     */
-    protected abstract void initialise(MuleMessage message);
-
-    /**
-     * Retrieves a specific message part for the given endpoint. the message will then be
-     * routed via the provider. <p/> <strong>NOTE:</strong>Implementations must provide
-     * proper synchronization for shared state (payload, properties, etc.)
-     * 
-     * @param message the current message being processed
-     * @param endpoint the endpoint that will be used to route the resulting message part
-     * @return the message part to dispatch
-     */
-    protected abstract MuleMessage getMessagePart(MuleMessage message, OutboundEndpoint endpoint);
-
-    /**
-     * This method is called after all parts of the original message have been processed;
-     * typically this is the case after {@link #getMessagePart(MuleMessage, OutboundEndpoint)}
-     * returned <code>null</code>.
-     */
-    protected abstract void cleanup();
-
+    protected abstract SplitMessage getMessageParts(MuleMessage message, List /* <OutboundEndpoint> */ endpoints);
 }

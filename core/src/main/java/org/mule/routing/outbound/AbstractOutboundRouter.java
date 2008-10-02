@@ -19,6 +19,7 @@ import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
@@ -33,14 +34,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractOutboundRouter</code> is a base router class that tracks
  * statistics about message processing through the router.
- *
  */
 public abstract class AbstractOutboundRouter extends AbstractRouter implements OutboundRouter
 {
@@ -62,6 +61,8 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
     protected TransactionConfig transactionConfig;
 
+    protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
+
     public void dispatch(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint) throws MuleException
     {
         setMessageProperties(session, message, endpoint);
@@ -71,14 +72,14 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             try
             {
                 logger.debug("Message being sent to: " + endpoint.getEndpointURI() + " Message payload: \n"
-                             + StringMessageUtils.truncate(message.getPayloadAsString(), 100, false)
-                             + "\n outbound transformer is: " + endpoint.getTransformers());
+                        + StringMessageUtils.truncate(message.getPayloadAsString(), 100, false)
+                        + "\n outbound transformer is: " + endpoint.getTransformers());
             }
             catch (Exception e)
             {
                 logger.debug("Message being sent to: " + endpoint.getEndpointURI()
-                             + " Message payload: \n(unable to retrieve payload: " + e.getMessage()
-                             + "\n outbound transformer is: " + endpoint.getTransformers());
+                        + " Message payload: \n(unable to retrieve payload: " + e.getMessage()
+                        + "\n outbound transformer is: " + endpoint.getTransformers());
             }
         }
 
@@ -91,7 +92,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
                 return null;
             }
         };
-        
+
         try
         {
             tt.execute(cb);
@@ -100,8 +101,8 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         {
             throw new RoutingException(message, null, e);
         }
-        
-        
+
+
         if (getRouterStatistics() != null)
         {
             if (getRouterStatistics().isEnabled())
@@ -148,7 +149,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
                 return session.sendEvent(message, endpoint);
             }
         };
-        
+
         MuleMessage result;
         try
         {
@@ -158,7 +159,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         {
             throw new RoutingException(message, null, e);
         }
-        
+
         if (getRouterStatistics() != null)
         {
             if (getRouterStatistics().isEnabled())
@@ -187,11 +188,11 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
         return result;
     }
-    
+
     protected TransactionTemplate createTransactionTemplate(MuleSession session, ImmutableEndpoint endpoint)
     {
         return new TransactionTemplate(endpoint.getTransactionConfig(),
-            session.getService().getExceptionListener(), muleContext);
+                session.getService().getExceptionListener(), muleContext);
     }
 
     protected void setMessageProperties(MuleSession session, MuleMessage message, OutboundEndpoint endpoint)
@@ -205,7 +206,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             if (logger.isDebugEnabled())
             {
                 logger.debug("Setting replyTo=" + replyTo + " for outbound endpoint: "
-                             + endpoint.getEndpointURI());
+                        + endpoint.getEndpointURI());
             }
         }
         if (enableCorrelation != ENABLE_CORRELATION_NEVER)
@@ -216,7 +217,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("CorrelationId is already set to '" + message.getCorrelationId()
-                                 + "' , not setting it again");
+                            + "' , not setting it again");
                 }
                 return;
             }
@@ -225,7 +226,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("CorrelationId is already set to '" + message.getCorrelationId()
-                                 + "', but router is configured to overwrite it");
+                            + "', but router is configured to overwrite it");
                 }
             }
             else
@@ -247,7 +248,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             {
                 StringBuffer buf = new StringBuffer();
                 buf.append("Setting Correlation info on Outbound router for endpoint: ").append(
-                    endpoint.getEndpointURI());
+                        endpoint.getEndpointURI());
                 buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
                 // buf.append(", ").append("Seq=").append(seq);
                 // buf.append(", ").append("Group Size=").append(group);
@@ -276,7 +277,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             if (!(umoEndpoint instanceof OutboundEndpoint))
             {
                 throw new InvalidEndpointTypeException(CoreMessages.outboundRouterMustUseOutboudEndpoints(
-                    this, umoEndpoint));
+                        this, umoEndpoint));
             }
             else
             {
@@ -334,7 +335,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             else
             {
                 throw new IllegalArgumentException("Value for enableCorrelation not recognised: "
-                                                   + enableCorrelation);
+                        + enableCorrelation);
             }
         }
     }
@@ -381,5 +382,15 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
         }
         return null;
+    }
+
+    public RouterResultsHandler getResultsHandler()
+    {
+        return resultsHandler;
+    }
+
+    public void setResultsHandler(RouterResultsHandler resultsHandler)
+    {
+        this.resultsHandler = resultsHandler;
     }
 }

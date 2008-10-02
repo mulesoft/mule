@@ -12,65 +12,49 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
-import org.mule.util.StringUtils;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
 {
-
     public void testMessageSplitterRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getService", getTestService());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://endpointUri.1");
-        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://endpointUri.2");
-        OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://endpointUri.3");
+        //Async endpoints
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2");
+        OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
+
+        //Sync endpoints
+        OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?synchronous=true");
+        OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?synchronous=true");
+        OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?synchronous=true");
 
         // Dummy message splitter
         AbstractMessageSplitter router = new AbstractMessageSplitter()
         {
-            private List parts;
-
-            protected void initialise(MuleMessage message)
+            protected SplitMessage getMessageParts(MuleMessage message, List endpoints)
             {
-                multimatch = false;
-                parts = Arrays.asList(StringUtils.splitAndTrim(message.getPayload().toString(), ","));
-            }
-
-            protected MuleMessage getMessagePart(MuleMessage message, OutboundEndpoint endpoint)
-            {
-                if (endpoint.getEndpointURI().getAddress().equals("endpointUri.1"))
+                int i = 0;
+                SplitMessage splitMessage = new SplitMessage();
+                for (StringTokenizer tokenizer = new StringTokenizer(message.getPayload().toString(), ","); tokenizer.hasMoreTokens(); i++)
                 {
-                    return new DefaultMuleMessage(parts.get(0));
+                    String s = tokenizer.nextToken();
+                    splitMessage.addPart(s, (OutboundEndpoint) endpoints.get(i));
                 }
-                else if (endpoint.getEndpointURI().getAddress().equals("endpointUri.2"))
-                {
-                    return new DefaultMuleMessage(parts.get(1));
-                }
-                else if (endpoint.getEndpointURI().getAddress().equals("endpointUri.3"))
-                {
-                    return new DefaultMuleMessage(parts.get(2));
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            
-            protected void cleanup()
-            {
-                parts = null;
+                return splitMessage;
             }
         };
 
@@ -86,17 +70,25 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint3)));
-        router.route(message, (MuleSession)session.proxy(), false);
+        router.route(message, (MuleSession) session.proxy(), false);
         session.verify();
+
+        endpoints = new ArrayList();
+        endpoints.add(endpoint4);
+        endpoints.add(endpoint5);
+        endpoints.add(endpoint6);
+        router.getEndpoints().clear();
+        router.setEndpoints(endpoints);
 
         message = new DefaultMuleMessage("test,mule,message");
 
-        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint1)), message);
-        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint2)), message);
-        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint3)), message);
-        MuleMessage result = router.route(message, (MuleSession)session.proxy(), true);
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint4)), message);
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint5)), message);
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint6)), message);
+        MuleMessage result = router.route(message, (MuleSession) session.proxy(), true);
         assertNotNull(result);
-        assertEquals(message, result);
+        assertTrue(result instanceof MuleMessageCollection);
+        assertEquals(3, ((MuleMessageCollection) result).size());
         session.verify();
     }
 }

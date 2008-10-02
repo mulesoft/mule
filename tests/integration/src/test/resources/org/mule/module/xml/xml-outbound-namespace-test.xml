@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
-       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
@@ -17,28 +17,14 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-                <mxml:message-splitter splitExpression="/expression" enableCorrelation="ALWAYS"
-                                       externalSchemaLocation="external" honorSynchronicity="true"
-                                       validateSchema="true">
-                    <outbound-endpoint address="test://test"/>
-                    <mxml:namespace prefix="bar" uri="foo"/>
-                </mxml:message-splitter>
-            </outbound>
-        </service>
-
-        <service name="fancy config round robin">
-            <inbound>
-                <forwarding-router/>
-            </inbound>
-            <outbound>
-                <mxml:round-robin-splitter splitExpression="/expression" enableCorrelation="IF_NOT_SET"
-                                           externalSchemaLocation="external" honorSynchronicity="true"
-                                           validateSchema="true" endpointFiltering="true">
-                    <outbound-endpoint address="test://test"/>
+                <mxml:round-robin-splitter splitExpression="/expression" enableCorrelation="ALWAYS"
+                                           externalSchemaLocation="external" validateSchema="true" deterministic="true">
+                    <vm:outbound-endpoint path="foo.bar"/>
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:round-robin-splitter>
             </outbound>
         </service>
+
 
     </model>
 

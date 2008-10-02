@@ -2035,7 +2035,9 @@
                 <xsd:attribute name="pattern" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The pattern to use when matching.
+                            The property name and possibly value to use when matching. If the expression is just a
+                            property name, the filter will check that the property exists.  Users can also uses '=' and
+                            '!=' to determine a specific value for a property.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3549,21 +3551,45 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- Splitter routers -->
     <xsd:element name="list-message-splitter-router" type="messageSplitterOutboundRouterType"
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The Filtering List Message Splitter accepts a list of objects that is split each object being routed to 
+                The Filtering List Message Splitter accepts a list of objects that is split each object being routed to
                 different endpoints.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+
     <xsd:complexType name="messageSplitterOutboundRouterType">
         <xsd:complexContent>
             <xsd:extension base="multipleEndpointFilteringOutboundRouterType">
                 <!-- this is not exposed to the user afaict? -->
                 <!-- xsd:attribute name="multimatch" type="substitutableBoolean"/ -->
-                <xsd:attribute name="honorSynchronicity" type="substitutableBoolean"/>
+                <!--
+                RM* I have disabled this property so that endpoint synchronicity is always honoured.
+                If we don't talk the sync config from the endpoint it becomes confusing to know what configures what
+                <xsd:attribute name="honorSynchronicity" type="substitutableBoolean"/>-->
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="expression-splitter-router" type="expressionSplitterOutboundRouterType"
+                 substitutionGroup="abstract-outbound-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                The Filtering List Message Splitter that will split the message based on an expression.  The expression
+                needs to return one or more message parts in order to be effective.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+
+    <xsd:complexType name="expressionSplitterOutboundRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="messageSplitterOutboundRouterType">
+                <xsd:attributeGroup ref="expressionAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
