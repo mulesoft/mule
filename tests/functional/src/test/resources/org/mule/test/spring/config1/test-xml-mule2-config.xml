@@ -139,15 +139,15 @@
 
         <service name="orangeComponent">
             <inbound>
-                <forwarding-catch-all-strategy>
-                    <outbound-endpoint address="test://catch.all"/>
-                </forwarding-catch-all-strategy>
                 <inbound-endpoint name="Orange" address="test://orange/" transformer-refs="TestCompressionTransformer"
                                   responseTransformer-refs="TestCompressionTransformer"/>
                 <inbound-endpoint ref="orangeEndpoint" transformer-refs="TestCompressionTransformer">
                     <payload-type-filter expectedType="java.lang.String"/>
                     <property key="testLocal" value="value1"/>
                 </inbound-endpoint>
+                <forwarding-catch-all-strategy>
+                    <outbound-endpoint address="test://catch.all"/>
+                </forwarding-catch-all-strategy>
             </inbound>
 
             <component>
@@ -183,13 +183,12 @@
 
         <service name="appleComponent">
             <inbound>
-                <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <inbound-endpoint ref="appleInEndpoint"/>
                 <selective-consumer-router>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </selective-consumer-router>
-                <idempotent-receiver-router>
-                </idempotent-receiver-router>
+                <idempotent-receiver-router/>
+                <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
             </inbound>
 
             <component>
@@ -197,7 +196,6 @@
             </component>
 
             <outbound>
-                <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <filtering-router transformer-refs="TestCompressionTransformer">
                     <outbound-endpoint address="test://appleQ2" name="TestApple-Out"/>
                     <payload-type-filter expectedType="java.lang.String"/>
@@ -210,6 +208,7 @@
                         <regex-filter pattern="(.*) brown (.*)"/>
                     </and-filter>
                 </filtering-router>
+                <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
             </outbound>
 
             <!--<custom-exception-strategy class="org.mule.DefaultExceptionStrategy"/>-->

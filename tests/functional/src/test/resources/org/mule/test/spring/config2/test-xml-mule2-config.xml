@@ -140,10 +140,6 @@
             <mule:service name="orangeComponent">
                 
                 <mule:inbound>
-                    <mule:forwarding-catch-all-strategy>
-                        <mule:outbound-endpoint
-                                address="test://catch.all"/>
-                    </mule:forwarding-catch-all-strategy>
                     <mule:inbound-endpoint name="Orange"
                                            address="test://orange/" transformer-refs="TestCompressionTransformer"
                                            responseTransformer-refs="TestCompressionTransformer"/>
@@ -154,6 +150,9 @@
                             <entry key="testLocal" value="value1"/>
                         </mule:properties>
                     </mule:inbound-endpoint>
+                    <mule:forwarding-catch-all-strategy>
+                        <mule:outbound-endpoint address="test://catch.all"/>
+                    </mule:forwarding-catch-all-strategy>
                 </mule:inbound>
 
                 <mule:component>
@@ -190,18 +189,18 @@
             <mule:service name="appleComponent">
 
                 <mule:inbound>
-                    <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                     <mule:inbound-endpoint ref="appleInEndpoint"/>
                     <mule:selective-consumer-router>
                         <mule:payload-type-filter expectedType="java.lang.String"/>
                     </mule:selective-consumer-router>
                     <mule:idempotent-receiver-router/>
+
+                    <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 </mule:inbound>
 
                 <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
 
                 <mule:outbound>
-                    <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                     <mule:filtering-router>
                         <mule:outbound-endpoint name="TestApple-Out" address="test://appleQ2"/>
                         <mule:payload-type-filter expectedType="java.lang.String"/>
@@ -214,6 +213,8 @@
                             <mule:regex-filter pattern="(.*) brown (.*)"/>
                         </mule:and-filter>
                     </mule:filtering-router>
+
+                    <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>                    
                 </mule:outbound>
 
                 <mule:default-service-exception-strategy/>

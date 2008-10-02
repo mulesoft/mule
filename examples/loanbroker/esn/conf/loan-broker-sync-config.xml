@@ -79,11 +79,11 @@
                      <forwarding-router/>
                  </inbound>
                  <outbound>
-                     <logging-catch-all-strategy/>
                      <static-recipient-list-router>
                          <reply-to address="LoanBrokerQuotes"/>
                          <message-property-filter pattern="recipients!=null"/>
                      </static-recipient-list-router>
+                     <logging-catch-all-strategy/>                     
                  </outbound>
              </service>
 

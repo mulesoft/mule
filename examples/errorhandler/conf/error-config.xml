@@ -117,8 +117,6 @@
             </pooled-component>
 
             <outbound>
-                <custom-catch-all-strategy class="org.mule.routing.LoggingCatchAllStrategy"/>
-                
                 <filtering-router transformer-refs="ErrorMessageToException">
                     <file:outbound-endpoint path="test-data/exceptions"
                                             outputPattern="Exception-[UUID].xml"
@@ -139,6 +137,8 @@
                                    transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
                     <payload-type-filter expectedType="org.mule.example.errorhandler.exceptions.BusinessException"/>
                 </filtering-router>
+                
+                <custom-catch-all-strategy class="org.mule.routing.LoggingCatchAllStrategy"/>
             </outbound>
         </service>
         

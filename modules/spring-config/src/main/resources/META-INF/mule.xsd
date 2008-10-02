@@ -271,9 +271,9 @@
     <!-- seemed pointless making these simple container types abstract -->
     <xsd:complexType name="inboundCollectionType">
         <xsd:sequence>
-            <xsd:element ref="abstract-catch-all-strategy" minOccurs="0"/>
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-inbound-router" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-catch-all-strategy" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="matchAll" type="substitutableBoolean" default="true">
             <xsd:annotation>
@@ -332,8 +332,8 @@
 
     <xsd:complexType name="outboundCollectionType">
         <xsd:sequence>
-            <xsd:element ref="abstract-catch-all-strategy" minOccurs="0"/>
             <xsd:element ref="abstract-outbound-router" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-catch-all-strategy" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="matchAll" type="substitutableBoolean" default="false">
             <xsd:annotation>

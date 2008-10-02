@@ -13,15 +13,15 @@
     <model name="test" >
         <service name="BridgeNoTransformer">
             <inbound>
-                <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
-                    <outbound-endpoint address="vm://catchall" connector-ref="vmQueue"/>
-                </custom-forwarding-catch-all-strategy>
-
                 <inbound-endpoint address="vm://in1" connector-ref="vmQueue"/>
 
                 <selective-consumer-router>
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </selective-consumer-router>
+
+                <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
+                    <outbound-endpoint address="vm://catchall" connector-ref="vmQueue"/>
+                </custom-forwarding-catch-all-strategy>
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -32,12 +32,6 @@
 
         <service name="BridgeTransformed">
             <inbound>
-                <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
-                    <outbound-endpoint address="vm://catchall" connector-ref="vmQueue">
-                        <string-to-byte-array-transformer/>
-                    </outbound-endpoint>
-                </custom-forwarding-catch-all-strategy>
-
                 <inbound-endpoint address="vm://in2" connector-ref="vmQueue">
                     <string-to-byte-array-transformer/>
                 </inbound-endpoint>
@@ -45,7 +39,14 @@
                 <selective-consumer-router>
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </selective-consumer-router>
+
+                <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
+                    <outbound-endpoint address="vm://catchall" connector-ref="vmQueue">
+                        <string-to-byte-array-transformer/>
+                    </outbound-endpoint>
+                </custom-forwarding-catch-all-strategy>
             </inbound>
+            
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="vm://out" connector-ref="vmQueue"/>
