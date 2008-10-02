@@ -37,6 +37,7 @@ import javax.jms.Session;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
+import javax.jms.MessageFormatException;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
@@ -140,6 +141,7 @@ public class JmsMessageUtils
             for (Iterator iter = list.iterator(); iter.hasNext();)
             {
                 Object o = iter.next();
+                validateStreamMessageType(o);
                 sMsg.writeObject(o);
             }
             return sMsg;
@@ -391,4 +393,34 @@ public class JmsMessageUtils
         return to;
     }
 
+    /**
+     * {@link StreamMessage#writeObject(Object)} accepts only primitives (and wrappers), String and byte[].
+     * An attempt to write anything else must fail with a MessageFormatException as per
+     * JMS 1.1 spec, Section 7.3 Standard Exceptions, page 89, 1st paragraph.
+     * <p/>
+     * Unfortunately, some JMS vendors are not compliant in this area, enforce here for consistent behavior.
+     * 
+     * @param candidate object to validate
+     */
+    protected static void validateStreamMessageType(Object candidate) throws MessageFormatException
+    {
+        if (candidate instanceof Boolean ||
+            candidate instanceof Byte ||
+            candidate instanceof Short ||
+            candidate instanceof Character ||
+            candidate instanceof Integer ||
+            candidate instanceof Long ||
+            candidate instanceof Float ||
+            candidate instanceof Double ||
+            candidate instanceof String ||
+            candidate instanceof byte[])
+        {
+            return;
+        }
+
+        throw new MessageFormatException(String.format("Invalid type passed to StreamMessage: %s . Allowed types are: " +
+                                                       "Boolean, Byte, Short, Character, Integer, Long, Float, Double," +
+                                                       "String and byte[]",
+                                                       ClassUtils.getShortClassName(candidate, "null")));
+    }
 }

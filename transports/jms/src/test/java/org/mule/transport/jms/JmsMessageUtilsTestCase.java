@@ -15,8 +15,18 @@ import org.mule.tck.AbstractMuleTestCase;
 import com.mockobjects.constraint.IsInstanceOf;
 import com.mockobjects.dynamic.Mock;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.jms.BytesMessage;
+import javax.jms.ConnectionFactory;
+import javax.jms.MessageFormatException;
+import javax.jms.Session;
+import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
 
 public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
 {
@@ -76,4 +86,71 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         mockMessage.verify();
     }
 
+    public void testStreamMessageSerialization() throws Exception
+    {
+        Session session = null;
+        try
+        {
+            // get a live session
+            ConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
+            session = cf.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+            // create a test list with data
+            List data = new ArrayList();
+            data.add(new Object());
+
+            // test the invalid input
+            try
+            {
+                JmsMessageUtils.toMessage(data, session);
+                fail("Should've failed with MessageFormatException");
+            }
+            catch (MessageFormatException e)
+            {
+                // expected
+            }
+
+
+            // test valid types
+            data.clear();
+            data.add(Boolean.TRUE);
+            data.add(new Byte("1"));
+            data.add(new Short("2"));
+            data.add(new Character('3'));
+            data.add(new Integer("4"));
+            // can't write Longs: https://issues.apache.org/activemq/browse/AMQ-1965
+            //data.add(new Long("5"));
+            data.add(new Float("6"));
+            data.add(new Double("7"));
+            data.add(new String("8"));
+            data.add(new byte[] {9, 10});
+
+
+            StreamMessage result = (StreamMessage) JmsMessageUtils.toMessage(data, session);
+            // reset so it's readable
+            result.reset();
+
+            assertEquals(Boolean.TRUE, result.readObject());
+            assertEquals(new Byte("1"), result.readObject());
+            assertEquals(new Short("2"), result.readObject());
+            assertEquals(new Character('3'), result.readObject());
+            assertEquals(new Integer("4"), result.readObject());
+            // can't write Longs: https://issues.apache.org/activemq/browse/AMQ-1965
+            //assertEquals(new Long("5"), result.readObject());
+            assertEquals(new Float("6"), result.readObject());
+            assertEquals(new Double("7"), result.readObject());
+            assertEquals(new String("8"), result.readObject());
+
+            assertTrue(Arrays.equals(new byte[] {9, 10}, (byte[]) result.readObject()));
+
+
+        }
+        finally
+        {
+            if (session != null)
+            {
+                session.close();
+            }
+        }
+    }
 }
