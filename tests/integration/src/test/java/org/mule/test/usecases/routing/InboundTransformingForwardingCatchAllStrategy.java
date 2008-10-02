@@ -21,47 +21,12 @@ import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.ServiceRoutingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractCatchAllStrategy;
+import org.mule.routing.ForwardingCatchAllStrategy;
 
-public class InboundTransformingForwardingCatchAllStrategy extends AbstractCatchAllStrategy
+public class InboundTransformingForwardingCatchAllStrategy extends ForwardingCatchAllStrategy
 {
-    public MuleMessage catchMessage(MuleMessage message, MuleSession session, boolean synchronous)
-        throws RoutingException
+    public InboundTransformingForwardingCatchAllStrategy()
     {
-        OutboundEndpoint endpoint = this.getEndpoint();
-
-        if (endpoint == null)
-        {
-            throw new ServiceRoutingException(
-                CoreMessages.noCatchAllEndpointSet(), message, this.getEndpoint(), session.getService());
-        }
-        try
-        {
-            message = new DefaultMuleMessage(RequestContext.getEventContext().transformMessage(), message);
-            MuleEvent newEvent = new DefaultMuleEvent(message, endpoint, session, synchronous);
-
-            if (synchronous)
-            {
-                MuleMessage result = endpoint.send(newEvent);
-                if (statistics != null)
-                {
-                    statistics.incrementRoutedMessage(getEndpoint());
-                }
-                return result;
-            }
-            else
-            {
-                endpoint.dispatch(newEvent);
-                if (statistics != null)
-                {
-                    statistics.incrementRoutedMessage(getEndpoint());
-                }
-                return null;
-            }
-
-        }
-        catch (Exception e)
-        {
-            throw new RoutingException(message, endpoint, e);
-        }
+        this.setSendTransformed(true);
     }
 }

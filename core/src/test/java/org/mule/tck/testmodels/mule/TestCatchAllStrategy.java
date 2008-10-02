@@ -31,7 +31,7 @@ public class TestCatchAllStrategy implements RouterCatchAllStrategy
         return endpoint;
     }
 
-    public MuleMessage catchMessage(MuleMessage message, MuleSession session, boolean synchronous)
+    public MuleMessage catchMessage(MuleMessage message, MuleSession session)
         throws RoutingException
     {
         System.out.println(StringMessageUtils.getBoilerPlate("Caught an event in the router!", '*', 40));

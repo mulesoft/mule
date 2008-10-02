@@ -39,20 +39,10 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
     public void testLoggingOnlyStrategy() throws Exception
     {
+        //Just test it works without failure
         MuleEvent event = getTestEvent("UncaughtEvent");
         LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy();
-        try
-        {
-            strategy.setEndpoint(getTestOutboundEndpoint("testProvider"));
-            fail("Illegal operation exception should have been thrown");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
-
-        assertNull(strategy.getEndpoint());
-        strategy.catchMessage(event.getMessage(), null, false);
+        strategy.catchMessage(event.getMessage(), null);
     }
 
     public void testForwardingStrategy() throws Exception
@@ -64,13 +54,15 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         MuleEvent event = getTestEvent("UncaughtEvent");
         strategy.setEndpoint((OutboundEndpoint)endpoint.proxy());
 
+        endpoint.expectAndReturn("isSynchronous", false);
+        endpoint.expectAndReturn("isSynchronous", false);
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expect("dispatch", C.isA(DefaultMuleEvent.class));
 
-        strategy.catchMessage(event.getMessage(), null, false);
+        strategy.catchMessage(event.getMessage(), null);
 
         endpoint.verify();
         dispatcher.verify();
@@ -91,7 +83,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
      
         try
         {
-            strategy.catchMessage(event.getMessage(), session, false);
+            strategy.catchMessage(event.getMessage(), session);
             fail();
         }
         catch (ServiceRoutingException sre)
@@ -118,6 +110,9 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         MuleEvent event = getTestEvent("UncaughtEvent");
         strategy.setEndpoint((OutboundEndpoint) endpoint.proxy());
 
+        endpoint.expectAndReturn("isSynchronous", true);
+        endpoint.expectAndReturn("isSynchronous", true);
+
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
         endpoint.expectAndReturn("getProperties", new HashMap());
@@ -136,7 +131,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
             }
         });
 
-        strategy.catchMessage(event.getMessage(), null, true);
+        strategy.catchMessage(event.getMessage(), null);
 
         endpoint.verify();
         dispatcher.verify();
@@ -176,9 +171,9 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         messageRouter.addRouter(filterRouter1);
         messageRouter.addRouter(filterRouter2);
 
-        LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy()
+        AbstractCatchAllStrategy strategy = new AbstractCatchAllStrategy()
         {
-            public MuleMessage catchMessage(MuleMessage message, MuleSession session, boolean synchronous)
+            public MuleMessage doCatchMessage(MuleMessage message, MuleSession session)
             {
                 catchAllCount[0]++;
                 return null;

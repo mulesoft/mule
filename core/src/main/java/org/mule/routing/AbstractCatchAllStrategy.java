@@ -12,18 +12,28 @@ package org.mule.routing;
 
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RouterCatchAllStrategy;
+import org.mule.api.routing.RoutingException;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
 import org.mule.management.stats.RouterStatistics;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router for any
- * events not caught by the router this strategy is associated with. Users can assign an
- * endpoint to this strategy to forward all events to. This is similar to a dead letter
- * queue in messaging.
- */
 
+/**
+ * <code>RouterCatchAllStrategy</code> is a strategy interface that allows developers to hook in custom code when
+ * an event is being routed on the inbound or outbound but does not match any of the criteria defined for the routing.
+ *
+ * Think of catch all strategies as a safety net for your events to ensure that all events will get processed.  If you
+ * do not use conditional routing logic, you will not need a catch all strategy.
+ *
+ * Note that it is advised to use this base class over the {@link org.mule.api.routing.RouterCatchAllStrategy} interface
+ * so that the {@link org.mule.management.stats.RouterStatistics} are available.
+ *
+ * @see org.mule.routing.LoggingCatchAllStrategy
+ * @see org.mule.routing.ForwardingCatchAllStrategy
+ */
 public abstract class AbstractCatchAllStrategy implements RouterCatchAllStrategy
 {
     /**
@@ -31,19 +41,11 @@ public abstract class AbstractCatchAllStrategy implements RouterCatchAllStrategy
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected OutboundEndpoint endpoint;
-
+    /** Router statistics used to monitor if a catch all strategy is invoked and if any events are dispatched
+     * from the strategy i.e. from the {@link org.mule.routing.ForwardingCatchAllStrategy}.
+     */
     protected RouterStatistics statistics;
 
-    public void setEndpoint(OutboundEndpoint endpoint)
-    {
-        this.endpoint = endpoint;
-    }
-
-    public OutboundEndpoint getEndpoint()
-    {
-        return endpoint;
-    }
 
     public RouterStatistics getStatistics()
     {
@@ -54,5 +56,31 @@ public abstract class AbstractCatchAllStrategy implements RouterCatchAllStrategy
     {
         this.statistics = statistics;
     }
+
+    /**
+     * This method will be invoked when an event is received or being sent where the criteria of the router(s) do not
+     * match the current event.
+     *
+     * @param message the current message being processed
+     * @param session the current session
+     * @return A result message from this processing. Depending on the messaging style being used this might become the
+     *         response message to a client or remote service call.
+     * @throws org.mule.api.routing.RoutingException
+     *          if there is a failure while processing this message.
+     */
+    public final MuleMessage catchMessage(MuleMessage message, MuleSession session) throws RoutingException
+    {
+        if(getStatistics()!=null)
+        {
+            getStatistics().incrementCaughtMessage();
+        }
+        else
+        {
+            logger.warn("Routing statistics not set on catch all strategy, this invocation will not be recorded.");
+        }
+        return doCatchMessage(message, session);
+    }
+
+    public abstract MuleMessage doCatchMessage(MuleMessage message, MuleSession session) throws RoutingException;
 
 }

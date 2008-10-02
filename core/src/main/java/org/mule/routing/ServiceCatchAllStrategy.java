@@ -26,26 +26,14 @@ import org.mule.api.routing.ServiceRoutingException;
  */
 public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
 {
-    public void setEndpoint(OutboundEndpoint endpoint)
-    {
-        throw new UnsupportedOperationException("The endpoint cannot be set on this catch all");
-    }
-
-    public OutboundEndpoint getEndpoint()
-    {
-        return null;
-    }
-
-    public synchronized MuleMessage catchMessage(MuleMessage message, MuleSession session, boolean synchronous)
+    public synchronized MuleMessage doCatchMessage(MuleMessage message, MuleSession session)
         throws RoutingException
     {
         MuleEvent event = RequestContext.getEvent();
         logger.debug("Catch all strategy handling event: " + event);
         try
         {
-            logger.info("MuleEvent being routed from catch all strategy for endpoint: " + event.getEndpoint());
-            event = new DefaultMuleEvent(message, event.getEndpoint(), session.getService(), event);
-            if (synchronous)
+            if (event.isSynchronous())
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
                 return session.getService().sendEvent(event);

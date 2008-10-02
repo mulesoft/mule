@@ -136,8 +136,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
                         {
                             getStatistics().incrementCaughtMessage();
                         }
-                        return getCatchAllStrategy().catchMessage(event.getMessage(), event.getSession(),
-                            event.isSynchronous());
+                        return getCatchAllStrategy().catchMessage(event.getMessage(), event.getSession());
 
                     }
                     else

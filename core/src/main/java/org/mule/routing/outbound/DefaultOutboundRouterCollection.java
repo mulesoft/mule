@@ -88,7 +88,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                         + session.getService().getName()
                         + " invoking catch all strategy");
             }
-            return catchAll(message, session, synchronous);
+            return catchAll(message, session);
         }
         else if (!matchfound)
         {
@@ -99,7 +99,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
         return message;
     }
 
-    protected MuleMessage catchAll(MuleMessage message, MuleSession session, boolean synchronous)
+    protected MuleMessage catchAll(MuleMessage message, MuleSession session)
             throws RoutingException
     {
         if (getStatistics().isEnabled())
@@ -107,7 +107,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
             getStatistics().incrementCaughtMessage();
         }
 
-        return getCatchAllStrategy().catchMessage(message, session, synchronous);
+        return getCatchAllStrategy().catchMessage(message, session);
     }
 
     public boolean hasEndpoints()

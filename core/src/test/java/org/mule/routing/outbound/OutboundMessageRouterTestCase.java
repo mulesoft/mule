@@ -17,6 +17,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.routing.LoggingCatchAllStrategy;
+import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -134,10 +135,9 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         messageRouter.addRouter(filterRouter1);
         messageRouter.addRouter(filterRouter2);
 
-        LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy()
+        AbstractCatchAllStrategy strategy = new AbstractCatchAllStrategy()
         {
-            public MuleMessage catchMessage(MuleMessage message, MuleSession session, boolean synchronous)
-                throws RoutingException
+            public MuleMessage doCatchMessage(MuleMessage message, MuleSession session) throws RoutingException
             {
                 catchAllCount[0]++;
                 return null;

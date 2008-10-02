@@ -11,6 +11,7 @@
 package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.management.stats.RouterStatistics;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -24,13 +25,25 @@ import org.mule.config.i18n.CoreMessages;
  * any events not caught by the router this strategy is associated with. Users can
  * assign an endpoint to this strategy to forward all events to. This can be used as
  * a dead letter/error queue.
+ *
  */
-
 public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
 {
     private boolean sendTransformed = false;
 
-    public MuleMessage catchMessage(MuleMessage message, MuleSession session, boolean synchronous)
+    protected OutboundEndpoint endpoint;
+
+    public void setEndpoint(OutboundEndpoint endpoint)
+    {
+        this.endpoint = endpoint;
+    }
+
+    public OutboundEndpoint getEndpoint()
+    {
+        return endpoint;
+    }
+
+    public MuleMessage doCatchMessage(MuleMessage message, MuleSession session)
         throws RoutingException
     {
         if (getEndpoint() == null)
@@ -46,9 +59,9 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
                 message.applyTransformers(endpoint.getTransformers());
             }
 
-            MuleEvent newEvent = new DefaultMuleEvent(message, endpoint, session, synchronous);
+            MuleEvent newEvent = new DefaultMuleEvent(message, endpoint, session, getEndpoint().isSynchronous());
 
-            if (synchronous)
+            if (getEndpoint().isSynchronous())
             {
                 MuleMessage result = endpoint.send(newEvent);
                 if (statistics != null)

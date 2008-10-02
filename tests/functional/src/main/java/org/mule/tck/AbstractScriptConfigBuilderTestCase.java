@@ -254,12 +254,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(2, service.getInboundRouter().getEndpoints().size());
         assertNotNull(service.getInboundRouter().getCatchAllStrategy());
         assertTrue(service.getInboundRouter().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
-        assertNotNull(service.getInboundRouter().getCatchAllStrategy().getEndpoint());
-        assertEquals("test://catch.all", service.getInboundRouter()
-            .getCatchAllStrategy()
-            .getEndpoint()
-            .getEndpointURI()
-            .toString());
+        ForwardingCatchAllStrategy fcas = (ForwardingCatchAllStrategy)service.getInboundRouter().getCatchAllStrategy();
+        assertNotNull(fcas.getEndpoint());
+        assertEquals("test://catch.all", fcas.getEndpoint().getEndpointURI().toString());
         endpoint = service.getInboundRouter().getEndpoint("orangeEndpoint");
         assertNotNull(endpoint);
         assertEquals("orangeEndpoint", endpoint.getName());

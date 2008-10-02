@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+      xmlns:scripting="http://www.mulesource.org/schema/mule/scripting/2.2"
+      xsi:schemaLocation="http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+         http://www.mulesource.org/schema/mule/scripting/2.2 http://www.mulesource.org/schema/mule/scripting/2.2/mule-scripting.xsd
+         http://www.mulesource.org/schema/mule/vm/2.2   http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd">
+
+    <description>
+        Junit test: for MuleSupport Portal: Case 00001692
+    </description>
+
+    <vm:connector name="VMQueue" queueEvents="true">
+        <vm:queueProfile persistent="true" maxOutstandingMessages="10"/>
+    </vm:connector>
+
+    <scripting:script engine="groovy" name="testComponent">
+        <scripting:text>
+            if(message.getProperty("messageType").equals("sync"))
+            {
+                return message.getPayloadAsString() + " OK"
+            }
+            else if(message.getProperty("messageType").equals("async"))
+            {
+                return message.getPayloadAsString() + "'s Response sent to asyncResponse"
+            }
+
+           return null
+       </scripting:text>
+    </scripting:script>
+
+    <model name="Case1692UnitTest">
+
+        <service name="SyncAsync">
+            <inbound>
+                <vm:inbound-endpoint path="singleSyncAsyncEntry" synchronous="true"/>
+                <selective-consumer-router>
+                    <message-property-filter pattern="messageType=sync"/>
+                </selective-consumer-router>
+                <forwarding-catch-all-strategy>
+                    <vm:outbound-endpoint path="async" synchronous="false"/>
+                </forwarding-catch-all-strategy>
+            </inbound>
+            <scripting:component script-ref="testComponent"/>
+        </service>
+
+        <service name="AsyncRequest">
+            <inbound>
+                <vm:inbound-endpoint path="async"/>
+                <selective-consumer-router>
+                    <message-property-filter pattern="messageType=async"/>
+                </selective-consumer-router>
+
+            </inbound>
+            <scripting:component script-ref="testComponent"/>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="asyncResponse"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+    </model>
+
+</mule>
