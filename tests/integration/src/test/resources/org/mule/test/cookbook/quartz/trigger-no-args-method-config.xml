@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--// START SNIPPET: full-config -->
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-      xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.0"
-      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.2"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
-       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
-       http://www.mulesource.org/schema/mule/quartz/2.0 http://www.mulesource.org/schema/mule/quartz/2.0/mule-quartz.xsd
-       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/quartz/2.2 http://www.mulesource.org/schema/mule/quartz/2.2/mule-quartz.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 

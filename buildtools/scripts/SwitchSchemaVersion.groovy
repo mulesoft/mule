@@ -9,7 +9,7 @@ import org.codehaus.groovy.ant.FileScanner
 def root = "."
 
 sourceSchemaVersion = "2.0"
-destSchemaVersion = "2.1"
+destSchemaVersion = "2.2"
 schemaBases = [ "http://www.mulesource.org/schema/mule/", "http://www.mulesource.com/schema/mule/" ]
 
 if (args.length > 0)

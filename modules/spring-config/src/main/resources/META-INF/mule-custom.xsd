@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/custom/2.0"
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/custom/2.2"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-            targetNamespace="http://www.mulesource.org/schema/mule/custom/2.0"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
+            targetNamespace="http://www.mulesource.org/schema/mule/custom/2.2"
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
-                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.2"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.2/mule.xsd" />
 
     <xsd:element name="model" type="customModelType" substitutionGroup="mule:abstract-model"/>
     <xsd:complexType name="customModelType">

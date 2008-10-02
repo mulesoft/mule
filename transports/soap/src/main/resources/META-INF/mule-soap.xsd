@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/ssl/2.0"
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/ssl/2.2"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0" 
-            targetNamespace="http://www.mulesource.org/schema/mule/soap/2.0"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.2" 
+            targetNamespace="http://www.mulesource.org/schema/mule/soap/2.2"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
-                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
-       <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.0"
-                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.0/mule-schemadoc.xsd"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.2"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.2/mule.xsd" />
+       <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.2"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.2/mule-schemadoc.xsd"/>
     
      <xsd:annotation>
         <xsd:documentation>The SOAP transport enables your components to be exposed as web services and to act as SOAP clients. The SOAP transport supports the Axis and CXF transports.</xsd:documentation>

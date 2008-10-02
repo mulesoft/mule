@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
-       xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
-       xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.0"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+       xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.2"
+       xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.2"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
-       http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd
-       http://www.mulesource.org/schema/mule/jbossts/2.0 http://www.mulesource.org/schema/mule/jbossts/2.0/mule-jbossts.xsd">
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/jdbc/2.2 http://www.mulesource.org/schema/mule/jdbc/2.2/mule-jdbc.xsd
+       http://www.mulesource.org/schema/mule/jbossts/2.2 http://www.mulesource.org/schema/mule/jbossts/2.2/mule-jbossts.xsd">
 
     <!-- 
     <mule-environment-properties synchronous="true" synchronousEventTimeout="5000">
