@@ -17,6 +17,7 @@ if (args.length > 0)
     root = args[0]
 }
 
+// switch the version in all XSD and XML files
 AntBuilder ant = new AntBuilder()
 FileScanner scanner = ant.fileScanner 
 {
@@ -30,12 +31,17 @@ FileScanner scanner = ant.fileScanner
     }
 }
 
-scanner.each 
-{
-    println "switching schema version on $it"
-    switchSchemaVersion(it)
+def noChange = {
+    return it   
 }
 
+scanner.each 
+{
+    //println "switching schema version on $it"
+    switchSchemaVersion(it, noChange, noChange)
+}
+
+// switch all spring.handlers and spring.schemas files
 scanner = ant.fileScanner
 {
     fileset(dir: root)
@@ -46,40 +52,65 @@ scanner = ant.fileScanner
     }
 }
 
-scanner.each
-{
-    println "switching schema version in $it"
-    switchSpringHandler(it)
+def preProcess = {
+    return it.replace("\\:", ":")
 }
 
-def switchSchemaVersion(File inFile)
+def postProcess = {
+    return it.replace(":", "\\:")
+}
+
+scanner.each
+{
+    //println "switching schema version on $it"
+    switchSchemaVersion(it, preProcess, postProcess)
+}
+
+def switchSchemaVersion(File inFile, def preProcessFunction, def postProcessFunction)
 {    
     def filename = inFile.name + ".version-switched"
     def outFile = new File(inFile.parentFile, filename)
-    def outWriter = new PrintWriter(new FileWriter(outFile))
-    
-    inFile.eachLine
+
+    def schemaMatched = false
+    outFile.withWriter
     {
-        line ->
-
-        def matchingSchemaBase = findMatchingSchema(line)
-        if (matchingSchemaBase != null)
+        outWriter ->
+             
+        inFile.eachLine
         {
-            def schemaName = findSchemaName(line, matchingSchemaBase)
-            def convertedLine = updateSchema(line, matchingSchemaBase, schemaName)
-            outWriter.println(convertedLine)
-        }
-        else
-        {
-            outWriter.println(line)
-        }
-    }
+            line ->
     
-    outWriter.close()
+            def preprocessed = preProcessFunction(line)
 
-    def backupFile = new File(inFile.parentFile, inFile.name + ".bak")
-    move(inFile, backupFile)
-    move(outFile, inFile)
+            def matchingSchemaBase = findMatchingSchema(preprocessed)
+            if (matchingSchemaBase != null)
+            {
+                schemaMatched = true
+                
+                def schemaName = findSchemaName(preprocessed, matchingSchemaBase)
+                def convertedLine = updateSchema(preprocessed, matchingSchemaBase, schemaName)
+                
+                convertedLine = postProcessFunction(convertedLine)
+                
+                outWriter.writeLine(convertedLine)
+            }
+            else
+            {
+                outWriter.writeLine(preprocessed)
+            }
+        }
+    }    
+    
+    if (schemaMatched)
+    {
+        def backupFile = new File(inFile.parentFile, inFile.name + ".bak")
+        move(inFile, backupFile)
+        move(outFile, inFile)
+    }
+    else
+    {
+        delete(outFile)
+    }
 }
 
 def findMatchingSchema(String line)
@@ -108,13 +139,13 @@ def findSchemaName(String line, String schemaBase)
     return line.substring(startSearchIndex, schemaNameEndIndex)
 }
 
-def updateSchema(String line, String schemaBase, String schemaName)
+def updateSchema(String inputLine, String schemaBase, String schemaName)
 {    
     def urlBase = schemaBase + schemaName + "/"
     def originalUrl = urlBase + sourceSchemaVersion
     def replacementUrl = urlBase + destSchemaVersion
-
-    return line.replaceAll(originalUrl, replacementUrl)
+    
+    return inputLine.replace(originalUrl, replacementUrl)
 }
 
 def move(File sourceFile, File destFile)
@@ -126,39 +157,14 @@ def move(File sourceFile, File destFile)
     
     if (sourceFile.renameTo(destFile) == false)
     {
-        fail("moving " + sourceFile.absolutePath + " to " + destFile.absolutePath + " failed")
+        throw new IOException("moving " + sourceFile.absolutePath + " to " + destFile.absolutePath + " failed")
     }
 }
 
-def switchSpringHandler(File inFile)
+def delete(File file)
 {
-    def filename = inFile.name + ".version-switched"
-    def outFile = new File(inFile.parentFile, filename)
-    def outWriter = new PrintWriter(new FileWriter(outFile))
-    
-    inFile.eachLine
+    if (file.delete() == false)
     {
-        line ->
-
-        line = line.replace("\\:", ":")
-        
-        def matchingSchemaBase = findMatchingSchema(line)
-        if (matchingSchemaBase != null)
-        {
-            def schemaName = findSchemaName(line, matchingSchemaBase)
-            def convertedLine = updateSchema(line, matchingSchemaBase, schemaName)
-            convertedLine = convertedLine.replace(":", "\\:")
-            outWriter.println(convertedLine)
-        }
-        else
-        {
-            outWriter.println(line)
-        }   
+        throw new IOException("deleting " + file.canonicalFile + " failed")
     }
-    
-    outWriter.close()
-
-    def backupFile = new File(inFile.parentFile, inFile.name + ".bak")
-    move(inFile, backupFile)
-    move(outFile, inFile)    
 }
