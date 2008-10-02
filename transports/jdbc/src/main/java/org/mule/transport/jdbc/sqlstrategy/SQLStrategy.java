@@ -19,14 +19,14 @@ package org.mule.transport.jdbc.sqlstrategy;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.transport.jdbc.JdbcConnector;
+
+import java.sql.Connection;
 
 public interface SQLStrategy 
-{
-    
-    public MuleMessage executeStatement(JdbcConnector connector,
-                                               ImmutableEndpoint endpoint,
-                                               MuleEvent event,
-                                               long timeout) throws Exception;
+{    
+    public MuleMessage executeStatement(Connection jdbcConnection,
+                                        ImmutableEndpoint endpoint,
+                                        MuleEvent event,
+                                        long timeout) throws Exception;
 
 }
