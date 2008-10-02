@@ -36,6 +36,22 @@ scanner.each
     switchSchemaVersion(it)
 }
 
+scanner = ant.fileScanner
+{
+    fileset(dir: root)
+    {
+        include(name: "**/spring.handlers")
+        include(name: "**/spring.schemas")
+        exclude(name: "**/target/**")
+    }
+}
+
+scanner.each
+{
+    println "switching schema version in $it"
+    switchSpringHandler(it)
+}
+
 def switchSchemaVersion(File inFile)
 {    
     def filename = inFile.name + ".version-switched"
@@ -50,7 +66,8 @@ def switchSchemaVersion(File inFile)
         if (matchingSchemaBase != null)
         {
             def schemaName = findSchemaName(line, matchingSchemaBase)
-            updateSchema(line, matchingSchemaBase, schemaName, outWriter)            
+            def convertedLine = updateSchema(line, matchingSchemaBase, schemaName)
+            outWriter.println(convertedLine)
         }
         else
         {
@@ -91,13 +108,13 @@ def findSchemaName(String line, String schemaBase)
     return line.substring(startSearchIndex, schemaNameEndIndex)
 }
 
-def updateSchema(String line, String schemaBase, String schemaName, PrintWriter writer)
+def updateSchema(String line, String schemaBase, String schemaName)
 {    
     def urlBase = schemaBase + schemaName + "/"
     def originalUrl = urlBase + sourceSchemaVersion
     def replacementUrl = urlBase + destSchemaVersion
 
-    writer.println(line.replaceAll(originalUrl, replacementUrl))
+    return line.replaceAll(originalUrl, replacementUrl)
 }
 
 def move(File sourceFile, File destFile)
@@ -106,10 +123,42 @@ def move(File sourceFile, File destFile)
     {
         throw new IOException(destFile.canonicalPath + " exists!")
     }
-
     
     if (sourceFile.renameTo(destFile) == false)
     {
         fail("moving " + sourceFile.absolutePath + " to " + destFile.absolutePath + " failed")
     }
+}
+
+def switchSpringHandler(File inFile)
+{
+    def filename = inFile.name + ".version-switched"
+    def outFile = new File(inFile.parentFile, filename)
+    def outWriter = new PrintWriter(new FileWriter(outFile))
+    
+    inFile.eachLine
+    {
+        line ->
+
+        line = line.replace("\\:", ":")
+        
+        def matchingSchemaBase = findMatchingSchema(line)
+        if (matchingSchemaBase != null)
+        {
+            def schemaName = findSchemaName(line, matchingSchemaBase)
+            def convertedLine = updateSchema(line, matchingSchemaBase, schemaName)
+            convertedLine = convertedLine.replace(":", "\\:")
+            outWriter.println(convertedLine)
+        }
+        else
+        {
+            outWriter.println(line)
+        }   
+    }
+    
+    outWriter.close()
+
+    def backupFile = new File(inFile.parentFile, inFile.name + ".bak")
+    move(inFile, backupFile)
+    move(outFile, inFile)    
 }
