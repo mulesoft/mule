@@ -39,8 +39,6 @@ import javax.sql.XADataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.apache.commons.dbutils.handlers.MapListHandler;
-import org.apache.commons.dbutils.handlers.MapListHandler;
 
 public class JdbcConnector extends AbstractConnector
 {
@@ -291,8 +289,9 @@ public class JdbcConnector extends AbstractConnector
             Object value = null;
             // If we find a value and it happens to be null, thats acceptable
             boolean foundValue = false;
+            boolean validExpression = ExpressionEvaluatorManager.isValidExpression(param);
             //There must be an expression namespace to use the ExpresionEvaluator i.e. header:type
-            if (message != null && ExpressionEvaluatorManager.isValidExpression(param))
+            if (message != null && validExpression)
             {
                 value = ExpressionEvaluatorManager.evaluate(param, message);
                 foundValue = value != null;
@@ -301,8 +300,11 @@ public class JdbcConnector extends AbstractConnector
             {
                 String name = param.substring(2, param.length() - 1);
                 //MULE-3597
-                logger.warn("Config is using the legacy param format " + param +
-                        " (no evaluator defined).  This expression can be replaced with ${header:" + name + "}");
+                if (!validExpression)
+                {
+                    logger.warn("Config is using the legacy param format " + param +
+                            " (no evaluator defined).  This expression can be replaced with ${header:" + name + "}");
+                }
                 value = endpoint.getProperty(name);
             }
 

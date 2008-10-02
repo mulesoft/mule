@@ -17,7 +17,7 @@
         <jdbc:query key="getTest"
                     value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE ID = 1 AND ACK IS NULL"/>
         <jdbc:query key="getTest.ack"
-                    value="UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id}"/>
+                    value="UPDATE TEST SET ACK = ${function:now} WHERE ID = ${header:id}"/>
         <jdbc:query key="writeTest"
                     value="INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES(1, NULL, NULL, NULL, NULL)"/>
     </jdbc:connector>
