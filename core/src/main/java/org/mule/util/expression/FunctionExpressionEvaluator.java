@@ -9,8 +9,10 @@
  */
 package org.mule.util.expression;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.UUID;
 
@@ -33,6 +35,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
  * <li>hostname - returns the hostname of the machine Mule is running on</li>
  * <li>ip - returns the ip address of the machine Mule is running on</li>
  * <li>count - returns a local count that will increment for each call.  If the server is re-started the counter will return to zero</li>
+ * <li>payloadClass - Returns a fuly qualified class name of the payload as a string</li>
+ * <li>shortPayloadClass - Returns just the class name of the payload as a string</li>
  * </ul>
  */
 public class FunctionExpressionEvaluator implements ExpressionEvaluator
@@ -55,6 +59,8 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
     public static final String HOSTNAME_FUNCTION = "hostname";
     public static final String IP_FUNCTION = "ip";
     public static final String COUNT_FUNCTION = "count";
+    public static final String PAYLOAD_CLASS_FUNCTION = "payloadClass";
+    public static final String SHORT_PAYLOAD_CLASS_FUNCTION = "shortPayloadClass";
 
     public Object evaluate(String name, Object message)
     {
@@ -69,7 +75,7 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
         else if (name.toLowerCase().startsWith(DATESTAMP_FUNCTION))
         {
             String temp = name.substring(DATESTAMP_FUNCTION.length());
-            if (temp.length()==0)
+            if (temp.length() == 0)
             {
                 return DateUtils.getTimeStamp(DEFAULT_DATE_FORMAT);
             }
@@ -112,6 +118,21 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
         else if (name.equalsIgnoreCase(COUNT_FUNCTION))
         {
             return new Long(count.getAndIncrement());
+        }
+        else if (message instanceof MuleMessage)
+        {
+            if (name.equalsIgnoreCase(PAYLOAD_CLASS_FUNCTION))
+            {
+                return ((MuleMessage) message).getPayload().getClass().getName();
+            }
+            else if (name.equalsIgnoreCase(SHORT_PAYLOAD_CLASS_FUNCTION))
+            {
+                return ClassUtils.getClassName(((MuleMessage) message).getPayload().getClass());
+            }
+            else
+            {
+                throw new IllegalArgumentException(name);
+            }
         }
         else
         {
