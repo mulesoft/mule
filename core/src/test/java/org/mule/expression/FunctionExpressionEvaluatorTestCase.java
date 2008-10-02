@@ -54,10 +54,10 @@ public class FunctionExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            o = extractor.evaluate("bork", message);
+            extractor.evaluate("bork", message);
             fail("bork is not a valid function");
         }
-        catch (Exception e)
+        catch (IllegalArgumentException e)
         {
             //expected
         }
@@ -94,11 +94,22 @@ public class FunctionExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            o = ExpressionEvaluatorManager.evaluate("function:bork", message);
+            ExpressionEvaluatorManager.evaluate("function:bork", message);
             fail("bork is not a valid function");
         }
-        catch (Exception e)
+        catch (IllegalArgumentException e)
         {
+            //expected
+        }
+
+        try
+        {
+            ExpressionEvaluatorManager.evaluate("function:", message);
+            fail("'Empty string' is not a valid function");
+        }
+        catch (IllegalArgumentException e)
+        {
+            System.out.println("");
             //expected
         }
     }
