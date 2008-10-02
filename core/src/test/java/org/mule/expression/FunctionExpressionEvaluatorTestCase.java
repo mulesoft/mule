@@ -109,7 +109,6 @@ public class FunctionExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
         catch (IllegalArgumentException e)
         {
-            System.out.println("");
             //expected
         }
     }
