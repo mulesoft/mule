@@ -18,12 +18,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.jms.BytesMessage;
 import javax.jms.Destination;
@@ -139,7 +139,8 @@ public class JmsMessageUtils
             List list = (List) object;
             for (Iterator iter = list.iterator(); iter.hasNext();)
             {
-                sMsg.writeObject(iter.next());
+                Object o = iter.next();
+                sMsg.writeObject(o);
             }
             return sMsg;
         }
@@ -193,14 +194,14 @@ public class JmsMessageUtils
         }
         else if (source instanceof StreamMessage)
         {
-            Vector result = new Vector();
+            List result = new ArrayList();
             try
             {
                 StreamMessage sMsg = (StreamMessage) source;
                 Object obj;
                 while ((obj = sMsg.readObject()) != null)
                 {
-                    result.addElement(obj);
+                    result.add(obj);
                 }
             }
             catch (MessageEOFException eof)
