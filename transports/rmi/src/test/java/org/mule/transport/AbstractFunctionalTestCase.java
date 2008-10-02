@@ -93,7 +93,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
             assertTrue(e instanceof DispatchException);
 
             Message message = RmiMessages.messageParamServiceMethodNotSet();
-            assertTrue(e.getCause().getMessage().startsWith(message.toString()));
+            assertTrue(e.getMessage().startsWith(message.toString()));
         }
     }
 
