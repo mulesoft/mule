@@ -10,7 +10,6 @@
 package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.routing.outbound.MultiExpressionMessageSplitter;
 import org.mule.util.expression.FunctionExpressionEvaluator;
 import org.mule.util.expression.ExpressionEvaluatorManager;
 import org.mule.api.MuleMessage;
