@@ -88,7 +88,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 
         MessagePropertyFilter filter = (MessagePropertyFilter)endpoint.getFilter();
         assertNotNull(filter);
-        assertEquals("foo=bar", filter.getExpression());
+        assertEquals("foo=bar", filter.getPattern());
     }
 
     // @Override

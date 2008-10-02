@@ -82,4 +82,15 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         message.removeProperty("foo2");
         assertTrue(!filter.accept(message));
     }
+
+
+    public void testMessagePropertyFilterPropertyExists() throws Exception
+    {
+        MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
+        MuleMessage message = new DefaultMuleMessage("blah");
+
+        assertTrue(!filter.accept(message));
+        message.setProperty("foo", "car");
+        assertTrue(filter.accept(message));
+    }
 }

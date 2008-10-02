@@ -102,7 +102,7 @@ muleContext.registry.registerTransformer(testCompressionTransformer);
 
 //Register Filter
 filter = new MessagePropertyFilter();
-filter.expression = "foo=bar"
+filter.pattern = "foo=bar"
 
 // Global Endpoint
 epBuilder= new EndpointURIEndpointBuilder("test://fruitBowlPublishQ", muleContext)

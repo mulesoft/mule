@@ -81,7 +81,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         
         MessagePropertyFilter filter = (MessagePropertyFilter)endpoint.getFilter();
         assertNotNull(filter);
-        assertEquals("foo=bar", filter.getExpression());
+        assertEquals("foo=bar", filter.getPattern());
 
         ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("testEPWithCS");
         assertNotNull(ep);

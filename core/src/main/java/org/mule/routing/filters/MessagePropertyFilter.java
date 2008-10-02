@@ -45,7 +45,7 @@ public class MessagePropertyFilter implements Filter
 
     public MessagePropertyFilter(String expression)
     {
-        setExpression(expression);
+        setPattern(expression);
     }
 
     public boolean accept(MuleMessage message)
@@ -89,7 +89,7 @@ public class MessagePropertyFilter implements Filter
             value2 = "null";
         }
 
-        boolean result = false;
+        boolean result;
 
         if (caseSensitive)
         {
@@ -103,12 +103,12 @@ public class MessagePropertyFilter implements Filter
         return (not ? !result : result);
     }
 
-    public String getExpression()
+    public String getPattern()
     {
         return propertyName + '=' + propertyValue;
     }
 
-    public void setExpression(String expression)
+    public void setPattern(String expression)
     {
         int i = expression.indexOf('=');
         if (i == -1)
@@ -139,13 +139,5 @@ public class MessagePropertyFilter implements Filter
     public void setCaseSensitive(boolean caseSensitive)
     {
         this.caseSensitive = caseSensitive;
-    }
-    
-    /**
-     * All Filters that are configured via spring have to implement this method.
-     */
-    public void setPattern(String pattern)
-    {
-        this.setExpression(pattern);
     }
 }
