@@ -115,7 +115,6 @@ import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.routing.outbound.TemplateEndpointRouter;
 import org.mule.routing.outbound.ExpressionMessageSplitter;
-import org.mule.routing.outbound.MultiExpressionMessageSplitter;
 import org.mule.routing.response.DefaultResponseRouterCollection;
 import org.mule.routing.response.SimpleCollectionResponseAggregator;
 import org.mule.routing.response.SingleResponseRouter;
