@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
 
 import javax.jms.BytesMessage;
 import javax.jms.ConnectionFactory;
@@ -165,12 +164,13 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         message.reset();
 
         AbstractJmsTransformer trans = new JMSMessageToObject();
-        Object result = trans.transform(message);
-        assertTrue("Transformed object should be a Vector", result instanceof Vector);
+        Object transformedObject = trans.transform(message);
+        assertTrue("Transformed object should be a List", transformedObject instanceof List);
 
-        String newText = (String) ((Vector) result).get(0);
-        Integer newI = (Integer) ((Vector) result).get(1);
-        Double newD = (Double) ((Vector) result).get(2);
+        final List result = (List) transformedObject;
+        String newText = (String) result.get(0);
+        Integer newI = (Integer) result.get(1);
+        Double newD = (Double) result.get(2);
         assertEquals(i, newI.intValue());
         assertEquals(new Double(d), newD);
         assertEquals(text, newText);
