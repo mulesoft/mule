@@ -139,8 +139,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint4)), message);
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint5)), message);
-        //Note as I have disabled 'honourSynchronicity' (MULE-3299) so setting the sync flag to true or false
-        //makes no difference.  See issue for more info.
+
         MuleMessage result = syncXmlSplitter.route(message, (MuleSession) session.proxy(), false);
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);

@@ -32,13 +32,6 @@ import java.util.Map;
  */
 public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 {
-    // flag which, if true, makes the splitter honour settings such as remoteSync and
-    // synchronous on the endpoint
-    //RM*: I am disabling public access for this property. I don't see why we wouldn't always honour
-    //outbound endpoint configuration. It's much clearer this way. I've raised MULE-3299 so that we may
-    //remove this property if everyone is happy :)
-    protected boolean honorSynchronicity = true;
-
     public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
             throws RoutingException
     {
@@ -90,12 +83,10 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                     sendMessage.setCorrelationSequence(correlationSequence++);
                 }
 
-                if (honorSynchronicity)
-                {
-                    synchronous = part.getEndpoint().isSynchronous();
-                    sendMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY,
-                            part.getEndpoint().isRemoteSync());
-                }
+                //Use sync config from endpoint
+                synchronous = part.getEndpoint().isSynchronous();
+                sendMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY,
+                        part.getEndpoint().isRemoteSync());
 
                 if (synchronous)
                 {

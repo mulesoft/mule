@@ -3567,10 +3567,6 @@
             <xsd:extension base="multipleEndpointFilteringOutboundRouterType">
                 <!-- this is not exposed to the user afaict? -->
                 <!-- xsd:attribute name="multimatch" type="substitutableBoolean"/ -->
-                <!--
-                RM* I have disabled this property so that endpoint synchronicity is always honoured.
-                If we don't talk the sync config from the endpoint it becomes confusing to know what configures what
-                <xsd:attribute name="honorSynchronicity" type="substitutableBoolean"/>-->
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
