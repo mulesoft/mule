@@ -34,7 +34,7 @@ import org.dom4j.XPath;
 import org.dom4j.io.SAXReader;
 
 /**
- * <code>FilteringXmlMessageSplitter</code> will split a DOM4J document into nodes
+ * <code>XmlMessageSplitter</code> will split a DOM4J document into nodes
  * based on the "splitExpression" property. <p/> Optionally, you can specify a
  * <code>namespaces</code> property map that contain prefix/namespace mappings.
  * Mind if you have a default namespace declared you should map it to some namespace,
