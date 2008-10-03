@@ -20,19 +20,19 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="pojo2"/>
+                    <jms:outbound-endpoint queue="pojo2" synchronous="true"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="pojo2">
             <inbound>
-                <jms:inbound-endpoint queue="pojo2"/>
+                <jms:inbound-endpoint queue="pojo2" synchronous="true"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="pojo3"/>
+                    <vm:outbound-endpoint path="pojo3" synchronous="true"/>
                 </pass-through-router>
             </outbound>
         </service>

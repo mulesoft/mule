@@ -18,7 +18,6 @@ import org.apache.commons.dbutils.handlers.ArrayListHandler;
 
 public class JdbcBridgeFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
-
     private static final int TEST_ROWS = 10;
     
     public JdbcBridgeFunctionalTestCase()

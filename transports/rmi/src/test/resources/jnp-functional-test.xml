@@ -31,16 +31,15 @@
 
         <service name="TestUMO">
             <inbound>
-                <inbound-endpoint address="vm://testin"/>
-                <forwarding-router/>
+                <inbound-endpoint address="vm://testin" synchronous="true"/>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <jnp:outbound-endpoint ref="Sender"/>
+                    <jnp:outbound-endpoint ref="Sender" synchronous="true"/>
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </filtering-router>
                 <filtering-router>
-                    <outbound-endpoint ref="Sender2"/>
+                    <outbound-endpoint ref="Sender2" synchronous="true"/>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>
             </outbound>

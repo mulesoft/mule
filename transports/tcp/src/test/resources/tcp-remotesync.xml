@@ -17,7 +17,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <tcp:outbound-endpoint host="localhost" port="6162"/>
+                    <tcp:outbound-endpoint host="localhost" port="6162" synchronous="true"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -25,11 +25,10 @@
         <service name="Echo2">
             <inbound>
                 <tcp:inbound-endpoint host="localhost" port="6163" remoteSync="true"/>
-                <forwarding-router/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="sync"/>
+                    <vm:outbound-endpoint path="sync" synchronous="true"/>
                 </pass-through-router>
             </outbound>
         </service>

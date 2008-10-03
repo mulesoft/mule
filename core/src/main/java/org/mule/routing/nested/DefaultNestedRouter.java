@@ -44,9 +44,9 @@ public class DefaultNestedRouter extends AbstractRouter implements NestedRouter
         setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_NESTED));
     }
 
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous) throws MessagingException
+    public MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException
     {
-        return outboundRouter.route(message, session, synchronous);
+        return outboundRouter.route(message, session);
     }
 
     public void setInterface(Class interfaceClass)

@@ -57,7 +57,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Orange.class), C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)));
-        router.route(message, (MuleSession) session.proxy(), false);
+        router.route(message, (MuleSession) session.proxy());
         session.verify();
 
         endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1?synchronous=true", null, new PayloadTypeFilter(Apple.class), null);
@@ -79,7 +79,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
                 message);
         session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)),
                 message);
-        MuleMessage result = router.route(message, (MuleSession) session.proxy(), true);
+        MuleMessage result = router.route(message, (MuleSession) session.proxy());
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof List);
         assertEquals(((List) result.getPayload()).size(), 4);

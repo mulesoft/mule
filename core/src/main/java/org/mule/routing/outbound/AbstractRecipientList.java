@@ -10,13 +10,12 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleMessage;
 import org.mule.MuleServer;
-import org.mule.DefaultMessageCollection;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.RegistrationException;
@@ -29,7 +28,6 @@ import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,13 +48,9 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
     private Boolean synchronous;
 
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
     {
-        if(this.synchronous!=null)
-        {
-            synchronous = this.synchronous.booleanValue();
-        }
 
         List recipients = this.getRecipients(message);
         List results = new ArrayList();
@@ -88,9 +82,10 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             request = new DefaultMuleMessage(message.getPayload(), message);
             endpoint = this.getRecipientEndpoint(request, recipient);
 
+            boolean sync = (this.synchronous==null ? endpoint.isSynchronous() : this.synchronous.booleanValue());
             try
             {
-                if (synchronous)
+                if (sync)
                 {
                     result = this.send(session, request, endpoint);
                     if (result != null)

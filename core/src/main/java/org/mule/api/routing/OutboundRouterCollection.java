@@ -28,7 +28,7 @@ public interface OutboundRouterCollection extends RouterCollection
      * @return a list containing 0 or events to be dispatched
      * @throws RoutingException If any of the events cannot be created.
      */
-    MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous) throws MessagingException;
+    MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException;
 
     /**
      * Determines if any endpoints have been set on this router.

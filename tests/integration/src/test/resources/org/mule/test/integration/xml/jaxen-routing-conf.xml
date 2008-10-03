@@ -14,12 +14,12 @@
 
     <service name="inService">
       <inbound>
-        <inbound-endpoint address="vm://in"/>
+        <inbound-endpoint address="vm://in" synchronous="true"/>
       </inbound>
       <bridge-component/>
       <outbound>
         <filtering-router>
-          <outbound-endpoint address="vm://echo"/>
+          <outbound-endpoint address="vm://echo" synchronous="true"/>
           <mule-xml:jaxen-filter pattern="/e:purchaseOrder/e:shipTo/@country" expectedValue="US">
             <mule-xml:namespace prefix="e" uri="http://www.example.com"/>
           </mule-xml:jaxen-filter>

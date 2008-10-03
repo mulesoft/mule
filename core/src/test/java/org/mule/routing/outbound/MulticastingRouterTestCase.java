@@ -26,7 +26,7 @@ import java.util.List;
 
 public class MulticastingRouterTestCase extends AbstractMuleTestCase
 {
-    public void testMulticastingRouter() throws Exception
+    public void testMulticastingRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getService", getTestService());
@@ -53,14 +53,72 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
-        router.route(message, (MuleSession)session.proxy(), false);
+        router.route(message, (MuleSession)session.proxy());
         session.verify();
 
-        message = new DefaultMuleMessage("test event");
+    }
+
+    public void testMulticastingRouterSync() throws Exception
+    {
+        Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
+
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
+        assertNotNull(endpoint1);
+
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?synchronous=true");
+        assertNotNull(endpoint2);
+
+        MulticastingRouter router = new MulticastingRouter();
+        RegExFilter filter = new RegExFilter("(.*) event");
+        router.setFilter(filter);
+        List endpoints = new ArrayList();
+        endpoints.add(endpoint1);
+        endpoints.add(endpoint2);
+        router.setEndpoints(endpoints);
+
+        assertEquals(filter, router.getFilter());
+
+        MuleMessage message = new DefaultMuleMessage("test event");
+
+        assertTrue(router.isMatch(message));
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
         session.expectAndReturn("sendEvent", C.eq(message, endpoint2), message);
-        MuleMessage result = router.route(message, (MuleSession)session.proxy(), true);
+        MuleMessage result = router.route(message, (MuleSession)session.proxy());
+        assertNotNull(result);
+        assertEquals(message, result);
+        session.verify();
+    }
+
+    public void testMulticastingRouterMixedSyncAsync() throws Exception
+    {
+        Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
+
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
+        assertNotNull(endpoint1);
+
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?synchronous=false");
+        assertNotNull(endpoint2);
+
+        MulticastingRouter router = new MulticastingRouter();
+        RegExFilter filter = new RegExFilter("(.*) event");
+        router.setFilter(filter);
+        List endpoints = new ArrayList();
+        endpoints.add(endpoint1);
+        endpoints.add(endpoint2);
+        router.setEndpoints(endpoints);
+
+        assertEquals(filter, router.getFilter());
+
+        MuleMessage message = new DefaultMuleMessage("test event");
+
+        assertTrue(router.isMatch(message));
+
+        session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
+        session.expectAndReturn("dispatchEvent", C.eq(message, endpoint2), message);
+        MuleMessage result = router.route(message, (MuleSession)session.proxy());
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();

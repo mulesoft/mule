@@ -48,8 +48,8 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 
     // We used Square templates as they can exist as part of an URI.
     private TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
-
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+    
+    public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
     {
         MuleMessage result = null;
@@ -63,7 +63,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 
         try
         {
-            if (synchronous)
+            if (ep.isSynchronous())
             {
                 result = send(session, message, ep);
             }

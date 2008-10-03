@@ -50,7 +50,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage(payload);
 
-        MuleMessage result = router.route(message, session, true);
+        MuleMessage result = router.route(message, session);
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);
         assertEquals("There should be 4 results for 4 split messages.", 4, ((MuleMessageCollection) result).size());
@@ -99,7 +99,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Orange.class), C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)));
-        asyncSplitter.route(message, (MuleSession) session.proxy(), false);
+        asyncSplitter.route(message, (MuleSession) session.proxy());
         session.verify();
 
         message = new DefaultMuleMessage(payload);
@@ -117,7 +117,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
                 message);
         session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint6)),
                 message);
-        MuleMessage result = syncSplitter.route(message, (MuleSession) session.proxy(), true);
+        MuleMessage result = syncSplitter.route(message, (MuleSession) session.proxy());
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);
         assertEquals(4, ((MuleMessageCollection) result).size());

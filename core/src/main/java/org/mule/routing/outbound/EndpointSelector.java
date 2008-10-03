@@ -51,7 +51,7 @@ public class EndpointSelector extends FilteringOutboundRouter
     private String customEvaluator;
     private String fullExpression;
 
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session)
             throws RoutingException
     {
         List endpoints;
@@ -68,7 +68,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         if (property == null)
         {
             throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), message, null);
+                    CoreMessages.expressionResultWasNull(getFullExpression()), message, null);
         }
 
         if (property instanceof String)
@@ -105,7 +105,7 @@ public class EndpointSelector extends FilteringOutboundRouter
                     throw new CouldNotRouteOutboundMessageException(CoreMessages.objectNotFound("Endpoint",
                             endpointName), message, ep);
                 }
-                if (synchronous)
+                if (ep.isSynchronous())
                 {
                     // TODO See MULE-2613, we only return the last message here
                     result = send(session, message, ep);

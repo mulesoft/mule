@@ -129,7 +129,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         session.expectAndReturn("getService", getTestService());
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint2)));
-        asyncXmlSplitter.route(message, (MuleSession) session.proxy(), false);
+        asyncXmlSplitter.route(message, (MuleSession) session.proxy());
         session.verify();
 
         message = new DefaultMuleMessage(payload);
@@ -140,7 +140,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint4)), message);
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint5)), message);
 
-        MuleMessage result = syncXmlSplitter.route(message, (MuleSession) session.proxy(), false);
+        MuleMessage result = syncXmlSplitter.route(message, (MuleSession) session.proxy());
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);
         assertEquals(2, ((MuleMessageCollection) result).size());
@@ -163,7 +163,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         assertTrue(splitter.isMatch(message));
         try
         {
-            splitter.route(message, (MuleSession) session.proxy(), false);
+            splitter.route(message, (MuleSession) session.proxy());
             fail("Should have thrown an exception, because XSD is not found.");
         }
         catch (IllegalArgumentException iaex)
@@ -185,7 +185,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         try
         {
-            splitter.route(message, (MuleSession) session.proxy(), false);
+            splitter.route(message, (MuleSession) session.proxy());
             fail("No exception thrown.");
         }
         catch (IllegalArgumentException iaex)
@@ -206,7 +206,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         try
         {
-            splitter.route(message, (MuleSession) session.proxy(), false);
+            splitter.route(message, (MuleSession) session.proxy());
             fail("No exception thrown.");
         }
         catch (IllegalArgumentException iaex)

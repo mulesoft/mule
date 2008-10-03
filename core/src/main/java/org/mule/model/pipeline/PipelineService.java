@@ -49,8 +49,7 @@ public class PipelineService extends DirectService
                 // }
                 if (outboundRouter.hasEndpoints())
                 {
-                    MuleMessage outboundReturnMessage = outboundRouter.route(returnMessage, event.getSession(),
-                        event.isSynchronous());
+                    MuleMessage outboundReturnMessage = outboundRouter.route(returnMessage, event.getSession());
                     if (outboundReturnMessage != null)
                     {
                         returnMessage = outboundReturnMessage;

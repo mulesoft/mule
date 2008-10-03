@@ -16,12 +16,12 @@
 
       <service name="Part2Service" initialState="started">
          <inbound>
-            <inbound-endpoint address="vm://in"/>
+            <inbound-endpoint address="vm://in" synchronous="true"/>
          </inbound>
          <outbound>
             <custom-outbound-router class="org.mule.routing.outbound.ChainingRouter">
-               <outbound-endpoint address="jms://out1"/>
-               <outbound-endpoint address="vm://out2"/>
+               <outbound-endpoint address="jms://out1" synchronous="true"/>
+               <outbound-endpoint address="vm://out2" synchronous="true"/>
             </custom-outbound-router>
          </outbound>
       </service>

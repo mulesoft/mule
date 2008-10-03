@@ -70,7 +70,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint3)));
-        router.route(message, (MuleSession) session.proxy(), false);
+        router.route(message, (MuleSession) session.proxy());
         session.verify();
 
         endpoints = new ArrayList();
@@ -85,7 +85,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint4)), message);
         session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint5)), message);
         session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint6)), message);
-        MuleMessage result = router.route(message, (MuleSession) session.proxy(), true);
+        MuleMessage result = router.route(message, (MuleSession) session.proxy());
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);
         assertEquals(3, ((MuleMessageCollection) result).size());

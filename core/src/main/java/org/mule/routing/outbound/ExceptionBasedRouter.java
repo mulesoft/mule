@@ -34,7 +34,7 @@ import org.mule.transaction.TransactionTemplate;
 public class ExceptionBasedRouter extends FilteringOutboundRouter
 {
 
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
     {
         if (endpoints == null || endpoints.size() == 0)
@@ -77,7 +77,7 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
                                 + ", as there are more endpoints available.");
                 }
 
-                if (!lastEndpoint || synchronous)
+                if (!lastEndpoint || endpoint.isSynchronous())
                 {
                     try
                     {

@@ -70,15 +70,17 @@ public interface OutboundRouter extends Router
      * 
      * @param message the message to send via one or more endpoints on this router
      * @param session the session used to actually send the event
-     * @param synchronous whether the invocation process should be synchronous or not
      * @return a result message if any from the invocation. If the synchronous flag
      *         is false a null result will always be returned.
      * @throws MessagingException if any errors occur during the sending of messages
      * @see org.mule.routing.outbound.FilteringOutboundRouter
      * @see org.mule.routing.outbound.ExceptionBasedRouter
      * @see org.mule.routing.outbound.MulticastingRouter
+     *
+     * @since 2.1 the synchronous argument has been removed. Instead use the synchronous attribute of the endpoint
+     * you are dispatching to.
      */
-    MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous) throws MessagingException;
+    MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException;
 
     /**
      * Determines if the event should be processed by this router. Routers can be

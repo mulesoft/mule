@@ -38,7 +38,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
         super(RouterStatistics.TYPE_OUTBOUND);
     }
 
-    public MuleMessage route(final MuleMessage message, final MuleSession session, final boolean synchronous)
+    public MuleMessage route(final MuleMessage message, final MuleSession session)
             throws MessagingException
     {
         MuleMessage result;
@@ -61,7 +61,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                 {
                     public Object doInTransaction() throws Exception
                     {
-                        return router.route(message, session, synchronous);
+                        return router.route(message, session);
                     }
                 };
                 try

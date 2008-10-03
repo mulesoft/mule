@@ -1151,4 +1151,9 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 275, StringMessageUtils.toString(endpoints), messagePart);
     }
+
+    public static Message expressionResultWasNull(String expression)
+    {
+        return factory.createMessage(BUNDLE_PATH, 276, expression);
+    }
 }

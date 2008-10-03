@@ -91,7 +91,7 @@ public class NestedInvocationHandler implements InvocationHandler
 
         MuleMessage reply;
         MuleEvent currentEvent = RequestContext.getEvent();
-        reply = router.route(message, currentEvent.getSession(), router.getEndpoint().isSynchronous());
+        reply = router.route(message, currentEvent.getSession());
 
         if (reply != null)
         {

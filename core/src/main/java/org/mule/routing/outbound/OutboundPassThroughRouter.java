@@ -60,13 +60,12 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
             "The Pass Through cannot use filters, use the FilteringOutboundRouter instead");
     }
 
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
-        throws RoutingException
+    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         if (endpoints == null || endpoints.size() == 0)
         {
             return message;
         }
-        return super.route(message, session, synchronous);
+        return super.route(message, session);
     }
 }

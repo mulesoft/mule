@@ -41,7 +41,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
     // We used square templates as they can exist as part of an URI.
     private TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
 
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
     {
         MuleMessage result = null;
@@ -89,7 +89,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
 
             ep = new DynamicURIOutboundEndpoint(ep, new MuleEndpointURI(uri));
 
-            if (synchronous)
+            if (ep.isSynchronous())
             {
                 result = send(session, message, ep);
             }

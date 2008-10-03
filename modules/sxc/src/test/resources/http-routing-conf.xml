@@ -20,12 +20,12 @@
             </inbound>
             <outbound>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="http://localhost:63081/echo"/>
+                    <outbound-endpoint address="http://localhost:63081/echo" synchronous="true"/>
                     <sxc:filter pattern="//invalid"/>
                     <sxc:namespace prefix="test" uri="http://foo"/>
                 </sxc:filtering-router>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="http://localhost:63081/echo">
+                    <outbound-endpoint address="http://localhost:63081/echo" synchronous="true">
                         <transformers>
                             <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
                         </transformers>

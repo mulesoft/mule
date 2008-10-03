@@ -150,7 +150,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter()
         {
-            public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+            public MuleMessage route(MuleMessage message, MuleSession session)
             {
                 count1[0]++;
                 return message;
@@ -159,7 +159,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter()
         {
-            public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+            public MuleMessage route(MuleMessage message, MuleSession session)
             {
                 count2[0]++;
                 return message;
@@ -183,17 +183,17 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         MuleSession session = getTestSession(getTestService(), muleContext);
 
-        messageRouter.route(new DefaultMuleMessage("hello"), session, true);
+        messageRouter.route(new DefaultMuleMessage("hello"), session);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(0, count2[0]);
 
-        messageRouter.route(new DefaultMuleMessage(new StringBuffer()), session, true);
+        messageRouter.route(new DefaultMuleMessage(new StringBuffer()), session);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(1, count2[0]);
 
-        messageRouter.route(new DefaultMuleMessage(new Exception()), session, true);
+        messageRouter.route(new DefaultMuleMessage(new Exception()), session);
         assertEquals(1, catchAllCount[0]);
         assertEquals(1, count1[0]);
         assertEquals(1, count2[0]);

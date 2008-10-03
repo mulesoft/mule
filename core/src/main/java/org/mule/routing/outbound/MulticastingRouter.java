@@ -28,7 +28,7 @@ import org.mule.config.i18n.CoreMessages;
 public class MulticastingRouter extends FilteringOutboundRouter
 {
 
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
     {
         MuleMessage result = null;
@@ -58,7 +58,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
                 for (int i = 0; i < endpoints.size(); i++)
                 {
                     endpoint = (OutboundEndpoint) endpoints.get(i);
-                    if (synchronous)
+                    if (endpoint.isSynchronous())
                     {
                         // Were we have multiple outbound endpoints
                         if (result == null)

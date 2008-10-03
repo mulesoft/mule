@@ -23,14 +23,14 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://queue_in" responseTransformer-refs="responsetransformer" />
+                    <outbound-endpoint address="jms://queue_in" responseTransformer-refs="responsetransformer" synchronous="true"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="JMSReplyProvider">
             <inbound>
-                <inbound-endpoint address="jms://queue_in" transformer-refs="jmsmessagetoobject inboundtransformer"/>
+                <inbound-endpoint address="jms://queue_in" transformer-refs="jmsmessagetoobject inboundtransformer" synchronous="true"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestReceiver"/>
         </service>

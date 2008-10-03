@@ -10,9 +10,6 @@
 
 package org.mule.transport.udp.functional;
 
-import java.net.Inet4Address;
-import java.util.Iterator;
-
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -27,8 +24,10 @@ import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 
+import java.util.Iterator;
+
 /**
- * The TemplateEndpointRouter allows endpoints to be altered at runtime based on
+ * The DynamicEndpointRouter allows endpoints to be altered at runtime based on
  * properties set on the current event or fallback values set on the endpoint
  * properties. Templated values are expressed using square braces around a property
  * name, i.e. axis:http://localhost:8082/MyService?method=[SOAP_METHOD]. Note that
@@ -38,14 +37,10 @@ import org.mule.routing.outbound.FilteringOutboundRouter;
 public class DynamicEndpointRouter extends FilteringOutboundRouter
 {
 
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
     {
         MuleMessage result = null;
-        if (logger.isTraceEnabled())
-        {
-            logger.info("Synchronous: " + synchronous);
-        }
 
         if (endpoints == null || endpoints.size() == 0)
         {
@@ -73,7 +68,7 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
                 }
             }
 
-            if (synchronous)
+            if (ep.isSynchronous())
             {
                 result = send(session, message, ep);
             }

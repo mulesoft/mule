@@ -20,7 +20,7 @@
             </inbound>
             <outbound>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="vm://log"/>
+                    <outbound-endpoint address="vm://log" synchronous="true"/>
                     <sxc:filter pattern="//purchaseOrder[@country]"/>
                     <sxc:namespace prefix="test" uri="http://foo"/>
                 </sxc:filtering-router>
@@ -43,7 +43,7 @@
             </inbound>
             <outbound>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="vm://log"/>
+                    <outbound-endpoint address="vm://log" synchronous="true"/>
                     <and-filter>
                         <sxc:filter pattern="//purchaseOrder[@country]"/>
                         <sxc:filter pattern="//purchaseOrder[@orderDate]"/>
@@ -58,7 +58,7 @@
             </inbound>
             <outbound>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="vm://log"/>
+                    <outbound-endpoint address="vm://log" synchronous="true"/>
                     <or-filter>
                         <sxc:filter pattern="//purchaseOrder[@country]"/>
                         <sxc:filter pattern="//purchaseOrder[@orderDate]"/>
@@ -73,7 +73,7 @@
             </inbound>
             <outbound>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="vm://log"/>
+                    <outbound-endpoint address="vm://log" synchronous="true"/>
                     <and-filter>
                         <sxc:filter pattern="//purchaseOrder[@country]"/>
                         <not-filter>
@@ -86,7 +86,7 @@
     
         <service name="log">
             <inbound>
-                <inbound-endpoint address="vm://log"/>
+                <inbound-endpoint address="vm://log" synchronous="true"/>
             </inbound>
             <component class="org.mule.module.sxc.ReceiveComponent"/>
         </service>

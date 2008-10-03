@@ -16,8 +16,8 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
-import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.AbstractCatchAllStrategy;
+import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -40,7 +40,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
         assertNotNull(messageRouter.getCatchAllStrategy());
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=false");
         assertNotNull(endpoint1);
 
         ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
@@ -73,14 +73,14 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage("test event");
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
-        messageRouter.route(message, (MuleSession)session.proxy(), false);
+        messageRouter.route(message, (MuleSession)session.proxy());
         session.verify();
 
         message = new DefaultMuleMessage(new IllegalArgumentException());
 
         session.expectAndReturn("getService", getTestService());
         session.expect("dispatchEvent", C.eq(message, endpoint2));
-        messageRouter.route(message, (MuleSession)session.proxy(), false);
+        messageRouter.route(message, (MuleSession)session.proxy());
         session.verify();
 
         FilteringOutboundRouter router3 = new FilteringOutboundRouter();
@@ -98,7 +98,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.eq(message, endpoint1));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
         messageRouter.setMatchAll(true);
-        messageRouter.route(message, (MuleSession)session.proxy(), false);
+        messageRouter.route(message, (MuleSession)session.proxy());
         session.verify();
     }
 
@@ -112,7 +112,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter()
         {
-            public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+            public MuleMessage route(MuleMessage message, MuleSession session)
                 throws RoutingException
             {
                 count1[0]++;
@@ -122,7 +122,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter()
         {
-            public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+            public MuleMessage route(MuleMessage message, MuleSession session)
                 throws RoutingException
             {
                 count2[0]++;
@@ -148,17 +148,17 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         MuleSession session = getTestSession(getTestService(), muleContext);
 
-        messageRouter.route(new DefaultMuleMessage("hello"), session, true);
+        messageRouter.route(new DefaultMuleMessage("hello"), session);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(0, count2[0]);
 
-        messageRouter.route(new DefaultMuleMessage(new StringBuffer()), session, true);
+        messageRouter.route(new DefaultMuleMessage(new StringBuffer()), session);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(1, count2[0]);
 
-        messageRouter.route(new DefaultMuleMessage(new Exception()), session, true);
+        messageRouter.route(new DefaultMuleMessage(new Exception()), session);
         assertEquals(1, catchAllCount[0]);
         assertEquals(1, count1[0]);
         assertEquals(1, count2[0]);

@@ -28,7 +28,7 @@ public class TransformerRouter extends AbstractOutboundRouter
 {
     private Transformer transformer;
 
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous) throws MessagingException
+    public MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException
     {
         if (transformer != null)
         {

@@ -10,7 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -18,11 +17,8 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <code>AbstractMessageSplitter</code> is an outbound Message Splitter used to split
@@ -32,8 +28,7 @@ import java.util.Map;
  */
 public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 {
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
-            throws RoutingException
+    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         String correlationId = messageInfoMapping.getCorrelationId(message);
 
@@ -84,7 +79,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                 }
 
                 //Use sync config from endpoint
-                synchronous = part.getEndpoint().isSynchronous();
+                boolean synchronous = part.getEndpoint().isSynchronous();
                 sendMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY,
                         part.getEndpoint().isRemoteSync());
 

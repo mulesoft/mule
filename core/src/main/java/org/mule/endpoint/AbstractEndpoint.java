@@ -30,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.emory.mathcs.backport.java.util.Collections;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -188,7 +187,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         {
             this.securityFilter.setEndpoint(this);
         }
-        this.synchronous = synchronous;
+
         this.remoteSync = remoteSync;
         this.remoteSyncTimeout = remoteSyncTimeout;
         this.initialState = initialState;
@@ -196,6 +195,19 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         this.endpointBuilderName = endpointBuilderName;
         this.muleContext = muleContext;
         this.retryPolicyTemplate = retryPolicyTemplate;
+
+        if(transactionConfig !=null && transactionConfig.getFactory() !=null)
+        {
+            if(logger.isDebugEnabled())
+            {
+                logger.debug("Endpoint has a transaction configuration. Defaulting to synchronous. Endpoint is: " + toString());
+            }
+            this.synchronous = true;
+        }
+        else
+        {
+            this.synchronous = synchronous;
+        }
     }
 
     public EndpointURI getEndpointURI()

@@ -29,7 +29,7 @@ import org.mule.transport.NullPayload;
 public class ChainingRouter extends FilteringOutboundRouter
 {
 
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
     {
         MuleMessage resultToReturn = null;
@@ -101,7 +101,7 @@ public class ChainingRouter extends FilteringOutboundRouter
                 {
                     // ok, the last call,
                     // use the 'sync/async' method parameter
-                    if (synchronous)
+                    if (endpoint.isSynchronous())
                     {
                         resultToReturn = send(session, intermediaryResult, endpoint);
                         if (logger.isDebugEnabled())

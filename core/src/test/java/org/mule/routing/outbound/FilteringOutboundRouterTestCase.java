@@ -32,12 +32,12 @@ import java.util.Map;
 
 public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 {
-    public void testFilteringOutboundRouter() throws Exception
+    public void testFilteringOutboundRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getService", getTestService());
         
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=false");
         assertNotNull(endpoint1);
 
         FilteringOutboundRouter router = new FilteringOutboundRouter();
@@ -55,17 +55,11 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
-        router.route(message, (MuleSession)session.proxy(), false);
+        router.route(message, (MuleSession)session.proxy());
         session.verify();
 
-        message = new DefaultMuleMessage("test event");
 
-        session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
-        MuleMessage result = router.route(message, (MuleSession)session.proxy(), true);
-        assertNotNull(result);
-        assertEquals(message, result);
-        session.verify();
-
+        //Test with transform
         message = new DefaultMuleMessage(new Exception("test event"));
 
         assertTrue(!router.isMatch(message));
@@ -84,6 +78,36 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
     }
+
+
+    public void testFilteringOutboundRouterSync() throws Exception
+        {
+            Mock session = MuleTestUtils.getMockSession();
+            session.matchAndReturn("getService", getTestService());
+
+            ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
+            assertNotNull(endpoint1);
+
+            FilteringOutboundRouter router = new FilteringOutboundRouter();
+            PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
+            router.setFilter(filter);
+            List endpoints = new ArrayList();
+            endpoints.add(endpoint1);
+            router.setEndpoints(endpoints);
+
+            assertFalse(router.isUseTemplates());
+            assertEquals(filter, router.getFilter());
+
+            MuleMessage message = new DefaultMuleMessage("test event");
+
+            session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
+            MuleMessage result = router.route(message, (MuleSession)session.proxy());
+            assertNotNull(result);
+            assertEquals(message, result);
+            session.verify();
+
+        }
+
 
     public void testFilteringOutboundRouterWithTemplates() throws Exception
     {

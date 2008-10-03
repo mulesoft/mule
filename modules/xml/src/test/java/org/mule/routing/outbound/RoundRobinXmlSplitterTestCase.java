@@ -114,7 +114,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint3)));
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
-        asyncXmlSplitter.route(message, (MuleSession) session.proxy(), false);
+        asyncXmlSplitter.route(message, (MuleSession) session.proxy());
         session.verify();
 
         message = new DefaultMuleMessage(payload);
@@ -124,7 +124,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint5)), message);
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint6)), message);
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint4)), message);
-        MuleMessage result = syncXmlSplitter.route(message, (MuleSession) session.proxy(), true);
+        MuleMessage result = syncXmlSplitter.route(message, (MuleSession) session.proxy());
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);
         assertEquals(4, ((MuleMessageCollection) result).size());
@@ -148,7 +148,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         assertTrue(splitter.isMatch(message));
         try
         {
-            splitter.route(message, (MuleSession) session.proxy(), false);
+            splitter.route(message, (MuleSession) session.proxy());
             fail("Should have thrown an exception, because XSD is not found.");
         }
         catch (IllegalArgumentException iaex)
@@ -171,7 +171,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
 
         try
         {
-            splitter.route(message, (MuleSession) session.proxy(), false);
+            splitter.route(message, (MuleSession) session.proxy());
             fail("No exception thrown.");
         }
         catch (IllegalArgumentException iaex)

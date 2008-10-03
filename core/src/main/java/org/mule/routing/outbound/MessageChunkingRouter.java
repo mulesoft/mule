@@ -48,12 +48,12 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
         this.numberOfMessages = numberOfMessages;
     }
 
-    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
     {
         if (messageSize == 0 && numberOfMessages < 2)
         {
-            return super.route(message, session, synchronous);
+            return super.route(message, session);
         }
         else if (messageSize > 0)
         {
@@ -99,7 +99,7 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
                     {
                         logger.info("sending part " + count + " of " + parts);
                     }
-                    super.route(part, session, synchronous);
+                    super.route(part, session);
                     if (logger.isInfoEnabled())
                     {
                         logger.info("sent");

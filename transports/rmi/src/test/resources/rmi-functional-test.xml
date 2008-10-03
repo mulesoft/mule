@@ -31,16 +31,16 @@
 
         <service name="TestUMO">
             <inbound>
-                <inbound-endpoint address="vm://testin"/>
+                <inbound-endpoint address="vm://testin" synchronous="true"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint ref="Sender"/>
+                    <outbound-endpoint ref="Sender" synchronous="true"/>
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </filtering-router>
                 <filtering-router>
-                    <rmi:outbound-endpoint ref="Sender2"/>
+                    <rmi:outbound-endpoint ref="Sender2" synchronous="true"/>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>
             </outbound>

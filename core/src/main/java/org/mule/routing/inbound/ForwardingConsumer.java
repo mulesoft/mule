@@ -12,9 +12,9 @@ package org.mule.routing.inbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RoutingException;
@@ -48,7 +48,7 @@ public class ForwardingConsumer extends SelectiveConsumer
                 {
                     MuleMessage message = new DefaultMuleMessage(event.transformMessage(), event.getMessage());
 
-                    MuleMessage response = router.route(message, event.getSession(), event.isSynchronous());
+                    MuleMessage response = router.route(message, event.getSession());
                     // TODO What's the correct behaviour for async endpoints?
                     // maybe let router.route() return a Future for the returned msg?
                     if (response != null)

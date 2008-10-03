@@ -45,10 +45,10 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test?synchronous=true");
         assertNotNull(endpoint1);
 
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test?synchronous=true");
         assertNotNull(endpoint2);
 
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
@@ -71,7 +71,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoints.get(0)), message);
         session.expectAndReturn("sendEvent", C.eq(message, endpoints.get(1)), message);
-        final MuleMessage result = router.route(message, (MuleSession)session.proxy(), true);
+        final MuleMessage result = router.route(message, (MuleSession)session.proxy());
         assertNotNull("This is a sync call, we need a result returned.", result);
         assertEquals(message, result);
         session.verify();
@@ -79,7 +79,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
     public void testChainingOutboundRouterSynchronousWithTemplate() throws Exception
     {
-        OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://foo?[barValue]");
+        OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://foo?[barValue]&synchronous=true");
         assertNotNull(endpoint3);
         router.addEndpoint(endpoint3);
 
@@ -89,15 +89,15 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
 
         ImmutableEndpoint ep = router.getEndpoint(2, message);
-        assertEquals("test://foo?bar", ep.getEndpointURI().toString());
+        assertEquals("test://foo?bar&synchronous=true", ep.getEndpointURI().toString());
 
         session.expectAndReturn("sendEvent", C.eq(message, new DynamicURIOutboundEndpoint(
-            (OutboundEndpoint) router.getEndpoints().get(0), new MuleEndpointURI("test://test"))), message);
+            (OutboundEndpoint) router.getEndpoints().get(0), new MuleEndpointURI("test://test?synchronous=true"))), message);
         session.expectAndReturn("sendEvent", C.eq(message, new DynamicURIOutboundEndpoint(
-            (OutboundEndpoint) router.getEndpoints().get(1), new MuleEndpointURI("test://test"))), message);
+            (OutboundEndpoint) router.getEndpoints().get(1), new MuleEndpointURI("test://test?synchronous=true"))), message);
         session.expectAndReturn("sendEvent", C.eq(message, new DynamicURIOutboundEndpoint(
-            (OutboundEndpoint) router.getEndpoints().get(2), new MuleEndpointURI("test://foo?bar"))), message);
-        final MuleMessage result = router.route(message, (MuleSession)session.proxy(), true);
+            (OutboundEndpoint) router.getEndpoints().get(2), new MuleEndpointURI("test://foo?bar&synchronous=true"))), message);
+        final MuleMessage result = router.route(message, (MuleSession)session.proxy());
         assertNotNull("This is a sync call, we need a result returned.", result);
         assertEquals(message, result);
         session.verify();
@@ -105,6 +105,16 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
     public void testChainingOutboundRouterAsynchronous() throws Exception
     {
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test");
+        assertNotNull(endpoint1);
+
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test");
+        assertNotNull(endpoint2);
+
+        endpoints.clear();
+        endpoints.add(endpoint1);
+        endpoints.add(endpoint2);
+        router.setEndpoints(endpoints);
         MuleMessage message = new DefaultMuleMessage("test event");
         assertTrue(router.isMatch(message));
 
@@ -112,7 +122,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoints.get(0)), message);
         session.expectAndReturn("dispatchEvent", C.eq(message, endpoints.get(1)), message);
-        final MuleMessage result = router.route(message, (MuleSession)session.proxy(), false);
+        final MuleMessage result = router.route(message, (MuleSession)session.proxy());
         assertNull("Async call shouldn't return any result.", result);
         session.verify();
     }
@@ -125,7 +135,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         final MuleMessage message = new DefaultMuleMessage("test event");
         final ImmutableEndpoint endpoint1 = (ImmutableEndpoint)endpoints.get(0);
         session.expect("sendEvent", C.eq(message, endpoint1));
-        MuleMessage result = router.route(message, (MuleSession)session.proxy(), false);
+        MuleMessage result = router.route(message, (MuleSession)session.proxy());
         session.verify();
         assertNull(result);
     }
