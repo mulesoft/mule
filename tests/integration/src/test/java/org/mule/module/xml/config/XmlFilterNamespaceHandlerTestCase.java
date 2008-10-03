@@ -57,7 +57,7 @@ public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
         Map namespaces = filter.getNamespaces();
         assertEquals(2, namespaces.size());
         assertEquals("http://www.springframework.org/schema/beans", namespaces.get("spring"));
-        assertEquals("http://www.mulesource.org/schema/mule/core/2.0", namespaces.get("mule"));
+        assertEquals("http://www.mulesource.org/schema/mule/core/2.2", namespaces.get("mule"));
     }
 
 }

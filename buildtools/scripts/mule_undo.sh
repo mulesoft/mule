@@ -16,7 +16,7 @@ then
     exit 1
 fi
 
-line=`egrep '<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"' "$file"`
+line=`egrep '<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"' "$file"`
 if [ -z "$line" ]
 then
     echo "file does not start with mule element"
