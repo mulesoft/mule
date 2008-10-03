@@ -11,8 +11,34 @@
     <artifactId>mule-transport-email</artifactId>
     <packaging>bundle</packaging>
     <name>E-Mail Transport</name>
-    <description>A Mule transport for Email Connectivity. This transport supplies a Pop3 connector, Smtp connector and a Mail connector which is an aggregation of the two.</description>
+    <description>A Mule transport for Email Connectivity. This transport supplies a Pop3 connector, Smtp connector and a
+        Mail connector which is an aggregation of the two.
+    </description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>native2ascii-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>native2ascii</goal>
+                        </goals>
+                        <configuration>
+                            <src>src/test/resources</src>
+                            <dest>src/test/resources</dest>
+                            <includes>*.src</includes>
+                            <ext>.properties</ext>
+                            <encoding>UTF-8</encoding>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
     <dependencies>
         <dependency>
             <groupId>javax.mail</groupId>

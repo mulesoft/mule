@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.activation.MimeType;
 import javax.mail.Header;
 import javax.mail.Message;
 import javax.mail.Part;
@@ -37,7 +38,7 @@ import javax.mail.Part;
  * <code>SimpleMailMessageAdapter</code> is an adapter for mail messages.
  * Unlike {@link MailMessageAdapter} this preserves the message intact in its original
  * form.
- *
+ * <p/>
  * <p>Header values are stored in two formats.  First, as historically used by
  * {@link MailMessageAdapter}, a single String value is stored for each distinct
  * header name (if a header is repeated only one value is stored).
@@ -95,7 +96,8 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
         this.message = message;
     }
 
-    public Object getPayload() {
+    public Object getPayload()
+    {
         return message;
     }
 
@@ -134,7 +136,7 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
     {
         if (message instanceof Message)
         {
-            return (Message)message;
+            return (Message) message;
         }
         else
         {
@@ -142,38 +144,38 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
         }
     }
 
-    private void setMessageDetails(Message message)  throws javax.mail.MessagingException
+    private void setMessageDetails(Message message) throws javax.mail.MessagingException
     {
         setProperty(MailProperties.INBOUND_TO_ADDRESSES_PROPERTY,
-            MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.TO)));
+                MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.TO)));
         setProperty(MailProperties.INBOUND_CC_ADDRESSES_PROPERTY,
-            MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.CC)));
+                MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.CC)));
         setProperty(MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY,
-            MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.BCC)));
-        try 
+                MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.BCC)));
+        try
         {
             setProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
-                MailUtils.mailAddressesToString(message.getReplyTo()));
-        } 
-        catch (javax.mail.MessagingException me) 
+                    MailUtils.mailAddressesToString(message.getReplyTo()));
+        }
+        catch (javax.mail.MessagingException me)
         {
             logger.warn("Invalid address found in ReplyTo header:", me);
         }
-        
-        try 
+
+        try
         {
             setProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
-                MailUtils.mailAddressesToString(message.getFrom()));
+                    MailUtils.mailAddressesToString(message.getFrom()));
         }
-        catch (javax.mail.MessagingException me) 
+        catch (javax.mail.MessagingException me)
         {
             logger.warn("Invalid address found in From header:", me);
         }
-        
+
         setProperty(MailProperties.INBOUND_SUBJECT_PROPERTY, StringUtils.defaultIfEmpty(
-            message.getSubject(),"(no subject)"));
+                message.getSubject(), "(no subject)"));
         setProperty(MailProperties.INBOUND_CONTENT_TYPE_PROPERTY, StringUtils.defaultIfEmpty(
-            message.getContentType(), "text/plain"));
+                message.getContentType(), "text/plain"));
 
         Date sentDate = message.getSentDate();
         if (sentDate == null)
@@ -184,7 +186,7 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
 
         for (Enumeration e = message.getAllHeaders(); e.hasMoreElements();)
         {
-            Header header = (Header)e.nextElement();
+            Header header = (Header) e.nextElement();
             String name = header.getName();
             String listName = toListHeader(name);
             String value = header.getValue();
@@ -208,10 +210,11 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
     /**
      * Check whether a property name has the format associated with a list
      * of header values
+     *
      * @param name A property name
      * @return true if the name is associated with a list of header values
-     * (more exactly, if it starts with HEADER_LIST_PREFIX, which gives an
-     * invalid header name according to RFC822).
+     *         (more exactly, if it starts with HEADER_LIST_PREFIX, which gives an
+     *         invalid header name according to RFC822).
      */
     public static boolean isListHeader(String name)
     {
@@ -221,6 +224,7 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
     /**
      * Convert a property name associated with a list of header values to
      * the relevant header name (ie drop the prefix)
+     *
      * @param name A property name
      * @return The associated header name (ie with HEADER_LIST_PREFIX removed)
      */
@@ -239,6 +243,7 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
     /**
      * Convert a header name to the property name associated with a list of
      * header values (ie prepend the prefix)
+     *
      * @param header A header name
      * @return The associated list property name (ie with HEADER_LIST_PREFIX prepended)
      */
@@ -274,7 +279,10 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
     private byte[] textPayload(String encoding) throws Exception
     {
         InputStream stream = addBuffer(message.getInputStream());
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        // We can't handle multi part mail that has, for exapmle, German (ISO-8859-1) 
+        // and Japanas (ISO-2022-JP) part. But maybe ok, this is just a convenience 
+        // method for simple non multi part mail.
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, getMessageCharset()));
         StringBuffer buffer = new StringBuffer(32768);
 
         String line;
@@ -289,5 +297,27 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
     public ThreadSafeAccess newThreadCopy()
     {
         return new SimpleMailMessageAdapter(this);
+    }
+
+    private String getMessageCharset()
+    {
+        try
+        {
+            String ct = message.getDataHandler().getContentType();
+            MimeType mt = new MimeType(ct);
+            // Can we can ignore pre-MIME mail that hasn't MIME header and
+            // uses local encoding convention?
+            return mt.getParameter("charset");
+        }
+        catch (Exception e)
+        {
+            String charset = System.getProperty("file.encoding");
+            if(logger.isWarnEnabled())
+            {
+                logger.warn("Unable to read charset from message. Defaulting to the system default: " + charset, e);
+            }
+            return charset;
+        }
+
     }
 }
