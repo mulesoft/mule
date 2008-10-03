@@ -52,9 +52,7 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
         }
         assertNotNull(exception);
         assertTrue(exception instanceof DispatchException);
-        Throwable rootCause = exception.getCause();
-        assertTrue(rootCause instanceof DispatchException);
-        assertTrue(rootCause.getMessage().startsWith("Cannot invoke WS call without an Operation."));
+        assertTrue(exception.getMessage().startsWith("Cannot invoke WS call without an Operation."));
     }
     
     public void testAxisOverJmsWithoutSettingSoapAction() throws Exception
