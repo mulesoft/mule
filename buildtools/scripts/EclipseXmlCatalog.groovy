@@ -11,7 +11,7 @@ otherxsd = /.*(\/|\\)(transports|modules|tests)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mu
 
 //destination base
 base = "http://www.mulesource.org/schema/mule/"
-schemaVersion = "2.0"
+schemaVersion = "2.2"
 
 def checkCurrentDirectory()
 {
