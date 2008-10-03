@@ -99,9 +99,11 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         }
     }
 
+    // TODO How does this method relate to exceptionThrown(Exception e) ?
     public void handleException(Exception exception)
     {
-        exceptionThrown(exception);
+        // TODO What's the difference between this and getConnector().handleException(e) ?
+        connector.getExceptionListener().exceptionThrown(exception);
     }
 
     public boolean validate()

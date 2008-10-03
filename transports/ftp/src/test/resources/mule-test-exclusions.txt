@@ -1,6 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-
-# Broke by changes for MULE-3740
-org.mule.transport.ftp.issues.MultiStreamMule1696TestCase
