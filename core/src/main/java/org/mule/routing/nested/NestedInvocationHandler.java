@@ -69,7 +69,7 @@ public class NestedInvocationHandler implements InvocationHandler
 
         MuleMessage message;
 
-        if(args==null)
+        if (args == null)
         {
             message = new DefaultMuleMessage(NullPayload.getInstance());
         }
