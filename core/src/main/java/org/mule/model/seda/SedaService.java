@@ -187,11 +187,6 @@ public class SedaService extends AbstractService implements Work, WorkListener
 
     protected void doDispatch(MuleEvent event) throws MuleException
     {
-        // Dispatching event to the service
-        if (stats.isEnabled())
-        {
-            stats.incReceivedEventASync();
-        }
         if (logger.isDebugEnabled())
         {
             logger.debug("Service: " + name + " has received asynchronous event on: "
@@ -235,11 +230,6 @@ public class SedaService extends AbstractService implements Work, WorkListener
             result = sendToOutboundRouter(event, result);
             result = processAsyncReplyRouter(result);
             processReplyTo(event, result, replyToHandler, replyTo);
-            // stats
-            if (stats.isEnabled())
-            {
-                stats.incSentEventSync();
-            }
         }
         catch (Exception e)
         {

@@ -876,6 +876,10 @@ public abstract class AbstractService implements Service
             {
                 // Here we can use the same message instance because there is no inbound response.
                 getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
+                if (stats.isEnabled())
+                {
+                    stats.incSentEventASync();
+                }
             }
         }
     }
@@ -901,6 +905,10 @@ public abstract class AbstractService implements Service
                 if (outboundReturnMessage != null)
                 {
                     result = outboundReturnMessage;
+                }
+                if (stats.isEnabled())
+                {
+                    stats.incSentEventSync();
                 }
             }
             else
