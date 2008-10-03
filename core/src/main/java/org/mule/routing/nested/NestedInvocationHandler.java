@@ -16,6 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.NestedRouter;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.NullPayload;
 import org.mule.util.StringMessageUtils;
 
 import java.lang.reflect.InvocationHandler;
@@ -68,7 +69,11 @@ public class NestedInvocationHandler implements InvocationHandler
 
         MuleMessage message;
 
-        if (args.length == 1)
+        if(args==null)
+        {
+            message = new DefaultMuleMessage(NullPayload.getInstance());
+        }
+        else if (args.length == 1)
         {
             message = new DefaultMuleMessage(args[0]);
         }
