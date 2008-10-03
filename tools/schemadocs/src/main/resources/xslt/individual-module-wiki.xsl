@@ -2,7 +2,7 @@
         version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.0"
+        xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.2"
         >
 
     <!-- $Id: -->
@@ -23,7 +23,7 @@
     <!-- We're rendering Wiki test -->
     <xsl:output method="text"/>
 
-    <xsl:include href="http://www.mulesource.org/xslt/mule/schemadoc/2.0/schemadoc-core-wiki.xsl"/>
+    <xsl:include href="http://www.mulesource.org/xslt/mule/schemadoc/2.2/schemadoc-core-wiki.xsl"/>
     <!--Use this if testing locally -->
     <!--<xsl:include href="schemadoc-core-wiki.xsl"/>-->
 

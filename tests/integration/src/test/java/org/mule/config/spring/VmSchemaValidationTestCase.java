@@ -20,7 +20,7 @@ public class VmSchemaValidationTestCase extends AbstractSchemaValidationTestCase
 
     public void testRootSchema() throws IOException, SAXException
     {
-        addSchema("http://www.mulesource.org/schema/mule/vm/2.0", "META-INF/mule-vm.xsd");
+        addSchema("http://www.mulesource.org/schema/mule/vm/2.2", "META-INF/mule-vm.xsd");
         doTest("org/mule/config/spring/vm-validation-test.xml");
     }
 
