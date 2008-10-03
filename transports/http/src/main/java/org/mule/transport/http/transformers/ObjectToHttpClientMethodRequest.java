@@ -378,29 +378,30 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         {
             headerName = (String) iterator.next();
 
-            headerValue = msg.getStringProperty(headerName, null);
-            if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null)
+            if (headerName.equalsIgnoreCase(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY))
             {
+                Map customHeaders = (Map) msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+                if (customHeaders != null)
+                {   
+                    for (Iterator headerItr = customHeaders.entrySet().iterator(); headerItr.hasNext();)
+                    {
+                        Map.Entry entry = (Map.Entry) headerItr.next();
+                        if (entry.getValue() != null)
+                        {
+                            httpMethod.addRequestHeader(entry.getKey().toString(), entry.getValue().toString());
+                        }
+                    }
+                }
+            }
+            else if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null)
+            {
+                headerValue = msg.getStringProperty(headerName, null);
                 if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
                 {
                     headerName = new StringBuffer(30).append("X-").append(headerName).toString();
                 }
 
                 httpMethod.addRequestHeader(headerName, headerValue);
-            }
-        }
-
-        Map customHeaders = (Map) msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
-        if (customHeaders != null)
-        {
-            Map.Entry entry;
-            for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();)
-            {
-                entry = (Map.Entry) iterator.next();
-                if (entry.getValue() != null)
-                {
-                    httpMethod.addRequestHeader(entry.getKey().toString(), entry.getValue().toString());
-                }
             }
         }
 
