@@ -13,6 +13,25 @@ otherxsd = /.*(\/|\\)(transports|modules|tests)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mu
 base = "http://www.mulesource.org/schema/mule/"
 schemaVersion = "2.2"
 
+def cliBuilder = new CliBuilder()
+cliBuilder.a(longOpt: "absolute", args: 0, "use absolute filenames instead of workspace references")
+cliBuilder.h(longOpt: "help", "show usage info")
+
+options = cliBuilder.parse(args)
+if (!options)
+{
+    println ""
+    println "Error parsing options " + args
+    println ""
+    System.exit(1)
+}
+
+if (options.h)
+{
+    cliBuilder.usage()
+    System.exit(0)
+}
+
 def checkCurrentDirectory()
 {
     if (! (new File("").getCanonicalFile().getName() == "scripts"))
@@ -85,7 +104,16 @@ def printSchemaEntry(projectName, projectFile, xsdFile)
     schemaRelativePath = xsdFile.absolutePath.substring(dirLength + 1)
     
     print("  <uri name=\"${schemaSource}\" ")
-    print("uri=\"platform:/resource/${projectName}/${schemaRelativePath}")
+    
+    if (options.a)
+    {
+        // TODO check if this is correct notation on Windows - I doubt so
+        print("uri=\"file://${projectDir}/${schemaRelativePath}") 
+    }
+    else
+    {
+        print("uri=\"platform:/resource/${projectName}/${schemaRelativePath}")
+    }
     println("\"/>")
 }
 
