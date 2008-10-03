@@ -17,6 +17,7 @@ import org.mule.api.retry.RetryPolicy;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.retry.DefaultRetryContext;
 import org.mule.retry.PolicyStatus;
+import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.retry.notifiers.ConnectNotifier;
 
 import java.io.InterruptedIOException;
@@ -81,11 +82,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
             }
             else
             {
-                throw cause;
-                // TODO Do we really want to wrap the exception here or just bubble up the original exception?
-                //throw new FatalConnectException(
-                //        CoreMessages.failedToConnect(context.getDescription(), this),
-                //        status.getThrowable(), callback.getWorkDescription());
+                throw new RetryPolicyExhaustedException(cause, callback.getWorkDescription());
             }
         }
         finally

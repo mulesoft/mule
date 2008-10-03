@@ -27,11 +27,11 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
+import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
-import org.mule.transport.FatalConnectException;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 
@@ -272,7 +272,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                         {
                             jmsConnector.start();
                         }
-                        catch (FatalConnectException fcex)
+                        catch (RetryPolicyExhaustedException rpex)
                         {
                             logger.fatal("Failed to reconnect to JMS server. I'm giving up.");
                         }

@@ -8,28 +8,28 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport;
+package org.mule.retry;
 
 import org.mule.api.lifecycle.FatalException;
 import org.mule.config.i18n.Message;
 
 /** TODO document */
-public class FatalConnectException extends FatalException
+public class RetryPolicyExhaustedException extends FatalException
 {
     /** Serial version */
     private static final long serialVersionUID = 3300563235465630595L;
 
-    public FatalConnectException(Message message, Object component)
+    public RetryPolicyExhaustedException(Message message, Object component)
     {
         super(message, component);
     }
 
-    public FatalConnectException(Message message, Throwable cause, Object component)
+    public RetryPolicyExhaustedException(Message message, Throwable cause, Object component)
     {
         super(message, cause, component);
     }
 
-    public FatalConnectException(Throwable cause, Object component)
+    public RetryPolicyExhaustedException(Throwable cause, Object component)
     {
         super(cause, component);
     }
