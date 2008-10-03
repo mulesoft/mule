@@ -53,6 +53,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.cookie.MalformedCookieException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -187,6 +188,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     ((HttpConnector) connector).getKeepAliveMonitor().removeExpirable(this);
                     
                     conn.writeResponse(processRequest(request));
+                    System.out.println("keep alive " + conn.isKeepAlive());
                 }
                 while (conn.isKeepAlive());
             }
@@ -289,10 +291,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 {
                     response = transformResponse(returnMessage);
                 }
-                response.disableKeepAlive(!((HttpConnector) connector).isKeepAlive());
                 
-                //TODO: Set Keep-Alive header?
-                response.removeHeaders("Connection");
+                response.disableKeepAlive(!((HttpConnector) connector).isKeepAlive());
                 
                 // Check if endpoint has a keep-alive property configured. Note the translation from
                 // keep-alive in the schema to keepAlive here.
@@ -301,19 +301,25 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 Header connectionHeader = request.getFirstHeader("Connection");
                 if (connectionHeader != null)
                 {
-                    if ("keep-alive".equalsIgnoreCase(connectionHeader.getValue()) 
-                        && ((HttpConnector) connector).isKeepAlive() && !endpointOverride) 
+                    String value = connectionHeader.getValue();
+					if ("keep-alive".equalsIgnoreCase(value) && !endpointOverride) 
                     {
-                        Header header = new Header(HttpConstants.HEADER_CONNECTION, "keep-alive");
-                        response.addHeader(header);
-                        header = new Header(HttpConstants.HEADER_KEEP_ALIVE, "timeout=" 
+                    	response.setKeepAlive(true);
+                        Header header = new Header(HttpConstants.HEADER_KEEP_ALIVE, "timeout=" 
                             + ((HttpConnector) connector).getKeepAliveTimeout());
                         response.addHeader(header);   
                     }
+                    else if ("close".equalsIgnoreCase(value))
+                    {
+                    	response.setKeepAlive(false);
+                    } 
+                    else if (response.getHttpVersion().greaterEquals(HttpVersion.HTTP_1_1))
+                    {
+                        response.setKeepAlive(true);
+                    }
                     else
                     {
-                        Header header = new Header(HttpConstants.HEADER_CONNECTION, "close");
-                        response.addHeader(header);     
+                        response.setKeepAlive(false);
                     }
                 }
             }

@@ -137,38 +137,20 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
                 }
             }
 
-            if (!response.containsHeader(HttpConstants.HEADER_CONNECTION))
+            // See if the the client explicitly handles connection persistence
+            String connHeader = msg.getStringProperty(HttpConstants.HEADER_CONNECTION, null);
+            if (connHeader != null)
             {
-                // See if the the client explicitly handles connection persistence
-                String connHeader = msg.getStringProperty(HttpConstants.HEADER_CONNECTION, null);
-                if (connHeader != null)
+                if (connHeader.equalsIgnoreCase("keep-alive"))
                 {
-                    if (connHeader.equalsIgnoreCase("keep-alive"))
-                    {
-                        Header header = new Header(HttpConstants.HEADER_CONNECTION, "keep-alive");
-                        response.addHeader(header);
-                        response.setKeepAlive(true);
-                    }
-                    if (connHeader.equalsIgnoreCase("close"))
-                    {
-                        Header header = new Header(HttpConstants.HEADER_CONNECTION, "close");
-                        response.addHeader(header);
-                        response.setKeepAlive(false);
-                    }
+                    response.setKeepAlive(true);
                 }
-                else
+                if (connHeader.equalsIgnoreCase("close"))
                 {
-                    // Use protocol default connection policy
-                    if (response.getHttpVersion().greaterEquals(HttpVersion.HTTP_1_1))
-                    {
-                        response.setKeepAlive(true);
-                    }
-                    else
-                    {
-                        response.setKeepAlive(false);
-                    }
+                    response.setKeepAlive(false);
                 }
             }
+            
             if ("HEAD".equalsIgnoreCase(msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, null)))
             {
                 // this is a head request, we don't want to send the actual content
