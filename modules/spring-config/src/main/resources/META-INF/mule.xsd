@@ -2314,7 +2314,7 @@
     <xsd:complexType name="messagePropertiesTransformerType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransformerType">
-                <xsd:sequence>
+                <xsd:choice minOccurs="1" maxOccurs="unbounded">
                     <xsd:element name="delete-message-property" type="keyType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -2329,6 +2329,13 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
+                    <xsd:element name="rename-message-property" type="keyValueType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Rename a message property.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element name="add-message-properties" type="mapType" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -2336,7 +2343,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                </xsd:sequence>
+                </xsd:choice>
                 <xsd:attribute name="overwrite" type="substitutableBoolean" use="optional" default="true">
                     <xsd:annotation>
                         <xsd:documentation>

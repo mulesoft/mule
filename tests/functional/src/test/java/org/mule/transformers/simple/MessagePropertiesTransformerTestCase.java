@@ -69,6 +69,42 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals("originalValue", transformed.getProperty("addedProperty"));
     }
 
+    public void testExpressionsInAddProperties() throws Exception
+    {
+        MessagePropertiesTransformer t = new MessagePropertiesTransformer();
+        Map add = new HashMap();
+        add.put("Foo", "${header:public-house}");
+        t.setAddProperties(add);
+
+        DefaultMuleMessage msg = new DefaultMuleMessage("message");
+        msg.setProperty("public-house", "Bar");
+        DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
+        assertSame(msg, transformed);
+        assertEquals(msg.getUniqueId(), transformed.getUniqueId());
+        assertEquals(msg.getPayload(), transformed.getPayload());
+        assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
+
+        assertEquals("Bar", transformed.getProperty("Foo"));
+    }
+
+    public void testRenameProperties() throws Exception
+    {
+        MessagePropertiesTransformer t = new MessagePropertiesTransformer();
+        Map add = new HashMap();
+        add.put("Foo", "Baz");
+        t.setRenameProperties(add);
+
+        DefaultMuleMessage msg = new DefaultMuleMessage("message");
+        msg.setProperty("Foo", "Bar");
+        DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
+        assertSame(msg, transformed);
+        assertEquals(msg.getUniqueId(), transformed.getUniqueId());
+        assertEquals(msg.getPayload(), transformed.getPayload());
+        assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
+
+        assertEquals("Bar", transformed.getProperty("Baz"));
+    }
+
     public void testDelete() throws Exception
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
@@ -92,11 +128,13 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertNotNull(transformer.getDeleteProperties());
         assertEquals(2, transformer.getAddProperties().size());
         assertEquals(2, transformer.getDeleteProperties().size());
+        assertEquals(1, transformer.getRenameProperties().size());
         assertTrue(transformer.isOverwrite());
         assertEquals("text/baz;charset=UTF-16BE", transformer.getAddProperties().get("Content-Type"));
         assertEquals("value", transformer.getAddProperties().get("key"));
         assertEquals("test-property1", transformer.getDeleteProperties().get(0));
         assertEquals("test-property2", transformer.getDeleteProperties().get(1));
+        assertEquals("Faz", transformer.getRenameProperties().get("Foo"));
     }
 
 }

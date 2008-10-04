@@ -13,6 +13,7 @@ package org.mule.transformer.simple;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -92,7 +93,14 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                 {
                     final String key = entry.getKey().toString();
 
-                    final Object value = entry.getValue();
+                    Object value = entry.getValue();
+
+                    //Enable expression support for property values
+                    if(ExpressionEvaluatorManager.isValidExpression(value.toString())) 
+                    {
+                        value = ExpressionEvaluatorManager.evaluate(value.toString(), message);
+                    }
+
                     if (overwrite)
                     {
                         if (logger.isDebugEnabled())
@@ -135,7 +143,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                 else
                 {
                     final String key = entry.getKey().toString();
-                    final String value = (String)entry.getValue();
+                    String value = (String)entry.getValue();
 
                     if (value == null)
                     {
@@ -143,6 +151,12 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                     }
                     else
                     {
+                        //Enable expression support for property values
+                        if(ExpressionEvaluatorManager.isValidExpression(value))
+                        {
+                            Object temp = ExpressionEvaluatorManager.evaluate(value.toString(), message);
+                            if(temp!=null) value = temp.toString();
+                        }
 
                         /* log transformation */
                         if (logger.isDebugEnabled() && !propertyNames.contains(key))
