@@ -18,6 +18,7 @@ import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
+import org.mule.util.expression.ExpressionConfig;
 import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.util.ArrayList;
@@ -46,10 +47,7 @@ public class EndpointSelector extends FilteringOutboundRouter
     public static final String DEFAULT_SELECTOR_EVALUATOR = "header";
     public static final String DEFAULT_SELECTOR_EXPRESSION = "endpoint";
 
-    private String expression = DEFAULT_SELECTOR_EXPRESSION;
-    private String evaluator = DEFAULT_SELECTOR_EVALUATOR;
-    private String customEvaluator;
-    private String fullExpression;
+    private ExpressionConfig expressionConfig = new ExpressionConfig(DEFAULT_SELECTOR_EXPRESSION, DEFAULT_SELECTOR_EVALUATOR, null);
 
     public MuleMessage route(MuleMessage message, MuleSession session)
             throws RoutingException
@@ -57,7 +55,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         List endpoints;
         String endpointName;
 
-        String prop = getFullExpression();
+        String prop = expressionConfig.getFullExpression();
         if (!ExpressionEvaluatorManager.isValidExpression(prop))
         {
             throw new CouldNotRouteOutboundMessageException(
@@ -68,7 +66,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         if (property == null)
         {
             throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.expressionResultWasNull(getFullExpression()), message, null);
+                    CoreMessages.expressionResultWasNull(expressionConfig.getFullExpression()), message, null);
         }
 
         if (property instanceof String)
@@ -83,10 +81,12 @@ public class EndpointSelector extends FilteringOutboundRouter
         else
         {
             throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSupportedType(
-                    getFullExpression(), new Class[]{String.class, List.class}, property.getClass()), message, null);
+                    expressionConfig.getFullExpression(), new Class[]{String.class, List.class}, property.getClass()), message, null);
         }
 
         MuleMessage result = null;
+        List results = new ArrayList(endpoints.size());
+
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             endpointName = iterator.next().toString();
@@ -94,7 +94,7 @@ public class EndpointSelector extends FilteringOutboundRouter
             if (StringUtils.isEmpty(endpointName))
             {
                 throw new CouldNotRouteOutboundMessageException(
-                        CoreMessages.objectIsNull("Endpoint Name: " + getFullExpression()), message, null);
+                        CoreMessages.objectIsNull("Endpoint Name: " + expressionConfig.getFullExpression()), message, null);
             }
             OutboundEndpoint ep = null;
             try
@@ -107,8 +107,7 @@ public class EndpointSelector extends FilteringOutboundRouter
                 }
                 if (ep.isSynchronous())
                 {
-                    // TODO See MULE-2613, we only return the last message here
-                    result = send(session, message, ep);
+                    results.add(send(session, message, ep));
                 }
                 else
                 {
@@ -120,7 +119,7 @@ public class EndpointSelector extends FilteringOutboundRouter
                 throw new CouldNotRouteOutboundMessageException(message, ep, e);
             }
         }
-        return result;
+        return resultsHandler.aggregateResults(results, message);
     }
 
     protected OutboundEndpoint lookupEndpoint(String endpointName) throws MuleException
@@ -148,47 +147,35 @@ public class EndpointSelector extends FilteringOutboundRouter
         return getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
     }
 
-    public String getFullExpression()
-    {
-        if (fullExpression == null)
-        {
-            if (evaluator.equalsIgnoreCase("custom"))
-            {
-                evaluator = customEvaluator;
-            }
-            fullExpression = evaluator + ":" + expression;
-            logger.debug("Full expression for EndpointSelector is: " + fullExpression);
-        }
-        return ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX + fullExpression + ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX;
-    }
+
 
     public String getExpression()
     {
-        return expression;
+        return expressionConfig.getExpression();
     }
 
     public void setExpression(String expression)
     {
-        this.expression = expression;
+        expressionConfig.setExpression(expression);
     }
 
     public String getCustomEvaluator()
     {
-        return customEvaluator;
+        return expressionConfig.getCustomEvaluator();
     }
 
     public void setCustomEvaluator(String customEvaluator)
     {
-        this.customEvaluator = customEvaluator;
+        expressionConfig.setCustomEvaluator(customEvaluator);
     }
 
     public String getEvaluator()
     {
-        return evaluator;
+        return expressionConfig.getEvaluator();
     }
 
     public void setEvaluator(String evaluator)
     {
-        this.evaluator = evaluator;
+        expressionConfig.setEvaluator(evaluator);
     }
 }
