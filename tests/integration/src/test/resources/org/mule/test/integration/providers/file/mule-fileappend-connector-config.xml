@@ -17,7 +17,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="file://myout"/>
+                    <outbound-endpoint address="file://myout" synchronous="true"/>
                 </pass-through-router>
             </outbound>
         </service>
