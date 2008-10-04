@@ -2,20 +2,17 @@
  * Genrerates a file that can be imported as eclipse XML catalog
  */
 
-//assume we are running in the buildtools/scripts directory
-root = "../.."
-
 //  the structure of xsd locations
 corexsd = /.*(\/|\\)spring-config(\/|\\).*(\/|\\)mule.xsd/
 otherxsd = /.*(\/|\\)(transports|modules|tests)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 
-//destination base
-base = "http://www.mulesource.org/schema/mule/"
-schemaVersion = "2.2"
-
 def cliBuilder = new CliBuilder()
-cliBuilder.a(longOpt: "absolute", args: 0, "use absolute filenames instead of workspace references")
+cliBuilder.a(longOpt: "absolute","use absolute filenames instead of workspace references")
+cliBuilder.c(longOpt: "community", "use community schema URLs")
+cliBuilder.e(longOpt: "enterprise", "use enterprise schema URLs")
 cliBuilder.h(longOpt: "help", "show usage info")
+cliBuilder.r(longOpt: "root", required: true, args: 1, "start scanning at this root folder")
+cliBuilder.s(longOpt: "schemaVersion", args: 1, "use the specified version")
 
 options = cliBuilder.parse(args)
 if (!options)
@@ -31,6 +28,23 @@ if (options.h)
     cliBuilder.usage()
     System.exit(0)
 }
+
+root = options.r
+
+base = "http://www.mulesource.org/schema/mule/"
+if (options.e)
+{
+    base = "http://www.mulesource.com/schema/mule/"
+}
+
+schemaVersion = "2.2"
+if (options.s)
+{
+    schemaVersion = options.s
+}
+
+//checkCurrentDirectory()
+searchEclipseProjects()
 
 def checkCurrentDirectory()
 {
@@ -116,6 +130,3 @@ def printSchemaEntry(projectName, projectFile, xsdFile)
     }
     println("\"/>")
 }
-
-checkCurrentDirectory()
-searchEclipseProjects()
