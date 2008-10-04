@@ -10,6 +10,7 @@
                http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
                http://www.mulesource.org/schema/mule/stdio/2.2 http://www.mulesource.org/schema/mule/stdio/2.2/mule-stdio.xsd
                http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+               http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
                http://www.mulesource.org/schema/mule/stdio/2.2 http://www.mulesource.org/schema/mule/stdio/2.2/mule-stdio.xsd">
 
     <description>
@@ -75,12 +76,12 @@
             
             <outbound>
                 <filtering-router>
-                    <vm:outbound-endpoint path="chitchatter"/>
+                    <vm:outbound-endpoint path="chitchatter" synchronous="true"/>
                     <payload-type-filter expectedType="org.mule.example.hello.NameString"/>
                 </filtering-router>
                 
                 <filtering-router>
-                    <vm:outbound-endpoint path="userErrorHandler"/>
+                    <vm:outbound-endpoint path="userErrorHandler" synchronous="true"/>
                     <payload-type-filter expectedType="java.lang.Exception"/>
                 </filtering-router>
             </outbound>

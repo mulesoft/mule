@@ -13,7 +13,7 @@ package org.mule.example.hello;
 import java.io.Serializable;
 
 /**
- * <code>NameString</code> TODO (document class)
+ * <code>NameString</code> is a simple string wrapper that holds a name and a greeting string
  */
 public class NameString implements Serializable
 {
@@ -71,5 +71,4 @@ public class NameString implements Serializable
     {
         return name != null && name.length() > 0;
     }
-
 }
