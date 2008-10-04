@@ -106,6 +106,7 @@ import org.mule.routing.outbound.ChainingRouter;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.EndpointSelector;
 import org.mule.routing.outbound.ExceptionBasedRouter;
+import org.mule.routing.outbound.ExpressionMessageSplitter;
 import org.mule.routing.outbound.ExpressionRecipientList;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.routing.outbound.ListMessageSplitter;
@@ -114,7 +115,6 @@ import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.routing.outbound.TemplateEndpointRouter;
-import org.mule.routing.outbound.ExpressionMessageSplitter;
 import org.mule.routing.response.DefaultResponseRouterCollection;
 import org.mule.routing.response.SimpleCollectionResponseAggregator;
 import org.mule.routing.response.SingleResponseRouter;
@@ -149,9 +149,9 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.util.expression.ExpressionConfig;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
-import org.mule.util.expression.ExpressionConfig;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -362,6 +362,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("property", new ChildMapEntryDefinitionParser("properties")).addCollection("properties");
         registerMuleBeanDefinitionParser("add-message-properties", new ChildMapDefinitionParser("addProperties")).addCollection("addProperties");
         registerMuleBeanDefinitionParser("add-message-property", new ChildMapEntryDefinitionParser("addProperties")).addCollection("addProperties");
+        registerMuleBeanDefinitionParser("rename-message-property", new ChildMapEntryDefinitionParser("renameProperties")).addCollection("renameProperties");
         registerBeanDefinitionParser("delete-message-property", new ChildListEntryDefinitionParser("deleteProperties", ChildMapEntryDefinitionParser.KEY));
         registerMuleBeanDefinitionParser("jndi-provider-properties", new ChildMapDefinitionParser("jndiProviderProperties")).addCollection("jndiProviderProperties");
         registerMuleBeanDefinitionParser("jndi-provider-property", new ChildMapEntryDefinitionParser("jndiProviderProperties")).addCollection("jndiProviderProperties");
