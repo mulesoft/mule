@@ -84,6 +84,7 @@ public class ExpressionConfig
     {
         if (fullExpression == null)
         {
+            validate();
             fullExpression = expressionPrefix + evaluator + ":" + expression + expressionPostfix;
         }
         return fullExpression;
