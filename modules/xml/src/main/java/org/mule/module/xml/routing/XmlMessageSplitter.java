@@ -31,6 +31,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.XPath;
+import org.dom4j.io.DOMReader;
 import org.dom4j.io.SAXReader;
 
 /**
@@ -163,10 +164,15 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
             {
                 dom4jDoc = (org.dom4j.Document) src;
             }
+            else if (src instanceof org.w3c.dom.Document)
+            {
+                DOMReader xmlReader = new DOMReader();
+                dom4jDoc = xmlReader.read((org.w3c.dom.Document)src);
+            }
             else
             {
                 throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(
-                        src.getClass(), new Class[]{Document.class, String.class, byte[].class}).getMessage());
+                        src.getClass(), new Class[]{org.w3c.dom.Document.class, Document.class, String.class, byte[].class}).getMessage());
             }
 
             XPath xpath = dom4jDoc.createXPath(splitExpression);

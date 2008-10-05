@@ -16,6 +16,7 @@ import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.module.xml.routing.XmlMessageSplitter;
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
@@ -26,6 +27,11 @@ import com.mockobjects.dynamic.Mock;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.dom.DOMResult;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -101,6 +107,16 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
         Document doc = DocumentHelper.parseText(payload);
         internalTestSuccessfulXmlSplitter(doc);
+    }
+
+    public void testW3CDocumentPayloadXmlMessageSplitter() throws Exception
+    {
+        String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
+        Source sourceDoc = XMLUtils.toXmlSource( XMLInputFactory.newInstance(), true, payload);
+        DOMResult result = new DOMResult();
+        Transformer transformer = XMLUtils.getTransformer();
+        transformer.transform(sourceDoc, result);
+        internalTestSuccessfulXmlSplitter(result.getNode());
     }
 
     public void testByteArrayPayloadXmlMessageSplitter() throws Exception
