@@ -52,11 +52,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -220,7 +218,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     /**
      * Shamelessly copy from Spring's ConditionalTestCase so in MULE-2.0 we can extend
      * this class from ConditionalTestCase.
-     * 
+     * <p/>
      * Subclasses can override <code>isDisabledInThisEnvironment</code> to skip a single test.
      */
     public void runBare() throws Throwable
@@ -300,6 +298,12 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         Runtime.getRuntime().halt(1);
     }
 
+    /**
+     * Normal JUnit method
+     * @throws Exception
+     *
+     * @see #doSetUp()
+     */
     protected final void setUp() throws Exception
     {
         // start a watchdog thread
@@ -372,7 +376,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         contextBuilder.setWorkListener(new TestingWorkListener());
     }
-    
+
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         return new DefaultsConfigurationBuilder();
@@ -390,6 +394,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     /**
      * Run <strong>before</strong> any testcase setup.
+     * This is called once only before the test suite runs.
      */
     protected void suitePreSetUp() throws Exception
     {
@@ -398,12 +403,19 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     /**
      * Run <strong>after</strong> all testcase teardowns.
+     * This is called once only after all the tests in the suite have run.
      */
     protected void suitePostTearDown() throws Exception
     {
         // nothing to do
     }
 
+    /**
+     * Normal JUnit method
+     * @throws Exception
+     *
+     * @see #doTearDown()
+     */
     protected final void tearDown() throws Exception
     {
         try
@@ -463,11 +475,23 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         }
     }
 
+    /**
+     * Exactly the same a {@link #setUp()} in normal JUnit test cases.  this is called <strong>before</strong> a test
+     * method has been called.
+     *
+     * @throws Exception if something fails that should halt the testcase
+     */
     protected void doSetUp() throws Exception
     {
         // template method
     }
 
+    /**
+     * Exactly the same a {@link #tearDown()} in normal JUnit test cases.  this is called <strong>after</strong> a test
+     * method has been called.
+     *
+     * @throws Exception if something fails that should halt the testcase
+     */
     protected void doTearDown() throws Exception
     {
         // template method
@@ -482,7 +506,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext);
     }
-    
+
     public static InboundEndpoint getTestInboundEndpoint(String name, String uri) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, null, null, null);
@@ -492,7 +516,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, null, null, null);
     }
-    
+
     public static InboundEndpoint getTestInboundEndpoint(String name, List transformers) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, null, transformers, null, null);
@@ -502,7 +526,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, null, transformers, null, null);
     }
-    
+
     public static InboundEndpoint getTestInboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, transformers, filter, properties);
@@ -522,7 +546,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         return MuleTestUtils.getTestEvent(data, muleContext);
     }
-    
+
     public static MuleEvent getTestInboundEvent(Object data) throws Exception
     {
         return MuleTestUtils.getTestInboundEvent(data, muleContext);
@@ -544,7 +568,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     }
 
     public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint)
-        throws Exception
+            throws Exception
     {
         return MuleTestUtils.getTestEvent(data, service, endpoint, muleContext);
     }
