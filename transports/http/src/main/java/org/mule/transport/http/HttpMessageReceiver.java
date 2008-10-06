@@ -188,7 +188,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     ((HttpConnector) connector).getKeepAliveMonitor().removeExpirable(this);
                     
                     conn.writeResponse(processRequest(request));
-                    System.out.println("keep alive " + conn.isKeepAlive());
                 }
                 while (conn.isKeepAlive());
             }
