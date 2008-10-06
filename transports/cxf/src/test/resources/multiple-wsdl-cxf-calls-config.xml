@@ -11,10 +11,7 @@
        http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd">
 
     <vm:connector name="vmConnector" queueEvents="true"/>
-    
-    <!-- Initialize a static instance so we can use it with our client -->
-    <cxf:connector name="connector.cxf.0" initializeStaticBusInstance="true"/>
-    
+
     <model name="cxfout">
         <service name="CXFOut">
             <inbound>

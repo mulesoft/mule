@@ -70,7 +70,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
     private String defaultFrontend = CxfConstants.JAX_WS_FRONTEND;
     private List<SedaService> services = Collections.synchronizedList(new ArrayList<SedaService>());
     private Map<String, Server> uriToServer = new HashMap<String, Server>();
-    private boolean initializeStaticBusInstance = false;
+    private boolean initializeStaticBusInstance = true;
     
     public CxfConnector()
     {

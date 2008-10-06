@@ -7,6 +7,9 @@
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
        http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd">
     
+    <!-- Initialize a static instance so we can use it with our client -->
+    <cxf:connector name="connector.cxf.0" initializeStaticBusInstance="false"/>
+    
     <model name="test">
         <service name="mycomponent">
             <inbound>
