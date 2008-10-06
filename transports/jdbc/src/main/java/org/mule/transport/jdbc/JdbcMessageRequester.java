@@ -13,55 +13,29 @@ package org.mule.transport.jdbc;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.jdbc.sqlstrategy.SQLStrategy;
-
-import java.sql.Connection;
 
 
 public class JdbcMessageRequester extends AbstractMessageRequester
 {
+
     private JdbcConnector connector;
-
-    private Connection jdbcConnection;
-
-    /** Are we inside a transaction? */
-    private boolean transaction;
 
     public JdbcMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (JdbcConnector) endpoint.getConnector();
-        useStrictConnectDisconnect = true;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.mule.transport.AbstractMessageDispatcher#doDispose()
+     */
     protected void doDispose()
     {
         // template method
-    }
-
-    //@Override
-    protected void doPreConnect(MuleEvent event) throws Exception
-    {
-        transaction = (TransactionCoordination.getInstance().getTransaction() != null);
-    }
-
-    protected void doConnect() throws Exception
-    {
-        if (jdbcConnection == null)
-        {
-            jdbcConnection = connector.getConnection();
-        }
-    }
-
-    protected void doDisconnect() throws Exception
-    {
-        if (!transaction)
-        {
-            jdbcConnection.close();
-            jdbcConnection = null;
-        }
     }
 
     /**
@@ -92,6 +66,20 @@ public class JdbcMessageRequester extends AbstractMessageRequester
     protected MuleMessage doRequest(long timeout, MuleEvent event) throws Exception
     {
         SQLStrategy strategy = connector.getSqlStrategyFactory().create("select", null);
-        return strategy.executeStatement(jdbcConnection, endpoint, event, timeout);        
+        return strategy.executeStatement(connector, endpoint, event, timeout);        
     }
+
+
+    protected void doConnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+
+
 }

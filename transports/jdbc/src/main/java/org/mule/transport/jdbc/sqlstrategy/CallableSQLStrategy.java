@@ -14,9 +14,13 @@ package org.mule.transport.jdbc.sqlstrategy;
 /**
  * Implements strategy for executing simple stored procedures.  Only IN parameters
  * can be used and no OUT values can be returned from the stored procedure.
+ * 
  */
-public  class CallableSQLStrategy extends SimpleUpdateSQLStrategy
+
+public  class CallableSQLStrategy 
+    extends SimpleUpdateSQLStrategy
 {
+
     protected static final String STORED_PROCEDURE_PREFIX = "{ ";
     protected static final String STORED_PROCEDURE_SUFFIX = " }";
     

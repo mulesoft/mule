@@ -11,7 +11,6 @@
 package org.mule.transport.jdbc;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -21,12 +20,14 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransactionFactory;
+import org.mule.transport.ConnectException;
 import org.mule.transport.TransactedPollingMessageReceiver;
 import org.mule.transport.jdbc.i18n.JdbcMessages;
 import org.mule.util.ArrayUtils;
 import org.mule.util.MapUtils;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,18 +39,12 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
     public static final String RECEIVE_MESSAGES_IN_XA_TRANSCTION = "receiveMessagesInXaTransaction";
     
     protected JdbcConnector connector;
-
-    private Connection jdbcConnection;
-    
     protected String readStmt;
     protected String ackStmt;
     protected List readParams;
     protected List ackParams;
     public boolean receiveMessagesInXaTransaction = false;
     
-    /** Are we inside a transaction? */
-    private boolean transaction;
-
     public JdbcMessageReceiver(Connector connector,
                                Service service,
                                InboundEndpoint endpoint,
@@ -57,7 +52,6 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                                String ackStmt) throws CreateException
     {
         super(connector, service, endpoint);
-        
         this.setFrequency(((JdbcConnector) connector).getPollingFrequency());
 
         boolean transactedEndpoint = endpoint.getTransactionConfig().isTransacted();
@@ -85,7 +79,8 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             logger.warn(JdbcMessages.forcePropertyNoTransaction(RECEIVE_MESSAGES_IN_XA_TRANSCTION, "XA transaction"));
             receiveMessagesInXaTransaction = false;
         }
-            
+    
+        
         this.connector = (JdbcConnector) connector;
         this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().isTransacted()
             && !this.connector.isTransactionPerMessage());
@@ -94,8 +89,6 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         this.readStmt = this.connector.parseStatement(readStmt, this.readParams);
         this.ackParams = new ArrayList();
         this.ackStmt = this.connector.parseStatement(ackStmt, this.ackParams);
-
-        useStrictConnectDisconnect = true;
     }
 
     protected void doDispose()
@@ -103,34 +96,35 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         // template method
     }
 
-    //@Override
-    protected void doPreConnect(MuleEvent event) throws Exception
-    {
-        transaction = (TransactionCoordination.getInstance().getTransaction() != null);
-    }
-
     protected void doConnect() throws Exception
     {
-        if (jdbcConnection == null)
+        Connection con = null;
+        try
         {
-            jdbcConnection = connector.getConnection();
+            con = this.connector.getConnection();
+        }
+        catch (Exception e)
+        {
+            throw new ConnectException(e, this);
+        }
+        finally
+        {
+            JdbcUtils.close(con);
         }
     }
 
-    protected void doDisconnect() throws Exception
+    protected void doDisconnect() throws ConnectException
     {
-        if (!transaction)
-        {
-            jdbcConnection.close();
-            jdbcConnection = null;
-        }
+        // noop
     }
 
     public void processMessage(Object message) throws Exception
     {
+        Connection con = null;
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         try
         {
+            con = this.connector.getConnection();
             MessageAdapter msgAdapter = this.connector.getMessageAdapter(message);
             MuleMessage umoMessage = new DefaultMuleMessage(msgAdapter);
             if (this.ackStmt != null)
@@ -140,7 +134,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                 {
                     logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(ackParams));
                 }
-                int nbRows = connector.getQueryRunner().update(jdbcConnection, this.ackStmt, ackParams);
+                int nbRows = connector.getQueryRunner().update(con, this.ackStmt, ackParams);
                 if (nbRows != 1)
                 {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);
@@ -151,14 +145,12 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         }
         catch (Exception ex)
         {
-            if (tx == null)
-            {
-                jdbcConnection.rollback();
-            }
-            else
+            if (tx != null)
             {
                 tx.setRollbackOnly();
             }
+
+            // rethrow
             throw ex;
         }
         finally
@@ -176,30 +168,51 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                 // connection
                 // is no longer used by the application and is ready for the 2PC
                 // commit.
-                //JdbcUtils.close(con);
+                JdbcUtils.close(con);
             }
         }
     }
 
     public List getMessages() throws Exception
     {
-        Object[] readParams = connector.getParams(endpoint, this.readParams, null, this.endpoint.getEndpointURI().getAddress());
-        if (logger.isDebugEnabled())
+        Connection con = null;
+        try
         {
-            logger.debug("SQL QUERY: " + readStmt + ", params = " + ArrayUtils.toString(readParams));
-        }
-        Object results = 
-            connector.getQueryRunner().query(jdbcConnection, this.readStmt, readParams, connector.getResultSetHandler());
+            try
+            {
+                con = this.connector.getConnection();
+            }
+            catch (SQLException e)
+            {
+                throw new ConnectException(e, this);
+            }
 
-        List resultList = (List) results;
-        if (resultList != null && resultList.size() > 1 && isReceiveMessagesInTransaction() && !receiveMessagesInXaTransaction)
-        {
-            logger.warn(JdbcMessages.moreThanOneMessageInTransaction(RECEIVE_MESSAGE_IN_TRANSCTION, RECEIVE_MESSAGES_IN_XA_TRANSCTION));
-            List singleResultList = new ArrayList(1);
-            singleResultList.add(resultList);
-            return singleResultList;
+            Object[] readParams = connector.getParams(endpoint, this.readParams, null, this.endpoint.getEndpointURI().getAddress());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("SQL QUERY: " + readStmt + ", params = " + ArrayUtils.toString(readParams));
+            }
+            Object results = connector.getQueryRunner().query(con, this.readStmt, readParams,
+                    connector.getResultSetHandler());
+
+            List resultList = (List) results;
+            if (resultList != null && resultList.size() > 1 && isReceiveMessagesInTransaction() && !receiveMessagesInXaTransaction)
+            {
+                logger.warn(JdbcMessages.moreThanOneMessageInTransaction(RECEIVE_MESSAGE_IN_TRANSCTION, RECEIVE_MESSAGES_IN_XA_TRANSCTION));
+                List singleResultList = new ArrayList(1);
+                singleResultList.add(resultList);
+                return singleResultList;
+            }
+            
+            return resultList;
         }
-        
-        return resultList;
+        finally
+        {
+            if (TransactionCoordination.getInstance().getTransaction() == null)
+            {
+                JdbcUtils.close(con);
+            }
+        }
     }
+
 }

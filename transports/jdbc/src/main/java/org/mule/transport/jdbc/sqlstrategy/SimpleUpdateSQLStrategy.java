@@ -15,6 +15,11 @@ package org.mule.transport.jdbc.sqlstrategy;
  * 
  */
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -22,26 +27,17 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transaction.Transaction;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.jdbc.JdbcConnector;
+import org.mule.transport.jdbc.JdbcUtils;
 import org.mule.util.ArrayUtils;
-
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
 
 public  class SimpleUpdateSQLStrategy 
     implements SQLStrategy
 {
     protected static Logger logger = Logger.getLogger(SelectSQLStrategy.class);
 
-    public MuleMessage executeStatement(Connection jdbcConnection, 
-                                        ImmutableEndpoint endpoint, 
-                                        MuleEvent event, 
-                                        long timeout) throws Exception
+    public MuleMessage executeStatement(JdbcConnector connector,
+            ImmutableEndpoint endpoint, MuleEvent event,long timeout) throws Exception
     {
-        JdbcConnector connector = (JdbcConnector) endpoint.getConnector();
-        
         //Unparsed SQL statement (with ${foo} format parameters)
         String statement = connector.getStatement(endpoint);
 
@@ -59,15 +55,19 @@ public  class SimpleUpdateSQLStrategy
             event.transformMessage()), endpoint.getEndpointURI().getAddress());
 
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        Connection con = null;
+            
         try
         {
+            con = connector.getConnection();
+            
             
             if (logger.isDebugEnabled())
             {
                 logger.debug("SQL UPDATE: " + sql + ", params = " + ArrayUtils.toString(paramValues));
             }
             
-            int nbRows = connector.getQueryRunner().update(jdbcConnection, sql, paramValues);
+            int nbRows = connector.getQueryRunner().update(con, sql, paramValues);
             
             if (nbRows != 1)
             {
@@ -75,7 +75,7 @@ public  class SimpleUpdateSQLStrategy
             }
             if (tx == null)
             {
-                jdbcConnection.commit();
+                JdbcUtils.commitAndClose(con);
             }
             logger.debug("MuleEvent dispatched succesfuly");
         }
@@ -84,11 +84,7 @@ public  class SimpleUpdateSQLStrategy
             logger.debug("Error dispatching event: " + e.getMessage(), e);
             if (tx == null)
             {
-                jdbcConnection.rollback();
-            }
-            else
-            {
-                tx.setRollbackOnly();
+                JdbcUtils.rollbackAndClose(con);
             }
             throw e;
         }
