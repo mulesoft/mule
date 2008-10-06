@@ -7,7 +7,7 @@ user's name is then passed to the first component which adds something to the
 string before passes on to the second component that also adds some text before 
 outputting the results back to the console.
 
-For more information, refer to http://mule.mulesource.org/display/MULEINTRO/Examples
+For more information, refer to http://mule.mulesource.org/display/MULE2INTRO/Examples
 
 +---------------------+
 | Running the example |

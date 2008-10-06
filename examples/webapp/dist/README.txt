@@ -6,7 +6,7 @@ LoanBroker, Hello World and Echo examples. It also provides examples of
 accessing Mule using REST style service calls and is itself an example of how
 to embed Mule in a webapp.
 
-For more information, refer to http://mule.mulesource.org/display/MULEINTRO/Examples
+For more information, refer to http://mule.mulesource.org/display/MULE2INTRO/Examples
 
 +---------------------+
 | Running the example |

@@ -5,7 +5,7 @@ This example demonstrates how to invoke an ASPX web service from Mule and
 transform the result using XSLT and deserialise the result to a StockQuote
 JavaBean. The example demonstrates using REST and SOAP to invoke the service.
 
-For more information, refer http://mule.mulesource.org/display/MULEINTRO/Examples
+For more information, refer http://mule.mulesource.org/display/MULE2INTRO/Examples
 
 +---------------------+
 | Running the example |
