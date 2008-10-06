@@ -42,10 +42,9 @@ public class PollingReceiverWorker implements Work
             running = true;
             try
             {
-               // Make sure we are connected
-               receiver.connect();
-
-               receiver.poll();
+                // make sure we are connected, wait if necessary
+                receiver.connected.whenTrue(null);
+                receiver.poll();
             }
             catch (InterruptedException e)
             {
