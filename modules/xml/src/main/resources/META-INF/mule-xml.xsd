@@ -239,23 +239,107 @@
     </xsd:complexType>
 
     <xsd:element name="xml-prettyprinter-transformer" type="xmlPrettyPrinterType"
-                 substitutionGroup="mule:abstract-transformer"/>
+                 substitutionGroup="mule:abstract-transformer">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Formats an XML string using the Pretty Printer functionality in {{org.dom4j.io.OutputFormat}}.
+                        </xsd:documentation>
+                    </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="xmlPrettyPrinterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
-                <xsd:attribute name="encoding" type="xsd:string"/>
-                <xsd:attribute name="expandEmptyElements" type="mule:substitutableBoolean"/>
-                <xsd:attribute name="indentEnabled" type="mule:substitutableBoolean"/>
-                <xsd:attribute name="indentString" type="xsd:string"/>
-                <xsd:attribute name="indentSize" type="mule:substitutableInt"/>
-                <xsd:attribute name="lineSeparator" type="xsd:string"/>
-                <xsd:attribute name="newLineAfterNTags" type="mule:substitutableInt"/>
-                <xsd:attribute name="newlines" type="mule:substitutableBoolean"/>
-                <xsd:attribute name="omitEncoding" type="mule:substitutableBoolean"/>
-                <xsd:attribute name="padText" type="mule:substitutableBoolean"/>
-                <xsd:attribute name="suppressDeclaration" type="mule:substitutableBoolean"/>
-                <xsd:attribute name="trimText" type="mule:substitutableBoolean"/>
-                <xsd:attribute name="XHTML" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="encoding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The encoding format to use, such as UTF-8.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="expandEmptyElements" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to expand empty elements from &lt;tagName&gt; to &lt;tagName&gt;&lt;/tagName&gt;.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="indentEnabled" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to enable indenting of the XML code. If true, the indent string and size are used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="indentString" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The string to use as the indent, usually an empty space.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="indentSize" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The number of indent strings to use for each indent, such as "2" if indentString is set to an empty space and you want to use two empty spaces for each indent.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="lineSeparator" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The string to use for new lines, typically "\n".
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="newLineAfterNTags" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If the {{newlines}} attribute is true, the number of closing tags after which a newline separator is inserted. For example, setting this to "5" will cause a newline to be inserted after the output of five closing tags (including single tags). 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="newlines" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether newlines should be printed. If false, the XML is printed all on one line. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="omitEncoding" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the XML declaration line includes the encoding of the document. It is common to suppress this in protocols such as SOAP.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="padText" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to ensure that text immediately preceded by or followed by an element will be "padded" with a single space. This is useful when you set {{trimText}} to true and want to ensure that "the quick &lt;b&gt;brown&lt;/b&gt; fox" does not become "the quick&lt;b&gt;brown&lt;/b&gt;fox". 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="suppressDeclaration" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to suppress the XML declaration line. It is common to suppress this in protocols such as SOAP.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="trimText" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to trim white space in the XML.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="XHTML" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to use the XHTML standard, which is like HTML but passes an XML parser with real, closed tags, and outputs CDATA sections with CDATA delimiters.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
