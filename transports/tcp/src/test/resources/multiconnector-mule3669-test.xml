@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.2"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/tcp/2.2 http://www.mulesource.org/schema/mule/tcp/2.2/mule-tcp.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd">
+
+
+    <tcp:connector name="test1"/>
+
+    <tcp:connector name="test2"/>
+
+    <tcp:endpoint name="epTest1" host="localhost" port="34532" connector-ref="test1"/>
+    <tcp:endpoint name="epTest2" host="localhost" port="43231" connector-ref="test2"/>
+
+    <model>
+        <service name="testService">
+            <inbound>
+                <inbound-endpoint ref="epTest1"/>
+            </inbound>
+            <null-component/>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="epTest2"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

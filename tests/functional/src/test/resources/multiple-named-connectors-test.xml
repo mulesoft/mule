@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd">
 
     <custom-connector name="testConnector1" class="org.mule.tck.testmodels.mule.TestConnector"/>
     <custom-connector name="testConnector2" class="org.mule.tck.testmodels.mule.TestConnector"/>
+
+     <endpoint name="globalEndpoint1" address="test://ge1" connector-ref="testConnector1"/>
+     <endpoint name="globalEndpoint2" address="test://ge2" connector-ref="testConnector2"/>
 
     <model name="MultilpleConnectorsTestModel">
         <service name="testService">
@@ -17,8 +18,22 @@
                     as there are multiple connectors available for the same transport.
                  -->
                 <inbound-endpoint address="test://endpoint1" connector-ref="testConnector1"/>
+
+                <!-- Test that global endpoint connector attribute is carried over correctly for ref endpoints -->
+                <inbound-endpoint ref="globalEndpoint2"/>
             </inbound>
             <null-component/>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="globalEndpoint1"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="testService2">
+            <inbound>
+
+            </inbound>
         </service>
     </model>
 
