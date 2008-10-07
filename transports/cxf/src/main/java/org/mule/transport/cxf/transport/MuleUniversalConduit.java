@@ -185,13 +185,11 @@ public class MuleUniversalConduit extends AbstractConduit
             if (result != null && !isOneway(m.getExchange()))
             {
                 Message inMessage = new MessageImpl();
-                String contentType = req.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+                String contentType = result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
 
                 inMessage.put(Message.ENCODING, result.getEncoding());
                 inMessage.put(Message.CONTENT_TYPE, contentType);
                 inMessage.setContent(InputStream.class, result.getPayload(InputStream.class));
-                // inMessage.setContent(InputStream.class,
-                // result.getPayload(InputStream.class));
                 inMessage.setExchange(m.getExchange());
                 getMessageObserver().onMessage(inMessage);
             }
