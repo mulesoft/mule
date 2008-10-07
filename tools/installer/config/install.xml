@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 
 <!-- This is a simple Mule Installer built with IzPack -->
-
 <installation version="1.0">
 
     <listeners>
         <listener installer="AntActionInstallerListener"
                   uninstaller="AntActionUninstallerListener" />
     </listeners>
-
 
     <!-- The info section -->
     <info>
@@ -65,8 +63,6 @@
     </resources>
 
     <!-- For ANT actions -->
-<!--     <jar src="../distribution/lib/opt/ant-1.6.5.jar" stage="postinstall" /> -->
-    <!-- jar src="../distribution/lib/opt/ant-launcher-1.7.0.jar" stage="postinstall" /-->
     <jar src="../distribution/lib/endorsed/xercesImpl-2.9.1.jar" stage="postinstall" />
     <jar src="../distribution/lib/endorsed/xml-apis-1.3.04.jar" stage="postinstall" />
 
@@ -124,6 +120,18 @@
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/launcher" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/mule" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/setup_local_instance.sh" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-freebsd-x86-32" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-hpux-parisc-32" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-linux-ia-64" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-linux-ppc-64" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-linux-x86-32" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-linux-x86-64" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-macosx-ppc-32" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-macosx-universal-32" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-solaris-sparc-32" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-solaris-sparc-64" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-solaris-x86-32" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/lib/boot/exec/wrapper-windows-x86-32.exe" stage="never"/>
 
             <executable targetfile="$INSTALL_PATH/lib/boot:$INSTALL_PATH/lib/opt:$INSTALL_PATH/lib/mule" class="org.mule.module.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
                 <args>
