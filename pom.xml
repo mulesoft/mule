@@ -981,9 +981,8 @@
                 <configuration>
                     <!-- by default download all sources when generating project files -->
                     <downloadSources>true</downloadSources>
-                    <!-- configure a JDK named 'jdk1.4' for this project -->
                     <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk14Name}</classpathContainer>
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk15Name}</classpathContainer>
                     </classpathContainers>
                 </configuration>
             </plugin>
@@ -992,7 +991,7 @@
                 <artifactId>maven-idea-plugin</artifactId>
                 <configuration>
                     <downloadSources>true</downloadSources>
-                    <jdkName>1.4</jdkName>
+                    <jdkName>1.5</jdkName>
                 </configuration>
             </plugin>
 
