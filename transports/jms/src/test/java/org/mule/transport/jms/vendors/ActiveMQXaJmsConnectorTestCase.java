@@ -13,7 +13,7 @@ package org.mule.transport.jms.vendors;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
-import org.mule.transport.jms.xa.ConnectionInvocationHandler;
+import org.mule.transport.jms.xa.TargetInvocationHandler;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -50,8 +50,8 @@ public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase
             Method cleanupMethod;
             if (Proxy.isProxyClass(clazz))
             {
-                ConnectionInvocationHandler handler =
-                        (ConnectionInvocationHandler) Proxy.getInvocationHandler(connection);
+                TargetInvocationHandler handler =
+                        (TargetInvocationHandler) Proxy.getInvocationHandler(connection);
                 // this is really an XA connection
                 connection = (Connection) handler.getTargetObject();
                 Class realConnectionClass = connection.getClass();

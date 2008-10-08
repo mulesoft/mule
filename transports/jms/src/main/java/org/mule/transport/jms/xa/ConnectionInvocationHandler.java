@@ -13,7 +13,6 @@ import org.mule.api.transaction.Transaction;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -27,9 +26,8 @@ import javax.jms.XASession;
 import javax.jms.XATopicConnection;
 import javax.jms.XATopicSession;
 
-public class ConnectionInvocationHandler implements InvocationHandler
+public class ConnectionInvocationHandler implements TargetInvocationHandler
 {
-
     private Object xaConnection;
 
     public ConnectionInvocationHandler(Object xac)
@@ -37,11 +35,8 @@ public class ConnectionInvocationHandler implements InvocationHandler
         this.xaConnection = xac;
     }
 
-    /**
-     * Can be one of 3 types.
-     * TODO check if we can portably cast it (JMS 1.1 vs 1.0.2b), see Jms102bSupport why
-     *
-     * @return underlying XAConnection instance
+    /* (non-Javadoc)
+     * @see org.mule.transport.jms.xa.ConnectionInvocationHandler#getTargetObject()
      */
     public Object getTargetObject()
     {
@@ -104,5 +99,4 @@ public class ConnectionInvocationHandler implements InvocationHandler
             return method.invoke(xaConnection, args);
         }
     }
-
 }

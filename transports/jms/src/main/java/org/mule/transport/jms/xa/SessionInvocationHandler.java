@@ -15,7 +15,6 @@ import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -35,7 +34,7 @@ import javax.transaction.xa.XAResource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class SessionInvocationHandler implements InvocationHandler
+public class SessionInvocationHandler implements TargetInvocationHandler
 {
     protected static final transient Log logger = LogFactory.getLog(SessionInvocationHandler.class);
 
@@ -218,7 +217,7 @@ public class SessionInvocationHandler implements InvocationHandler
         this.enlisted = enlisted;
     }
 
-    public XASession getTargetObject()
+    public Object getTargetObject()
     {
         return xaSession;
     }
