@@ -59,6 +59,10 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
                 catch (Exception e)
                 {
                     cause = e;
+                    if (logger.isDebugEnabled())
+                    {
+                        cause.printStackTrace();
+                    }
                     if (notifier != null)
                     {
                         notifier.failed(context, cause);
