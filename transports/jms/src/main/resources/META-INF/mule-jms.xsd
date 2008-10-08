@@ -39,7 +39,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <!-- The ConnectionFactory is required for non-vendor JMS configs -->
-                <xsd:attribute name="connectionFactory-ref" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="connectionFactory-ref" type="xsd:NMTOKEN"/>
                 <xsd:attributeGroup ref="jmsConnectorAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -90,9 +90,47 @@
         <xsd:attribute name="numberOfConsumers" type="mule:substitutableInt">
             <xsd:annotation>
                 <xsd:documentation>
-                         The configures the number of concurrent consumers that will be used to receive JMS messages.  
-                         (Note: If you use this attribute you should not configure the 'numberOfConcurrentTransactedReceivers' which has the same effect.)
-                      </xsd:documentation>
+                    Configures the number of concurrent consumers that will be used to receive JMS messages.  
+                    (Note: If you use this attribute you should not configure the 'numberOfConcurrentTransactedReceivers' which has the same effect.)
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="jndiInitialFactory" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Configures the initial factory class to use when connecting to JNDI.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="jndiProviderUrl" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Configures the URL to use when connecting to JNDI.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="connectionFactoryJndiName" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Configures the name to use when looking up the connection factory from JNDI.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="jndiDestinations" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Set this to true if you want to lookup queues or topics from JNDI instead of
+                    creating them from the session.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="forceJndiDestinations" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    If this is set to true, Mule to fails when a topic or queue cannot be retrieved 
+                    from JNDI. If this is set to false, Mule will create a topic or queue from the
+                    JMS session if the JNDI lookup fails.
+                </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>

@@ -232,7 +232,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             }
             
             // no connection factory ... give up
-            throw new InitialisationException(JmsMessages.noConnectionFactorySet(), this);
+            throw new InitialisationException(JmsMessages.noConnectionFactoryConfigured(), this);
         }
     }
     
@@ -368,11 +368,6 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         {
             throw new InitialisationException(e, this);
         }
-        if (cf == null)
-        {
-            throw new InitialisationException(JmsMessages.noConnectionFactorySet(), this);
-        }
-
 
         if (username != null)
         {
@@ -1102,6 +1097,36 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
    public void setJndiContext(Context jndiContext)
    {
        this.jndiContext = jndiContext;
+   }
+
+   public String getJndiInitialFactory()
+   {
+       return jndiInitialFactory;
+   }
+
+   public void setJndiInitialFactory(String jndiInitialFactory)
+   {
+       this.jndiInitialFactory = jndiInitialFactory;
+   }
+
+   public String getJndiProviderUrl()
+   {
+       return jndiProviderUrl;
+   }
+
+   public void setJndiProviderUrl(String jndiProviderUrl)
+   {
+       this.jndiProviderUrl = jndiProviderUrl;
+   }
+
+   public String getConnectionFactoryJndiName()
+   {
+       return connectionFactoryJndiName;
+   }
+
+   public void setConnectionFactoryJndiName(String connectionFactoryJndiName)
+   {
+       this.connectionFactoryJndiName = connectionFactoryJndiName;
    }
 
    public boolean isJndiDestinations()

@@ -72,4 +72,12 @@
     <jms:endpoint name="endpoint4" queue="blub" connector-ref="jmsConnectorDefaults">
         <xa-transaction action="ALWAYS_JOIN"/>
     </jms:endpoint>
+    
+    <jms:connector name="jmsJndiConnector" 
+                   jndiInitialFactory="org.mule.transport.jms.test.JmsTestContextFactory"
+                   jndiProviderUrl="jndi://test"
+                   connectionFactoryJndiName="jms/connectionFactory" 
+                   jndiDestinations="true"
+                   forceJndiDestinations="true"/>
+
 </mule>

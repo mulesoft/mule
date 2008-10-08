@@ -28,6 +28,8 @@ import org.mule.transport.jms.test.TestRedeliveryHandler;
 
 import javax.jms.Session;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
+
 
 /**
  * Tests the "jms" namespace.
@@ -167,4 +169,16 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(MuleTransactionConfig.ACTION_ALWAYS_JOIN, endpoint.getTransactionConfig().getAction());
     }
 
+    public void testJndiConnectorAtributes() throws Exception
+    {
+        JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsJndiConnector");
+        assertNotNull(connector);
+
+        assertEquals("org.mule.transport.jms.test.JmsTestContextFactory", connector.getJndiInitialFactory());
+        assertEquals("jndi://test", connector.getJndiProviderUrl());
+        assertEquals("jms/connectionFactory", connector.getConnectionFactoryJndiName());
+        assertEquals(ActiveMQConnectionFactory.class, connector.getConnectionFactory().getClass());
+        assertTrue(connector.isJndiDestinations());
+        assertTrue(connector.isForceJndiDestinations());
+    }
 }
