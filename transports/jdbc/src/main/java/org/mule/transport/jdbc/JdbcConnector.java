@@ -206,7 +206,7 @@ public class JdbcConnector extends AbstractConnector
         {
             if (tx.hasResource(dataSource))
             {
-                logger.debug("Retrieving connection from current transaction");
+                logger.debug("Retrieving connection from current transaction: " + tx);
                 return (Connection) tx.getResource(dataSource);
             }
         }
@@ -215,7 +215,7 @@ public class JdbcConnector extends AbstractConnector
 
         if (tx != null)
         {
-            logger.debug("Binding connection to current transaction");
+            logger.debug("Binding connection " + con + " to current transaction: " + tx);
             try
             {
                 tx.bindResource(dataSource, con);
@@ -223,7 +223,7 @@ public class JdbcConnector extends AbstractConnector
             catch (TransactionException e)
             {
                 JdbcUtils.close(con);
-                throw new RuntimeException("Could not bind connection to current transaction", e);
+                throw new RuntimeException("Could not bind connection to current transaction: " + tx, e);
             }
         }
         return con;
