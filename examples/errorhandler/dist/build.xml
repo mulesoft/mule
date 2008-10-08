@@ -37,15 +37,6 @@
              dest="${dir.user.lib}/concurrent-1.3.4.jar"
              verbose="true"
              usetimestamp="true"/>
-        <!-- Used by Email connector -->
-        <get src="${url.maven.repo}/javax/mail/mail/1.4/mail-1.4.jar"
-             dest="${dir.user.lib}/mail-1.4.jar"
-             verbose="true"
-             usetimestamp="true"/>
-        <get src="${url.maven.repo}/javax/activation/activation/1.1/activation-1.1.jar"
-             dest="${dir.user.lib}/activation-1.1.jar"
-             verbose="true"
-             usetimestamp="true"/>
     </target>
 
     <target name="init" depends="get.libraries">

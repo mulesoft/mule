@@ -79,6 +79,11 @@
             <artifactId>mule-transport-file</artifactId>
             <version>${muleVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail.osgi</artifactId>
+            <version>1.4</version>
+        </dependency>
 
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -87,24 +92,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <!-- this is the dist pom that does not have a parent set. Make sure
-                 that the version declared here matches the version in mule's
-                 toplevel pom's dependencyManagement section.
-            -->
-            <version>1.4</version>
-            <artifactId>mail</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <!-- this is the dist pom that does not have a parent set. Make sure
-                 that the version declared here matches the version in mule's
-                 toplevel pom's dependencyManagement section.
-            -->
-            <version>1.1</version>
-        </dependency>
         <!-- ActiveMQ for JMS -->
         <dependency>
             <groupId>org.apache.activemq</groupId>
@@ -342,14 +329,6 @@
                                     <groupId>concurrent</groupId>
                                     <artifactId>concurrent</artifactId>
                                     <version>1.3.4</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>javax.mail</groupId>
-                                    <artifactId>mail</artifactId>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>javax.activation</groupId>
-                                    <artifactId>activation</artifactId>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

@@ -15,6 +15,18 @@
     </description>
 
   <build>
+        <defaultGoal>install</defaultGoal>
+
+        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+        <resources>
+            <resource>
+                <directory>conf</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -85,11 +97,6 @@
       <groupId>org.mule.transports</groupId>
       <artifactId>mule-transport-http</artifactId>
       <version>${muleVersion}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.mail</groupId>
-      <artifactId>mail</artifactId>
-      <version>1.4</version>
     </dependency>
     
     <!-- 
