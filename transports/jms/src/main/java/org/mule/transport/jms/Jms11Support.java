@@ -10,6 +10,8 @@
 
 package org.mule.transport.jms;
 
+import java.text.MessageFormat;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
@@ -20,6 +22,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
+import javax.naming.NamingException;
 
 /**
  * <code>Jms11Support</code> is a template class to provide an abstraction to to
@@ -110,6 +113,19 @@ public class Jms11Support implements JmsSupport
 
     public Destination createDestination(Session session, String name, boolean topic) throws JMSException
     {
+        if (connector.isJndiDestinations())
+        {
+            Destination dest = this.getJndiDestination(name);
+            if (dest != null)
+            {
+                return dest;
+            }
+            else if (connector.isForceJndiDestinations())
+            {
+                throw new JMSException("JNDI destination not found with name: " + name);
+            }
+        }
+        
         if (session == null)
         {
             throw new IllegalArgumentException("MuleSession cannot be null when creating a destination");
@@ -127,6 +143,30 @@ public class Jms11Support implements JmsSupport
         {
             return session.createQueue(name);
         }
+    }
+    
+    protected Destination getJndiDestination(String name) throws JMSException
+    {
+        Object temp;
+        try
+        {
+            temp = connector.lookupFromJndi(name);
+        }
+        catch (NamingException e)
+        {
+            String message = MessageFormat.format("Failed to look up destination {0}. Reason: {1}",
+                new Object[] { name, e.getMessage() });
+            throw new JMSException(message);
+        }
+        
+        if (temp != null)
+        {
+            if (temp instanceof Destination)
+            {
+                return (Destination) temp;
+            }
+        }
+        return null;
     }
 
     public Destination createTemporaryDestination(Session session, boolean topic) throws JMSException

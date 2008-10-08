@@ -12,6 +12,7 @@ package org.mule.transport.jms;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -36,6 +37,7 @@ import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 
 import java.text.MessageFormat;
+import java.util.Hashtable;
 import java.util.Map;
 
 import javax.jms.Connection;
@@ -48,6 +50,9 @@ import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 import javax.jms.XAConnectionFactory;
+import javax.naming.CommunicationException;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
@@ -96,16 +101,39 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     // JMS Connection
     ////////////////////////////////////////////////////////////////////////
 
+    /**
+     * JMS Connection, not settable by the user.
+     */
+    private Connection connection;
+
     private ConnectionFactory connectionFactory;
 
     public String username = null;
 
     public String password = null;
 
+    ////////////////////////////////////////////////////////////////////////
+    // JNDI Connection
+    ////////////////////////////////////////////////////////////////////////
+    
+    private Context jndiContext = null;
+
     /**
-     * JMS Connection, not settable by the user.
+     * This object guards all access to the jndiContext
      */
-    private Connection connection;
+    private Object jndiLock = new Object();
+
+    private String jndiProviderUrl;
+
+    private String jndiInitialFactory;
+
+    private Map jndiProviderProperties;
+
+    private String connectionFactoryJndiName;
+
+    private boolean jndiDestinations = false;
+
+    private boolean forceJndiDestinations = false;
 
     ////////////////////////////////////////////////////////////////////////
     // Strategy classes
@@ -136,15 +164,15 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     protected void doInitialise() throws InitialisationException
     {
-        if (connectionFactory == null)
+        try
         {
-            connectionFactory = getDefaultConnectionFactory();
+            connectionFactory = this.createConnectionFactory();
         }
-        if (connectionFactory == null)
+        catch (NamingException ne)
         {
-            throw new InitialisationException(JmsMessages.noConnectionFactorySet(), this);
+            throw new InitialisationException(JmsMessages.errorCreatingConnectionFactory(), this);
         }
-
+        
         if (topicResolver == null)
         {
             topicResolver = new DefaultJmsTopicResolver(this);
@@ -164,7 +192,53 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
     }
 
-    /** Override this method to provide a default ConnectionFactory for a vendor-specific JMS Connector. */
+    protected ConnectionFactory createConnectionFactory() throws InitialisationException, NamingException
+    {
+        // if an initial factory class was configured that takes precedence over the 
+        // spring-configured connection factory or the one that our subclasses may provide
+        if (jndiInitialFactory != null)
+        {
+            this.initJndiContext();
+
+            Object temp = jndiContext.lookup(connectionFactoryJndiName);
+            if (temp instanceof ConnectionFactory)
+            {
+                return (ConnectionFactory)temp;
+            }
+            else
+            {
+                throw new InitialisationException(
+                    JmsMessages.invalidResourceType(ConnectionFactory.class, temp), this);
+            }
+        }
+        else
+        {
+            // don't look up objects from JNDI in any case
+            jndiDestinations = false;
+            forceJndiDestinations = false;
+
+            // don't use JNDI. Use the spring-configured connection factory if that's provided
+            if (connectionFactory != null)
+            {
+                return connectionFactory;
+            }
+            
+            // no spring-configured connection factory. See if there is a default one (e.g. from
+            // subclass)
+            ConnectionFactory factory = this.getDefaultConnectionFactory();
+            if (factory != null)
+            {
+                return factory;
+            }
+            
+            // no connection factory ... give up
+            throw new InitialisationException(JmsMessages.noConnectionFactorySet(), this);
+        }
+    }
+    
+    /** 
+     * Override this method to provide a default ConnectionFactory for a vendor-specific JMS Connector. 
+     */
     protected ConnectionFactory getDefaultConnectionFactory()
     {
         return null;
@@ -183,6 +257,98 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                 logger.error("Jms connector failed to dispose properly: ", e);
             }
             connection = null;
+        }
+        
+        if (jndiContext != null)
+        {
+            try
+            {
+                jndiContext.close();
+            }
+            catch (NamingException ne)
+            {
+                logger.error("Jms connector failed to dispose properly: ", ne);
+            }
+            finally
+            {
+                jndiContext = null;
+            }
+        }
+    }
+
+    protected void initJndiContext() throws NamingException, InitialisationException
+    {
+        synchronized (jndiLock)
+        {
+            Hashtable<String, Object> props = new Hashtable<String, Object>();
+
+            if (jndiInitialFactory != null)
+            {
+                props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
+            }
+            else if (jndiProviderProperties == null
+                     || !jndiProviderProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY))
+            {
+                throw new InitialisationException(CoreMessages.objectIsNull("jndiInitialFactory"), this);
+            }
+
+            if (jndiProviderUrl != null)
+            {
+                props.put(Context.PROVIDER_URL, jndiProviderUrl);
+            }
+
+            if (jndiProviderProperties != null)
+            {
+                props.putAll(jndiProviderProperties);
+            }
+            
+            jndiContext = new InitialContext(props);
+        }
+    }
+
+    protected Object lookupFromJndi(String jndiName) throws NamingException
+    {
+        synchronized (jndiLock)
+        {
+            try
+            {
+                return jndiContext.lookup(jndiName);
+            }
+            catch (CommunicationException ce)
+            {
+                logger.warn("JNDI communication error", ce);
+                
+                // Our connection to JNDI failed. Make a single attempt to reconnect to JNDI.
+                try
+                {
+                    /*
+                     Uncomment for manual testing ... this gives you time to restart the JNDI
+                     server
+                     
+                    try
+                    {
+                        logger.info("sleep for 20 secs before JNDI retry");
+                        Thread.sleep(20000);
+                        logger.info("done sleeping");
+                    }
+                    catch (InterruptedException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                    */
+                    
+                    // re-connect to JNDI
+                    this.initJndiContext();
+                    
+                    // now retry the lookup.
+                    return jndiContext.lookup(jndiName);
+                }
+                catch (InitialisationException ie)
+                {
+                    // this may actually never happen as we were connected to JNDI before
+                    throw new MuleRuntimeException(JmsMessages.errorInitializingJndi(), ie);
+                }
+            }
         }
     }
 
@@ -927,4 +1093,35 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
    {
        return honorQosHeaders;
    }
+
+   public Context getJndiContext()
+   {
+       return jndiContext;
+   }
+
+   public void setJndiContext(Context jndiContext)
+   {
+       this.jndiContext = jndiContext;
+   }
+
+   public boolean isJndiDestinations()
+   {
+       return jndiDestinations;
+   }
+
+   public void setJndiDestinations(boolean jndiDestinations)
+   {
+       this.jndiDestinations = jndiDestinations;
+   }
+
+   public boolean isForceJndiDestinations()
+   {
+       return forceJndiDestinations;
+   }
+
+   public void setForceJndiDestinations(boolean forceJndiDestinations)
+   {
+       this.forceJndiDestinations = forceJndiDestinations;
+   }
+
 }

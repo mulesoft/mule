@@ -161,6 +161,19 @@ public class Jms102bSupport extends Jms11Support
 
     public Destination createDestination(Session session, String name, boolean topic) throws JMSException
     {
+        if (connector.isJndiDestinations())
+        {
+            Destination dest = this.getJndiDestination(name);
+            if (dest != null)
+            {
+                return dest;
+            }
+            else if (connector.isForceJndiDestinations())
+            {
+                throw new JMSException("JNDI destination not found with name: " + name);
+            }
+        }
+
         if (session == null)
         {
             throw new IllegalArgumentException("MuleSession cannot be null when creating a destination");
