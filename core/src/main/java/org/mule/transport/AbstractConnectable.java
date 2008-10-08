@@ -99,11 +99,33 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         }
     }
 
-    // TODO How does this method relate to exceptionThrown(Exception e) ?
     public void handleException(Exception exception)
     {
-        // TODO What's the difference between this and getConnector().handleException(e) ?
+        if (exception instanceof ConnectException)
+        {
+            logger.info("Exception caught is a ConnectException, disconnecting receiver and invoking ReconnectStrategy");
+            try
+            {
+                disconnect();
+            }
+            catch (Exception e)
+            {
+                connector.getExceptionListener().exceptionThrown(e);
+            }
+        }
         connector.getExceptionListener().exceptionThrown(exception);
+        if (exception instanceof ConnectException)
+        {
+            try
+            {
+                logger.warn("Reconnecting after exception: " + exception.getMessage(), exception);
+                connect();
+            }
+            catch (Exception e)
+            {
+                connector.getExceptionListener().exceptionThrown(e);
+            }
+        }
     }
 
     public boolean validate()
