@@ -17,7 +17,7 @@
         <repository>
             <id>mule-libs</id>
             <name>3rd-party Libraries</name>
-            <url>dav:https://dav.codehaus.org/mule/dependencies/maven2/</url>
+            <url>dav:https://dav.codehaus.org/dist/mule/dependencies/maven2/</url>
         </repository>
     </distributionManagement>
 
