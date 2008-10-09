@@ -15,8 +15,6 @@ import org.mule.tck.jndi.TestContextFactory;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-
 public class JmsTestContextFactory extends TestContextFactory
 {
 
@@ -24,9 +22,7 @@ public class JmsTestContextFactory extends TestContextFactory
     protected void populateTestData(Context context) throws NamingException
     {
         super.populateTestData(context);
-        context.bind("jms/connectionFactory", new ActiveMQConnectionFactory());
+        context.bind("jms/connectionFactory", new TestConnectionFactory());
     }
 
 }
-
-

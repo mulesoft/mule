@@ -109,6 +109,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="jndiProviderProperties-ref" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Configures a reference to a Map that contains additional provider properties.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="connectionFactoryJndiName" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>

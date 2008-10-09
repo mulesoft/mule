@@ -2,9 +2,11 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
 
@@ -73,9 +75,16 @@
         <xa-transaction action="ALWAYS_JOIN"/>
     </jms:endpoint>
     
+    <spring:beans>
+        <util:properties id="providerProperties">
+            <spring:prop key="key">value</spring:prop>
+        </util:properties>
+    </spring:beans>
+    
     <jms:connector name="jmsJndiConnector" 
                    jndiInitialFactory="org.mule.transport.jms.test.JmsTestContextFactory"
                    jndiProviderUrl="jndi://test"
+                   jndiProviderProperties-ref="providerProperties"
                    connectionFactoryJndiName="jms/connectionFactory" 
                    jndiDestinations="true"
                    forceJndiDestinations="true"/>

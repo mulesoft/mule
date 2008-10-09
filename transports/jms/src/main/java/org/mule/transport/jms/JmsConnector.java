@@ -324,7 +324,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                     /*
                      Uncomment for manual testing ... this gives you time to restart the JNDI
                      server
-                     
+
                     try
                     {
                         logger.info("sleep for 20 secs before JNDI retry");
@@ -336,7 +336,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                         throw new RuntimeException(e);
                     }
                     */
-                    
+
                     // re-connect to JNDI
                     this.initJndiContext();
                     
@@ -1117,6 +1117,16 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
    public void setJndiProviderUrl(String jndiProviderUrl)
    {
        this.jndiProviderUrl = jndiProviderUrl;
+   }
+
+   public Map getJndiProviderProperties()
+   {
+       return jndiProviderProperties;
+   }
+
+   public void setJndiProviderProperties(Map jndiProviderProperties)
+   {
+       this.jndiProviderProperties = jndiProviderProperties;
    }
 
    public String getConnectionFactoryJndiName()
