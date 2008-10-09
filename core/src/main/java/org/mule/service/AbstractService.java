@@ -899,7 +899,7 @@ public abstract class AbstractService implements Service
                 // Here we need to use a copy of the message instance because there
                 // is an inbound response so that transformers executed as part of
                 // the outbound phase do not affect the inbound response. MULE-3307
-                MuleMessage outboundReturnMessage = getOutboundRouter().route(new DefaultMuleMessage(result), event.getSession());
+                MuleMessage outboundReturnMessage = getOutboundRouter().route(new DefaultMuleMessage(result.getPayload(), result), event.getSession());
                 if (outboundReturnMessage != null)
                 {
                     result = outboundReturnMessage;

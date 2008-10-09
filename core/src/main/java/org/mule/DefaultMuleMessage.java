@@ -36,7 +36,6 @@ import java.util.Set;
 import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -69,6 +68,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         {
         }
     }
+
+    //Use public DefaultMuleMessage(Object message, Map props) instead
+    @Deprecated
     public DefaultMuleMessage(Object message)
     {
         this(message, (Map) null);
@@ -76,7 +78,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
 
     public DefaultMuleMessage(Object message, Map properties)
     {
-        if (message instanceof MessageAdapter)
+        //Explicitly check for MuleMessage as a safeguard since MuleMessage is instance of MessageAdapter
+        if (message instanceof MuleMessage)
+        {
+            adapter = ((MuleMessage) message).getAdapter();
+        }
+        else if (message instanceof MessageAdapter)
         {
             adapter = (MessageAdapter) message;
         }

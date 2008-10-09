@@ -13,13 +13,16 @@ package org.mule;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.simple.ObjectToByteArray;
+import org.mule.transport.DefaultMessageAdapter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -44,6 +47,19 @@ public class MuleMessageTestCase extends AbstractMuleTestCase
         assertEquals(deserialized.getUniqueId(), msg.getUniqueId());
         assertEquals(deserialized.getPayload(), msg.getPayload());
         assertEquals(deserialized.getAttachmentNames(), msg.getAttachmentNames());
+    }
+
+    public void testConstructors() throws Exception
+    {
+        Apple payload = new Apple();
+        //Ensure that the MuleMessage is unwrapped correctly
+        DefaultMuleMessage message = new DefaultMuleMessage(new DefaultMuleMessage(payload));
+        assertEquals(message.getPayload(), payload);
+
+        DefaultMessageAdapter adapter = new DefaultMessageAdapter(payload);
+
+        message = new DefaultMuleMessage(adapter, new HashMap());
+        assertEquals(message.getPayload(), payload);
     }
 
     // silly little fake DataSource so that we don't need to use javamail
