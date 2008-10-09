@@ -142,10 +142,11 @@
                     <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="expression" type="xsd:string"/>
-                <xsd:attribute name="outputType" default="VALUE">
+                <xsd:attribute name="outputType">
                     <xsd:annotation>
                         <xsd:documentation>
-                          The type of output the extractor should use.
+                          The type of output the extractor should use. By default it 
+                          returns the VALUE of the node.
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>

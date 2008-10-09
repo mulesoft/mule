@@ -15,6 +15,8 @@ import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.List;
 
+import org.dom4j.Node;
+
 public class JXPathExtractorTestCase extends AbstractMuleTestCase
 {
 
@@ -65,6 +67,19 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase
         assertEquals("Wrong value returned.", "value3", results.get(2));
     }
 
+    public void testMultipleResultsAsNode() throws Exception
+    {
+        JXPathExtractor extractor = new JXPathExtractor();
+        extractor.setExpression("/root/node");
+        extractor.setSingleResult(false);
+        extractor.setOutputType(JXPathExtractor.OUTPUT_TYPE_NODE);
+        
+        final Object objResult = extractor.transform(TEST_XML_MULTI_RESULTS);
+        assertNotNull(objResult);
+        List results = (List)objResult;
+        assertEquals("Wrong number of results returned.", 3, results.size());
+        assertTrue(results.get(0) instanceof Node);
+    }
     /**
      * This xpath expression will internally have DefaultText returned, test there
      * are no ClassCastExceptions.

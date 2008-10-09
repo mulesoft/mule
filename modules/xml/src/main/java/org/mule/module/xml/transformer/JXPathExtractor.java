@@ -68,6 +68,14 @@ public class JXPathExtractor extends AbstractTransformer
                     xpath.setNamespaceURIs(namespaces);
                 }
                 
+                // This is the way we always did it before, so keep doing it that way
+                // as xpath.evaluate() will return non-string results (like Doubles)
+                // for some scenarios.
+                if (outputType == null && singleResult)
+                {
+                    return xpath.valueOf(doc);
+                }
+                
                 // TODO handle non-list cases, see
                 //http://www.dom4j.org/apidocs/org/dom4j/XPath.html#evaluate(java.lang.Object)
                 Object obj = xpath.evaluate(doc);
@@ -80,10 +88,6 @@ public class JXPathExtractor extends AbstractTransformer
                         
                         if (singleResult)
                         {
-                            if (logger.isWarnEnabled())
-                            {
-                                logger.warn("There are multiple Nodes returned. But only one record is returned because singleResult is true");
-                            }
                             break;
                         }
                     }
@@ -110,20 +114,10 @@ public class JXPathExtractor extends AbstractTransformer
     
     private Object add(Object result, Object value)
     {
+        Object formattedResult = getResult(value);
         if (singleResult)
         {
-            if (StringUtils.contains(OUTPUT_TYPE_VALUE, outputType) || outputType == null)
-            {
-                result = ((Node) value).getText();
-            }
-            else if (StringUtils.contains(OUTPUT_TYPE_XML, outputType))
-            {
-                result = ((Node) value).asXML();
-            }
-            else if (StringUtils.contains(OUTPUT_TYPE_NODE, outputType))
-            {
-                result = value;
-            }
+            return formattedResult;
         }
         else
         {
@@ -131,18 +125,41 @@ public class JXPathExtractor extends AbstractTransformer
             {
                 result = new ArrayList();
             }
-            if (StringUtils.contains(OUTPUT_TYPE_NODE, outputType))
+            
+            ((List) result).add(formattedResult);
+        }
+        return result;
+    }
+
+    private Object getResult(Object value)
+    {
+        Object result = null;
+        if (StringUtils.contains(OUTPUT_TYPE_VALUE, outputType) || outputType == null)
+        {
+            if (value instanceof Node)
             {
-                ((List) result).add(value);
+                result = ((Node) value).getText();
             }
-            else if (StringUtils.contains(OUTPUT_TYPE_XML, outputType))
+            else
             {
-                ((List) result).add(((Node) value).asXML());
+                // this maintains backward compat with previous 2.1.x versions. 
+                result = value.toString();
             }
-            else if (StringUtils.contains(OUTPUT_TYPE_VALUE, outputType) || outputType == null)
+        }
+        else if (StringUtils.contains(OUTPUT_TYPE_XML, outputType))
+        {
+            if (value instanceof Node)
             {
-                ((List) result).add(((Node) value).getText());
+                result = ((Node) value).asXML();
             }
+            else 
+            {
+                throw new IllegalStateException("XPath expression output must be a Node to output as XML. Expression type was: " + value.getClass());
+            }
+        }
+        else if (StringUtils.contains(OUTPUT_TYPE_NODE, outputType))
+        {
+            result = value;
         }
         return result;
     }
