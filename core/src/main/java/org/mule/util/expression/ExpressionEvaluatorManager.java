@@ -42,17 +42,16 @@ public class ExpressionEvaluatorManager
 
     private static ConcurrentMap evaluators = new ConcurrentHashMap(8);
 
-    public static void registerEvaluator(ExpressionEvaluator extractor)
+    public static void registerEvaluator(ExpressionEvaluator evaluator)
     {
-        if (extractor == null)
+        if (evaluator == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("extractor").getMessage());
         }
-        Object previous = evaluators.putIfAbsent(extractor.getName(), extractor);
-        if (previous != null)
-        {
-            throw new IllegalArgumentException(CoreMessages.objectAlreadyExists(extractor.getName()).getMessage());
-        }
+
+        final String name = evaluator.getName();
+        logger.warn("Evaluators already contain an object named '" + name + "'.  The previous object will be overwritten.");
+        evaluators.put(evaluator.getName(), evaluator);
     }
 
     /**
