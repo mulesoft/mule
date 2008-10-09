@@ -66,7 +66,6 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertFalse(c.isPersistentDelivery());
         assertEquals(0, c.getMaxRedelivery());
         assertFalse(c.isCacheJmsSessions());
-        assertTrue(c.isRecoverJmsConnections());
         assertFalse(c.isEagerConsumer());
 
         assertEquals("1.0.2b", c.getSpecification());
@@ -94,7 +93,6 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertTrue(c.isPersistentDelivery());
         assertEquals(5, c.getMaxRedelivery());
         assertTrue(c.isCacheJmsSessions());
-        assertFalse(c.isRecoverJmsConnections());
         assertFalse(c.isEagerConsumer());
 
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config

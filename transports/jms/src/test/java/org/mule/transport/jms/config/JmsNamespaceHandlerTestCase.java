@@ -65,7 +65,6 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertFalse(c.isPersistentDelivery());
         assertEquals(0, c.getMaxRedelivery());
         assertFalse(c.isCacheJmsSessions());
-        assertTrue(c.isRecoverJmsConnections());
         assertTrue(c.isEagerConsumer());
         assertEquals(4, c.getNumberOfConcurrentTransactedReceivers());
     }
@@ -91,7 +90,6 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isPersistentDelivery());
         assertEquals(5, c.getMaxRedelivery());
         assertTrue(c.isCacheJmsSessions());
-        assertFalse(c.isRecoverJmsConnections());
         assertFalse(c.isEagerConsumer());
 
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
@@ -126,7 +124,6 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isPersistentDelivery());
         assertEquals(5, c.getMaxRedelivery());
         assertTrue(c.isCacheJmsSessions());
-        assertFalse(c.isRecoverJmsConnections());
         assertFalse(c.isEagerConsumer());
 
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config

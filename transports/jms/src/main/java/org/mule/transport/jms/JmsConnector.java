@@ -87,8 +87,6 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     private boolean cacheJmsSessions = false;
 
-    private boolean recoverJmsConnections = true;
-
     /** Whether to create a consumer on connect. */
     private boolean eagerConsumer = true;
 
@@ -888,16 +886,6 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     public void setSpecification(String specification)
     {
         this.specification = specification;
-    }
-
-    public void setRecoverJmsConnections(boolean recover)
-    {
-        this.recoverJmsConnections = recover;
-    }
-
-    public boolean isRecoverJmsConnections()
-    {
-        return this.recoverJmsConnections;
     }
 
     public String getUsername()
