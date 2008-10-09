@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -34,7 +35,6 @@ public class MulticastingRouter extends FilteringOutboundRouter
     public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
     {
-        MuleMessage result = null;
         if (endpoints == null || endpoints.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
@@ -57,19 +57,16 @@ public class MulticastingRouter extends FilteringOutboundRouter
         try
         {
             OutboundEndpoint endpoint;
-            synchronized (endpoints)
+            for (int i = 0; i < endpoints.size(); i++)
             {
-                for (int i = 0; i < endpoints.size(); i++)
+                endpoint = (OutboundEndpoint) endpoints.get(i);
+                if (endpoint.isSynchronous())
                 {
-                    endpoint = (OutboundEndpoint) endpoints.get(i);
-                    if (endpoint.isSynchronous())
-                    {
-                        results.add(send(session, message, endpoint));
-                    }
-                    else
-                    {
-                        dispatch(session, message, endpoint);
-                    }
+                    results.add(send(session, new DefaultMuleMessage(message.getPayload(), message), endpoint));
+                }
+                else
+                {
+                    dispatch(session, message, endpoint);
                 }
             }
         }
