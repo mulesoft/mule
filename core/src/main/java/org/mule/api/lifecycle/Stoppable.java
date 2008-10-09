@@ -13,7 +13,11 @@ package org.mule.api.lifecycle;
 import org.mule.api.MuleException;
 
 /**
- * <code>Stoppable</code> TODO (document class)
+ * <code>Stoppable</code> is a lifecycle interfaqce that introduces a {@link #stop()} method to an object.
+ *
+ * This lifecycle interface should always be implemented with its opposite lifecycle interface {@link org.mule.api.lifecycle.Stoppable}.
+ *
+ * @see org.mule.api.lifecycle.Startable
  */
 public interface Stoppable
 {

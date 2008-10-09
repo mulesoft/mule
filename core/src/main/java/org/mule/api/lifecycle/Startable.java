@@ -15,9 +15,12 @@ import org.mule.api.MuleException;
 /**
  * <code>Startable</code> provides an object with a {@link #start()} method
  * which gets called when the Mule instance gets started.  This is mostly used by
- * infrastructure components, but can also be implemented by service objects
+ * infrastructure components, but can also be implemented by service objects.
  *
- * @see LifecycleAdapter
+ * This lifecycle interface should always be implemented with its opposite lifecycle interface {@link org.mule.api.lifecycle.Stoppable}.
+ *
+ * @see org.mule.api.lifecycle.Stoppable
+ *
  */
 public interface Startable
 {
