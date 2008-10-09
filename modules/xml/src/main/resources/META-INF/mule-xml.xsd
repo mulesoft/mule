@@ -138,8 +138,32 @@
     <xsd:complexType name="jxpathExtractorType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
+                <xsd:sequence>
+                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="expression" type="xsd:string"/>
-                <xsd:attribute name="singleResult" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="outputType" default="VALUE">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                          The type of output the extractor should use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="VALUE"/>
+                            <xsd:enumeration value="XML"/>
+                            <xsd:enumeration value="NODE"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="singleResult" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                          Whether or not the extractor should return a list of results or a single result.
+                          Defaults to true.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

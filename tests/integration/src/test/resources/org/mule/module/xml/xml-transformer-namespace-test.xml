@@ -21,7 +21,11 @@
             singleResult="false"
             ignoreBadInput="true"
             returnClass="java.lang.Object"
-            name="jxpathExtractor"/>
+            outputType="VALUE"
+            name="jxpathExtractor">
+        <mxml:namespace prefix="foo1" uri="http://foo.com"/>
+        <mxml:namespace prefix="foo2" uri="http://foo.com"/>
+    </mxml:jxpath-extractor-transformer>
 
     <mxml:object-to-xml-transformer
             ignoreBadInput="true"

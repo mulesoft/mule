@@ -22,6 +22,8 @@ import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
 
+import java.util.Map;
+
 public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
@@ -41,6 +43,13 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
             JXPathExtractor.class);
         assertEquals("/expression", extractor.getExpression());
         assertFalse(extractor.isSingleResult());
+        assertEquals(JXPathExtractor.OUTPUT_TYPE_VALUE, extractor.getOutputType());
+        
+        Map ns = extractor.getNamespaces();
+        assertNotNull(ns);
+        
+        assertEquals("http://foo.com", ns.get("foo1"));
+        assertEquals("http://foo.com", ns.get("foo2"));
     }
 
     public void testObjectToXml()
