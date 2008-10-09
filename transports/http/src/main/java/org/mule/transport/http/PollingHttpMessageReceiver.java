@@ -114,7 +114,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 
         MuleMessage message = connector.send(outboundEndpoint, event);
 
-        if (message.getIntProperty(HttpConstants.HEADER_CONTENT_LENGTH, 0) == 0 && discardEmptyContent)
+        if (message.getIntProperty(HttpConstants.HEADER_CONTENT_LENGTH, -1) == 0 && discardEmptyContent)
         {
             if (logger.isDebugEnabled())
             {
