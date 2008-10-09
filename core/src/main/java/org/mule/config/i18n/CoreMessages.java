@@ -1132,9 +1132,9 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 271);
     }
 
-    public static Message failedToConnect(String what, RetryPolicyTemplate policy)
+    public static Message retryPolicyExhausted(RetryPolicyTemplate policy)
     {
-        return factory.createMessage(BUNDLE_PATH, 272, what, policy);
+        return factory.createMessage(BUNDLE_PATH, 272, policy);
     }
 
     public static Message notConnectedYet(String what)
