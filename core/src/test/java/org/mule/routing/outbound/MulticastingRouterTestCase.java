@@ -84,8 +84,8 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
 
-        session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
-        session.expectAndReturn("sendEvent", C.eq(message, endpoint2), message);
+        session.expectAndReturn("sendEvent",  C.args(C.isA(MuleMessage.class), C.eq(endpoint1)), message);
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint2)), message);
         MuleMessage result = router.route(message, (MuleSession)session.proxy());
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);
@@ -118,7 +118,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
 
-        session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
+        session.expectAndReturn("sendEvent",  C.args(C.isA(MuleMessage.class), C.eq(endpoint1)), message);
         session.expectAndReturn("dispatchEvent", C.eq(message, endpoint2), message);
         MuleMessage result = router.route(message, (MuleSession)session.proxy());
         assertNotNull(result);
