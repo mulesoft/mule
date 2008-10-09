@@ -144,8 +144,8 @@ public class TransactionTemplate
             if (suspendedXATx != null)
             {
                 resumeXATransaction(suspendedXATx);
-				// we've handled this exception above. just return null now, this way we isolate
-				// the context delimited by XA's ALWAYS_BEGIN
+                // we've handled this exception above. just return null now, this way we isolate
+                // the context delimited by XA's ALWAYS_BEGIN
                 return null;
             }
             else
