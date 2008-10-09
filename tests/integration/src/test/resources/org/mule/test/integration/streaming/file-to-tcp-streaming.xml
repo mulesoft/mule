@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:file="http://www.mulesource.org/schema/mule/file/2.2"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.2"
+       xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.2"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/stdio/2.2 http://www.mulesource.org/schema/mule/stdio/2.2/mule-stdio.xsd
+       http://www.mulesource.org/schema/mule/file/2.2 http://www.mulesource.org/schema/mule/file/2.2/mule-file.xsd
        http://www.mulesource.org/schema/mule/tcp/2.2 http://www.mulesource.org/schema/mule/tcp/2.2/mule-tcp.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd">
     
@@ -15,26 +17,26 @@
     <model name="main">
         <service name="bridge1">
             <inbound>
-                <inbound-endpoint address="file://${mule.working.dir}/test-data/in"/>
+                <file:inbound-endpoint path="${mule.working.dir}/test-data/in" moveToDirectory="${mule.working.dir}/test-data/processing" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="tcp://localhost:34561"/>
+                    <tcp:outbound-endpoint host="localhost" port="34561"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="bridge2">
             <inbound>
-                <inbound-endpoint address="tcp://localhost:34561"/>
+                <tcp:inbound-endpoint host="localhost" port="34561"/>
             </inbound>
             <component class="org.mule.test.integration.streaming.SimpleStreamingBean"/>
             <outbound>
                 <multicasting-router>
-                    <!--<outbound-endpoint address="stdio://System.out" streaming="true"/>-->
-                    <outbound-endpoint address="file://${mule.working.dir}/test-data/out" encoding="UTF8">
-                        <property key="outputPattern" value="foo.txt.processed"/>
-                    </outbound-endpoint>
+                    <stdio:outbound-endpoint system="OUT">
+                        <auto-transformer returnClass="java.lang.String"/>
+                    </stdio:outbound-endpoint>
+                    <file:outbound-endpoint path="${mule.working.dir}/test-data/out" encoding="UTF8" outputPattern="foo.txt.processed"/>
                 </multicasting-router>
             </outbound>
         </service>
