@@ -10,6 +10,7 @@
 package org.mule.util.expression;
 
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.StringUtils;
 
 /**
  * A simple configuration object for holding the common Expression evaluator configuration.
@@ -37,19 +38,19 @@ public class ExpressionConfig
 
     public ExpressionConfig(String expression, String evaluator, String customEvaluator)
     {
-        this.customEvaluator = customEvaluator;
-        this.evaluator = evaluator;
-        this.expression = expression;
+        this(expression, evaluator, customEvaluator,
+                ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX,
+                ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX);
+
     }
 
     public ExpressionConfig(String expression, String evaluator, String customEvaluator, String expressionPrefix, String expressionPostfix)
     {
-        this.customEvaluator = customEvaluator;
-        this.evaluator = evaluator;
-        this.expression = expression;
+        setCustomEvaluator(customEvaluator);
+        setEvaluator(evaluator);
+        setExpression(expression);
         this.expressionPostfix = expressionPostfix;
         this.expressionPrefix = expressionPrefix;
-        this.fullExpression = fullExpression;
     }
 
     public void validate()
@@ -97,7 +98,7 @@ public class ExpressionConfig
 
     public void setCustomEvaluator(String customEvaluator)
     {
-        this.customEvaluator = customEvaluator;
+        this.customEvaluator = StringUtils.trimToNull(customEvaluator);
     }
 
     public String getEvaluator()
@@ -107,7 +108,7 @@ public class ExpressionConfig
 
     public void setEvaluator(String evaluator)
     {
-        this.evaluator = evaluator;
+        this.evaluator = StringUtils.trimToNull(evaluator);
     }
 
     public String getExpression()
@@ -117,6 +118,6 @@ public class ExpressionConfig
 
     public void setExpression(String expression)
     {
-        this.expression = expression;
+        this.expression = StringUtils.trimToNull(expression);
     }
 }
