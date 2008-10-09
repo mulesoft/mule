@@ -1049,8 +1049,13 @@
                             <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
                             <!--Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date-->
                             <!-- include repository revision from buildnumber plugin -->
+                            
+                            <!-- MULE-3783 Exclude for now as otherwise bundle manifest don't get these properties
+                                 Only a few jars that are not converted to bundles yet will have these entries missing 
+                                 and more important bundles will now have this entry.
                             <Build-Revision>${buildNumber}</Build-Revision>
                             <Build-Date>${timestamp}</Build-Date>
+                            -->
                             <Dev-List-Email>dev@mule.codehaus.org</Dev-List-Email>
                         </manifestEntries>
                     </archive>

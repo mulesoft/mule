@@ -128,7 +128,7 @@ public class MuleManifest
                             while (e.hasMoreElements())
                             {
                                 URL url = (URL) e.nextElement();
-                                if (url.toExternalForm().indexOf("mule-core") > -1)
+                                if (url.toExternalForm().indexOf("mule-core") > -1 && url.toExternalForm().indexOf("tests.jar") < 0)
                                 {
                                     return url;
                                 }
