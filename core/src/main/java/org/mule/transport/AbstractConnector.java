@@ -57,7 +57,7 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.lifecycle.AlreadyInitialisedException;
 import org.mule.model.streaming.DelegatingInputStream;
-import org.mule.retry.RetryPolicyExhaustedException;
+import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.service.TransportFactory;
@@ -662,40 +662,24 @@ public abstract class AbstractConnector
      */
     public void handleException(Exception exception)
     {
-        if (exception instanceof ConnectException)
+        boolean retry = 
+            exception instanceof ConnectException 
+            && !(retryPolicyTemplate instanceof NoRetryPolicyTemplate);
+            
+        if (retry)
         {
-            logger.info("Exception caught is a ConnectException, disconnecting receiver and invoking ReconnectStrategy");
+            logger.info("Exception caught is a ConnectException, attempting to reconnect...");
             try
             {
                 disconnect();
-            }
-            catch (Exception e)
-            {
-                if (exceptionListener == null)
+                if (exceptionListener != null)
                 {
-                    throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNotExceptionListener(this.getName()), e);
+                    exceptionListener.exceptionThrown(exception);
                 }
                 else
                 {
-                    exceptionListener.exceptionThrown(e);
+                    throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNotExceptionListener(this.getName()), exception);
                 }
-            }
-        }
-
-        if (exceptionListener == null)
-        {
-            throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNotExceptionListener(this.getName()), exception);
-        }
-        else
-        {
-            exceptionListener.exceptionThrown(exception);
-        }
-
-        if (exception instanceof ConnectException)
-        {
-            try
-            {
-                logger.warn("Reconnecting after exception: " + exception.getMessage(), exception);
                 connect();
             }
             catch (Exception e)
@@ -708,6 +692,17 @@ public abstract class AbstractConnector
                 {
                     exceptionListener.exceptionThrown(e);
                 }
+            }
+        }
+        else
+        {
+            if (exceptionListener != null)
+            {
+                exceptionListener.exceptionThrown(exception);
+            }
+            else
+            {
+                throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNotExceptionListener(this.getName()), exception);
             }
         }
     }
