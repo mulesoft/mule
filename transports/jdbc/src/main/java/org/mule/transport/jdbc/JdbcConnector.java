@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.text.MessageFormat;
 
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
@@ -49,7 +50,7 @@ public class JdbcConnector extends AbstractConnector
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
 
-    private static final Pattern STATEMENT_ARGS = TemplateParser.ANT_TEMPLATE_PATTERN;
+    private static final Pattern STATEMENT_ARGS = TemplateParser.WIGGLY_MULE_TEMPLATE_PATTERN;
 
     protected SQLStrategyFactory sqlStrategyFactory = new SQLStrategyFactory();
 
@@ -265,12 +266,12 @@ public class JdbcConnector extends AbstractConnector
         {
             String key = m.group();
             m.appendReplacement(sb, "?");
-            //Special legacy handling for ${payload}
-            if (key.equals("${payload}"))
+            //Special legacy handling for #[payload]
+            if (key.equals("#[payload]"))
             {
                 //MULE-3597
-                logger.error("invalid expression template ${payload}. It should be replaced with ${payload:} to conform with the correct expression syntax. Mule has replacedthis for you, but may not in future versions.");
-                key = "${payload:}";
+                logger.error("invalid expression template #[payload]. It should be replaced with #[payload:] to conform with the correct expression syntax. Mule has replaced this for you, but may not in future versions.");
+                key = "#[payload:]";
             }
             params.add(key);
         }
@@ -302,8 +303,10 @@ public class JdbcConnector extends AbstractConnector
                 //MULE-3597
                 if (!validExpression)
                 {
-                    logger.warn("Config is using the legacy param format " + param +
-                            " (no evaluator defined).  This expression can be replaced with ${header:" + name + "}");
+                    logger.warn(MessageFormat.format("Config is using the legacy param format {0} (no evaluator defined)." +
+                                                     " This expression can be replaced with {1}header:{2}{3}",
+                                                     param, ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX,
+                                                     name, ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX));
                 }
                 value = endpoint.getProperty(name);
             }

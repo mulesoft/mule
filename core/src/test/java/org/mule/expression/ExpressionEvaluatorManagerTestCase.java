@@ -57,10 +57,16 @@ public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
 
     public void testValidator() throws Exception
     {
-        assertTrue(ExpressionEvaluatorManager.isValidExpression("http://${bean:user}:${bean:password}@${header:host}:${header:port}/foo/bar"));
-        assertTrue(ExpressionEvaluatorManager.isValidExpression("${bean:user}"));
+        // fail for old-style ${}
+        assertFalse(ExpressionEvaluatorManager.isValidExpression("http://${bean:user}:${bean:password}@${header:host}:${header:port}/foo/bar"));
+        assertFalse(ExpressionEvaluatorManager.isValidExpression("${bean:user}"));
+
+        // wiggly mule style!
+        assertTrue(ExpressionEvaluatorManager.isValidExpression("#[bean:user]"));
+        assertTrue(ExpressionEvaluatorManager.isValidExpression("http://#[bean:user]:#[bean:password]@#[header:host]:#[header:port]/foo/bar"));
+
         assertFalse(ExpressionEvaluatorManager.isValidExpression("{bean:user}"));
-        assertFalse(ExpressionEvaluatorManager.isValidExpression("${bean:user"));
+        assertFalse(ExpressionEvaluatorManager.isValidExpression("#{bean:user"));
         assertFalse(ExpressionEvaluatorManager.isValidExpression("user"));
     }
 }

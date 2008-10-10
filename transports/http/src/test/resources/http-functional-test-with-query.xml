@@ -11,7 +11,7 @@
        http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd">
 
     <http:endpoint name="clientEndpoint1" host="localhost" port="60199" path="test1/?foo=boo&amp;far=bar" synchronous="true"/>
-    <http:endpoint name="clientEndpoint2" host="localhost" port="60199" path="test1/?foo=${header:foo}&amp;far=${header:far}" synchronous="true"/>
+    <http:endpoint name="clientEndpoint2" host="localhost" port="60199" path="test1/?foo=%23[header:foo]&amp;far=%23[header:far]" synchronous="true"/>
 
     <http:endpoint name="serverEndpoint1" host="localhost" port="60199" path="test1" synchronous="true">
         <expression-transformer>

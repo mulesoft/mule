@@ -26,13 +26,13 @@ import org.apache.commons.logging.LogFactory;
  * discovering the correct transformer(s) in the registry. This is only suited for simple transformations between common types.
  * <p/>
  * <code>
- * ${payload:byte[]}
+ * #[payload:byte[]]
  * </code>
  * <p/>
  * or
  * <p/>
  * <code>
- * ${payload:org.mule.api.OutputHandler}
+ * #[payload:org.mule.api.OutputHandler]
  * </code>
  * <p/>
  * If the object passed in is not a MuleMessage, the same object will be returned.

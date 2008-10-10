@@ -13,7 +13,6 @@ package org.mule.transport.file;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.DefaultMessageAdapter;
-import org.mule.transport.file.FileConnector;
 
 /**
  * Test the syntax of the SimpleFilename parser
@@ -35,34 +34,34 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         adapter.setProperty(FileConnector.PROPERTY_FILENAME, "newName");
     }
 
-    public void testAntStyleParsing()
+    public void testWigglyMuleStyleParsing()
     {
-        String result = parser.getFilename(adapter, "Test1_${function:count}.txt");
+        String result = parser.getFilename(adapter, "Test1_#[function:count].txt");
         assertEquals("Test1_0.txt", result);
 
-        result = parser.getFilename(adapter, "Test2_${function:datestamp-yyMMdd}.txt");
+        result = parser.getFilename(adapter, "Test2_#[function:datestamp-yyMMdd].txt");
         assertEquals(16, result.length());
 
-        result = parser.getFilename(adapter, "Test3_${function:datestamp}.txt");
+        result = parser.getFilename(adapter, "Test3_#[function:datestamp].txt");
         assertEquals(31, result.length());
 
-        result = parser.getFilename(adapter, "Test4_${function:systime}.txt");
-        assertFalse(result.equals("Test4_${function:systime}.txt"));
+        result = parser.getFilename(adapter, "Test4_#[function:systime].txt");
+        assertFalse(result.equals("Test4_#[function:systime].txt"));
 
-        result = parser.getFilename(adapter, "Test5_${function:uuid}.txt");
-        assertFalse(result.equals("Test5_${function:uuid}.txt"));
+        result = parser.getFilename(adapter, "Test5_#[function:uuid].txt");
+        assertFalse(result.equals("Test5_#[function:uuid].txt"));
 
-        result = parser.getFilename(adapter, "Test6_${function:count}.txt");
+        result = parser.getFilename(adapter, "Test6_#[function:count].txt");
         assertEquals("Test6_1.txt", result);
 
-        result = parser.getFilename(adapter, "Test7_${header:originalFilename}.txt");
+        result = parser.getFilename(adapter, "Test7_#[header:originalFilename].txt");
         assertEquals("Test7_originalName.txt", result);
 
-        result = parser.getFilename(adapter, "Test8_${header:foo}.txt");
+        result = parser.getFilename(adapter, "Test8_#[header:foo].txt");
         assertEquals("Test8_bar.txt", result);
 
-        result = parser.getFilename(adapter, "Test9_${header:xxx}.txt");
-        assertEquals("Test9_${header:xxx}.txt", result);
+        result = parser.getFilename(adapter, "Test9_#[header:xxx].txt");
+        assertEquals("Test9_#[header:xxx].txt", result);
 
     }
 

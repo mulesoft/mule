@@ -32,7 +32,7 @@ public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
         if (message instanceof MessageAdapter)
         {
             result = ((MessageAdapter) message).getProperty(expression);
-            //Should this fallback be in its own expression evaluator i.e. ${endpoint-param:foo} ??
+            //Should this fallback be in its own expression evaluator i.e. #[endpoint-param:foo] ??
             //I'm not sure becaus ethis way there is a fallback where the message doesn't have a value the
             //endpoint can define a default
             if (result == null && RequestContext.getEventContext() != null)

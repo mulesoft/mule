@@ -54,17 +54,18 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage("test");
 
-        assertTrue(ExpressionEvaluatorManager.isValidExpression("${payload:}"));
+        assertFalse(ExpressionEvaluatorManager.isValidExpression("${payload:}"));
+        assertTrue(ExpressionEvaluatorManager.isValidExpression("#[payload:]"));
 
-        Object result = ExpressionEvaluatorManager.evaluate("${payload:}", message);
+        Object result = ExpressionEvaluatorManager.evaluate("#[payload:]", message);
         assertNotNull(result);
         assertEquals("test", result);
 
-        result = ExpressionEvaluatorManager.evaluate("${payload:}", new ArrayList(1));
+        result = ExpressionEvaluatorManager.evaluate("#[payload:]", new ArrayList(1));
         assertNotNull(result);
         assertTrue(result instanceof List);
 
-        result = ExpressionEvaluatorManager.evaluate("${payload:}", null);
+        result = ExpressionEvaluatorManager.evaluate("#[payload:]", null);
         assertNull(result);
     }
 

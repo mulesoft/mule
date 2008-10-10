@@ -104,7 +104,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
 
     public void testAppendedUrlWithExpressions() throws Exception
     {
-        MuleMessage message = setupRequestContext("http://mycompany.com/test?fruits=${header:fruit1},${header:fruit2}&correlationID=${message:correlationId}");
+        MuleMessage message = setupRequestContext("http://mycompany.com/test?fruits=#[header:fruit1],#[header:fruit2]&correlationID=#[message:correlationId]");
         // transforming a payload here will add it as body=xxx query parameter
         message.setPayload(NullPayload.getInstance());
         message.setCorrelationId("1234");
@@ -121,7 +121,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
 
     public void testAppendedUrlWithBadExpressions() throws Exception
     {
-        MuleMessage message = setupRequestContext("http://mycompany.com/test?param=${foo:bar}");
+        MuleMessage message = setupRequestContext("http://mycompany.com/test?param=#[foo:bar]}");
         // transforming a payload here will add it as body=xxx query parameter
         message.setPayload(NullPayload.getInstance());
         ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
@@ -134,9 +134,10 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         catch (TransformerException e)
         {
             //Expected
+            assertTrue(e.getMessage().contains("Evaluator for \"foo\" is not registered with Mule"));
         }
 
-        message = setupRequestContext("http://mycompany.com/test?param=${header:bar}");
+        message = setupRequestContext("http://mycompany.com/test?param=#[header:bar]");
         // transforming a payload here will add it as body=xxx query parameter
         message.setPayload(NullPayload.getInstance());
         try
@@ -147,6 +148,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         catch (TransformerException e)
         {
             //Expected
+            assertTrue(e.getMessage().contains("Expression Evaluator \"header\" with expression \"bar\" returned null but a value was required"));
         }
 
     }

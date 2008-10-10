@@ -28,11 +28,11 @@
      -->
     <jdbc:connector name="jdbcConnector" dataSource-ref="jdbcDataSource1" pollingFrequency="1000">
         <jdbc:query key="read" value="SELECT id, type, data FROM test WHERE type=1"/>
-        <jdbc:query key="read.ack" value="UPDATE test SET type=2 WHERE id=${map-payload:id}"/>
+        <jdbc:query key="read.ack" value="UPDATE test SET type=2 WHERE id=#[map-payload:id]"/>
     </jdbc:connector>
 
     <jdbc:connector name="jdbcOUTConnector" dataSource-ref="jdbcDataSource2" pollingFrequency="10000">
-        <jdbc:query key="write" value="INSERT INTO test_out(id, type, data) VALUES(${map-payload:id}, ${map-payload:type}, ${map-payload:data})"/>
+        <jdbc:query key="write" value="INSERT INTO test_out(id, type, data) VALUES(#[map-payload:id], #[map-payload:type], #[map-payload:data])"/>
     </jdbc:connector>
     
     <model name="testing">

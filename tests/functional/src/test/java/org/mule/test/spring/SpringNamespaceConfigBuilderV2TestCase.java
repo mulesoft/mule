@@ -16,8 +16,10 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
+import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.MuleMessage;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.outbound.AbstractOutboundRouter;
@@ -25,8 +27,11 @@ import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
+import org.mule.DefaultMuleMessage;
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This is an extended version of the same test covered in
@@ -70,7 +75,15 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertEquals(1, routers.size());
         AbstractOutboundRouter theRouter = (AbstractOutboundRouter)routers.get(0);
         // the one we put in the config
-        assertTrue(theRouter.getMessageInfoMapping() instanceof ExpressionMessageInfoMapping);
+        final MessageInfoMapping mapping = theRouter.getMessageInfoMapping();
+        assertTrue(mapping instanceof ExpressionMessageInfoMapping);
+
+        Map props = new HashMap();
+        props.put("id", "myID123");
+        props.put("correlation", "myCorrelationID456");
+        MuleMessage msg = new DefaultMuleMessage("foo", props);
+        assertEquals("myID123",mapping.getMessageId(msg));
+        assertEquals("myCorrelationID456",mapping.getCorrelationId(msg));
     }
 
     public void testMessageInfoMappingResponseRouterConfig() throws Exception

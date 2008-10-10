@@ -19,20 +19,23 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.expression.ExpressionEvaluatorManager;
 import org.mule.util.store.InMemoryObjectStore;
 
+import java.text.MessageFormat;
+
 /**
  * <code>IdempotentReceiver</code> ensures that only unique messages are received by a
  * service. It does this by checking the unique ID of the incoming message. Note that
  * the underlying endpoint must support unique message IDs for this to work, otherwise a
  * <code>UniqueIdNotSupportedException</code> is thrown.<br>
  * By default this implementation uses an instance of
- * {@link IdempotentInMemoryMessageIdStore}.
  */
 public class IdempotentReceiver extends SelectiveConsumer
 {
     protected volatile ObjectStore store;
     protected volatile String assignedComponentName;
 
-    protected String idExpression = "${message:id}";
+    protected String idExpression = MessageFormat.format("{0}message:id{1}",
+                                                         ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX,
+                                                         ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX);
 
     public IdempotentReceiver()
     {

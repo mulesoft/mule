@@ -80,8 +80,8 @@
                 <xsd:annotation>
                     <xsd:documentation>
                         A global property is a named string.
-                        It can be used inserted in most attribute values using the $\{...\} syntax.
-                        So the attribute value "$\{foo\}" would be replaced by the value associated with
+                        It can be used inserted in most attribute values using the #\[...\] syntax.
+                        So the attribute value "#\[foo\]" would be replaced by the value associated with
                         the property named "foo".
                     </xsd:documentation>
                 </xsd:annotation>
@@ -254,7 +254,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The name of the property.
-                    This is used inside ${...}.
+                    This is used inside #[...].
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -262,7 +262,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The value of the property.
-                    This replaces each occurence of ${...}.
+                    This replaces each occurence of #[...].
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -3134,7 +3134,7 @@
             <xsd:documentation>
                 Ensures that only unique messages are received by a service. It does this by checking the unique ID of
                 the incoming message. Note that The id used to can be generated from the message using an expression
-                defined in the _idExpression_ attribute. By default, the expression used is $\{message:id\}, which means
+                defined in the _idExpression_ attribute. By default, the expression used is #\[message:id\], which means
                 the underlying endpoint must support unique message IDs for this to work, otherwise a
                 {{UniqueIdNotSupportedException}} is thrown.
             </xsd:documentation>
@@ -3169,10 +3169,10 @@
                             Defines one or more expressions to use when extrating the ID from the message. For example,
                             it would be possible to combine to headers as the id of the message to provide idempotency
                             against:
-                            "$\{headers:foo,bar\}" or
+                            "#\[headers:foo,bar\]" or
                             combine the message ide with a header:
-                            "$\{message:id\}-${header:foo}".
-                            If this property is not set "$\{message:id\}" will be used by default.
+                            "#\[message:id\]-#[header:foo]".
+                            If this property is not set "#\[message:id\]" will be used by default.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -4117,11 +4117,11 @@
     <xsd:simpleType name="propertyPlaceholderType">
         <xsd:annotation>
             <xsd:documentation>
-                A type that defines an Ant-style property placeholder
+                A type that defines a Mule-style property placeholder
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:string">
-            <xsd:pattern value="(\$\{[^\}]+\})"/>
+            <xsd:pattern value="(\#\[[^\]]+\]|\$\{[^\}]+\})"/>
         </xsd:restriction>
     </xsd:simpleType>
 

@@ -83,18 +83,18 @@ public class MessageExpressionEvaluatorTestCase extends AbstractMuleTestCase
         message.setExceptionPayload(new DefaultExceptionPayload(e));
 
 
-        assertEquals(message.getUniqueId(), ExpressionEvaluatorManager.evaluate("${message:id}", message));
-        assertEquals(message.getUniqueId(), ExpressionEvaluatorManager.evaluate("${message:correlationId}", message));
-        assertEquals(new Integer(1), ExpressionEvaluatorManager.evaluate("${message:correlationSequence}", message));
-        assertEquals(new Integer(2), ExpressionEvaluatorManager.evaluate("${message:correlationGroupSize}", message));
-        assertEquals("foo", ExpressionEvaluatorManager.evaluate("${message:replyTo}", message));
-        assertEquals(e, ExpressionEvaluatorManager.evaluate("${message:exception}", message));
-        assertEquals("UTF-8", ExpressionEvaluatorManager.evaluate("${message:encoding}", message));
-        assertEquals("test", ExpressionEvaluatorManager.evaluate("${message:payload}", message));
+        assertEquals(message.getUniqueId(), ExpressionEvaluatorManager.evaluate("#[message:id]", message));
+        assertEquals(message.getUniqueId(), ExpressionEvaluatorManager.evaluate("#[message:correlationId]", message));
+        assertEquals(new Integer(1), ExpressionEvaluatorManager.evaluate("#[message:correlationSequence]", message));
+        assertEquals(new Integer(2), ExpressionEvaluatorManager.evaluate("#[message:correlationGroupSize]", message));
+        assertEquals("foo", ExpressionEvaluatorManager.evaluate("#[message:replyTo]", message));
+        assertEquals(e, ExpressionEvaluatorManager.evaluate("#[message:exception]", message));
+        assertEquals("UTF-8", ExpressionEvaluatorManager.evaluate("#[message:encoding]", message));
+        assertEquals("test", ExpressionEvaluatorManager.evaluate("#[message:payload]", message));
 
         try
         {
-            ExpressionEvaluatorManager.evaluate("${message:xxx}", message, true);
+            ExpressionEvaluatorManager.evaluate("#[message:xxx]", message, true);
             fail("xxx is not a supported expresion");
         }
         catch (Exception e1)

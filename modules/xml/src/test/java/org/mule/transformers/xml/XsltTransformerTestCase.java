@@ -220,7 +220,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
         // set parameter
         Map params = new HashMap();
-        params.put("param1", "${header:myproperty}");
+        params.put("param1", "#[header:myproperty]");
         transformer.setContextProperties(params);
 
         // init transformer

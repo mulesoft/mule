@@ -69,7 +69,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         }
     }
 
-    //Use public DefaultMuleMessage(Object message, Map props) instead
+
+    /**
+     * @deprecated Use public DefaultMuleMessage(Object message, Map props) instead
+     */
     @Deprecated
     public DefaultMuleMessage(Object message)
     {

@@ -47,15 +47,15 @@ public  class SelectSQLStrategy
         
         String[] stmts = connector.getReadAndAckStatements(endpoint);
         
-        //Unparsed SQL statements (with ${foo} parameters)
+        //Unparsed SQL statements (with #[foo] parameters)
         String readStmt = stmts[0];
         String ackStmt = stmts[1];
         
-        //Storage for params (format is ${foo})
+        //Storage for params (format is #[foo])
         List readParams = new ArrayList();
         List ackParams = new ArrayList();
         
-        //Prepared statement form (with ? placeholders instead of ${foo} params)
+        //Prepared statement form (with ? placeholders instead of #[foo] params)
         readStmt = connector.parseStatement(readStmt, readParams);
         ackStmt = connector.parseStatement(ackStmt, ackParams);
 

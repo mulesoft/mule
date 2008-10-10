@@ -46,7 +46,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * object.
  * <p/>
  * This transformer maintains a pool of {@link javax.xml.Transformer} objects to speed up processing of concurrent requests.
- * The pool can be configured using {@link #setMaxIdleTransformers()} and {@link #setMaxIdleTransformers()}.
+ * The pool can be configured using {@link #setMaxIdleTransformers(int)}.
  * <p/>
  * Parameter can also be set as part of the transformation context and these can be mapped to conent in the current message using
  * property extractors or can be fixed values.
@@ -62,14 +62,14 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * <p/>
  * <pre>
  *  &lt;mxml:xslt-transformer name=&quot;MyXsltTransformer&quot; xslFile=&quot;myXslFile.xsl&quot;&amp;gt
- *      &lt;context-property name=&quot;myParameter&quot; value=&quot;${head:myproperty}&quot;/&amp;gt
- *      &lt;context-property name=&quot;myParameter2&quot; value=&quot;${function:uuid}&quot;/&amp;gt
+ *      &lt;context-property name=&quot;myParameter&quot; value=&quot;#[head:myproperty]&quot;/&amp;gt
+ *      &lt;context-property name=&quot;myParameter2&quot; value=&quot;#[function:uuid]&quot;/&amp;gt
  *  &lt;/mxml:xslt-transformer&amp;gt
  * </pre>
  * <p/>
  * <p>
  * The 'header' expression pulls a header from the current message and 'function' can execute a set of arbitrary functions.
- * You can also pass in static values by ommitting the expression prefix '${'.
+ * You can also pass in static values by ommitting the expression prefix '#['.
  * </p>
  * <p/>
  * In addition to being able to pass in an XSLT file you can also define templates inline. For example -
@@ -100,7 +100,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     // MAX_IDLE is also the total limit
     private static final int MAX_ACTIVE_TRANSFORMERS = MAX_IDLE_TRANSFORMERS;
     // Prefix to use in a parameter to specify it is an expression that must be evaluated
-    private static final String PARAM_EXTRACTOR_TOKEN = "${";
+    private static final String PARAM_EXTRACTOR_TOKEN = ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX;
 
     protected final GenericObjectPool transformerPool;
 

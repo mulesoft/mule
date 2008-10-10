@@ -30,6 +30,7 @@ public final class TemplateParser
     public static final String ANT_TEMPLATE_STYLE = "ant";
     public static final String SQUARE_TEMPLATE_STYLE = "square";
     public static final String CURLY_TEMPLATE_STYLE = "curly";
+    public static final String WIGGLY_MULE_TEMPLATE_STYLE = "mule";
 
     /**
      * logger used by this class
@@ -39,6 +40,7 @@ public final class TemplateParser
     public static final Pattern ANT_TEMPLATE_PATTERN = Pattern.compile("\\$\\{[^\\}]+\\}");
     public static final Pattern SQUARE_TEMPLATE_PATTERN = Pattern.compile("\\[[^\\]]+\\]");
     public static final Pattern CURLY_TEMPLATE_PATTERN = Pattern.compile("\\{[^\\}]+\\}");
+    public static final Pattern WIGGLY_MULE_TEMPLATE_PATTERN = Pattern.compile("\\#\\[[^\\]]+\\]");
 
     private final Pattern pattern;
     private final int pre;
@@ -61,11 +63,22 @@ public final class TemplateParser
         return new TemplateParser(CURLY_TEMPLATE_STYLE);
     }
 
+    public static TemplateParser createMuleStyleParser()
+    {
+        return new TemplateParser(WIGGLY_MULE_TEMPLATE_STYLE);
+    }
+
     private TemplateParser(String style)
     {
         if (ANT_TEMPLATE_STYLE.equals(style))
         {
             pattern = ANT_TEMPLATE_PATTERN;
+            pre = 2;
+            post = 1;
+        }
+        else if (WIGGLY_MULE_TEMPLATE_STYLE.equals(style))
+        {
+            pattern = WIGGLY_MULE_TEMPLATE_PATTERN;
             pre = 2;
             post = 1;
         }
@@ -243,6 +256,7 @@ public final class TemplateParser
                     case '{':
                     case '}':
                     case '$':
+                    case '#':
                         buffer.append("\\");
                         // fall through to append original character
                     default:

@@ -131,24 +131,24 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testSingleAttachmentUsingManager() throws Exception
     {
-        Object result = ExpressionEvaluatorManager.evaluate("${attachment:foo}", message);
+        Object result = ExpressionEvaluatorManager.evaluate("#[attachment:foo]", message);
         assertNotNull(result);
         assertTrue(result instanceof DataHandler);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(4);
         ((DataHandler)result).writeTo(baos);
         assertEquals("moo", baos.toString());
 
-        result = ExpressionEvaluatorManager.evaluate("${attachment:fool}", message);
+        result = ExpressionEvaluatorManager.evaluate("#[attachment:fool]", message);
         assertNull(result);
 
-        result = ExpressionEvaluatorManager.evaluate("${attachment:foo}", new Object());
+        result = ExpressionEvaluatorManager.evaluate("#[attachment:foo]", new Object());
         assertNull(result);
 
     }
 
     public void testMapHeadersUsingManager() throws Exception
     {
-        Object result = ExpressionEvaluatorManager.evaluate("${attachments:foo, baz}", message);
+        Object result = ExpressionEvaluatorManager.evaluate("#[attachments:foo, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(2, ((Map)result).size());
@@ -167,17 +167,17 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         dh.writeTo(baos);
         assertEquals("maz", baos.toString());
 
-        result = ExpressionEvaluatorManager.evaluate("${attachments:fool}", message);
+        result = ExpressionEvaluatorManager.evaluate("#[attachments:fool]", message);
         assertNull(result);
 
-        result = ExpressionEvaluatorManager.evaluate("${attachments:foo}", new Object());
+        result = ExpressionEvaluatorManager.evaluate("#[attachments:foo]", new Object());
         assertNull(result);
 
     }
 
     public void testListHeadersUsingManager() throws Exception
     {
-        Object result = ExpressionEvaluatorManager.evaluate("${attachments-list:foo,baz}", message);
+        Object result = ExpressionEvaluatorManager.evaluate("#[attachments-list:foo,baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(2, ((List)result).size());
@@ -194,10 +194,10 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         dh.writeTo(baos);
         assertEquals("maz", baos.toString());
 
-        result = ExpressionEvaluatorManager.evaluate("${attachments-list:fool}", message);
+        result = ExpressionEvaluatorManager.evaluate("#[attachments-list:fool]", message);
         assertNull(result);
 
-        result = ExpressionEvaluatorManager.evaluate("${attachments-list:foo}", new Object());
+        result = ExpressionEvaluatorManager.evaluate("#[attachments-list:foo]", new Object());
         assertNull(result);
 
     }

@@ -35,10 +35,11 @@ public class ExpressionEvaluatorManager
      */
     protected static transient final Log logger = LogFactory.getLog(ExpressionEvaluatorManager.class);
 
-    public static final String DEFAULT_EXPRESSION_PREFIX = "${";
-    public static final String DEFAULT_EXPRESSION_POSTFIX = "}";
+    public static final String DEFAULT_EXPRESSION_PREFIX = "#[";
+    public static final String DEFAULT_EXPRESSION_POSTFIX = "]";
 
-    private static TemplateParser parser = TemplateParser.createAntStyleParser();
+    // default style parser
+    private static TemplateParser parser = TemplateParser.createMuleStyleParser();
 
     private static ConcurrentMap evaluators = new ConcurrentHashMap(8);
 
@@ -50,7 +51,11 @@ public class ExpressionEvaluatorManager
         }
 
         final String name = evaluator.getName();
-        logger.warn("Evaluators already contain an object named '" + name + "'.  The previous object will be overwritten.");
+        // TODO MULE-3809 Eliminate duplicate evaluators registration
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Evaluators already contain an object named '" + name + "'.  The previous object will be overwritten.");
+        }
         evaluators.put(evaluator.getName(), evaluator);
     }
 
@@ -87,7 +92,7 @@ public class ExpressionEvaluatorManager
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "${mule:serviceName}" are both valid. For situations where
+     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
      * one or more expressions need to be parsed within a single text, the {@link #parse(String, Object, boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *
@@ -104,7 +109,7 @@ public class ExpressionEvaluatorManager
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "${mule:serviceName}" are both valid. For situations where
+     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
      * one or more expressions need to be parsed within a single text, the {@link #parse(String, Object, boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *
@@ -123,7 +128,7 @@ public class ExpressionEvaluatorManager
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "${mule:serviceName}" are both valid. For situations where
+     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
      * one or more expressions need to be parsed within a single text, the {@link #parse(String, Object, boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *
@@ -154,13 +159,13 @@ public class ExpressionEvaluatorManager
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "${mule:serviceName}" are both valid. For situations where
+     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
      * one or more expressions need to be parsed within a single text, the {@link #parse(String, Object, boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *
      * @param expression       a single expression i.e. xpath://foo
      * @param object           The object (usually {@link org.mule.api.MuleMessage}) to evaluate the expression on.
-     * @param expressionPrefix the expression prefix to use. The default is "${" but any character is valid.
+     * @param expressionPrefix the expression prefix to use. The default is "#[" but any character is valid.
      *                         It is unlikely that users will want to change this except maybe to use "["  instead.
      * @param failIfNull       determines if an exception should be thrown if expression could not be evaluated or returns
      *                         null.
@@ -252,7 +257,7 @@ public class ExpressionEvaluatorManager
 
     /**
      * Determines if the expression is valid or not.  This method will validate a single expression or
-     * expressions embedded in a string.  the expression must be well formed i.e. ${bean:user}
+     * expressions embedded in a string.  the expression must be well formed i.e. #[bean:user]
      *
      * @param expression the expression to validate
      * @return true if the expression evaluator is recognised

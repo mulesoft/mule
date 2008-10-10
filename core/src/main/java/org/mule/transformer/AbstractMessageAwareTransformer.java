@@ -44,9 +44,9 @@ public abstract class AbstractMessageAwareTransformer extends AbstractTransforme
     public final Object doTransform(Object src, String encoding) throws TransformerException
     {
         MuleMessage message;
-        if(src instanceof MuleMessage)
+        if (src instanceof MuleMessage)
         {
-            message = (MuleMessage)src;
+            message = (MuleMessage) src;
         }
         else if (MuleServer.getMuleContext().getConfiguration().isAutoWrapMessageAwareTransform())
         {
@@ -60,7 +60,7 @@ public abstract class AbstractMessageAwareTransformer extends AbstractTransforme
                 throw new TransformerException(CoreMessages.noCurrentEventForTransformer(), this);
             }
             message = event.getMessage();
-            if(!message.getPayload().equals(src))
+            if (!message.getPayload().equals(src))
             {
                 throw new IllegalStateException("Transform payload does not match current MuleEventContext payload");
             }
@@ -68,7 +68,6 @@ public abstract class AbstractMessageAwareTransformer extends AbstractTransforme
         return transform(message, encoding);
     }
 
-    public abstract Object transform(MuleMessage message, String outputEncoding)
-        throws TransformerException;
+    public abstract Object transform(MuleMessage message, String outputEncoding) throws TransformerException;
 
 }

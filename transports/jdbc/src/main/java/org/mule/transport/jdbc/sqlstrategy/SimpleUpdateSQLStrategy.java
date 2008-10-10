@@ -38,13 +38,13 @@ public  class SimpleUpdateSQLStrategy
     public MuleMessage executeStatement(JdbcConnector connector,
             ImmutableEndpoint endpoint, MuleEvent event,long timeout) throws Exception
     {
-        //Unparsed SQL statement (with ${foo} format parameters)
+        //Unparsed SQL statement (with #[foo] format parameters)
         String statement = connector.getStatement(endpoint);
 
         //Storage for parameters
         List paramNames = new ArrayList();
         
-        //Parsed SQL statement (with ? placeholders instead of ${foo} params)
+        //Parsed SQL statement (with ? placeholders instead of #[foo] params)
         String sql = connector.parseStatement(statement, paramNames);
         
         //Optionally escape or further manipulate SQL statement.  Used in subclasses.

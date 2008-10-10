@@ -18,16 +18,16 @@
 
     <jdbc:connector name="jdbcConnector3" dataSource-ref="testDS1">
         <jdbc:query key="getTest"
-                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL" />
+                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL" />
         <jdbc:query key="getTest2"
-                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL" />
+                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL" />
         <jdbc:query key="getTest.ack"
-                    value="UPDATE TEST SET ACK = ${function:NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}" />
+                    value="UPDATE TEST SET ACK = #[function:NOW]WHERE ID = #[id] AND TYPE = #[type] AND DATA = #[data]" />
     </jdbc:connector>
 
     <jdbc:endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
         <jdbc:query key="getTest2" value="OVERRIDDEN VALUE" />
-        <jdbc:query key="getTest3" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL" />
+        <jdbc:query key="getTest3" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL" />
     </jdbc:endpoint>
 
     <jdbc:endpoint name="endpointWithTransaction" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">

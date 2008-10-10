@@ -18,8 +18,8 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.text.MessageFormat;
 
 /**
  * <code>StaticRecipientList</code> is used to dispatch a single event to multiple
@@ -71,13 +71,16 @@ public class ExpressionRecipientList extends AbstractRecipientList
 
     public String getFullExpression()
     {
-        if(fullExpression==null)
+        if (fullExpression == null)
         {
-            if(evaluator.equalsIgnoreCase("custom"))
+            if (evaluator.equalsIgnoreCase("custom"))
             {
                 evaluator = customEvaluator;
             }
-                fullExpression = "${" + evaluator + ":" + expression + "}";
+            fullExpression = MessageFormat.format("{0}{1}:{2}{3}",
+                                                  ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX,
+                                                  evaluator, expression,
+                                                  ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX);
             logger.debug("Full expression for EndpointSelector is: " + fullExpression);
         }
         return fullExpression;

@@ -174,8 +174,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         try
         {
             //Allow Expressions to be embedded
-            endpoint = endpoint.replaceAll("\\[", "\\{");
-            endpoint = endpoint.replaceAll("\\]", "\\}");
+            endpoint = endpoint.replaceAll("%23", "#");
             endpoint = ExpressionEvaluatorManager.parse(endpoint, msg, true);
             URI uri = new URI(endpoint);
             HttpMethod httpMethod;
@@ -184,7 +183,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             {
                 httpMethod = new GetMethod(uri.toString());
                 String paramName = URLEncoder.encode(msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
-                        HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY), outputEncoding);
+                                                                           HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY), outputEncoding);
                 String paramValue = URLEncoder.encode(src.toString(), outputEncoding);
 
                 String query = uri.getRawQuery();
@@ -259,7 +258,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             {
                 // TODO we should probably set other properties here
                 String httpVersion = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY,
-                        HttpConstants.HTTP11);
+                                                           HttpConstants.HTTP11);
                 if (HttpConstants.HTTP10.equals(httpVersion))
                 {
                     httpMethod.getParams().setVersion(HttpVersion.HTTP_1_0);
