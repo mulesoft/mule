@@ -74,14 +74,14 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         // Stop service and give workers a chance to finnish up before insepcting
         // queues
         muleContext.stop();
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         assertQueues(numMessage, "TestPersistentQueueService");
 
         muleContext.start();
         Thread.sleep(200);
         muleContext.stop();
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         assertQueues(numMessage, "TestPersistentQueueService");
 
@@ -108,7 +108,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         // Stop service and give workers a chance to finnish up before insepcting
         // queues
         muleContext.stop();
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         // Paused service does not process messages before or during stop().
         assertEquals(0, getTestQueueSession().getQueue("out").size());
@@ -117,7 +117,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         muleContext.start();
         Thread.sleep(200);
         muleContext.stop();
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         // Paused service process messages before or during stop().
         assertTrue(getTestQueueSession().getQueue("out").size() > 1);
@@ -153,7 +153,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         // inspecting
         // queues.
         muleContext.stop();
-        Thread.sleep(100);
+        Thread.sleep(200);
         assertQueues(numMessage, "TestPersistentQueueService");
 
         // 3) Dispose and restart Mule and let it run for a short while
@@ -165,7 +165,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         // Stop service and give workers a chance to finnish up before insepcting
         // queues
         muleContext.stop();
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         assertQueues(numMessage, "TestPersistentQueueService");
 
