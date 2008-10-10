@@ -40,9 +40,9 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     public static final String CONNECTOR_NAME = "testConnector";
     public static final String DEFAULT_MESSAGE = "Test Message";
 
-    public static final String SQL_READ = "SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL";
-    public static final String SQL_ACK = "UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}";
-    public static final String SQL_WRITE = "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)";
+    public static final String SQL_READ = "SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL";
+    public static final String SQL_ACK = "UPDATE TEST SET ACK = #[NOW] WHERE ID = ${id} AND TYPE = #[type] AND DATA = #[data]";
+    public static final String SQL_WRITE = "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(#[type], #[payload], NULL, NULL)";
     
     public static String EMBEDDED_CONNECTION_STRING;
     public static final String EMBEDDED_DRIVER_NAME = "org.apache.derby.jdbc.EmbeddedDriver";

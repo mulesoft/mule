@@ -34,9 +34,9 @@
         <receiver-threading-profile maxThreadsActive="2" maxThreadsIdle="2" maxBufferSize="1" doThreading="false" poolExhaustedAction="WAIT"/>
         <dispatcher-threading-profile maxThreadsActive="2" maxThreadsIdle="2" maxBufferSize="1" doThreading="false" poolExhaustedAction="WAIT"/>
         
-        <jdbc:query key="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
-        <jdbc:query key="getTest.ack" value="UPDATE TEST SET ACK = ${function:NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}" />
-        <jdbc:query key="writeTest" value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)" />
+        <jdbc:query key="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL"/>
+        <jdbc:query key="getTest.ack" value="UPDATE TEST SET ACK = ${function:NOW} WHERE ID = #[id] AND TYPE = #[type] AND DATA = #[data]" />
+        <jdbc:query key="writeTest" value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(#[type], #[payload], NULL, NULL)" />
     </jdbc:connector>
 
     <model name="model">
