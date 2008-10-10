@@ -89,7 +89,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
@@ -220,12 +219,6 @@ public abstract class AbstractConnector
 
     private RetryPolicyTemplate retryPolicyTemplate;
     
-    /**
-     * If doThreading is used in ReconnectingStrategy receivers must wait for 
-     * connector to connect before they connect.
-     */
-    protected final Semaphore connectedSemaphore = new Semaphore(0);
-
     protected final WaitableBoolean connected = new WaitableBoolean(false);
 
     protected final WaitableBoolean connecting = new WaitableBoolean(false);
@@ -1409,7 +1402,6 @@ public abstract class AbstractConnector
             ConnectionNotification.CONNECTION_DISCONNECTED));
 
         connected.set(false);
-        connectedSemaphore.drainPermits();
 
         try
         {
@@ -2177,11 +2169,6 @@ public abstract class AbstractConnector
         return sb.toString();
     }
     
-    public Semaphore getConnectedSemaphore()
-    {
-        return connectedSemaphore;
-    }
-
     public RetryPolicyTemplate getRetryPolicyTemplate()
     {
         return retryPolicyTemplate;
