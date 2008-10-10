@@ -21,7 +21,7 @@
 		<!-- use "netstat -a -p udp" and you will svn see the port leaking problem -->
         <service name="DynamicEndpoint">
             <inbound>
-                <udp:inbound-endpoint host="#[hostname]" port="61000" />
+                <udp:inbound-endpoint host="${hostname}" port="61000" />
             </inbound>
             <outbound>
                 <custom-outbound-router class="org.mule.transport.udp.functional.DynamicEndpointRouter">
