@@ -35,7 +35,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         add.put("addedProperty", "overwrittenValue");
         t.setAddProperties(add);
 
-        MuleMessage msg = new DefaultMuleMessage("message");
+        MuleMessage msg = new DefaultMuleMessage("message", (Map) null);
         msg.setProperty("addedProperty", "originalValue");
         MuleEventContext ctx = getTestEventContext(msg);
         // context clones message
@@ -58,7 +58,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         t.setAddProperties(add);
         t.setOverwrite(false);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message");
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
         msg.setProperty("addedProperty", "originalValue");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
@@ -73,10 +73,10 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
         Map add = new HashMap();
-        add.put("Foo", "${header:public-house}");
+        add.put("Foo", "#[header:public-house]");
         t.setAddProperties(add);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message");
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
         msg.setProperty("public-house", "Bar");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
@@ -94,7 +94,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         add.put("Foo", "Baz");
         t.setRenameProperties(add);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message");
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
         msg.setProperty("Foo", "Bar");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
@@ -110,7 +110,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
         t.setDeleteProperties(Collections.singletonList("badProperty"));
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message");
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
         msg.setProperty("badProperty", "badValue");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
