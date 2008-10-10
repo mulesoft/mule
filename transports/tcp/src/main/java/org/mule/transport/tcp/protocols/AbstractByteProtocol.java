@@ -62,9 +62,11 @@ public abstract class AbstractByteProtocol implements TcpProtocol
         {
             if (streamOk)
             {
-                IOUtils.copyLarge((InputStream) data, os);
+                InputStream is = (InputStream) data;
+                IOUtils.copyLarge(is, os);
                 os.flush();
                 os.close();
+                is.close();
             }
             else
             {
