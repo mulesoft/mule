@@ -239,8 +239,8 @@
                 <mule:async-reply>
                      <mule:inbound-endpoint address="test://async-reply"/>
                     <mule:single-async-reply-router>
-                        <mule:expression-message-info-mapping messageIdExpression="${header:id}"
-                                                              correlationIdExpression="${header:correlation}"/>
+                        <mule:expression-message-info-mapping messageIdExpression="#[header:id]"
+                                                              correlationIdExpression="#[header:correlation]"/>
                     </mule:single-async-reply-router>
                 </mule:async-reply>
             </mule:service>

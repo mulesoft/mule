@@ -42,8 +42,8 @@
         </mulexml:xslt-text>
 
         <!--// START SNIPPET: transformer-params -->
-        <mulexml:context-property key="title" value="${header:ListTitle}"/>
-        <mulexml:context-property key="rating" value="${header:ListRating}"/>
+        <mulexml:context-property key="title" value="#[header:ListTitle]"/>
+        <mulexml:context-property key="rating" value="#[header:ListRating]"/>
         <!--// END SNIPPET: transformer-params -->
     </mulexml:xslt-transformer>
     <!--// END SNIPPET: transformer-config -->

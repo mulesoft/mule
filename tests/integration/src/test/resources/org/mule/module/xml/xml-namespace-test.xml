@@ -22,6 +22,6 @@
                 </xsl:template>
             </xsl:stylesheet>
         </mxml:xslt-text>
-        <mxml:context-property key="echo" value="${header:Welcome}"/>
+        <mxml:context-property key="echo" value="#[header:Welcome]"/>
     </mxml:xslt-transformer>
 </mule>

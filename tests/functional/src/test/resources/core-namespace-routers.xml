@@ -23,7 +23,7 @@
 
         <service name="IdempotentReceiverRouter">
             <inbound>
-                <idempotent-receiver-router idExpression="${message:id}-${message:correlationId}">
+                <idempotent-receiver-router idExpression="#[message:id]-#[message:correlationId]">
                     <simple-text-file-store directory="foo" maxEntries="10000000"/>
                 </idempotent-receiver-router>
             </inbound>

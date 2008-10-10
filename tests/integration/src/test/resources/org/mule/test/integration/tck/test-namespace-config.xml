@@ -33,7 +33,7 @@
             <inbound>
                 <inbound-endpoint address="vm://service3"/>
             </inbound>
-            <test:component enableMessageHistory="false" appendString=" received in ${mule:serviceName}"/>
+            <test:component enableMessageHistory="false" appendString=" received in #[mule:serviceName]"/>
         </service>
 
         <service name="testService4">

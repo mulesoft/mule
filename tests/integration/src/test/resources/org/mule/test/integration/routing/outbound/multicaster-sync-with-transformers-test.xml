@@ -44,7 +44,7 @@
                 <vm:inbound-endpoint path="service1.queue"/>
             </inbound>
             <test:component>
-                <test:return-data>${function:shortPayloadClass} Received</test:return-data>
+                <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
             </test:component>
         </service>
 
@@ -53,7 +53,7 @@
                 <vm:inbound-endpoint path="service2.queue"/>
             </inbound>
             <test:component>
-                <test:return-data>${function:shortPayloadClass} Received</test:return-data>
+                <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
             </test:component>
         </service>
 
@@ -62,7 +62,7 @@
                 <vm:inbound-endpoint path="service3.queue"/>
             </inbound>
             <test:component>
-                <test:return-data>${function:shortPayloadClass} Received</test:return-data>
+                <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
             </test:component>
         </service>
     </model>

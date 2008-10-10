@@ -36,10 +36,10 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-                <!-- this property is set from the test case as something like "${bean:childBean.value}"
-                 or ${xpath:/endpoints/endpoint}
+                <!-- this property is set from the test case as something like "#[bean:childBean.value]"
+                 or #[xpath:/endpoints/endpoint]
                  -->
-                <endpoint-selector-router evaluator="custom" custom-evaluator="${selector.evaluator}" expression="${selector.expression}">
+                <endpoint-selector-router evaluator="custom" custom-evaluator="#[selector.evaluator]" expression="#[selector.expression]">
                     <!-- this could be a global endpoint too once MULE-2595  is fixed -->                    
                     <vm:outbound-endpoint name="matchingEndpoint1" path="match1" connector-ref="queue"/>
                     <outbound-endpoint name="matchingEndpoint2" address="vm://match2" connector-ref="queue"/>

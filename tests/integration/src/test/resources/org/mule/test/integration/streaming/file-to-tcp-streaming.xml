@@ -17,7 +17,7 @@
     <model name="main">
         <service name="bridge1">
             <inbound>
-                <file:inbound-endpoint path="${mule.working.dir}/test-data/in" moveToDirectory="${mule.working.dir}/test-data/processing" />
+                <file:inbound-endpoint path="#[mule.working.dir]/test-data/in" moveToDirectory="#[mule.working.dir]/test-data/processing" />
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -36,7 +36,7 @@
                     <stdio:outbound-endpoint system="OUT">
                         <auto-transformer returnClass="java.lang.String"/>
                     </stdio:outbound-endpoint>
-                    <file:outbound-endpoint path="${mule.working.dir}/test-data/out" encoding="UTF8" outputPattern="foo.txt.processed"/>
+                    <file:outbound-endpoint path="#[mule.working.dir]/test-data/out" encoding="UTF8" outputPattern="foo.txt.processed"/>
                 </multicasting-router>
             </outbound>
         </service>

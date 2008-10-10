@@ -16,11 +16,11 @@
 
         <service name="PassingThrough">
             <inbound>
-                <udp:inbound-endpoint host="${hostname}" port="61000"/>
+                <udp:inbound-endpoint host="#[hostname]" port="61000"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <udp:outbound-endpoint host="${hostname}" port="61001"/>
+                    <udp:outbound-endpoint host="#[hostname]" port="61001"/>
                 </pass-through-router>
             </outbound>
         </service>
