@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.api.MuleContext;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
@@ -29,5 +30,9 @@ public class EmbeddedMuleTestCase extends TestCase
         assertFalse(context.isStarted());
         context.start();
         assertTrue(context.isStarted());
+
+        final EndpointBuilder endpoint = context.getRegistry().lookupEndpointBuilder("endpoint");
+        assertNotNull(endpoint);
+        assertEquals("test://value", endpoint.buildInboundEndpoint().getEndpointURI().toString());
     }
 }
