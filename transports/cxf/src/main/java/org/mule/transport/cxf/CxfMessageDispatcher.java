@@ -51,7 +51,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
 
     protected final CxfConnector connector;
     protected ClientWrapper wrapper;
-    private final TemplateParser soapActionTemplateParser = TemplateParser.createAntStyleParser();
+    private final TemplateParser soapActionTemplateParser = TemplateParser.createMuleStyleParser();
 
     public CxfMessageDispatcher(OutboundEndpoint endpoint)
     {

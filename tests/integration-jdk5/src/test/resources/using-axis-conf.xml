@@ -29,7 +29,7 @@
                 <pass-through-router>
                     <outbound-endpoint address="axis:http://localhost:63382/services/CxfService?method=receive">
                         <properties>
-                            <spring:entry key="soapAction" value="${methodNamespace}${method}"/>
+                            <spring:entry key="soapAction" value="#[methodNamespace]#[method]"/>
                             <spring:entry key="soapMethods">
                                 <spring:list>
                                     <spring:bean class="org.mule.transport.soap.SoapMethod">

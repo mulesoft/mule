@@ -28,7 +28,7 @@
                    clientConfig="clientConfig"
                    address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
                    connector-ref="axisConnector2"
-                   soapAction="[methodNamespace][method]"
+                   soapAction="#[methodNamespace]#[method]"
                    SOAPAction="direct"
                    style="DOCUMENT"
                    use="ENCODED"

@@ -58,7 +58,7 @@
                     <axis:outbound-endpoint
                             address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
                             responseTransformer-refs="XmlDecoder Xslt XmlToObject"
-                            soapAction="[methodNamespace][method]">
+                            soapAction="#[methodNamespace]#[method]">
                         <axis:soap-method method="qname{GetQuote:http://www.webserviceX.NET/}">
                             <axis:soap-parameter parameter="symbol" type="string" mode="IN"/>
                             <axis:soap-parameter parameter="GetQuoteResult" type="string" mode="OUT"/>

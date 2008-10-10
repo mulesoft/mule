@@ -44,7 +44,7 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
      */
     private final Log logger = LogFactory.getLog(getClass());
 
-    private TemplateParser templateParser = TemplateParser.createAntStyleParser();
+    private TemplateParser templateParser = TemplateParser.createMuleStyleParser();
 
     public StringToEmailMessage()
     {

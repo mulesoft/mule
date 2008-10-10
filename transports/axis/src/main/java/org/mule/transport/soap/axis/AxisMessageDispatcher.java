@@ -504,7 +504,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             properties.put("serviceName", event.getService().getName());
         }
 
-        TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
         soapAction = tp.parse(properties, soapAction);
 
         if (logger.isDebugEnabled())
