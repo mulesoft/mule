@@ -62,3 +62,6 @@ org.mule.test.integration.client.MuleClientRemotingJmsTestCase
 
 # This works, but it requires tools.jar on the classpath which we currently don't require:
 org.mule.test.integration.client.MuleClientWSDLExternalTestCase
+
+# MULE-3557
+org.mule.test.integration.streaming.FileToTcpStreamingTestCase
