@@ -17,27 +17,32 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
+import java.util.Map;
 
 /**
  */
 public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources() {
+    
+    protected String getConfigResources() 
+    {
         return "org/mule/test/integration/routing/outbound/chaining-router-null-handling.xml";
     }
 
-    public void testNoComponentFails() throws Exception {
-
+    public void testNoComponentFails() throws Exception 
+    {
         MuleClient muleClient = new MuleClient();
-        MuleMessage result = muleClient.send("vm://incomingPass", new DefaultMuleMessage("thePayload"));
+        MuleMessage message = new DefaultMuleMessage("thePayload", (Map) null);
+        MuleMessage result = muleClient.send("vm://incomingPass", message);
         assertNull("Shouldn't have any exceptions", result.getExceptionPayload());
         assertEquals("thePayload Received component1 Received component2Pass", result.getPayloadAsString());
     }
 
-    public void testLastComponentFails() throws Exception {
-
+    public void testLastComponentFails() throws Exception 
+    {
         MuleClient muleClient = new MuleClient();
-        MuleMessage result = muleClient.send("vm://incomingLastFail", new DefaultMuleMessage("thePayload"));
+        MuleMessage message = new DefaultMuleMessage("thePayload", (Map) null);
+        MuleMessage result = muleClient.send("vm://incomingLastFail", message);
         assertNotNull("Should be a NullPayload instead.", result);
         assertEquals("Should be a NullPayload instead.", NullPayload.getInstance(), result.getPayload());
         assertNotNull("Should've contained an exception payload", result.getExceptionPayload());
@@ -48,10 +53,11 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         assertEquals("Exception raised in wrong service", "component2Fail", compName);
     }
 
-    public void testFirstComponentFails() throws Exception {
-
+    public void testFirstComponentFails() throws Exception
+    {
         MuleClient muleClient = new MuleClient();
-        MuleMessage result = muleClient.send("vm://incomingFirstFail", new DefaultMuleMessage("thePayload"));
+        MuleMessage message = new DefaultMuleMessage("thePayload", (Map) null);
+        MuleMessage result = muleClient.send("vm://incomingFirstFail", message);
         assertNotNull("Should be a NullPayload instead.", result);
         assertEquals("Should be a NullPayload instead.", NullPayload.getInstance(), result.getPayload());
         assertNotNull("Should've contained an exception payload", result.getExceptionPayload());
@@ -61,4 +67,5 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         String compName = ((ServiceException) exception).getService().getName();
         assertEquals("Exception raised in wrong service", "component1Fail", compName);
     }
+    
 }
