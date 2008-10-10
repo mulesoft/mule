@@ -2,70 +2,23 @@
 Assembly descriptor for the composite Mule library (jar).
 -->
 <assembly>
-  <id>embedded</id>
-  <formats>
-    <format>jar</format>
-  </formats>
-  <includeBaseDirectory>false</includeBaseDirectory>
-  <!-- Once http://jira.codehaus.org/browse/MASSEMBLY-41 is fixed, we should be able to
-       replace the following lists with some clever wildcards.
-
-       DO: see http://jira.codehaus.org/browse/MASSEMBLY-220 for the next problems
-       with the assembly plugin.
-  -->
-  <dependencySets>
-    <dependencySet>
-      <outputDirectory>/</outputDirectory>
-      <unpack>true</unpack>
-      <includes>
-        <!-- Core -->
-        <include>org.mule:mule-core</include>
-        <!-- Transports -->
-        <include>org.mule.transports:mule-transport-axis</include>
-        <include>org.mule.transports:mule-transport-bpm</include>
-        <include>org.mule.transports:mule-transport-cxf</include>
-        <include>org.mule.transports:mule-transport-ejb</include>
-        <include>org.mule.transports:mule-transport-email</include>
-        <include>org.mule.transports:mule-transport-file</include>
-        <include>org.mule.transports:mule-transport-ftp</include>
-        <include>org.mule.transports:mule-transport-http</include>
-        <include>org.mule.transports:mule-transport-jbpm</include>
-        <include>org.mule.transports:mule-transport-jdbc</include>
-        <include>org.mule.transports:mule-transport-jms</include>
-        <include>org.mule.transports:mule-transport-multicast</include>
-        <include>org.mule.transports:mule-transport-quartz</include>
-        <include>org.mule.transports:mule-transport-rmi</include>
-        <include>org.mule.transports:mule-transport-soap</include>
-        <include>org.mule.transports:mule-transport-servlet</include>
-        <include>org.mule.transports:mule-transport-ssl</include>
-        <include>org.mule.transports:mule-transport-stdio</include>
-        <include>org.mule.transports:mule-transport-tcp</include>
-        <include>org.mule.transports:mule-transport-udp</include>
-        <include>org.mule.transports:mule-transport-vm</include>
-        <include>org.mule.transports:mule-transport-xmpp</include>
-        <!-- Modules -->
-        <include>org.mule.modules:mule-module-1to2migration</include>
-        <include>org.mule.modules:mule-module-acegi</include>
-        <include>org.mule.modules:mule-module-boot</include>
-        <include>org.mule.modules:mule-module-builders</include>
-        <include>org.mule.modules:mule-module-client</include>
-        <include>org.mule.modules:mule-module-i18n</include>
-        <include>org.mule.modules:mule-module-jaas</include>
-        <include>org.mule.modules:mule-module-jbossts</include>
-        <include>org.mule.modules:mule-module-jotm</include>
-        <include>org.mule.modules:mule-module-management</include>
-        <include>org.mule.modules:mule-module-ognl</include>
-        <include>org.mule.modules:mule-module-pgp</include>
-        <include>org.mule.modules:mule-module-scripting</include>
-        <include>org.mule.modules:mule-module-spring-config</include>
-        <include>org.mule.modules:mule-module-spring-extras</include>
-        <!-- include>org.mule.modules:mule-module-wssecurity</include -->
-        <include>org.mule.modules:mule-module-xml</include>
-      </includes>
-      <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
-      <excludes>
-        <exclude>org.mule.distributions:mule-embedded</exclude>
-      </excludes>
-    </dependencySet>
-  </dependencySets>
+    <id>embedded</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>target/dependency</directory>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory>META-INF</outputDirectory>
+            <includes>
+                <include>spring.schemas</include>
+                <include>spring.handlers</include>
+            </includes>
+        </fileSet>
+    </fileSets>
 </assembly>
