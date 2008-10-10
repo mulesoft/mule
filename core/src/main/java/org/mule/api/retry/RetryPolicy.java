@@ -13,9 +13,9 @@ package org.mule.api.retry;
 import org.mule.retry.PolicyStatus;
 
 /**
- * A policy defines 
+ * A RetryPolicy takes some action each time an exception occurs and returns a PolicyStatus
+ * which indicates whether the policy is exhausted or should continue to retry.  
  */
-
 public interface RetryPolicy
 {
     public PolicyStatus applyPolicy(Throwable cause);
