@@ -32,12 +32,6 @@ public class NoRetryPolicyTemplate extends AbstractPolicyTemplate
         }
     }
 
-    //@Override
-    public boolean isRetryEnabled()
-    {
-        return false;
-    }
-    
     public String toString()
     {
         return "NoRetryPolicy{}";

@@ -102,14 +102,6 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
     }
     
     /**
-    * @return true if a policy is configured which will actually retry
-    */
-    public boolean isRetryEnabled()
-    {
-        return true;
-    }
-
-    /**
      * should the retry template using this policy be executed in its own thread
      * @return
      */
