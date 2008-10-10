@@ -31,8 +31,8 @@
     <vm:connector name="vmConnector" queueEvents="true"/>
        
     <jdbc:connector name="jdbcConnectorXA" dataSource-ref="jdbcDataSourceXA">
-        <jdbc:query key="insertRecord" value="INSERT into Test (data) VALUES (${payload})"/>
-        <jdbc:query key="causeException" value="INSERT into Test (bad_column_name) VALUES (${payload})"/>
+        <jdbc:query key="insertRecord" value="INSERT into Test (data) VALUES (#[payload])"/>
+        <jdbc:query key="causeException" value="INSERT into Test (bad_column_name) VALUES (#[payload])"/>
     </jdbc:connector>
     
     <jms:activemq-xa-connector name="jmsConnectorXA"/>
