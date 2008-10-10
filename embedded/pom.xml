@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
- <version>2.2.0-SNAPSHOT</version>
+        <version>2.2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule</artifactId>
     <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the 
@@ -18,19 +18,235 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.mule</groupId>
+                                    <artifactId>mule-core</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <!-- Transports -->
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-axis</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-bpm</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-cxf</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-ejb</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-email</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-file</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-ftp</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-http</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-jbpm</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-jdbc</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-jetty</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-jms</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-multicast</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-quartz</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-rmi</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-soap</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-servlet</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-ssl</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-stdio</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-tcp</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-udp</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-vm</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-xmpp</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <!-- Modules -->
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-acegi</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-boot</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-builders</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-client</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-jaas</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-jbossts</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-management</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-ognl</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-pgp</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-scripting</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-spring-config</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-spring-extras</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-sxc</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-xml</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo.groovy</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>${project.basedir}/SpringSchemasHandlers.groovy</source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <!--
                     Don't upgrade because of http://jira.codehaus.org/browse/MASSEMBLY-194,
                     Needs to be fixed and then assembly descriptors should be updated.
                  -->
                 <version>2.1</version>
-                <configuration>
-                    <!-- <finalName>mule-${version}.jar</finalName> -->
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-                    <appendAssemblyId>true</appendAssemblyId>
-                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -38,9 +254,16 @@
                             <!--
                                 'attached' ensures there's only a single run bound to m2's lifecycle.
                                 The default 'assembly' goal would run every plugin in this pom twice.
-                            -->
+                                -->
                             <goal>attached</goal>
                         </goals>
+                        <configuration>
+                            <!-- <finalName>mule-${version}.jar</finalName> -->
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                            <appendAssemblyId>true</appendAssemblyId>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
