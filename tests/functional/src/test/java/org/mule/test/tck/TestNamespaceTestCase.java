@@ -69,7 +69,7 @@ public class TestNamespaceTestCase extends FunctionalTestCase
 
         assertFalse(ftc.isEnableMessageHistory());
         assertTrue(ftc.isEnableNotifications());
-        assertEquals(" ${mule:serviceName}", ftc.getAppendString());
+        assertEquals(" #[mule:serviceName]", ftc.getAppendString());
         assertNull(ftc.getReturnData());
         assertNull(ftc.getEventCallback());
     }

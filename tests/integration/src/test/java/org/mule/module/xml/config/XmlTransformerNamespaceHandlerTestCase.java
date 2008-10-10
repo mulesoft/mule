@@ -79,7 +79,7 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
         String transform = xslt.getXslt();
         assertTrue(transform.indexOf("test for this string in test") > -1);
 
-        assertEquals("${header:foo}", xslt.getContextProperties().get("bar"));
+        assertEquals("#[header:foo]", xslt.getContextProperties().get("bar"));
     }
 
     public void testDomToXmlOnEndpoint() throws MuleException
@@ -122,7 +122,7 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
         String transform = xslt.getXslt();
         assertTrue(transform.indexOf("test for this string in test") > -1);
 
-        assertEquals("${header:foo}", xslt.getContextProperties().get("bar"));
+        assertEquals("#[header:foo]", xslt.getContextProperties().get("bar"));
     }
     protected AbstractTransformer getAndTestTransformer(String name, Class clazz)
     {

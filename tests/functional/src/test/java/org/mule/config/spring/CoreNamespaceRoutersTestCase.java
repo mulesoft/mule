@@ -56,7 +56,7 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
         Router r = lookupInboundRouterFromService("IdempotentReceiverRouter");
         assertTrue(r instanceof IdempotentReceiver);
         IdempotentReceiver router = (IdempotentReceiver)r;
-        assertEquals("${message:id}-${message:correlationId}", router.getIdExpression());
+        assertEquals("#[message:id]-#[message:correlationId]", router.getIdExpression());
         assertNotNull(router.getStore());
         assertTrue(router.getStore() instanceof TextFileObjectStore);
         TextFileObjectStore store = (TextFileObjectStore)router.getStore();
