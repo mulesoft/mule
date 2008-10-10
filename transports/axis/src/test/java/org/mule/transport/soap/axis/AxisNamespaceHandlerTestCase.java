@@ -63,7 +63,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         ImmutableEndpoint endpoint =
                 muleContext.getRegistry().lookupEndpointBuilder("endpoint").buildOutboundEndpoint();
         Map props = endpoint.getProperties();
-        assertEquals("[methodNamespace][method]", assertKey(props, SoapConstants.SOAP_ACTION_PROPERTY, String.class));
+        assertEquals("#[methodNamespace]#[method]", assertKey(props, SoapConstants.SOAP_ACTION_PROPERTY, String.class));
         assertEquals("direct", assertKey(props, SoapConstants.SOAP_ACTION_PROPERTY_CAPS, String.class));
         assertEquals("clientConfig", assertKey(props, "clientConfig", String.class));
         assertEquals(Use.ENCODED_STR, assertKey(props, AxisConnector.USE, String.class));

@@ -28,7 +28,7 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
         
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         MuleEvent event = getTestEvent("test,", ep);
-        String result = dispatcher.parseSoapAction("[hostInfo]/[method]", new QName("foo"), event);
+        String result = dispatcher.parseSoapAction("#[hostInfo]/#[method]", new QName("foo"), event);
 
         assertEquals("http://mycompany.com:8080/foo", result);
     }
@@ -40,7 +40,7 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         MuleEvent event = getTestEvent("test,", ep);
         event.getService().setName("myService");
-        String result = dispatcher.parseSoapAction("[scheme]://[host]:[port]/[serviceName]/[method]",
+        String result = dispatcher.parseSoapAction("#[scheme]://#[host]:#[port]/#[serviceName]/#[method]",
             new QName("foo"), event);
 
         assertEquals("http://mycompany.com:8080/myService/foo", result);
