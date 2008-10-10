@@ -6,18 +6,53 @@
 
 import org.codehaus.groovy.ant.FileScanner
 
-def root = "."
+def cliBuilder = new CliBuilder()
+cliBuilder.f(longOpt: "from", args: 1, "switch from version (e.g. 2.0)")
+cliBuilder.h(longOpt: "help", "show usage info")
+cliBuilder.r(longOpt: "root", args: 1, "start scanning at this root folder")
+cliBuilder.t(longOpt: "to", args: 1, "switch to version (e.g. 2.1)")
 
-sourceSchemaVersion = "2.0"
-destSchemaVersion = "2.2"
-schemaBases = [ "http://www.mulesource.org/schema/mule/", "http://www.mulesource.com/schema/mule/" ]
-
-if (args.length > 0)
+options = cliBuilder.parse(args)
+if (!options)
 {
-    root = args[0]
+    println ""
+    println "Error parsing options " + args
+    println ""
+    System.exit(1)
 }
 
+if (options.h)
+{
+    cliBuilder.usage()
+    System.exit(0)
+}
+
+def root = "."
+if (options.r)
+{
+    root = options.r
+}    
+
+sourceSchemaVersion = "2.0"
+if (options.f)
+{
+    sourceSchemaVersion = options.f
+}
+
+destSchemaVersion = "2.2"
+if (options.t)
+{
+    destSchemaVersion = options.t
+}
+
+// this regex matches both, the CE (.org) and EE (.com) schema in the source version
+// There is one matching group around the whole schema so the matching schema name can be
+// accessed from the code below
+schemaRegex = /.*(http:\/\/www.mulesource.[org|com]{3}?\/schema\/mule\/.*\/$sourceSchemaVersion).*/
+
+//
 // switch the version in all XSD and XML files
+//
 AntBuilder ant = new AntBuilder()
 FileScanner scanner = ant.fileScanner 
 {
@@ -41,7 +76,9 @@ scanner.each
     switchSchemaVersion(it, noChange, noChange)
 }
 
+//
 // switch all spring.handlers and spring.schemas files
+//
 scanner = ant.fileScanner
 {
     fileset(dir: root)
@@ -71,7 +108,7 @@ def switchSchemaVersion(File inFile, def preProcessFunction, def postProcessFunc
     def filename = inFile.name + ".version-switched"
     def outFile = new File(inFile.parentFile, filename)
 
-    def schemaMatched = false
+    def schemaReplaced = false
     outFile.withWriter
     {
         outWriter ->
@@ -80,28 +117,27 @@ def switchSchemaVersion(File inFile, def preProcessFunction, def postProcessFunc
         {
             line ->
     
-            def preprocessed = preProcessFunction(line)
-
-            def matchingSchemaBase = findMatchingSchema(preprocessed)
-            if (matchingSchemaBase != null)
+            line = preProcessFunction(line)
+            
+            def match = (line =~ schemaRegex)
+            while (match.find())
             {
-                schemaMatched = true
+                schemaReplaced = true
                 
-                def schemaName = findSchemaName(preprocessed, matchingSchemaBase)
-                def convertedLine = updateSchema(preprocessed, matchingSchemaBase, schemaName)
+                def srcSchema = match[0][1]
+                def destSchema = srcSchema.replace(sourceSchemaVersion, destSchemaVersion)
                 
-                convertedLine = postProcessFunction(convertedLine)
+                line = line.replace(srcSchema, destSchema)
                 
-                outWriter.writeLine(convertedLine)
+                match = (line =~ schemaRegex)
             }
-            else
-            {
-                outWriter.writeLine(preprocessed)
-            }
+            
+            def convertedLine = postProcessFunction(line)
+            outWriter.writeLine(convertedLine)
         }
     }    
     
-    if (schemaMatched)
+    if (schemaReplaced)
     {
         def backupFile = new File(inFile.parentFile, inFile.name + ".bak")
         move(inFile, backupFile)
@@ -111,41 +147,6 @@ def switchSchemaVersion(File inFile, def preProcessFunction, def postProcessFunc
     {
         delete(outFile)
     }
-}
-
-def findMatchingSchema(String line)
-{
-    for (String schema : schemaBases)
-    {
-        if ((line.indexOf(schema) > -1) && (line.indexOf(sourceSchemaVersion) >= -1))
-        {
-            return schema
-        }
-    }
-    
-    return null
-}
-
-def findSchemaName(String line, String schemaBase)
-{
-    def schemaBaseIndex = line.indexOf(schemaBase)
-    if (schemaBaseIndex == -1)
-    {
-        throw new IllegalArgumentException("$schemaBase not found in $line")
-    }
-            
-    def startSearchIndex = schemaBaseIndex + schemaBase.length()
-    def schemaNameEndIndex = line.indexOf("/", startSearchIndex)
-    return line.substring(startSearchIndex, schemaNameEndIndex)
-}
-
-def updateSchema(String inputLine, String schemaBase, String schemaName)
-{    
-    def urlBase = schemaBase + schemaName + "/"
-    def originalUrl = urlBase + sourceSchemaVersion
-    def replacementUrl = urlBase + destSchemaVersion
-    
-    return inputLine.replace(originalUrl, replacementUrl)
 }
 
 def move(File sourceFile, File destFile)
