@@ -33,6 +33,7 @@
                 ||Name||Description||
                 |log|a logger that can be used to write to Mule's log file.|
                 |muleContext|a reference to the MuleContext object.|
+                |eventContext| A reference to the eventcontext. This allows you to dispatch events progammatically from your script|
                 |message|the current message.|
                 |originalPayload|the payload of the current message before any transforms.|
                 |payload|the transformed payload of the current message if a transformer is configured on the service.
