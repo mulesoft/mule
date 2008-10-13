@@ -58,7 +58,7 @@ public class DefaultStreamCloserService implements StreamCloserService
                     else
                     {
                         log.debug("Unable to find an StreamCloser for the stream type: " + stream.getClass()
-                                  + ", the stream: " + stream + " will not been closed.");
+                                  + ", the stream: " + stream + " will not be closed.");
                     }
                 }
             }
