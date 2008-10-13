@@ -16,7 +16,7 @@
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-common</artifactId>
-            <version>${muleVersion}</version>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
