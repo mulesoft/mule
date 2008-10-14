@@ -11,8 +11,7 @@
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
        http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
-       http://www.mulesource.org/schema/mule/jbossts/2.2 http://www.mulesource.org/schema/mule/jbossts/2.2/mule-jbossts.xsd
-       ">
+       http://www.mulesource.org/schema/mule/jbossts/2.2 http://www.mulesource.org/schema/mule/jbossts/2.2/mule-jbossts.xsd">
 
     <jbossts:transaction-manager/>
 
@@ -63,8 +62,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint ref="out">
-                        <!-- MULE-3382 -->
-                        <custom-transaction action="NONE" factory-class="org.mule.transaction.XaTransactionFactory"/>
+                        <xa-transaction action="NONE"/>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -82,8 +80,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint ref="out">
-                        <!-- MULE-3382 -->
-                        <custom-transaction action="NONE" factory-class="org.mule.transaction.XaTransactionFactory"/>
+                        <xa-transaction action="NONE"/>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
