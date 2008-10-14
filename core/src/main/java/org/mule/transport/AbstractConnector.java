@@ -664,7 +664,16 @@ public abstract class AbstractConnector
             logger.info("Exception caught is a ConnectException, attempting to reconnect...");
             try
             {
-                disconnect();
+                try
+                {
+                    disconnect();
+                }
+                catch (Exception de)
+                {
+                    logger.error(de);
+                }
+                
+                // Log or otherwise handle exception
                 if (exceptionListener != null)
                 {
                     exceptionListener.exceptionThrown(exception);
@@ -673,6 +682,8 @@ public abstract class AbstractConnector
                 {
                     throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNotExceptionListener(this.getName()), exception);
                 }
+                
+                // Reconnect (retry policy will go into effect here if configured)
                 connect();
             }
             catch (Exception e)
