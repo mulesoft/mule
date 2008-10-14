@@ -64,14 +64,16 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="autoDelete" type="mule:substitutableBoolean">
+                <xsd:attribute name="autoDelete" type="mule:substitutableBoolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
-                            By default, when a file is received it is read into a String or byte[]. The file is moved if the moveToDirectory is set, otherwise it is deleted. To access the File object set this property to false and specify a NoActionTransformer transformer for the connector. Mule will not delete the file, so it is up to the component to delete it when it is done. If the moveToDirectory is set, the file is first moved, then the File object of the moved file is passed to the component. It is recommended that a moveToDirectory is specified when turning autoDelete off.
+                            If set to true, it will cause the file to be deleted once it is read. If streaming is turned on, this occurs when the InputStream for the file is closed. Otherwise the file will be read into memory and deleted immediately.
+                            
+                            To access the {{java.io.File}} object set this property to false and specify a NoActionTransformer transformer for the connector. Mule will not delete the file, so it is up to the component to delete it when it is done. If the moveToDirectory is set, the file is first moved, then the File object of the moved file is passed to the component. It is recommended that a moveToDirectory is specified when turning autoDelete off.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="outputAppend" type="mule:substitutableBoolean">
+                <xsd:attribute name="outputAppend" type="mule:substitutableBoolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
                             Whether the output should be appended to the existing file.
@@ -85,7 +87,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="streaming" type="mule:substitutableBoolean">
+                <xsd:attribute name="streaming" type="mule:substitutableBoolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
                             Should a FileInputStream be sent as the message payload or a File?
