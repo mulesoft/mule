@@ -105,11 +105,41 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="addressAttributes">
-        <xsd:attribute name="host" type="xsd:string"/>
-        <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
-        <xsd:attribute name="object" type="xsd:string"/>
-        <xsd:attribute name="method" type="xsd:string"/>
-        <xsd:attribute name="methodArgumentTypes" type="xsd:string"/>
+        <xsd:attribute name="host" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The endpoint host name.
+                </xsd:documentation>
+            </xsd:annotation>
+         </xsd:attribute>
+        <xsd:attribute name="port" type="mule:substitutablePortNumber">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The port number to use when a connection is made.
+                </xsd:documentation>
+            </xsd:annotation>
+         </xsd:attribute>
+        <xsd:attribute name="object" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The class name of the object that is being invoked over RMI.
+                </xsd:documentation>
+            </xsd:annotation>
+         </xsd:attribute>
+        <xsd:attribute name="method" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The name of the method to invoke.
+                </xsd:documentation>
+            </xsd:annotation>
+         </xsd:attribute>
+        <xsd:attribute name="methodArgumentTypes" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Comma separated argument types of the method to invoke. For example, "java.lang.String".
+                </xsd:documentation>
+            </xsd:annotation>
+         </xsd:attribute>
     </xsd:attributeGroup>
 
 </xsd:schema>
