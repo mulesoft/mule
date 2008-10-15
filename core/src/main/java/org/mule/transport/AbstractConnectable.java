@@ -218,9 +218,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             }
         });
         
-        // Wait until we are connected (or until the retry policy is exhausted and a final exception has been thrown).
-        connected.whenTrue(null);
-
         if (startOnConnect)
         {
             start();
