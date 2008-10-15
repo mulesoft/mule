@@ -548,25 +548,30 @@ public abstract class AbstractConnector
     {
         if (receiverWorkManager.get() == null)
         {
-            ThreadingProfile tp = getReceiverThreadingProfile();
-            if (tp == null)
-            {
-                throw new ConfigurationException(MessageFactory.createStaticMessage("No ReceiverThreadingProfile has been configured"));
-            }
-            WorkManager newWorkManager = tp.createWorkManager(getName() + ".receiver");
+            WorkManager newWorkManager = this.getReceiverThreadingProfile().createWorkManager(
+                getName() + ".receiver");
 
             if (receiverWorkManager.compareAndSet(null, newWorkManager))
             {
                 newWorkManager.start();
             }
         }
-
         if (dispatcherWorkManager.get() == null)
         {
             WorkManager newWorkManager = this.getDispatcherThreadingProfile().createWorkManager(
                 getName() + ".dispatcher");
 
             if (dispatcherWorkManager.compareAndSet(null, newWorkManager))
+            {
+                newWorkManager.start();
+            }
+        }
+        if (requesterWorkManager.get() == null)
+        {
+            WorkManager newWorkManager = this.getRequesterThreadingProfile().createWorkManager(
+                getName() + ".requester");
+
+            if (requesterWorkManager.compareAndSet(null, newWorkManager))
             {
                 newWorkManager.start();
             }
