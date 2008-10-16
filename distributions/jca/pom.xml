@@ -128,12 +128,8 @@
             <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <!-- OSGi-ready -->
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-stax-api_1.0_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
+        <!-- Do not exclude geronimo-stax-api because some appservers (e.g. jboss 4.2.3) does not 
+             come with this API -->
         <!-- Distributed separately in profiler pack -->
         <dependency>
             <groupId>com.yourkit</groupId>

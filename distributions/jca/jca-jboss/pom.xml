@@ -67,5 +67,15 @@
             <version>${mx4jVersion}</version>
             <scope>provided</scope>
         </dependency>
+        <!--
+             Exclude bsh because it is already in JBoss lib dir and if it is deployed along with mule
+             JBoss tries to delpoy embedded .bsh scripts.
+        -->
+        <dependency>
+            <groupId>bsh</groupId>
+            <artifactId>bsh.osgi</artifactId>
+            <version>${bshVersion}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>
