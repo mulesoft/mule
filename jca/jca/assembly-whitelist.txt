@@ -38,6 +38,7 @@ cxf-rt-ws-security-2.1.2
 cxf-tools-common-2.1.2
 dom4j.osgi-1.6.1
 FastInfoset-1.2.2
+geronimo-stax-api_1.0_spec-1.0.1
 groovy-all-1.5.6
 groovy-engine.osgi-1.1
 hibernate.osgi-3.2.2.ga
