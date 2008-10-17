@@ -12,12 +12,10 @@ package org.mule.api.retry;
 
 
 /**
- * A factory responsible for creating a retry policy.  Custom policies should
- * Implement this factory and provide a private class which implements the 
- * {@link org.mule.api.retry.RetryPolicy} interface.  
- * The factory is the object that actually gets configured then new
- * {@link org.mule.api.retry.RetryPolicy} objects are created each time using the configuration
- * on the factory. 
+ * A RetryPolicyTemplate creates a new {@link RetryPolicy} instance each time the retry goes into effect, 
+ * thereby resetting any state the policy may have (counters, etc.)
+ * 
+ * A {@link RetryNotifier} may be set in order to take action upon each retry attempt.
  */
 public interface RetryPolicyTemplate
 {

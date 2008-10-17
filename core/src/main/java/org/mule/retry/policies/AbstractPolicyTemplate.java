@@ -26,13 +26,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Base class for PolicyFactory implementations
- * */
+ * Base class for RetryPolicyTemplate implementations.  Uses ConnectNotifier as RetryNotifier
+ * by default.
+ */
 public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
 {
-    /** should the retry template using this policy be executed in its own thread */
-    protected boolean connectAsychronously = false;
-
     protected RetryNotifier notifier = new ConnectNotifier();
     
     protected transient final Log logger = LogFactory.getLog(getClass());
@@ -101,24 +99,6 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
         }
     }
     
-    /**
-     * should the retry template using this policy be executed in its own thread
-     * @return
-     */
-    public boolean isConnectAsynchronously()
-    {
-        return connectAsychronously;
-    }
-
-    /**
-     * should the retry template using this policy be executed in its own thread
-     * @param conectAsychronously
-     */
-    public void setConectAsychronously(boolean connectAsychronously)
-    {
-        this.connectAsychronously = connectAsychronously;
-    }
-
     public RetryNotifier getNotifier()
     {
         return notifier;

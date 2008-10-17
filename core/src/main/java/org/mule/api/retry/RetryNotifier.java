@@ -11,13 +11,14 @@
 package org.mule.api.retry;
 
 /**
- * The RetryNotifier interface is a callback that allows actions to be performed after each retry. For example, when
- * retrying connections Mule will fire server notification events on success or failure.
+ * This interface is a callback that allows actions to be performed after each retry attempt, 
+ * such as firing notifications, logging, etc.
  */
-
 public interface RetryNotifier
 {
-    public void sucess(RetryContext context);
-
+    /** Called each time a retry attempt fails. */
     public void failed(RetryContext context, Throwable e);
+
+    /** Called when a retry attempt finally suceeds. */
+    public void sucess(RetryContext context);
 }

@@ -14,8 +14,7 @@ import org.mule.api.retry.RetryPolicy;
 import org.mule.retry.PolicyStatus;
 
 /**
- * This policy does what it says on the tin.  It will allow a {@link RetryTemplate} to execute
- * once and then stop.
+ * This policy is basically a placeholder.  It does not attempt to retry at all.
  */
 public class NoRetryPolicyTemplate extends AbstractPolicyTemplate
 {

@@ -13,7 +13,10 @@ package org.mule.retry;
 import org.mule.api.lifecycle.FatalException;
 import org.mule.config.i18n.Message;
 
-/** TODO document */
+/** 
+ * This exception is thrown when a Retry policy has made all the retry attempts 
+ * it wants to make and is still failing.
+ */
 public class RetryPolicyExhaustedException extends FatalException
 {
     /** Serial version */

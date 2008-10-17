@@ -11,7 +11,7 @@
 package org.mule.retry;
 
 /**
- * When a policy is executed, it can be in two states -
+ * Indicates the current state of a {@link RetryPolicy}
  * - ok: The policy is active
  * - exhausted: The policy has run through the actions for the policy
  *

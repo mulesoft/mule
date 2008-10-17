@@ -14,8 +14,10 @@ import org.mule.api.MuleMessage;
 
 import java.util.Map;
 
-/** TODO */
-
+/**
+ * The RetryContext is used to store any data which carries over from 
+ * attempt to attempt such as response messages.
+ */
 public interface RetryContext
 {
     Map getMetaInfo();

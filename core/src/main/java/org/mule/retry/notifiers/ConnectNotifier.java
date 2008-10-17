@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Fires a ConnectionNotification when the Retry Policy succeeds or fails.
+ * Fires a {@link ConnectionNotification} each time a retry attempt is made.
  */
 public class ConnectNotifier implements RetryNotifier
 {
