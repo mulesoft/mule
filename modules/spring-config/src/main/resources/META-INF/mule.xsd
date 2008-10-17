@@ -1989,6 +1989,7 @@
                             <xsd:enumeration value="ognl"/>
                             <xsd:enumeration value="xpath"/>
                             <xsd:enumeration value="jxpath"/>
+                            <xsd:enumeration value="groovy"/>
                             <xsd:enumeration value="bean"/>
                             <xsd:enumeration value="custom"/>
                         </xsd:restriction>
