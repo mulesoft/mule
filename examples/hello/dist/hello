@@ -23,8 +23,9 @@ MULE_LIB=./conf
 export MULE_LIB
 
 echo "The Hello example is available in two variations:"
-echo "  1. Simple Configuration"
-echo "  2. Receive events via HTTP"
+echo "  1. Hello from the Command Line"
+echo "  2. Hello using the HTTP transport"
+echo "     (surf to http://localhost:8888/?name=Dolly)"
 echo "Select the one you wish to execute and press Enter..."
 read i
 

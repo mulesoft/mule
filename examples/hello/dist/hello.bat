@@ -11,8 +11,9 @@ REM Any changes to the files in .\conf will take precedence over those deployed 
 SET MULE_LIB=.\conf
 
 ECHO The Hello example is available in two variations:
-ECHO   1. Simple Configuration
-ECHO   2. Receive events via HTTP
+ECHO   1. Hello from the Command Line
+ECHO   2. Hello using the HTTP transport
+ECHO      (surf to http://localhost:8888/?name=Dolly)
 SET /P Choice=Select the one you wish to execute and press Enter...
 
 IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -config hello-config.xml

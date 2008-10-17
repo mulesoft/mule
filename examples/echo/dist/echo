@@ -23,9 +23,11 @@ MULE_LIB=./conf
 export MULE_LIB
 
 echo "The Echo example is available in three variations:"
-echo "  1. Simple Echo Configuration"
+echo "  1. Echo from the Command Line"
 echo "  2. Echo using the Axis Transport"
-echo "  3. Echo using the Cxf Transport"
+echo "     (surf to http://localhost:65081/services/EchoUMO?method=echo&param=hello)"
+echo "  3. Echo using the CXF Transport"
+echo "     (surf to http://localhost:65082/services/EchoUMO/echo/text/hello)"
 echo "Select the one you wish to execute and press Enter..."
 read i
 
