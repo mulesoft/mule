@@ -47,7 +47,7 @@ public class ExpressionEvaluatorManager
     {
         if (evaluator == null)
         {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("extractor").getMessage());
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("evaluator").getMessage());
         }
 
         final String name = evaluator.getName();
