@@ -27,13 +27,5 @@
         <!-- <rar-name>mule-jca-${version}.rar</rar-name> -->
         <rar-name>mule-jca-jboss-${version}.rar</rar-name>
         <connection-definition>org.mule.module.jca.MuleConnectionFactory</connection-definition>
-        <!--
-            Uncomment and override with custom settings, don't edit ra.xml directly.
-
-        <config-property name="ConfigurationBuilder"
-                         type="java.lang.String">org.mule.module.spring.config.SpringConfigurationBuilder</config-property>
-        <config-property name="Configurations"
-                         type="java.lang.String">my-custom-mule-config.xml</config-property>
-        -->
     </tx-connection-factory>
 </connection-factories> 
