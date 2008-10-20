@@ -46,4 +46,15 @@ public class JndiJmsConnectorTestCase extends AbstractJmsFunctionalTestCase
         assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
     }
     
+    public void testTopicFromJndi() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        
+        client.dispatch("jms://topic:in3?connector=jmsConnector2", DEFAULT_INPUT_MESSAGE, null);
+        
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+    }
+    
 }

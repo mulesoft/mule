@@ -19,6 +19,7 @@
                 through JNDI properties
             -->
             <spring:prop key="queue.in2">in-queue2</spring:prop>
+            <spring:prop key="topic.in3">in-topic3</spring:prop>
         </util:properties>
     </spring:beans>
     
@@ -57,6 +58,18 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="TopicFromJndi">
+            <inbound>
+                <!-- this topic is looked up from JNDI -->
+                <jms:inbound-endpoint topic="in3" connector-ref="jmsConnector2"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out" />
                 </pass-through-router>
             </outbound>
         </service>
