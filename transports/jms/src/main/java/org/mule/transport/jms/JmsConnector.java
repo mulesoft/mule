@@ -33,6 +33,7 @@ import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
+import org.mule.util.BeanUtils;
 
 import java.text.MessageFormat;
 import java.util.Hashtable;
@@ -100,6 +101,8 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     private Connection connection;
 
     private ConnectionFactory connectionFactory;
+    
+    private Map connectionFactoryProperties;
 
     public String username = null;
 
@@ -164,6 +167,12 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         catch (NamingException ne)
         {
             throw new InitialisationException(JmsMessages.errorCreatingConnectionFactory(), this);
+        }
+        
+        if ((connectionFactoryProperties != null) && !connectionFactoryProperties.isEmpty())
+        {
+            // apply connection factory properties
+            BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
         }
         
         if (topicResolver == null)
@@ -1114,6 +1123,23 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
    public void setForceJndiDestinations(boolean forceJndiDestinations)
    {
        this.forceJndiDestinations = forceJndiDestinations;
+   }
+
+   /**
+    * @return Returns underlying connection factory properties.
+    */
+   public Map getConnectionFactoryProperties()
+   {
+       return connectionFactoryProperties;
+   }
+
+   /**
+    * @param connectionFactoryProperties properties to be set on the underlying
+    *            ConnectionFactory.
+    */
+   public void setConnectionFactoryProperties(Map connectionFactoryProperties)
+   {
+       this.connectionFactoryProperties = connectionFactoryProperties;
    }
 
 }
