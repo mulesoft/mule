@@ -53,7 +53,6 @@
     </scm>
 
     <properties>
-        <muleCEVersion>2.2.0-SNAPSHOT</muleCEVersion>
         <!--
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
@@ -160,77 +159,77 @@
             <dependency>
                 <groupId>org.mule</groupId>
                 <artifactId>mule-core</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.modules</groupId>
                 <artifactId>mule-module-client</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.modules</groupId>
                 <artifactId>mule-module-spring-config</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.modules</groupId>
                 <artifactId>mule-module-builders</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.modules</groupId>
                 <artifactId>mule-module-xml</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-bpm</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-file</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-http</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-rmi</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-soap</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-ssl</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-tcp</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-udp</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-vm</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-stdio</artifactId>
-                <version>${muleCEVersion}</version>
+                <version>${version}</version>
             </dependency>
 
              <dependency>
