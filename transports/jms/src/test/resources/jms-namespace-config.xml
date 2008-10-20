@@ -85,6 +85,12 @@
                    jndiProviderProperties-ref="providerProperties"
                    connectionFactoryJndiName="jms/connectionFactory" 
                    jndiDestinations="true"
-                   forceJndiDestinations="true"/>
+                   forceJndiDestinations="true">
 
+        <spring:property name="connectionFactoryProperties">
+            <spring:map>
+                <spring:entry key="customProperty" value="customValue"/>
+            </spring:map>
+        </spring:property>
+    </jms:connector>
 </mule>

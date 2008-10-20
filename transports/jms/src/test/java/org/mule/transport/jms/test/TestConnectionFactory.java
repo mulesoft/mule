@@ -19,6 +19,7 @@ public class TestConnectionFactory implements QueueConnectionFactory
 {
     private String providerProperty = "NOT_SET";
     private String connectionFactoryProperty = "NOT_SET";
+    private Object customProperty;
 
     public Connection createConnection() throws JMSException
     {
@@ -64,5 +65,15 @@ public class TestConnectionFactory implements QueueConnectionFactory
     public QueueConnection createQueueConnection(String string, String string1) throws JMSException
     {
         return null;
+    }
+    
+    public Object getCustomProperty()
+    {
+        return customProperty;
+    }
+    
+    public void setCustomProperty(Object custom)
+    {
+        customProperty = custom;
     }
 }

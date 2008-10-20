@@ -176,5 +176,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(connector.isJndiDestinations());
         assertTrue(connector.isForceJndiDestinations());
         assertEquals("value", connector.getJndiProviderProperties().get("key"));
+        assertEquals("customValue", connector.getConnectionFactoryProperties().get("customProperty"));
+        assertEquals("customValue", ((TestConnectionFactory) connector.getConnectionFactory()).getCustomProperty());
     }
 }
