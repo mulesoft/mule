@@ -1,18 +1,36 @@
 /**
  * SwitchVersion
  *
- * Usage: SwitchVersion <directory> <old version> <new version>
- *
- * Finds recursively all pom.xml files and switches <old version>
- * to <new version>.
+ * Finds recursively all pom.xml files and switches <old version> to <new version>.
+ * 
+ * $Id$
  */
 
 import java.util.regex.Pattern
 
-def root = new File(args[0])
+def cliBuilder = new CliBuilder()
+cliBuilder.f(longOpt: "from", args: 1, required: true, "switch from version (e.g. 2.0)")
+cliBuilder.h(longOpt: "help", "show usage info")
+cliBuilder.r(longOpt: "root", args: 1, required: true, "start scanning at this root folder")
+cliBuilder.t(longOpt: "to", args: 1, required: true, "switch to version (e.g. 2.1)")
 
-oldVersion = args[1]
-newVersion = args[2]
+options = cliBuilder.parse(args)
+if (!options)
+{
+    println ""
+    println "Error parsing options " + args
+    println ""
+    System.exit(1)
+}
+if (options.h)
+{
+    cliBuilder.usage()
+    System.exit(0)
+}
+
+def root = new File(options.r)
+oldVersion = options.f
+newVersion = options.t
 
 versionPattern = Pattern.compile("\\s*<version>.*</version>.*")
 
