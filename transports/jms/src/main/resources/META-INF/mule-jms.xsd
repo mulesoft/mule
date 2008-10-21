@@ -159,7 +159,13 @@
     <xsd:complexType name="activeMqConnectorType">
         <xsd:complexContent>
             <xsd:extension base="vendorJmsConnectorType">
-                <xsd:attribute name="brokerURL" type="xsd:string"/>
+                <xsd:attribute name="brokerURL" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        The URL used to connect to the JMS server. If not set, the default is vm://localhost?broker.persistent=false&amp;broker.useJmx=false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
