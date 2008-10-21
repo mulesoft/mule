@@ -166,7 +166,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         catch (NamingException ne)
         {
-            throw new InitialisationException(JmsMessages.errorCreatingConnectionFactory(), this);
+            throw new InitialisationException(JmsMessages.errorCreatingConnectionFactory(), ne, this);
         }
         
         if ((connectionFactoryProperties != null) && !connectionFactoryProperties.isEmpty())
