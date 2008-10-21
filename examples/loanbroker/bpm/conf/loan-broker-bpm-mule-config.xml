@@ -24,9 +24,6 @@
         <jms:activemq-connector name="jmsConnector" />
     -->
 
-    <!-- The Loan Broker is driven by a Process Engine -->
-    <endpoint name="ProcessEngine" address="bpm://LoanBroker" />
-
     <!-- Customer loan requests to the Loan Broker -->
     <vm:endpoint name="CustomerRequests" path="customer.requests" connector-ref="syncVm" />
     <!-- Requests to the credit agency -->
@@ -57,7 +54,7 @@
             <component class="org.mule.example.loanbroker.DefaultLoanBroker" />
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint ref="ProcessEngine" synchronous="false" />
+                    <bpm:outbound-endpoint process="LoanBroker" />
                 </filtering-router>
             </outbound>
         </service>
@@ -65,7 +62,7 @@
         <!-- Messages generated from the process engine -->
         <service name="FromBPMS">
             <inbound>
-                <inbound-endpoint ref="ProcessEngine" />
+                <bpm:inbound-endpoint process="LoanBroker" />
             </inbound>
             <component class="org.mule.example.loanbroker.DefaultLoanBroker" />
             <outbound>
