@@ -97,11 +97,14 @@
                 <exclude name="**/com.springsource.javax.servlet*.jar"/>
                 <exclude name="**/servlet-api*.jar"/>
             </lib>
+            <lib dir="${dir.mule.home}/lib/endorsed">
+                <include name="xercesImpl-*"/>
+            </lib>
             <!-- This libs decl is needed for building the example on Mule EE -->
             <lib dir="${dir.mule.home}/lib/boot">
                 <include name="*slf4j*"/>
                 <include name="log4j-*.jar"/>
-                <include name="commons-codec-*"/>
+                <include name="commons-codec*"/>
             </lib>
             <fileset dir="${dir.webapp}"/>
             <classes dir="${dir.classes}"/>
