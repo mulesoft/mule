@@ -24,6 +24,9 @@ import javax.jms.Session;
 import javax.jms.Topic;
 import javax.naming.NamingException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>Jms11Support</code> is a template class to provide an abstraction to to
  * the JMS 1.1 API specification.
@@ -31,6 +34,12 @@ import javax.naming.NamingException;
 
 public class Jms11Support implements JmsSupport
 {
+
+    /**
+     * logger used by this class
+     */
+    protected final Log logger = LogFactory.getLog(getClass());
+
     protected JmsConnector connector;
 
     public Jms11Support(JmsConnector connector)
@@ -118,6 +127,10 @@ public class Jms11Support implements JmsSupport
             Destination dest = this.getJndiDestination(name);
             if (dest != null)
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(MessageFormat.format("Destination {0} located in JNDI, will use it now", name));
+                }
                 return dest;
             }
             else if (connector.isForceJndiDestinations())
@@ -125,7 +138,12 @@ public class Jms11Support implements JmsSupport
                 throw new JMSException("JNDI destination not found with name: " + name);
             }
         }
-        
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Using non-JNDI destination " + name + ", will create one now");
+        }
+
         if (session == null)
         {
             throw new IllegalArgumentException("MuleSession cannot be null when creating a destination");
@@ -150,12 +168,16 @@ public class Jms11Support implements JmsSupport
         Object temp;
         try
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(MessageFormat.format("Looking up {0} from JNDI", name));
+            }
             temp = connector.lookupFromJndi(name);
         }
         catch (NamingException e)
         {
             String message = MessageFormat.format("Failed to look up destination {0}. Reason: {1}",
-                new Object[] { name, e.getMessage() });
+                                                  name, e.getMessage());
             throw new JMSException(message);
         }
         

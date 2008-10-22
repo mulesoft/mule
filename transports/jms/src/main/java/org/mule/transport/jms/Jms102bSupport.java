@@ -10,6 +10,8 @@
 
 package org.mule.transport.jms;
 
+import java.text.MessageFormat;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
@@ -166,12 +168,22 @@ public class Jms102bSupport extends Jms11Support
             Destination dest = this.getJndiDestination(name);
             if (dest != null)
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(MessageFormat.format("Destination {0} located in JNDI, will use it now", name));
+                }
+
                 return dest;
             }
             else if (connector.isForceJndiDestinations())
             {
                 throw new JMSException("JNDI destination not found with name: " + name);
             }
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Using non-JNDI destination " + name + ", will create one now");
         }
 
         if (session == null)
