@@ -73,7 +73,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             if (logger.isInfoEnabled())
             {
                 logger.info("Destination " + getEndpoint().getEndpointURI() + " is a topic, but " + receiversCount +
-                                " receivers have been configured. Will configure only 1.");
+                                " receivers have been requested. Will configure only 1.");
             }
             receiversCount = 1;
         }
