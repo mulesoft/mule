@@ -176,6 +176,10 @@ public class Jms11Support implements JmsSupport
         }
         catch (NamingException e)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(e);
+            }
             String message = MessageFormat.format("Failed to look up destination {0}. Reason: {1}",
                                                   name, e.getMessage());
             throw new JMSException(message);
