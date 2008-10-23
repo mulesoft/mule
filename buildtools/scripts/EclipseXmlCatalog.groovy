@@ -1,7 +1,11 @@
 /*
  * Genrerates a file that can be imported as eclipse XML catalog
+ * 
+ * $Id$
  */
 
+import org.codehaus.groovy.ant.FileScanner
+ 
 //  the structure of xsd locations
 corexsd = /.*(\/|\\)spring-config(\/|\\).*(\/|\\)mule.xsd/
 otherxsd = /.*(\/|\\)(transports|modules|tests)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
@@ -43,19 +47,8 @@ if (options.s)
     schemaVersion = options.s
 }
 
-//checkCurrentDirectory()
+ant = new AntBuilder()
 searchEclipseProjects()
-
-def checkCurrentDirectory()
-{
-    if (! (new File("").getCanonicalFile().getName() == "scripts"))
-    {
-        println ""
-        println "WARNING: run from in the buildtools/scripts directory"
-        println ""
-        System.exit(1)
-    }
-}
 
 def searchEclipseProjects()
 {
@@ -63,12 +56,17 @@ def searchEclipseProjects()
     
     println("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<catalog xmlns=\"urn:oasis:names:tc:entity:xmlns:xml:catalog\">")
     
-    for (projectFile in new AntBuilder().fileScanner {
+    FileScanner scanner = ant.fileScanner 
+    {
         fileset(dir:root)
         {
             include(name:"**/.project")
-        }})
+        }        
+    }
+    scanner.each
     {
+        projectFile ->
+    
         // extract the project's name from the .project file
         match = (projectFile.getText() =~ nameRegEx)
         projectName =  match[0][1]
@@ -82,15 +80,19 @@ def searchEclipseProjects()
 def processProject(projectFile, projectName)
 {
     projectDir = projectFile.getParentFile()
-    for (xsdFile in new AntBuilder().fileScanner {
+    
+    FileScanner scanner = ant.fileScanner 
+    {
         fileset(dir:projectDir)
         {
             include(name:"**/*.xsd")
             exclude(name:"**/src/test/**/*.xsd")
             exclude(name:"**/target/**/*.xsd")
-        }})
+        }
+    }
+    scanner.each
     {
-        printSchemaEntry(projectName, projectFile, xsdFile)
+        printSchemaEntry(projectName, projectFile, it)
     }
 }
 
@@ -105,7 +107,15 @@ def printSchemaEntry(projectName, projectFile, xsdFile)
     {
         match = (xsdFile.absolutePath =~ otherxsd)
         name = match[0][7]
-        schemaSource = "${base}${name}/$schemaVersion/mule-${name}.xsd"
+        
+        urlPath = name
+        if (options.e)
+        {
+            // The name still has the -ee suffix. The URLs however may not include the -ee suffix
+            urlPath = name.replace("-ee", "")
+        }
+        
+        schemaSource = "${base}${urlPath}/$schemaVersion/mule-${name}.xsd"
     }
     else
     {
