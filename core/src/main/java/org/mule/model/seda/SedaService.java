@@ -38,6 +38,8 @@ import org.mule.transport.NullPayload;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
+import java.text.MessageFormat;
+
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
@@ -188,8 +190,8 @@ public class SedaService extends AbstractService implements Work, WorkListener
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Service: " + name + " has received asynchronous event on: "
-                         + event.getEndpoint().getEndpointURI());
+            logger.debug(MessageFormat.format("Service: {0} has received asynchronous event on: {1}",
+                                              name, event.getEndpoint().getEndpointURI()));
         }
 
         // Block until we can queue the next event
@@ -221,7 +223,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(this + " : got proxy for " + event.getId() + " = " + component);
+                logger.debug(MessageFormat.format("{0} : got proxy for {1} = {2}", this, event.getId(), component));
             }
             Object replyTo = event.getMessage().getReplyTo();
             ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), (InboundEndpoint) event.getEndpoint());
@@ -326,8 +328,8 @@ public class SedaService extends AbstractService implements Work, WorkListener
 
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Service: " + name + " dequeued event on: "
-                                        + event.getEndpoint().getEndpointURI());
+                        logger.debug(MessageFormat.format("Service: {0} dequeued event on: {1}",
+                                                          name, event.getEndpoint().getEndpointURI()));
                     }
                     workManager.scheduleWork(new ComponentStageWorker(event), WorkManager.INDEFINITE, null, this);
                 }
@@ -367,7 +369,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
         }
         if (logger.isDebugEnabled())
         {
-            logger.debug("Service " + name + " putting event on queue " + queue.getName() + ": " + event);
+            logger.debug(MessageFormat.format("Service {0} putting event on queue {1}: {2}", name, queue.getName(), event));
         }
         queue.put(event);
     }
@@ -380,7 +382,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
         }
         if (logger.isDebugEnabled())
         {
-            logger.debug("Service " + name + " polling queue " + queue.getName() + ", timeout = " + queueTimeout);
+            logger.debug(MessageFormat.format("Service {0} polling queue {1}, timeout = {2}", name, queue.getName(), queueTimeout));
         }
         if (getQueueTimeout() == null)
         {
