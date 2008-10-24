@@ -8,19 +8,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.security;
+package org.mule.test.config;
 
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.security.SecurityManager;
 import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.security.MockEncryptionStrategy;
+import org.mule.tck.security.MockSecurityProvider;
 
 import java.util.Iterator;
 
-/**
- * TODO - move to functional tests packge one Ross has finished working there
- */
 public class SecurityNamespaceHandlerTestCase extends FunctionalTestCase
 {
 

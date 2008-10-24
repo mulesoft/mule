@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.security;
+package org.mule.tck.security;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.Authentication;

@@ -8,21 +8,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.security;
+package org.mule.tck.security;
 
-public class Named
+import org.mule.security.SecretKeyFactory;
+
+/**
+ * Empty mock for tests
+ */
+public class MockKeyFactory extends Named implements SecretKeyFactory
 {
 
-    private String name;
-
-    public String getName()
+    public byte[] getKey()
     {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
+        return "key".getBytes();
     }
 
 }
