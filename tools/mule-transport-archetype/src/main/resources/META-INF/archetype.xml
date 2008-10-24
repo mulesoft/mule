@@ -13,12 +13,13 @@
         </variable>
         <variable>
             <name>forgeProject</name>
-            <description>Will This project be hosted on MuleForge? [y] or [n]</description>
+            <description>Will this project be hosted on MuleForge? [y] or [n]</description>
             <defvalue>y</defvalue>
         </variable>
         <variable>
             <name>hasCustomSchema</name>
-            <description>Will This transport have a custom schema for configuring the transport in Xml?</description>
+            <description>Will this transport have a custom schema for configuring the transport in Xml? 
+[y] or [n]</description>
             <defvalue>y</defvalue>
         </variable>
         <variable>
@@ -36,8 +37,12 @@
 
                 <variable>
                     <name>inboundTransformer</name>
+                    <!-- 
+                        Indentation matters here! Do not indent the second line as this will cause 
+                        odd indentation when actually running the archetype.
+                    -->
                     <description>If this transport will have a default inbound transformer, enter the name of the
-                        transformer? (i.e. JmsMessageToObject)
+transformer? (i.e. JmsMessageToObject)
                     </description>
                     <defvalue>n</defvalue>
                 </variable>
@@ -52,8 +57,12 @@
             <variables>
                 <variable>
                     <name>outboundTransformer</name>
+                    <!-- 
+                        Indentation matters here! Do not indent the second line as this will cause 
+                        odd indentation when actually running the archetype.
+                    -->
                     <description>If this transport will have a default outbound transformer, enter the name of the
-                        transformer? (i.e. ObjectToJmsMessage)
+transformer? (i.e. ObjectToJmsMessage)
                     </description>
                     <defvalue>n</defvalue>
                 </variable>
@@ -68,8 +77,12 @@
             <variables>
                 <variable>
                     <name>hasCustomTransactions</name>
+                    <!-- 
+                        Indentation matters here! Do not indent the second line as this will cause 
+                        odd indentation when actually running the archetype.
+                    -->
                     <description>Does this transport use a non-JTA Transaction manager? [y] or [n]
-                        (i.e. needs to wrap proprietary transaction management)
+(i.e. needs to wrap proprietary transaction management)
                     </description>
                     <defvalue>n</defvalue>
                 </variable>
@@ -78,11 +91,15 @@
 
         <variable>
             <name>endpointBuilder</name>
-            <description>What type of Endpoints does this transport use?
-                - [r]esource endpoints (i.e. jms://my.queue)
-                - [u]rl endpoints (i.e. http://localhost:1234/context/foo?param=1)
-                - [s]ocket endpoints (i.e. tcp://localhost:1234)
-                - [c]ustom - parse your own
+            <!-- 
+                Indentation matters here! Do not indent the second line as this will cause 
+                odd indentation when actually running the archetype.
+            -->
+            <description>What type of endpoints does this transport use?
+            - [r]esource endpoints (i.e. jms://my.queue)
+            - [u]rl endpoints (i.e. http://localhost:1234/context/foo?param=1)
+            - [s]ocket endpoints (i.e. tcp://localhost:1234)
+            - [c]ustom - parse your own
             </description>
             <defvalue>r</defvalue>
         </variable>
