@@ -67,11 +67,11 @@ public class MessageExpressionEvaluator implements ExpressionEvaluator
                 }
                 else if (expression.equals("correlationSequence"))
                 {
-                    return new Integer(((MuleMessage) message).getCorrelationSequence());
+                    return ((MuleMessage) message).getCorrelationSequence();
                 }
                 else if (expression.equals("correlationGroupSize"))
                 {
-                    return new Integer(((MuleMessage) message).getCorrelationGroupSize());
+                    return ((MuleMessage) message).getCorrelationGroupSize();
                 }
                 else if (expression.equals("replyTo"))
                 {
