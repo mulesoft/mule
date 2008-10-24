@@ -10,6 +10,11 @@
 
 package org.mule.example.bookstore;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,11 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.jws.WebService;
-
-import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 
 @WebService(serviceName="BookstoreService",
     portName="BookstorePort",
@@ -63,7 +63,7 @@ public class BookstoreImpl implements Bookstore
         try
         {
             Book book = books.get(bookId);
-            MuleMessage msg = new DefaultMuleMessage(new Object[] { book, address, email} );
+            MuleMessage msg = new DefaultMuleMessage(new Object[] { book, address, email}, (Map) null);
 
             RequestContext.getEventContext().dispatchEvent(msg, "orderEmailService");
             System.out.println("Dispatched message to orderService.");

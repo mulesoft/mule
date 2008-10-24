@@ -1,5 +1,5 @@
 /*
- * $$Id$$
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -9,6 +9,13 @@
  */
 
 package org.mule.example.bookstore.client;
+
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.context.DefaultMuleContextFactory;
+import org.mule.example.bookstore.Book;
+import org.mule.example.bookstore.Bookstore;
+import org.mule.example.bookstore.LocaleMessage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,12 +28,6 @@ import java.util.Random;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.example.bookstore.Book;
-import org.mule.example.bookstore.Bookstore;
-import org.mule.example.bookstore.LocaleMessage;
 
 public class BookstoreClient
 {
@@ -121,7 +122,7 @@ public class BookstoreClient
             {   
                 System.out.println("\n" + LocaleMessage.getOrderWelcomeMessage());
                 System.out.println("\n" + LocaleMessage.getBookIdPrompt());
-                long bookId = new Integer(getInput());
+                long bookId = Long.parseLong(getInput());
                 System.out.println("\n" + LocaleMessage.getHomeAddressPrompt());
                 String homeAddress = getInput();
                 System.out.println("\n" + LocaleMessage.getEmailAddressPrompt());
