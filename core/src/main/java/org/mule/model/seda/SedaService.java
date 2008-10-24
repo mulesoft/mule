@@ -90,7 +90,6 @@ public class SedaService extends AbstractService implements Work, WorkListener
      * 
      * @throws org.mule.api.lifecycle.InitialisationException if the service fails
      *             to initialise
-     * @see org.mule.api.UMODescriptor
      */
     protected synchronized void doInitialise() throws InitialisationException
     {
@@ -111,7 +110,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
         if (queueTimeout == null)
         {
             // TODO MULE-2102 This should be configured in the default template.
-            setQueueTimeout(new Integer(((SedaModel) model).getQueueTimeout()));
+            setQueueTimeout(((SedaModel) model).getQueueTimeout());
         }
         
         try
@@ -389,7 +388,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
         }
         else
         {
-            return (MuleEvent) queue.poll(getQueueTimeout().intValue());
+            return (MuleEvent) queue.poll(getQueueTimeout());
         }
     }
 
