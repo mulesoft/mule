@@ -52,6 +52,18 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
