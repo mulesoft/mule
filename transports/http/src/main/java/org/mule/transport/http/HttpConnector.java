@@ -103,7 +103,7 @@ public class HttpConnector extends TcpConnector
 
     private boolean followRedirects = false;
 
-    //@Override
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();

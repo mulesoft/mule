@@ -298,7 +298,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             messages.add(message);
         }
 
-        //@Override
+        @Override
         protected Object preProcessMessage(Object message) throws Exception
         {
             Message m = (Message) message;

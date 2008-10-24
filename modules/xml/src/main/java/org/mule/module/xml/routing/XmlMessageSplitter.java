@@ -110,7 +110,7 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
         this.externalSchemaLocation = externalSchemaLocation;
     }
 
-    //@Override
+    @Override
     public void initialise() throws InitialisationException
     {
         if (StringUtils.isBlank(splitExpression))

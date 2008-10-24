@@ -88,7 +88,7 @@ public class EventGroup implements Comparable, Serializable
      * 
      * @see java.lang.Object#equals(Object)
      */
-    // //@Override
+    // @Override
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -116,7 +116,7 @@ public class EventGroup implements Comparable, Serializable
      * 
      * @see java.lang.Object#hashCode()
      */
-    // //@Override
+    // @Override
     public int hashCode()
     {
         return groupId.hashCode();
@@ -247,7 +247,7 @@ public class EventGroup implements Comparable, Serializable
         }
     }
 
-    // //@Override
+    // @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer(80);

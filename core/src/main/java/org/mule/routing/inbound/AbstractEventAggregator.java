@@ -31,7 +31,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
 
     private int timeout = 0;
 
-    //@Override
+    @Override
     public void initialise() throws InitialisationException
     {
         eventCorrelator = new EventCorrelator(getCorrelatorCallback(), getMessageInfoMapping(), muleContext);
@@ -53,7 +53,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     protected abstract EventCorrelatorCallback getCorrelatorCallback();
 
 
-    //@Override
+    @Override
     public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
         MuleMessage msg = eventCorrelator.process(event);

@@ -16,7 +16,7 @@ import org.mule.tck.FunctionalTestCase;
 
 public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCase
 {
-    //@Override
+    @Override
     protected String getConfigResources()
     {
         return "groovy-transformer-config.xml";

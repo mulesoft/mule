@@ -23,7 +23,7 @@ public class JmxMissingIdTestCase extends TestCase
 {
     MuleContext muleContext;
     
-    //@Override
+    @Override
     protected void tearDown() throws Exception
     {
         super.tearDown();

@@ -26,7 +26,7 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
     private final String MANAGER_ID = "Test_Instance";
     private final String TEST_DOMAIN = JmxModernSupport.DEFAULT_JMX_DOMAIN_PREFIX + "." + MANAGER_ID;
 
-    //@Override
+    @Override
     protected void configureMuleContext(MuleContextBuilder contextBuilder)
     {
         super.configureMuleContext(contextBuilder);

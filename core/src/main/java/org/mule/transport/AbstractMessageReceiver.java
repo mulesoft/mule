@@ -109,7 +109,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
      * @throws org.mule.api.lifecycle.RecoverableException
      *          if an error occurs that can be recovered from
      */
-    //@Override
+    @Override
     public final void initialise() throws InitialisationException
     {
         super.initialise();
@@ -120,7 +120,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         doInitialise();
     }
 
-    //@Override
+    @Override
     public final synchronized void dispose()
     {
         super.dispose();
@@ -402,7 +402,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         super.setEndpoint(endpoint);
     }
     
-    //@Override
+    @Override
     protected WorkManager getWorkManager()
     {
         try

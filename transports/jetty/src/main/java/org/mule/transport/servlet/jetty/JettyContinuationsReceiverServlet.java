@@ -27,7 +27,7 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
 {
     private Object mutex = new Object();
 
-    //@Override
+    @Override
     protected MuleMessage doMethod(HttpServletRequest request, String method) throws MuleException
     {
         final Continuation continuation = ContinuationSupport.getContinuation(request, mutex);

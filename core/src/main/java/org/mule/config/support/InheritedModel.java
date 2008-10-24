@@ -22,7 +22,7 @@ public class InheritedModel extends AbstractModel
     }
     
 
-    //@Override
+    @Override
     public String getName()
     {
         return super.getName() + "#" + hashCode();

@@ -138,7 +138,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
      *
      * {@inheritDoc}
      */
-    //@Override
+    @Override
     public Object getPayload(Class outputType) throws TransformerException
     {
         List results = new ArrayList(getMessageList().size());
@@ -158,7 +158,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     /**
      * {@inheritDoc}
      */
-    //@Override
+    @Override
     public byte[] getPayloadAsBytes() throws Exception
     {
         throw new UnsupportedOperationException("getPayloadAsBytes(), use getPayload(byte[].class)");
@@ -167,7 +167,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     /**
      * {@inheritDoc}
      */
-    //@Override
+    @Override
     public String getPayloadAsString(String encoding) throws Exception
     {
         throw new UnsupportedOperationException("getPayloadAsString(), use getPayload(String[].class)");

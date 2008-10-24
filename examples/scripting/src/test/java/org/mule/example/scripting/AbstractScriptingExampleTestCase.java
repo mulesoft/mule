@@ -16,7 +16,7 @@ import java.util.Properties;
 
 public abstract class AbstractScriptingExampleTestCase extends FunctionalTestCase
 {    
-    //@Override
+    @Override
     protected String getConfigResources()
     {
         return "change-machine.xml";
@@ -26,7 +26,7 @@ public abstract class AbstractScriptingExampleTestCase extends FunctionalTestCas
     
     abstract protected String getCurrency();
     
-    //@Override
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties props = new Properties();

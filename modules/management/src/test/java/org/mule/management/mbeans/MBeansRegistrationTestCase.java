@@ -41,7 +41,7 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
     private String domainName;
     private JmxSupport jmxSupport;
 
-    //@Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();

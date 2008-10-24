@@ -25,7 +25,7 @@ import javax.servlet.ServletContext;
  */
 public class MockTestCase extends AbstractWebappTestCase
 {
-    //@Override
+    @Override
     protected String getConfigurationResources()
     {
         return "jmx-config.xml," +

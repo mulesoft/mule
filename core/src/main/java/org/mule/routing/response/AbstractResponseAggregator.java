@@ -36,7 +36,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
     private EventCorrelator eventCorrelator;
 
-    //@Override
+    @Override
     public void initialise() throws InitialisationException
     {
         if (timeout == -1) // undefined

@@ -36,7 +36,7 @@ public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunction
 
     Scenario scenarioAcknowledge = new NonTransactedScenario()
     {
-        //@Override
+        @Override
         public int getAcknowledge()
         {
             return Session.CLIENT_ACKNOWLEDGE;
@@ -58,7 +58,7 @@ public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunction
 
     Scenario scenarioWithoutAcknowledge = new NonTransactedScenario()
     {
-        //@Override
+        @Override
         public int getAcknowledge()
         {
             return Session.CLIENT_ACKNOWLEDGE;

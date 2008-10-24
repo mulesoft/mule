@@ -37,7 +37,7 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     private JMXServiceURL serviceUrl;
     private JmxAgent jmxAgent;
 
-    //@Override
+    @Override
     protected void configureMuleContext(MuleContextBuilder contextBuilder)
     {
         super.configureMuleContext(contextBuilder);

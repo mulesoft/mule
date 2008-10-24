@@ -38,7 +38,7 @@ public class MulticastSocketFactory extends UdpSocketFactory
     }
 
 
-    //@java.lang.Override
+    @java.lang.Override
     public void destroyObject(Object key, Object object) throws Exception
     {
         ImmutableEndpoint ep = (ImmutableEndpoint)key;

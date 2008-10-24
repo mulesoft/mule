@@ -29,14 +29,14 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
         super(endpoint);
     }
 
-    //@Override
+    @Override
     public final void initialise() throws InitialisationException
     {
         super.initialise();
         doInitialise();
     }
 
-    //@Override
+    @Override
     public final synchronized void dispose()
     {
         super.dispose();
@@ -97,7 +97,7 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
         }
     }
 
-    //@Override
+    @Override
     protected WorkManager getWorkManager()
     {
         try

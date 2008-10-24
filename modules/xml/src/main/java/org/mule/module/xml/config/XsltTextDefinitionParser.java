@@ -77,7 +77,7 @@ public class XsltTextDefinitionParser extends ChildDefinitionParser
         super.postProcess(context, assembler, element);
     }
 
-    //@Override
+    @Override
     public String getPropertyName(Element e)
     {
         //We need to set this to null since we have already set the property on the parent in the postProcess() method

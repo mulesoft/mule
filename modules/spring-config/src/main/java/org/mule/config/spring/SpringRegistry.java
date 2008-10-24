@@ -63,7 +63,7 @@ public class SpringRegistry extends AbstractRegistry
         this.applicationContext = applicationContext;
     }
 
-    //@Override
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         if (applicationContext instanceof ConfigurableApplicationContext)

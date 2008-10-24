@@ -126,7 +126,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
         }
     }
 
-    //@Override
+    @Override
     public String toString()
     {
         assertAccess(READ);

@@ -38,7 +38,7 @@ public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWor
     * (non-Javadoc)
     *
     */
-    //@Override
+    @Override
     public void doRun()
     {
         try

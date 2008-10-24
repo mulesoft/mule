@@ -35,7 +35,7 @@ public class ServletRequestToOutputHandler extends AbstractTransformer implement
         setReturnClass(OutputHandler.class);
     }
 
-    //@Override
+    @Override
     public Object doTransform(final Object src, String encoding) throws TransformerException
     {
             return new OutputHandler()

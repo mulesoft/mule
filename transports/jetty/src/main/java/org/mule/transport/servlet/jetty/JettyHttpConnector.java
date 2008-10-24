@@ -70,7 +70,7 @@ public class JettyHttpConnector extends AbstractConnector
         return JETTY;
     }
 
-    //@Override
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         httpServer = new Server();
@@ -274,7 +274,7 @@ public class JettyHttpConnector extends AbstractConnector
      *
      * @return Value for property 'replyToHandler'.
      */
-    //@Override
+    @Override
     public ReplyToHandler getReplyToHandler()
     {
         if (isUseContinuations())

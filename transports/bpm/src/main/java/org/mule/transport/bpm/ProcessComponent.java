@@ -18,7 +18,7 @@ import org.apache.commons.lang.NotImplementedException;
 // TODO MULE-3205
 public class ProcessComponent extends AbstractComponent
 {
-    //@Override
+    @Override
     protected Object doInvoke(MuleEvent event) throws Exception
     {
         throw new NotImplementedException();

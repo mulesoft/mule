@@ -30,7 +30,7 @@ public class AutoTransformer extends AbstractMessageAwareTransformer
      * @throws org.mule.api.lifecycle.InitialisationException
      *
      */
-    //@Override
+    @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();

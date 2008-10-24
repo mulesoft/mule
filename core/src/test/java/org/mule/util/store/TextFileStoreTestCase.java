@@ -20,7 +20,7 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
     public static final String DIR = ".mule/temp";
     TextFileObjectStore store;
 
-    //@Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -28,7 +28,7 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
 
     }
 
-    //@Override
+    @Override
     protected void doTearDown() throws Exception
     {
         if (store != null)

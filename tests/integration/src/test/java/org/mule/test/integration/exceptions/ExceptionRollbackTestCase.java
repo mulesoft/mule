@@ -26,7 +26,7 @@ public class ExceptionRollbackTestCase extends AbstractMuleTestCase
     private DefaultServiceExceptionStrategy strategy;
     private Transaction tx;
 
-    //@Override
+    @Override
     protected void doSetUp() throws Exception
     {
         strategy = new DefaultServiceExceptionStrategy();
@@ -37,7 +37,7 @@ public class ExceptionRollbackTestCase extends AbstractMuleTestCase
         TransactionCoordination.getInstance().bindTransaction(tx);
     }
 
-    //@Override
+    @Override
     protected void doTearDown() throws Exception
     {
         TransactionCoordination.getInstance().unbindTransaction(tx);

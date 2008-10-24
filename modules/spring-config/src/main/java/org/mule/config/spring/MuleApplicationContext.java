@@ -88,7 +88,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         return configResources;
     }
 
-    //@Override
+    @Override
     protected Resource[] getConfigResources()
     {
         return springResources;
@@ -104,7 +104,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         beanDefinitionReader.loadBeanDefinitions(springResources);
     }
 
-    //@Override
+    @Override
     protected DefaultListableBeanFactory createBeanFactory()
     {
         //Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container

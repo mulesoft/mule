@@ -17,7 +17,7 @@ import org.mule.transaction.TransactionCoordination;
 public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
 {
 
-    // //@Override
+    // @Override
     protected void doTearDown() throws Exception
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();

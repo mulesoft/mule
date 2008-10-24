@@ -57,14 +57,14 @@ public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
         this.config.setExpression(expression);
     }
 
-    //@Override
+    @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
         config.validate();
     }
 
-    //@Override
+    @Override
     protected List splitMessage(MuleMessage message)
     {
         List results = new ArrayList(4);

@@ -62,7 +62,7 @@ public class DataObjectDefinitionParser extends ChildDefinitionParser
         super(setterMethod, DataObjectFactoryBean.class, constraint, allowClassAttribute);
     }
 
-    //@Override
+    @Override
     protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
         if(StringUtils.isNotEmpty(element.getTextContent()))

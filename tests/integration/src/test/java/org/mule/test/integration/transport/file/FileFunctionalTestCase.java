@@ -29,7 +29,7 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
 {
     private Object receivedData = null;
 
-    //@Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();

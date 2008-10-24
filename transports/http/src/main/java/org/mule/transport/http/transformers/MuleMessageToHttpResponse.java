@@ -53,7 +53,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
     }
 
 
-    //@Override
+    @Override
     public void initialise() throws InitialisationException
     {
         format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);

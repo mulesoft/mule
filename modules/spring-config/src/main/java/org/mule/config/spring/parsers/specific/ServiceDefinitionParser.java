@@ -33,7 +33,7 @@ public class ServiceDefinitionParser extends OrphanDefinitionParser
         registerPreProcessor(new ProvideDefaultName("service"));
     }
 
-    //@java.lang.Override
+    @java.lang.Override
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         Element parent = (Element) element.getParentNode();

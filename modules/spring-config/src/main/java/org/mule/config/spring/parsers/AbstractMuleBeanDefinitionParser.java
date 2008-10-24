@@ -397,7 +397,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         postProcess(getParserContext(), assembler, element);
     }
 
-    //@Override
+    @Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
     {
         return getBeanName(element);

@@ -70,7 +70,7 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
      * @throws org.mule.api.lifecycle.InitialisationException
      *
      */
-    //@Override
+    @Override
     public void initialise() throws InitialisationException
     {
         if (arguments == null || arguments.size() == 0)

@@ -12,6 +12,7 @@ package org.mule.module.scripting.component;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.NestedRouter;
 import org.mule.api.routing.NestedRouterCollection;
@@ -40,7 +41,7 @@ public class ScriptComponent extends AbstractComponent
 
     private Map proxies;
 
-    //@Override
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();

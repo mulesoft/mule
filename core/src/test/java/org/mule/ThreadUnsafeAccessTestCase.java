@@ -19,14 +19,14 @@ public class ThreadUnsafeAccessTestCase extends AbstractThreadSafeAccessTestCase
 {
     private boolean messageScribblingState;
     
-    //@Override
+    @Override
     protected void doTearDown() throws Exception
     {
         ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(messageScribblingState);
         super.doTearDown();
     }
 
-    //@Override
+    @Override
     protected void configureMuleContext(MuleContextBuilder contextBuilder)
     {
         super.configureMuleContext(contextBuilder);

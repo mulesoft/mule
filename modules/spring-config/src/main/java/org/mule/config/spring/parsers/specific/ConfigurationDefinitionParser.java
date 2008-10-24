@@ -37,7 +37,7 @@ public class ConfigurationDefinitionParser extends NamedDefinitionParser
         return MuleConfiguration.class;
     }
 
-    //@Override
+    @Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
     {
         return MuleProperties.OBJECT_MULE_CONFIGURATION;

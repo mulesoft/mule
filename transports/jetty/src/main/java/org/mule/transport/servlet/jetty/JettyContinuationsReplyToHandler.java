@@ -28,7 +28,7 @@ public class JettyContinuationsReplyToHandler extends DefaultReplyToHandler
         super(transformers);
     }
 
-    //@Override
+    @Override
     public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
     {
         Continuation continuation = (Continuation)replyTo;

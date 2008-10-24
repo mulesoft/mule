@@ -48,7 +48,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
         this.comparator = eventComparator;
     }
 
-    // //@Override
+    // @Override
     public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
         MuleEvent[] result = null;

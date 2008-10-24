@@ -32,7 +32,7 @@ public class PropertyPlaceholderProcessor extends PropertyPlaceholderConfigurer 
     private Map factories = new HashMap();
     
 
-    //@Override
+    @Override
     protected Properties mergeProperties() throws IOException
     {
         RegistryProperties props = new RegistryProperties();

@@ -28,7 +28,7 @@ public class GrandchildDefinitionParser extends ChildDefinitionParser
         super(setterMethod, clazz, constraint, allowClassAttribute);
     }
 
-    //@Override
+    @Override
     protected String getParentBeanName(Element element)
     {
         return getGrandparentBeanName(element);

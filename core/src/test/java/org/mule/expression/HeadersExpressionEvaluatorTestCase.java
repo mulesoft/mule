@@ -25,7 +25,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
     private Map props;
 
-    //@Override
+    @Override
     public void doSetUp()
     {
         props = new HashMap(3);

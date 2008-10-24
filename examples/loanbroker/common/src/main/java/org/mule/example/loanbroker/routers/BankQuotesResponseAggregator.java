@@ -23,7 +23,7 @@ import org.mule.routing.response.ResponseCorrelationAggregator;
  */
 public class BankQuotesResponseAggregator extends ResponseCorrelationAggregator
 {
-    //@Override
+    @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
         return new CollectionCorrelatorCallback()

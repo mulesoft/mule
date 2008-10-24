@@ -24,7 +24,7 @@ public class ContainerManagedLifecyclePhase extends DefaultLifecyclePhase
         super(name, lifecycleClass, oppositePhaseName);
     }
 
-    //@java.lang.Override
+    @java.lang.Override
     public void applyLifecycle(Collection objects, String currentPhase) throws MuleException
     {
         //The container manages this lifecycle

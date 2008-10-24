@@ -40,7 +40,7 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
     private static final AtomicInteger globalCounter = new AtomicInteger(0);
     private boolean failIfNoMatch = true;
 
-    //@Override
+    @Override
     public void initialise() throws InitialisationException
     {
         if (isDisableRoundRobin())

@@ -70,7 +70,7 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
         }
     }
     
-    //@Override
+    @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         // Not sure if this is required. Adding for now for backwards compatability

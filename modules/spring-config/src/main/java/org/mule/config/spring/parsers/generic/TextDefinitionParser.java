@@ -35,7 +35,7 @@ public class TextDefinitionParser extends ChildDefinitionParser
         super(setterMethod, String.class);
     }
 
-    //@Override
+    @Override
     protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {        
         Node node = element.getFirstChild();

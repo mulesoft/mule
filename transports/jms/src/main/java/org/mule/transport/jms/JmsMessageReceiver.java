@@ -104,7 +104,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
             super(messages, receiver);
         }
 
-        //@Override
+        @Override
         protected Object preProcessMessage(Object message) throws Exception
         {
             Message m = (Message) message;

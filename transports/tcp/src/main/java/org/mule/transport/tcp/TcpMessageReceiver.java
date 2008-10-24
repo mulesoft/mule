@@ -393,7 +393,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                 && !disposing.get() && moreMessages;
         }
 
-        //@Override
+        @Override
         protected void handleResults(List messages) throws Exception
         {            
             //should send back only if remote synch is set or no outbound endpoints

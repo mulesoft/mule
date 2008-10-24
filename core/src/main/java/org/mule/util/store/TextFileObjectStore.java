@@ -89,7 +89,7 @@ public class TextFileObjectStore extends InMemoryObjectStore
      * @throws Exception                if the store is not available or any other
      *                                  implementation-specific error occured
      */
-    //@Override
+    @Override
     public boolean storeObject(String id, Object item) throws Exception
     {
         if (!(item instanceof String))

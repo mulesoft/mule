@@ -14,7 +14,7 @@ import org.mule.transport.http.functional.HttpFunctionalTestCase;
 
 public class JettyRestFunctionalTestCase extends HttpFunctionalTestCase
 {
-    //@Override
+    @Override
     protected String getConfigResources()
     {
         return "jetty-rest-functional-test.xml";

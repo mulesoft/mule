@@ -30,13 +30,13 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
         super("ejb", "ejb-functional-test.xml");
     }
 
-    //@Override
+    @Override
     public void testCase() throws Exception
     {
         // TODO
     }
     
-    //@Override
+    @Override
     public void testBadMethodType() throws Exception
     {
         // moving this to xml config requires endpoint properties
@@ -60,7 +60,7 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
         }
     }
 
-    //@Override
+    @Override
     public void testCorrectMethodType() throws Exception
     {
         // moving this to xml config requires endpoint properties

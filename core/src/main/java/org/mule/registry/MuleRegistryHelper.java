@@ -106,8 +106,6 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
      * should be used instead.<br/><br/>
      * 
      * @param name the idendtifer/name used to register endpoint in registry
-     * @see #lookupInboundEndpoint(String, org.mule.api.MuleContext)
-     * @see #lookupResponseEndpoint(String, org.mule.api.MuleContext)
      */
     public ImmutableEndpoint lookupEndpoint(String name)
     {
@@ -470,19 +468,16 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return ServiceDescriptorFactory.create(type, name, props, overrides, registry, null);
     }
 
-    //@java.lang.Override
     public void registerAgent(Agent agent) throws MuleException
     {
         registry.registerObject(getName(agent), agent, Agent.class);
     }
 
-    //@java.lang.Override
     public void registerConnector(Connector connector) throws MuleException
     {
         registry.registerObject(getName(connector), connector, Connector.class);
     }
 
-    //@java.lang.Override
     public void registerEndpoint(ImmutableEndpoint endpoint) throws MuleException
     {
         registry.registerObject(getName(endpoint), endpoint, ImmutableEndpoint.class);
@@ -493,50 +488,42 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         registry.registerObject(name, builder, EndpointBuilder.class);
     }
 
-    //@java.lang.Override
     public void registerModel(Model model) throws MuleException
     {
         registry.registerObject(getName(model), model, Model.class);
     }
 
-    //@java.lang.Override
     public void registerService(Service service) throws MuleException
     {
         registry.registerObject(getName(service), service, Service.class);
     }
 
-    //@java.lang.Override
     public void unregisterService(String serviceName) throws MuleException
     {
         registry.unregisterObject(serviceName, Service.class);
     }
 
 
-    //@java.lang.Override
     public void unregisterAgent(String agentName) throws MuleException
     {
         registry.unregisterObject(agentName, Agent.class);
     }
 
-    //@java.lang.Override
     public void unregisterConnector(String connectorName) throws MuleException
     {
         registry.unregisterObject(connectorName, Connector.class);
     }
 
-    //@java.lang.Override
     public void unregisterEndpoint(String endpointName) throws MuleException
     {
         registry.unregisterObject(endpointName, ImmutableEndpoint.class);
     }
 
-    //@java.lang.Override
     public void unregisterModel(String modelName) throws MuleException
     {
         registry.unregisterObject(modelName, Model.class);
     }
 
-    //@java.lang.Override
     public void unregisterTransformer(String transformerName) throws MuleException
     {
         Transformer transformer = lookupTransformer(transformerName);
@@ -548,7 +535,6 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         registry.unregisterObject(transformerName, Transformer.class);
     }
 
-    //@java.lang.Override
 //    public Transformer lookupTransformer(String name)
 //    {
 //        Transformer transformer = super.lookupTransformer(name);

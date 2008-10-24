@@ -55,7 +55,7 @@ public class OrphanMapDefinitionParser extends AbstractMuleBeanDefinitionParser
         getBeanAssembler(element, builder).setBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
     }
 
-    //@Override
+    @Override
 
     protected void preProcess(Element element)
     {
@@ -66,7 +66,7 @@ public class OrphanMapDefinitionParser extends AbstractMuleBeanDefinitionParser
         }
     }
     
-    //@java.lang.Override
+    @java.lang.Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
     {
         return name;

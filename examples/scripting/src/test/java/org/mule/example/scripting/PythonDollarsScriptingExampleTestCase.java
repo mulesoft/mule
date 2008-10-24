@@ -13,7 +13,7 @@ package org.mule.example.scripting;
 
 public class PythonDollarsScriptingExampleTestCase extends AbstractDollarsScriptingExampleTestCase
 {   
-    //@Override
+    @Override
     protected String getScriptFile()
     {
         return "greedy.py";

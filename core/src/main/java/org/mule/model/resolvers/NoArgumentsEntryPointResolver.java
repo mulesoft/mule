@@ -25,13 +25,13 @@ import org.mule.util.ClassUtils;
  */
 public class NoArgumentsEntryPointResolver extends AbstractArgumentEntryPointResolver
 {
-    //@java.lang.Override
+    @java.lang.Override
     protected Class[] getMethodArgumentTypes(Object[] payload)
     {
         return ClassUtils.NO_ARGS_TYPE;
     }
 
-    //@java.lang.Override
+    @java.lang.Override
     protected Object[] getPayloadFromMessage(MuleEventContext context) throws TransformerException
     {
         return ClassUtils.NO_ARGS;

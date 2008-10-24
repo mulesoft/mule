@@ -21,7 +21,7 @@ import org.mule.util.expression.MuleContextExpressionEvaluator;
 
 public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
-    //@Override
+    @Override
     protected void doSetUp() throws Exception
     {
         MuleEvent event = getTestEvent("testing",

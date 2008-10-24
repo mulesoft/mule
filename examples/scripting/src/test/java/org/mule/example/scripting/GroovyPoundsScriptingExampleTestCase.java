@@ -13,7 +13,7 @@ package org.mule.example.scripting;
 
 public class GroovyPoundsScriptingExampleTestCase extends AbstractPoundsScriptingExampleTestCase
 {   
-    //@Override
+    @Override
     protected String getScriptFile()
     {
         return "greedy.groovy";

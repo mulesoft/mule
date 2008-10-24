@@ -37,7 +37,7 @@ public class EndpointRefParser extends ParentDefinitionParser
 
 
 
-    //@Override
+    @Override
     protected void preProcess(Element element)
     {
         //This causes the Bean framework to process the "ref" as a string rather than a ref to another object

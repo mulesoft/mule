@@ -58,7 +58,7 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
-    //@java.lang.Override
+    @java.lang.Override
     protected void doInitialise() throws InitialisationException
     {
         applyProcessors(lookupObjects(Connector.class));
@@ -84,7 +84,7 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
-    //@Override
+    @Override
     protected void doDispose()
     {
         synchronized(registry)

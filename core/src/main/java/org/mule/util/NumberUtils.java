@@ -105,22 +105,22 @@ public class NumberUtils extends org.apache.commons.lang.math.NumberUtils
         }
     }
 
-    //@Override
+    @Override
     public static int toInt(String str) {
         return toInt(str, INTEGER_ERROR);
     }
 
-    //@Override
+    @Override
     public static long toLong(String str) {
         return toLong(str, LONG_ERROR);
     }
 
-    //@Override
+    @Override
     public static float toFloat(String str) {
         return toFloat(str, FLOAT_ERROR);
     }
     
-    //@Override
+    @Override
     public static double toDouble(String str) {
         return toDouble(str, DOUBLE_ERROR);
     }

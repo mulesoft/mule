@@ -41,7 +41,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         super(endpoint);
     }
 
-    //@Override
+    @Override
     public final void initialise() throws InitialisationException
     {
         super.initialise();
@@ -49,7 +49,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         doInitialise();
     }
 
-    //@Override
+    @Override
     public final synchronized void dispose()
     {
         super.dispose();
@@ -324,7 +324,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         return false;
     }
 
-    //@Override
+    @Override
     protected WorkManager getWorkManager()
     {
         try
