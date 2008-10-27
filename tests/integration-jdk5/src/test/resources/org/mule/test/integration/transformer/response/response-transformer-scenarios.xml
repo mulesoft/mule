@@ -129,10 +129,10 @@
             </inbound>
             <outbound>
                 <chaining-router>
-                    <outbound-endpoint address="vm://echo" />
+                    <outbound-endpoint address="vm://echo"/>
                     <outbound-endpoint address="jms://echo" />
                     <outbound-endpoint address="vm://echo" responseTransformer-refs="customResponse" />
-                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" />
+                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" synchronous="true" />
                 </chaining-router>
             </outbound>
         </service>
