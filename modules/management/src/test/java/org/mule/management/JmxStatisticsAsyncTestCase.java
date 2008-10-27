@@ -11,6 +11,7 @@
 package org.mule.management;
 
 import org.mule.management.stats.ServiceStatistics;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
@@ -26,7 +27,7 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        muleClient muleClient = new MuleClient(FunctionalTestCase.muleContext);
+        MuleClient muleClient = new MuleClient(FunctionalTestCase.muleContext);
         muleClient.dispatch("vm://in", "Hello world", null);
         muleClient.request("vm://out", 5000);
     }

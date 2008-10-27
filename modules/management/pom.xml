@@ -58,7 +58,6 @@
             <artifactId>mule-module-client</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>

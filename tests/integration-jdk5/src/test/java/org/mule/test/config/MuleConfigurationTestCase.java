@@ -55,7 +55,6 @@ public class MuleConfigurationTestCase extends TestCase
         config.setSystemModelType("direct");
         config.setDefaultSynchronousEventTimeout(30000);
         config.setDefaultTransactionTimeout(60000);
-        config.setDefaultRemoteSync(true);
         config.setWorkingDirectory("/some/directory");
         config.setClientMode(true);
         ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(false);
@@ -141,7 +140,6 @@ public class MuleConfigurationTestCase extends TestCase
         mutableConfig.setSystemModelType("direct");
         mutableConfig.setDefaultSynchronousEventTimeout(30000);
         mutableConfig.setDefaultTransactionTimeout(60000);
-        mutableConfig.setDefaultRemoteSync(true);
         mutableConfig.setClientMode(true);
 
         // These are not OK to change after init
@@ -158,7 +156,6 @@ public class MuleConfigurationTestCase extends TestCase
         assertEquals("direct", config.getSystemModelType());
         assertEquals(30000, config.getDefaultSynchronousEventTimeout());
         assertEquals(60000, config.getDefaultTransactionTimeout());
-        assertTrue(config.isDefaultRemoteSync());
         assertTrue(config.isClientMode());
         
         // These are not OK to change after init
@@ -180,7 +177,6 @@ public class MuleConfigurationTestCase extends TestCase
         mutableConfig.setSystemModelType("direct");
         mutableConfig.setDefaultSynchronousEventTimeout(30000);
         mutableConfig.setDefaultTransactionTimeout(60000);
-        mutableConfig.setDefaultRemoteSync(true);
         mutableConfig.setClientMode(true);
 
         MuleConfiguration config = muleContext.getConfiguration();
@@ -188,7 +184,6 @@ public class MuleConfigurationTestCase extends TestCase
         assertFalse("direct".equals(config.getSystemModelType()));
         assertFalse(30000 == config.getDefaultSynchronousEventTimeout());
         assertFalse(60000 == config.getDefaultTransactionTimeout());
-        assertFalse(config.isDefaultRemoteSync());
         assertFalse(config.isClientMode());
     }
 
@@ -200,7 +195,6 @@ public class MuleConfigurationTestCase extends TestCase
         assertEquals("direct", config.getSystemModelType());
         assertEquals(30000, config.getDefaultSynchronousEventTimeout());
         assertEquals(60000, config.getDefaultTransactionTimeout());
-        assertTrue(config.isDefaultRemoteSync());
         assertEquals("/some/directory", config.getWorkingDirectory());
         assertTrue(config.isClientMode());
         assertFalse(ThreadSafeAccess.AccessControl.isFailOnMessageScribbling());

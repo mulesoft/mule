@@ -10,8 +10,8 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Callable;
 
 import java.util.HashMap;
