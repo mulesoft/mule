@@ -38,7 +38,6 @@
     <xm:xml-to-object-transformer name="XmlToObject"/>
     <xml-entity-decoder-transformer name="XmlDecoder"/>
     <xm:xslt-transformer name="Xslt" xsl-file="xsl/soap-stock.xsl"/>
-    <object-to-string-transformer name="ToString"/>
 
     <!--
         The Mule model initialises and manages your UMO components
@@ -51,13 +50,12 @@
         <service name="serviceProxy">
             <inbound>
                 <vm:inbound-endpoint path="stockquote"
-                                     responseTransformer-refs="ToString XmlDecoder Xslt XmlToObject"/>
+                                     responseTransformer-refs="XmlDecoder Xslt XmlToObject" synchronous="true"/>
             </inbound>
             <outbound>
                 <pass-through-router>
                     <axis:outbound-endpoint
                             address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
-                            responseTransformer-refs="XmlDecoder Xslt XmlToObject"
                             soapAction="#[methodNamespace]#[method]">
                         <axis:soap-method method="qname{GetQuote:http://www.webserviceX.NET/}">
                             <axis:soap-parameter parameter="symbol" type="string" mode="IN"/>
