@@ -199,16 +199,18 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     /**
      * RemoteSync causes the message dispatch to wait for a response to an event on a
      * response channel after it sends the event. The following rules apply to
-     * RemoteSync 1. The connector has to support remoteSync. Some transports do not
-     * have the notion of a response channel 2. Check if the endpoint has been
-     * configured for remoteSync 3. Check if the REMOTE_SYNC message header has been
-     * set 4. Finally, if the current service has a response router configured,
+     * RemoteSync:
+     * <ol><li>The connector has to support remoteSync. Some transports do not
+     * have the notion of a response channel.
+     * <li>Check if the endpoint has been configured for remoteSync.
+     * <li>Check if the REMOTE_SYNC message header has been set.
+     * <li>Finally, if the current service has a response router configured,
      * that the router will handle the response channel event and we should not try
      * and receive a response in the Message dispatcher If remotesync should not be
      * used we must remove the REMOTE_SYNC header Note the MuleClient will
      * automatically set the REMOTE_SYNC header when client.send(..) is called so
      * that results are returned from remote invocations too.
-     *
+     * </ol>
      * @param event the current event
      * @return true if a response channel should be used to get a resposne from the
      *         event dispatch.
