@@ -12,10 +12,10 @@ package org.mule.expression;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.expression.ExpressionEvaluatorManager;
 import org.mule.util.expression.MessageHeaderExpressionEvaluator;
 import org.mule.util.expression.MessageHeadersExpressionEvaluator;
 import org.mule.util.expression.MessageHeadersListExpressionEvaluator;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,9 +46,6 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         result = eval.evaluate("fool", message);
         assertNull(result);
 
-        result = eval.evaluate("foo", new Object());
-        assertNull(result);
-
     }
 
     public void testMapHeaders() throws Exception
@@ -67,10 +64,6 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         result = eval.evaluate("fool", message);
         assertNull(result);
-
-        result = eval.evaluate("foo", new Object());
-        assertNull(result);
-
     }
 
     public void testListHeaders() throws Exception
@@ -88,10 +81,6 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         result = eval.evaluate("fool", message);
         assertNull(result);
-
-        result = eval.evaluate("foo", new Object());
-        assertNull(result);
-
     }
 
 
@@ -105,10 +94,6 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         result = ExpressionEvaluatorManager.evaluate("#[header:fool]", message);
         assertNull(result);
-
-        result = ExpressionEvaluatorManager.evaluate("#[header:foo]", new Object());
-        assertNull(result);
-
     }
 
     public void testMapHeadersUsingManager() throws Exception
@@ -126,10 +111,6 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         result = ExpressionEvaluatorManager.evaluate("#[headers:fool]", message);
         assertNull(result);
-
-        result = ExpressionEvaluatorManager.evaluate("#[headers:foo]", new Object());
-        assertNull(result);
-
     }
 
     public void testListHeadersUsingManager() throws Exception
@@ -146,9 +127,5 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         result = ExpressionEvaluatorManager.evaluate("#[headers-list:fool]", message);
         assertNull(result);
-
-        result = ExpressionEvaluatorManager.evaluate("#[headers-list:foo]", new Object());
-        assertNull(result);
-
     }
 }

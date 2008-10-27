@@ -13,6 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.scripting.component.Scriptable;
 import org.mule.util.expression.ExpressionEvaluator;
@@ -20,8 +21,8 @@ import org.mule.util.expression.ExpressionEvaluator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.script.ScriptException;
 import javax.script.Bindings;
+import javax.script.ScriptException;
 
 /**
  * An abstract {@link org.mule.util.expression.ExpressionEvaluator} that can be used for any JSR-233 script engine.
@@ -40,7 +41,7 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
      * @param message    the message to extract from
      * @return the result of the extraction or null if the property was not found
      */
-    public Object evaluate(String expression, Object message)
+    public Object evaluate(String expression, MessageAdapter message)
     {
         Scriptable script = getScript(expression);
         Bindings bindings = script.getScriptEngine().createBindings();

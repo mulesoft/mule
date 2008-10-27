@@ -47,7 +47,7 @@ public class MessageExpressionEvaluator implements ExpressionEvaluator
      */
     protected transient final Log logger = LogFactory.getLog(MessagePayloadExpressionEvaluator.class);
 
-    public Object evaluate(String expression, Object message)
+    public Object evaluate(String expression, MessageAdapter message)
     {
         if (message instanceof MuleMessage)
         {

@@ -26,7 +26,7 @@ public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
 {
     public static final String NAME = "attachment";
 
-    public Object evaluate(String name, Object message)
+    public Object evaluate(String name, MessageAdapter message)
     {
         if (message instanceof MessageAdapter)
         {

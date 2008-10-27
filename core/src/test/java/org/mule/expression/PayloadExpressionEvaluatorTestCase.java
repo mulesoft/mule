@@ -21,8 +21,6 @@ import org.mule.util.expression.ExpressionEvaluatorManager;
 import org.mule.util.expression.MessagePayloadExpressionEvaluator;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
@@ -37,10 +35,6 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("test", result);
 
         //no expression
-        result = eval.evaluate(null, new ArrayList(1));
-        assertNotNull(result);
-        assertTrue(result instanceof List);
-
         result = eval.evaluate(null, null);
         assertNull(result);
     }
@@ -60,10 +54,6 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
         Object result = ExpressionEvaluatorManager.evaluate("#[payload:]", message);
         assertNotNull(result);
         assertEquals("test", result);
-
-        result = ExpressionEvaluatorManager.evaluate("#[payload:]", new ArrayList(1));
-        assertNotNull(result);
-        assertTrue(result instanceof List);
 
         result = ExpressionEvaluatorManager.evaluate("#[payload:]", null);
         assertNull(result);

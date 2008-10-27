@@ -30,7 +30,7 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public Object evaluate(String name, Object message)
+    public Object evaluate(String name, MessageAdapter message)
     {
 
         Object result = null;

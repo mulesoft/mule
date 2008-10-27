@@ -16,9 +16,6 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.expression.ExpressionEvaluatorManager;
 import org.mule.util.expression.MessageExpressionEvaluator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MessageExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
     public void testUsingEvaluatorDirectly() throws Exception
@@ -39,10 +36,6 @@ public class MessageExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals(message, result);
 
         //no expression
-        result = eval.evaluate(null, new ArrayList(1));
-        assertNotNull(result);
-        assertTrue(result instanceof List);
-
         result = eval.evaluate(null, null);
         assertNull(result);
 

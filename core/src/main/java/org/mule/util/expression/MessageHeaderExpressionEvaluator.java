@@ -26,7 +26,7 @@ public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
 {
     public static final String NAME = "header";
 
-    public Object evaluate(String expression, Object message)
+    public Object evaluate(String expression, MessageAdapter message)
     {
         Object result = null;
         if (message instanceof MessageAdapter)

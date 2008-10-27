@@ -10,6 +10,7 @@
 package org.mule.util.expression;
 
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.TemplateParser;
 
@@ -93,87 +94,34 @@ public class ExpressionEvaluatorManager
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
      * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
-     * one or more expressions need to be parsed within a single text, the {@link #parse(String, Object, boolean)}
+     * one or more expressions need to be parsed within a single text, the {@link #parse(String,org.mule.api.transport.MessageAdapter,boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *
      * @param expression a single expression i.e. xpath://foo
-     * @param object     The object (usually {@link org.mule.api.MuleMessage}) to evaluate the expression on.
+     * @param message
      * @return the result of the evaluation
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public static Object evaluate(String expression, Object object) throws ExpressionRuntimeException
+    public static Object evaluate(String expression, MessageAdapter message) throws ExpressionRuntimeException
     {
-        return evaluate(expression, object, DEFAULT_EXPRESSION_PREFIX, false);
+        return evaluate(expression, message, false);
     }
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
      * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
-     * one or more expressions need to be parsed within a single text, the {@link #parse(String, Object, boolean)}
+     * one or more expressions need to be parsed within a single text, the {@link #parse(String,org.mule.api.transport.MessageAdapter,boolean)}
      * method should be used since it will iterate through all expressions in a string.
      *
      * @param expression a single expression i.e. xpath://foo
-     * @param object     The object (usually {@link org.mule.api.MuleMessage}) to evaluate the expression on.
-     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
-     *                   null.
-     * @return the result of the evaluation
+     * @param message
+     *@param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
+     *                   null. @return the result of the evaluation
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public static Object evaluate(String expression, Object object, boolean failIfNull) throws ExpressionRuntimeException
-    {
-        return evaluate(expression, object, DEFAULT_EXPRESSION_PREFIX, failIfNull);
-    }
-
-    /**
-     * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
-     * one or more expressions need to be parsed within a single text, the {@link #parse(String, Object, boolean)}
-     * method should be used since it will iterate through all expressions in a string.
-     *
-     * @param expression a single expression i.e. xpath://foo
-     * @param evaluator  the evaluator to use when executing the expression
-     * @param object     The object (usually {@link org.mule.api.MuleMessage}) to evaluate the expression on.
-     *                   It is unlikely that users will want to change this execpt maybe to use "["  instead.
-     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
-     *                   null.
-     * @return the result of the evaluation
-     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
-     *                                    'failIfNull is set to true.
-     */
-    public static Object evaluate(String expression, String evaluator, Object object, boolean failIfNull) throws ExpressionRuntimeException
-    {
-        ExpressionEvaluator extractor = (ExpressionEvaluator) evaluators.get(evaluator);
-        if (extractor == null)
-        {
-            throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator).getMessage());
-        }
-        Object result = extractor.evaluate(expression, object);
-        if (result == null && failIfNull)
-        {
-            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(evaluator, expression));
-        }
-        return result;
-    }
-
-    /**
-     * Evaluates the given expression.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
-     * one or more expressions need to be parsed within a single text, the {@link #parse(String, Object, boolean)}
-     * method should be used since it will iterate through all expressions in a string.
-     *
-     * @param expression       a single expression i.e. xpath://foo
-     * @param object           The object (usually {@link org.mule.api.MuleMessage}) to evaluate the expression on.
-     * @param expressionPrefix the expression prefix to use. The default is "#[" but any character is valid.
-     *                         It is unlikely that users will want to change this except maybe to use "["  instead.
-     * @param failIfNull       determines if an exception should be thrown if expression could not be evaluated or returns
-     *                         null.
-     * @return the result of the evaluation
-     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
-     *                                    'failIfNull is set to true.
-     */
-    public static Object evaluate(String expression, Object object, String expressionPrefix, boolean failIfNull) throws ExpressionRuntimeException
+    public static Object evaluate(String expression, MessageAdapter message, boolean failIfNull) throws ExpressionRuntimeException
     {
         String name;
 
@@ -181,7 +129,7 @@ public class ExpressionEvaluatorManager
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
         }
-        if (expression.startsWith(expressionPrefix))
+        if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX))
         {
             expression = expression.substring(2, expression.length() - 1);
         }
@@ -189,52 +137,79 @@ public class ExpressionEvaluatorManager
         if (i > -1)
         {
             name = expression.substring(0, i);
-            expression = expression.substring(i + 1);
+            expression = expression.substring(i + DEFAULT_EXPRESSION_POSTFIX.length());
         }
         else
         {
             name = expression;
             expression = null;
         }
-        return evaluate(expression, name, object, failIfNull);
-
-
+        return evaluate(expression, name, message, failIfNull);
     }
 
     /**
-     * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If
-     * a user needs to evaluate a single expression they can use {@link #evaluate(String, Object, boolean)}.
+     * Evaluates the given expression.  The expression should be a single expression definition with or without
+     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
+     * one or more expressions need to be parsed within a single text, the {@link #parse(String,org.mule.api.transport.MessageAdapter,boolean)}
+     * method should be used since it will iterate through all expressions in a string.
      *
      * @param expression a single expression i.e. xpath://foo
-     * @param object     The object (usually {@link org.mule.api.MuleMessage}) to evaluate the expression on.
-     * @return the result of the evaluation
+     * @param evaluator  the evaluator to use when executing the expression
+     * @param message
+     *@param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
+     *                   null. @return the result of the evaluation
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public static String parse(String expression, Object object) throws ExpressionRuntimeException
+    public static Object evaluate(String expression, String evaluator, MessageAdapter message, boolean failIfNull) throws ExpressionRuntimeException
     {
-        return parse(expression, object, false);
+        ExpressionEvaluator extractor = (ExpressionEvaluator) evaluators.get(evaluator);
+        if (extractor == null)
+        {
+            throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator).getMessage());
+        }
+        Object result = extractor.evaluate(expression, message);
+        if (result == null && failIfNull)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(evaluator, expression));
+        }
+        return result;
     }
+
 
     /**
      * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If
-     * a user needs to evaluate a single expression they can use {@link #evaluate(String, Object, boolean)}.
+     * a user needs to evaluate a single expression they can use {@link #evaluate(String,org.mule.api.transport.MessageAdapter,boolean)}.
      *
      * @param expression a single expression i.e. xpath://foo
-     * @param object     The object (usually {@link org.mule.api.MuleMessage}) to evaluate the expression on.
-     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
-     *                   null.
+     * @param message
      * @return the result of the evaluation
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public static String parse(final String expression, final Object object, final boolean failIfNull) throws ExpressionRuntimeException
+    public static String parse(String expression, MessageAdapter message) throws ExpressionRuntimeException
+    {
+        return parse(expression, message, false);
+    }
+
+    /**
+     * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If
+     * a user needs to evaluate a single expression they can use {@link #evaluate(String,org.mule.api.transport.MessageAdapter,boolean)}.
+     *
+     * @param expression a single expression i.e. xpath://foo
+     * @param message
+     *@param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
+     *                   null. @return the result of the evaluation
+     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
+     *                                    'failIfNull is set to true.
+     */
+    public static String parse(final String expression, final MessageAdapter message, final boolean failIfNull) throws ExpressionRuntimeException
     {
         return parser.parse(new TemplateParser.TemplateCallback()
         {
             public Object match(String token)
             {
-                return evaluate(token, object, failIfNull);
+                return evaluate(token, message, failIfNull);
             }
         }, expression);
     }

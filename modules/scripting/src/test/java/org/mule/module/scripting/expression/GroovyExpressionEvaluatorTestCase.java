@@ -10,7 +10,6 @@
 package org.mule.module.scripting.expression;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.module.scripting.expression.GroovyExpressionEvaluator;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -34,11 +33,6 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((Boolean) value).booleanValue());
 
         value = e.evaluate("message.payload.banana.bitten", msg);
-        assertNotNull(value);
-        assertTrue(value instanceof Boolean);
-        assertTrue(((Boolean) value).booleanValue());
-
-        value = e.evaluate("payload.apple.washed", payload);
         assertNotNull(value);
         assertTrue(value instanceof Boolean);
         assertTrue(((Boolean) value).booleanValue());

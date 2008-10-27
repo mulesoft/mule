@@ -33,11 +33,6 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(value instanceof Boolean);
         assertTrue(((Boolean)value).booleanValue());
 
-        value = e.evaluate("apple/washed", payload);
-        assertNotNull(value);
-        assertTrue(value instanceof Boolean);
-        assertTrue(((Boolean)value).booleanValue());
-
         value = e.evaluate("bar", msg);
         assertNull(value);
     }

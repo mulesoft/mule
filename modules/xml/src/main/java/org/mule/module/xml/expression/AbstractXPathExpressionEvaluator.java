@@ -9,9 +9,9 @@
  */
 package org.mule.module.xml.expression;
 
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.transport.MessageAdapter;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.util.expression.ExpressionEvaluator;
 
@@ -33,17 +33,14 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
     private Map cache = new WeakHashMap(8);
 
     /** {@inheritDoc} */
-    public Object evaluate(String expression, Object message)
+    public Object evaluate(String expression, MessageAdapter message)
     {
         try
         {
-            if(message instanceof MuleMessage)
-            {
-                message = ((MuleMessage)message).getPayload();
-            }
-            XPath xpath = getXPath(expression, message);
+            Object payload = message.getPayload();
+            XPath xpath = getXPath(expression, payload);
 
-            List result = xpath.selectNodes(message);
+            List result = xpath.selectNodes(payload);
             result = extractResultsFromNodes(result);
             if(result.size()==1)
             {

@@ -11,6 +11,7 @@
 package org.mule.util.expression;
 
 import org.mule.MuleServer;
+import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.AbstractEndpointBuilder;
 
@@ -32,7 +33,7 @@ public class EndpointInfoExpressionEvaluator implements ExpressionEvaluator
      */
     protected transient final Log logger = LogFactory.getLog(EndpointInfoExpressionEvaluator.class);
 
-    public Object evaluate(String expression, Object message)
+    public Object evaluate(String expression, MessageAdapter message)
     {
         int i = expression.indexOf(".");
         String endpointName;

@@ -30,7 +30,7 @@ public class MessageHeadersListExpressionEvaluator implements ExpressionEvaluato
     public static final String NAME = "headers-list";
     public static final String DELIM = ",";
 
-    public Object evaluate(String expression, Object message)
+    public Object evaluate(String expression, MessageAdapter message)
     {
         boolean required = false;
 

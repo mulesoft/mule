@@ -63,10 +63,6 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         
         result = eval.evaluate("fool", message);
         assertNull(result);
-
-        result = eval.evaluate("foo", new Object());
-        assertNull(result);
-
     }
 
     public void testMapHeaders() throws Exception
@@ -94,10 +90,6 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         result = eval.evaluate("fool", message);
         assertNull(result);
-
-        result = eval.evaluate("foo", new Object());
-        assertNull(result);
-
     }
 
     public void testListHeaders() throws Exception
@@ -123,10 +115,6 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         result = eval.evaluate("fool", message);
         assertNull(result);
-
-        result = eval.evaluate("foo", new Object());
-        assertNull(result);
-
     }
 
     public void testSingleAttachmentUsingManager() throws Exception
@@ -140,10 +128,6 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         result = ExpressionEvaluatorManager.evaluate("#[attachment:fool]", message);
         assertNull(result);
-
-        result = ExpressionEvaluatorManager.evaluate("#[attachment:foo]", new Object());
-        assertNull(result);
-
     }
 
     public void testMapHeadersUsingManager() throws Exception
@@ -169,10 +153,6 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         result = ExpressionEvaluatorManager.evaluate("#[attachments:fool]", message);
         assertNull(result);
-
-        result = ExpressionEvaluatorManager.evaluate("#[attachments:foo]", new Object());
-        assertNull(result);
-
     }
 
     public void testListHeadersUsingManager() throws Exception
@@ -196,10 +176,6 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         result = ExpressionEvaluatorManager.evaluate("#[attachments-list:fool]", message);
         assertNull(result);
-
-        result = ExpressionEvaluatorManager.evaluate("#[attachments-list:foo]", new Object());
-        assertNull(result);
-
     }
 
     // silly little fake DataSource so that we don't need to use javamail

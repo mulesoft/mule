@@ -22,7 +22,7 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
 {
     public static final String NAME = "map-payload";
     
-    public Object evaluate(String expression, Object message)
+    public Object evaluate(String expression, MessageAdapter message)
     {
         Object payload = message;
         if (message instanceof MessageAdapter)

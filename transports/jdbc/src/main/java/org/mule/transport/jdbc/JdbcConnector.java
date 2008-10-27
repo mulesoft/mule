@@ -11,6 +11,7 @@
 package org.mule.transport.jdbc;
 
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -29,11 +30,11 @@ import org.mule.util.TemplateParser;
 import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.sql.Connection;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.text.MessageFormat;
 
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
@@ -279,7 +280,7 @@ public class JdbcConnector extends AbstractConnector
         return sb.toString();
     }
 
-    public Object[] getParams(ImmutableEndpoint endpoint, List paramNames, Object message, String query)
+    public Object[] getParams(ImmutableEndpoint endpoint, List paramNames, MuleMessage message, String query)
             throws Exception
     {
 

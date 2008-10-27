@@ -14,7 +14,7 @@ import org.mule.config.i18n.Message;
 
 /**
  * If thrown by the {@link org.mule.util.expression.ExpressionEvaluatorManager} if an expression returns null
- * and failIfNull was set when {@link org.mule.util.expression.ExpressionEvaluatorManager#evaluate(String, Object, boolean)}
+ * and failIfNull was set when {@link ExpressionEvaluatorManager#evaluate(String,org.mule.api.transport.MessageAdapter,boolean)}
  * was called.
  */
 public class ExpressionRuntimeException extends MuleRuntimeException

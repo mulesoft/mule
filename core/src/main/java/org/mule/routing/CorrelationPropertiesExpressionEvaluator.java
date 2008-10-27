@@ -24,7 +24,7 @@ import org.mule.util.expression.MessageHeaderExpressionEvaluator;
  */
 public class CorrelationPropertiesExpressionEvaluator extends MessageHeaderExpressionEvaluator
 {
-    public final Object evaluate(String name, Object message)
+    public final Object evaluate(String name, MessageAdapter message)
     {
         Object result;
         MessageAdapter msg = null;

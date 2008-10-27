@@ -15,11 +15,6 @@ package org.mule.transport.jdbc.sqlstrategy;
  * 
  */
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -30,6 +25,13 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcUtils;
 import org.mule.util.ArrayUtils;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 public  class SelectSQLStrategy 
     implements SQLStrategy
@@ -119,7 +121,7 @@ public  class SelectSQLStrategy
             //Execute ack statement
             if (ackStmt != null)
             {
-                Object[] params = connector.getParams(endpoint, ackParams, result, ackStmt);
+                Object[] params = connector.getParams(endpoint, ackParams, new DefaultMuleMessage(result, (Map)null), ackStmt);
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(params));

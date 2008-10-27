@@ -11,6 +11,7 @@
 package org.mule.util.expression;
 
 import org.mule.api.NamedObject;
+import org.mule.api.transport.MessageAdapter;
 
 /**
  * <code>ExpressionEvaluator</code> extracts a property from the message in a generic
@@ -29,6 +30,6 @@ public interface ExpressionEvaluator extends NamedObject
      * @param message the message to extract from
      * @return the result of the extraction or null if the property was not found
      */
-    Object evaluate(String expression, Object message);
+    Object evaluate(String expression, MessageAdapter message);
 
 }

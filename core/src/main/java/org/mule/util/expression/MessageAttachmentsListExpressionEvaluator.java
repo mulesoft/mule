@@ -31,7 +31,7 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
     public static final String NAME = "attachments-list";
     public static final String DELIM = ",";
 
-    public Object evaluate(String expression, Object message)
+    public Object evaluate(String expression, MessageAdapter message)
     {
         boolean required = false;
 
