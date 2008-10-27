@@ -16,6 +16,7 @@ import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.sql.Timestamp;
 import java.util.Map;
+import java.util.Collections;
 
 public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
 {
@@ -69,5 +70,18 @@ public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
         assertFalse(ExpressionEvaluatorManager.isValidExpression("{bean:user}"));
         assertFalse(ExpressionEvaluatorManager.isValidExpression("#{bean:user"));
         assertFalse(ExpressionEvaluatorManager.isValidExpression("user"));
+    }
+
+    public void testParsing()
+    {
+        MuleMessage msg = new DefaultMuleMessage("test", Collections.emptyMap());
+        msg.setProperty("user", "vasya");
+        msg.setProperty("password", "pupkin");
+        msg.setProperty("host", "example.com");
+        msg.setProperty("port", "12345");
+
+        String result = ExpressionEvaluatorManager.parse("http://#[header:user]:#[header:password]@#[header:host]:#[header:port]/foo/bar", msg);
+        assertNotNull(result);
+        assertEquals("http://vasya:pupkin@example.com:12345/foo/bar", result);
     }
 }
