@@ -99,7 +99,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 transacted = true;
                 // If a transaction is running, we can not receive any messages
                 // in the same transaction using remoteSync
-                remoteSync=false;
+                remoteSync = false;
             }
             // Should we be caching sessions? Note this is not part of the JMS spec.
             // and is turned off by default.
