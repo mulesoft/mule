@@ -46,7 +46,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
 
     private MimeMessage message;
     private GreenMail servers;
-    private boolean initialEmail = false;
+    private final boolean initialEmail;
     private String protocol;
     private int port;
 
@@ -72,14 +72,14 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         super.doTearDown();
     }
 
-    private void storeEmail() throws Exception
+    private synchronized void storeEmail() throws Exception
     {
         GreenMailUtilities.storeEmail(servers.getManagers().getUserManager(),
                 EMAIL, USER, PASSWORD, (MimeMessage) getValidMessage());
         assertEquals(1, servers.getReceivedMessages().length);
     }
     
-    private void startServers() throws Exception
+    private synchronized void startServers() throws Exception
     {
         servers = new GreenMail(getSetups());
         GreenMailUtilities.robustStartup(servers, LOCALHOST, port, START_ATTEMPTS, TEST_ATTEMPTS, STARTUP_PERIOD_MS);
@@ -94,7 +94,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         return new ServerSetup[]{new ServerSetup(port, null, protocol)};
     }
 
-    private void stopServers() throws Exception
+    private synchronized void stopServers() throws Exception
     {
         if (null != servers)
         {
@@ -102,7 +102,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         }
     }
 
-    protected GreenMail getServers()
+    protected synchronized GreenMail getServers()
     {
         return servers;
     }
