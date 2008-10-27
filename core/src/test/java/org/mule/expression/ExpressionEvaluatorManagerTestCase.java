@@ -13,15 +13,15 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.expression.ExpressionEvaluatorManager;
-import org.mule.util.expression.MapPayloadExpressionEvaluator;
 
 import java.sql.Timestamp;
+import java.util.Map;
 
 public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
 {
     public void testManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", (Map) null);
         Object o = ExpressionEvaluatorManager.evaluate("function:uuid", message);
         assertNotNull(o);
         o = ExpressionEvaluatorManager.evaluate("function:now", message);
