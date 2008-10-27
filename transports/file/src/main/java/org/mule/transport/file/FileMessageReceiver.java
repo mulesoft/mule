@@ -36,7 +36,6 @@ import java.nio.channels.FileLock;
 import java.util.Comparator;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-
 import org.apache.commons.collections.comparators.ReverseComparator;
 
 /**
@@ -178,6 +177,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         if (!attemptFileLock(sourceFile))
         {
             return;
+        }
+        else if(logger.isInfoEnabled())
+        {
+            logger.info("Lock obtained on file: " + sourceFile.getAbsolutePath());
         }
 
         FileConnector fc = ((FileConnector) connector);

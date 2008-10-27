@@ -1,26 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd">
 
     <model name="model">
         <service name="TestUMO">
             <inbound>
-                <inbound-endpoint address="vm://filesend"/>
-                <forwarding-router/>
+                <inbound-endpoint address="vm://filesend" synchronous="true"/>
             </inbound>
             <outbound>
-                <chaining-router>
-                    <outbound-endpoint address="file://FirstWrite">
+                <multicasting-router>
+                    <outbound-endpoint address="file://FirstWrite"  synchronous="true">
                         <property key="outputPattern" value="export.txt"/>
                     </outbound-endpoint>
-                    <outbound-endpoint address="file://SecondWrite">
+                    <outbound-endpoint address="file://SecondWrite"  synchronous="true">
                         <property key="outputPattern" value="export.txt.OK"/>
                     </outbound-endpoint>
-                </chaining-router>
+                </multicasting-router>
             </outbound>
         </service>
     </model>

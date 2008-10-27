@@ -59,7 +59,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
         try 
         {
-            if (useRemoteSync(event))
+            if (returnResponse(event))
             {
                 try
                 {
@@ -86,12 +86,12 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
             }
             else
             {
-                return event.getMessage();
+                return null;
             }
         }
         finally
         {
-            if (!useRemoteSync(event))
+            if (!returnResponse(event))
             {
                 connector.releaseSocket(socket, endpoint);
             }

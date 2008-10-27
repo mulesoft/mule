@@ -10,14 +10,9 @@
 
 package org.mule.transport.tcp;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleSession;
-import org.mule.NullSessionHandler;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.tcp.TcpConnector;
 
 import java.util.Arrays;
 
@@ -33,13 +28,8 @@ public class TcpSyncTestCase extends FunctionalTestCase
 
     protected MuleMessage send(Object payload) throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(payload);
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            endpointUri);
-        DefaultMuleSession session = new DefaultMuleSession(message, new NullSessionHandler(), muleContext);
-        DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, true);
-        event.setTimeout(60000);
-        return event.getSession().sendEvent(event);
+        MuleClient client = new MuleClient();
+        return client.send(endpointUri, payload, null);
     }
 
     public void testSendString() throws Exception

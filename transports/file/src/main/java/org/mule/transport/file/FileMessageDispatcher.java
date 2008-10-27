@@ -146,7 +146,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return event.getMessage();
+        return null;
     }
 
     protected void doDispose()

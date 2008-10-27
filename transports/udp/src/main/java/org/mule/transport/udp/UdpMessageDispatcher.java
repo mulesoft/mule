@@ -94,7 +94,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     {
         doDispatch(event);
         // If we're doing sync receive try and read return info from socket
-        if (event.getEndpoint().isRemoteSync())
+        if (event.getEndpoint().isSynchronous())
         {
             DatagramSocket socket = connector.getSocket(event.getEndpoint());
             DatagramPacket result = receive(socket, event.getTimeout());
@@ -106,7 +106,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         }
         else
         {
-            return event.getMessage();
+            return null;
         }
     }
 

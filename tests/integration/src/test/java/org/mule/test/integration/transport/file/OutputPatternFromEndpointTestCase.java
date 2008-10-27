@@ -16,6 +16,8 @@ import org.mule.util.FileUtils;
 
 import java.io.File;
 
+import junit.framework.AssertionFailedError;
+
 public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
 {
 
@@ -70,6 +72,11 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
             // check that the files with the correct output pattern were generated
             assertTrue(FileUtils.newFile(myDir, myFileName1).exists());
             assertTrue(FileUtils.newFile(myDir2, myFileName2).exists());
+        }
+        catch (AssertionFailedError e1)
+        {
+            //The original assertion was getting masked by a failure in the finally block
+            e1.printStackTrace();
         }
         finally
         {
