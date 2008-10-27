@@ -55,11 +55,10 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
 
         Credentials user = new MuleCredentials(userHeader, getSecurityManager());
 
-        Authentication authResult;
-        Authentication umoAuthentication = new DefaultMuleAuthentication(user);
+        Authentication authentication;
         try
         {
-            authResult = getSecurityManager().authenticate(umoAuthentication);
+            authentication = getSecurityManager().authenticate(new DefaultMuleAuthentication(user));
         }
         catch (Exception e)
         {
@@ -76,11 +75,11 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         // Authentication success
         if (logger.isDebugEnabled())
         {
-            logger.debug("Authentication success: " + authResult.toString());
+            logger.debug("Authentication success: " + authentication.toString());
         }
 
-        SecurityContext context = getSecurityManager().createSecurityContext(authResult);
-        context.setAuthentication(authResult);
+        SecurityContext context = getSecurityManager().createSecurityContext(authentication);
+        context.setAuthentication(authentication);
         event.getSession().setSecurityContext(context);
     }
 
