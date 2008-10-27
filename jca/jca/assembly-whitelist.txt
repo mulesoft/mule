@@ -109,9 +109,9 @@ spring-core-2.5.5
 spring-jdbc-2.5.5
 spring-jms-2.5.5
 spring-modules-jbpm31.osgi-0.9
-spring-orm-2.5.2
-spring-tx-2.5.2
-spring-web-2.5.2
+spring-orm-2.5.5
+spring-tx-2.5.5
+spring-web-2.5.5
 stax-utils.osgi-20080702
 sxc-xpath.osgi-0.7.2
 wrapper.osgi-3.2.3
