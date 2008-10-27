@@ -31,6 +31,7 @@ public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
 
     public void testRegistration() throws Exception
     {
+        // http://mule.mulesource.org/jira/browse/MULE-3809 . For now ignore duplicate registrations.
         /*try
         {
             ExpressionEvaluatorManager.registerEvaluator(new MapPayloadExpressionEvaluator());
