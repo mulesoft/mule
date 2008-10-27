@@ -46,8 +46,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         deleteUnacceptedMessages = global.deleteUnacceptedMessages;
         securityFilter = global.securityFilter;
         synchronous = global.synchronous;
-        remoteSync = global.remoteSync;
-        remoteSyncTimeout = global.remoteSyncTimeout;
+        responseTimeout = global.responseTimeout;
         encoding = global.encoding;
         retryPolicyTemplate = global.retryPolicyTemplate;
     }
@@ -86,8 +85,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setTransactionConfig(source.getTransactionConfig());
         setDeleteUnacceptedMessages(source.isDeleteUnacceptedMessages());
         setInitialState(source.getInitialState());
-        setRemoteSyncTimeout(source.getRemoteSyncTimeout());
-        setRemoteSync(source.isRemoteSync());
+        setResponseTimeout(source.getResponseTimeout());
         setFilter(source.getFilter());
         setSecurityFilter(source.getSecurityFilter());
         setRetryPolicyTemplate(source.getRetryPolicyTemplate());

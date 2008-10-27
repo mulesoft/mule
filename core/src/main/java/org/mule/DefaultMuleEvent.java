@@ -571,7 +571,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         if (timeout == TIMEOUT_NOT_SET_VALUE)
         {
             // If this is not set it will use the default timeout value
-            timeout = endpoint.getRemoteSyncTimeout();
+            timeout = endpoint.getResponseTimeout();
         }
         return timeout;
     }

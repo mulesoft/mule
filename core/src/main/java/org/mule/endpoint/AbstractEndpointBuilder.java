@@ -60,8 +60,7 @@ import java.util.Properties;
 public abstract class AbstractEndpointBuilder implements EndpointBuilder
 {
 
-    public static final String PROPERTY_REMOTE_SYNC = "remoteSync";
-    public static final String PROPERTY_REMOTE_SYNC_TIMEOUT = "remoteSyncTimeout";
+    public static final String PROPERTY_RESPONSE_TIMEOUT = "responseTimeout";
 
     protected URIBuilder uriBuilder;
     protected Connector connector;
@@ -74,8 +73,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected Boolean deleteUnacceptedMessages;
     protected EndpointSecurityFilter securityFilter;
     protected Boolean synchronous;
-    protected Boolean remoteSync;
-    protected Integer remoteSyncTimeout;
+    protected Integer responseTimeout;
     protected String initialState = ImmutableEndpoint.INITIAL_STATE_STARTED;
     protected String encoding;
     protected Integer createConnector;
@@ -98,8 +96,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected void setPropertiesFromProperties(Map properties)
     {
         synchronous = getBooleanProperty(properties, MuleProperties.SYNCHRONOUS_PROPERTY, synchronous);
-        remoteSync = getBooleanProperty(properties, PROPERTY_REMOTE_SYNC, remoteSync);
-        remoteSyncTimeout = getIntegerProperty(properties, PROPERTY_REMOTE_SYNC_TIMEOUT, remoteSyncTimeout);
+        responseTimeout = getIntegerProperty(properties, PROPERTY_RESPONSE_TIMEOUT, responseTimeout);
     }
 
     public static Boolean getBooleanProperty(Map properties, String name, Boolean dflt)
@@ -152,21 +149,12 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         List transformers = getInboundTransformers(connector, endpointURI);
         List responseTransformers = getInboundEndpointResponseTransformers(connector, endpointURI);
 
-        boolean remoteSync = getRemoteSync(connector);
-        boolean synchronous;
-        if (remoteSync)
-        {
-            synchronous = true;
-        }
-        else
-        {
-            synchronous = getSynchronous(connector, endpointURI);
-        }
+        boolean synchronous = getSynchronous(connector, endpointURI);
 
         return new DefaultInboundEndpoint(connector, endpointURI, transformers, responseTransformers,
             getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
-            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous, remoteSync,
-            getRemoteSyncTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
+            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
+                getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
             name, muleContext, getRetryPolicyTemplate(connector));
     }
 
@@ -196,21 +184,12 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         List transformers = getOutboundTransformers(connector, endpointURI);
         List responseTransformers = getOutboundEndpointResponseTransformers(connector, endpointURI);
 
-        boolean remoteSync = getRemoteSync(connector);
-        boolean synchronous;
-        if (remoteSync)
-        {
-            synchronous = true;
-        }
-        else
-        {
-            synchronous = getSynchronous(connector, endpointURI);
-        }
+        boolean synchronous = getSynchronous(connector, endpointURI);
 
         return new DefaultOutboundEndpoint(connector, endpointURI, transformers, responseTransformers,
             getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
-            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous, remoteSync,
-            getRemoteSyncTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
+            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
+            getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
             name, muleContext, getRetryPolicyTemplate(connector));
 
     }
@@ -295,16 +274,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return Collections.unmodifiableMap(combiner);
     }
 
-    protected boolean getRemoteSync(Connector connector)
-    {
-        return remoteSync != null ? remoteSync.booleanValue() : getDefaultRemoteSync(connector);
-    }
-
-    protected boolean getDefaultRemoteSync(Connector connector)
-    {
-        return muleContext.getConfiguration().isDefaultRemoteSync();
-    }
-
     protected boolean getDeleteUnacceptedMessages(Connector connector)
     {
         return deleteUnacceptedMessages != null
@@ -357,13 +326,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return ImmutableEndpoint.INITIAL_STATE_STARTED;
     }
 
-    protected int getRemoteSyncTimeout(Connector connector)
+    protected int getResponseTimeout(Connector connector)
     {
-        return remoteSyncTimeout != null ? remoteSyncTimeout.intValue() : getDefaultRemoteSyncTimeout(connector);
+        return responseTimeout != null ? responseTimeout.intValue() : getDefaultResponseTimeout(connector);
 
     }
 
-    protected int getDefaultRemoteSyncTimeout(Connector connector)
+    protected int getDefaultResponseTimeout(Connector connector)
     {
         return muleContext.getConfiguration().getDefaultSynchronousEventTimeout();
     }
@@ -652,15 +621,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     }
 
-    public void setRemoteSync(boolean remoteSync)
+    public void setResponseTimeout(int responseTimeout)
     {
-        this.remoteSync = Boolean.valueOf(remoteSync);
-
-    }
-
-    public void setRemoteSyncTimeout(int remoteSyncTimeout)
-    {
-        this.remoteSyncTimeout = new Integer(remoteSyncTimeout);
+        this.responseTimeout = new Integer(responseTimeout);
 
     }
 
@@ -714,7 +677,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector, deleteUnacceptedMessages,
-            encoding, uriBuilder, filter, initialState, name, properties, remoteSync, remoteSyncTimeout,
+            encoding, uriBuilder, filter, initialState, name, properties, responseTimeout,
             responseTransformers, securityFilter, synchronous, transactionConfig, transformers});
     }
 
@@ -730,8 +693,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                && equal(deleteUnacceptedMessages, other.deleteUnacceptedMessages) && equal(encoding, other.encoding)
                && equal(uriBuilder, other.uriBuilder) && equal(filter, other.filter)
                && equal(initialState, other.initialState) && equal(name, other.name)
-               && equal(properties, other.properties) && equal(remoteSync, other.remoteSync)
-               && equal(remoteSyncTimeout, other.remoteSyncTimeout)
+               && equal(properties, other.properties)
+               && equal(responseTimeout, other.responseTimeout)
                && equal(responseTransformers, other.responseTransformers)
                && equal(securityFilter, other.securityFilter) && equal(synchronous, other.synchronous)
                && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
@@ -768,13 +731,10 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         {
             builder.setSynchronous(synchronous.booleanValue());
         }
-        if (remoteSync != null)
+
+        if (responseTimeout != null)
         {
-            builder.setRemoteSync(remoteSync.booleanValue());
-        }
-        if (remoteSyncTimeout != null)
-        {
-            builder.setRemoteSyncTimeout(remoteSyncTimeout.intValue());
+            builder.setResponseTimeout(responseTimeout.intValue());
         }
 
         return builder;

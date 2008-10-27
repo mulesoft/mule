@@ -17,13 +17,13 @@
 
     <vm:connector name="vm" queueEvents="true"/>
 
-    <jms:activemq-xa-connector name="jmsConnectorTestDriver" specification="1.1"/>
+    <jms:activemq-xa-connector name="jmsConnectorTestDriver" specification="1.1" disableTemporaryReplyToDestinations="true"/>
 
     <jms:activemq-xa-connector name="jmsConnectorC1" specification="1.1" durable="true" clientId="C1"
-            numberOfConcurrentTransactedReceivers="1"/>
+            numberOfConcurrentTransactedReceivers="1" disableTemporaryReplyToDestinations="true"/>
 
     <jms:activemq-xa-connector name="jmsConnectorC2" specification="1.1" durable="true" clientId="C2"
-        numberOfConcurrentTransactedReceivers="1"/>
+        numberOfConcurrentTransactedReceivers="1" disableTemporaryReplyToDestinations="true"/>
 
     <vm:endpoint name="in" path="in" connector-ref="vm"/>
     <vm:endpoint name="out" path="out" connector-ref="vm"/>

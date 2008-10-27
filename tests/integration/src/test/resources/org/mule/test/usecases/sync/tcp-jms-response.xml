@@ -21,7 +21,7 @@
 
         <service name="TcpReceiver">
             <inbound>
-                <inbound-endpoint address="tcp://localhost:4444" remoteSync="true" />
+                <inbound-endpoint address="tcp://localhost:4444" synchronous="true" />
             </inbound>
             <component class="org.mule.component.simple.EchoComponent" />
             <outbound>

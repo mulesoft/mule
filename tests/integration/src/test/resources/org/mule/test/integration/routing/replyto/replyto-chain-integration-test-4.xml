@@ -15,7 +15,7 @@
     <model name="InjectionProblem">
         <service name="pojo1">
             <inbound>
-                <vm:inbound-endpoint path="pojo1" remoteSync="true" remoteSyncTimeout="10000"/>
+                <vm:inbound-endpoint path="pojo1" synchronous="true" responseTimeout="10000"/>
             </inbound>
             <echo-component/>
             <outbound>

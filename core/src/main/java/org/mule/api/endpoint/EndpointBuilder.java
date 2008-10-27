@@ -74,9 +74,7 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     void setSynchronous(boolean synchronous);
 
-    void setRemoteSync(boolean remoteSync);
-
-    void setRemoteSyncTimeout(int remoteSyncTimeout);
+    void setResponseTimeout(int responseTimeout);
 
     void setInitialState(String initialState);
 

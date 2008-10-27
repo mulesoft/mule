@@ -25,13 +25,11 @@ import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionCoordination;
 
 import java.io.OutputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -216,7 +214,6 @@ public class DefaultMuleEventContext implements MuleEventContext
     public MuleMessage sendEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
         // If synchronous receive has not been explicitly set, default it to true
-        setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }
 
@@ -234,7 +231,6 @@ public class DefaultMuleEventContext implements MuleEventContext
     {
         // If synchronous receive has not been explicitly set, default it to
         // true
-        setRemoteSync(message, (OutboundEndpoint) event.getEndpoint());
         return session.sendEvent(message);
     }
 
@@ -256,7 +252,6 @@ public class DefaultMuleEventContext implements MuleEventContext
 
         // If synchronous receive has not been explicitly set, default it to
         // true
-        setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }
 
@@ -422,7 +417,6 @@ public class DefaultMuleEventContext implements MuleEventContext
     public MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException
     {
         OutboundEndpoint endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
-        setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }
 
@@ -636,22 +630,6 @@ public class DefaultMuleEventContext implements MuleEventContext
     public int getTimeout()
     {
         return event.getTimeout();
-    }
-
-    private void setRemoteSync(MuleMessage message, OutboundEndpoint endpoint)
-    {
-        if (endpoint.isRemoteSync())
-        {
-            if (getTransaction() == null)
-            {
-                message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
-            }
-            else
-            {
-                throw new IllegalStateException(
-                    CoreMessages.cannotUseTxAndRemoteSync().getMessage());
-            }
-        }
     }
 
     /**

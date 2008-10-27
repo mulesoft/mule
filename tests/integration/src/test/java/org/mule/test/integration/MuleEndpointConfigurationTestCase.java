@@ -136,9 +136,9 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testEndpointFromURI() throws Exception
     {
         ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "test://hello?remoteSync=true&remoteSyncTimeout=2002&connector=testConnector1");
-        assertTrue(ep.isRemoteSync());
-        assertEquals(2002, ep.getRemoteSyncTimeout());
+            "test://hello?synchronous=true&responseTimeout=2002&connector=testConnector1");
+        assertTrue(ep.isSynchronous());
+        assertEquals(2002, ep.getResponseTimeout());
         assertTrue(ep instanceof InboundEndpoint);
 
         // Test MuleEvent timeout proporgation

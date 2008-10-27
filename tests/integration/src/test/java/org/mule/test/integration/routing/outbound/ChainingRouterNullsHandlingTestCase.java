@@ -19,8 +19,6 @@ import org.mule.transport.NullPayload;
 
 import java.util.Map;
 
-/**
- */
 public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
 {
     

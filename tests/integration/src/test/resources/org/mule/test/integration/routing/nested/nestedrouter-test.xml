@@ -9,7 +9,7 @@
               http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd">
 
     <!-- Testing with ActiveMq -->
-    <jms:activemq-connector name="jmsConnector" />
+    <jms:activemq-connector name="jmsConnector"/>
 
     <vm:connector name="vmConnector" queueEvents="true" />
 
@@ -48,7 +48,7 @@
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
                 <binding interface="org.mule.test.integration.routing.nested.HelloInterface">
-                    <outbound-endpoint address="jms://hello.in" remoteSync="true" />
+                    <outbound-endpoint address="jms://hello.in" synchronous="true" />
                 </binding>
             </component>
             <outbound>
@@ -65,7 +65,7 @@
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
                 <binding interface="org.mule.test.integration.routing.nested.HelloInterface">
-                    <outbound-endpoint address="jms://topic:thello.in" remoteSync="true" />
+                    <outbound-endpoint address="jms://topic:thello.in" synchronous="true" />
                 </binding>
             </component>
             <outbound>

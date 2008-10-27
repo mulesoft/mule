@@ -69,10 +69,8 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     protected void testDefaultCommonEndpointAttributes(ImmutableEndpoint ep)
     {
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-        assertEquals(muleContext.getConfiguration().getDefaultSynchronousEventTimeout(), ep.getRemoteSyncTimeout());
-        assertEquals(muleContext.getConfiguration().isDefaultSynchronousEndpoints()
-                     || muleContext.getConfiguration().isDefaultRemoteSync(), ep.isSynchronous());
-        assertEquals(muleContext.getConfiguration().isDefaultRemoteSync(), ep.isRemoteSync());
+        assertEquals(muleContext.getConfiguration().getDefaultSynchronousEventTimeout(), ep.getResponseTimeout());
+        assertEquals(muleContext.getConfiguration().isDefaultSynchronousEndpoints(), ep.isSynchronous());
         assertTrue("ep.getRetryPolicyTemplate() = " + ep.getRetryPolicyTemplate().getClass(), ep.getRetryPolicyTemplate() instanceof NoRetryPolicyTemplate);
         assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);
         assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);

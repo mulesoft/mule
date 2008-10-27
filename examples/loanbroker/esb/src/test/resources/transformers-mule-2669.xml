@@ -25,9 +25,7 @@
     <model name="test">
         <service name="test service">
             <inbound>
-                <inbound-endpoint address="jms://in"
-                                  connector-ref="noOutbound"
-                                  synchronous="true"
+                <jms:inbound-endpoint queue="in" synchronous="true" connector-ref="noOutbound"
                                   transformer-refs="JMSMessageToObject SetLendersAsRecipients ObjectToJMSMessage"/>
             </inbound>
             <component class="org.mule.example.loanbroker.issues.SimpleEchoComponent"/>

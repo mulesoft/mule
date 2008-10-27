@@ -170,20 +170,13 @@ public interface ImmutableEndpoint extends Serializable
     boolean isSynchronous();
 
     /**
-     * For certain providers that support the notion of a backchannel such as sockets
-     * (outputStream) or Jms (ReplyTo) Mule can automatically wait for a response
-     * from a backchannel when dispatching over these protocols. This is different
-     * for synchronous as synchronous behavior only applies to in
-     *
-     */
-    boolean isRemoteSync();
-
-    /**
-     * The timeout value for remoteSync invocations
+     * The timeout value for waiting for a response from a remote invocation or back channel.  Mule will only wait
+     * for a response is the {@link #isSynchronous()} flag is set to true.
      *
      * @return the timeout in milliseconds
+     *
      */
-    int getRemoteSyncTimeout();
+    int getResponseTimeout();
 
     /**
      * Sets the state the endpoint will be loaded in. The States are 'stopped' and

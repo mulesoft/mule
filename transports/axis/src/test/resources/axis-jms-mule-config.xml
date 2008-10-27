@@ -13,7 +13,7 @@
     <!--
         JmsConnector is used to send and receive information via the Jms channel
     -->
-    <jms:activemq-connector name="jmsConnector" />
+    <jms:activemq-connector name="jmsConnector"/>
     <!-- this is needed also, but does not work now -->
     <!--                            brokerUrl="vm://localhost?broker.persistence=true"/> -->
 

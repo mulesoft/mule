@@ -13,7 +13,7 @@
     <model name="Tcp_with_remote_sync">
         <service name="Echo1">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="6161" remoteSync="true"/>
+                <tcp:inbound-endpoint host="localhost" port="6161" synchronous="true"/>
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -24,7 +24,7 @@
 
         <service name="Echo2">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="6163" remoteSync="true"/>
+                <tcp:inbound-endpoint host="localhost" port="6163" synchronous="true"/>
             </inbound>
             <outbound>
                 <pass-through-router>

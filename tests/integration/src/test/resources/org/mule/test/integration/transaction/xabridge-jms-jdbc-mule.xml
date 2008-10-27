@@ -28,7 +28,7 @@
     <!-- Transaction manager -->
     <jbossts:transaction-manager/>
 
-    <jms:activemq-xa-connector name="jmsConnector" eagerConsumer="false"/>
+    <jms:activemq-xa-connector name="jmsConnector" eagerConsumer="false" disableTemporaryReplyToDestinations="true"/>
 
     <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSourceXA">
         <receiver-threading-profile maxThreadsActive="2" maxThreadsIdle="2" maxBufferSize="1" doThreading="false" poolExhaustedAction="WAIT"/>

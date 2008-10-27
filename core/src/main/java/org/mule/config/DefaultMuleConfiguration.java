@@ -61,12 +61,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
      */
     private int defaultTransactionTimeout = 30000;
 
-    /**
-     * Determines whether when running synchronously, return events are received
-     * before returning the call. i.e. in jms wait for a replyTo. Vm queues do this
-     * automatically
-     */
-    private boolean remoteSync = false;
     
     /** Where Mule stores any runtime files to disk */
     private String workingDirectory = "./.mule";
@@ -171,11 +165,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         {
             defaultTransactionTimeout = NumberUtils.toInt(p);
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "remoteSync");
-        if (p != null)
-        {
-            remoteSync = BooleanUtils.toBoolean(p);
-        }
+
         p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "workingDirectory");
         if (p != null)
         {
@@ -275,19 +265,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         if (verifyContextNotStarted())
         {
             this.synchronousEventTimeout = synchronousEventTimeout;
-        }
-    }
-
-    public boolean isDefaultRemoteSync()
-    {
-        return remoteSync;
-    }
-
-    public void setDefaultRemoteSync(boolean remoteSync)
-    {
-        if (verifyContextNotStarted())
-        {
-            this.remoteSync = remoteSync;
         }
     }
 

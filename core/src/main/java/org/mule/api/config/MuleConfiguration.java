@@ -25,8 +25,6 @@ public interface MuleConfiguration
 
     int getDefaultSynchronousEventTimeout();
 
-    boolean isDefaultRemoteSync();
-
     String getWorkingDirectory();
 
     String getMuleHomeDirectory();

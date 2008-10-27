@@ -611,7 +611,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
                     {
                         originalAdapter = adapter;
                     }
-                    //TODO RM*: Must make sure this works for all scenarios
+
                     if (result instanceof MuleMessage)
                     {
                         synchronized (this)

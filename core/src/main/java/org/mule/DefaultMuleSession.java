@@ -214,7 +214,7 @@ public final class DefaultMuleSession implements MuleSession
 
         // Handles the situation where a response has been received via a remote
         // ReplyTo channel.
-        if (endpoint.isRemoteSync() && result != null)
+        if (endpoint.isSynchronous() && result != null)
         {
             result.applyTransformers(endpoint.getResponseTransformers());
         }

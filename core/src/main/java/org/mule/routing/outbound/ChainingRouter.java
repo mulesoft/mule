@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
@@ -28,6 +29,22 @@ import org.mule.transport.NullPayload;
 
 public class ChainingRouter extends FilteringOutboundRouter
 {
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        if (endpoints == null || endpoints.size() == 0)
+        {
+            throw new InitialisationException(CoreMessages.objectIsNull("endpoints"), this);
+        }
+
+//        for (int i = 0; i < endpoints.size() - 1; i++)
+//        {   endpoints.get(i);
+//
+//        }
+
+    }
 
     public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
@@ -126,18 +143,6 @@ public class ChainingRouter extends FilteringOutboundRouter
         }
         return resultToReturn;
     }
-
-//    public void addEndpoint(Endpoint endpoint)
-//    {
-//        if (!endpoint.isRemoteSync())
-//        {
-//            logger.debug("Endpoint: "
-//                         + endpoint.getEndpointURI()
-//                         + " registered on chaining router needs to be RemoteSync enabled. Setting this property now");
-//            endpoint.setRemoteSync(true);
-//        }
-//        super.addEndpoint(endpoint);
-//    }
 
     /**
      * Process intermediary result of invocation. The method will be invoked

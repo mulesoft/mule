@@ -28,7 +28,7 @@
     <model name="model">
         <service name="JmsToJdbc">
             <inbound>
-                <jms:inbound-endpoint queue="my.queue" connector-ref="jmsXAConnector" remoteSync="true">
+                <jms:inbound-endpoint queue="my.queue" connector-ref="jmsXAConnector" synchronous="true">
                     <xa-transaction action="ALWAYS_BEGIN"/>
                 </jms:inbound-endpoint>
             </inbound>

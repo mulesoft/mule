@@ -107,21 +107,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     private final boolean synchronous;
 
     /**
-     * Determines whether a synchronous call should block to obtain a response from a
-     * remote server (if the transport supports it). For example for Jms endpoints,
-     * setting remote sync will cause a temporary destination to be set up as a
-     * replyTo destination and will send the message a wait for a response on the
-     * replyTo destination. If the JMSReplyTo is already set on the message that
-     * destination will be used instead.
-     */
-    private final boolean remoteSync;
-
-    /**
      * How long to block when performing a remote synchronisation to a remote host.
      * This property is optional and will be set to the default Synchonous MuleEvent
      * time out value if not set
      */
-    private final int remoteSyncTimeout;
+    private final int responseTimeout;
 
     /**
      * The state that the endpoint is initialised in such as started or stopped
@@ -147,8 +137,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             boolean deleteUnacceptedMessages,
                             EndpointSecurityFilter securityFilter,
                             boolean synchronous,
-                            boolean remoteSync,
-                            int remoteSyncTimeout,
+                            int responseTimeout,
                             String initialState,
                             String endpointEncoding,
                             String endpointBuilderName,
@@ -188,15 +177,16 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
             this.securityFilter.setEndpoint(this);
         }
 
-        this.remoteSync = remoteSync;
-        this.remoteSyncTimeout = remoteSyncTimeout;
+        this.responseTimeout = responseTimeout;
         this.initialState = initialState;
         this.endpointEncoding = endpointEncoding;
         this.endpointBuilderName = endpointBuilderName;
         this.muleContext = muleContext;
         this.retryPolicyTemplate = retryPolicyTemplate;
 
-        if(transactionConfig !=null && transactionConfig.getFactory() !=null)
+        if(transactionConfig !=null && transactionConfig.getFactory() !=null &&
+                transactionConfig.getAction() != TransactionConfig.ACTION_NONE &&
+                transactionConfig.getAction() != TransactionConfig.ACTION_NEVER)
         {
             if(logger.isDebugEnabled())
             {
@@ -286,8 +276,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                + connector + ", transformer=" + transformers + ", name='" + name + "'" + ", properties=" + properties
                + ", transactionConfig=" + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
                + deleteUnacceptedMessages + ", securityFilter=" + securityFilter + ", synchronous=" + synchronous
-               + ", initialState=" + initialState + ", remoteSync=" + remoteSync + ", remoteSyncTimeout="
-               + remoteSyncTimeout + ", endpointEncoding=" + endpointEncoding + "}";
+               + ", initialState=" + initialState + ", responseTimeout="
+               + responseTimeout + ", endpointEncoding=" + endpointEncoding + "}";
     }
 
     public String getProtocol()
@@ -320,8 +310,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                && equal(initialState, other.initialState)
                // don't include lifecycle state as lifecycle code includes hashing
                // && equal(initialised, other.initialised)
-               && equal(name, other.name) && equal(properties, other.properties) && remoteSync == other.remoteSync
-               && remoteSyncTimeout == other.remoteSyncTimeout
+               && equal(name, other.name) && equal(properties, other.properties)
+               && responseTimeout == other.responseTimeout
                && equal(responseTransformers, other.responseTransformers)
                && equal(securityFilter, other.securityFilter) && synchronous == other.synchronous
                && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
@@ -337,7 +327,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
             initialState,
             // don't include lifecycle state as lifecycle code includes hashing
             // initialised,
-            name, properties, remoteSync ? Boolean.TRUE : Boolean.FALSE, new Integer(remoteSyncTimeout),
+            name, properties, new Integer(responseTimeout),
             responseTransformers, securityFilter, synchronous ? Boolean.TRUE : Boolean.FALSE, transactionConfig,
             transformers});
     }
@@ -388,27 +378,15 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return synchronous;
     }
 
-    /**
-     * For certain providers that support the notion of a backchannel such as sockets
-     * (outputStream) or Jms (ReplyTo) Mule can automatically wait for a response
-     * from a backchannel when dispatching over these protocols. This is different
-     * for synchronous as synchronous behavior only applies to in
-     * 
-     * @return
-     */
-    public boolean isRemoteSync()
-    {
-        return remoteSync;
-    }
 
     /**
      * The timeout value for remoteSync invocations
      * 
      * @return the timeout in milliseconds
      */
-    public int getRemoteSyncTimeout()
+    public int getResponseTimeout()
     {
-        return remoteSyncTimeout;
+        return responseTimeout;
     }
 
     /**

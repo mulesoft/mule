@@ -213,12 +213,12 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
      * @return true if a response channel should be used to get a resposne from the
      *         event dispatch.
      */
-    protected boolean useRemoteSync(MuleEvent event)
+    protected boolean returnResponse(MuleEvent event)
     {
         boolean remoteSync = false;
-        if (event.getEndpoint().getConnector().isRemoteSyncEnabled())
+        if (event.getEndpoint().getConnector().isResponseEnabled())
         {
-            remoteSync = event.getEndpoint().isRemoteSync()
+            remoteSync = event.getEndpoint().isSynchronous()
                             || event.getMessage().getBooleanProperty(
                                 MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
             if (remoteSync)

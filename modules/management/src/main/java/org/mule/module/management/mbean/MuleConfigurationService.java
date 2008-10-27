@@ -43,40 +43,15 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         return muleConfiguration.getDefaultSynchronousEventTimeout();
     }
 
-//    public void setSynchronousEventTimeout(int synchronousEventTimeout)
-//    {
-//        muleConfiguration.setDefaultSynchronousEventTimeout(synchronousEventTimeout);
-//    }
-
-    public boolean isRemoteSync()
-    {
-        return muleConfiguration.isDefaultRemoteSync();
-    }
-
-//    public void setRemoteSync(boolean remoteSync)
-//    {
-//        muleConfiguration.setDefaultRemoteSync(remoteSync);
-//    }
-
     public String getWorkingDirectory()
     {
         return muleConfiguration.getWorkingDirectory();
     }
 
-//    public void setWorkingDirectory(String workingDirectory)
-//    {
-//        muleConfiguration.setWorkingDirectory(workingDirectory);
-//    }
-
     public int getTransactionTimeout()
     {
         return muleConfiguration.getDefaultTransactionTimeout();
     }
-
-//    public void setTransactionTimeout(int transactionTimeout)
-//    {
-//        muleConfiguration.setDefaultTransactionTimeout(transactionTimeout);
-//    }
 
     public boolean isClientMode()
     {
@@ -89,8 +64,4 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         return muleConfiguration.getDefaultEncoding();
     }
 
-//    public void setEncoding(String encoding)
-//    {
-//        muleConfiguration.setDefaultEncoding(encoding);
-//    }
 }

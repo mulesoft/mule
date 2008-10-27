@@ -131,9 +131,9 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return endpoint.getProtocol();
     }
 
-    public int getRemoteSyncTimeout()
+    public int getResponseTimeout()
     {
-        return endpoint.getRemoteSyncTimeout();
+        return endpoint.getResponseTimeout();
     }
 
     public List getResponseTransformers()
@@ -164,11 +164,6 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     public boolean isReadOnly()
     {
         return endpoint.isReadOnly();
-    }
-
-    public boolean isRemoteSync()
-    {
-        return endpoint.isRemoteSync();
     }
 
     public boolean isSynchronous()

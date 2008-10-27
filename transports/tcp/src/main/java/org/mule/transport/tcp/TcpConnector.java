@@ -376,7 +376,7 @@ public class TcpConnector extends AbstractConnector
         this.tcpProtocol = tcpProtocol;
     }
 
-    public boolean isRemoteSyncEnabled()
+    public boolean isResponseEnabled()
     {
         return true;
     }

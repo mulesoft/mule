@@ -149,7 +149,7 @@ public class XmppConnector extends AbstractConnector
         return xmppConnection;
     }
 
-    public boolean isRemoteSyncEnabled()
+    public boolean isResponseEnabled()
     {
         return true;
     }

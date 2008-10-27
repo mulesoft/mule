@@ -216,7 +216,7 @@ public class UniversalSender extends BasicHandler
             {
                 MuleContext muleContext = MuleServer.getMuleContext();
                 EndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, muleContext);
-                builder.setRemoteSync(true);
+                builder.setSynchronous(true);
                 OutboundEndpoint syncEndpoint = muleContext.getRegistry()
                     .lookupEndpointFactory()
                     .getOutboundEndpoint(builder);

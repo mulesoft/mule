@@ -14,13 +14,13 @@
         -->
         <service name="bridge1">
             <inbound>
-                <inbound-endpoint address="vm://incomingPass"/>
+                <inbound-endpoint address="vm://incomingPass" />
             </inbound>
 
             <outbound>
                 <chaining-router>
                     <outbound-endpoint address="vm://component1"/>
-                    <outbound-endpoint address="vm://component2Pass"/>
+                    <outbound-endpoint address="vm://component2Pass" synchronous="true"/>
                 </chaining-router>
             </outbound>
         </service>
@@ -36,7 +36,7 @@
             <outbound>
                 <chaining-router>
                     <outbound-endpoint address="vm://component1"/>
-                    <outbound-endpoint address="vm://component2Fail"/>
+                    <outbound-endpoint address="vm://component2Fail" synchronous="true"/>
                 </chaining-router>
             </outbound>
         </service>

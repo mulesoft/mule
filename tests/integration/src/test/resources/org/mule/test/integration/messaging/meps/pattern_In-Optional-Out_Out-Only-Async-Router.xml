@@ -35,7 +35,7 @@
 
     <vm:connector name="vmConnector" queueEvents="true"/>
 
-    <vm:endpoint path="test.inbound" name="inboundEndpoint" remoteSync="true" synchronous="true"/>
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
     <vm:endpoint path="test.external.app" name="externalEndpoint" synchronous="false"/>
     <vm:endpoint path="test.reply" name="replyEndpoint" synchronous="false"/>
 

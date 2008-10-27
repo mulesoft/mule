@@ -42,8 +42,8 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     public static final boolean PROTOCOL = ChildAddressDefinitionParser.PROTOCOL;
     public static final String PROPERTIES = "properties";
     public static final String[] RESTRICTED_ENDPOINT_ATTRIBUTES =
-            new String[]{MuleProperties.SYNCHRONOUS_PROPERTY, AbstractEndpointBuilder.PROPERTY_REMOTE_SYNC,
-                    AbstractEndpointBuilder.PROPERTY_REMOTE_SYNC_TIMEOUT, "encoding",
+            new String[]{MuleProperties.SYNCHRONOUS_PROPERTY,
+                    AbstractEndpointBuilder.PROPERTY_RESPONSE_TIMEOUT, "encoding",
                     "connector", "createConnector", "transformer", "responseTransformer"};
 
     // this is an example of parsing a single element with several parsers.  in this case

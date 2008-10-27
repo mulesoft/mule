@@ -9,7 +9,7 @@
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
 
-    <jms:activemq-connector name="jmsConnector"/>
+    <jms:activemq-connector name="jmsConnector" disableTemporaryReplyToDestinations="true"/>
 
     <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
     <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector"/>

@@ -18,12 +18,13 @@
     <model name="model">
         <service name="TcpReceiver">
             <inbound>
-                <inbound-endpoint address="tcp://localhost:4444" remoteSync="true"/>
+                <inbound-endpoint address="tcp://localhost:4444" synchronous="true"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="jms://queue_in" responseTransformer-refs="responsetransformer" synchronous="true"/>
+                    <!--<reply-to address="jms://reply"/>-->
                 </pass-through-router>
             </outbound>
         </service>

@@ -108,7 +108,7 @@
                     <!-- We invoke the credit Agency service using remoteSync which means that a response
                     will be returned from the service. there is also a responseTransformer that will
                     conver the Xml returned from the CreditAgency Ejb into a CreditProfile object -->
-                    <outbound-endpoint remoteSync="true" transformer-refs="LoanQuoteRequestToCreditProfileArgs"
+                    <outbound-endpoint synchronous="true" transformer-refs="LoanQuoteRequestToCreditProfileArgs"
                                    responseTransformer-refs="CreditProfileXmlToCreditProfile" ref="CreditAgency" />
                     <outbound-endpoint ref="LenderGateway" />
                 </filtering-router>
@@ -121,7 +121,7 @@
             </inbound>
             <outbound>
                 <chaining-router>
-                    <outbound-endpoint remoteSync="true" ref="LenderService" />
+                    <outbound-endpoint synchronous="true" ref="LenderService" />
                     <outbound-endpoint ref="BankingGateway"
                                    transformer-refs="SetLendersAsRecipients ObjectToJMSMessage" />
                 </chaining-router>

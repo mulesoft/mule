@@ -50,7 +50,6 @@ import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -98,7 +97,7 @@ public class RemoteDispatcher implements Disposable
         asyncServerEndpoint = endpointFactory.getOutboundEndpoint(endpoint);
 
         EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpoint);
-        endpointBuilder.setRemoteSync(true);
+        endpointBuilder.setSynchronous(true);
         syncServerEndpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             endpointBuilder);
 

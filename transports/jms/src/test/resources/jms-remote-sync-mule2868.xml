@@ -17,7 +17,7 @@
 
         <service name="JmsQueueComponent">
             <inbound>
-                <inbound-endpoint address="vm://in"  remoteSync="true"/>
+                <inbound-endpoint address="vm://in" synchronous="true"/>
             </inbound>
             <bridge-component />
             <outbound>

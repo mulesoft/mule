@@ -18,7 +18,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.registry.Registry;
 import org.mule.api.service.Service;
-import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -217,8 +216,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     {
         String receiverClass = messageReceiver;
 
-        if (endpoint.getTransactionConfig() != null
-                && endpoint.getTransactionConfig().getAction() != TransactionConfig.ACTION_NONE)
+        if (endpoint.getTransactionConfig().isTransacted())
         {
             boolean xaTx = endpoint.getTransactionConfig().getFactory() instanceof XaTransactionFactory;
             if (transactedMessageReceiver != null && !xaTx)

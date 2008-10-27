@@ -16,18 +16,18 @@
 
         <service name="echo">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="65432" synchronous="true"/>
+                <tcp:inbound-endpoint host="localhost" port="65432" synchronous="false"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <tcp:outbound-endpoint host="localhost" port="65433" synchronous="true"/>
+                    <tcp:outbound-endpoint host="localhost" port="65433" synchronous="false"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="testComponent">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="65433" synchronous="true"/>
+                <tcp:inbound-endpoint host="localhost" port="65433" synchronous="false"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.transport.tcp.integration.EOFStreamingTestComponent"/>

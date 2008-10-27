@@ -23,8 +23,8 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="responder" synchronous="false"
-                                          remoteSync="true" connector-ref="default"/>
+                    <vm:outbound-endpoint path="responder"
+                                          synchronous="true" connector-ref="default"/>
                 </pass-through-router>
             </outbound>
         </service>

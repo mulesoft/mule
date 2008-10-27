@@ -350,7 +350,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     
     public void testMuleConfiguration()
     {
-        assertTrue(muleContext.getConfiguration().isDefaultRemoteSync());
         assertTrue(muleContext.getConfiguration().isDefaultSynchronousEndpoints());
     }
 

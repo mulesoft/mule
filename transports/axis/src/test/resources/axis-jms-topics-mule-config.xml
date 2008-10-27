@@ -10,7 +10,7 @@
        http://www.mulesource.org/schema/mule/axis/2.2 http://www.mulesource.org/schema/mule/axis/2.2/mule-axis.xsd
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
 
-    <jms:activemq-connector name="jmsConnector"  />
+    <jms:activemq-connector name="jmsConnector"/>
     <!-- this is needed also, but does not work now -->
     <!--                            brokerUrl="vm://localhost?broker.persistence=true"/> -->
 

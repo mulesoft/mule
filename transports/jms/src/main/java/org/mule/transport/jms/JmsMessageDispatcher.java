@@ -20,7 +20,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.ClassUtils;
@@ -83,7 +82,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         Destination replyTo = null;
         boolean transacted = false;
         boolean cached = false;
-        boolean remoteSync = useRemoteSync(event);
+        boolean remoteSync = returnResponse(event);
 
         if (logger.isDebugEnabled())
         {
@@ -98,14 +97,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             if (session != null)
             {
                 transacted = true;
-
                 // If a transaction is running, we can not receive any messages
-                // in the same transaction.
-                if (remoteSync)
-                {
-                    throw new IllegalTransactionStateException(
-                            JmsMessages.connectorDoesNotSupportSyncReceiveWhenTransacted());
-                }
+                // in the same transaction using remoteSync
+                remoteSync=false;
             }
             // Should we be caching sessions? Note this is not part of the JMS spec.
             // and is turned off by default.
@@ -206,7 +200,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     }
                 }
                 // Are we going to wait for a return event ?
-                if (remoteSync && replyTo == null)
+                if (remoteSync && replyTo == null && !connector.isDisableTemporaryReplyToDestinations())
                 {
                     replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
                 }
@@ -217,7 +211,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
 
                 // Are we going to wait for a return event ?
-                if (remoteSync)
+                if (remoteSync && replyTo != null)
                 {
                     try
                     {

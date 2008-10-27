@@ -122,13 +122,8 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         MuleMessage message = client.send("vm://syncOutboundEndpointResponseTransformer", "request", null);
         assertNotNull(message);
-        // TODO Custom response transformer should be applied as response is received, but as remoteSync="false"
-        // no transformation happens
-        // Ross: really, if VM is sync, its remoteSync by default
-        // Ross: I think the vm transport need to automatically set the the reote Sync flag if sync
-        // assertEquals("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE + VM_RESPONSE,
-        // message.getPayloadAsString());
-        assertEquals("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + VM_RESPONSE, message.getPayloadAsString());
+        assertEquals("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE + VM_RESPONSE,
+        message.getPayloadAsString());
     }
 
     public void testJmsRemoteSync() throws Exception

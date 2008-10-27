@@ -81,7 +81,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
     {
         sendMessage(event);
 
-        if (useRemoteSync(event))
+        if (returnResponse(event))
         {
             Message response;
 

@@ -29,7 +29,7 @@
 
     <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
 
-    <jms:endpoint queue="external.app" name="ExternalEndpoint" remoteSync="true" remoteSyncTimeout="3000"/>
+    <jms:endpoint queue="external.app" name="ExternalEndpoint" synchronous="true" responseTimeout="3000"/>
 
     <model>
         <service name="In-Out_Out-In-Service">

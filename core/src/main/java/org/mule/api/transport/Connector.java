@@ -147,7 +147,7 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      */
     MessageRequesterFactory getRequesterFactory();
 
-    boolean isRemoteSyncEnabled();
+    boolean isResponseEnabled();
     
     /**
      * Used to define is this connectors endpoints' should be synchronous by default rather than 

@@ -418,13 +418,6 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="defaultRemoteSync" type="substitutableBoolean" default="false">
-            <xsd:annotation>
-                <xsd:documentation>
-                    If true then connections to endpoints will wait for a response from the remote service.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="defaultSynchronousEventTimeout" type="xsd:string" default="3000">
             <xsd:annotation>
                 <xsd:documentation>
@@ -1755,18 +1748,11 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="remoteSync" type="substitutableBoolean">
+
+        <xsd:attribute name="responseTimeout" type="substitutableInt">
             <xsd:annotation>
                 <xsd:documentation>
-                    If true the component will wait for a response to the outgoing message before
-                    replying to the incoming message.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="remoteSyncTimeout" type="substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The timeout for the remoteSync wait (ms).
+                    The timeout for a response if making a synchronous endpoint call
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

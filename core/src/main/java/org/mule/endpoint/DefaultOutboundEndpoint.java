@@ -42,8 +42,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    boolean deleteUnacceptedMessage,
                                    EndpointSecurityFilter securityFilter,
                                    boolean synchronous,
-                                   boolean remoteSync,
-                                   int remoteSyncTimeout,
+                                   int responseTimeout,
                                    String initialState,
                                    String endpointEncoding,
                                    String endpointBuilderName,
@@ -51,7 +50,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    RetryPolicyTemplate retryPolicyTemplate)
     {
         super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
-            deleteUnacceptedMessage, securityFilter, synchronous, remoteSync, remoteSyncTimeout, initialState,
+            deleteUnacceptedMessage, securityFilter, synchronous, responseTimeout, initialState,
             endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate);
     }
 

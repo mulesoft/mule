@@ -22,7 +22,7 @@
 
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="another.service" remoteSync="true" remoteSyncTimeout="5000"/>
+                    <jms:outbound-endpoint queue="another.service" synchronous="true" responseTimeout="5000"/>
                 </pass-through-router>
             </outbound>
         </service>

@@ -27,7 +27,7 @@
 
         <service name="HttpWithRemoteSynch">
             <inbound>
-                <inbound-endpoint address="http://localhost:8989" remoteSync="true">
+                <inbound-endpoint address="http://localhost:8989" synchronous="true">
                     <byte-array-to-string-transformer/>
                 </inbound-endpoint>
             </inbound>

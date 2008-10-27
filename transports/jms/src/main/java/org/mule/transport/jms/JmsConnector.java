@@ -143,6 +143,8 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     private RedeliveryHandlerFactory redeliveryHandlerFactory;
 
+    private boolean disableTemporaryReplyToDestinations = false;
+
     ////////////////////////////////////////////////////////////////////////
     // Methods
     ////////////////////////////////////////////////////////////////////////
@@ -937,7 +939,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         this.maxRedelivery = maxRedelivery;
     }
 
-    public boolean isRemoteSyncEnabled()
+    public boolean isResponseEnabled()
     {
         return true;
     }
@@ -1124,6 +1126,16 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
    {
        this.forceJndiDestinations = forceJndiDestinations;
    }
+
+    public boolean isDisableTemporaryReplyToDestinations()
+    {
+        return disableTemporaryReplyToDestinations;
+    }
+
+    public void setDisableTemporaryReplyToDestinations(boolean disableTemporaryReplyToDestinations)
+    {
+        this.disableTemporaryReplyToDestinations = disableTemporaryReplyToDestinations;
+    }
 
    /**
     * @return Returns underlying connection factory properties.

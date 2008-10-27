@@ -268,29 +268,29 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
             // Test creating an endpoint from endpointBuilder1
             endpointBuilder1.setSynchronous(true);
-            endpointBuilder1.setRemoteSyncTimeout(99);
+            endpointBuilder1.setResponseTimeout(99);
             ImmutableEndpoint ep = endpointFactory.getInboundEndpoint(endpointBuilder1);
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
             assertTrue(ep.isSynchronous());
-            assertEquals(99, ep.getRemoteSyncTimeout());
+            assertEquals(99, ep.getResponseTimeout());
             assertNotNull(ep.getConnector());
             assertEquals(testConnector1, ep.getConnector());
 
             // Test creating an endpoint from endpointBuilder2
             endpointBuilder2.setSynchronous(false);
-            endpointBuilder2.setRemoteSyncTimeout(0);
+            endpointBuilder2.setResponseTimeout(0);
             endpointBuilder2.setConnector(testConnector2);
             ImmutableEndpoint ep2 = endpointFactory.getInboundEndpoint(endpointBuilder2);
             assertEquals(ep2.getEndpointURI().getUri().toString(), "test://address");
             assertFalse(ep2.isSynchronous());
-            assertEquals(0, ep2.getRemoteSyncTimeout());
+            assertEquals(0, ep2.getResponseTimeout());
             assertNotNull(ep.getConnector());
             assertEquals(testConnector2, ep2.getConnector());
 
             // Test creating a new endpoint from endpointBuilder1
             ImmutableEndpoint ep3 = endpointFactory.getInboundEndpoint(endpointBuilder1);
             assertEquals(ep3.getEndpointURI().getUri().toString(), "test://address");
-            assertTrue(ep3.getRemoteSyncTimeout() != 0);
+            assertTrue(ep3.getResponseTimeout() != 0);
             assertTrue(ep3.isSynchronous());
             assertNotNull(ep.getConnector());
             assertEquals(testConnector1, ep3.getConnector());

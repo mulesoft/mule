@@ -13,7 +13,7 @@
     <model name="model">
         <service name="TestReceiverUMO">
             <inbound>
-                <inbound-endpoint address="jms://test.queue"/>
+                <inbound-endpoint address="jms://test.queue" synchronous="true"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestReceiver"/>
             <outbound>

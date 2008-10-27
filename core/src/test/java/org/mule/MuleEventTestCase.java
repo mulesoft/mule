@@ -264,7 +264,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals(endpoint.getEndpointBuilderName(), deserialized.getEndpoint().getEndpointBuilderName());
         assertEquals(endpoint.getEndpointURI(), deserialized.getEndpoint().getEndpointURI());
         assertEquals(endpoint.getProtocol(), deserialized.getEndpoint().getProtocol());
-        assertEquals(endpoint.getRemoteSyncTimeout(), deserialized.getEndpoint().getRemoteSyncTimeout());
+        assertEquals(endpoint.getResponseTimeout(), deserialized.getEndpoint().getResponseTimeout());
         assertEquals(endpoint.getConnector().getClass(), deserialized.getEndpoint().getConnector().getClass());
         
         List deserializedTransformers = deserialized.getEndpoint().getTransformers();

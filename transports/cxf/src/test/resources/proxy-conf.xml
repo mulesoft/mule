@@ -77,7 +77,7 @@
                 <pass-through-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
-                        remoteSync="true"/>
+                        synchronous="true"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -90,7 +90,7 @@
                 <pass-through-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
-                        remoteSync="true">
+                        synchronous="true">
                          <response-transformers>
                              <transformer ref="TestXslt"/>
                          </response-transformers>
@@ -111,13 +111,13 @@
                 <filtering-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
                         proxy="true"
-                        remoteSync="true"/>
+                        synchronous="true"/>
                     <message-property-filter pattern="SOAPAction=http://acme.com/no-transform"/>
                 </filtering-router>
                 <filtering-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
                         proxy="true"
-                        remoteSync="true">
+                        synchronous="true">
                          <response-transformers>
                              <transformer ref="TestXslt"/>
                          </response-transformers>

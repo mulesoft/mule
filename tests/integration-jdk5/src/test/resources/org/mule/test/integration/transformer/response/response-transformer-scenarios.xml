@@ -113,12 +113,12 @@
 
         <service name="JmsRemoteSyncOutboundEndpointResponseTransformer">
             <inbound>
-                <inbound-endpoint address="vm://jmsRemoteSyncOutboundEndpointResponseTransformer" remoteSync="true" />
+                <inbound-endpoint address="vm://jmsRemoteSyncOutboundEndpointResponseTransformer" synchronous="true" />
             </inbound>
             <outbound>
                 <pass-through-router>
                     <!-- remoteSync shouldn't need to be set on outbound endpoint is it is set on inbound endpoint -->
-                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" remoteSync="true" />
+                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" synchronous="true" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -144,10 +144,10 @@
             <component>
                 <singleton-object class="org.mule.test.integration.transformer.response.NestedRouterComponent" />
                 <binding interface="org.mule.test.integration.transformer.response.BindingInterface" method="hello1">
-                    <outbound-endpoint address="vm://echo" responseTransformer-refs="customResponse" remoteSync="true" />
+                    <outbound-endpoint address="vm://echo" responseTransformer-refs="customResponse" synchronous="true" />
                 </binding>
                 <binding interface="org.mule.test.integration.transformer.response.BindingInterface" method="hello2">
-                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" remoteSync="true" />
+                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" synchronous="true" />
                 </binding>
             </component>
         </service>

@@ -241,7 +241,7 @@ public class VMConnector extends AbstractConnector
     }
 
     // @Override
-    public boolean isRemoteSyncEnabled()
+    public boolean isResponseEnabled()
     {
         return true;
     }                                                      

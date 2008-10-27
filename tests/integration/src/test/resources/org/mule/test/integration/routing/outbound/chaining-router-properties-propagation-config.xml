@@ -15,14 +15,14 @@
         <add-message-property key="TTL" value="10000"/>
     </message-properties-transformer>
 
-    <endpoint name="inboundEndpoint" address="vm://inbound"/>
-    <endpoint name="hop1Endpoint" address="vm://hop1"/>
-    <endpoint name="hop2Endpoint" address="vm://hop2"/>
+    <endpoint name="inboundEndpoint" address="vm://inbound" synchronous="true"/>
+    <endpoint name="hop1Endpoint" address="vm://hop1" synchronous="true"/>
+    <endpoint name="hop2Endpoint" address="vm://hop2" synchronous="true"/>
 
     <model name="main">
         <service name="chainingComponent">
             <inbound>
-                <inbound-endpoint ref="inboundEndpoint" synchronous="true"/>
+                <inbound-endpoint ref="inboundEndpoint"/>
                 <forwarding-router/>
             </inbound>
             <outbound>

@@ -118,9 +118,9 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return endpoint.getProtocol();
     }
 
-    public int getRemoteSyncTimeout()
+    public int getResponseTimeout()
     {
-        return endpoint.getRemoteSyncTimeout();
+        return endpoint.getResponseTimeout();
     }
 
     public List getResponseTransformers()
@@ -151,11 +151,6 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     public boolean isReadOnly()
     {
         return endpoint.isReadOnly();
-    }
-
-    public boolean isRemoteSync()
-    {
-        return endpoint.isRemoteSync();
     }
 
     public boolean isSynchronous()
