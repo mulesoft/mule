@@ -39,7 +39,7 @@
         <service name="HTTPPostSample">
             <inbound>
                 <vm:inbound-endpoint path="stockquote"
-                                     responseTransformer-refs="ToString XmlDecoder Xslt XmlToObject"/>
+                                     responseTransformer-refs="ToString XmlDecoder Xslt XmlToObject" synchronous="true"/>
             </inbound>
             <http:rest-service-component
                     serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
