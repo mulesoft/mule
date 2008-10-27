@@ -81,10 +81,6 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     protected void create() throws Exception
     {
         AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
-        // TODO RM: these are endpoint properties now
-//        String style = (String)descriptor.getProperties().get("style");
-//        String use = (String)descriptor.getProperties().get("use");
-//        String doc = (String)descriptor.getProperties().get("documentation");
         String style = (String) endpoint.getProperties().get(AxisConnector.STYLE);
         String use = (String) endpoint.getProperties().get(AxisConnector.USE);
         String doc = (String) endpoint.getProperties().get("documentation");
@@ -224,8 +220,6 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         }
 
         // WSDL override
-        // TODO RM: this is an endpoint property now?
-        // String wsdlFile = (String)descriptor.getProperties().get("wsdlFile");
         String wsdlFile = (String) endpoint.getProperties().get("wsdlFile");
         if (wsdlFile != null)
         {
