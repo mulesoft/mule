@@ -11,14 +11,11 @@
 package org.mule.test.integration.service;
 
 import org.mule.api.service.Service;
-import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.queue.FilePersistenceStrategy;
 import org.mule.util.queue.QueueSession;
 import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.xa.ResourceManagerSystemException;
-import org.mule.context.notification.MuleContextNotification;
 
 public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 {
