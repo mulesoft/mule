@@ -15,11 +15,11 @@ import java.util.Collection;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
-
+// START SNIPPET: interface
 @WebService
 public interface Bookstore
 {
-long addBook(@WebParam(name="book") Book book);
+	long addBook(@WebParam(name="book") Book book);
     
     @WebResult(name="bookIds")
     Collection<Long> addBooks(@WebParam(name="books") Collection<Book> books);
@@ -31,5 +31,4 @@ long addBook(@WebParam(name="book") Book book);
                    @WebParam(name="address") String address,
                    @WebParam(name="email") String email);
 }
-
-
+// END SNIPPET: interface
