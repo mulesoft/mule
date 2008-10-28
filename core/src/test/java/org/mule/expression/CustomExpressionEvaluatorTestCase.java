@@ -34,7 +34,7 @@ public class CustomExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("Wrong evaluation result", "testabc", result);
     }
 
-    private class FooExpressionEvaluator implements ExpressionEvaluator
+    public static class FooExpressionEvaluator implements ExpressionEvaluator
     {
 
         public Object evaluate(String expression, MessageAdapter message)
