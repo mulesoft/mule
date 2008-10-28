@@ -11,11 +11,14 @@
 package org.mule.test.integration.service;
 
 import org.mule.api.service.Service;
+import org.mule.api.context.notification.MuleContextNotificationListener;
+import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.queue.FilePersistenceStrategy;
 import org.mule.util.queue.QueueSession;
 import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.xa.ResourceManagerSystemException;
+import org.mule.context.notification.MuleContextNotification;
 
 public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 {
@@ -185,7 +188,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
      * queue 2) Events dispatched to outbound vm endpooint 3) Events that were unable
      * to be sent to stopped service and raised exceptions
      */
-    private void assertQueues(int numMessage, String service) throws ResourceManagerSystemException
+    private synchronized void assertQueues(int numMessage, String service) throws ResourceManagerSystemException
     {
         QueueSession queueSession = getTestQueueSession();
         logger.info("SEDA Queue: " + queueSession.getQueue("out").size() + ", Outbound endpoint vm queue: "
