@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.1"
+	xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/2.1 http://www.mulesource.org/schema/mule/core/2.1/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.1 http://www.mulesource.org/schema/mule/vm/2.1/mule-vm.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<configuration defaultSynchronousEndpoints="true" />
+
+	<spring:bean id="SpringBeanLifecycleTrackerComponent" class="org.mule.test.integration.components.LifecycleTrackerComponent"
+		init-method="springInitialize" destroy-method="springDestroy" scope="singleton">
+		<spring:property name="property" value="sbltc" />
+	</spring:bean>
+
+	<model name="MuleLifecyle">
+
+		<service name="SpringBeanService">
+			<inbound>
+				<vm:inbound-endpoint path="SpringBeanService.In" />
+			</inbound>
+			<component>
+				<spring-object bean="SpringBeanLifecycleTrackerComponent" />
+			</component>
+		</service>
+
+		<service name="MulePrototypeService">
+			<inbound>
+				<vm:inbound-endpoint path="MulePrototypeService.In" />
+			</inbound>
+			<component>
+				<prototype-object class="org.mule.test.integration.components.LifecycleTrackerComponent">
+					<property key="property" value="mps" />
+				</prototype-object>
+			</component>
+		</service>
+
+		<service name="MulePooledPrototypeService">
+			<inbound>
+				<vm:inbound-endpoint path="MulePooledPrototypeService.In" />
+			</inbound>
+			<pooled-component>
+				<prototype-object class="org.mule.test.integration.components.LifecycleTrackerComponent">
+					<property key="property" value="mpps" />
+				</prototype-object>
+				<pooling-profile maxActive="3" initialisationPolicy="INITIALISE_ALL" />
+			</pooled-component>
+		</service>
+
+		<service name="MuleSingletonService">
+			<inbound>
+				<vm:inbound-endpoint path="MuleSingletonService.In" />
+			</inbound>
+			<component>
+				<singleton-object class="org.mule.test.integration.components.LifecycleTrackerComponent">
+					<property key="property" value="mss" />
+				</singleton-object>
+			</component>
+		</service>
+
+	 </model>
+</mule>

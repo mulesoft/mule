@@ -119,7 +119,7 @@ public class CommonsPoolObjectPool implements ObjectPool
             {
                 for (int t = 0; t < numToBorrow; t++)
                 {
-                    holderList.add(objectFactory.getInstance());
+                    holderList.add(getPooledObjectFactory().makeObject());
                 }
             }
             finally

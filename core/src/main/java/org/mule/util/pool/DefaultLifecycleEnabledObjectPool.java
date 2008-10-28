@@ -65,6 +65,7 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
 
     public void start() throws MuleException
     {
+        started.set(true);
         synchronized (items)
         {
             for (Iterator i = items.iterator(); i.hasNext();)
@@ -76,6 +77,7 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
 
     public void stop() throws MuleException
     {
+        started.set(false);
         synchronized (items)
         {
             for (Iterator i = items.iterator(); i.hasNext();)
@@ -98,6 +100,7 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
 
         public void destroyObject(Object obj) throws Exception
         {
+            // Only stop existing objects if they havn't already been stopped
             if (started.get() && obj instanceof Stoppable)
             {
                 ((Stoppable) obj).stop();
@@ -115,7 +118,8 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
         public Object makeObject() throws Exception
         {
             Object object = objectFactory.getInstance();
-            if (!started.get() && object instanceof Startable)
+            // Only start newly created objects if pool is started
+            if (started.get() && object instanceof Startable)
             {
                 ((Startable) object).start();
             }

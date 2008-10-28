@@ -235,31 +235,34 @@ public abstract class AbstractComponent implements Component, Interceptor
 
     public void dispose()
     {
-        disposing.set(true);
-        try
+        if (!disposed.get())
         {
-            if (started.get())
+            disposing.set(true);
+            try
             {
-                stop();
+                if (started.get())
+                {
+                    stop();
+                }
             }
-        }
-        catch (MuleException e)
-        {
-            logger.error(CoreMessages.failedToStop(toString()));
-        }
-        try
-        {
-            doDispose();
-        }
-        catch (Exception e)
-        {
-            logger.warn(CoreMessages.failedToDispose(toString()), e);
-        }
-        finally
-        {
-            disposed.set(true);
-            disposing.set(false);
-            initialised.set(false);
+            catch (MuleException e)
+            {
+                logger.error(CoreMessages.failedToStop(toString()));
+            }
+            try
+            {
+                doDispose();
+            }
+            catch (Exception e)
+            {
+                logger.warn(CoreMessages.failedToDispose(toString()), e);
+            }
+            finally
+            {
+                disposed.set(true);
+                disposing.set(false);
+                initialised.set(false);
+            }
         }
     }
 
