@@ -19,7 +19,6 @@ import org.mule.util.xa.ResourceManagerSystemException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     private static Log logger = LogFactory.getLog(TransactionalQueueManager.class);
 
-    private Map queues = new HashMap();
+    private Map<String, QueueInfo> queues = new HashMap<String, QueueInfo>();
 
     private QueuePersistenceStrategy memoryPersistenceStrategy = new MemoryPersistenceStrategy();
     private QueuePersistenceStrategy persistenceStrategy;
@@ -64,7 +63,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     protected synchronized QueueInfo getQueue(String name)
     {
-        QueueInfo q = (QueueInfo) queues.get(name);
+        QueueInfo q = queues.get(name);
         if (q == null)
         {
             q = new QueueInfo();
@@ -116,7 +115,10 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             logger.error("Error closing persistent store", e);
         }
         // Clear queues on shutdown to avoid duplicate entries on warm restarts (MULE-3678)
-        queues = new HashMap();
+        synchronized (this)
+        {
+            queues.clear();
+        }
         return super.shutdown(mode, timeoutMSecs);
     }
 
@@ -127,9 +129,9 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             try
             {
                 List msgs = persistenceStrategy.restore();
-                for (Iterator it = msgs.iterator(); it.hasNext();)
+                for (Object msg : msgs)
                 {
-                    Holder h = (Holder) it.next();
+                    Holder h = (Holder) msg;
                     getQueue(h.getQueue()).putNow(h.getId());
                 }
             }
@@ -182,16 +184,15 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         {
             if (ctx.added != null)
             {
-                for (Iterator it = ctx.added.entrySet().iterator(); it.hasNext();)
+                for (Object o : ctx.added.entrySet())
                 {
-                    Map.Entry entry = (Map.Entry) it.next();
+                    Map.Entry entry = (Map.Entry) o;
                     QueueInfo queue = (QueueInfo) entry.getKey();
                     List queueAdded = (List) entry.getValue();
                     if (queueAdded != null && queueAdded.size() > 0)
                     {
-                        for (Iterator itAdded = queueAdded.iterator(); itAdded.hasNext();)
+                        for (Object object : queueAdded)
                         {
-                            Object object = itAdded.next();
                             Object id = doStore(queue, object);
                             queue.putNow(id);
                         }
@@ -200,16 +201,15 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             }
             if (ctx.removed != null)
             {
-                for (Iterator it = ctx.removed.entrySet().iterator(); it.hasNext();)
+                for (Object o : ctx.removed.entrySet())
                 {
-                    Map.Entry entry = (Map.Entry) it.next();
+                    Map.Entry entry = (Map.Entry) o;
                     QueueInfo queue = (QueueInfo) entry.getKey();
                     List queueRemoved = (List) entry.getValue();
                     if (queueRemoved != null && queueRemoved.size() > 0)
                     {
-                        for (Iterator itRemoved = queueRemoved.iterator(); itRemoved.hasNext();)
+                        for (Object id : queueRemoved)
                         {
-                            Object id = itRemoved.next();
                             doRemove(queue, id);
                         }
                     }
@@ -263,16 +263,15 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         QueueTransactionContext ctx = (QueueTransactionContext) context;
         if (ctx.removed != null)
         {
-            for (Iterator it = ctx.removed.entrySet().iterator(); it.hasNext();)
+            for (Object o : ctx.removed.entrySet())
             {
-                Map.Entry entry = (Map.Entry) it.next();
+                Map.Entry entry = (Map.Entry) o;
                 QueueInfo queue = (QueueInfo) entry.getKey();
                 List queueRemoved = (List) entry.getValue();
                 if (queueRemoved != null && queueRemoved.size() > 0)
                 {
-                    for (Iterator itRemoved = queueRemoved.iterator(); itRemoved.hasNext();)
+                    for (Object id : queueRemoved)
                     {
-                        Object id = itRemoved.next();
                         queue.putNow(id);
                     }
                 }
@@ -287,6 +286,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         protected Map added;
         protected Map removed;
 
+        @SuppressWarnings("unchecked")
         public boolean offer(QueueInfo queue, Object item, long timeout) throws InterruptedException
         {
             readOnly = false;
@@ -312,6 +312,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             }
         }
 
+        @SuppressWarnings("unchecked")
         public Object poll(QueueInfo queue, long timeout) throws IOException, InterruptedException
         {
             readOnly = false;
