@@ -19,27 +19,60 @@
 
     <xsd:element name="jxpath-filter" type="jxpathFilterType" substitutionGroup="mule:abstract-filter"/>
     <xsd:complexType name="jxpathFilterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Filters messages based on XPath expressions using JXPath.
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:patternFilterType">
                 <xsd:sequence>
                     <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="lenient" type="mule:substitutableBoolean" default="true"/>
-                <xsd:attribute name="expectedValue" type="xsd:string"/>
+                <xsd:attribute name="lenient" type="mule:substitutableBoolean" default="true">
+			        <xsd:annotation>
+			            <xsd:documentation>
+			                Whether or not errors are thrown if the XPath expression
+			                doesn't exist.
+			            </xsd:documentation>
+			        </xsd:annotation>
+		        </xsd:attribute>
+                <xsd:attribute name="expectedValue" type="xsd:string">
+			        <xsd:annotation>
+			            <xsd:documentation>
+			                The expected value of the XPath expression evaluation. If
+			                the expected value matches the evaluation, the filter returns
+			                true.
+			            </xsd:documentation>
+			        </xsd:annotation>
+		        </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="jaxen-filter" type="jaxenFilterType" substitutionGroup="mule:abstract-filter"/>
     <xsd:complexType name="jaxenFilterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Filters messages based on XPath expressions using Jaxen.
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:patternFilterType">
                 <xsd:sequence>
                     <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="expectedValue" type="xsd:string"/>
+                <xsd:attribute name="expectedValue" type="xsd:string">
+			        <xsd:annotation>
+			            <xsd:documentation>
+			                The expected value of the XPath expression evaluation. If
+			                the expected value matches the evaluation, the filter returns
+			                true.
+			            </xsd:documentation>
+			        </xsd:annotation>
+			    </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -129,13 +162,38 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="dom-to-xml-transformer" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="dom-to-xml-transformer" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts an XML payload (Document, XML stream, Source, etc) to 
+                a serialized String representation. 
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
     <xsd:element name="dom-to-output-handler-transformer" type="xmlTransformerType"
-                 substitutionGroup="mule:abstract-transformer"/>
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts an XML payload (Document, XML stream, Source, etc) to 
+                an OutputHandler for efficient serialization.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="jxpath-extractor-transformer" type="jxpathExtractorType"
                  substitutionGroup="mule:abstract-transformer"/>
     <xsd:complexType name="jxpathExtractorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                The JXPathExtractor is a simple transformer that evaluates an XPath 
+                expression against the given bean and that returns the result.
+                By default, a single result will be returned. If multiple values 
+                are expected, set the {{singleResult}} property to {{false}}. In this 
+                case a {{List}} of values will be returned. Note the property is 
+                currently ignored for non-String/XML payloads.
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
                 <xsd:sequence>
@@ -178,10 +236,23 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="xml-to-dom-transformer" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="xml-to-dom-transformer" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Transformer an XML message payload to org.w3c.dom.Document.  
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
     <xsd:element name="xml-to-object-transformer" type="mule:abstractTransformerType"
-                 substitutionGroup="mule:abstract-transformer"/>
-
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts XML to Java bean graphs using XStream.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
     <xsd:element name="xslt-transformer" type="xsltTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>A transformer used to perform XSLT transforms on the current message payload. Transform
@@ -372,6 +443,12 @@
     <!-- xml support -->
 
     <xsd:complexType name="namespaceType">
+	    <xsd:annotation>
+	         <xsd:documentation>
+	             A namespace declaration for XPath expressions. The prefix used here
+	             can be used inside XPath expressions.
+	         </xsd:documentation>
+	    </xsd:annotation>
         <xsd:attribute name="prefix" type="xsd:string" use="required"/>
         <xsd:attribute name="uri" type="xsd:string" use="required"/>
     </xsd:complexType>
