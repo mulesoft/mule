@@ -164,7 +164,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                         {
                             return getConnectionDescription();
                         }
-                    });
+                    }, getWorkManager());
                 }
                 catch (Exception e)
                 {
