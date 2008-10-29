@@ -10,6 +10,8 @@
 
 package org.mule.api.retry;
 
+import org.mule.api.context.WorkManager;
+
 
 /**
  * A RetryPolicyTemplate creates a new {@link RetryPolicy} instance each time the retry goes into effect, 
@@ -25,5 +27,5 @@ public interface RetryPolicyTemplate
 
     void setNotifier(RetryNotifier retryNotifier);
 
-    RetryContext execute(RetryCallback callback) throws Exception;
+    RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception;
 }

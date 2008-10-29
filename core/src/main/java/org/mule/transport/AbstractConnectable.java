@@ -216,7 +216,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             {
                 return getConnectionDescription();
             }
-        });
+        }, getWorkManager());
         
         if (startOnConnect)
         {

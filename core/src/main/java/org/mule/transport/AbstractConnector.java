@@ -576,13 +576,23 @@ public abstract class AbstractConnector
     }
     protected void disposeWorkManagers()
     {
+        WorkManager workManager;
+        
         logger.debug("Disposing dispatcher work manager");
-        WorkManager workManager = (WorkManager) dispatcherWorkManager.get();
+        workManager = (WorkManager) dispatcherWorkManager.get();
         if (workManager != null)
         {
             workManager.dispose();
         }
         dispatcherWorkManager.set(null);
+
+        logger.debug("Disposing requester work manager");
+        workManager = (WorkManager) requesterWorkManager.get();
+        if (workManager != null)
+        {
+            workManager.dispose();
+        }
+        requesterWorkManager.set(null);
 
         logger.debug("Disposing receiver work manager");
         workManager = (WorkManager) receiverWorkManager.get();
@@ -1379,7 +1389,7 @@ public abstract class AbstractConnector
             {
                 return getConnectionDescription();
             }
-        });
+        }, muleContext.getWorkManager());
 
         if(startOnConnect.get())
         {

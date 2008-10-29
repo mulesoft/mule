@@ -10,6 +10,7 @@
 
 package org.mule.retry.policies;
 
+import org.mule.api.context.WorkManager;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryNotifier;
@@ -35,7 +36,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
     
     protected transient final Log logger = LogFactory.getLog(getClass());
     
-    public RetryContext execute(RetryCallback callback) throws Exception
+    public RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception
     {
         PolicyStatus status = null;
         RetryPolicy policy = createRetryInstance();
