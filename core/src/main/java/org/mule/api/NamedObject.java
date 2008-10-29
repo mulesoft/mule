@@ -21,7 +21,7 @@ public interface NamedObject
     void setName(String name);
 
     /**
-     * Gts the name of the object
+     * Gets the name of the object
      * @return the name of the object
      */
     String getName();
