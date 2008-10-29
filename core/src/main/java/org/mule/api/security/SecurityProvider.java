@@ -13,11 +13,10 @@ package org.mule.api.security;
 import org.mule.api.lifecycle.Initialisable;
 
 /**
- * <code>SecurityProvider</code> is a target security provider thsat actually
+ * <code>SecurityProvider</code> is a target security provider that actually
  * does the work of authenticating credentials and populating the Authentication
  * object.
  */
-
 public interface SecurityProvider extends Initialisable
 {
     void setName(String name);
