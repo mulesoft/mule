@@ -30,6 +30,12 @@ public class AcegiProviderAdapter extends AbstractSecurityProvider implements Au
     private AuthenticationProvider delegate;
     private Map securityProperties;
 
+    /** For Spring IoC only */
+    public AcegiProviderAdapter()
+    {
+        super();
+    }
+
     public AcegiProviderAdapter(AuthenticationProvider delegate)
     {
         this(delegate, "acegi");
