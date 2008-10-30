@@ -33,7 +33,7 @@ public class AcegiProviderAdapter extends AbstractSecurityProvider implements Au
     /** For Spring IoC only */
     public AcegiProviderAdapter()
     {
-        super();
+        super("acegi");
     }
 
     public AcegiProviderAdapter(AuthenticationProvider delegate)
