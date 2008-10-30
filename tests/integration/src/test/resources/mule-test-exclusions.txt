@@ -62,3 +62,7 @@ org.mule.test.integration.client.MuleClientWSDLExternalTestCase
 
 # MULE-3557
 org.mule.test.integration.streaming.FileToTcpStreamingTestCase
+
+# EE-979
+org.mule.security.MultiuserSecurityTestCase
+

@@ -8,6 +8,8 @@
         <property name="userMap">
             <value>
                 marie=marie,ROLE_ADMIN
+                stan=stan,ROLE_ADMIN
+                cindy=cindy,ROLE_USER
                 anon=anon,ROLE_ANONYMOUS
             </value>
         </property>
