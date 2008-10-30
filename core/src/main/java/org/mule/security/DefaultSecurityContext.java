@@ -8,43 +8,30 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.jaas;
+package org.mule.security;
 
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
 
-public class JaasSecurityContext implements SecurityContext
+/**
+ * Trivial {@link SecurityContext} implementation which simply holds the {@link Authentication} object.
+ */
+public class DefaultSecurityContext implements SecurityContext
 {
+    private Authentication authentication;
 
-    private JaasAuthentication authentication;
-
-    /**
-     * Constructor for the class
-     * 
-     * @param authentication
-     */
-    public JaasSecurityContext(JaasAuthentication authentication)
+    public DefaultSecurityContext(Authentication authentication)
     {
         this.authentication = authentication;
     }
 
-    /**
-     * Returns the authentication
-     * 
-     * @return authentication
-     */
     public final Authentication getAuthentication()
     {
         return authentication;
     }
 
-    /**
-     * Sets the Authentication
-     * 
-     * @param authentication
-     */
     public final void setAuthentication(Authentication authentication)
     {
-        this.authentication = (JaasAuthentication) authentication;
+        this.authentication = authentication;
     }
 }

@@ -8,23 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.jaas;
+package org.mule.security;
 
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.security.SecurityContextFactory;
 
-public class JaasSecurityContextFactory implements SecurityContextFactory
+public class DefaultSecurityContextFactory implements SecurityContextFactory
 {
-    /**
-     * Creates the Jaas Security Context
-     * 
-     * @param authentication
-     * @return JaasSecurityContext((Authentication) authentication)
-     */
     public final SecurityContext create(Authentication authentication)
     {
-        return new JaasSecurityContext((JaasAuthentication) authentication);
+        return new DefaultSecurityContext(authentication);
     }
-
 }

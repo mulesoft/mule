@@ -12,12 +12,9 @@ package org.mule.module.jaas;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.security.SecurityContextFactory;
-import org.mule.api.security.SecurityProvider;
 import org.mule.api.security.UnauthorisedException;
-import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.security.AbstractSecurityProvider;
 
 import java.io.IOException;
 import java.security.Security;
@@ -33,19 +30,18 @@ import javax.security.auth.login.LoginException;
 /**
  *  This is the Provider for Mule's Jaas Security.
  */
-public class JaasSimpleAuthenticationProvider implements SecurityProvider
+public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider
 {
-
     private String loginConfig;
     private String loginContextName;
     private String credentials;
     private String loginModule;
     private String defaultModule = "org.mule.module.jaas.loginmodule.DefaultLoginModule";
-    private String name;
-    private SecurityContextFactory factory;
 
-    // ~ Getters and Setters
-    // ================================================================
+    public JaasSimpleAuthenticationProvider()
+    {
+        super("jaas");
+    }
 
     /**
      * Sets the login Configuration
@@ -125,18 +121,6 @@ public class JaasSimpleAuthenticationProvider implements SecurityProvider
     public final void setLoginModule(String loginModule)
     {
         this.loginModule = loginModule;
-    }
-
-    /** @return name */
-    public final String getName()
-    {
-        return name;
-    }
-
-    /** @param name  */
-    public final void setName(String name)
-    {
-        this.name = name;
     }
 
     // ~ Methods ================================================================
@@ -232,29 +216,6 @@ public class JaasSimpleAuthenticationProvider implements SecurityProvider
     }
 
     /**
-     * checks whether the class is supported.
-     *
-     * @param aClass
-     * @return
-     */
-    public final boolean supports(Class aClass)
-    {
-        return Authentication.class.isAssignableFrom(aClass);
-    }
-
-    /**
-     * @return
-     * @throws UnknownAuthenticationTypeException
-     *          This occurs when the Security
-     *          Factory cannot be created
-     */
-    public final SecurityContext createSecurityContext(Authentication auth)
-            throws UnknownAuthenticationTypeException
-    {
-        return factory.create(auth);
-    }
-
-    /**
      * The initialise method checks whether a jaas configuration file exists. If it
      * exists, it will call the configureJaas() method to create the context URL of
      * that file. If such a configuration file is not present, it will then try to
@@ -263,7 +224,7 @@ public class JaasSimpleAuthenticationProvider implements SecurityProvider
      *
      * @throws InitialisationException
      */
-    public final void initialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         // configure jaas from properties passed to the provider from the Mule XML
         // configuration file
@@ -308,16 +269,6 @@ public class JaasSimpleAuthenticationProvider implements SecurityProvider
             {
                 throw new InitialisationException(e, this);
             }
-        }
-
-        // create the Jaas SecurityContext Factory
-        try
-        {
-            factory = new JaasSecurityContextFactory();
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(CoreMessages.failedToCreate("JaasProvider"), e, this);
         }
     }
 

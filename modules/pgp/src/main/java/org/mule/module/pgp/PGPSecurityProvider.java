@@ -12,48 +12,26 @@ package org.mule.module.pgp;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.security.SecurityContextFactory;
 import org.mule.api.security.SecurityException;
-import org.mule.api.security.SecurityProvider;
 import org.mule.api.security.UnauthorisedException;
-import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.pgp.i18n.PGPMessages;
+import org.mule.security.AbstractSecurityProvider;
 
 import cryptix.message.Message;
 import cryptix.message.MessageException;
 import cryptix.message.SignedMessage;
 import cryptix.pki.KeyBundle;
 
-public class PGPSecurityProvider implements SecurityProvider
+public class PGPSecurityProvider extends AbstractSecurityProvider
 {
-    private String name = "PGPSecurityProvider";
-
     private PGPKeyRing keyManager;
 
-    private SecurityContextFactory factory;
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.SecurityProvider#setName(java.lang.String)
-     */
-    public void setName(String name)
+    public PGPSecurityProvider()
     {
-        this.name = name;
+        super("pgp");
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.SecurityProvider#getName()
-     */
-    public String getName()
-    {
-        return name;
-    }
-
+    
     /*
      * (non-Javadoc)
      * 
@@ -112,25 +90,14 @@ public class PGPSecurityProvider implements SecurityProvider
         return PGPAuthentication.class.isAssignableFrom(aClass);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.SecurityProvider#createSecurityContext(org.mule.api.security.Authentication)
-     */
-    public SecurityContext createSecurityContext(Authentication auth)
-            throws UnknownAuthenticationTypeException
-    {
-        return factory.create(auth);
-    }
-
-    public void initialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         try
         {
             java.security.Security.addProvider(new cryptix.jce.provider.CryptixCrypto());
             java.security.Security.addProvider(new cryptix.openpgp.provider.CryptixOpenPGP());
 
-            factory = new PGPSecurityContextFactory();
+            setSecurityContextFactory(new PGPSecurityContextFactory());
         }
         catch (Exception e)
         {

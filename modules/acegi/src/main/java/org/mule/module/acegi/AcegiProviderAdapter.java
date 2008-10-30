@@ -12,11 +12,8 @@ package org.mule.module.acegi;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.Authentication;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.security.SecurityContextFactory;
 import org.mule.api.security.SecurityException;
-import org.mule.api.security.SecurityProvider;
-import org.mule.api.security.UnknownAuthenticationTypeException;
+import org.mule.security.AbstractSecurityProvider;
 
 import java.util.Map;
 
@@ -28,46 +25,25 @@ import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
  * <code>AcegiProviderAdapter</code> is a wrapper for an Acegi Security provider to
  * use with the SecurityManager
  */
-public class AcegiProviderAdapter implements SecurityProvider, AuthenticationProvider
+public class AcegiProviderAdapter extends AbstractSecurityProvider implements AuthenticationProvider
 {
     private AuthenticationProvider delegate;
-    private String name;
-    private SecurityContextFactory factory;
     private Map securityProperties;
-
-    public AcegiProviderAdapter()
-    {
-        super();
-    }
 
     public AcegiProviderAdapter(AuthenticationProvider delegate)
     {
-        this.delegate = delegate;
+        this(delegate, "acegi");
     }
 
     public AcegiProviderAdapter(AuthenticationProvider delegate, String name)
     {
+        super(name);
         this.delegate = delegate;
-        this.name = name;
     }
 
-    public void initialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
-        // all initialisation should be handled in the spring
-        // intitialisation hook afterPropertiesSet()
-
-        // register context factory
-        factory = new AcegiSecurityContextFactory();
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public String getName()
-    {
-        return name;
+        setSecurityContextFactory(new AcegiSecurityContextFactory());
     }
 
     public Authentication authenticate(Authentication authentication) throws SecurityException
@@ -92,11 +68,6 @@ public class AcegiProviderAdapter implements SecurityProvider, AuthenticationPro
         return delegate.authenticate(authentication);
     }
 
-    public boolean supports(Class aClass)
-    {
-        return Authentication.class.isAssignableFrom(aClass);
-    }
-
     public AuthenticationProvider getDelegate()
     {
         return delegate;
@@ -105,16 +76,6 @@ public class AcegiProviderAdapter implements SecurityProvider, AuthenticationPro
     public void setDelegate(AuthenticationProvider delegate)
     {
         this.delegate = delegate;
-    }
-
-    public SecurityContext createSecurityContext(Authentication auth)
-        throws UnknownAuthenticationTypeException
-    {
-        /*
-         * if (strategy != null){ return factory.create(auth, strategy); } else {
-         */
-        return factory.create(auth);
-        // }
     }
 
     public Map getSecurityProperties()
