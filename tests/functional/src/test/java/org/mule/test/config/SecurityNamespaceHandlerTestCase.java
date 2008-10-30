@@ -16,7 +16,7 @@ import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.security.MockEncryptionStrategy;
-import org.mule.tck.security.MockSecurityProvider;
+import org.mule.tck.security.TestSingleUserSecurityProvider;
 
 import java.util.Iterator;
 
@@ -32,7 +32,7 @@ public class SecurityNamespaceHandlerTestCase extends FunctionalTestCase
     {
         SecurityManager securityManager = muleContext.getSecurityManager();
         assertNotNull(securityManager.getProvider("dummySecurityProvider"));
-        assertTrue(securityManager.getProvider("dummySecurityProvider") instanceof MockSecurityProvider);
+        assertTrue(securityManager.getProvider("dummySecurityProvider") instanceof TestSingleUserSecurityProvider);
         verifyEncryptionStrategy(securityManager, "dummyEncryptionStrategy", MockEncryptionStrategy.class);
         verifyEncryptionStrategy(securityManager, "passwordEncryptionStrategy", PasswordBasedEncryptionStrategy.class);
         verifyEncryptionStrategy(securityManager, "secretKeyEncryptionStrategy", SecretKeyEncryptionStrategy.class);
