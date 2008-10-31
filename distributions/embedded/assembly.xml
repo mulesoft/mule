@@ -20,5 +20,12 @@ Assembly descriptor for the composite Mule library (jar).
                 <include>spring.handlers</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory>META-INF/services/org/mule/config</outputDirectory>
+            <includes>
+                <include>registry-bootstrap.properties</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </assembly>
