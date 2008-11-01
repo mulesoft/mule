@@ -26,9 +26,6 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 {
     public void initialise() throws InitialisationException
     {
-        // We start off with the TransientRegistry by default.
-        addRegistry(-1, new TransientRegistry());
-        
         Iterator it = getRegistries().iterator(); 
         while (it.hasNext())
         {

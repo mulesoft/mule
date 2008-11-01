@@ -24,7 +24,6 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
 
@@ -49,12 +48,16 @@ public class TransientRegistry extends AbstractRegistry
     //@ThreadSafe synchronized(registry)
     private Map registry = new HashMap();
 
-    public TransientRegistry()
+    private MuleContext context;
+
+    public TransientRegistry(MuleContext context)
     {
         super(REGISTRY_ID);
+        this.context = context;
         synchronized(registry)
         {
-            registry.put("_mulePropertyExtractorProcessor", new ExpressionEvaluatorProcessor());
+            registry.put("_muleContextProcessor", new MuleContextProcessor(context));
+            registry.put("_mulePropertyExtractorProcessor", new ExpressionEvaluatorProcessor(context));
         }
     }
 
@@ -211,26 +214,19 @@ public class TransientRegistry extends AbstractRegistry
             }
             registry.put(key, object);
         }
-            MuleContext mc = MuleServer.getMuleContext();
-            logger.debug("context: " + mc);
-            if (mc != null)
+
+        try
+        {
+            if(logger.isDebugEnabled())
             {
-                logger.debug("applying lifecycle");
-                try
-                {
-                    mc.getLifecycleManager().applyCompletedPhases(object);
-                }
-                catch (MuleException e)
-                {
-                    throw new RegistrationException(e);
-                }
+                logger.debug("applying lifecycle to object: " + object);
             }
-            else
-            {
-                throw new RegistrationException("Unable to register object (\""
-                        + key + ":" + ClassUtils.getSimpleName(object.getClass())
-                        + "\") because MuleContext has not yet been created.");
-            }
+            context.getLifecycleManager().applyCompletedPhases(object);
+        }
+        catch (MuleException e)
+        {
+            throw new RegistrationException(e);
+        }
     }
 
     public void unregisterObject(String key, Object metadata) throws RegistrationException

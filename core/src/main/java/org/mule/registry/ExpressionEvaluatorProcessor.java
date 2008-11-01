@@ -9,29 +9,31 @@
  */
 package org.mule.registry;
 
+import org.mule.api.MuleContext;
+import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.registry.ObjectProcessor;
-import org.mule.util.expression.ExpressionEvaluator;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 /** 
- * Registers ExpressionEvaluators with the {@link org.mule.util.expression.ExpressionEvaluatorManager} so that they will
+ * Registers ExpressionEvaluators with the {@link org.mule.expression.DefaultExpressionManager} so that they will
  * be resolved at run-time.
- * {@link org.mule.util.expression.ExpressionEvaluator} objects are used to execute property expressions (usually on the
+ * {@link org.mule.api.expression.ExpressionEvaluator} objects are used to execute property expressions (usually on the
  * current message) at run-time to extract a dynamic value.
  */
 public class ExpressionEvaluatorProcessor implements ObjectProcessor, Disposable
 {
-    public ExpressionEvaluatorProcessor()
+    private MuleContext context;
+
+    public ExpressionEvaluatorProcessor(MuleContext context)
     {
-        ExpressionEvaluatorManager.clearEvaluators();
+        this.context = context;
     }
 
     public Object process(Object object)
     {
         if(object instanceof ExpressionEvaluator)
         {
-            ExpressionEvaluatorManager.registerEvaluator((ExpressionEvaluator)object);
+            context.getExpressionManager().registerEvaluator((ExpressionEvaluator)object);
         }
         return object;
     }
@@ -43,6 +45,6 @@ public class ExpressionEvaluatorProcessor implements ObjectProcessor, Disposable
      */
     public void dispose()
     {
-        ExpressionEvaluatorManager.clearEvaluators();
+        context.getExpressionManager().clearEvaluators();
     }
 }
