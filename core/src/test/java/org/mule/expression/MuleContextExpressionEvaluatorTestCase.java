@@ -16,8 +16,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.util.expression.ExpressionEvaluatorManager;
-import org.mule.util.expression.MuleContextExpressionEvaluator;
 
 public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
@@ -70,30 +68,30 @@ public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testExpressionsFromExtractorManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test");
-        Object o = ExpressionEvaluatorManager.evaluate("mule:serviceName", message);
+        Object o = muleContext.getExpressionManager().evaluate("mule:serviceName", message);
         assertEquals("apple", o);
 
-        o = ExpressionEvaluatorManager.evaluate("mule:modelName", message);
+        o = muleContext.getExpressionManager().evaluate("mule:modelName", message);
         assertNotNull(o);
 
-        o = ExpressionEvaluatorManager.evaluate("mule:inboundEndpoint", message);
+        o = muleContext.getExpressionManager().evaluate("mule:inboundEndpoint", message);
         assertEquals("test://foo", o.toString());
 
-        o = ExpressionEvaluatorManager.evaluate("mule:serverId", message);
+        o = muleContext.getExpressionManager().evaluate("mule:serverId", message);
         assertNotNull(o);
 
-        o = ExpressionEvaluatorManager.evaluate("mule:clusterId", message);
+        o = muleContext.getExpressionManager().evaluate("mule:clusterId", message);
         assertNotNull(o);
 
-        o = ExpressionEvaluatorManager.evaluate("mule:domainId", message);
+        o = muleContext.getExpressionManager().evaluate("mule:domainId", message);
         assertNotNull(o);
 
-        o = ExpressionEvaluatorManager.evaluate("mule:workingDir", message);
+        o = muleContext.getExpressionManager().evaluate("mule:workingDir", message);
         assertNotNull(o);
 
         try
         {
-            o = ExpressionEvaluatorManager.evaluate("mule:bork", message);
+            o = muleContext.getExpressionManager().evaluate("mule:bork", message);
             fail("bork is not a valid mule context value");
         }
         catch (Exception e)

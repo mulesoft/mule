@@ -7,15 +7,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.expression;
+package org.mule.expression;
 
+import org.mule.api.expression.ExpressionManager;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
 
 /**
  * A simple configuration object for holding the common Expression evaluator configuration.
  * The {@link #getFullExpression()} will return the evaluator and expression information in a format
- * that can be passed into the {@link org.mule.util.expression.ExpressionEvaluatorManager}
+ * that can be passed into the {@link DefaultExpressionManager}
  */
 public class ExpressionConfig
 {
@@ -29,18 +30,19 @@ public class ExpressionConfig
 
     private String fullExpression;
 
-    private String expressionPrefix = ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX;
-    private String expressionPostfix = ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX;
+    private String expressionPrefix = ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+    private String expressionPostfix = ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 
     public ExpressionConfig()
     {
+
     }
 
     public ExpressionConfig(String expression, String evaluator, String customEvaluator)
     {
         this(expression, evaluator, customEvaluator,
-                ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX,
-                ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX);
+                ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
+                ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
 
     }
 
@@ -53,7 +55,7 @@ public class ExpressionConfig
         this.expressionPrefix = expressionPrefix;
     }
 
-    public void validate()
+    public void validate(ExpressionManager manager)
     {
         if (expression == null)
         {
@@ -75,17 +77,17 @@ public class ExpressionConfig
             }
         }
 
-        if (!ExpressionEvaluatorManager.isEvaluatorRegistered(evaluator))
+        if (!manager.isEvaluatorRegistered(evaluator))
         {
             throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator).getMessage());
         }
     }
 
-    public String getFullExpression()
+    public String getFullExpression(ExpressionManager manager)
     {
         if (fullExpression == null)
         {
-            validate();
+            validate(manager);
             fullExpression = expressionPrefix + evaluator + ":" + expression + expressionPostfix;
         }
         return fullExpression;

@@ -12,20 +12,19 @@ package org.mule.expression;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.sql.Timestamp;
-import java.util.Map;
 import java.util.Collections;
+import java.util.Map;
 
 public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
 {
     public void testManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", (Map) null);
-        Object o = ExpressionEvaluatorManager.evaluate("function:uuid", message);
+        Object o = muleContext.getExpressionManager().evaluate("function:uuid", message);
         assertNotNull(o);
-        o = ExpressionEvaluatorManager.evaluate("function:now", message);
+        o = muleContext.getExpressionManager().evaluate("function:now", message);
         assertNotNull(o);
         assertTrue(o instanceof Timestamp);
     }
@@ -35,7 +34,7 @@ public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
         // http://mule.mulesource.org/jira/browse/MULE-3809 . For now ignore duplicate registrations.
         /*try
         {
-            ExpressionEvaluatorManager.registerEvaluator(new MapPayloadExpressionEvaluator());
+            DefaultExpressionManager.registerEvaluator(new MapPayloadExpressionEvaluator());
             fail("extractor already exists");
         }
         catch (IllegalArgumentException e)
@@ -45,14 +44,14 @@ public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
 
         try
         {
-            ExpressionEvaluatorManager.registerEvaluator(null);
+            muleContext.getExpressionManager().registerEvaluator(null);
             fail("null extractor");
         }
         catch (IllegalArgumentException e)
         {
             //Expected
         }
-        assertNull(ExpressionEvaluatorManager.unregisterEvaluator(null));
+        assertNull(muleContext.getExpressionManager().unregisterEvaluator(null));
 
     }
 
@@ -60,16 +59,16 @@ public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
     public void testValidator() throws Exception
     {
         // fail for old-style ${}
-        assertFalse(ExpressionEvaluatorManager.isValidExpression("http://${bean:user}:${bean:password}@${header:host}:${header:port}/foo/bar"));
-        assertFalse(ExpressionEvaluatorManager.isValidExpression("${bean:user}"));
+        assertFalse(muleContext.getExpressionManager().isValidExpression("http://${bean:user}:${bean:password}@${header:host}:${header:port}/foo/bar"));
+        assertFalse(muleContext.getExpressionManager().isValidExpression("${bean:user}"));
 
         // wiggly mule style!
-        assertTrue(ExpressionEvaluatorManager.isValidExpression("#[bean:user]"));
-        assertTrue(ExpressionEvaluatorManager.isValidExpression("http://#[bean:user]:#[bean:password]@#[header:host]:#[header:port]/foo/bar"));
+        assertTrue(muleContext.getExpressionManager().isValidExpression("#[bean:user]"));
+        assertTrue(muleContext.getExpressionManager().isValidExpression("http://#[bean:user]:#[bean:password]@#[header:host]:#[header:port]/foo/bar"));
 
-        assertFalse(ExpressionEvaluatorManager.isValidExpression("{bean:user}"));
-        assertFalse(ExpressionEvaluatorManager.isValidExpression("#{bean:user"));
-        assertFalse(ExpressionEvaluatorManager.isValidExpression("user"));
+        assertFalse(muleContext.getExpressionManager().isValidExpression("{bean:user}"));
+        assertFalse(muleContext.getExpressionManager().isValidExpression("#{bean:user"));
+        assertFalse(muleContext.getExpressionManager().isValidExpression("user"));
     }
 
     public void testParsing()
@@ -80,7 +79,7 @@ public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
         msg.setProperty("host", "example.com");
         msg.setProperty("port", "12345");
 
-        String result = ExpressionEvaluatorManager.parse("http://#[header:user]:#[header:password]@#[header:host]:#[header:port]/foo/bar", msg);
+        String result = muleContext.getExpressionManager().parse("http://#[header:user]:#[header:password]@#[header:host]:#[header:port]/foo/bar", msg);
         assertNotNull(result);
         assertEquals("http://vasya:pupkin@example.com:12345/foo/bar", result);
     }

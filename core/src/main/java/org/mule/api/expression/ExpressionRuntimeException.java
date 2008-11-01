@@ -7,14 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.expression;
+package org.mule.api.expression;
 
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 
 /**
- * If thrown by the {@link org.mule.util.expression.ExpressionEvaluatorManager} if an expression returns null
- * and failIfNull was set when {@link ExpressionEvaluatorManager#evaluate(String,org.mule.api.transport.MessageAdapter,boolean)}
+ * If thrown by the {@link org.mule.expression.DefaultExpressionManager} if an expression returns null
+ * and failIfNull was set when {@link org.mule.expression.DefaultExpressionManager#evaluate(String,org.mule.api.transport.MessageAdapter,boolean)}
  * was called.
  */
 public class ExpressionRuntimeException extends MuleRuntimeException

@@ -14,10 +14,12 @@ import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidResult;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.Component;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.interceptor.Interceptor;
@@ -40,14 +42,13 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract {@link Component} to be used by all {@link Component} implementations.
  */
-public abstract class AbstractComponent implements Component, Interceptor
+public abstract class AbstractComponent implements Component, Interceptor, MuleContextAware
 {
 
     /**
@@ -64,6 +65,13 @@ public abstract class AbstractComponent implements Component, Interceptor
     protected final AtomicBoolean disposed = new AtomicBoolean(false);
     protected ServerNotificationHandler notificationHandler;
     protected List interceptors = new ArrayList();
+    protected MuleContext muleContext;
+
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 
     public List getInterceptors()
     {

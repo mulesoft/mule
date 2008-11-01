@@ -8,9 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.expression;
+package org.mule.expression;
 
 import org.mule.RequestContext;
+import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transport.MessageAdapter;
 
 /**
@@ -20,7 +21,7 @@ import org.mule.api.transport.MessageAdapter;
  * @see MessageHeadersListExpressionEvaluator
  * @see MessageHeadersExpressionEvaluator
  * @see ExpressionEvaluator
- * @see ExpressionEvaluatorManager
+ * @see DefaultExpressionManager
  */
 public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
 {

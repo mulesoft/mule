@@ -11,9 +11,11 @@
 package org.mule.transport.http.transformers;
 
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -23,7 +25,6 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.StreamPayloadRequestEntity;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.StringUtils;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -56,8 +57,10 @@ import org.apache.commons.lang.SerializationUtils;
  * HttpClient HttpMethod that represents an HttpRequest.
  */
 
-public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransformer
+public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransformer implements MuleContextAware
 {
+
+    private MuleContext muleContext;
 
     public ObjectToHttpClientMethodRequest()
     {
@@ -68,6 +71,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         registerSourceType(InputStream.class);
         registerSourceType(OutputHandler.class);
         registerSourceType(NullPayload.class);
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
     protected int addParameters(String queryString, PostMethod postMethod, MuleMessage msg)
@@ -103,7 +111,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 paramName = currentParam.substring(0, equals);
                 paramValue = currentParam.substring(equals + 1);
                 //Run query params through the expression evaluator
-//                Object temp = ExpressionEvaluatorManager.evaluate(paramValue, msg, "$[", true);
+//                Object temp = DefaultExpressionManager.evaluate(paramValue, msg, "$[", true);
 //                if (temp != null)
 //                {
 //                    //Process param collections
@@ -175,7 +183,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         {
             //Allow Expressions to be embedded
             endpoint = endpoint.replaceAll("%23", "#");
-            endpoint = ExpressionEvaluatorManager.parse(endpoint, msg, true);
+            endpoint = muleContext.getExpressionManager().parse(endpoint, msg, true);
             URI uri = new URI(endpoint);
             HttpMethod httpMethod;
 

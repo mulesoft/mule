@@ -11,10 +11,9 @@
 package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.expression.ExpressionEvaluator;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.util.Map;
 
@@ -26,9 +25,9 @@ public class CustomExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testCustomExpressionEvaluator()
     {
-        ExpressionEvaluatorManager.registerEvaluator(new FooExpressionEvaluator());
+        muleContext.getExpressionManager().registerEvaluator(new FooExpressionEvaluator());
 
-        Object result = ExpressionEvaluatorManager.evaluate("#[foo:abc]", 
+        Object result = muleContext.getExpressionManager().evaluate("#[foo:abc]",
             new DefaultMuleMessage("test", (Map) null));
         assertNotNull(result);
         assertEquals("Wrong evaluation result", "testabc", result);

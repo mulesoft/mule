@@ -8,30 +8,31 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.expression;
+package org.mule.expression;
 
+import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transport.MessageAdapter;
 
-import java.util.Map;
+import javax.activation.DataHandler;
 
 /**
- * If the message payload is a map this extractor will look up the property value in
- * the map
+ * Looks up an attachment with the given name.
+ *
+ * @see MessageAttachmentsListExpressionEvaluator
+ * @see MessageAttachmentsExpressionEvaluator
+ * @see org.mule.api.expression.ExpressionEvaluator
+ * @see DefaultExpressionManager
  */
-public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
+public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
 {
-    public static final String NAME = "map-payload";
-    
-    public Object evaluate(String expression, MessageAdapter message)
+    public static final String NAME = "attachment";
+
+    public Object evaluate(String name, MessageAdapter message)
     {
-        Object payload = message;
         if (message instanceof MessageAdapter)
         {
-            payload = ((MessageAdapter) message).getPayload();
-        }
-        if (payload instanceof Map)
-        {
-            return ((Map) payload).get(expression);
+            DataHandler dh = ((MessageAdapter) message).getAttachment(name);
+            return dh;
         }
         return null;
     }
@@ -47,5 +48,4 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
     {
         throw new UnsupportedOperationException("setName");
     }
-
 }

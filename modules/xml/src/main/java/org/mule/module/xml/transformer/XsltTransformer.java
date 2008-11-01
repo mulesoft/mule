@@ -11,7 +11,10 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -20,7 +23,6 @@ import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,7 +93,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * </pre>
  */
 
-public class XsltTransformer extends AbstractXmlTransformer
+public class XsltTransformer extends AbstractXmlTransformer implements MuleContextAware
 {
     // keep at least 1 XSLT Transformer ready by default
     private static final int MIN_IDLE_TRANSFORMERS = 1;
@@ -100,7 +102,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     // MAX_IDLE is also the total limit
     private static final int MAX_ACTIVE_TRANSFORMERS = MAX_IDLE_TRANSFORMERS;
     // Prefix to use in a parameter to specify it is an expression that must be evaluated
-    private static final String PARAM_EXTRACTOR_TOKEN = ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX;
+    private static final String PARAM_EXTRACTOR_TOKEN = ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
     protected final GenericObjectPool transformerPool;
 
@@ -109,6 +111,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     private volatile String xslFile;
     private volatile String xslt;
     private volatile Map contextProperties;
+    private MuleContext muleContext;
 
     private URIResolver uriResolver;
 
@@ -132,6 +135,11 @@ public class XsltTransformer extends AbstractXmlTransformer
         {
             throw new InitialisationException(te, this);
         }
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
     /**
@@ -505,7 +513,7 @@ public class XsltTransformer extends AbstractXmlTransformer
                 {
                     throw new TransformerException(CoreMessages.noCurrentEventForTransformer(), this);
                 }
-                return ExpressionEvaluatorManager.evaluate(value.toString(), context.getMessage());
+                return muleContext.getExpressionManager().evaluate(value.toString(), context.getMessage());
             }
         }
 

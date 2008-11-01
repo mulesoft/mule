@@ -12,7 +12,7 @@ package org.mule.module.scripting.expression;
 import org.mule.api.MuleMessage;
 
 /**
- * An {@link org.mule.util.expression.ExpressionEvaluator} that allows the user to define Groovy expressions to extract
+ * An {@link org.mule.api.expression.ExpressionEvaluator} that allows the user to define Groovy expressions to extract
  * data from the current message.
  *
  * If a POJO is passed in it is accessible from the 'payload' namespace.  If a {@link MuleMessage} instance is used then

@@ -12,6 +12,7 @@ package org.mule.module.xml.expression;
 
 import org.mule.module.xml.i18n.XmlMessages;
 
+import org.dom4j.Element;
 import org.dom4j.Node;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
@@ -28,11 +29,11 @@ public class XPathExpressionEvaluator extends AbstractXPathExpressionEvaluator
 
     protected XPath createXPath(String expression, Object object) throws JaxenException
     {
-        if(object instanceof Document)
+        if(object instanceof Document || object instanceof Element)
         {
             return new DOMXPath(expression);
         }
-        else if (object instanceof org.dom4j.Document)
+        else if (object instanceof org.dom4j.Document || object instanceof org.dom4j.Element)
         {
             return new Dom4jXPath(expression);
         }

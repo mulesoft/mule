@@ -263,10 +263,9 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
 class TestLifecycleAdapterFactory implements LifecycleAdapterFactory
 {
 
-    public LifecycleAdapter create(Object pojoService, JavaComponent component, EntryPointResolverSet resolver)
+    public LifecycleAdapter create(Object pojoService, JavaComponent component, EntryPointResolverSet resolver, MuleContext muleContext)
         throws MuleException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 

@@ -10,10 +10,10 @@
 package org.mule.module.xml.expression;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.module.xml.i18n.XmlMessages;
-import org.mule.util.expression.ExpressionEvaluator;
 
 import java.util.ArrayList;
 import java.util.Iterator;

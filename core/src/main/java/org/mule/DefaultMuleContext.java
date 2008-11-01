@@ -18,6 +18,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -35,6 +36,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
+import org.mule.expression.DefaultExpressionManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
@@ -82,6 +84,8 @@ public class DefaultMuleContext implements MuleContext
     /** the date in milliseconds from when the server was started */
     private long startDate;
 
+    private ExpressionManager expressionManager;
+
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager, 
                               WorkListener workListener, 
@@ -93,11 +97,13 @@ public class DefaultMuleContext implements MuleContext
         this.workListener = workListener;
         this.lifecycleManager = lifecycleManager;
         this.notificationManager = notificationManager;
+        //there is no point having this object configurable
+        this.expressionManager = new DefaultExpressionManager();
     }
 
     protected RegistryBroker createRegistryBroker()
     {
-        return new DefaultRegistryBroker();
+        return new DefaultRegistryBroker(this);
     }
     
     protected MuleRegistry createRegistryHelper(Registry registry)
@@ -578,5 +584,16 @@ public class DefaultMuleContext implements MuleContext
     public long getStartDate()
     {
         return startDate;
+    }
+
+    /**
+     * Returns the Expression Manager configured for this instance of Mule
+     *
+     * @return the Expression Manager configured for this instance of Mule
+     * @see org.mule.api.expression.ExpressionManager
+     */
+    public ExpressionManager getExpressionManager()
+    {
+        return expressionManager;
     }
 }

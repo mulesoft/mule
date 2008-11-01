@@ -27,6 +27,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         super.doSetUp();
 
         parser = new ExpressionFilenameParser();
+        parser.setMuleContext(muleContext);
 
         adapter = new DefaultMessageAdapter("hello");
         adapter.setProperty("foo", "bar");

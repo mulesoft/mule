@@ -14,6 +14,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleManager;
@@ -200,6 +201,14 @@ public interface MuleContext extends Lifecycle
 
     /**
      * Returns the date when the server was started.
+     * @return the date when the server was started.
      */
     long getStartDate();
+
+    /**
+     * Returns the Expression Manager configured for this instance of Mule
+     * @return the Expression Manager configured for this instance of Mule
+     * @see org.mule.api.expression.ExpressionManager
+     */
+    ExpressionManager getExpressionManager();
 }

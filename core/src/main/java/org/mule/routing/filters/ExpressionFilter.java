@@ -9,10 +9,11 @@
  */
 package org.mule.routing.filters;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Allows boolean expressions to be executed on a message
  */
-public class ExpressionFilter implements Filter
+public class ExpressionFilter implements Filter, MuleContextAware
 {
     /**
      * logger used by this class
@@ -32,6 +33,8 @@ public class ExpressionFilter implements Filter
     private String customEvaluator;
     private String fullExpression;
     private boolean nullReturnsTrue = false;
+    private MuleContext muleContext;
+
     private static final String TRUE = "true";
 
     /** For evaluators that are not expression languages we can delegate the execution to another filter */
@@ -66,6 +69,11 @@ public class ExpressionFilter implements Filter
         super();
     }
 
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
     /**
      * Check a given message against this filter.
      *
@@ -80,7 +88,7 @@ public class ExpressionFilter implements Filter
             return delegateFilter.accept(message);
         }
 
-        Object result = ExpressionEvaluatorManager.evaluate(expr, message);
+        Object result = muleContext.getExpressionManager().evaluate(expr, message);
         if (result == null)
         {
             return nullReturnsTrue;

@@ -11,12 +11,12 @@ package org.mule.module.scripting.expression;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.scripting.component.Scriptable;
-import org.mule.util.expression.ExpressionEvaluator;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -25,7 +25,7 @@ import javax.script.Bindings;
 import javax.script.ScriptException;
 
 /**
- * An abstract {@link org.mule.util.expression.ExpressionEvaluator} that can be used for any JSR-233 script engine.
+ * An abstract {@link org.mule.api.expression.ExpressionEvaluator} that can be used for any JSR-233 script engine.
  *
  * If a POJO is passed in it is accessible from the 'payload' namespace.  If a {@link MuleMessage} instance is used then
  * it is accessible from the message' namespace and the 'payload' namespace is also available.

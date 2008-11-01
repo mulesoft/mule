@@ -9,16 +9,30 @@
  */
 package org.mule.transport.quartz.config;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
 import org.mule.transport.quartz.QuartzConnector;
 
 /**
  * Base implementation of {@link org.mule.transport.quartz.config.JobConfig}.
  */
-public abstract class AbstractJobConfig implements JobConfig
+public abstract class AbstractJobConfig implements JobConfig, MuleContextAware
 {
     private String groupName = QuartzConnector.DEFAULT_GROUP_NAME;
 
     private String jobGroupName = QuartzConnector.DEFAULT_GROUP_NAME;
+
+    private MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
 
     public String getGroupName()
     {

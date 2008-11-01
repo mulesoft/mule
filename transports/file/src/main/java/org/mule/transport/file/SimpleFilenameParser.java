@@ -10,11 +10,11 @@
 
 package org.mule.transport.file;
 
+import org.mule.api.expression.ExpressionManager;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.util.DateUtils;
 import org.mule.util.TemplateParser;
 import org.mule.util.UUID;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.logging.Log;
@@ -61,7 +61,7 @@ public class SimpleFilenameParser implements FilenameParser
         }
         else
         {
-            if (pattern.contains(ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX))
+            if (pattern.contains(ExpressionManager.DEFAULT_EXPRESSION_PREFIX))
             {
                 return getFilename(adapter, pattern, wigglyMuleParser);
             }

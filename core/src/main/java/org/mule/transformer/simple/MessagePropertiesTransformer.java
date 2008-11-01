@@ -10,10 +10,11 @@
 
 package org.mule.transformer.simple;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -33,13 +34,15 @@ import java.util.Set;
  * <code>null</code>, it will be left intact. The transformer then acts as a more
  * gentle 'enricher'. The default setting is <code>true</code>.
  */
-public class MessagePropertiesTransformer extends AbstractMessageAwareTransformer
+public class MessagePropertiesTransformer extends AbstractMessageAwareTransformer implements MuleContextAware
 {
     private List deleteProperties = null;
     private Map addProperties = null;
     /** the properties map containing rename mappings for message properties */
     private Map renameProperties;
     private boolean overwrite = true;
+
+    private MuleContext muleContext;
 
     public MessagePropertiesTransformer()
     {
@@ -69,6 +72,11 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
         return clone;
     }
 
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         if (deleteProperties != null && deleteProperties.size() > 0)
@@ -96,9 +104,9 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                     Object value = entry.getValue();
 
                     //Enable expression support for property values
-                    if(ExpressionEvaluatorManager.isValidExpression(value.toString())) 
+                    if(muleContext.getExpressionManager().isValidExpression(value.toString()))
                     {
-                        value = ExpressionEvaluatorManager.evaluate(value.toString(), message);
+                        value = muleContext.getExpressionManager().evaluate(value.toString(), message);
                     }
 
                     if (overwrite)
@@ -152,9 +160,9 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                     else
                     {
                         //Enable expression support for property values
-                        if(ExpressionEvaluatorManager.isValidExpression(value))
+                        if(muleContext.getExpressionManager().isValidExpression(value))
                         {
-                            Object temp = ExpressionEvaluatorManager.evaluate(value.toString(), message);
+                            Object temp = muleContext.getExpressionManager().evaluate(value.toString(), message);
                             if(temp!=null) value = temp.toString();
                         }
 

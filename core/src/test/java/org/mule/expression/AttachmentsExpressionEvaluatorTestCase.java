@@ -12,10 +12,6 @@ package org.mule.expression;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.expression.ExpressionEvaluatorManager;
-import org.mule.util.expression.MessageAttachmentExpressionEvaluator;
-import org.mule.util.expression.MessageAttachmentsExpressionEvaluator;
-import org.mule.util.expression.MessageAttachmentsListExpressionEvaluator;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -119,20 +115,20 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testSingleAttachmentUsingManager() throws Exception
     {
-        Object result = ExpressionEvaluatorManager.evaluate("#[attachment:foo]", message);
+        Object result = muleContext.getExpressionManager().evaluate("#[attachment:foo]", message);
         assertNotNull(result);
         assertTrue(result instanceof DataHandler);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(4);
         ((DataHandler)result).writeTo(baos);
         assertEquals("moo", baos.toString());
 
-        result = ExpressionEvaluatorManager.evaluate("#[attachment:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[attachment:fool]", message);
         assertNull(result);
     }
 
     public void testMapHeadersUsingManager() throws Exception
     {
-        Object result = ExpressionEvaluatorManager.evaluate("#[attachments:foo, baz]", message);
+        Object result = muleContext.getExpressionManager().evaluate("#[attachments:foo, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(2, ((Map)result).size());
@@ -151,13 +147,13 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         dh.writeTo(baos);
         assertEquals("maz", baos.toString());
 
-        result = ExpressionEvaluatorManager.evaluate("#[attachments:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[attachments:fool]", message);
         assertNull(result);
     }
 
     public void testListHeadersUsingManager() throws Exception
     {
-        Object result = ExpressionEvaluatorManager.evaluate("#[attachments-list:foo,baz]", message);
+        Object result = muleContext.getExpressionManager().evaluate("#[attachments-list:foo,baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(2, ((List)result).size());
@@ -174,7 +170,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         dh.writeTo(baos);
         assertEquals("maz", baos.toString());
 
-        result = ExpressionEvaluatorManager.evaluate("#[attachments-list:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[attachments-list:fool]", message);
         assertNull(result);
     }
 

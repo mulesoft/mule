@@ -12,7 +12,7 @@ package org.mule.routing;
 
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.util.expression.MessageHeaderExpressionEvaluator;
+import org.mule.expression.MessageHeaderExpressionEvaluator;
 
 /**
  * <code>CorrelationPropertiesExpressionEvaluator</code> is a default implementation used for

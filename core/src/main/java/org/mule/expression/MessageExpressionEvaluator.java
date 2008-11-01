@@ -8,10 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.expression;
+package org.mule.expression;
 
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
+import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.util.StringUtils;
 
@@ -35,8 +36,8 @@ import org.apache.commons.logging.LogFactory;
  * <p/>
  * If the object passed in is not a MuleMessage, the same object will be returned.
  *
- * @see org.mule.util.expression.ExpressionEvaluator
- * @see org.mule.util.expression.ExpressionEvaluatorManager
+ * @see org.mule.api.expression.ExpressionEvaluator
+ * @see DefaultExpressionManager
  */
 public class MessageExpressionEvaluator implements ExpressionEvaluator
 {

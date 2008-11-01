@@ -8,8 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.expression;
+package org.mule.expression;
 
+import org.mule.api.expression.ExpressionEvaluator;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 
@@ -21,9 +23,9 @@ import java.util.StringTokenizer;
  * Looks up the property on the message using the expression given. The expression can contain a comma-separated list
  * of header names to lookup. A {@link java.util.Map} of key value pairs is returned.
  *
- * @see org.mule.util.expression.MessageHeadersListExpressionEvaluator
- * @see org.mule.util.expression.ExpressionEvaluator
- * @see org.mule.util.expression.ExpressionEvaluatorManager
+ * @see MessageHeadersListExpressionEvaluator
+ * @see org.mule.api.expression.ExpressionEvaluator
+ * @see DefaultExpressionManager
  */
 public class MessageHeadersExpressionEvaluator implements ExpressionEvaluator
 {

@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -27,7 +28,6 @@ import org.mule.transport.jdbc.sqlstrategy.SQLStrategyFactory;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.sql.Connection;
 import java.text.MessageFormat;
@@ -291,11 +291,11 @@ public class JdbcConnector extends AbstractConnector
             Object value = null;
             // If we find a value and it happens to be null, thats acceptable
             boolean foundValue = false;
-            boolean validExpression = ExpressionEvaluatorManager.isValidExpression(param);
+            boolean validExpression = muleContext.getExpressionManager().isValidExpression(param);
             //There must be an expression namespace to use the ExpresionEvaluator i.e. header:type
             if (message != null && validExpression)
             {
-                value = ExpressionEvaluatorManager.evaluate(param, message);
+                value = muleContext.getExpressionManager().evaluate(param, message);
                 foundValue = value != null;
             }
             if (!foundValue)
@@ -306,8 +306,8 @@ public class JdbcConnector extends AbstractConnector
                 {
                     logger.warn(MessageFormat.format("Config is using the legacy param format {0} (no evaluator defined)." +
                                                      " This expression can be replaced with {1}header:{2}{3}",
-                                                     param, ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX,
-                                                     name, ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX));
+                                                     param, ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
+                                                     name, ExpressionManager.DEFAULT_EXPRESSION_POSTFIX));
                 }
                 value = endpoint.getProperty(name);
             }

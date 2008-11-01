@@ -13,11 +13,13 @@ package org.mule.component;
 import org.mule.DefaultMuleEventContext;
 import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -65,14 +67,14 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
 
     private EntryPointResolverSet entryPointResolver;
 
-    public DefaultLifecycleAdapter(Object componentObject, JavaComponent component) throws MuleException
+    public DefaultLifecycleAdapter(Object componentObject, JavaComponent component, MuleContext muleContext) throws MuleException
     {
-        this(componentObject, component, new LegacyEntryPointResolverSet());
+        this(componentObject, component, new LegacyEntryPointResolverSet(), muleContext);
     }
 
     public DefaultLifecycleAdapter(Object componentObject,
                                    JavaComponent component,
-                                   EntryPointResolverSet entryPointResolver) throws MuleException
+                                   EntryPointResolverSet entryPointResolver, MuleContext muleContext) throws MuleException
     {
 
         if (componentObject == null)
@@ -94,6 +96,11 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         if (componentObject instanceof ServiceAware)
         {
             ((ServiceAware) componentObject).setService(component.getService());
+        }
+
+        if (componentObject instanceof MuleContextAware)
+        {
+            ((MuleContextAware) componentObject).setMuleContext(muleContext);
         }
         configureNestedRouter();
     }

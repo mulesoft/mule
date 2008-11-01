@@ -17,9 +17,8 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.expression.ExpressionConfig;
 import org.mule.util.StringUtils;
-import org.mule.util.expression.ExpressionConfig;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -55,18 +54,18 @@ public class EndpointSelector extends FilteringOutboundRouter
         List endpoints;
         String endpointName;
 
-        String prop = expressionConfig.getFullExpression();
-        if (!ExpressionEvaluatorManager.isValidExpression(prop))
+        String prop = expressionConfig.getFullExpression(expressionManager);
+        if (!muleContext.getExpressionManager().isValidExpression(prop))
         {
             throw new CouldNotRouteOutboundMessageException(
                     CoreMessages.expressionInvalidForProperty("expression", prop), message, null);
         }
 
-        Object property = ExpressionEvaluatorManager.evaluate(prop, message);
+        Object property = muleContext.getExpressionManager().evaluate(prop, message);
         if (property == null)
         {
             throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.expressionResultWasNull(expressionConfig.getFullExpression()), message, null);
+                    CoreMessages.expressionResultWasNull(expressionConfig.getFullExpression(expressionManager)), message, null);
         }
 
         if (property instanceof String)
@@ -81,7 +80,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         else
         {
             throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSupportedType(
-                    expressionConfig.getFullExpression(), new Class[]{String.class, List.class}, property.getClass()), message, null);
+                    expressionConfig.getFullExpression(expressionManager), new Class[]{String.class, List.class}, property.getClass()), message, null);
         }
 
         MuleMessage result = null;
@@ -94,7 +93,7 @@ public class EndpointSelector extends FilteringOutboundRouter
             if (StringUtils.isEmpty(endpointName))
             {
                 throw new CouldNotRouteOutboundMessageException(
-                        CoreMessages.objectIsNull("Endpoint Name: " + expressionConfig.getFullExpression()), message, null);
+                        CoreMessages.objectIsNull("Endpoint Name: " + expressionConfig.getFullExpression(expressionManager)), message, null);
             }
             OutboundEndpoint ep = null;
             try

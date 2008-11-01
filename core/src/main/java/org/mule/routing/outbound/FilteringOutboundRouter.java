@@ -17,6 +17,8 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.expression.ExpressionManager;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
@@ -48,7 +50,16 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 
     // We used Square templates as they can exist as part of an URI.
     private TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
-    
+
+    protected ExpressionManager expressionManager;
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        expressionManager = muleContext.getExpressionManager();
+    }
+
     public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
     {

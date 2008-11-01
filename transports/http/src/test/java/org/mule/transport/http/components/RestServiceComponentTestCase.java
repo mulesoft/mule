@@ -10,10 +10,10 @@
 package org.mule.transport.http.components;
 
 import org.mule.api.component.Component;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.text.MessageFormat;
 
@@ -22,8 +22,8 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
     
     public static final String SERVICE_NAME = "WORMS";
     public static final String SERVICE_URL = MessageFormat.format("{0}header:serviceUrl{1}",
-                                                                  ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX,
-                                                                  ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX);
+                                                                  ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
+                                                                  ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
     //public static final String SERVICE_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote";
 
     protected String getConfigResources()

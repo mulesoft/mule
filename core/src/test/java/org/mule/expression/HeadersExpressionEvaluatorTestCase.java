@@ -12,10 +12,6 @@ package org.mule.expression;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.expression.ExpressionEvaluatorManager;
-import org.mule.util.expression.MessageHeaderExpressionEvaluator;
-import org.mule.util.expression.MessageHeadersExpressionEvaluator;
-import org.mule.util.expression.MessageHeadersListExpressionEvaluator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -88,11 +84,11 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage("test", props);
 
-        Object result = ExpressionEvaluatorManager.evaluate("#[header:foo]", message);
+        Object result = muleContext.getExpressionManager().evaluate("#[header:foo]", message);
         assertNotNull(result);
         assertEquals("moo", result);
 
-        result = ExpressionEvaluatorManager.evaluate("#[header:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[header:fool]", message);
         assertNull(result);
     }
 
@@ -101,7 +97,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage("test", props);
 
-        Object result = ExpressionEvaluatorManager.evaluate("#[headers:foo, baz]", message);
+        Object result = muleContext.getExpressionManager().evaluate("#[headers:foo, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(2, ((Map)result).size());
@@ -109,7 +105,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((Map)result).values().contains("maz"));
         assertFalse(((Map)result).values().contains("mar"));
 
-        result = ExpressionEvaluatorManager.evaluate("#[headers:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[headers:fool]", message);
         assertNull(result);
     }
 
@@ -117,7 +113,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage("test", props);
 
-        Object result = ExpressionEvaluatorManager.evaluate("#[headers-list:foo, baz]", message);
+        Object result = muleContext.getExpressionManager().evaluate("#[headers-list:foo, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(2, ((List)result).size());
@@ -125,7 +121,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((List)result).contains("maz"));
         assertFalse(((List)result).contains("mar"));
 
-        result = ExpressionEvaluatorManager.evaluate("#[headers-list:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[headers-list:fool]", message);
         assertNull(result);
     }
 }

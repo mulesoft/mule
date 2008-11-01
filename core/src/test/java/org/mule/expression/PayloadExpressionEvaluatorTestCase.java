@@ -17,8 +17,6 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.FruitBowlToFruitBasket;
-import org.mule.util.expression.ExpressionEvaluatorManager;
-import org.mule.util.expression.MessagePayloadExpressionEvaluator;
 
 import java.io.ByteArrayInputStream;
 
@@ -48,14 +46,14 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage("test");
 
-        assertFalse(ExpressionEvaluatorManager.isValidExpression("${payload:}"));
-        assertTrue(ExpressionEvaluatorManager.isValidExpression("#[payload:]"));
+        assertFalse(muleContext.getExpressionManager().isValidExpression("${payload:}"));
+        assertTrue(muleContext.getExpressionManager().isValidExpression("#[payload:]"));
 
-        Object result = ExpressionEvaluatorManager.evaluate("#[payload:]", message);
+        Object result = muleContext.getExpressionManager().evaluate("#[payload:]", message);
         assertNotNull(result);
         assertEquals("test", result);
 
-        result = ExpressionEvaluatorManager.evaluate("#[payload:]", null);
+        result = muleContext.getExpressionManager().evaluate("#[payload:]", null);
         assertNull(result);
     }
 

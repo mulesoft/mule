@@ -32,6 +32,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
     public void testIdempotentReceiver() throws Exception
     {
         IdempotentReceiver router = new IdempotentReceiver();
+        router.setMuleContext(muleContext);
 
         Mock session = MuleTestUtils.getMockSession();
         Service testService = getTestService("test", Apple.class);

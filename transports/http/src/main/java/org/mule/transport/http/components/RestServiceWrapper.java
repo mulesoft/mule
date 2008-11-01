@@ -20,8 +20,6 @@ import org.mule.component.AbstractComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.transport.NullPayload;
-import org.mule.util.expression.ExpressionEvaluator;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -77,7 +75,7 @@ public class RestServiceWrapper extends AbstractComponent
     /**
      * Required params that are pulled from the message. If these params don't exist
      * the call will fail Note that you can use
-     * {@link org.mule.util.expression.ExpressionEvaluator} expressions such as
+     * {@link org.mule.api.expression.ExpressionEvaluator} expressions such as
      * xpath, header, xquery, etc
      *
      * @param requiredParams
@@ -89,7 +87,7 @@ public class RestServiceWrapper extends AbstractComponent
 
     /**
      * Optional params that are pulled from the message. If these params don't exist
-     * execution will continue. Note that you can use {@link ExpressionEvaluator}
+     * execution will continue. Note that you can use {@link org.mule.api.expression.ExpressionEvaluator}
      * expressions such as xpath, header, xquery, etc
      *
      * @param requiredParams
@@ -141,7 +139,7 @@ public class RestServiceWrapper extends AbstractComponent
         {
             throw new InitialisationException(CoreMessages.objectIsNull("serviceUrl"), this);
         }
-        else if (!ExpressionEvaluatorManager.isValidExpression(serviceUrl))
+        else if (!muleContext.getExpressionManager().isValidExpression(serviceUrl))
         {
             try
             {
@@ -169,9 +167,9 @@ public class RestServiceWrapper extends AbstractComponent
         Object request = event.transformMessage();
         String tempUrl = serviceUrl;
         MuleMessage result;
-        if (ExpressionEvaluatorManager.isValidExpression(serviceUrl))
+        if (muleContext.getExpressionManager().isValidExpression(serviceUrl))
         {
-            tempUrl = ExpressionEvaluatorManager.parse(serviceUrl, event.getMessage(), true);
+            tempUrl = muleContext.getExpressionManager().parse(serviceUrl, event.getMessage(), true);
         }
 
         StringBuffer urlBuffer = new StringBuffer(tempUrl);
@@ -262,7 +260,7 @@ public class RestServiceWrapper extends AbstractComponent
             Map.Entry entry = (Map.Entry) iterator.next();
             String name = (String) entry.getKey();
             String exp = (String) entry.getValue();
-            Object value = ExpressionEvaluatorManager.evaluate(exp, msg);
+            Object value = muleContext.getExpressionManager().evaluate(exp, msg);
 
             if (value == null)
             {

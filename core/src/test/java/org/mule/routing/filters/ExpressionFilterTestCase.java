@@ -24,6 +24,7 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
     public void testHeaderFilter() throws Exception
     {
         ExpressionFilter filter = new ExpressionFilter("header", "foo=bar");
+        filter.setMuleContext(muleContext);
         MuleMessage message = new DefaultMuleMessage("blah");
         assertTrue(!filter.accept(message));
         message.setProperty("foo", "bar");
@@ -33,6 +34,8 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
     public void testHeaderFilterWithNot() throws Exception
     {
         ExpressionFilter filter = new ExpressionFilter("header", "foo!=bar");
+        filter.setMuleContext(muleContext);
+
         MuleMessage message = new DefaultMuleMessage("blah");
 
         assertTrue(filter.accept(message));
@@ -45,6 +48,8 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
     public void testHeaderFilterWithNotNull() throws Exception
     {
         ExpressionFilter filter = new ExpressionFilter("header", "foo!=null");
+        filter.setMuleContext(muleContext);
+
         MuleMessage message = new DefaultMuleMessage("blah");
 
         assertTrue(!filter.accept(message));
@@ -74,6 +79,8 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
     {
 
         ExpressionFilter filter = new ExpressionFilter("regex", "The quick (.*)");
+        filter.setMuleContext(muleContext);
+
         assertNotNull(filter.getExpression());
 
         assertTrue(filter.accept(new DefaultMuleMessage("The quick brown fox")));
@@ -86,6 +93,8 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
     public void testExceptionTypeFilter()
     {
         ExpressionFilter filter = new ExpressionFilter("exception-type:java.lang.Exception");
+        filter.setMuleContext(muleContext);
+
         MuleMessage m = new DefaultMuleMessage("test");
         assertTrue(!filter.accept(m));
         m.setExceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test")));
@@ -100,6 +109,7 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
     public void testPayloadTypeFilter()
     {
         ExpressionFilter filter = new ExpressionFilter("payload-type:org.mule.tck.testmodels.fruit.Apple");
+        filter.setMuleContext(muleContext);
 
         assertTrue(filter.accept(new DefaultMuleMessage(new Apple())));
         assertTrue(!filter.accept(new DefaultMuleMessage("test")));
@@ -112,6 +122,7 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
     public void testWildcardFilterMultiplePatterns()
     {
         ExpressionFilter filter = new ExpressionFilter("wildcard:* brown*, The*");
+        filter.setMuleContext(muleContext);
 
         assertTrue(filter.accept(new DefaultMuleMessage("The quick brown fox")));
         assertTrue(filter.accept(new DefaultMuleMessage(" brown fox")));
@@ -121,6 +132,8 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
     public void testTrueString()
     {
         ExpressionFilter filter = new ExpressionFilter("payload:");
+        filter.setMuleContext(muleContext);
+
         filter.setNullReturnsTrue(true);
 
         assertTrue(filter.accept(new DefaultMuleMessage("true")));
@@ -131,6 +144,8 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
     public void testFalseString()
     {
         ExpressionFilter filter = new ExpressionFilter("payload:");
+        filter.setMuleContext(muleContext);
+
         filter.setNullReturnsTrue(false);
 
         assertFalse(filter.accept(new DefaultMuleMessage("false")));
@@ -141,6 +156,8 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
     public void testOtherString()
     {
         ExpressionFilter filter = new ExpressionFilter("payload:");
+        filter.setMuleContext(muleContext);
+        
         filter.setNullReturnsTrue(false);
 
         assertFalse(filter.accept(new DefaultMuleMessage("otherTrueString")));

@@ -48,6 +48,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         transformer.setReturnClass(String.class);
         transformer.setXslFile("cdcatalog.xsl");
         transformer.setMaxActiveTransformers(42);
+        transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;
     }
@@ -214,7 +215,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         XsltTransformer transformer = new XsltTransformer();
 
         transformer.setReturnClass(String.class);
-        
+        transformer.setMuleContext(muleContext);
         // set stylesheet
         transformer.setXslt(xsl);
 

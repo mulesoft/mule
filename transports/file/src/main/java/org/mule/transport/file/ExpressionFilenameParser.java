@@ -10,9 +10,11 @@
 
 package org.mule.transport.file;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.util.TemplateParser;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.text.MessageFormat;
 
@@ -40,15 +42,22 @@ import java.text.MessageFormat;
  * </ul>
  */
 
-public class ExpressionFilenameParser implements FilenameParser
+public class ExpressionFilenameParser implements FilenameParser, MuleContextAware
 {
     public static final String DEFAULT_DATE_FORMAT = "dd-MM-yy_HH-mm-ss.SSS";
     public static final String DEFAULT_EXPRESSION = MessageFormat.format("{0}function:uuid{1}.dat",
-                                                                         ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX,
-                                                                         ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX);
+                                                                         ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
+                                                                         ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
 
     private final TemplateParser wigglyMuleParser = TemplateParser.createMuleStyleParser();
     private final TemplateParser squareParser = TemplateParser.createSquareBracesStyleParser();
+
+    private MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 
     public String getFilename(MessageAdapter adapter, String expression)
     {
@@ -57,7 +66,7 @@ public class ExpressionFilenameParser implements FilenameParser
             return expression = DEFAULT_EXPRESSION;
         }
 
-        if (expression.indexOf(ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX) > -1)
+        if (expression.indexOf(ExpressionManager.DEFAULT_EXPRESSION_PREFIX) > -1)
         {
             return getFilename(adapter, expression, wigglyMuleParser);
         }
@@ -74,7 +83,7 @@ public class ExpressionFilenameParser implements FilenameParser
         {
             public Object match(String token)
             {
-                return ExpressionEvaluatorManager.evaluate(token, adapter);
+                return muleContext.getExpressionManager().evaluate(token, adapter);
             }
         }, expression);
     }

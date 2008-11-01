@@ -10,12 +10,13 @@
 
 package org.mule.api.component;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.model.EntryPointResolverSet;
 
 /** <code>LifecycleAdapterFactory</code> TODO (document class) */
 public interface LifecycleAdapterFactory
 {
-    LifecycleAdapter create(Object pojoService, JavaComponent component, EntryPointResolverSet resolver)
+    LifecycleAdapter create(Object pojoService, JavaComponent component, EntryPointResolverSet resolver, MuleContext muleContext)
         throws MuleException;
 }

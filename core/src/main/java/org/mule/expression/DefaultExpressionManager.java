@@ -7,8 +7,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.expression;
+package org.mule.expression;
 
+import org.mule.api.expression.ExpressionEvaluator;
+import org.mule.api.expression.ExpressionManager;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
@@ -28,23 +31,20 @@ import org.apache.commons.logging.LogFactory;
  * <p/>
  * Users can register or unregister {@link ExpressionEvaluator} through this interface.
  */
-public class ExpressionEvaluatorManager
+public class DefaultExpressionManager implements ExpressionManager
 {
 
     /**
      * logger used by this class
      */
-    protected static transient final Log logger = LogFactory.getLog(ExpressionEvaluatorManager.class);
-
-    public static final String DEFAULT_EXPRESSION_PREFIX = "#[";
-    public static final String DEFAULT_EXPRESSION_POSTFIX = "]";
+    protected static transient final Log logger = LogFactory.getLog(DefaultExpressionManager.class);
 
     // default style parser
-    private static TemplateParser parser = TemplateParser.createMuleStyleParser();
+    private TemplateParser parser = TemplateParser.createMuleStyleParser();
 
-    private static ConcurrentMap evaluators = new ConcurrentHashMap(8);
+    private ConcurrentMap evaluators = new ConcurrentHashMap(8);
 
-    public static void registerEvaluator(ExpressionEvaluator evaluator)
+    public void registerEvaluator(ExpressionEvaluator evaluator)
     {
         if (evaluator == null)
         {
@@ -66,7 +66,7 @@ public class ExpressionEvaluatorManager
      * @param name the name of the expression evaluator
      * @return true if the evaluator is registered with the manager, false otherwise
      */
-    public static boolean isEvaluatorRegistered(String name)
+    public boolean isEvaluatorRegistered(String name)
     {
         return evaluators.containsKey(name);
     }
@@ -76,14 +76,14 @@ public class ExpressionEvaluatorManager
      *
      * @param name the name of the evaluator to remove
      */
-    public static ExpressionEvaluator unregisterEvaluator(String name)
+    public ExpressionEvaluator unregisterEvaluator(String name)
     {
         if (name == null)
         {
             return null;
         }
 
-        ExpressionEvaluator evaluator = (ExpressionEvaluator) ExpressionEvaluatorManager.evaluators.remove(name);
+        ExpressionEvaluator evaluator = (ExpressionEvaluator)evaluators.remove(name);
         if (evaluator instanceof Disposable)
         {
             ((Disposable) evaluator).dispose();
@@ -103,7 +103,7 @@ public class ExpressionEvaluatorManager
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public static Object evaluate(String expression, MessageAdapter message) throws ExpressionRuntimeException
+    public Object evaluate(String expression, MessageAdapter message) throws ExpressionRuntimeException
     {
         return evaluate(expression, message, false);
     }
@@ -121,7 +121,7 @@ public class ExpressionEvaluatorManager
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public static Object evaluate(String expression, MessageAdapter message, boolean failIfNull) throws ExpressionRuntimeException
+    public Object evaluate(String expression, MessageAdapter message, boolean failIfNull) throws ExpressionRuntimeException
     {
         String name;
 
@@ -161,7 +161,7 @@ public class ExpressionEvaluatorManager
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public static Object evaluate(String expression, String evaluator, MessageAdapter message, boolean failIfNull) throws ExpressionRuntimeException
+    public Object evaluate(String expression, String evaluator, MessageAdapter message, boolean failIfNull) throws ExpressionRuntimeException
     {
         ExpressionEvaluator extractor = (ExpressionEvaluator) evaluators.get(evaluator);
         if (extractor == null)
@@ -184,10 +184,10 @@ public class ExpressionEvaluatorManager
      * @param expression a single expression i.e. xpath://foo
      * @param message
      * @return the result of the evaluation
-     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
+     * @throws org.mule.api.expression.ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public static String parse(String expression, MessageAdapter message) throws ExpressionRuntimeException
+    public String parse(String expression, MessageAdapter message) throws ExpressionRuntimeException
     {
         return parse(expression, message, false);
     }
@@ -203,7 +203,7 @@ public class ExpressionEvaluatorManager
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
-    public static String parse(final String expression, final MessageAdapter message, final boolean failIfNull) throws ExpressionRuntimeException
+    public String parse(final String expression, final MessageAdapter message, final boolean failIfNull) throws ExpressionRuntimeException
     {
         return parser.parse(new TemplateParser.TemplateCallback()
         {
@@ -217,7 +217,7 @@ public class ExpressionEvaluatorManager
     /**
      * Clears all registered evaluators from the manager.
      */
-    public static synchronized void clearEvaluators()
+    public synchronized void clearEvaluators()
     {
         for (Iterator iterator = evaluators.values().iterator(); iterator.hasNext();)
         {
@@ -237,7 +237,7 @@ public class ExpressionEvaluatorManager
      * @param expression the expression to validate
      * @return true if the expression evaluator is recognised
      */
-    public static boolean isValidExpression(String expression)
+    public boolean isValidExpression(String expression)
     {
         final AtomicBoolean valid = new AtomicBoolean(true);
         final AtomicBoolean match = new AtomicBoolean(false);

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.expression;
+package org.mule.api.expression;
 
 import org.mule.api.NamedObject;
 import org.mule.api.transport.MessageAdapter;

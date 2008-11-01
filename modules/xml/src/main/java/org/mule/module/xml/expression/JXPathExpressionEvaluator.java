@@ -10,9 +10,9 @@
 
 package org.mule.module.xml.expression;
 
+import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.util.expression.ExpressionEvaluator;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.logging.Log;

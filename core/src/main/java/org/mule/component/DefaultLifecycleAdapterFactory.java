@@ -10,6 +10,7 @@
 
 package org.mule.component;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
@@ -35,10 +36,10 @@ public class DefaultLifecycleAdapterFactory implements LifecycleAdapterFactory
      * @see org.mule.api.lifecycle.LifecycleAdapterFactory#create(java.lang.Object,
      *      org.mule.api.UMODescriptor)
      */
-    public LifecycleAdapter create(Object pojoService, JavaComponent component, EntryPointResolverSet resolver)
+    public LifecycleAdapter create(Object pojoService, JavaComponent component, EntryPointResolverSet resolver, MuleContext muleContext)
         throws MuleException
     {
-        return new DefaultLifecycleAdapter(pojoService, component, resolver);
+        return new DefaultLifecycleAdapter(pojoService, component, resolver, muleContext);
     }
 
 }

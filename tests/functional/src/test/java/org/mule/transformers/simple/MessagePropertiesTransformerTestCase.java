@@ -34,6 +34,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         Map add = new HashMap();
         add.put("addedProperty", "overwrittenValue");
         t.setAddProperties(add);
+        t.setMuleContext(muleContext);
 
         MuleMessage msg = new DefaultMuleMessage("message", (Map) null);
         msg.setProperty("addedProperty", "originalValue");
@@ -57,6 +58,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         add.put("addedProperty", "overwrittenValue");
         t.setAddProperties(add);
         t.setOverwrite(false);
+        t.setMuleContext(muleContext);
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
         msg.setProperty("addedProperty", "originalValue");
@@ -75,6 +77,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         Map add = new HashMap();
         add.put("Foo", "#[header:public-house]");
         t.setAddProperties(add);
+        t.setMuleContext(muleContext);
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
         msg.setProperty("public-house", "Bar");
@@ -93,6 +96,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         Map add = new HashMap();
         add.put("Foo", "Baz");
         t.setRenameProperties(add);
+        t.setMuleContext(muleContext);
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
         msg.setProperty("Foo", "Bar");
@@ -109,6 +113,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
         t.setDeleteProperties(Collections.singletonList("badProperty"));
+        t.setMuleContext(muleContext);
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
         msg.setProperty("badProperty", "badValue");
@@ -123,6 +128,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
     public void testTransformerConfig() throws Exception
     {
         MessagePropertiesTransformer transformer = (MessagePropertiesTransformer) RegistryContext.getRegistry().lookupTransformer("testTransformer");
+        transformer.setMuleContext(muleContext);
         assertNotNull(transformer);
         assertNotNull(transformer.getAddProperties());
         assertNotNull(transformer.getDeleteProperties());

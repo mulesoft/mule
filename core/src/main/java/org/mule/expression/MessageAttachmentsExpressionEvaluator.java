@@ -8,8 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.expression;
+package org.mule.expression;
 
+import org.mule.api.expression.ExpressionEvaluator;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 
@@ -24,7 +26,7 @@ import java.util.StringTokenizer;
  * @see MessageAttachmentsListExpressionEvaluator
  * @see MessageAttachmentExpressionEvaluator
  * @see ExpressionEvaluator
- * @see ExpressionEvaluatorManager
+ * @see DefaultExpressionManager
  */
 public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluator
 {

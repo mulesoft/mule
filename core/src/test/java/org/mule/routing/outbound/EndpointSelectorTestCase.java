@@ -51,6 +51,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         router = new EndpointSelector();
         router.setEndpoints(endpoints);
         router.setMuleContext(muleContext);
+        router.initialise();
     }
 
     public void testSelectEndpointDefaultProperty() throws Exception

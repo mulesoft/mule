@@ -9,26 +9,33 @@
  */
 package org.mule.routing;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.MessageInfoMapping;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 /**
  * TODO
  */
-public class ExpressionMessageInfoMapping implements MessageInfoMapping
+public class ExpressionMessageInfoMapping implements MessageInfoMapping, MuleContextAware
 {
     private String correlationIdExpression;
     private String messageIdExpression;
+    private MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 
     public String getMessageId(MuleMessage message)
     {
-        return (String)ExpressionEvaluatorManager.evaluate(getMessageIdExpression(), message, true);
+        return (String) muleContext.getExpressionManager().evaluate(getMessageIdExpression(), message, true);
     }
 
     public String getCorrelationId(MuleMessage message)
     {
-        String id = (String)ExpressionEvaluatorManager.evaluate(getCorrelationIdExpression(), message, true);
+        String id = (String) muleContext.getExpressionManager().evaluate(getCorrelationIdExpression(), message, true);
         if (id == null)
         {
             id = getMessageId(message);

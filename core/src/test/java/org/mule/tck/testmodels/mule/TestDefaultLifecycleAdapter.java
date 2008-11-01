@@ -10,6 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.model.EntryPointResolverSet;
@@ -23,9 +24,9 @@ public class TestDefaultLifecycleAdapter extends DefaultLifecycleAdapter
      * @param descriptor
      * @throws MuleException
      */
-    public TestDefaultLifecycleAdapter(Object pojoService, JavaComponent service) throws MuleException
+    public TestDefaultLifecycleAdapter(Object pojoService, JavaComponent service, MuleContext muleContext) throws MuleException
     {
-        super(pojoService, service);
+        super(pojoService, service, muleContext);
     }
 
     /**
@@ -36,9 +37,10 @@ public class TestDefaultLifecycleAdapter extends DefaultLifecycleAdapter
      */
     public TestDefaultLifecycleAdapter(Object pojoService,
                                        JavaComponent service,
-                                       EntryPointResolverSet epResolver) throws MuleException
+                                       EntryPointResolverSet epResolver,
+                                       MuleContext muleContext) throws MuleException
     {
-        super(pojoService, service, epResolver);
+        super(pojoService, service, epResolver, muleContext);
     }
 
 }

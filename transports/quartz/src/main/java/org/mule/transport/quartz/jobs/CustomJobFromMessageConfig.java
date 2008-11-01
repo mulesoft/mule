@@ -14,7 +14,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.quartz.config.AbstractJobConfig;
 import org.mule.transport.quartz.config.JobConfig;
 import org.mule.util.ClassUtils;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -36,7 +35,7 @@ public class CustomJobFromMessageConfig extends AbstractJobConfig
             evaluator = customEvaluator;
         }
 
-        Object result = ExpressionEvaluatorManager.evaluate(expression, evaluator, message, true);
+        Object result = getMuleContext().getExpressionManager().evaluate(expression, evaluator, message, true);
         Class clazz;
         if (result instanceof Job)
         {
@@ -62,7 +61,7 @@ public class CustomJobFromMessageConfig extends AbstractJobConfig
             evaluator = customEvaluator;
         }
 
-        Object result = ExpressionEvaluatorManager.evaluate(expression, evaluator, message, true);
+        Object result = getMuleContext().getExpressionManager().evaluate(expression, evaluator, message, true);
         if (result instanceof Job)
         {
             CustomJobConfig customJob = new CustomJobConfig();

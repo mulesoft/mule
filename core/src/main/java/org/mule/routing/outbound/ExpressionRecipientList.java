@@ -11,15 +11,15 @@
 package org.mule.routing.outbound;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
-import org.mule.util.StringUtils;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.StringUtils;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.text.MessageFormat;
 
 /**
  * <code>StaticRecipientList</code> is used to dispatch a single event to multiple
@@ -41,13 +41,13 @@ public class ExpressionRecipientList extends AbstractRecipientList
     protected List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException
     {
         String expr = getFullExpression();
-        if(!ExpressionEvaluatorManager.isValidExpression(expr))
+        if(!muleContext.getExpressionManager().isValidExpression(expr))
         {
             throw new CouldNotRouteOutboundMessageException(
                     CoreMessages.expressionInvalidForProperty("expression", expr), message, null);
         }
 
-        Object msgRecipients = ExpressionEvaluatorManager.evaluate(expr, message);
+        Object msgRecipients = muleContext.getExpressionManager().evaluate(expr, message);
         if(msgRecipients ==null)
         {
             throw new CouldNotRouteOutboundMessageException(
@@ -78,9 +78,9 @@ public class ExpressionRecipientList extends AbstractRecipientList
                 evaluator = customEvaluator;
             }
             fullExpression = MessageFormat.format("{0}{1}:{2}{3}",
-                                                  ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX,
+                                                  ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
                                                   evaluator, expression,
-                                                  ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX);
+                                                  ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
             logger.debug("Full expression for EndpointSelector is: " + fullExpression);
         }
         return fullExpression;

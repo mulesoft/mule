@@ -26,7 +26,11 @@ public class BeanPayloadExpressionEvaluator extends AbstractXPathExpressionEvalu
 
     protected Object extractResultFromNode(Object result)
     {
-        return ((org.jaxen.javabean.Element)result).getObject();
+        if(result instanceof org.jaxen.javabean.Element)
+        {
+            return ((org.jaxen.javabean.Element)result).getObject();
+        }
+        return result;
     }
 
     /** {@inheritDoc} */

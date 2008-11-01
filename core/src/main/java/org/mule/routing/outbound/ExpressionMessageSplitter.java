@@ -11,8 +11,7 @@ package org.mule.routing.outbound;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.util.expression.ExpressionConfig;
-import org.mule.util.expression.ExpressionEvaluatorManager;
+import org.mule.expression.ExpressionConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,14 +60,14 @@ public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        config.validate();
+        config.validate(expressionManager);
     }
 
     @Override
     protected List splitMessage(MuleMessage message)
     {
         List results = new ArrayList(4);
-        Object result = ExpressionEvaluatorManager.evaluate(config.getFullExpression(), message);
+        Object result = muleContext.getExpressionManager().evaluate(config.getFullExpression(expressionManager), message);
         if(result instanceof List)
         {
             results.addAll((List)result);

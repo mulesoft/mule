@@ -168,6 +168,7 @@ public abstract class AbstractService implements Service
         component.setService(this);
         component.initialise();
 
+
         if (inboundRouter == null)
         {
             // Create Default routes that route to the default inbound and

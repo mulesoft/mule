@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transformer.Transformer;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.OutputHandler;
@@ -52,7 +52,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     public static final int ERROR_STATUS_CODE_RANGE_START = 400;
     private final HttpConnector connector;
     private volatile HttpClient client = null;
-    private final Transformer sendTransformer;
+    //TODO should this really be hardcoded??
+    private final ObjectToHttpClientMethodRequest sendTransformer;
 
     public HttpClientMessageDispatcher(OutboundEndpoint endpoint)
     {
@@ -60,7 +61,16 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (HttpConnector) endpoint.getConnector();
         this.sendTransformer = new ObjectToHttpClientMethodRequest();
     }
-    
+
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        super.doInitialise();
+        //This seems wrong
+        sendTransformer.setMuleContext(connector.getMuleContext());
+        sendTransformer.initialise();
+    }
+
     protected void doConnect() throws Exception
     {
         if (client == null)

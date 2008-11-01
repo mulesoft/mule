@@ -49,6 +49,8 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         message.setPayload(NullPayload.getInstance());
 
         ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
+        transformer.setMuleContext(muleContext);
+        transformer.initialise();
         Object response = transformer.transform(message);
         
         assertTrue(response instanceof HttpMethod);
@@ -64,6 +66,8 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         message.setPayload(NullPayload.getInstance());
         
         ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
+        transformer.setMuleContext(muleContext);
+        transformer.initialise();
         Object response = transformer.transform(message);
         
         assertTrue(response instanceof HttpMethod);
@@ -79,6 +83,8 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         message.setPayload(NullPayload.getInstance());
         
         ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
+        transformer.setMuleContext(muleContext);
+        transformer.initialise();
         Object response = transformer.transform(message);
         
         assertTrue(response instanceof HttpMethod);
@@ -94,6 +100,8 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         message.setPayload("test");
         
         ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
+        transformer.setMuleContext(muleContext);
+        transformer.initialise();
         Object response = transformer.transform(message);
         
         assertTrue(response instanceof HttpMethod);
@@ -111,6 +119,8 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         message.setProperty("fruit1", "apple");
         message.setProperty("fruit2", "orange");
         ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
+        transformer.setMuleContext(muleContext);
+        transformer.initialise();
         Object response = transformer.transform(message);
 
         assertTrue(response instanceof HttpMethod);
@@ -125,6 +135,8 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         // transforming a payload here will add it as body=xxx query parameter
         message.setPayload(NullPayload.getInstance());
         ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
+        transformer.setMuleContext(muleContext);
+        transformer.initialise();
         Object response = null;
         try
         {

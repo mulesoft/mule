@@ -8,9 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.expression;
+package org.mule.expression;
 
 import org.mule.MuleServer;
+import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.AbstractEndpointBuilder;
@@ -21,8 +22,8 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Looks up information about a global endpoint
  *
- * @see org.mule.util.expression.ExpressionEvaluator
- * @see org.mule.util.expression.ExpressionEvaluatorManager
+ * @see org.mule.api.expression.ExpressionEvaluator
+ * @see DefaultExpressionManager
  */
 public class EndpointInfoExpressionEvaluator implements ExpressionEvaluator
 {

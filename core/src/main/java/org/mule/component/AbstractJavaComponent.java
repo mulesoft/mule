@@ -107,13 +107,13 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         if (lifecycleAdapterFactory != null)
         {
             // Custom lifecycleAdapterFactory set on component
-            lifecycleAdapter = lifecycleAdapterFactory.create(objectFactory.getInstance(), this, entryPointResolverSet);
+            lifecycleAdapter = lifecycleAdapterFactory.create(objectFactory.getInstance(), this, entryPointResolverSet, muleContext);
         }
         else
         {
             // Inherit lifecycleAdapterFactory from model
             lifecycleAdapter = service.getModel().getLifecycleAdapterFactory().create(objectFactory.getInstance(),
-                this, entryPointResolverSet);
+                this, entryPointResolverSet, muleContext);
         }
         lifecycleAdapter.initialise();
         return lifecycleAdapter;

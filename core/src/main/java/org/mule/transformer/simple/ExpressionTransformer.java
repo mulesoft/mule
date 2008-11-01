@@ -9,13 +9,14 @@
  */
 package org.mule.transformer.simple;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractMessageAwareTransformer;
-import org.mule.util.expression.ExpressionEvaluatorManager;
-import org.mule.util.expression.ExpressionRuntimeException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,10 +41,11 @@ import java.util.List;
  * This transformer provides a very powerful way to pull different bits of information from the
  * message and pass them to the service.
  */
-public class ExpressionTransformer extends AbstractMessageAwareTransformer
+public class ExpressionTransformer extends AbstractMessageAwareTransformer implements MuleContextAware
 {
     private List arguments;
     private boolean returnSourceIfNull = false;
+    private static MuleContext muleContext;
 
     public ExpressionTransformer()
     {
@@ -51,6 +53,11 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
         registerSourceType(Object.class);
         setReturnClass(Object.class);
         arguments = new ArrayList(4);
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
     public void addArgument(Argument argument)
@@ -101,7 +108,7 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
             Argument argument = (Argument) iterator.next();
             try
             {
-                results[i] = ExpressionEvaluatorManager.evaluate(argument.getFullExpression(), message);
+                results[i] = muleContext.getExpressionManager().evaluate(argument.getFullExpression(), message);
             }
             catch (ExpressionRuntimeException e)
             {
@@ -250,7 +257,7 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer
                 }
             }
 
-            if (!ExpressionEvaluatorManager.isEvaluatorRegistered(evaluator))
+            if (!muleContext.getExpressionManager().isEvaluatorRegistered(evaluator))
             {
                 throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator).getMessage());
             }

@@ -12,11 +12,11 @@ package org.mule.routing.inbound;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.store.ObjectStore;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 import org.mule.util.store.InMemoryObjectStore;
 
 import java.text.MessageFormat;
@@ -34,8 +34,8 @@ public class IdempotentReceiver extends SelectiveConsumer
     protected volatile String assignedComponentName;
 
     protected String idExpression = MessageFormat.format("{0}message:id{1}",
-                                                         ExpressionEvaluatorManager.DEFAULT_EXPRESSION_PREFIX,
-                                                         ExpressionEvaluatorManager.DEFAULT_EXPRESSION_POSTFIX);
+                                                         ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
+                                                         ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
 
     public IdempotentReceiver()
     {
@@ -135,7 +135,7 @@ public class IdempotentReceiver extends SelectiveConsumer
 
     protected String getIdForEvent(MuleEvent event) throws MessagingException
     {
-        return ExpressionEvaluatorManager.parse(idExpression, event.getMessage(), true);
+        return muleContext.getExpressionManager().parse(idExpression, event.getMessage(), true);
     }
 
     public String getIdExpression()
