@@ -59,6 +59,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     // private EndpointBuilder endpointBuilderImpl;
 
     private Properties exceptionMappings = new Properties();
+    private Registry registry;
 
     private ClassLoader classLoader;
     
@@ -79,15 +80,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         defaultResponseTransformer = removeProperty(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER, props);
         endpointBuilder = removeProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, props);
         sessionHandler = removeProperty(MuleProperties.CONNECTOR_SESSION_HANDLER, props);
+        this.registry = registry;
 
-//        try
-//        {
-//                registerDefaultTransformers(registry);
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
         this.classLoader = classLoader;
     }
 
@@ -401,6 +395,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             {
                 inboundTransformer = (Transformer) ClassUtils.instanciateClass(
                         defaultInboundTransformer, ClassUtils.NO_ARGS, classLoader);
+                registry.registerObject(inboundTransformer.getName(), inboundTransformer);
                 return CollectionUtils.singletonList(inboundTransformer);
             }
             catch (Exception e)
@@ -427,6 +422,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             {
                 outboundTransformer = (Transformer) ClassUtils.instanciateClass(
                         defaultOutboundTransformer, ClassUtils.NO_ARGS, classLoader);
+                registry.registerObject(outboundTransformer.getName(), outboundTransformer);
                 return CollectionUtils.singletonList(outboundTransformer);
             }
             catch (Exception e)
@@ -453,6 +449,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             {
                 responseTransformer = (Transformer) ClassUtils.instanciateClass(
                         defaultResponseTransformer, ClassUtils.NO_ARGS, classLoader);
+                registry.registerObject(responseTransformer.getName(), responseTransformer);                
                 return CollectionUtils.singletonList(responseTransformer);
             }
             catch (Exception e)
