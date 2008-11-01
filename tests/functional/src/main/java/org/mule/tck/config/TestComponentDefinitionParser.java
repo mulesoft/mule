@@ -55,6 +55,12 @@ public class TestComponentDefinitionParser extends ComponentDefinitionParser
         addIgnored("doInboundTransform");
     }
 
+    public TestComponentDefinitionParser(Class componentInstanceClass)
+    {
+        this();
+        this.componentInstanceClass = componentInstanceClass;
+    }
+
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         Element parent = (Element) element.getParentNode();

@@ -69,7 +69,7 @@ public class WsdlCallTestCase extends FunctionalTestCase
         Document document = new SAXReader().read(wsdlStream);
         
         List nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
-        assertEquals("TestServiceComponent", ((Element) nodes.get(0)).attribute("name").getStringValue());
+        assertEquals("Callable", ((Element) nodes.get(0)).attribute("name").getStringValue());
         nodes = document.selectNodes("//wsdl:definitions/wsdl:service/wsdl:port/soap:address");
         assertEquals(location, ((Element) nodes.get(0)).attribute("location").getStringValue());
     }
@@ -81,7 +81,7 @@ public class WsdlCallTestCase extends FunctionalTestCase
         
         Document document = new SAXReader().read(wsdlStream);
         List nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
-        assertEquals(((Element) nodes.get(0)).attribute("name").getStringValue(), "TestServiceComponent");
+        assertEquals(((Element) nodes.get(0)).attribute("name").getStringValue(), "Callable");
         
         nodes = document.selectNodes("//wsdl:definitions/wsdl:service/wsdl:port/soap:address");
         assertEquals(location, ((Element) nodes.get(0)).attribute("location").getStringValue());

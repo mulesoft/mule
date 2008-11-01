@@ -16,18 +16,17 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.expression.ExpressionEvaluatorManager;
 
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  * @see FunctionalTestNotificationListener
  */
 
-public class FunctionalTestComponent implements Callable, Initialisable, Disposable
+public class FunctionalTestComponent implements Callable, Initialisable, Disposable, MuleContextAware, Receiveable
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -60,6 +59,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     private String appendString;
     private Class exceptionToThrow;
     private long waitTime = 0;
+    private MuleContext muleContext;
 
     /**
      * Keeps a list of any messages received on this service. Note that only references
@@ -74,6 +74,11 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         {
             messageHistory = new CopyOnWriteArrayList();
         }
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
     public void dispose()
@@ -163,7 +168,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      */
     protected String append(String contents, MuleMessage message)
     {
-        return contents + ExpressionEvaluatorManager.parse(appendString, message);
+        return contents + muleContext.getExpressionManager().parse(appendString, message);
     }
 
     /**
@@ -196,9 +201,9 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         Object replyMessage;
         if (returnData != null)
         {
-            if (returnData instanceof String && ExpressionEvaluatorManager.isValidExpression(returnData.toString()))
+            if (returnData instanceof String && muleContext.getExpressionManager().isValidExpression(returnData.toString()))
             {
-                replyMessage = ExpressionEvaluatorManager.parse(returnData.toString(), context.getMessage());
+                replyMessage = muleContext.getExpressionManager().parse(returnData.toString(), context.getMessage());
             }
             else
             {

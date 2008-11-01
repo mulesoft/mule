@@ -4,7 +4,9 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
     xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
        http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
@@ -30,9 +32,9 @@
 
           <service name="TestUMO">
                <inbound>
-                    <cxf:inbound-endpoint address="http://localhost:65081/services/TestUMO" />
+                    <cxf:inbound-endpoint address="http://localhost:65081/services/TestUMO" serviceClass="org.mule.tck.functional.Receiveable"/>
                </inbound>
-               <component class="org.mule.tck.functional.FunctionalTestComponent" />
+               <test:web-service-component/>
           </service>
 
      </model>

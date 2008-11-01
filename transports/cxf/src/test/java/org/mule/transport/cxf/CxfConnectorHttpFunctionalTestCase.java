@@ -67,7 +67,7 @@ public class CxfConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointF
         nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
 
         Element element = (Element) nodes.get(0);
-        assertEquals("TestServiceComponent", element.attribute("name").getStringValue());
+        assertEquals("EchoService", element.attribute("name").getStringValue());
 
         nodes = document.selectNodes("//wsdl:definitions/wsdl:service/wsdl:port");
 

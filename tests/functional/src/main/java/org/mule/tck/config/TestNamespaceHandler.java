@@ -13,6 +13,7 @@ package org.mule.tck.config;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.endpoint.URIBuilder;
 import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.tck.testmodels.services.TestServiceComponent;
 
 public class TestNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -23,6 +24,7 @@ public class TestNamespaceHandler extends AbstractMuleNamespaceHandler
         registerConnectorDefinitionParser(TestConnector.class);
         
         registerBeanDefinitionParser("component", new TestComponentDefinitionParser());
+        registerBeanDefinitionParser("web-service-component", new TestComponentDefinitionParser(TestServiceComponent.class));
         //This is handled by the TestComponentDefinitionParser
         registerIgnoredElement("return-data");
         registerIgnoredElement("callback");

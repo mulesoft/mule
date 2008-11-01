@@ -19,7 +19,7 @@
      <model name="TestCxfHeaders">
         <service name="TestComponent">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:63181/services/TestComponent"/>
+                <cxf:inbound-endpoint address="http://localhost:63181/services/TestComponent" serviceClass="org.mule.tck.functional.Receiveable"/>
             </inbound>
             <test:component appendString=" Received"/>
         </service>

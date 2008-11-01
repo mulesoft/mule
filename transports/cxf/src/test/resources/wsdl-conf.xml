@@ -4,8 +4,10 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:servlet="http://www.mulesource.org/schema/mule/servlet/2.2"
        xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
        http://www.mulesource.org/schema/mule/servlet/2.2 http://www.mulesource.org/schema/mule/servlet/2.2/mule-servlet.xsd
        http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd">
@@ -18,16 +20,16 @@
 
         <service name="mycomponent">
             <inbound>
-                <inbound-endpoint address="cxf:servlet://mycomponent" />
+                <cxf:inbound-endpoint address="servlet://mycomponent" serviceClass="org.mule.api.lifecycle.Callable"/>
             </inbound>
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <test:component/>
         </service>
         
         <service name="cxfService">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:63082/cxfService" />
+                <cxf:inbound-endpoint address="http://localhost:63082/cxfService" serviceClass="org.mule.api.lifecycle.Callable"/>
             </inbound>
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <test:component/>
         </service>
 
     </model>

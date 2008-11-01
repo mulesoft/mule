@@ -2,7 +2,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
        xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
        http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd">
@@ -12,38 +14,30 @@
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:62108/mule/mycomponent"/>
+                <cxf:inbound-endpoint address="http://localhost:62108/mule/mycomponent" serviceClass="org.mule.api.component.simple.EchoService"/>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            </component>
+            <test:web-service-component/>
         </service>
 
         <service name="mycomponent2">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:62109/mule/services/mycomponent2"/>
+                <cxf:inbound-endpoint address="http://localhost:62109/mule/services/mycomponent2" serviceClass="org.mule.tck.testmodels.services.DateService"/>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            </component>
+            <test:web-service-component/>
         </service>
 
         <service name="mycomponent3">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:62109/mycomponent3"/>
+                <cxf:inbound-endpoint address="http://localhost:62109/mycomponent3" serviceClass="org.mule.tck.testmodels.services.PeopleService"/>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            </component>
+            <test:web-service-component/>
         </service>
 
         <service name="mycomponent4">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:62110/mycomponent4" synchronous="false"/>
+                <cxf:inbound-endpoint address="http://localhost:62110/mycomponent4" synchronous="false" serviceClass="org.mule.api.lifecycle.Callable"/>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            </component>
+            <test:web-service-component/>            
         </service>
     </model>
 

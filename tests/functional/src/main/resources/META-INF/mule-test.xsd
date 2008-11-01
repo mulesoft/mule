@@ -23,6 +23,17 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="web-service-component" type="testComponentType" substitutionGroup="mule:abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                A component that can be used for testing web services.  This component has the same properties as the *test:component*
+                but it also implements 3 other service interfaces: org.mule.api.component.simple.EchoService, org.mule.tck.testmodels.services.DateService and
+                org.mule.tck.testmodels.services.PeopleService. The other service interfaces that are implemented are org.mule.api.lifecycle.Callable.
+                When using this with WS endpoints such as CXF be sure to set the *serviceClass* property of the endpoint to the type of service you are using.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:complexType name="testComponentType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractComponentType">
