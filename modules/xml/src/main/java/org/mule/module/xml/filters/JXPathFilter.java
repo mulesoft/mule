@@ -61,19 +61,23 @@ public class JXPathFilter implements Filter, MuleContextAware
         this.muleContext = context;
         try
         {
-            namespaceManager = (NamespaceManager)muleContext.getRegistry().lookupObject(NamespaceManager.class);
+            namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
         }
         catch (RegistrationException e)
         {
             throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
         }
-        if(namespaces == null)
+
+        if (namespaceManager != null)
         {
-            namespaces = new HashMap(namespaceManager.getNamespaces());
-        }
-        else
-        {
-            namespaces.putAll(namespaceManager.getNamespaces());
+            if (namespaces == null)
+            {
+                namespaces = new HashMap(namespaceManager.getNamespaces());
+            }
+            else
+            {
+                namespaces.putAll(namespaceManager.getNamespaces());
+            }
         }
     }
 
@@ -148,7 +152,7 @@ public class JXPathFilter implements Filter, MuleContextAware
             logger.warn("JxPath filter rejected message because of an error while parsing XML: " + e.getMessage(), e);
             return false;
         }
-        
+
         // Payload is XML
         if (dom4jDoc != null)
         {
@@ -254,25 +258,33 @@ public class JXPathFilter implements Filter, MuleContextAware
         context.setLenient(lenient);
     }
 
-    /** @return XPath expression */
+    /**
+     * @return XPath expression
+     */
     public String getPattern()
     {
         return pattern;
     }
 
-    /** @param pattern The XPath expression */
+    /**
+     * @param pattern The XPath expression
+     */
     public void setPattern(String pattern)
     {
         this.pattern = pattern;
     }
 
-    /** @return The expected result value of the XPath expression */
+    /**
+     * @return The expected result value of the XPath expression
+     */
     public String getExpectedValue()
     {
         return expectedValue;
     }
 
-    /** Sets the expected result value of the XPath expression */
+    /**
+     * Sets the expected result value of the XPath expression
+     */
     public void setExpectedValue(String expectedValue)
     {
         this.expectedValue = expectedValue;

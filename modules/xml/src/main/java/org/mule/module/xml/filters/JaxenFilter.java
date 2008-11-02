@@ -82,13 +82,16 @@ public class JaxenFilter implements Filter, MuleContextAware
         {
             throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
         }
-        if(namespaces == null)
+        if(namespaceManager!=null)
         {
-            namespaces = new HashMap(namespaceManager.getNamespaces());
-        }
-        else
-        {
-            namespaces.putAll(namespaceManager.getNamespaces());
+            if(namespaces == null)
+            {
+                namespaces = new HashMap(namespaceManager.getNamespaces());
+            }
+            else
+            {
+                namespaces.putAll(namespaceManager.getNamespaces());
+            }
         }
     }
 
