@@ -10,4 +10,10 @@
         <mulexml:namespace prefix="foo" uri="http://foo.com"/>
     </mulexml:namespace-manager>
 
+    <endpoint name="test.ep1" address="test://ep1">
+        <mulexml:jxpath-filter pattern="/bar:foo/bar:bar">
+            <mulexml:namespace prefix="bar" uri="http://bar.com"/>
+        </mulexml:jxpath-filter>
+    </endpoint>
+
 </mule>

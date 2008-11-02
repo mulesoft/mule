@@ -9,6 +9,9 @@
  */
 package org.mule.module.xml.config;
 
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.tck.FunctionalTestCase;
 
@@ -25,5 +28,18 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertNotNull(manager);
         assertTrue(manager.isIncludeConfigNamespaces());
         assertEquals(4, manager.getNamespaces().size());
+    }
+
+    public void testJXPathFilterConfig() throws Exception
+    {
+        EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("test.ep1");
+
+        InboundEndpoint ep = epb.buildInboundEndpoint();
+        assertNotNull(ep.getFilter());
+        assertTrue(ep.getFilter() instanceof JXPathFilter);
+        JXPathFilter filter = (JXPathFilter)ep.getFilter();
+        assertEquals("/bar:foo/bar:bar", filter.getPattern());
+        assertEquals(5, filter.getNamespaces().size());
+        assertEquals("http://bar.com", filter.getNamespaces().get("bar"));
     }
 }

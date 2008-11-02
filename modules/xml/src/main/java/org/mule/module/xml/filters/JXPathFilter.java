@@ -10,10 +10,17 @@
 
 package org.mule.module.xml.filters;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.filter.Filter;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -29,7 +36,7 @@ import org.dom4j.XPath;
  * <code>JXPathFilter</code> evaluates an XPath expression against a W3C Document,
  * XML string, or Java bean and returns true if the result is as expected.
  */
-public class JXPathFilter implements Filter
+public class JXPathFilter implements Filter, MuleContextAware
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -41,9 +48,33 @@ public class JXPathFilter implements Filter
     private AbstractFactory factory;
     private boolean lenient = true;
 
+    private MuleContext muleContext;
+    private NamespaceManager namespaceManager;
+
     public JXPathFilter()
     {
         super();
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+        try
+        {
+            namespaceManager = (NamespaceManager)muleContext.getRegistry().lookupObject(NamespaceManager.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
+        }
+        if(namespaces == null)
+        {
+            namespaces = new HashMap(namespaceManager.getNamespaces());
+        }
+        else
+        {
+            namespaces.putAll(namespaceManager.getNamespaces());
+        }
     }
 
     public JXPathFilter(String pattern)
