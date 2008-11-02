@@ -39,7 +39,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
     {
         testComponentLifecycle(
             "SpringBeanService",
-            "[setProperty, setMuleContext, springInitialize, setService, initialise, start, start, stop, stop, dispose, springDestroy]");
+            "[setProperty, setMuleContext, springInitialize, setService, setMuleContext, initialise, start, start, stop, stop, dispose, springDestroy]");
     }
 
     /**
@@ -51,7 +51,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
     public void testSingletonServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MuleSingletonService",
-            "[setProperty, setService, initialise, start, stop, dispose]");
+            "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]");
     }
 
     /**
@@ -63,7 +63,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
     public void testMulePrototypeServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePrototypeService",
-            "[setProperty, setService, initialise, start, stop, dispose]");
+            "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]");
     }
 
     /**
@@ -74,7 +74,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
      */
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
-        testComponentLifecycle("MulePooledPrototypeService", "[setProperty, setService, initialise, start, stop, dispose]");
+        testComponentLifecycle("MulePooledPrototypeService", "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]");
     }
 
     private void testComponentLifecycle(final String serviceName, final String expectedLifeCycle)
