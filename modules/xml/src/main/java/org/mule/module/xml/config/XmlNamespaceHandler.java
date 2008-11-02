@@ -48,6 +48,8 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("xml-to-object-transformer", new TransformerDefinitionParser(XmlToObject.class));
         registerBeanDefinitionParser("xml-prettyprinter-transformer", new TransformerDefinitionParser(XmlPrettyPrinter.class));
         registerBeanDefinitionParser("xslt-transformer", new XsltTransformerDefinitionParser());
+
+        registerBeanDefinitionParser("namespace-manager", new NamespaceManagerDefinitionParser());
         registerBeanDefinitionParser("namespace", new ChildMapEntryDefinitionParser("namespaces", "prefix", "uri"));
         registerBeanDefinitionParser("context-property", new ChildMapEntryDefinitionParser("contextProperties", "key", "value"));
         registerBeanDefinitionParser("xslt-text", new XsltTextDefinitionParser("xslt", String.class));

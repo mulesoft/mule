@@ -31,22 +31,22 @@
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="lenient" type="mule:substitutableBoolean" default="true">
-			        <xsd:annotation>
-			            <xsd:documentation>
-			                Whether or not errors are thrown if the XPath expression
-			                doesn't exist.
-			            </xsd:documentation>
-			        </xsd:annotation>
-		        </xsd:attribute>
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether or not errors are thrown if the XPath expression
+                            doesn't exist.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="expectedValue" type="xsd:string">
-			        <xsd:annotation>
-			            <xsd:documentation>
-			                The expected value of the XPath expression evaluation. If
-			                the expected value matches the evaluation, the filter returns
-			                true.
-			            </xsd:documentation>
-			        </xsd:annotation>
-		        </xsd:attribute>
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The expected value of the XPath expression evaluation. If
+                            the expected value matches the evaluation, the filter returns
+                            true.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -65,14 +65,14 @@
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="expectedValue" type="xsd:string">
-			        <xsd:annotation>
-			            <xsd:documentation>
-			                The expected value of the XPath expression evaluation. If
-			                the expected value matches the evaluation, the filter returns
-			                true.
-			            </xsd:documentation>
-			        </xsd:annotation>
-			    </xsd:attribute>
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The expected value of the XPath expression evaluation. If
+                            the expected value matches the evaluation, the filter returns
+                            true.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -165,17 +165,17 @@
     <xsd:element name="dom-to-xml-transformer" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Converts an XML payload (Document, XML stream, Source, etc) to 
-                a serialized String representation. 
+                Converts an XML payload (Document, XML stream, Source, etc) to
+                a serialized String representation.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:element name="dom-to-output-handler-transformer" type="xmlTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Converts an XML payload (Document, XML stream, Source, etc) to 
+                Converts an XML payload (Document, XML stream, Source, etc) to
                 an OutputHandler for efficient serialization.
             </xsd:documentation>
         </xsd:annotation>
@@ -186,11 +186,11 @@
     <xsd:complexType name="jxpathExtractorType">
         <xsd:annotation>
             <xsd:documentation>
-                The JXPathExtractor is a simple transformer that evaluates an XPath 
+                The JXPathExtractor is a simple transformer that evaluates an XPath
                 expression against the given bean and that returns the result.
-                By default, a single result will be returned. If multiple values 
-                are expected, set the {{singleResult}} property to {{false}}. In this 
-                case a {{List}} of values will be returned. Note the property is 
+                By default, a single result will be returned. If multiple values
+                are expected, set the {{singleResult}} property to {{false}}. In this
+                case a {{List}} of values will be returned. Note the property is
                 currently ignored for non-String/XML payloads.
             </xsd:documentation>
         </xsd:annotation>
@@ -203,8 +203,8 @@
                 <xsd:attribute name="outputType">
                     <xsd:annotation>
                         <xsd:documentation>
-                          The type of output the extractor should use. By default it 
-                          returns the VALUE of the node.
+                            The type of output the extractor should use. By default it
+                            returns the VALUE of the node.
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
@@ -218,8 +218,8 @@
                 <xsd:attribute name="singleResult" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                          Whether or not the extractor should return a list of results or a single result.
-                          Defaults to true.
+                            Whether or not the extractor should return a list of results or a single result.
+                            Defaults to true.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -239,11 +239,11 @@
     <xsd:element name="xml-to-dom-transformer" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Transformer an XML message payload to org.w3c.dom.Document.  
+                Transformer an XML message payload to org.w3c.dom.Document.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:element name="xml-to-object-transformer" type="mule:abstractTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
@@ -252,7 +252,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:element name="xslt-transformer" type="xsltTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>A transformer used to perform XSLT transforms on the current message payload. Transform
@@ -336,11 +336,11 @@
 
     <xsd:element name="xml-prettyprinter-transformer" type="xmlPrettyPrinterType"
                  substitutionGroup="mule:abstract-transformer">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Formats an XML string using the Pretty Printer functionality in {{org.dom4j.io.OutputFormat}}.
-                        </xsd:documentation>
-                    </xsd:annotation>
+        <xsd:annotation>
+            <xsd:documentation>
+                Formats an XML string using the Pretty Printer functionality in {{org.dom4j.io.OutputFormat}}.
+            </xsd:documentation>
+        </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="xmlPrettyPrinterType">
         <xsd:complexContent>
@@ -376,7 +376,8 @@
                 <xsd:attribute name="indentSize" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The number of indent strings to use for each indent, such as "2" if indentString is set to an empty space and you want to use two empty spaces for each indent.
+                            The number of indent strings to use for each indent, such as "2" if indentString is set to
+                            an empty space and you want to use two empty spaces for each indent.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -390,35 +391,41 @@
                 <xsd:attribute name="newLineAfterNTags" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If the {{newlines}} attribute is true, the number of closing tags after which a newline separator is inserted. For example, setting this to "5" will cause a newline to be inserted after the output of five closing tags (including single tags). 
+                            If the {{newlines}} attribute is true, the number of closing tags after which a newline
+                            separator is inserted. For example, setting this to "5" will cause a newline to be inserted
+                            after the output of five closing tags (including single tags).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="newlines" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether newlines should be printed. If false, the XML is printed all on one line. 
+                            Whether newlines should be printed. If false, the XML is printed all on one line.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="omitEncoding" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether the XML declaration line includes the encoding of the document. It is common to suppress this in protocols such as SOAP.
+                            Whether the XML declaration line includes the encoding of the document. It is common to
+                            suppress this in protocols such as SOAP.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="padText" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether to ensure that text immediately preceded by or followed by an element will be "padded" with a single space. This is useful when you set {{trimText}} to true and want to ensure that "the quick &lt;b&gt;brown&lt;/b&gt; fox" does not become "the quick&lt;b&gt;brown&lt;/b&gt;fox". 
+                            Whether to ensure that text immediately preceded by or followed by an element will be
+                            "padded" with a single space. This is useful when you set {{trimText}} to true and want to
+                            ensure that "the quick &lt;b&gt;brown&lt;/b&gt; fox" does not become "the quick&lt;b&gt;brown&lt;/b&gt;fox".
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="suppressDeclaration" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether to suppress the XML declaration line. It is common to suppress this in protocols such as SOAP.
+                            Whether to suppress the XML declaration line. It is common to suppress this in protocols
+                            such as SOAP.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -432,7 +439,8 @@
                 <xsd:attribute name="XHTML" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether to use the XHTML standard, which is like HTML but passes an XML parser with real, closed tags, and outputs CDATA sections with CDATA delimiters.
+                            Whether to use the XHTML standard, which is like HTML but passes an XML parser with real,
+                            closed tags, and outputs CDATA sections with CDATA delimiters.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -442,13 +450,37 @@
 
     <!-- xml support -->
 
+    <xsd:element name="namespace-manager" type="namespaceManagerType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="namespaceManagerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A manager that allows global namespaces to be configured. These namespaces will be made available to
+                expressions routers, filters and transformers.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence>
+                    <xsd:element name="namespace" type="namespaceType" minOccurs="1" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="includeConfigNamespaces" type="xsd:boolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>If true, the namespaces configured on the Xml configuration file will be
+                            added to the Manager.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>                
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:complexType name="namespaceType">
-	    <xsd:annotation>
-	         <xsd:documentation>
-	             A namespace declaration for XPath expressions. The prefix used here
-	             can be used inside XPath expressions.
-	         </xsd:documentation>
-	    </xsd:annotation>
+        <xsd:annotation>
+            <xsd:documentation>
+                A namespace declaration for XPath expressions. The prefix used here
+                can be used inside XPath expressions.
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:attribute name="prefix" type="xsd:string" use="required"/>
         <xsd:attribute name="uri" type="xsd:string" use="required"/>
     </xsd:complexType>
