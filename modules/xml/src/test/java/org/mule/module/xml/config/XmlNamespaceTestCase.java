@@ -12,6 +12,7 @@ package org.mule.module.xml.config;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.xml.filters.JXPathFilter;
+import org.mule.module.xml.filters.JaxenFilter;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.tck.FunctionalTestCase;
 
@@ -41,5 +42,18 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertEquals("/bar:foo/bar:bar", filter.getPattern());
         assertEquals(5, filter.getNamespaces().size());
         assertEquals("http://bar.com", filter.getNamespaces().get("bar"));
+    }
+
+    public void testJaxenFilterConfig() throws Exception
+    {
+        EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("test.ep2");
+
+        InboundEndpoint ep = epb.buildInboundEndpoint();
+        assertNotNull(ep.getFilter());
+        assertTrue(ep.getFilter() instanceof JaxenFilter);
+        JaxenFilter filter = (JaxenFilter)ep.getFilter();
+        assertEquals("/car:foo/car:bar", filter.getPattern());
+        assertEquals(5, filter.getNamespaces().size());
+        assertEquals("http://car.com", filter.getNamespaces().get("car"));
     }
 }

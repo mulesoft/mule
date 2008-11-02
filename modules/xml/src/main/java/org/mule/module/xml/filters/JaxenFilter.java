@@ -10,11 +10,18 @@
 
 package org.mule.module.xml.filters;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.filter.Filter;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -34,7 +41,7 @@ import org.jaxen.javabean.JavaBeanXPath;
  * <code>JaxenFilter</code> evaluates an XPath expression against an XML document
  * using Jaxen.
  */
-public class JaxenFilter implements Filter
+public class JaxenFilter implements Filter, MuleContextAware
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -43,6 +50,9 @@ public class JaxenFilter implements Filter
     private Map namespaces = null;
     private Map contextProperties = null;
     private AbstractFactory factory;
+
+    private MuleContext muleContext;
+    private NamespaceManager namespaceManager;
 
     public JaxenFilter()
     {
@@ -58,6 +68,28 @@ public class JaxenFilter implements Filter
     {
         this.pattern = pattern;
         this.expectedValue = expectedValue;
+    }
+
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+        try
+        {
+            namespaceManager = (NamespaceManager)muleContext.getRegistry().lookupObject(NamespaceManager.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
+        }
+        if(namespaces == null)
+        {
+            namespaces = new HashMap(namespaceManager.getNamespaces());
+        }
+        else
+        {
+            namespaces.putAll(namespaceManager.getNamespaces());
+        }
     }
 
     public boolean accept(MuleMessage obj)

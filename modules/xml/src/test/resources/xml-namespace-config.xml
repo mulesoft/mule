@@ -16,4 +16,9 @@
         </mulexml:jxpath-filter>
     </endpoint>
 
+    <endpoint name="test.ep2" address="test://ep2">
+        <mulexml:jaxen-filter pattern="/car:foo/car:bar">
+            <mulexml:namespace prefix="car" uri="http://car.com"/>
+        </mulexml:jaxen-filter>
+    </endpoint>
 </mule>
