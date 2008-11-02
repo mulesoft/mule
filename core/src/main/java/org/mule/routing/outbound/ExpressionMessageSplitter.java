@@ -43,6 +43,11 @@ public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
 
     public void setEvaluator(String evaluator)
     {
+        //Switch to XPath node since we want the Dom nodes not the value of the node
+        if(evaluator.equals("xpath"))
+        {
+            evaluator = "xpath-node";
+        }
         config.setEvaluator(evaluator);
     }
 
