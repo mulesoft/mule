@@ -10,13 +10,16 @@
 
 package org.mule.module.xml.functional;
 
+import java.text.MessageFormat;
 import java.util.Properties;
 
 
-public class JXPathPropertyExtractorTestCase extends AbstractXmlPropertyExtractorTestCase
+public class JXPathExpressionTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public JXPathPropertyExtractorTestCase()
+    public static final String MESSAGE = "<endpoint>{0}</endpoint>";
+
+    public JXPathExpressionTestCase()
     {
         super(true);
     }
@@ -30,14 +33,19 @@ public class JXPathPropertyExtractorTestCase extends AbstractXmlPropertyExtracto
         return p;
     }
 
-    protected Object getMatchMessage()
+    protected Object getMatchMessage() throws Exception
     {
-        return "<endpoint>matchingEndpoint1</endpoint>";
+        return documentFor("matchingEndpoint1");
     }
 
-    protected Object getErrorMessage()
+    protected Object getErrorMessage() throws Exception
     {
-        return "<endpoint>missingEndpoint</endpoint>";
+        return documentFor("missingEndpoint");
+    }
+
+    protected String documentFor(String name) throws Exception
+    {
+        return MessageFormat.format(MESSAGE, name);
     }
 
 }

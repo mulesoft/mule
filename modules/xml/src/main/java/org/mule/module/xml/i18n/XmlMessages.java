@@ -32,4 +32,9 @@ public class XmlMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 3, resultCls.getName());
     }
+
+    public static Message failedToRegisterNamespace(String prefix, String uri)
+    {
+        return factory.createMessage(BUNDLE_PATH, 4, prefix, uri);
+    }
 }

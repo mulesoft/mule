@@ -9,11 +9,17 @@
  */
 package org.mule.module.xml.expression;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.transport.MessageAdapter;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.i18n.XmlMessages;
+import org.mule.module.xml.util.NamespaceManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,9 +34,25 @@ import org.jaxen.XPath;
  * Provides a base class for XPath property extractors. The XPath engine used is jaxen (http://jaxen.org) which supports
  * XPath queries on other object models such as JavaBeans as well as Xml
  */
-public abstract class AbstractXPathExpressionEvaluator implements ExpressionEvaluator, Disposable
+public abstract class AbstractXPathExpressionEvaluator implements ExpressionEvaluator, Disposable, MuleContextAware
 {
     private Map cache = new WeakHashMap(8);
+
+    private MuleContext muleContext;
+    private NamespaceManager namespaceManager;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+        try
+        {
+            namespaceManager = (NamespaceManager)muleContext.getRegistry().lookupObject(NamespaceManager.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
+        }
+    }
 
     /** {@inheritDoc} */
     public Object evaluate(String expression, MessageAdapter message)
@@ -39,6 +61,10 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
         {
             Object payload = message.getPayload();
             XPath xpath = getXPath(expression, payload);
+            if(namespaceManager!=null)
+            {
+                addNamespaces(namespaceManager, xpath);
+            }
 
             List result = xpath.selectNodes(payload);
             result = extractResultsFromNodes(result);
@@ -58,6 +84,22 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
         catch (JaxenException e)
         {
             throw new MuleRuntimeException(XmlMessages.failedToProcessXPath(expression), e);
+        }
+    }
+
+    protected void addNamespaces(NamespaceManager manager, XPath xpath)
+    {
+        for (Iterator iterator = manager.getNamespaces().entrySet().iterator(); iterator.hasNext();)
+        {
+            Map.Entry entry = (Map.Entry)iterator.next();
+            try
+            {
+                xpath.addNamespace(entry.getKey().toString(), entry.getValue().toString());
+            }
+            catch (JaxenException e)
+            {
+                throw new ExpressionRuntimeException(XmlMessages.failedToRegisterNamespace(entry.getKey().toString(), entry.getValue().toString()));
+            }
         }
     }
 
@@ -103,6 +145,21 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
     public void dispose()
     {
         cache.clear();
+    }
+
+    public NamespaceManager getNamespaceManager()
+    {
+        return namespaceManager;
+    }
+
+    public void setNamespaceManager(NamespaceManager namespaceManager)
+    {
+        this.namespaceManager = namespaceManager;
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
     }
 
     protected abstract Object extractResultFromNode(Object result);
