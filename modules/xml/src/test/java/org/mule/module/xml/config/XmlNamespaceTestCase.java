@@ -13,6 +13,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.module.xml.filters.JaxenFilter;
+import org.mule.module.xml.transformer.JXPathExtractor;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.tck.FunctionalTestCase;
 
@@ -55,5 +56,15 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertEquals("/car:foo/car:bar", filter.getPattern());
         assertEquals(5, filter.getNamespaces().size());
         assertEquals("http://car.com", filter.getNamespaces().get("car"));
+    }
+
+    public void testJXPathExtractor() throws Exception
+    {
+        JXPathExtractor transformer = (JXPathExtractor)muleContext.getRegistry().lookupTransformer("jxpath-extractor");
+        assertNotNull(transformer);
+        assertNotNull(transformer.getNamespaces());
+        assertEquals(5, transformer.getNamespaces().size());
+        assertNotNull(transformer.getNamespaces().get("foo"));
+        assertNotNull(transformer.getNamespaces().get("bar"));
     }
 }

@@ -21,4 +21,8 @@
             <mulexml:namespace prefix="car" uri="http://car.com"/>
         </mulexml:jaxen-filter>
     </endpoint>
+
+    <mulexml:jxpath-extractor-transformer name="jxpath-extractor">
+        <mulexml:namespace prefix="bar" uri="http://bar.com"/>
+    </mulexml:jxpath-extractor-transformer>
 </mule>

@@ -10,11 +10,19 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.module.xml.util.NamespaceManager;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +40,7 @@ import org.dom4j.XPath;
  * {@link List} of values will be returned. Note the property is currently ignored
  * for non-String/XML payloads.
  */
-public class JXPathExtractor extends AbstractTransformer
+public class JXPathExtractor extends AbstractTransformer implements MuleContextAware
 {
     public static final String OUTPUT_TYPE_NODE = "NODE";
 
@@ -47,6 +55,46 @@ public class JXPathExtractor extends AbstractTransformer
     private volatile Map namespaces;
 
     private volatile boolean singleResult = true;
+
+    private MuleContext muleContext;
+    private NamespaceManager namespaceManager;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+        try
+        {
+            namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
+        }
+    }
+
+    /**
+     * Template method where deriving classes can do any initialisation after the
+     * properties have been set on this transformer
+     *
+     * @throws org.mule.api.lifecycle.InitialisationException
+     *
+     */
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        if (namespaceManager != null)
+        {
+            if (namespaces == null)
+            {
+                namespaces = new HashMap(namespaceManager.getNamespaces());
+            }
+            else
+            {
+                namespaces.putAll(namespaceManager.getNamespaces());
+            }
+        }
+    }
 
     /**
      * Evaluate the expression in the context of the given object and returns the
