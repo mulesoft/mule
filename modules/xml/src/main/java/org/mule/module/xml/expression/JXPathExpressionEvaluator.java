@@ -60,7 +60,7 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator
 
     public Object evaluate(String name, MessageAdapter message)
     {
-        Object result ;
+        Object result = null;
         Object payload = message.getPayload();
         JXPathContext context = JXPathContext.newContext(message.getPayload());
         if (namespaceManager != null)
@@ -88,7 +88,18 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator
         //payload is a bean
         else
         {
-            result = context.getValue(name);
+            try
+            {
+                result = context.getValue(name);
+            }
+            catch (Exception e)
+            {
+                // ignore
+                if(logger.isDebugEnabled())
+                {
+                    logger.debug("failed to process JXPath expression: " + name, e);
+                }
+            }
         }
         return result;
     }
