@@ -231,7 +231,15 @@
     <xsd:complexType name="objectToXmlType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
-                <xsd:attribute name="acceptUMOMessage" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="acceptUMOMessage" type="mule:substitutableBoolean" default="false">
+			        <xsd:annotation>
+			            <xsd:documentation>
+			                Whether or not the transformer will serialize the payload
+			                or the entire MuleMessage including not only its payload, but 
+			                also its properties, correlation id, etc. 
+			            </xsd:documentation>
+			        </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
