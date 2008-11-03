@@ -28,10 +28,8 @@
             </inbound>
             <outbound>
                 <expression-splitter-router evaluator="xpath" expression="//acme:Trade">
-                    <vm:outbound-endpoint path="service1.queue" synchronous="true">
-                    </vm:outbound-endpoint>
-                    <vm:outbound-endpoint path="service2.queue" synchronous="true">
-                    </vm:outbound-endpoint>
+                    <vm:outbound-endpoint path="service1.queue" synchronous="true"/>
+                    <vm:outbound-endpoint path="service2.queue" synchronous="true"/>
                 </expression-splitter-router>
             </outbound>
         </service>
