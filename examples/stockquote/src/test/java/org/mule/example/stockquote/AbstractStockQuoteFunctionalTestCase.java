@@ -24,9 +24,9 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
     {
         MuleClient client = new MuleClient();
         MuleMessage response = client.send("vm://stockquote", "CSCO", null);
-    
+
         if (null == response)
-        { 
+        {
             fail("No response message.");
         }
         else
@@ -35,7 +35,7 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
             {
                 String text = response.getPayloadAsString();
                 assertNotNull("Null response", text);
-                assertTrue("Stock quote should contain \"Cisco\": " + text, StringUtils.contains(text, "Cisco"));
+                assertTrue("Stock quote should contain \"CISCO\": " + text, StringUtils.contains(text, "CISCO"));
                 if (Locale.getDefault().getISO3Language().equalsIgnoreCase("eng"))
                 {
                     // the stockquote message is localized ...
