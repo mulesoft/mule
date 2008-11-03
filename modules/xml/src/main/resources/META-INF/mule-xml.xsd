@@ -13,6 +13,23 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.2"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.2/mule.xsd"/>
 
+    <xsd:annotation>
+        <xsd:documentation>
+            The XML module contains a number of tools to help you read, transform, and write XML.
+        </xsd:documentation>
+
+        <xsd:appinfo>
+            <schemadoc:short-name>xml</schemadoc:short-name>
+            <schemadoc:page-title>XML Module</schemadoc:page-title>
+
+            <schemadoc:additional-documentation where="after-common-elements">
+            </schemadoc:additional-documentation>
+
+            <schemadoc:additional-documentation where="after-specific-elements">
+            </schemadoc:additional-documentation>
+        </xsd:appinfo>
+    </xsd:annotation>
+    
     <!-- xml filters -->
 
     <xsd:element name="is-xml-filter" type="mule:abstractFilterType" substitutionGroup="mule:abstract-filter"/>
@@ -182,8 +199,7 @@
     </xsd:element>
 
     <xsd:element name="jxpath-extractor-transformer" type="jxpathExtractorType"
-                 substitutionGroup="mule:abstract-transformer"/>
-    <xsd:complexType name="jxpathExtractorType">
+                 substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 The JXPathExtractor is a simple transformer that evaluates an XPath
@@ -194,6 +210,9 @@
                 currently ignored for non-String/XML payloads.
             </xsd:documentation>
         </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:complexType name="jxpathExtractorType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
                 <xsd:sequence>
@@ -227,7 +246,14 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="object-to-xml-transformer" type="objectToXmlType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="object-to-xml-transformer" type="objectToXmlType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Convert a Java object to an XML representation using XStream.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
     <xsd:complexType name="objectToXmlType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
