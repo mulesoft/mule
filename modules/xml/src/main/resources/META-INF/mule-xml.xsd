@@ -3,6 +3,7 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
             xmlns:spring="http://www.springframework.org/schema/beans"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.2"
             targetNamespace="http://www.mulesource.org/schema/mule/xml/2.2"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
