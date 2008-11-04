@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.dom4j.Document;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
@@ -60,6 +61,12 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
         try
         {
             Object payload = message.getPayload();
+            //we need to convert to a Dom if its an XML string
+            if(payload instanceof String)
+            {
+                payload = message.getPayload(Document.class);
+            }
+
             XPath xpath = getXPath(expression, payload);
             if(namespaceManager!=null)
             {
@@ -81,7 +88,7 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
                 return result;
             }
         }
-        catch (JaxenException e)
+        catch (Exception e)
         {
             throw new MuleRuntimeException(XmlMessages.failedToProcessXPath(expression), e);
         }
