@@ -71,7 +71,7 @@ public class XPathExpressionEvaluator extends AbstractXPathExpressionEvaluator
 //        }
         else
         {
-            throw new IllegalArgumentException(XmlMessages.domTypeNotSupported(result.getClass()).getMessage());
+            return result;
         }
     }
 
