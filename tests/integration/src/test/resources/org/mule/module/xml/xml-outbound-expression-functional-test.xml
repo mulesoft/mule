@@ -10,6 +10,11 @@
        http://www.mulesource.org/schema/mule/xml/2.2 http://www.mulesource.org/schema/mule/xml/2.2/mule-xml.xsd
        http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd">
 
+    <!-- this is for the splitter; the element -->
+    <mxml:namespace-manager includeConfigNamespaces="true">
+        <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.2"/>
+    </mxml:namespace-manager>
+
     <vm:connector name="default"/>
     <vm:connector name="queue" queueEvents="true"/>
 
@@ -32,21 +37,14 @@
                 <inbound-endpoint ref="split"/>
             </inbound>
             <outbound>
-                <mxml:filter-based-splitter splitExpression="/mule:mule/mule:model/mule:service" failIfNoMatch="false">
+                <expression-splitter-router evaluator="xpath" expression="/mule:mule/mule:model/mule:service" disableRoundRobin="true" failIfNoMatch="false">
                     <outbound-endpoint ref="service1">
-                        <mxml:jxpath-filter pattern="/mule:service/@name" expectedValue="service splitter">
-                            <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.2"/>
-                        </mxml:jxpath-filter>
+                        <expression-filter evaluator="xpath" expression="/mule:service/@name = 'service splitter'"/>
                     </outbound-endpoint>
                     <outbound-endpoint ref="service2">
-                        <mxml:jxpath-filter pattern="/mule:service/@name" expectedValue="round robin deterministic">
-                            <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.2"/>
-                        </mxml:jxpath-filter>
+                        <expression-filter evaluator="xpath" expression="/mule:service/@name = 'round robin deterministic'"/>
                     </outbound-endpoint>
-                    <!-- this is for the splitter; the element ordering is unfortunate -->
-                    <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
-                    <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.2"/>
-                </mxml:filter-based-splitter>
+                </expression-splitter-router>
             </outbound>
         </service>
 
@@ -56,13 +54,10 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-
-                <mxml:round-robin-splitter splitExpression="/mule:mule/mule:model/mule:service">
+                <expression-splitter-router evaluator="xpath" expression="/mule:mule/mule:model/mule:service">
                     <outbound-endpoint ref="robin1"/>
                     <outbound-endpoint ref="robin2"/>
-                    <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
-                    <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.2"/>
-                </mxml:round-robin-splitter>
+                </expression-splitter-router>
             </outbound>
         </service>
 
@@ -72,12 +67,10 @@
                 <forwarding-router/>
             </inbound>
             <outbound>
-                <mxml:round-robin-splitter splitExpression="/mule:mule/mule:model/mule:service" deterministic="false">
+                <expression-splitter-router evaluator="xpath" expression="/mule:mule/mule:model/mule:service" deterministic="false">
                     <outbound-endpoint ref="robin1"/>
                     <outbound-endpoint ref="robin2"/>
-                    <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
-                    <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.2"/>
-                </mxml:round-robin-splitter>
+                </expression-splitter-router>
             </outbound>
         </service>
 

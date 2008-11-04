@@ -10,7 +10,7 @@
 
 package org.mule.module.xml.functional;
 
-public class FilteringXmlMessageSplitterFunctionalTestCase extends AbstractXmlSplitterOutboundFunctionalTestCase
+public class FilteringXmlMessageExpressionSplitterFunctionalTestCase extends AbstractXmlExpressionSplitterOutboundFunctionalTestCase
 {
 
     public void testSplit() throws Exception

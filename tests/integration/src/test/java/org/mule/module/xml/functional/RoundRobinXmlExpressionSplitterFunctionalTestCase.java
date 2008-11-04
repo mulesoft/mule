@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
 
 import java.io.IOException;
 
-public class RoundRobinXmlSplitterFunctionalTestCase extends AbstractXmlSplitterOutboundFunctionalTestCase
+public class RoundRobinXmlExpressionSplitterFunctionalTestCase extends AbstractXmlExpressionSplitterOutboundFunctionalTestCase
 {
 
     public void testSimple() throws MuleException, IOException

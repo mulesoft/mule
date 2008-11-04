@@ -22,7 +22,7 @@ import java.util.List;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
-public abstract class AbstractXmlOutboundFunctionalTestCase extends AbstractXmlFunctionalTestCase
+public abstract class AbstractXmlSplitterOutboundFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
 
     public static final String SERVICE_SPLITTER = "service splitter";
