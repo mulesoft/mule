@@ -10,6 +10,7 @@
 
 package org.mule.expression;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transport.MessageAdapter;
 
@@ -27,7 +28,7 @@ public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
 {
     public static final String NAME = "attachment";
 
-    public Object evaluate(String name, MessageAdapter message)
+    public Object evaluate(String name, MuleMessage message)
     {
         if (message instanceof MessageAdapter)
         {

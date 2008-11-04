@@ -10,6 +10,7 @@
 
 package org.mule.transport.file;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
@@ -83,7 +84,7 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
         {
             public Object match(String token)
             {
-                return muleContext.getExpressionManager().evaluate(token, adapter);
+                return muleContext.getExpressionManager().evaluate(token, new DefaultMuleMessage(adapter));
             }
         }, expression);
     }

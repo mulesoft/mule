@@ -10,6 +10,7 @@
 
 package org.mule.routing;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.expression.MessageHeaderExpressionEvaluator;
@@ -24,7 +25,7 @@ import org.mule.expression.MessageHeaderExpressionEvaluator;
  */
 public class CorrelationPropertiesExpressionEvaluator extends MessageHeaderExpressionEvaluator
 {
-    public final Object evaluate(String name, MessageAdapter message)
+    public final Object evaluate(String name, MuleMessage message)
     {
         Object result;
         MessageAdapter msg = null;

@@ -12,7 +12,6 @@ package org.mule.expression;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
@@ -64,7 +63,7 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
     public static final String PAYLOAD_CLASS_FUNCTION = "payloadClass";
     public static final String SHORT_PAYLOAD_CLASS_FUNCTION = "shortPayloadClass";
 
-    public Object evaluate(String name, MessageAdapter message)
+    public Object evaluate(String name, MuleMessage message)
     {
         if (name.equalsIgnoreCase(NOW_FUNCTION))
         {

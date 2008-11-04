@@ -10,6 +10,7 @@
 
 package org.mule.expression;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.transport.MessageAdapter;
@@ -33,7 +34,7 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
     public static final String NAME = "attachments-list";
     public static final String DELIM = ",";
 
-    public Object evaluate(String expression, MessageAdapter message)
+    public Object evaluate(String expression, MuleMessage message)
     {
         boolean required = false;
 

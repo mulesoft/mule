@@ -11,6 +11,7 @@
 package org.mule.expression;
 
 import org.mule.RequestContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transport.MessageAdapter;
 
@@ -27,7 +28,7 @@ public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
 {
     public static final String NAME = "header";
 
-    public Object evaluate(String expression, MessageAdapter message)
+    public Object evaluate(String expression, MuleMessage message)
     {
         Object result = null;
         if (message instanceof MessageAdapter)

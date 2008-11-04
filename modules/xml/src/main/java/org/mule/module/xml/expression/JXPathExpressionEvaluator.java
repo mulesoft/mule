@@ -11,10 +11,10 @@
 package org.mule.module.xml.expression;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.NamespaceManager;
@@ -58,7 +58,7 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator
         }
     }
 
-    public Object evaluate(String name, MessageAdapter message)
+    public Object evaluate(String name, MuleMessage message)
     {
         Object result = null;
         Object payload = message.getPayload();

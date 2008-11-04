@@ -10,6 +10,7 @@
 
 package org.mule.expression;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transport.MessageAdapter;
 
@@ -23,7 +24,7 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
 {
     public static final String NAME = "map-payload";
     
-    public Object evaluate(String expression, MessageAdapter message)
+    public Object evaluate(String expression, MuleMessage message)
     {
         Object payload = message;
         if (message instanceof MessageAdapter)

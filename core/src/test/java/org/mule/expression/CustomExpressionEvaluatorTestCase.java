@@ -11,8 +11,8 @@
 package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.Map;
@@ -36,7 +36,7 @@ public class CustomExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public static class FooExpressionEvaluator implements ExpressionEvaluator
     {
 
-        public Object evaluate(String expression, MessageAdapter message)
+        public Object evaluate(String expression, MuleMessage message)
         {
             return message.getPayload() + expression;
         }

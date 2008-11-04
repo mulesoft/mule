@@ -14,7 +14,6 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.scripting.component.Scriptable;
 
@@ -41,7 +40,7 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
      * @param message    the message to extract from
      * @return the result of the extraction or null if the property was not found
      */
-    public Object evaluate(String expression, MessageAdapter message)
+    public Object evaluate(String expression, MuleMessage message)
     {
         Scriptable script = getScript(expression);
         Bindings bindings = script.getScriptEngine().createBindings();

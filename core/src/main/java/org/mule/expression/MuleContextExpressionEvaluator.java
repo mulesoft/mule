@@ -13,9 +13,9 @@ import org.mule.MuleServer;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 
 /**
@@ -43,7 +43,7 @@ public class MuleContextExpressionEvaluator implements ExpressionEvaluator
      * @param message    the message to extract from
      * @return the result of the extraction or null if the property was not found
      */
-    public Object evaluate(String expression, MessageAdapter message)
+    public Object evaluate(String expression, MuleMessage message)
     {
         if (expression.equals("serviceName"))
         {
