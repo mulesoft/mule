@@ -10,6 +10,7 @@
 
 package org.mule.module.xml.expression;
 
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
 /**
@@ -24,6 +25,7 @@ public class XPathNodeExpressionEvaluator extends XPathExpressionEvaluator
         if(result instanceof Element)
         {
             ((Element)result).detach();
+            return DocumentHelper.createDocument((Element)result);
         }
         return result;
     }
