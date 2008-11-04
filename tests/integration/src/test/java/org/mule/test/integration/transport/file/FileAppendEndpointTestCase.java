@@ -42,7 +42,7 @@ public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 
             MuleClient client = new MuleClient();
             client.send("vm://fileappend", "Hello1", null);
-            fail("Expected exception: java.lang.IllegalArgumentException: configuring outputAppend on the file endpoint is no longer support. You can configure a the File connector instead.");
+            fail("Expected exception: java.lang.IllegalArgumentException: Configuring 'outputAppend' on a file endpoint is no longer supported. You may configure it on a file connector instead.");
         }
         catch (Exception e)
         {
