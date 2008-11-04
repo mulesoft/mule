@@ -52,7 +52,7 @@ public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
         assertEquals(2, coll.size());
         List results = (List) coll.getPayload();
 
-        assertTrue(results.contains("DefaultElement Received in ServiceOne"));
-        assertTrue(results.contains("DefaultElement Received in ServiceTwo"));
+        assertTrue(results.contains("DefaultDocument Received in ServiceOne"));
+        assertTrue(results.contains("DefaultDocument Received in ServiceTwo"));
     }
 }
