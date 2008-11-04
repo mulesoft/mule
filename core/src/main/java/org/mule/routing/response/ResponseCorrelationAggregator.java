@@ -13,8 +13,8 @@ package org.mule.routing.response;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutingException;
-import org.mule.routing.inbound.EventGroup;
 import org.mule.routing.EventCorrelatorCallback;
+import org.mule.routing.inbound.EventGroup;
 
 /**
  * <code>ResponseCorrelationAggregator</code> Correlates one or more events on a
@@ -64,7 +64,7 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
 
             if (expected == -1)
             {
-                logger.warn("Correlation Group Size not set, but CorrelationAggregator is being used.  Message is being forwarded");
+                logger.warn("Correlation Group Size not set, but AbstractCorrelationAggregator is being used.  Message is being forwarded");
                 return true;
             }
 

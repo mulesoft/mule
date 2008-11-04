@@ -26,7 +26,7 @@ public class RouterDefinitionParser extends ChildDefinitionParser
         standardOptions();
     }
 
-    // specifically for subclasses of CorrelationAggregator (requires a "class=..." in the config)
+    // specifically for subclasses of AbstractCorrelationAggregator (requires a "class=..." in the config)
     public RouterDefinitionParser()
     {
         super(ROUTER, null, AbstractEventAggregator.class, true);

@@ -68,7 +68,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
 
         if (size == -1)
         {
-            logger.warn("Correlation Group Size not set, but CorrelationAggregator is being used."
+            logger.warn("Correlation Group Size not set, but AbstractCorrelationAggregator is being used."
                     + " Message is being forwarded");
             return true;
         }

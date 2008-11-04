@@ -20,7 +20,7 @@ import org.mule.routing.EventCorrelatorCallback;
  * CorrelationGroupSize properties of the {@link org.mule.api.MuleMessage} to manage
  * message groups.
  */
-public abstract class CorrelationAggregator extends AbstractEventAggregator
+public abstract class AbstractCorrelationAggregator extends AbstractEventAggregator
 {
 
     protected EventCorrelatorCallback getCorrelatorCallback()
@@ -34,7 +34,7 @@ public abstract class CorrelationAggregator extends AbstractEventAggregator
     {
         public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
         {
-            return CorrelationAggregator.this.aggregateEvents(events);
+            return AbstractCorrelationAggregator.this.aggregateEvents(events);
         }
     }
 

@@ -12,14 +12,14 @@ package org.mule.example.loanbroker.routers;
 
 import org.mule.api.MuleMessage;
 import org.mule.routing.AggregationException;
-import org.mule.routing.inbound.CorrelationAggregator;
+import org.mule.routing.inbound.AbstractCorrelationAggregator;
 import org.mule.routing.inbound.EventGroup;
 
 /**
  * <code>BankQuotesInboundAggregator</code> receives a number of quotes and selects the
  * lowest
  */
-public class BankQuotesInboundAggregator extends CorrelationAggregator
+public class BankQuotesInboundAggregator extends AbstractCorrelationAggregator
 {
     /**
      * This method is invoked if the shouldAggregate method is called and returns

@@ -24,7 +24,7 @@ public class BindingDefinitionParser extends ChildDefinitionParser
         standardOptions();
     }
 
-    // specifically for subclasses of CorrelationAggregator (requires a "class=..." in the config)
+    // specifically for subclasses of AbstractCorrelationAggregator (requires a "class=..." in the config)
     public BindingDefinitionParser(String setterMethod)
     {
         super(setterMethod, null, AbstractEventAggregator.class, true);
