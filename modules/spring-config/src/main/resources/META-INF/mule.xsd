@@ -405,7 +405,7 @@
             <xsd:element ref="abstract-retry-policy" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The default retry policy, used by connectors and endpoints if no more 
+                        The default retry policy, used by connectors and endpoints if no more
                         specific policy is configured for them.
                     </xsd:documentation>
                 </xsd:annotation>
@@ -1104,7 +1104,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for a retry notifier element.
-                The RetryNotifier interface is a callback that allows actions to be performed after each retry. 
+                The RetryNotifier interface is a callback that allows actions to be performed after each retry.
                 For example, when retrying connections Mule will fire server notification events on success or failure.
             </xsd:documentation>
         </xsd:annotation>
@@ -1430,7 +1430,7 @@
                 <xsd:attribute name="factory-class" type="substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A class that implements the TransactionFactory interface that will be 
+                            A class that implements the TransactionFactory interface that will be
                             instantiated and used to generate a transaction.
                             This attribute and the "factory-ref" attribute are mutually exclusive;
                             one of the two is required.
@@ -1440,7 +1440,7 @@
                 <xsd:attribute name="factory-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A bean that implements the TransactionFactory interface that will be 
+                            A bean that implements the TransactionFactory interface that will be
                             used to generate a transaction.
                             This attribute and the "factory-class" attribute are mutually exclusive;
                             one of the two is required.
@@ -1450,7 +1450,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="xa-transaction" type="xaTransactionType" substitutionGroup="abstract-transaction">
         <xsd:annotation>
             <xsd:documentation>
@@ -2111,7 +2111,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <!--==============================================================-->
     <!--   Interceptor elements                                       -->
     <!--==============================================================-->
@@ -2135,7 +2135,7 @@
         </xsd:attribute>
     </xsd:complexType>
     <xsd:element name="interceptor-stack" type="abstractInterceptorStackType" substitutionGroup="abstract-interceptor-stack"/>
-    
+
 
     <xsd:element name="abstract-interceptor" abstract="true" type="abstractInterceptorType">
         <xsd:annotation>
@@ -2154,7 +2154,7 @@
             </xsd:choice>
         </xsd:sequence>
     </xsd:group>
-    
+
     <xsd:complexType name="refInterceptorStackType">
         <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required">
             <xsd:annotation>
@@ -2164,7 +2164,7 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
-    
+
     <xsd:element name="timer-interceptor" type="abstractInterceptorType" substitutionGroup="abstract-interceptor">
         <xsd:annotation>
             <xsd:documentation>
@@ -3188,8 +3188,8 @@
     <xsd:element name="wire-tap-router" type="wireTapRouterType" substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The WireTap inbound router allows you to route certain messages to a different endpoint as well as to 
-                the component. 
+                The WireTap inbound router allows you to route certain messages to a different endpoint as well as to
+                the component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3216,8 +3216,8 @@
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                Applies one or more filters to the incoming message. If the filters match, the message is forwarded to 
-                the component. Otherwise, the message is forwarded to the catch-all strategy on the router. If no 
+                Applies one or more filters to the incoming message. If the filters match, the message is forwarded to
+                the component. Otherwise, the message is forwarded to the catch-all strategy on the router. If no
                 catch-all strategy is configured, the message is ignored and a warning is logged.
             </xsd:documentation>
         </xsd:annotation>
@@ -3229,8 +3229,8 @@
             <xsd:documentation>
                 Holds back a group of messages and resequence them using the messages correlation sequence property.
             </xsd:documentation>
-        </xsd:annotation>                 
-    </xsd:element>             
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:complexType name="selectiveConsumerRouterType">
         <xsd:complexContent>
@@ -3238,8 +3238,13 @@
                 <xsd:sequence>
                     <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS"/>
-                <xsd:attribute name="transformFirst" type="substitutableBoolean"/>
+                <xsd:attribute name="transformFirst" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Determines whether the transformers on the inbound endpoint that received the current message should be applied before the message is filtered.  The default is 'false'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -3248,14 +3253,14 @@
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                This aggregator combines two or more messages into a single message by matching messages with a given 
-                Correlation Id. Correlation IDs are set on messages when they are dispatched by certain outbound 
-                routers such as the Recipient List and Message Splitter routers. These messages can be aggregated back 
+                This aggregator combines two or more messages into a single message by matching messages with a given
+                Correlation Id. Correlation IDs are set on messages when they are dispatched by certain outbound
+                routers such as the Recipient List and Message Splitter routers. These messages can be aggregated back
                 together again using this router.
             </xsd:documentation>
-        </xsd:annotation>   
+        </xsd:annotation>
     </xsd:element>
-                     
+
     <xsd:complexType name="messageChunkingAggregatorRouterType">
         <xsd:complexContent>
             <xsd:extension base="baseAggregatorRouterType">
@@ -3270,16 +3275,22 @@
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                This router is used to configure a custom message aggregator.  Mule provides an abstract implementation 
-                that has a template method that performs the message aggregation. A common use of the aggregator router 
+                This router is used to configure a custom message aggregator.  Mule provides an abstract implementation
+                that has a template method that performs the message aggregation. A common use of the aggregator router
                 is to combine the results of multiple requests such as "ask this set of vendors for the best price of X".
             </xsd:documentation>
-        </xsd:annotation>   
+        </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="customCorrelationAggregatorRouterType">
         <xsd:complexContent>
             <xsd:extension base="messageChunkingAggregatorRouterType">
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The fully qualified classname of the custom correlation aggregator router to use. This class should extend {{org.mule.routing.inbound.AbstractCorrelationAgregator}}.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -3291,29 +3302,35 @@
                 Configures a Collection Response Router. This will return a MuleMessageCollection message
                 type that will contain all events received for a each correlation group.
             </xsd:documentation>
-        </xsd:annotation>                 
+        </xsd:annotation>
     </xsd:element>
 
     <xsd:element name="custom-inbound-router" type="customInboundRouterType"
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                Allows for custom inbound routers to be configured.
+                Allows a custom {{org.mule.api.InboundRouterCollection}} to be cnfigured by the user. The property should contain the fully qualified Java class name of the router.  This property should NOT be used unless you are absolutely sure you know what you are doing.
             </xsd:documentation>
-        </xsd:annotation>                 
+        </xsd:annotation>
     </xsd:element>
 
     <xsd:complexType name="customInboundRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property elements so that custom configuration can be configured on the
+                                custom router.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            An implementation of InboundRouter (Java fully qualified class name)
+                            An implementation of {{org.mule.api.routing.inbound.InboundRouter}} (Java fully qualified class name). It is good practice to create custom inbound routers by extending the {{org.mule.routing.inbound.SelectiveConsumer}}.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3324,7 +3341,13 @@
     <xsd:complexType name="baseAggregatorRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
-                <xsd:attribute name="timeout" type="substitutableInt"/>
+                <xsd:attribute name="timeout" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines a timeout in Milliseconds to wait for events to be aggregated. By default the router will throw an exeception if the router is waiting for a correlation group and times out before all group enties are received.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -3355,8 +3378,22 @@
         <xsd:complexContent>
             <xsd:extension base="abstractAsyncReplyRouterType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>
+                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The endpoint used to receive the response(s) on.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The message info mapper used to extract key bits of the message information, such as
+                                Message ID or Correlation ID.  these properties are used by some routers and this mapping
+                                information tells Mule where to get the information from in the current message.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -3368,9 +3405,24 @@
         <xsd:complexContent>
             <xsd:extension base="asyncReplyRouterType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property elements so that custom configuration can be configured on the
+                                custom router.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A fully qualified Java class name of the router to use. The router should either extend
+                            {{org.mule.routing.response.AbstractResponseRouter}} or
+                            {{org.mule.routing.response.AbstractResponseAggregator}}.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -3389,8 +3441,22 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element ref="abstract-transaction" minOccurs="0" />
-            <xsd:element ref="abstract-message-info-mapping" minOccurs="0" />
+            <xsd:element ref="abstract-transaction" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Defines an overall transaction that will be used for all endpoints on this router.  This is only useful when you want to define an outbound only transaction that will commit all of the transactions defined on the outbound endpoints for this router.  Note that you must still define a transaction on each of the endpoints that should take part in the transaction.  These transactions should always be configured to JOIN the existing transaction.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        The message info mapper used to extract key bits of the message information, such as
+                        Message ID or Correlation ID.  these properties are used by some routers and this mapping
+                        information tells Mule where to get the information from in the current message.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
         </xsd:sequence>
     </xsd:group>
 
@@ -3400,23 +3466,30 @@
             <xsd:element ref="abstract-filter" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Filter used to filter message. 
+                        Filter used to filter message.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Filters are applied before message transformations.  A transformer canbe configured here to 
+                        Filters are applied before message transformations.  A transformer can be configured here to
                         transform messages before they are filtered.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
         </xsd:sequence>
     </xsd:group>
-    
+
     <xsd:attributeGroup name="defaultOutboundRouterAttributes">
         <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Determines whether correlation information should be attached to the current message. For instance, sometimes
+                    external applications will configure a correlation ID on a JMS message, setting 'enableCorrelation=IF_NOT_SET' will ensure
+                    that Mule will only set a correlation ID if one isn't already present.
+                </xsd:documentation>
+            </xsd:annotation>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
                     <xsd:enumeration value="ALWAYS" />
@@ -3488,24 +3561,24 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:element name="template-endpoint-router" type="filteringOutboundRouterType"
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The TemplateEndpointRouter allows endpoints to be altered at runtime based on properties set on the 
-                current event or fallback values set on the endpoint properties.  Templated values are expressed using 
+                The TemplateEndpointRouter allows endpoints to be altered at runtime based on properties set on the
+                current event or fallback values set on the endpoint properties.  Templated values are expressed using
                 square braces around a property name,
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-                 
+
     <xsd:element name="chaining-router" type="multipleEndpointFilteringOutboundRouterType"
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The Chaining router can be used to send the message through multiple endpoints using the result of the 
-                first invocation as the input for the next.
+                The Chaining router can be used to send the message through multiple endpoints using the result of the
+                first invocation as the input for the next. When a Chaining router is configured all but the last endpoint will be invoked synchronously.  For the last endpoint the synchronous flag on that endpoint will be used to determine how to dispatch the message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3514,7 +3587,7 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The Exception Based router can be used to send a message over an endpoint by selecting the first 
+                The Exception Based router can be used to send a message over an endpoint by selecting the first
                 endpoint that can connect to the transport.
             </xsd:documentation>
         </xsd:annotation>
@@ -3533,10 +3606,11 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                // TODO
+                The Endpoint Selector router will choose one of the endpoints configured on this router based on an
+                expression evaluated on the current message.
             </xsd:documentation>
         </xsd:annotation>
-    </xsd:element>                 
+    </xsd:element>
     <xsd:complexType name="endpointSelectorRouterType">
         <xsd:complexContent>
             <xsd:extension base="multipleEndpointFilteringOutboundRouterType">
@@ -3546,7 +3620,52 @@
     </xsd:complexType>
 
     <!-- Splitter routers -->
-    <xsd:element name="list-message-splitter-router" type="messageSplitterOutboundRouterType"
+
+    <!-- Extends AbstractMessageSplitter-->
+    <xsd:complexType name="messageSplitterOutboundRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="multipleEndpointFilteringOutboundRouterType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- Extends AbstractRoundRobinMessageSplitter -->
+    <xsd:complexType name="roundRobinSplitterType">
+        <xsd:complexContent>
+            <xsd:extension base="messageSplitterOutboundRouterType">
+                <xsd:attribute name="deterministic" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If 'disableRoundRobin' is false and this option is true (the default)
+                            then the first message part if routed to the first endpoint, the
+                            second part to the second endpoint, etc, with the nth part going to
+                            the (n modulo number of endpoints) endpoint.
+                            If false then the messages will be distributed equally amongst all
+                            endpoints.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="disableRoundRobin" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If filters are being used on endpoints then round robin behaviour is probably not desirable.
+                            This flag switches round robin behaviour off, it is on by default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="failIfNoMatch" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If 'disableRoundRobin' is true, there may be situations where the current split message does not match
+                            any endpoints.  this flag controls whether an exception should be thrown when a match is not found.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="list-message-splitter-router" type="roundRobinSplitterType"
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
@@ -3555,15 +3674,6 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
-    <xsd:complexType name="messageSplitterOutboundRouterType">
-        <xsd:complexContent>
-            <xsd:extension base="multipleEndpointFilteringOutboundRouterType">
-                <!-- this is not exposed to the user afaict? -->
-                <!-- xsd:attribute name="multimatch" type="substitutableBoolean"/ -->
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:element name="expression-splitter-router" type="expressionSplitterOutboundRouterType"
                  substitutionGroup="abstract-outbound-router">
@@ -3578,16 +3688,17 @@
 
     <xsd:complexType name="expressionSplitterOutboundRouterType">
         <xsd:complexContent>
-            <xsd:extension base="messageSplitterOutboundRouterType">
+            <xsd:extension base="roundRobinSplitterType">
                 <xsd:attributeGroup ref="expressionAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- Messgae chunking routers -->
     <xsd:element name="message-chunking-router" type="chunkingRouterType" substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                This router allows you to split a single message into a number of fixed-length messages that will all 
+                This router allows you to split a single message into a number of fixed-length messages that will all
                 be routed to the same endpoint.
             </xsd:documentation>
         </xsd:annotation>
@@ -3595,17 +3706,29 @@
     <xsd:complexType name="chunkingRouterType">
         <xsd:complexContent>
             <xsd:extension base="multipleEndpointFilteringOutboundRouterType">
-                <xsd:attribute name="messageSize" type="substitutableInt"/>
-                <xsd:attribute name="numberOfMessages" type="substitutableInt"/>
+                <xsd:attribute name="messageSize" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>The message chunk size (in bytes) that the current message will be split into.
+                        Note that this is mutually exclusive to the 'numberOfMessages' property.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="numberOfMessages" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>The number of message peices to break the current message into.  This property is less useful than the
+                    'message' size property since, usually messages are constricted by size.
+                    Note that this is mutually exclusive to the 'messageSize' property.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- recipient List routers -->
     <xsd:element name="static-recipient-list-router" type="staticRecipientListRouterType" substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The recipient list router can be used to send the same message to multiple endpoints over the same 
-                endpoint or to implement routing-slip behaviour where the next destination for the message is 
+                The recipient list router can be used to send the same message to multiple endpoints over the same
+                endpoint or to implement routing-slip behaviour where the next destination for the message is
                 determined from message properties or the payload. It uses a static list of recipient endpoints
                 which are specified via the attribute recipientsProperty and delimited by the attribute recipientsDelimieter.
             </xsd:documentation>
@@ -3616,12 +3739,44 @@
             <xsd:extension base="abstractOutboundRouterType">
                 <xsd:sequence>
                     <xsd:group ref="defaultFilteredOutboundRouterElements"/>
-                    <xsd:element name="recipients" type="listOrSetType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="recipients" type="listOrSetType" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A static list of endpoint names or URIs that will be used as recipients of the current message.
+                                Usually, if this list is set there is no need to set the 'recipientsProperty'.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="defaultFilteredOutboundRouterAttributes"/>
-                <xsd:attribute name="recipientsProperty" type="xsd:string"/>
-                <xsd:attribute name="recipientsDelimiter" type="xsd:string"/>
-                <xsd:attribute name="synchronous" type="xsd:boolean"/>
+                <xsd:attribute name="recipientsProperty" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines a property name on the current message where a list of endpoint names (or URIs) can
+                            be obtained. This property can return a {{java.util.List}} of values or a delimited {{java.lang.String}}.
+                            If the 'recipientsProperty' returns a string then the 'recipientsDelimiter' property is used
+                            to split the string.
+                            If the entries in the String or List define endpoint names, these will be looked up at runtime.
+                            If the entries define endpoint URIs these endpoints will be created at runtime.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="recipientsDelimiter" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The delimiter to use when splitting a String list of recipients.  the default is ','.
+                            This property is only used with the 'recipientsProperty'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="synchronous" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>This flag controls whether the message will be sent to the recipients
+                            synchronously. Unlike other routers th recipient list router doesn't have pre-configured endpoints
+                            so the synchronicity of the endpoint cannot be honoured.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -3630,32 +3785,48 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The expression recipient list router can be used to send the same message to multiple endpoints over the same 
-                endpoint or to implement routing-slip behaviour where the next destination for the message is 
+                The expression recipient list router can be used to send the same message to multiple endpoints over the same
+                endpoint or to implement routing-slip behaviour where the next destination for the message is
                 determined from message properties or the payload. It uses a list of recipients endpoints
                 which are extracted from the message using an expression. (As of 2.1)
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+
     <xsd:complexType name="expressionRecipientListRouterType">
         <xsd:complexContent>
             <xsd:extension base="abstractOutboundRouterType">
                 <xsd:sequence>
                     <xsd:group ref="defaultFilteredOutboundRouterElements"/>
-                    <xsd:element name="recipients" type="listOrSetType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="recipients" type="listOrSetType" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A static list of endpoint names or URIs that will be used as recipients of the current message.
+                                If the expression on this router returns a list of endpoint names, the endpoints here will be checked as well as any global endpoints.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="defaultFilteredOutboundRouterAttributes"/>
                 <xsd:attributeGroup ref="expressionAttributes"/>
-                <xsd:attribute name="synchronous" type="xsd:boolean"/>
+                <xsd:attribute name="synchronous" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>This flag controls whether the message will be sent to the recipients
+                            synchronously. Unlike other routers th recipient list router doesn't have pre-configured endpoints
+                            so the synchronicity of the endpoint cannot be honoured.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- custom router -->
     <xsd:element name="custom-outbound-router" type="customOutboundRouterType"
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                // 
+                Allows a custom {{org.mule.api.OutboundRouterCollection}} to be cnfigured by the user. The property should contain the fully qualified Java class name of the router.  This property should NOT be used unless you are absolutely sure you know what you are doing.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3665,13 +3836,20 @@
                 <xsd:sequence>
                     <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:group ref="defaultFilteredOutboundRouterElements"/>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property elements so that custom configuration can be configured on the
+                                custom router.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="defaultFilteredOutboundRouterAttributes"/>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            An implementation of OutboundRouter (Java fully qualified class name)
+                            Allows a custom {{org.mule.api.OutboundRouter}} to be cnfigured by the user. The property should contain the fully qualified Java class name of the router.  It is generally good practice for this custom router to extend {{org.mule.rounting.outbound.FilteringOutboundRouter}}.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3684,11 +3862,11 @@
     <xsd:element name="logging-catch-all-strategy" type="loggingCatchAllStrategyType" substitutionGroup="abstract-catch-all-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                 This catch all strategy does nothing with the event and logs (using the _WARN_ log level) the fact 
+                 This catch all strategy does nothing with the event and logs (using the _WARN_ log level) the fact
                  that the event was not dispatched due to the fact there was no routing path defined.
             </xsd:documentation>
         </xsd:annotation>
-    </xsd:element>             
+    </xsd:element>
     <xsd:complexType name="loggingCatchAllStrategyType">
         <xsd:complexContent>
             <xsd:extension base="abstractCatchAllStrategyType"/>
@@ -3712,11 +3890,11 @@
                  substitutionGroup="abstract-catch-all-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                This catch all strategy is used to forward the event to an endpoint that is configured if no outbound 
+                This catch all strategy is used to forward the event to an endpoint that is configured if no outbound
                 routers match.
             </xsd:documentation>
         </xsd:annotation>
-    </xsd:element>             
+    </xsd:element>
     <xsd:complexType name="forwardingCatchAllStrategyType">
         <xsd:complexContent>
             <xsd:extension base="abstractCatchAllStrategyType">
