@@ -11,12 +11,17 @@
 package org.mule.module.sxc;
 
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.TransformerException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.module.xml.transformer.XmlToXMLStreamReader;
+import org.mule.module.xml.util.NamespaceManager;
 import org.mule.routing.filters.logic.AndFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.filters.logic.OrFilter;
@@ -25,6 +30,7 @@ import org.mule.routing.outbound.FilteringOutboundRouter;
 import com.envoisolutions.sxc.xpath.XPathBuilder;
 import com.envoisolutions.sxc.xpath.XPathEvaluator;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -47,6 +53,33 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
     private XPathEvaluator evaluator;
 
     private XPathBuilder builder;
+
+    private NamespaceManager namespaceManager;
+
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+        try
+        {
+            namespaceManager = (NamespaceManager)muleContext.getRegistry().lookupObject(NamespaceManager.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
+        }
+        if(namespaceManager!=null)
+        {
+            if(namespaces == null)
+            {
+                namespaces = new HashMap(namespaceManager.getNamespaces());
+            }
+            else
+            {
+                namespaces.putAll(namespaceManager.getNamespaces());
+            }
+        }
+    }
 
     @Override
     public void setFilter(Filter filter)

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+       xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.2"
+       xmlns:sxc="http://www.mulesource.org/schema/mule/sxc/2.2"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+               http://www.mulesource.org/schema/mule/sxc/2.2 http://www.mulesource.org/schema/mule/sxc/2.2/mule-sxc.xsd
+               http://www.mulesource.org/schema/mule/xml/2.2 http://www.mulesource.org/schema/mule/xml/2.2/mule-xml.xsd
+               http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd">
+
+    <mule-xml:namespace-manager>
+        <mule-xml:namespace prefix="test" uri="http://foo"/>
+    </mule-xml:namespace-manager>
+    
+    <model name="Test">
+    
+        <service name="proxy">
+            <inbound>
+                <inbound-endpoint address="vm://in" synchronous="true"/>
+            </inbound>
+            <outbound>
+                <sxc:filtering-router>
+                    <outbound-endpoint address="vm://log" synchronous="true"/>
+                    <sxc:filter pattern="//purchaseOrder[@country]"/>
+                </sxc:filtering-router>
+            <!-- 
+                 <filtering-router>
+                     <outbound-endpoint address="vm://log"/>
+                     <mule-xml:jxpath-filter pattern="//purchaseOrder/@country" expectedValue="US"/>
+                 </filtering-router>
+                 <filtering-router>
+                     <outbound-endpoint address="vm://log"/>
+                     <mule-xml:jaxen-filter pattern="//purchaseOrder/@country" expectedValue="US"/>
+                 </filtering-router>
+                 -->
+            </outbound>
+        </service>
+        
+        <service name="andProxy">
+            <inbound>
+                <inbound-endpoint address="vm://and-filter" synchronous="true"/>
+            </inbound>
+            <outbound>
+                <sxc:filtering-router>
+                    <outbound-endpoint address="vm://log" synchronous="true"/>
+                    <and-filter>
+                        <sxc:filter pattern="//purchaseOrder[@country]"/>
+                        <sxc:filter pattern="//purchaseOrder[@orderDate]"/>
+                    </and-filter>
+                </sxc:filtering-router>
+            </outbound>
+        </service>
+    
+        <service name="orProxy">
+            <inbound>
+                <inbound-endpoint address="vm://or-filter" synchronous="true"/>
+            </inbound>
+            <outbound>
+                <sxc:filtering-router>
+                    <outbound-endpoint address="vm://log" synchronous="true"/>
+                    <or-filter>
+                        <sxc:filter pattern="//purchaseOrder[@country]"/>
+                        <sxc:filter pattern="//purchaseOrder[@orderDate]"/>
+                    </or-filter>
+                </sxc:filtering-router>
+            </outbound>
+        </service>
+    
+        <service name="notProxy">
+            <inbound>
+                <inbound-endpoint address="vm://not-filter" synchronous="true"/>
+            </inbound>
+            <outbound>
+                <sxc:filtering-router>
+                    <outbound-endpoint address="vm://log" synchronous="true"/>
+                    <and-filter>
+                        <sxc:filter pattern="//purchaseOrder[@country]"/>
+                        <not-filter>
+                            <sxc:filter pattern="//purchaseOrder[@foo]"/>
+                        </not-filter>
+                    </and-filter>
+                </sxc:filtering-router>
+            </outbound>
+        </service>
+    
+        <service name="log">
+            <inbound>
+                <inbound-endpoint address="vm://log" synchronous="true"/>
+            </inbound>
+            <component class="org.mule.module.sxc.ReceiveComponent"/>
+        </service>
+
+    </model>
+
+</mule>
+        
