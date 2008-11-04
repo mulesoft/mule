@@ -15,6 +15,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.GenericLifecycleManager;
@@ -26,6 +27,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -130,6 +132,13 @@ public class SpringRegistry extends AbstractRegistry
             //    MapUtils.debugPrint(System.out, "Beans of type " + type, map);
             //}
             return map.values();
+        }
+        catch (BeanCreationException bcex)
+        {
+            // BCE is a result of a broken config, propagate it (see MULE-3297 for more details)
+            throw new MuleRuntimeException(
+                    MessageFactory.createStaticMessage(String.format("Failed to lookup beans of type %s from the Spring registry", type)),
+                    bcex);
         }
         catch (Exception e)
         {
