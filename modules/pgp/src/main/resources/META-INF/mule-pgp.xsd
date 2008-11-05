@@ -11,8 +11,12 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.2/mule.xsd" />
 
     <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager"/>
-
     <xsd:complexType name="securityManagerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Security manager for PGP related functionality.
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:abstractSecurityManagerType">
                 <xsd:sequence>
@@ -23,15 +27,13 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <!-- pgp provider -->
     <xsd:element name="security-provider" type="pgpSecurityProviderType">
         <xsd:annotation>
             <xsd:documentation>
-                A security manager for PGP related functionality.
+                Security provider for PGP related functionality.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
     <xsd:complexType name="pgpSecurityProviderType">
         <xsd:complexContent>
             <xsd:extension base="mule:securityProviderType">
@@ -40,15 +42,13 @@
         </xsd:complexContent>
     </xsd:complexType>
     
-    <!-- key based encryption strategy -->
     <xsd:element name="keybased-encryption-strategy" type="keyBasedEncryptionStrategyType">
         <xsd:annotation>
             <xsd:documentation>
-                TODO
+                PGP encryption 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
     <xsd:complexType name="keyBasedEncryptionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="mule:encryptionStrategyType">
@@ -61,11 +61,10 @@
     <xsd:element name="security-filter" type="pgpSecurityFilterType" substitutionGroup="mule:abstract-security-filter">
         <xsd:annotation>
             <xsd:documentation>
-                TODO
+                Filters messages based on PGP encryption.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
     <xsd:complexType name="pgpSecurityFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractSecurityFilterType">
@@ -76,5 +75,4 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
 </xsd:schema>
