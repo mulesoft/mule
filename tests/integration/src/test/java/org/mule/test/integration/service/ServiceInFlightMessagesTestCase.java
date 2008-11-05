@@ -53,7 +53,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
             service.dispatchEvent(getTestEvent("test", service, getTestInboundEndpoint("test://test")));
         }
 
-        //Thread.sleep(100);
+        Thread.sleep(100);
 
         // Stop rather than dispose so we still have access to the connector for this
         // test.
@@ -91,7 +91,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         // Let mule finnish up with the rest of the messages until seda queue is
         // // empty
         muleContext.start();
-        //Thread.sleep(3000);
+        Thread.sleep(1000);
         muleContext.stop();
 
         assertQueues(numMessage, "TestPersistentQueueService");
@@ -127,7 +127,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertQueues(numMessage, "PausedTestPersistentQueueService");
 
         service.resume();
-        //Thread.sleep(100);
+        Thread.sleep(100);
 
         // Paused service processes messages when resumed.
         assertTrue(getTestQueueSession().getQueue("out").size() > 0);
@@ -136,7 +136,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         // Let mule finnish up with the rest of the messages until seda queue is
         // // empty
         muleContext.start();
-        //Thread.sleep(3000);
+        Thread.sleep(1000);
         muleContext.stop();
 
         assertQueues(numMessage, "PausedTestPersistentQueueService");
@@ -175,7 +175,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         // Let mule finnish up with the rest of the messages until seda queue is
         // empty
         muleContext.start();
-        //Thread.sleep(3000);
+        Thread.sleep(1000);
         muleContext.stop();
         assertQueues(numMessage, "TestPersistentQueueService");
     }
