@@ -136,7 +136,7 @@
         <slf4jVersion>1.5.0</slf4jVersion>     
         <smackVersion>2.2.1</smackVersion>
         <springOsgiVersion>1.0.2</springOsgiVersion>
-        <springVersion>2.5.5</springVersion>
+        <springVersion>2.5.6</springVersion>
         <springModulesVersion>0.9</springModulesVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <sxcVersion>0.7.2</sxcVersion>
