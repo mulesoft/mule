@@ -17,7 +17,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
@@ -151,7 +150,10 @@ public class AxisServiceComponent implements Initialisable, Callable
             // request parameters appended
             // Using the soap prefix ensures that we use a soap endpoint builder
             EndpointURI endpointUri = context.getEndpointURI();
-            if (!"servlet".equalsIgnoreCase(context.getEndpointURI().getSchemeMetaInfo()))
+            //We need to re-parse the URI here because we are only give the listening endpoint, not the actual
+            //request endpoint. The request endpoint needs to have the query parameters from the client
+            //There is no need to do this for Servlet because it does things differently
+            if (!"true".equalsIgnoreCase(context.getEndpointURI().getParams().getProperty("servlet.endpoint")))
             {
                 String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().getScheme()
                                 + "://" + context.getEndpointURI().getHost() + ":"
@@ -219,6 +221,117 @@ public class AxisServiceComponent implements Initialisable, Callable
         catch (Exception e)
         {
             reportTroubleInGet(e, response);
+        }
+    }
+
+    protected void doPost(MuleEventContext context, WriterMessageAdapter response)
+        throws Exception
+    {
+        String soapAction;
+        Message responseMsg;
+        AxisEngine engine = getAxis();
+        if (engine == null)
+        {
+
+            throw new MessagingException(CoreMessages.objectIsNull("Axis Engine"), context.getMessage());
+        }
+        MessageContext msgContext = new MessageContext(engine);
+
+        String contentType;
+        try
+        {
+            //EndpointURI endpointUri = getEndpoint(context);
+            EndpointURI endpointUri = context.getEndpointURI();
+            populateMessageContext(msgContext, context, endpointUri);
+            if (securityProvider != null)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("securityProvider:" + securityProvider);
+                }
+                msgContext.setProperty("securityProvider", securityProvider);
+            }
+
+            Object request = context.transformMessage();
+            if (request instanceof File)
+            {
+                request = new FileInputStream((File)request);
+            }
+            else if (request instanceof byte[])
+            {
+                request = new ByteArrayInputStream((byte[])request);
+            }
+
+            Message requestMsg = new Message(request, false, context.getMessage().getStringProperty(
+                HTTPConstants.HEADER_CONTENT_TYPE, null), context.getMessage().getStringProperty(
+                HTTPConstants.HEADER_CONTENT_LOCATION, null));
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Request Message:" + requestMsg);
+            }
+            msgContext.setRequestMessage(requestMsg);
+            msgContext.setProperty("transport.url", endpointUri.toString());
+
+            soapAction = getSoapAction(context);
+            if (soapAction != null)
+            {
+                msgContext.setUseSOAPAction(true);
+                msgContext.setSOAPActionURI(soapAction);
+            }
+            msgContext.setSession(new AxisMuleSession(context.getSession()));
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Invoking Axis Engine.");
+            }
+            AxisServiceProxy.setProperties(RequestContext.getEvent().getEndpoint().getProperties());
+            engine.invoke(msgContext);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Return from Axis Engine.");
+            }
+            if (RequestContext.getExceptionPayload() instanceof Exception)
+            {
+                throw (Exception)RequestContext.getExceptionPayload().getException();
+            }
+            // remove temporary file used for soap message with attachment
+            if (request instanceof File)
+            {
+                ((File)request).delete();
+            }
+            responseMsg = msgContext.getResponseMessage();
+            if (responseMsg == null)
+            {
+                throw new Exception(Messages.getMessage("noResponse01"));
+            }
+        }
+        catch (AxisFault fault)
+        {
+            logger.error(fault.toString() + " target service is: " + msgContext.getTargetService()
+                            + ". MuleEvent is: " + context.toString(), fault);
+            processAxisFault(fault);
+            configureResponseFromAxisFault(response, fault);
+            responseMsg = msgContext.getResponseMessage();
+            if (responseMsg == null)
+            {
+                responseMsg = new Message(fault);
+            }
+        }
+        catch (Exception e)
+        {
+            responseMsg = msgContext.getResponseMessage();
+            response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "500");
+            responseMsg = convertExceptionToAxisFault(e, responseMsg);
+        }
+
+        contentType = responseMsg.getContentType(msgContext.getSOAPConstants());
+
+        sendResponse(contentType, response, responseMsg);
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Response sent.");
         }
     }
 
@@ -516,133 +629,6 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.write("<p>" + Messages.getMessage("noService06") + "</p>");
     }
 
-    protected void doPost(MuleEventContext context, WriterMessageAdapter response)
-        throws Exception
-    {
-        String soapAction;
-        Message responseMsg;
-        AxisEngine engine = getAxis();
-        if (engine == null)
-        {
-
-            throw new MessagingException(CoreMessages.objectIsNull("Axis Engine"), context.getMessage());
-        }
-        MessageContext msgContext = new MessageContext(engine);
-
-        String contentType;
-        try
-        {
-            EndpointURI endpointUri = getEndpoint(context);
-            populateMessageContext(msgContext, context, endpointUri);
-            if (securityProvider != null)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("securityProvider:" + securityProvider);
-                }
-                msgContext.setProperty("securityProvider", securityProvider);
-            }
-
-            Object request = context.transformMessage();
-            if (request instanceof File)
-            {
-                request = new FileInputStream((File)request);
-            }
-            else if (request instanceof byte[])
-            {
-                request = new ByteArrayInputStream((byte[])request);
-            }
-
-            Message requestMsg = new Message(request, false, context.getMessage().getStringProperty(
-                HTTPConstants.HEADER_CONTENT_TYPE, null), context.getMessage().getStringProperty(
-                HTTPConstants.HEADER_CONTENT_LOCATION, null));
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Request Message:" + requestMsg);
-            }
-            msgContext.setRequestMessage(requestMsg);
-            msgContext.setProperty("transport.url", endpointUri.toString());
-
-            soapAction = getSoapAction(context);
-            if (soapAction != null)
-            {
-                msgContext.setUseSOAPAction(true);
-                msgContext.setSOAPActionURI(soapAction);
-            }
-            msgContext.setSession(new AxisMuleSession(context.getSession()));
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Invoking Axis Engine.");
-            }
-            AxisServiceProxy.setProperties(RequestContext.getEvent().getEndpoint().getProperties());
-            engine.invoke(msgContext);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Return from Axis Engine.");
-            }
-            if (RequestContext.getExceptionPayload() instanceof Exception)
-            {
-                throw (Exception)RequestContext.getExceptionPayload().getException();
-            }
-            // remove temporary file used for soap message with attachment
-            if (request instanceof File)
-            {
-                ((File)request).delete();
-            }
-            responseMsg = msgContext.getResponseMessage();
-            if (responseMsg == null)
-            {
-                throw new Exception(Messages.getMessage("noResponse01"));
-            }
-        }
-        catch (AxisFault fault)
-        {
-            logger.error(fault.toString() + " target service is: " + msgContext.getTargetService()
-                            + ". MuleEvent is: " + context.toString(), fault);
-            processAxisFault(fault);
-            configureResponseFromAxisFault(response, fault);
-            responseMsg = msgContext.getResponseMessage();
-            if (responseMsg == null)
-            {
-                responseMsg = new Message(fault);
-            }
-        }
-        catch (Exception e)
-        {
-            responseMsg = msgContext.getResponseMessage();
-            response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "500");
-            responseMsg = convertExceptionToAxisFault(e, responseMsg);
-        }
-
-        contentType = responseMsg.getContentType(msgContext.getSOAPConstants());
-
-        sendResponse(contentType, response, responseMsg);
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Response sent.");
-        }
-    }
-
-    private EndpointURI getEndpoint(MuleEventContext context) throws EndpointException
-    {
-        String endpoint = context.getEndpointURI().getAddress();
-        String request = context.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, null);
-        if (request != null)
-        {
-            int i = endpoint.indexOf("/", endpoint.indexOf("://") + 3);
-            if (i > -1)
-            {
-                endpoint = endpoint.substring(0, i);
-            }
-            endpoint += request;
-            return new MuleEndpointURI(endpoint);
-        }
-        return context.getEndpointURI();
-    }
-
     private void configureResponseFromAxisFault(WriterMessageAdapter response, AxisFault fault)
     {
         int status = getHttpResponseStatus(fault);
@@ -739,7 +725,9 @@ public class AxisServiceComponent implements Initialisable, Callable
                         throw new AxisFault("Failed to find service: " + "/" + endpointUri.getAddress());
                     }
                 }
-                else if (!endpointUri.getPath().startsWith(servicePath + serviceName))
+                //We use ends with rather than starts with because if a servlet binding is used we do not have the full
+                //path info when the service is registered.  Track MULE-3931 for more info.
+                else if (!endpointUri.getPath().endsWith(servicePath + serviceName))
                 {
                     throw new AxisFault("Failed to find service: " + endpointUri.getPath());
                 }

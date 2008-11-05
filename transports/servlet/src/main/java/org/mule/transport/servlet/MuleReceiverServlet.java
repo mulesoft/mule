@@ -15,6 +15,7 @@ import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointException;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.MessageReceiver;
@@ -329,11 +330,14 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
         
         // Tell the dynamic endpoint about our new URL
-        ((DynamicURIInboundEndpoint) endpoint).setEndpointURI(new MuleEndpointURI(getRequestUrl(httpServletRequest)));
+        //Note we don't use the servlet: prefix since we need to be dealing with the raw endpoint here
+        EndpointURI epURI = new MuleEndpointURI(getRequestUrl(httpServletRequest));
         
         try
         {
-            receiver.getEndpointURI().initialise();
+            epURI.initialise();
+            epURI.getParams().setProperty("servlet.endpoint", "true");
+            ((DynamicURIInboundEndpoint) endpoint).setEndpointURI(epURI);
         }
         catch (InitialisationException e)
         {
@@ -345,15 +349,14 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     protected String getRequestUrl(HttpServletRequest httpServletRequest)
     {
         StringBuffer url = new StringBuffer();
-        url.append(connector.getProtocol().toLowerCase());
-        url.append(":");
+
         url.append(httpServletRequest.getScheme());
         url.append("://");
         url.append(httpServletRequest.getServerName());
         url.append(":");
         url.append(httpServletRequest.getServerPort());
-        url.append("/");
-        url.append(getReceiverName(httpServletRequest));
+        url.append(httpServletRequest.getServletPath());
+        url.append(httpServletRequest.getPathInfo());
         if (httpServletRequest.getQueryString() != null)
         {
             url.append("?");

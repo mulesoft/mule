@@ -4,7 +4,9 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:servlet="http://www.mulesource.org/schema/mule/servlet/2.2"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.2"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
     xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
        http://www.mulesource.org/schema/mule/servlet/2.2 http://www.mulesource.org/schema/mule/servlet/2.2/mule-servlet.xsd
@@ -15,9 +17,9 @@
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <axis:inbound-endpoint address="servlet://mycomponent"/>
+                <axis:inbound-endpoint address="servlet://mycomponent" synchronous="true"/>
             </inbound>
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <test:web-service-component/>
         </service>
     </model>
 

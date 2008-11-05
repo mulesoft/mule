@@ -48,6 +48,11 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
     protected abstract String getWsdlEndpoint();
 
+    protected Map getMessageProperties(Map props)
+    {
+        return props;
+    }
+
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient();
@@ -57,7 +62,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         for (int i = 0; i < number; i++)
         {
             props.put("X-Message-Number", String.valueOf(i));
-            MuleMessage msg = client.send(getRequestResponseEndpoint(), "Message " + i, props);
+            MuleMessage msg = client.send(getRequestResponseEndpoint(), "Message " + i, getMessageProperties(props));
             assertNotNull(msg);
             results.add(msg.getPayload());
         }
@@ -98,7 +103,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         MuleMessage result = client.send(getSendReceiveComplexEndpoint1(), new Person("Dino", "Flintstone"),
-            null);
+            getMessageProperties(new HashMap()));
         assertEquals(NullPayload.getInstance(), result.getPayload());
 
         result = client.request(getSendReceiveComplexEndpoint2(), 0);
@@ -122,7 +127,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        client.dispatch(getDispatchAsyncComplexEndpoint1(), new Person("Betty", "Rubble"), null);
+        client.dispatch(getDispatchAsyncComplexEndpoint1(), new Person("Betty", "Rubble"), getMessageProperties(new HashMap()));
         Thread.sleep(4500);
 
         // lets get our newly added person
@@ -139,7 +144,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         try
         {
-            client.send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), null);
+            client.send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), getMessageProperties(new HashMap()));
             fail("A nested Fault should have been raised");
         }
         catch (MuleException e)
@@ -169,6 +174,12 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         {
             location = location.substring(0, location.length() - 1);
         }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(result.getPayloadAsString());
+        }
+        System.out.println(result.getPayloadAsString());
         if (result.getPayloadAsString().indexOf("location=\"" + location) == -1)
         {
             assertTrue(result.getPayloadAsString().indexOf("location='" + location) > -1);
@@ -179,11 +190,6 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         }
 
         assertTrue(result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "").startsWith("text/xml"));
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug(result.getPayloadAsString());
-        }
     }
 
 }

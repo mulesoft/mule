@@ -6,9 +6,6 @@
 # MULE-3674
 org.mule.transport.soap.axis.VmToAxisProxyTestCase
 
-# MULE-2607
-org.mule.transport.soap.axis.AxisServletBindingTestCase
-
 # MULE-2164
 org.mule.transport.soap.axis.AxisEndpointMule2164TestCase
 
