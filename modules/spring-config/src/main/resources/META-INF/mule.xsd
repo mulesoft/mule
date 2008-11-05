@@ -4505,7 +4505,14 @@
                 </xsd:sequence>
                 <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
                 <xsd:attribute name="numberOfConcurrentTransactedReceivers" type="substitutableInt"/>
-                <xsd:attribute name="dynamicNotification" type="substitutableBoolean"/>
+                <xsd:attribute name="dynamicNotification" type="substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows notification listeners to be registered dynamically in runtime using the MuleContext.  This has a 
+                            minimal performance overhead.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
