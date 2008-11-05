@@ -1,0 +1,26 @@
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:spring="http://www.springframework.org/schema/beans"
+  xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+  xmlns:cxf-core="http://cxf.apache.org/core"
+  xmlns:wsa="http://cxf.apache.org/ws/addressing"
+  xsi:schemaLocation="
+       http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+       http://cxf.apache.org/ws/addressing http://cxf.apache.org/schemas/ws-addr-conf.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd">
+
+  <model name="TestCxfModel">
+    <service name="echoService">
+      <inbound>
+          <cxf:inbound-endpoint address="http://localhost:63081/services/employee" mtomEnabled="false">
+            <cxf:features>
+              <wsa:addressing />
+            </cxf:features>
+          </cxf:inbound-endpoint>
+      </inbound>
+      <component class="org.mule.transport.cxf.employee.EmployeeDirectoryImpl"/>
+    </service>
+  </model>
+</mule>

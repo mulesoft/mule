@@ -247,7 +247,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
                     Message outMessage = m.getExchange().getOutMessage();
                     
                     Message contentMsg = null;
-                    if (outFaultMessage != null) 
+                    if (outFaultMessage != null && outFaultMessage.getContent(OutputStream.class) != null) 
                     {
                         contentMsg = outFaultMessage;
                     } 
