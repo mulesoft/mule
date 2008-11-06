@@ -149,15 +149,15 @@ public class TimedSocketTestCase extends AbstractMuleTestCase
         }
         catch (MalformedURLException mue)
         {
-            fail("Invalid URL");
+            fail("Invalid URL: " + mue);
         }
         catch (SocketException se)
         {
-            fail("Socket exception");
+            fail("Socket exception: " + se);
         }
         catch (IOException ioe)
         {
-            fail("Network I/O error - " + ioe);
+            fail("Network I/O error: " + ioe);
         }
         finally
         {
@@ -170,7 +170,7 @@ public class TimedSocketTestCase extends AbstractMuleTestCase
             }
             catch (Exception ignore)
             {
-                fail("Error closing connection");
+                fail("Error closing connection: " + ignore);
             }
         }
     }
