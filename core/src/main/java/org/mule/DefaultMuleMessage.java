@@ -116,20 +116,16 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         setEncoding(previous.getEncoding());
         if (previous.getAttachmentNames().size() > 0)
         {
-            Set attNames = adapter.getAttachmentNames();
-            synchronized (attNames)
+            Set<String> attNames = adapter.getAttachmentNames();
+            for (String s : attNames)
             {
-                for (Object attName : attNames)
+                try
                 {
-                    String s = (String) attName;
-                    try
-                    {
-                        addAttachment(s, adapter.getAttachment(s));
-                    }
-                    catch (Exception e)
-                    {
-                        throw new MuleRuntimeException(CoreMessages.failedToReadAttachment(s), e);
-                    }
+                    addAttachment(s, adapter.getAttachment(s));
+                }
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(CoreMessages.failedToReadAttachment(s), e);
                 }
             }
         }
