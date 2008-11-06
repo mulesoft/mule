@@ -18,6 +18,23 @@
 
     <model name="TestModel">
 
+        <service name="TestService">
+            <test:component waitTime="30"/>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint ref="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="PausedTestService" initialState="paused">
+            <test:component waitTime="30"/>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint ref="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
 
         <service name="TestPersistentQueueService">
             <test:component waitTime="30"/>
@@ -29,7 +46,15 @@
             <queue-profile persistent="true"/>
         </service>
 
-
+        <service name="PausedTestPersistentQueueService" initialState="paused">
+            <test:component waitTime="30"/>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint ref="out" />
+                </pass-through-router>
+            </outbound>
+            <queue-profile persistent="true"/>
+        </service>
 
     </model>
 
