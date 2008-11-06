@@ -13,6 +13,7 @@ package org.mule.transport.jms;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.util.MapUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
 
 import javax.jms.Destination;
 import javax.jms.Queue;
@@ -79,8 +80,10 @@ public class DefaultJmsTopicResolver implements JmsTopicResolver
     /** {@inheritDoc} */
     public boolean isTopic (ImmutableEndpoint endpoint, boolean fallbackToEndpointProperties)
     {
-        final String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-        boolean topic = JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo);
+        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
+
+        boolean topic = JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo) ||
+                endpoint.getEndpointURI().toString().contains(JmsConstants.TOPIC_PROPERTY + ":");
         if (!topic && fallbackToEndpointProperties)
         {
             topic = MapUtils.getBooleanValue(endpoint.getProperties(), JmsConstants.TOPIC_PROPERTY, false);

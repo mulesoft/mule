@@ -22,5 +22,9 @@
     <endpoint name="ep5" address="jms://context.aTopic.Properties">
         <property key="topic" value="true"/>
     </endpoint>
+    <endpoint name="ep6" address="jms://topic:/context/TopicWithLeadingSlash"/>
+    <endpoint name="ep7" address="jms://topic:context/TopicWithSlashes"/>
+    <endpoint name="ep8" address="jms://queue/testQueue"/>
+
 
 </mule>

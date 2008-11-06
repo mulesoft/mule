@@ -144,6 +144,30 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
         assertTrue(resolver.isTopic(endpoint));
     }
 
+    public void testEndpointTopicWithLeadingSlash() throws Exception
+    {
+        ImmutableEndpoint endpoint = muleContext.getRegistry()
+                .lookupEndpointFactory()
+                .getInboundEndpoint("ep6");
+        assertTrue(resolver.isTopic(endpoint));
+    }
+
+    public void testEndpointTopicWithSlashes() throws Exception
+    {
+        ImmutableEndpoint endpoint = muleContext.getRegistry()
+                .lookupEndpointFactory()
+                .getInboundEndpoint("ep7");
+        assertTrue(resolver.isTopic(endpoint));
+    }
+
+    public void testEndpointQueueWithSlashes() throws Exception
+    {
+        ImmutableEndpoint endpoint = muleContext.getRegistry()
+                .lookupEndpointFactory()
+                .getInboundEndpoint("ep8");
+        assertFalse(resolver.isTopic(endpoint));
+    }
+
 
     public void testDestinationNotTopic() throws Exception
     {
