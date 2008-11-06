@@ -118,7 +118,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /**
      * This object guards all access to the jndiContext
      */
-    private Object jndiLock = new Object();
+    private final Object jndiLock = new Object();
 
     private String jndiProviderUrl;
 
@@ -546,10 +546,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             logger.debug(MessageFormat.format(
                     "Retrieving new jms session from connection: " +
                             "topic={0}, transacted={1}, ack mode={2}, nolocal={3}",
-                    new Object[]{Boolean.valueOf(topic),
-                                 Boolean.valueOf(transacted),
-                                 new Integer(acknowledgementMode),
-                                 Boolean.valueOf(noLocal)}));
+                            topic, transacted, acknowledgementMode, noLocal));
         }
 
         session = jmsSupport.createSession(connection, topic, transacted, acknowledgementMode, noLocal);
@@ -768,7 +765,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                 }
                 logger.info(MessageFormat.format(
                         "Faled to delete a temporary queue '{0}' Reason: {1}",
-                        new Object[]{queueName, e.getMessage()}));
+                        queueName, e.getMessage()));
             }
         }
     }
