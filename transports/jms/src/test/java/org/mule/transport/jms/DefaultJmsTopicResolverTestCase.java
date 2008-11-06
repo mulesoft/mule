@@ -12,8 +12,6 @@ package org.mule.transport.jms;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.jms.DefaultJmsTopicResolver;
-import org.mule.transport.jms.JmsConnector;
 
 import com.mockobjects.dynamic.Mock;
 
