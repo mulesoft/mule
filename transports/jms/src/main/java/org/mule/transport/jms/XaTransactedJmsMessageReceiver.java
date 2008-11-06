@@ -28,8 +28,8 @@ import org.mule.transport.jms.filters.JmsSelectorFilter;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -168,9 +168,9 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                     List messages = getMessages();
                     if (messages != null && messages.size() > 0)
                     {
-                        for (Iterator it = messages.iterator(); it.hasNext();)
+                        for (Object message : messages)
                         {
-                            processMessage(it.next());
+                            processMessage(message);
                         }
                     }
                     return null;
@@ -259,7 +259,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         }
 
         MessageAdapter adapter = connector.getMessageAdapter(message);
-        routeMessage(new DefaultMuleMessage(adapter));
+        routeMessage(new DefaultMuleMessage(adapter, (Map) null));
         return null;
     }
 
@@ -362,7 +362,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             boolean durable = connector.isDurable();
             if (tempDurable != null)
             {
-                durable = Boolean.valueOf(tempDurable).booleanValue();
+                durable = Boolean.valueOf(tempDurable);
             }
 
             // Get the durable subscriber name if there is one

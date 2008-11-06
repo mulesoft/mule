@@ -247,7 +247,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 boolean durable = jmsConnector.isDurable();
                 if (tempDurable != null)
                 {
-                    durable = Boolean.valueOf(tempDurable).booleanValue();
+                    durable = Boolean.valueOf(tempDurable);
                 }
 
                 // Get the durable subscriber name if there is one
