@@ -39,6 +39,15 @@
             <artifactId>plexus-interactivity-api</artifactId>
             <version>1.0-alpha-6</version>
         </dependency>
+        <!--
+            MULE-3813: include a dependency to the log4j version we use so the build
+            works well when building offline.
+        -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4jVersion}</version>
+        </dependency>
     </dependencies>
 
     <build>
