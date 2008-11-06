@@ -70,8 +70,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
 
             JmsSupport support = connector.getJmsSupport();
             session = connector.getSession(false, topic);
-            Destination dest = support.createDestination(session, endpoint.getEndpointURI().getAddress(),
-                topic);
+            Destination dest = support.createDestination(session, endpoint);
 
             // Extract jms selector
             String selector = null;

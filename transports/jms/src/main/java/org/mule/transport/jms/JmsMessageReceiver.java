@@ -225,11 +225,10 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
                 session = this.connector.getSession(endpoint);
             }
 
-            boolean topic = connector.getTopicResolver().isTopic(endpoint, true);
+            boolean topic = connector.getTopicResolver().isTopic(endpoint);
 
             // Create destination
-            Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(),
-                    topic);
+            Destination dest = jmsSupport.createDestination(session, endpoint);
 
             // Extract jms selector
             String selector = null;

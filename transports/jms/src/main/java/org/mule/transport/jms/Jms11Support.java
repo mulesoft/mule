@@ -10,6 +10,8 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
+
 import java.text.MessageFormat;
 
 import javax.jms.Connection;
@@ -118,6 +120,20 @@ public class Jms11Support implements JmsSupport
                     "A durable subscriber name was set but the destination was not a Topic");
             }
         }
+    }
+
+    public Destination createDestination(Session session, ImmutableEndpoint endpoint) throws JMSException
+    {
+        String address = endpoint.getEndpointURI().toString();
+        if (address.contains(JmsConstants.TOPIC_PROPERTY + ":"))
+        {
+            address = address.substring((connector.getProtocol() + "://" + JmsConstants.TOPIC_PROPERTY + ":").length()); 
+        }
+        else
+        {
+            address = endpoint.getEndpointURI().getAddress();
+        }
+        return createDestination(session, address, connector.getTopicResolver().isTopic(endpoint));
     }
 
     public Destination createDestination(Session session, String name, boolean topic) throws JMSException

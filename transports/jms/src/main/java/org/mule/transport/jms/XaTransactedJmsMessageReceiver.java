@@ -343,8 +343,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
 
             // Create destination
             final boolean topic = connector.getTopicResolver().isTopic(endpoint);
-            Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI()
-                .getAddress(), topic);
+            Destination dest = jmsSupport.createDestination(session, endpoint);
 
             // Extract jms selector
             String selector = null;

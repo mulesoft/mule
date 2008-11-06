@@ -130,8 +130,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             boolean topic = connector.getTopicResolver().isTopic(event.getEndpoint(), true);
 
-            Destination dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(),
-                    topic);
+            Destination dest = connector.getJmsSupport().createDestination(session, endpoint);
             producer = connector.getJmsSupport().createProducer(session, dest, topic);
 
             Object message = event.transformMessage();

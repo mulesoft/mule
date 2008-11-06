@@ -10,6 +10,8 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -52,6 +54,8 @@ public interface JmsSupport
         throws JMSException;
 
     Destination createDestination(Session session, String name, boolean topic) throws JMSException;
+
+    Destination createDestination(Session session, ImmutableEndpoint endpoint) throws JMSException;
 
     Destination createTemporaryDestination(Session session, boolean topic) throws JMSException;
 

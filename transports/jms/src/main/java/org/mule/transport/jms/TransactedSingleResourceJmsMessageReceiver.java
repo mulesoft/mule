@@ -99,11 +99,9 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             }
 
             // Create destination
-            boolean topic = connector.getTopicResolver().isTopic(endpoint, true);
+            boolean topic = connector.getTopicResolver().isTopic(endpoint);
 
-            Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(),
-                    topic);
-
+            Destination dest = jmsSupport.createDestination(session, endpoint);
             // Extract jms selector
             String selector = null;
             if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)

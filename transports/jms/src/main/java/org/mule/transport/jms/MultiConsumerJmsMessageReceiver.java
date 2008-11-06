@@ -38,7 +38,6 @@ import javax.resource.spi.work.WorkException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -217,7 +216,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 JmsSupport jmsSupport = jmsConnector.getJmsSupport();
                 boolean topic = jmsConnector.getTopicResolver().isTopic(endpoint, true);
-                
+
                 // Create session if none exists
                 if (session == null)
                 {
@@ -225,8 +224,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 }
 
                 // Create destination
-                Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(),
-                                                                topic);
+                Destination dest = jmsSupport.createDestination(session, endpoint);
 
                 // Extract jms selector
                 String selector = null;
