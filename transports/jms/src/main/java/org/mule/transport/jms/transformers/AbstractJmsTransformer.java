@@ -19,6 +19,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transport.ConnectException;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsConstants;
 import org.mule.transport.jms.JmsMessageUtils;
@@ -194,7 +195,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
         }
     }
 
-    protected Session getSession() throws TransformerException, JMSException
+    protected Session getSession() throws TransformerException, ConnectException, JMSException
     {
         if (endpoint != null)
         {

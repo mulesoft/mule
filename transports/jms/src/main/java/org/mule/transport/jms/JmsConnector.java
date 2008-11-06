@@ -26,6 +26,7 @@ import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.transaction.TransactionCoordination;
@@ -520,17 +521,17 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         return null;
     }
 
-    public Session getSession(ImmutableEndpoint endpoint) throws JMSException
+    public Session getSession(ImmutableEndpoint endpoint) throws ConnectException, JMSException
     {
         final boolean topic = getTopicResolver().isTopic(endpoint);
         return getSession(endpoint.getTransactionConfig().isTransacted(), topic);
     }
 
-    public Session getSession(boolean transacted, boolean topic) throws JMSException
+    public Session getSession(boolean transacted, boolean topic) throws ConnectException, JMSException
     {
         if (!isConnected())
         {
-            throw new JMSException("Not connected");
+            throw new ConnectException(MessageFactory.createStaticMessage("Not connected"), this);
         }
         Session session = getSessionFromTransaction();
         if (session != null)
