@@ -26,7 +26,6 @@ import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.transaction.TransactionCoordination;
@@ -531,7 +530,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         if (!isConnected())
         {
-            throw new ConnectException(MessageFactory.createStaticMessage("Not connected"), this);
+            throw new ConnectException(CoreMessages.notConnectedYet("JMS connector"), this);
         }
         Session session = getSessionFromTransaction();
         if (session != null)
