@@ -28,7 +28,6 @@ import org.mule.util.ClassUtils;
 import java.io.InputStream;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,10 +51,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
 
     private MessageAdapter adapter;
     private MessageAdapter originalAdapter = null;
-    private transient List appliedTransformerHashCodes = new CopyOnWriteArrayList();
+    private transient List<Integer> appliedTransformerHashCodes = new CopyOnWriteArrayList();
     private byte[] cache;
     
-    private static final List consumableClasses = new ArrayList(); 
+    private static final List<Class> consumableClasses = new ArrayList<Class>();
     
     static
     {
@@ -120,9 +119,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
             Set attNames = adapter.getAttachmentNames();
             synchronized (attNames)
             {
-                for (Iterator iterator = attNames.iterator(); iterator.hasNext();)
+                for (Object attName : attNames)
                 {
-                    String s = (String) iterator.next();
+                    String s = (String) attName;
                     try
                     {
                         addAttachment(s, adapter.getAttachment(s));
@@ -156,6 +155,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
      * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
      *                              payload
      */
+    // TODO this encoding param is never used?
     protected Object getPayload(Class outputType, String encoding) throws TransformerException
     {
         //Handle null by ignoring the request
@@ -181,7 +181,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         // List transformers = RegistryContext.getRegistry().lookupTransformers(inputCls, outputType);
 
         //The transformer to execute on this message
-        Transformer transformer = null;
+        Transformer transformer;
         transformer = MuleServer.getMuleContext().getRegistry().lookupTransformer(inputCls, outputType);
 
         //no transformers found
@@ -228,11 +228,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         {
             return false;
         }
-        
-        for (Iterator itr = consumableClasses.iterator(); itr.hasNext();) 
+
+        for (Class c : consumableClasses)
         {
-            Class c = (Class) itr.next();
-        
             if (c.isAssignableFrom(inputCls))
             {
                 return true;
@@ -563,10 +561,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
 
     public void applyTransformers(List transformers, Class outputType) throws TransformerException
     {
-        if (!transformers.isEmpty() && !appliedTransformerHashCodes.contains(new Integer(transformers.hashCode())))
+        if (!transformers.isEmpty() && !appliedTransformerHashCodes.contains(transformers.hashCode()))
         {
             applyAllTransformers(transformers);
-            appliedTransformerHashCodes.add(new Integer(transformers.hashCode()));
+            appliedTransformerHashCodes.add(transformers.hashCode());
         }
 
         if (null != outputType && !getPayload().getClass().isAssignableFrom(outputType))
@@ -580,10 +578,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         if (!transformers.isEmpty())
         {
 
-            Iterator iterator = transformers.iterator();
-            while (iterator.hasNext())
+            for (Object transformer1 : transformers)
             {
-                Transformer transformer = (Transformer) iterator.next();
+                Transformer transformer = (Transformer) transformer1;
 
                 if (getPayload() == null)
                 {
@@ -596,7 +593,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
                         if (logger.isDebugEnabled())
                         {
                             logger.debug("Transformer " + transformer +
-                                    " doesn't support the null payload, exiting from transformer chain.");
+                                         " doesn't support the null payload, exiting from transformer chain.");
                         }
                         break;
                     }
