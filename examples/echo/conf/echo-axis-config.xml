@@ -29,6 +29,7 @@
                 <axis:inbound-endpoint address="http://localhost:65081/services">
                     <soap:http-to-soap-request-transformer/>
                 </axis:inbound-endpoint>
+                <axis:inbound-endpoint address="http://localhost:65082/services"/>
                 <vm:inbound-endpoint path="echo" />
             </inbound>
             <echo-component/>
