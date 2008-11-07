@@ -98,14 +98,14 @@
                 <xsd:attribute name="keepSendSocketOpen" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If set, the socket is not closed after sending a message.
+                            If set, the socket is not closed after sending a message.  This attribute only applies when sending data over a socket (Client).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="keepAlive" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but unused for long periods and closes them if the connection becomes unavailable.
+                            Enables SO_KEEPALIVE behavior on open sockets. This automatically checks socket connections that are open but unused for long periods and closes them if the connection becomes unavailable.  This is a property on the socket itself and is used by a server socket to control whether connections to the server are kept alive before they are recycled.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

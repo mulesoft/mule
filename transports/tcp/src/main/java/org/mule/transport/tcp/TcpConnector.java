@@ -64,13 +64,26 @@ public class TcpConnector extends AbstractConnector
     private Boolean reuseAddress = Boolean.TRUE; // this could be null for Java default
     private int socketSoLinger = DEFAULT_SO_LINGER;
     private TcpProtocol tcpProtocol;
-    private boolean keepSendSocketOpen = false;
-    private boolean keepAlive = false;
     private AbstractTcpSocketFactory socketFactory;
     private SimpleServerSocketFactory serverSocketFactory;
     private GenericKeyedObjectPool socketsPool = new GenericKeyedObjectPool();
     private int keepAliveTimeout = 0;
     private ExpiryMonitor keepAliveMonitor;
+
+    /** 
+     * If set, the socket is not closed after sending a message.  This attribute 
+     * only applies when sending data over a socket (Client).
+     */
+    private boolean keepSendSocketOpen = false;
+
+    /**
+     * Enables SO_KEEPALIVE behavior on open sockets. This automatically checks 
+     * socket connections that are open but unused for long periods and closes 
+     * them if the connection becomes unavailable.  This is a property on the 
+     * socket itself and is used by a server socket to control whether 
+     * connections to the server are kept alive before they are recycled.
+     */
+    private boolean keepAlive = false;
 
     //TODO MULE-2300 remove once fixed
     private TcpSocketKey lastSocketKey;
