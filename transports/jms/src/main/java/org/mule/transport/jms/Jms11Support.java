@@ -127,7 +127,13 @@ public class Jms11Support implements JmsSupport
         String address = endpoint.getEndpointURI().toString();
         if (address.contains(JmsConstants.TOPIC_PROPERTY + ":"))
         {
-            address = address.substring((connector.getProtocol() + "://" + JmsConstants.TOPIC_PROPERTY + ":").length()); 
+            // cut prefixes
+            address = address.substring((connector.getProtocol() + "://" + JmsConstants.TOPIC_PROPERTY + ":").length());
+            // cut any endpoint uri params, if any
+            if (address.contains("?"))
+            {
+                address = address.substring(0, address.indexOf('?'));
+            }
         }
         else
         {
