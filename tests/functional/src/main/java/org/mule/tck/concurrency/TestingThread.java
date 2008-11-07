@@ -12,6 +12,8 @@ package org.mule.tck.concurrency;
 
 import org.mule.util.concurrent.Latch;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 /**
  * This class is very useful for test cases which need to make assertions 
  * concurrently in different threads.  Usage is as follows:
@@ -49,6 +51,8 @@ import org.mule.util.concurrent.Latch;
  */
 public abstract class TestingThread extends Thread implements Runnable
 {
+    public static final long AWAIT_TIMEOUT = 10000;
+    
     private final Latch done = new Latch();
     private volatile Throwable exception = null;        
 
@@ -81,7 +85,7 @@ public abstract class TestingThread extends Thread implements Runnable
      */
     public void await() throws InterruptedException
     {
-        done.await();
+        done.await(AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
     /**
