@@ -56,7 +56,7 @@ public abstract class AbstractWebappTestCase extends AbstractMuleTestCase
             {
                 String text = response.getPayloadAsString();
                 assertNotNull("Null response", text);
-                assertTrue("Stock quote should contain \"CISCO\": " + text, StringUtils.contains(text, "CISCO"));
+                assertTrue("Stock quote should contain \"CISCO\": " + text, StringUtils.containsIgnoreCase(text, "CISCO"));
                 assertTrue("Stock quote should start with \"StockQuote[\":" + text, text.startsWith("StockQuote["));
                 logger.debug("**********");
                 logger.debug(response.getPayload());
