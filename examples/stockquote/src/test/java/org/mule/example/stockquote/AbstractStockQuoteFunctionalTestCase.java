@@ -35,7 +35,7 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
             {
                 String text = response.getPayloadAsString();
                 assertNotNull("Null response", text);
-                assertTrue("Stock quote should contain \"CISCO\": " + text, StringUtils.contains(text, "CISCO"));
+                assertTrue("Stock quote should contain \"CISCO\": " + text, StringUtils.containsIgnoreCase(text, "CISCO"));
                 if (Locale.getDefault().getISO3Language().equalsIgnoreCase("eng"))
                 {
                     // the stockquote message is localized ...
