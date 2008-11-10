@@ -13,7 +13,6 @@ package org.mule.transport.jms;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.util.MapUtils;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.StringUtils;
 
 import javax.jms.Destination;
 import javax.jms.Queue;
