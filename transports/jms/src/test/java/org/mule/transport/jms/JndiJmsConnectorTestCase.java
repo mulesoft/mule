@@ -50,7 +50,7 @@ public class JndiJmsConnectorTestCase extends AbstractJmsFunctionalTestCase
     {
         MuleClient client = new MuleClient();
         
-        client.dispatch("jms://topic:in3?connector=jmsConnector2", DEFAULT_INPUT_MESSAGE, null);
+        client.dispatch("jms://topic:some/long/path/in3?connector=jmsConnector2", DEFAULT_INPUT_MESSAGE, null);
         
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
