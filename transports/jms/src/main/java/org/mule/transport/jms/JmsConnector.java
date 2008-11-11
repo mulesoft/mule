@@ -384,13 +384,13 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
         if (connection != null)
         {
+            if (clientId != null)
+            {
+                connection.setClientID(getClientId());
+            }
             connection.setExceptionListener(this);
         }
 
-        if (clientId != null)
-        {
-            connection.setClientID(getClientId());
-        }
 
         return connection;
     }
