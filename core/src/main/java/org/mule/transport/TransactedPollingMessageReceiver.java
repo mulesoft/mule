@@ -117,21 +117,13 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             {
                 public Object doInTransaction() throws Exception
                 {
-                    if (useStrictConnectDisconnect) connect();
-                    try
+                    List messages = getMessages();
+                    if (messages != null && messages.size() > 0)
                     {
-                        List messages = getMessages();
-                        if (messages != null && messages.size() > 0)
+                        for (Iterator it = messages.iterator(); it.hasNext();)
                         {
-                            for (Iterator it = messages.iterator(); it.hasNext();)
-                            {
-                                TransactedPollingMessageReceiver.this.processMessage(it.next());
-                            }
+                            TransactedPollingMessageReceiver.this.processMessage(it.next());
                         }
-                    }
-                    finally
-                    {
-                        if (useStrictConnectDisconnect) disconnect();
                     }
                     return null;
                 }
@@ -140,33 +132,25 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         }
         else
         {
-            if (useStrictConnectDisconnect) connect();
-            try
+            // Receive messages and launch a worker for each message
+            List messages = getMessages();
+            if (messages != null && messages.size() > 0)
             {
-                // Receive messages and launch a worker for each message
-                List messages = getMessages();
-                if (messages != null && messages.size() > 0)
+                final CountDownLatch countdown = new CountDownLatch(messages.size());
+                for (Iterator it = messages.iterator(); it.hasNext();)
                 {
-                    final CountDownLatch countdown = new CountDownLatch(messages.size());
-                    for (Iterator it = messages.iterator(); it.hasNext();)
+                    try
                     {
-                        try
-                        {
-                            this.getWorkManager().scheduleWork(
-                                    new MessageProcessorWorker(tt, countdown, it.next()));
-                        }
-                        catch (Exception e)
-                        {
-                            countdown.countDown();
-                            throw e;
-                        }
+                        this.getWorkManager().scheduleWork(
+                                new MessageProcessorWorker(tt, countdown, it.next()));
                     }
-                    countdown.await();
+                    catch (Exception e)
+                    {
+                        countdown.countDown();
+                        throw e;
+                    }
                 }
-            }
-            finally
-            {
-                if (useStrictConnectDisconnect) disconnect();
+                countdown.await();
             }
         }
     }

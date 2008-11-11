@@ -47,6 +47,7 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <code>TcpMessageReceiver</code> acts like a TCP server to receive socket
@@ -56,6 +57,8 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 {
     private ServerSocket serverSocket = null;
 
+    protected final AtomicBoolean disposing = new AtomicBoolean(false);
+    
     public TcpMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
             throws CreateException
     {

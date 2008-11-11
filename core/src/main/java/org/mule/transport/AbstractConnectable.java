@@ -41,30 +41,19 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
 
     protected ImmutableEndpoint endpoint;
     protected final AbstractConnector connector;
+    protected RetryPolicyTemplate retryTemplate;
 
-    protected final AtomicBoolean disposing = new AtomicBoolean(false);
+    protected final WaitableBoolean connected = new WaitableBoolean(false);
+    protected final WaitableBoolean started = new WaitableBoolean(false);
     protected final AtomicBoolean disposed = new AtomicBoolean(false);
 
-    protected RetryPolicyTemplate retryTemplate;
-    
-    protected final AtomicBoolean connecting = new AtomicBoolean(false);
-    protected final WaitableBoolean connected = new WaitableBoolean(false);
-
-    protected final WaitableBoolean stopped = new WaitableBoolean(true);
-
-    protected boolean asyncConnections = false;
-    
-    protected boolean startOnConnect = false;
-    
     /**
-     * For the new retry policies to work properly, the transport's connection/disconnection 
-     * to/from the underlying resource must occur in the doConnect()/doDisconnect() methods 
-     * and not in doSend()/doDispatch()/doRequest()/getMessages(). This flag (false by default) 
-     * indicates whether this particular Receiver/Dispatcher/Requester complies with this requirement.
-     * @see MULE-3754
+     * Indicates whether the receiver/dispatcher/requester should start upon connecting.  
+     * This is necessary to support asynchronous retry policies, otherwise the start() 
+     * method would block until connection is successful.
      */
-    protected boolean useStrictConnectDisconnect = false;
-    
+    protected boolean startOnConnect = false;
+
     public AbstractConnectable(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
@@ -297,7 +286,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             return;
         }
 
-        if (stopped.compareAndSet(true, false))
+        if (started.compareAndSet(false, true))
         {
             doStart();
         }
@@ -318,7 +307,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             logger.error(e.getMessage(), e);
         }
 
-        if (stopped.compareAndSet(false, true))
+        if (started.compareAndSet(true, false))
         {
             try
             {

@@ -38,11 +38,6 @@ public class ConnectorService implements ConnectorServiceMBean
         return connector.isDisposed();
     }
 
-    public boolean isDisposing()
-    {
-        return connector.isDisposing();
-    }
-
     public String getName()
     {
         return name;

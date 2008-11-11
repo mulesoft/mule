@@ -126,7 +126,6 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         super.dispose();
         try
         {
-            disposing.set(true);
             doDispose();
         }
         finally

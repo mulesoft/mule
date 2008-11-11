@@ -22,8 +22,6 @@ public interface ConnectorServiceMBean extends Initialisable
 
     boolean isDisposed();
 
-    boolean isDisposing();
-
     String getName();
 
     String getProtocol();

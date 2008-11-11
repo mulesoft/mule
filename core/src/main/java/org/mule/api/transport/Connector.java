@@ -63,19 +63,11 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
 
     boolean isConnected();
 
-    boolean isConnecting();
-    
     /**
      * @return false if the connector is alive and well or true if the connector is
      *         being destroyed
      */
     boolean isDisposed();
-
-    /**
-     * @return false if the connector is alive and well or true if the connector has
-     *         been told to dispose
-     */
-    boolean isDisposing();
 
     /**
      * Gets a {@link MessageAdapter} from the connector for the given message

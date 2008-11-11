@@ -42,7 +42,6 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
         super.dispose();
         try
         {
-            disposing.set(true);
             doDispose();
         }
         finally
@@ -69,14 +68,7 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
             // Make sure we are connected
             connect();
             MuleMessage result = null;
-            try
-            {
-                result = doRequest(timeout);
-            }
-            finally
-            {
-                if (useStrictConnectDisconnect) disconnect();
-            }
+            result = doRequest(timeout);
 
             if (result != null && connector.isEnableMessageEvents())
             {

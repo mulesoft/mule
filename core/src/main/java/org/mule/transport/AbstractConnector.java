@@ -91,6 +91,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -135,16 +136,6 @@ public abstract class AbstractConnector
     protected final Log logger = LogFactory.getLog(getClass());
 
     /**
-     * Specifies if the endpoint started
-     */
-    protected final AtomicBoolean started = new AtomicBoolean(false);
-
-    /**
-     * True once the endpoint has been initialsed
-     */
-    protected final AtomicBoolean initialised = new AtomicBoolean(false);
-
-    /**
      * The name that identifies the endpoint
      */
     protected volatile String name;
@@ -153,16 +144,6 @@ public abstract class AbstractConnector
      * The exception strategy used by this connector
      */
     protected volatile ExceptionListener exceptionListener;
-
-    /**
-     * Determines in the connector is alive and well
-     */
-    protected final AtomicBoolean disposed = new AtomicBoolean(false);
-
-    /**
-     * Determines in connector has been told to dispose
-     */
-    protected final AtomicBoolean disposing = new AtomicBoolean(false);
 
     /**
      * Factory used to create dispatchers for this connector
@@ -216,16 +197,6 @@ public abstract class AbstractConnector
 
     private RetryPolicyTemplate retryPolicyTemplate;
     
-    protected final WaitableBoolean connected = new WaitableBoolean(false);
-
-    protected final WaitableBoolean connecting = new WaitableBoolean(false);
-
-    /**
-     * If the connect method was called via the start method, this will be set so
-     * that when the connector comes on line it will be started
-     */
-    protected final WaitableBoolean startOnConnect = new WaitableBoolean(false);
-
     /**
      * Optimise the handling of message notifications.  If dynamic is set to false then the
      * cached notification handler implements a shortcut for message notifications.
@@ -274,6 +245,19 @@ public abstract class AbstractConnector
 
     protected MuleContext muleContext;
 
+    protected final AtomicBoolean initialised = new AtomicBoolean(false);
+    protected final WaitableBoolean connected = new WaitableBoolean(false);
+    protected final AtomicBoolean started = new AtomicBoolean(false);
+    protected final AtomicBoolean disposed = new AtomicBoolean(false);
+
+    /**
+     * Indicates whether the connector should start upon connecting.  This is necessary 
+     * to support asynchronous retry policies, otherwise the start() method would block 
+     * until connection is successful.
+     */
+    protected boolean startOnConnect = false;
+
+    
     public AbstractConnector()
     {
         setDynamicNotification(false);
@@ -381,7 +365,7 @@ public abstract class AbstractConnector
 
         if (!this.isConnected())
         {
-            startOnConnect.set(true);
+            startOnConnect = true;
             
             // Make sure we are connected
             try
@@ -509,8 +493,6 @@ public abstract class AbstractConnector
      */
     public final synchronized void dispose()
     {
-        disposing.set(true);
-
         if (logger.isInfoEnabled())
         {
             logger.info("Disposing: " + this);
@@ -1288,12 +1270,6 @@ public abstract class AbstractConnector
         cachedNotificationHandler.fireNotification(notification);
     }
 
-    /** {@inheritDoc} */
-    public boolean isDisposing()
-    {
-        return disposing.get();
-    }
-
     public boolean isResponseEnabled()
     {
         return false;
@@ -1370,7 +1346,7 @@ public abstract class AbstractConnector
     {
         this.checkDisposed();
 
-        if (isConnected() || isConnecting())
+        if (isConnected())
         {
             return;
         }
@@ -1380,11 +1356,9 @@ public abstract class AbstractConnector
             {
                 public void doWork(RetryContext context) throws Exception
                 {
-                    setConnecting(true);
                     doConnect();
                     setConnected(true);
-                    setConnecting(false);
-                    if(startOnConnect.get())
+                    if (startOnConnect)
                     {
                         start();
                     }                
@@ -1401,7 +1375,7 @@ public abstract class AbstractConnector
 
     public void disconnect() throws Exception
     {
-        startOnConnect.set(this.isStarted());
+        startOnConnect = isStarted();
 
         this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
             ConnectionNotification.CONNECTION_DISCONNECTED));
@@ -1457,16 +1431,6 @@ public abstract class AbstractConnector
     public final void setConnected(boolean flag)
     {
         connected.set(flag);
-    }
-
-    public final boolean isConnecting()
-    {
-        return connecting.get();
-    }
-
-    protected final void setConnecting(boolean flag)
-    {
-        connecting.set(flag);
     }
 
     /**

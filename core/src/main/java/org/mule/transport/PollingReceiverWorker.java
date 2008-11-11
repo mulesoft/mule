@@ -37,7 +37,7 @@ public class PollingReceiverWorker implements Work
     // by the scheduler
     public void run()
     {
-        if (!receiver.stopped.get())
+        if (receiver.started.get())
         {
             running = true;
             try

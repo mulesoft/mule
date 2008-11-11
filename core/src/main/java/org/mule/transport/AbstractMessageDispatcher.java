@@ -55,7 +55,6 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         super.dispose();
         try
         {
-            disposing.set(true);
             doDispose();
         }
         finally
@@ -162,15 +161,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             doPreConnect(event);
             connect();
 
-            MuleMessage result = null;
-            try
-            {
-                result = doSend(event);
-            }
-            finally
-            {
-                if (useStrictConnectDisconnect) disconnect();
-            }
+            MuleMessage result = doSend(event);
 
             if (connector.isEnableMessageEvents())
             {
@@ -270,14 +261,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 // Make sure we are connected
                 doPreConnect(event);
                 connect();
-                try
-                {
-                    doDispatch(event);
-                }
-                finally
-                {
-                    if (useStrictConnectDisconnect) disconnect();
-                }
+                doDispatch(event);
 
                 if (connector.isEnableMessageEvents())
                 {
