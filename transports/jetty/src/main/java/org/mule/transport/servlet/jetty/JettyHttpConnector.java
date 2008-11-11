@@ -208,15 +208,7 @@ public class JettyHttpConnector extends AbstractConnector
         serverPorts.put(new Integer(uri.getPort()), null);
         receiverServlet.addReceiver(receiver);
 
-        try
-        {
-            cnn.start();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            throw e;
-        }
+        cnn.start();
     }
 
     protected org.mortbay.jetty.AbstractConnector createJettyConnector()

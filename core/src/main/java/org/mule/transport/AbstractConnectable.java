@@ -201,7 +201,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
                     {
                         if (logger.isDebugEnabled())
                         {
-                            e.printStackTrace();
+                            logger.debug(e);
                         }
                         throw e;
                     }

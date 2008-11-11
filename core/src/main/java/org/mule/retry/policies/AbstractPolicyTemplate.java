@@ -60,7 +60,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
                     cause = e;
                     if (logger.isDebugEnabled())
                     {
-                        cause.printStackTrace();
+                        logger.debug(cause);
                     }
                     if (notifier != null)
                     {

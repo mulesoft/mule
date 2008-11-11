@@ -50,7 +50,6 @@ public class SpringRemoteInvokerComponent implements Initialisable, Callable
             }
             catch (Throwable ex)
             {
-                ex.printStackTrace();
                 return new RemoteInvocationResult(ex);
             }
         }
