@@ -1375,43 +1375,28 @@ public abstract class AbstractConnector
             return;
         }
 
-        retryPolicyTemplate.execute(new RetryCallback()
-        {
-            public void doWork(RetryContext context) throws Exception
+        retryPolicyTemplate.execute(
+            new RetryCallback()
             {
-                setConnecting(true);
-                doConnect();
-                setConnected(true);
-                setConnecting(false);
-            }
-
-            public String getWorkDescription()
-            {
-                return getConnectionDescription();
-            }
-        }, muleContext.getWorkManager());
-
-        if(startOnConnect.get())
-        {
-            start();
-        }
-        
-        if (receivers != null)
-        {
-            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
-            {
-                MessageReceiver receiver = (MessageReceiver) iterator.next();
-                if (logger.isDebugEnabled())
+                public void doWork(RetryContext context) throws Exception
                 {
-                    logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                    setConnecting(true);
+                    doConnect();
+                    setConnected(true);
+                    setConnecting(false);
+                    if(startOnConnect.get())
+                    {
+                        start();
+                    }                
                 }
-                receiver.connect();
-                if(startOnConnect.get())
+    
+                public String getWorkDescription()
                 {
-                    receiver.start();
+                    return getConnectionDescription();
                 }
-            }
-        }
+            }, 
+            muleContext.getWorkManager()
+        );
     }
 
     public void disconnect() throws Exception

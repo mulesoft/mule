@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -193,35 +194,37 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             throw new IllegalStateException("Requester/dispatcher has been disposed; cannot connect to resource");
         }
 
-        retryTemplate.execute(new RetryCallback()
-        {
-            public void doWork(RetryContext context) throws Exception
+        retryTemplate.execute(
+            new RetryCallback()
             {
-                try
+                public void doWork(RetryContext context) throws Exception
                 {
-                    doConnect();
-                }
-                catch (Exception e)
-                {
-                    if (logger.isDebugEnabled())
+                    try
                     {
-                        e.printStackTrace();
+                        doConnect();
+                        connected.set(true);
+                        if (startOnConnect)
+                        {
+                            start();
+                        }
                     }
-                    throw e;
+                    catch (Exception e)
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            e.printStackTrace();
+                        }
+                        throw e;
+                    }
                 }
-                connected.set(true);
-            }
-
-            public String getWorkDescription()
-            {
-                return getConnectionDescription();
-            }
-        }, getWorkManager());
-        
-        if (startOnConnect)
-        {
-            start();
-        }
+    
+                public String getWorkDescription()
+                {
+                    return getConnectionDescription();
+                }
+            }, 
+            getWorkManager()
+        );
     }
 
     public final synchronized void disconnect() throws Exception
@@ -281,6 +284,16 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         if(!connected.get())
         {
             startOnConnect = true;
+
+            // Make sure we are connected
+            try
+            {
+                connect();
+            }
+            catch (Exception e)
+            {
+                throw new LifecycleException(e, this);
+            }
             return;
         }
 
