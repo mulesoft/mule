@@ -11,11 +11,6 @@ connector=org.mule.transport.${TransportNameLower}.${TransportName}Connector
 # your transport. This is always required.
 message.adapter=org.mule.transport.${TransportNameLower}.${TransportName}MessageAdapter
 
-#if( $Streaming == "y")
-# The message adapter to use if the inbound endpoint is marked for streaming
-streaming.message.adapter=org.mule.transport.${TransportNameLower}.${TransportName}StreamingMessageAdapter
-#end
-
 #if( $hasDispatcher == "y")
 # The factory used to create dispatchers responsible for sending events from the underlying technology
 dispatcher.factory=org.mule.transport.${TransportNameLower}.${TransportName}MessageDispatcherFactory
