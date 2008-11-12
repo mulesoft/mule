@@ -288,9 +288,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createRequesterFactory()
-     */
     public MessageRequesterFactory createRequesterFactory() throws TransportServiceException
     {
         if (requesterFactory != null)
@@ -308,7 +305,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         else
         {
-            //Its valid not to have a Dispatcher factory on the transport
+            //Its valid not to have a Requester factory on the transport
             return null;
         }
     }
