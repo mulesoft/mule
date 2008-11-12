@@ -25,6 +25,7 @@ public class TestCaseWatchdog extends Thread
     protected final long delay;
     protected final TimeUnit unit;
     protected final TestCaseWatchdogTimeoutHandler handler;
+    protected volatile boolean timedOut = false;
 
     public TestCaseWatchdog(long delay, TimeUnit unit, TestCaseWatchdogTimeoutHandler timeoutHandler)
     {
@@ -46,7 +47,11 @@ public class TestCaseWatchdog extends Thread
         try
         {
             Thread.sleep(millisToWait);
-            handler.handleTimeout(delay, unit);
+            timedOut = true;
+            if (handler != null)
+            {
+                handler.handleTimeout(delay, unit);
+            }
         }
         catch (InterruptedException interrupted)
         {
@@ -62,4 +67,8 @@ public class TestCaseWatchdog extends Thread
         this.interrupt();
     }
 
+    public boolean hasTimedOut()
+    {
+        return timedOut;
+    }
 }
