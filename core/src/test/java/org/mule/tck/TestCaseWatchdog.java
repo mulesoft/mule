@@ -67,7 +67,7 @@ public class TestCaseWatchdog extends Thread
         this.interrupt();
     }
 
-    public boolean hasTimedOut()
+    public boolean isTimedOut()
     {
         return timedOut;
     }
