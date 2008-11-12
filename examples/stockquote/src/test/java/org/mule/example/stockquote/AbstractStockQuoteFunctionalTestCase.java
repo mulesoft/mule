@@ -15,10 +15,74 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.StringUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Locale;
 
 public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTestCase
 {
+    public static final String TEST_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote?symbol=CSCO";
+
+    /**
+     * If a simple call to the web service indicates that it is not responding properly,
+     * we disable the test case so as to not report a test failure which has nothing to do
+     * with Mule.
+     * 
+     * @see EE-947
+     */
+    protected boolean isDisabledInThisEnvironment()
+    {
+        return !isWebServiceOnline();
+    }
+    
+    /**
+     * @return true if the web service is functioning correctly
+     */
+    protected boolean isWebServiceOnline()
+    {
+        logger.debug("Verifying that the web service is on-line...");
+        
+        BufferedReader input = null;
+        try 
+        {
+            input = new BufferedReader(new InputStreamReader(new URL(TEST_URL).openStream()));
+
+            String response = "";
+            String line;
+            while ((line = input.readLine()) != null) 
+            {
+                response += line;
+            }
+
+            if (response.contains("Cisco"))
+            {
+                return true;
+            }
+            else
+            {
+                logger.warn("Unexpected response, web service does not seem to be on-line: \n" + response);
+                return false;
+            }
+        } 
+        catch (Exception e) 
+        {
+            logger.warn("Exception occurred, web service does not seem to be on-line: " + e);
+            return false;
+        } 
+        finally
+        {
+            if (input != null)
+            {
+                try
+                {
+                    input.close();
+                }
+                catch (IOException ioe) {}
+            }
+        }
+    }
 
     public void testStockQuoteExample() throws Exception
     {
@@ -52,5 +116,4 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
             }
         }
     }
-
 }
