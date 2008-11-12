@@ -22,6 +22,7 @@
 [y] or [n]</description>
             <defvalue>y</defvalue>
         </variable>
+        
         <variable>
             <name>hasReceiver</name>
             <description>Can the transport receive inbound requests? [y] or [n]</description>
@@ -67,6 +68,12 @@ transformer? (i.e. ObjectToJmsMessage)
                     <defvalue>n</defvalue>
                 </variable>
             </variables>
+        </variable>
+
+        <variable>
+            <name>hasRequester</name>
+            <description>Can the transport request incoming messages programmatically? [y] or [n]</description>
+            <defvalue>y</defvalue>
         </variable>
 
         <variable>
@@ -190,14 +197,14 @@ transformer? (i.e. ObjectToJmsMessage)
             <output>
                 src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageRequester.java
             </output>
-            <dependsOnVar>hasReceiver=y</dependsOnVar>
+            <dependsOnVar>hasRequester=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/MessageRequesterFactory.vm</file>
             <output>
                 src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageRequesterFactory.java
             </output>
-            <dependsOnVar>hasReceiver=y</dependsOnVar>
+            <dependsOnVar>hasRequester=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/TransactedMessageReceiver.vm</file>
