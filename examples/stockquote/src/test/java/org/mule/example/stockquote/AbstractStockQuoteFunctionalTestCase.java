@@ -56,7 +56,7 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
                 response += line;
             }
 
-            if (response.contains("Cisco"))
+            if (StringUtils.containsIgnoreCase(response, "Cisco"))
             {
                 return true;
             }
