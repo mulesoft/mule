@@ -14,14 +14,26 @@
     <xsd:complexType name="securityManagerType">
         <xsd:annotation>
             <xsd:documentation>
-                Security manager for PGP related functionality.
+                Security manager for PGP-related functionality.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:abstractSecurityManagerType">
                 <xsd:sequence>
-                    <xsd:element ref="security-provider"/>
-                    <xsd:element ref="keybased-encryption-strategy"/>
+                    <xsd:element ref="security-provider">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Reference to the security provider to use with this security manager.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="keybased-encryption-strategy">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Reference to the key-based encryption strategy to use with this security manager.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -30,14 +42,20 @@
     <xsd:element name="security-provider" type="pgpSecurityProviderType">
         <xsd:annotation>
             <xsd:documentation>
-                Security provider for PGP related functionality.
+                Security provider for PGP-related functionality.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="pgpSecurityProviderType">
         <xsd:complexContent>
             <xsd:extension base="mule:securityProviderType">
-                <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to the key manager to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -45,15 +63,27 @@
     <xsd:element name="keybased-encryption-strategy" type="keyBasedEncryptionStrategyType">
         <xsd:annotation>
             <xsd:documentation>
-                PGP encryption 
+                A key-based PGP encryption strategy. Specifies the key manager and credentials accessor to use for this strategy.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="keyBasedEncryptionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="mule:encryptionStrategyType">
-                <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required"/>
-                <xsd:attribute name="credentialsAccessor-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to the key manager to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="credentialsAccessor-ref" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to the credentials accessor to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -68,10 +98,34 @@
     <xsd:complexType name="pgpSecurityFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractSecurityFilterType">
-                <xsd:attribute name="strategyName" type="xsd:string" use="required"/>
-                <xsd:attribute name="signRequired" type="xsd:string" use="required"/>
-                <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required"/>
-                <xsd:attribute name="credentialsAccessor-ref" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="strategyName" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the PGP encryption strategy to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="signRequired" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether signing is required.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to the key manager to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="credentialsAccessor-ref" type="xsd:NMTOKEN" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to the credentials accessor to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
