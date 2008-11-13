@@ -52,9 +52,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -141,6 +143,13 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      */
     protected Latch callbackCalled;
 
+    /**
+     * When a test case depends on a 3rd-party resource such as a public web service,
+     * it may be desirable to not fail the test upon timeout but rather to simply log 
+     * a warning.
+     */
+    private boolean failOnTimeout = true;
+    
     public AbstractMuleTestCase()
     {
         super();
@@ -294,8 +303,17 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     public void handleTimeout(long timeout, TimeUnit unit)
     {
-        logger.fatal("Timeout of " + unit.toMillis(timeout) + "ms exceeded - exiting VM!");
-        Runtime.getRuntime().halt(1);
+        String msg = "Timeout of " + unit.toMillis(timeout) + "ms exceeded - exiting VM!";
+        
+        if (failOnTimeout)
+        {
+            logger.fatal(msg);
+            Runtime.getRuntime().halt(1);
+        }
+        else
+        {
+            logger.warn(msg);
+        }
     }
 
     /**
@@ -722,5 +740,10 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     protected void setStartContext(boolean startContext)
     {
         this.startContext = startContext;
+    }
+
+    public void setFailOnTimeout(boolean failOnTimeout)
+    {
+        this.failOnTimeout = failOnTimeout;
     }
 }

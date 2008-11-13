@@ -18,6 +18,19 @@ import org.mule.tck.FunctionalTestCase;
 
 public class MultipleWsdlCxfCallsTestCase extends FunctionalTestCase
 {
+    public MultipleWsdlCxfCallsTestCase()
+    {
+        super();
+        
+        // Do not fail test case upon timeout because this probably just means
+        // that the 3rd-party web service is off-line.
+        setFailOnTimeout(false);
+    }
+    
+    protected String getConfigResources()
+    {
+        return "multiple-wsdl-cxf-calls-config.xml";
+    }
 
     public void testMultipleAsynchronousCalls() throws Exception
     {
@@ -61,12 +74,6 @@ public class MultipleWsdlCxfCallsTestCase extends FunctionalTestCase
             assertNotNull(result.getPayload());    
         }
     }
-
-    protected String getConfigResources()
-    {
-        return "multiple-wsdl-cxf-calls-config.xml";
-    }
-    
 }
 
 

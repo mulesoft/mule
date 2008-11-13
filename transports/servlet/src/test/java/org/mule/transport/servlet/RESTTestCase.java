@@ -17,6 +17,14 @@ import org.mule.tck.FunctionalTestCase;
 
 public class RESTTestCase extends FunctionalTestCase
 {
+    public RESTTestCase()
+    {
+        super();
+        
+        // Do not fail test case upon timeout because this probably just means
+        // that the 3rd-party web service is off-line.
+        setFailOnTimeout(false);
+    }
     
     protected String getConfigResources()
     {

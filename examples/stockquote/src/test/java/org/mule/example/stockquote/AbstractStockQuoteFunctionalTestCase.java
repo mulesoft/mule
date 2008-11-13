@@ -25,6 +25,15 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
 {
     public static final String TEST_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote?symbol=CSCO";
 
+    public AbstractStockQuoteFunctionalTestCase()
+    {
+        super();
+        
+        // Do not fail test case upon timeout because this probably just means
+        // that the 3rd-party web service is off-line.
+        setFailOnTimeout(false);
+    }
+    
     /**
      * If a simple call to the web service indicates that it is not responding properly,
      * we disable the test case so as to not report a test failure which has nothing to do
