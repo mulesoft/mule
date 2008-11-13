@@ -13,12 +13,10 @@ package org.mule.test.components;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.NullPayload;
 import org.mule.RequestContext;
 
 public class ComponentStoppingEventFlowTestCase extends FunctionalTestCase
 {
-    private static final String TEST_DATA_STRING = "this data should not be returned";
 
     protected String getConfigResources()
     {
@@ -33,7 +31,7 @@ public class ComponentStoppingEventFlowTestCase extends FunctionalTestCase
         assertNotNull(msg);
         final String payload = msg.getPayloadAsString();
         assertNotNull(payload);
-        assertEquals(TEST_DATA_STRING, payload);
+        assertEquals(TEST_MESSAGE, payload);
     }
 
     public static final class ComponentStoppingFlow
@@ -43,7 +41,7 @@ public class ComponentStoppingEventFlowTestCase extends FunctionalTestCase
         public String process(String input)
         {
             RequestContext.getEventContext().setStopFurtherProcessing(true);
-            return TEST_DATA_STRING;
+            return TEST_MESSAGE;
         }
     }
 }
