@@ -59,14 +59,14 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     }
     
     // @Override
-    protected void doSetUp() throws Exception
+    protected synchronized void doSetUp() throws Exception
     {
         super.doSetUp();
         startServers();
     }
     
     // @Override
-    protected void doTearDown() throws Exception 
+    protected synchronized void doTearDown() throws Exception 
     {
         stopServers();
         super.doTearDown();
