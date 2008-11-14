@@ -11,13 +11,16 @@ package org.mule.util;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /** TODO */
 public class ExceptionHolder implements ExceptionListener
 {
-    private List exceptions = new ArrayList(2);
+    protected final Log logger = LogFactory.getLog(getClass());
+    private List<Exception> exceptions = new ArrayList<Exception>(2);
 
     public void exceptionThrown(Exception e)
     {
@@ -41,10 +44,9 @@ public class ExceptionHolder implements ExceptionListener
 
     public void print()
     {
-        for (Iterator iterator = exceptions.iterator(); iterator.hasNext();)
+        for (Exception exception : exceptions)
         {
-            Exception exception = (Exception) iterator.next();
-            exception.printStackTrace();
+            logger.error(exception);
         }
     }
 }
