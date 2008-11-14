@@ -10,7 +10,7 @@
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
        ">
 
-    <jms:activemq-connector name="jmsConnector1"/>
+    <jms:activemq-connector name="jmsConnector1" disableTemporaryReplyToDestinations="true" />
     <jms:activemq-connector name="jmsConnector2"/>
 
 
