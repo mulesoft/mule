@@ -25,7 +25,7 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         return "providers/activemq/jms-single-tx-ALWAYS_BEGIN-configuration.xml";
     }
 
-    public void testConfigrationA() throws Exception
+    public void testConfigurationA() throws Exception
     {
         scenarioCommit.setInputQueue(JMS_QUEUE_INPUT_CONF_A);
         scenarioRollback.setInputQueue(JMS_QUEUE_INPUT_CONF_A);
@@ -40,7 +40,7 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         receive(scenarioNotReceive);
     }
 
-    public void testConfigrationB() throws Exception
+    public void testConfigurationB() throws Exception
     {
         scenarioCommit.setInputQueue(JMS_QUEUE_INPUT_CONF_B);
         scenarioRollback.setInputQueue(JMS_QUEUE_INPUT_CONF_B);
@@ -56,7 +56,7 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
     }
 
     /*
-    public void testConfigrationC() throws Exception
+    public void testConfigurationC() throws Exception
     {
         scenarioCommit.setInputQueue(JMS_QUEUE_INPUT_CONF_C);
         scenarioRollback.setInputQueue(JMS_QUEUE_INPUT_CONF_C);
