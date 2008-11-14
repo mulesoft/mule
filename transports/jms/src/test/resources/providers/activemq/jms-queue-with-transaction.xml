@@ -13,8 +13,8 @@
 
     <vm:connector name="VMQueue" queueEvents="true"/>
 
-    <jms:activemq-connector name="jmsConnector" eagerConsumer="true"/>
-    
+    <jms:activemq-connector name="jmsConnector" eagerConsumer="true" disableTemporaryReplyToDestinations="true"/>
+
     <jms:endpoint name="feederQueue" queue="feeder.queue">
         <jms:transaction action="ALWAYS_BEGIN" timeout="3000"/>
     </jms:endpoint>
