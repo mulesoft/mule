@@ -55,6 +55,23 @@ public class ExpressionConfig
         this.expressionPrefix = expressionPrefix;
     }
 
+    public void parse(String expressionString)
+    {
+        if(expressionString.startsWith(expressionPrefix))
+        {
+            expressionString = expressionString.substring(expressionPrefix.length());
+            expressionString = expressionString.substring(0, expressionString.length() - expressionPostfix.length());
+        }
+        
+        int i = expressionString.indexOf(":");
+        if(i < 0)
+        {
+            throw new IllegalArgumentException("Expression is invalid: " + expressionString);
+        }
+        this.evaluator = expressionString.substring(0, i);
+        this.expression = expressionString.substring(i+1);
+    }
+
     public void validate(ExpressionManager manager)
     {
         if (expression == null)
