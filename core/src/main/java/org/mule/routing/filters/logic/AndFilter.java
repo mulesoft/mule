@@ -16,10 +16,9 @@ import org.mule.api.routing.filter.Filter;
 import java.util.Iterator;
 
 /**
- * <code>AndFilter</code> accepts only if the leftFilter and rightFilter filter
+ * <code>AndFilter</code> accepts only if all the filters
  * accept.
  */
-
 public class AndFilter extends AbstractFilterCollection
 {
 
@@ -44,16 +43,15 @@ public class AndFilter extends AbstractFilterCollection
         {
             return false;
         }
-        int counter=0;
         for (Iterator iterator = getFilters().iterator(); iterator.hasNext();)
         {
             Filter umoFilter = (Filter) iterator.next();
-            if(umoFilter.accept(message))
+            if(!umoFilter.accept(message))
             {
-                counter++;
+                return false;
             }
         }
 
-        return counter == getFilters().size();
+        return true;
     }
 }
