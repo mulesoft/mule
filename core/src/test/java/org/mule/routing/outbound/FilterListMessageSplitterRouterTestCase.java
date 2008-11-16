@@ -19,8 +19,8 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.util.mock.PayloadClassConstraint;
 
-import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
@@ -53,10 +53,10 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         MuleMessage message = new DefaultMuleMessage(payload);
 
         assertTrue(router.isMatch(message));
-        session.expect("dispatchEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)));
-        session.expect("dispatchEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)));
-        session.expect("dispatchEvent", C.args(new PayloadConstraint(Orange.class), C.eq(endpoint2)));
-        session.expect("dispatchEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)));
+        session.expect("dispatchEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)));
+        session.expect("dispatchEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)));
+        session.expect("dispatchEvent", C.args(new PayloadClassConstraint(Orange.class), C.eq(endpoint2)));
+        session.expect("dispatchEvent", C.args(new PayloadClassConstraint(String.class), C.eq(endpoint3)));
         router.route(message, (MuleSession) session.proxy());
         session.verify();
 
@@ -71,34 +71,19 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
 
         message = new DefaultMuleMessage(payload);
 
-        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)),
+        session.expectAndReturn("sendEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)),
                 message);
-        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)),
+        session.expectAndReturn("sendEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)),
                 message);
-        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Orange.class), C.eq(endpoint2)),
+        session.expectAndReturn("sendEvent", C.args(new PayloadClassConstraint(Orange.class), C.eq(endpoint2)),
                 message);
-        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)),
+        session.expectAndReturn("sendEvent", C.args(new PayloadClassConstraint(String.class), C.eq(endpoint3)),
                 message);
         MuleMessage result = router.route(message, (MuleSession) session.proxy());
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof List);
         assertEquals(((List) result.getPayload()).size(), 4);
         session.verify();
-    }
-
-    private class PayloadConstraint implements Constraint
-    {
-        private Class type;
-
-        public PayloadConstraint(Class type)
-        {
-            this.type = type;
-        }
-
-        public boolean eval(Object o)
-        {
-            return ((MuleMessage) o).getPayload().getClass().equals(type);
-        }
     }
 
 }

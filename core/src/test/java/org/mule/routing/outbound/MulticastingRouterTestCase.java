@@ -18,6 +18,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.util.mock.PayloadConstraint;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -27,33 +28,32 @@ import java.util.List;
 
 public class MulticastingRouterTestCase extends AbstractMuleTestCase
 {
+
     public void testMulticastingRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getService", getTestService());
-        
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        RegExFilter filter = new RegExFilter("(.*) Message");
+
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test1", null, filter, null);
         assertNotNull(endpoint1);
 
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test2", null, filter, null);
         assertNotNull(endpoint2);
 
         MulticastingRouter router = new MulticastingRouter();
-        RegExFilter filter = new RegExFilter("(.*) event");
-        router.setFilter(filter);
+
         List endpoints = new ArrayList();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         router.setEndpoints(endpoints);
 
-        assertEquals(filter, router.getFilter());
-
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
 
         assertTrue(router.isMatch(message));
 
-        session.expect("dispatchEvent", C.eq(message, endpoint1));
-        session.expect("dispatchEvent", C.eq(message, endpoint2));
+        session.expect("dispatchEvent", C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint1)));
+        session.expect("dispatchEvent", C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint2)));
         router.route(message, (MuleSession)session.proxy());
         session.verify();
 
@@ -71,7 +71,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         assertNotNull(endpoint2);
 
         MulticastingRouter router = new MulticastingRouter();
-        RegExFilter filter = new RegExFilter("(.*) event");
+        RegExFilter filter = new RegExFilter("(.*) Message");
         router.setFilter(filter);
         List endpoints = new ArrayList();
         endpoints.add(endpoint1);
@@ -80,12 +80,12 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
 
         assertTrue(router.isMatch(message));
 
-        session.expectAndReturn("sendEvent",  C.args(C.isA(MuleMessage.class), C.eq(endpoint1)), message);
-        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint2)), message);
+        session.expectAndReturn("sendEvent",  C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint1)), message);
+        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint2)), message);
         MuleMessage result = router.route(message, (MuleSession)session.proxy());
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);
@@ -105,21 +105,19 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         assertNotNull(endpoint2);
 
         MulticastingRouter router = new MulticastingRouter();
-        RegExFilter filter = new RegExFilter("(.*) event");
-        router.setFilter(filter);
+
         List endpoints = new ArrayList();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         router.setEndpoints(endpoints);
 
-        assertEquals(filter, router.getFilter());
 
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
 
         assertTrue(router.isMatch(message));
 
-        session.expectAndReturn("sendEvent",  C.args(C.isA(MuleMessage.class), C.eq(endpoint1)), message);
-        session.expectAndReturn("dispatchEvent", C.eq(message, endpoint2), message);
+        session.expectAndReturn("sendEvent",  C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint1)), message);
+        session.expectAndReturn("dispatchEvent", C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint2)), message);
         MuleMessage result = router.route(message, (MuleSession)session.proxy());
         assertNotNull(result);
         assertEquals(message, result);
