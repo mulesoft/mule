@@ -22,13 +22,13 @@ import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.PooledJavaComponent;
-import org.mule.component.builder.ReflectionMessageBuilder;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.example.loanbroker.AsynchronousLoanBroker;
 import org.mule.example.loanbroker.bank.Bank;
+import org.mule.example.loanbroker.credit.CreditAgencyService;
 import org.mule.example.loanbroker.lender.DefaultLender;
 import org.mule.example.loanbroker.routers.BankQuotesResponseAggregator;
 import org.mule.example.loanbroker.transformers.CreditProfileXmlToCreditProfile;
@@ -40,6 +40,8 @@ import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
+import org.mule.routing.nested.DefaultNestedRouter;
+import org.mule.routing.nested.DefaultNestedRouterCollection;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
@@ -181,21 +183,31 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         Service creditAgencyGatewayService = new SedaService();
         creditAgencyGatewayService.setName("CreditAgencyGatewayService");
         creditAgencyGatewayService.setModel(model);
-        creditAgencyGatewayService.setComponent(new PooledJavaComponent(new PrototypeObjectFactory(ReflectionMessageBuilder.class)));
+        PooledJavaComponent component = new PooledJavaComponent(new PrototypeObjectFactory(CreditAgencyGateway.class));
+        creditAgencyGatewayService.setComponent(component);
         // in
         InboundRouterCollection creditAgencyGatewayServiceInbound = new DefaultInboundRouterCollection();
         creditAgencyGatewayServiceInbound.addEndpoint(CreditAgencyGateway.buildInboundEndpoint());
         creditAgencyGatewayService.setInboundRouter(creditAgencyGatewayServiceInbound);
-        // out
-        OutboundRouterCollection creditAgencyGatewayServiceOutbound = new DefaultOutboundRouterCollection();
-        FilteringOutboundRouter creditAgencyGatewayServiceOutboundRouter = new FilteringOutboundRouter();
+        //binding
         EndpointBuilder eb2 = (EndpointBuilder) CreditAgency.clone();
         eb2.addTransformer(LoanQuoteRequestToCreditProfileArgs);
         eb2.setSynchronous(true);
         List<Transformer> responseTransformers = new ArrayList<Transformer>();
         responseTransformers.add(CreditProfileXmlToCreditProfile);
         eb2.setResponseTransformers(responseTransformers);
-        creditAgencyGatewayServiceOutboundRouter.addEndpoint(eb2.buildOutboundEndpoint());
+        //Create Binding
+        component.setNestedRouter(new DefaultNestedRouterCollection());
+        DefaultNestedRouter binding = new DefaultNestedRouter();
+        binding.setInterface(CreditAgencyService.class);
+        binding.setMethod("getCreditProfile");
+        binding.setEndpoint(eb2.buildOutboundEndpoint());
+        component.getNestedRouter().addRouter(binding);
+
+        // out
+        OutboundRouterCollection creditAgencyGatewayServiceOutbound = new DefaultOutboundRouterCollection();
+        FilteringOutboundRouter creditAgencyGatewayServiceOutboundRouter = new FilteringOutboundRouter();
+
         creditAgencyGatewayServiceOutboundRouter.addEndpoint(LenderGateway.buildOutboundEndpoint());
         creditAgencyGatewayServiceOutbound.addRouter(creditAgencyGatewayServiceOutboundRouter);
         creditAgencyGatewayService.setOutboundRouter(creditAgencyGatewayServiceOutbound);
