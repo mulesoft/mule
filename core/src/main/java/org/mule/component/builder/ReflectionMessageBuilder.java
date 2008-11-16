@@ -25,6 +25,7 @@ import java.util.Set;
 /**
  * Will try and set the result of an invocation as a bean property on the request
  * message using reflection.
+ * @deprecated Since 2.2. Users should configure components with bindings.
  */
 public class ReflectionMessageBuilder extends AbstractMessageBuilder
 {

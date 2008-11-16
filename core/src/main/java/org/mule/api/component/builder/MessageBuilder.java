@@ -17,6 +17,7 @@ import org.mule.component.builder.MessageBuilderException;
  * A Strategy Class for Building one message from the invocation results of a chain
  * if endpoints. This is used for invoking different endpoints to obain parts of a
  * larger message.
+ * @deprecated Since 2.2. Users should configure components with bindings.
  */
 public interface MessageBuilder
 {

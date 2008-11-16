@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * A service that will invoke all outbound endpoints configured on the service
  * allow the result of each endpoint invocation to be aggregated to a single message.
+ * @deprecated Since 2.2. Users should configure components with bindings.
  */
 public abstract class AbstractMessageBuilder implements ServiceAware, Callable, MessageBuilder
 {
