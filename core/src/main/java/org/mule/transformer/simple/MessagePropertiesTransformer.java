@@ -131,6 +131,10 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                                     new Object[]{key, value}));
                             }
                         }
+                        else
+                        {
+                            message.setProperty(key, value);
+                        }
                     }
                 }
             }
