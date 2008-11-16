@@ -10,16 +10,6 @@
 
 package org.mule.transport.jdbc.sqlstrategy;
 
-/**
- * Implements strategy for handling individual insert, update, and delete statements  
- * 
- */
-
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -30,8 +20,16 @@ import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcUtils;
 import org.mule.util.ArrayUtils;
 
-public  class SimpleUpdateSQLStrategy 
-    implements SQLStrategy
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+/**
+ * Implements strategy for handling individual insert, update, and delete statements
+ *
+ */
+public  class SimpleUpdateSQLStrategy  implements SQLStrategy
 {
     protected static Logger logger = Logger.getLogger(SelectSQLStrategy.class);
 
@@ -51,8 +49,9 @@ public  class SimpleUpdateSQLStrategy
         sql = escapeStatement(sql);
         
         //Get parameter values from message
+        MuleMessage message = event.getMessage();
         Object[] paramValues = connector.getParams(endpoint, paramNames, new DefaultMuleMessage(
-            event.transformMessage()), endpoint.getEndpointURI().getAddress());
+            event.transformMessage(), message), endpoint.getEndpointURI().getAddress());
 
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         Connection con = null;
