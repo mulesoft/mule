@@ -24,7 +24,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "/http-rest-service-wrapper-functional-test.xml";
+        return "http-rest-service-wrapper-functional-test.xml";
     }
 
     public void testErrorExpressionOnRegexFilterFail() throws Exception
