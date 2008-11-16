@@ -13,7 +13,7 @@ package org.mule.api.security;
 import java.util.Map;
 
 /**
- * <code>UMOAuthentication</code> represents an authentication request and contains
+ * <code>Authentication</code> represents an authentication request and contains
  * authentication information if the request was successful
  */
 public interface Authentication
