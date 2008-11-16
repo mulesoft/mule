@@ -19,8 +19,9 @@
         http://mule.mulesource.org/wiki/display/MULE/LoanBroker+ESB for details.
     </description>
 
+    <!-- Import property placeholders -->
     <context:property-placeholder location="openejb.properties"/>
-
+    
     <ejb:connector name="ejbConnector" securityPolicy="security.policy"
         jndiInitialFactory="org.openejb.client.LocalInitialContextFactory">
         <jndi-provider-property key="openejb.base" value="${openejb.base}"/>
@@ -31,14 +32,32 @@
 
     <jms:activemq-connector name="jmsConnector" />
 
+    <!--
+    Examples of different types of Transformers are used here to show some of the built in features of Mule transformers -->
+
+    <!-- custom transformers that implements the Mule Transformer API -->
     <custom-transformer name="RestRequestToCustomerRequest"
                              class="org.mule.example.loanbroker.transformers.RestRequestToCustomerRequest" />
-    <custom-transformer name="LoanQuoteRequestToCreditProfileArgs"
-                             class="org.mule.example.loanbroker.transformers.LoanQuoteRequestToCreditProfileArgs" />
+
     <custom-transformer name="CreditProfileXmlToCreditProfile"
                              class="org.mule.example.loanbroker.transformers.CreditProfileXmlToCreditProfile" />
-    <custom-transformer name="SetLendersAsRecipients"
-                             class="org.mule.example.loanbroker.transformers.SetLendersAsRecipients" />
+
+    <!-- The expression transformer can be used to extract multiple arguments from the current message (as a List or Array)
+     Here we use the 'bean' Expression Evaluator to extract the name and SSN of the customer we are performing a credit check on.
+     These arguments are accepted by the EJB service -->
+    <expression-transformer name="CustomerToCreditProfileArgs">
+        <return-argument evaluator="bean" expression="name"/>
+        <return-argument evaluator="bean" expression="ssn"/>
+    </expression-transformer>
+
+    <!-- The Message properties transformer can be used to add, modify or delete properties on the current message.
+    In this instance we use a groovy expression to get a List of endpoints from each of the lenders and set them as a property
+    on the message called 'recipients'-->
+    <message-properties-transformer name="SetLendersAsRecipients">
+        <add-message-property key="recipients" value="#[groovy:payload.lenders.endpoint]"/>
+    </message-properties-transformer>
+
+    <!-- Example of a built-in, transport specific transformer -->
     <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage" />
 
     <endpoint name="CustomerRequestsREST" address="jetty:rest://localhost:8888/loanbroker" />
@@ -72,10 +91,10 @@
 
     <model name="loan-broker">
 
-        <!--
-        The loan broker is used to receive loan requests
-        -->
         <service name="LoanBroker">
+            <description>
+                The LoanBroker service is our 'entry' service that accepts requests from the outside world
+            </description>
             <inbound>
                 <inbound-endpoint ref="CustomerRequestsREST" transformer-refs="RestRequestToCustomerRequest" />
                 <inbound-endpoint ref="CustomerRequests" />
@@ -95,40 +114,56 @@
             </async-reply>
         </service>
 
-        <!--
-        The credit agency service will get the credit profile for a customer
-        -->
         <service name="CreditAgencyGatewayService">
+            <description>
+                The credit agency service will get the credit profile for a customer.
+
+                This service serves as a 'proxy' or 'gateway' to a back-end system. It is responsible for invoking the
+                CreditAgency back-end service ensuring that the correct data is sent to the service and the data passed back is
+                added to our bus message.
+                This service uses a component binding to call out to the CreditAgency service before sending the bus message onto
+                the next endpoint.
+            </description>
             <inbound>
                 <inbound-endpoint ref="CreditAgencyGateway" />
             </inbound>
-            <component class="org.mule.component.builder.ReflectionMessageBuilder" />
-            <outbound>
-                <filtering-router>
-                    <!-- We invoke the credit Agency service using remoteSync which means that a response
+            <component class="org.mule.example.loanbroker.esb.CreditAgencyGateway">
+                <binding interface="org.mule.example.loanbroker.credit.CreditAgencyService" method="getCreditProfile">
+                    <!-- We invoke the credit Agency service using synchronous which means that a response
                     will be returned from the service. there is also a responseTransformer that will
                     conver the Xml returned from the CreditAgency Ejb into a CreditProfile object -->
-                    <outbound-endpoint synchronous="true" transformer-refs="LoanQuoteRequestToCreditProfileArgs"
+                    <outbound-endpoint synchronous="true" transformer-refs="CustomerToCreditProfileArgs"
                                    responseTransformer-refs="CreditProfileXmlToCreditProfile" ref="CreditAgency" />
+                </binding>
+            </component>
+            <outbound>
+                <pass-through-router>
                     <outbound-endpoint ref="LenderGateway" />
-                </filtering-router>
+                </pass-through-router>
             </outbound>
         </service>
 
         <service name="LenderGatewayService">
+            <description>
+                Much like the previous service the is a gateway/proxy to a LenderService back-end application. In this instance
+                the LenderService understands our bus message so we just use a chaining router to send the response form the
+                Lender Service to the next endpoint.
+            </description>
             <inbound>
                 <inbound-endpoint ref="LenderGateway" />
             </inbound>
             <outbound>
                 <chaining-router>
                     <outbound-endpoint synchronous="true" ref="LenderService" />
-                    <outbound-endpoint ref="BankingGateway"
-                                   transformer-refs="SetLendersAsRecipients ObjectToJMSMessage" />
+                    <outbound-endpoint ref="BankingGateway" transformer-refs="SetLendersAsRecipients ObjectToJMSMessage" />
                 </chaining-router>
             </outbound>
         </service>
 
         <service name="LenderServiceService">
+            <description>
+                Responsible for getting a list of lenders that will provide a Loan quote.
+            </description>
             <inbound>
                 <inbound-endpoint ref="LenderService" />
             </inbound>
@@ -136,6 +171,9 @@
         </service>
 
         <service name="BankingGatewayService">
+            <description>
+                This gateway is responsible for sending the Loan Reqest information to each of the Lenders.
+            </description>
             <inbound>
                 <inbound-endpoint ref="BankingGateway" />
             </inbound>
