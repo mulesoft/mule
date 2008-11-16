@@ -14,6 +14,7 @@
         <http:endpoint name="serverEndpoint" host="localhost" port="60203" synchronous="true" transformer-refs="ByteArrayToString"/>
         <vm:endpoint name="restServiceEndpoint" path="restservice" />
         <vm:endpoint name="restServiceEndpoint2" path="restservice2" />
+        <vm:endpoint name="restServiceEndpoint3" path="restservice3" />
 
         <byte-array-to-string-transformer name="ByteArrayToString"/>
 
@@ -42,11 +43,23 @@
             </http:rest-service-component>
         </service>
 
-        <service name="Service">
+        <service name="HTTPPostSample3">
+            <inbound>
+                <inbound-endpoint ref="restServiceEndpoint3"/>
+            </inbound>
+            <!-- Testusing expressions and literal values -->
+            <http:rest-service-component serviceUrl="http://localhost:60203" httpMethod="POST">
+                <http:requiredParameter key="foo" value="boo"/>
+                <http:requiredParameter key="faz" value="#[header:baz-header]"/>
+                <http:optionalParameter key="far" value="#[header:bar-optional-header]"/>
+            </http:rest-service-component>
+        </service>
+
+        <service name="EchoService">
             <inbound>
                 <inbound-endpoint ref="serverEndpoint"/>    
             </inbound>
-            <component class="org.mule.transport.http.components.RestErrorExpressionTestCase$EchoComponent"/>
+            <echo-component/>
         </service>
         
     </model>
