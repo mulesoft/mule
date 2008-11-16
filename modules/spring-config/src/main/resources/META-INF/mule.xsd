@@ -80,8 +80,8 @@
                 <xsd:annotation>
                     <xsd:documentation>
                         A global property is a named string.
-                        It can be used inserted in most attribute values using the #\[...\] syntax.
-                        So the attribute value "#\[foo\]" would be replaced by the value associated with
+                        It can be used inserted in most attribute values using the ${...} syntax.
+                        So the attribute value "${foo}" would be replaced by the value associated with
                         the property named "foo".
                     </xsd:documentation>
                 </xsd:annotation>
@@ -254,7 +254,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The name of the property.
-                    This is used inside #[...].
+                    This is used inside ${...}.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -262,7 +262,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The value of the property.
-                    This replaces each occurence of #[...].
+                    This replaces each occurence of ${...}.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -3467,6 +3467,7 @@
                 <xsd:annotation>
                     <xsd:documentation>
                         Filter used to filter message.
+                        @Deprecated since 2.2.  Configure the filter on the endpoint instead of the router.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -3542,6 +3543,18 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:complexType name="singleEndpointFilteringOutboundRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractOutboundRouterType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-outbound-endpoint" maxOccurs="1"/>
+                    <xsd:group ref="defaultFilteredOutboundRouterElements"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="defaultFilteredOutboundRouterAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <!--  Concrete Outbound Routers -->
 
     <xsd:element name="pass-through-router" type="outboundRouterType"
@@ -3554,7 +3567,7 @@
     </xsd:element>
 
     <!--  FilteringOutboundRouter only uses a single endpoint. For now this needs to support multiple endpoints for MessageBuilderComponent usage only. -->
-    <xsd:element name="filtering-router" type="multipleEndpointFilteringOutboundRouterType" substitutionGroup="abstract-outbound-router">
+    <xsd:element name="filtering-router" type="singleEndpointFilteringOutboundRouterType" substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
                 This router uses filters to determine whether the message matches a particular criteria and if so will route the message to the endpoint configured on the router
