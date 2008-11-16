@@ -45,7 +45,14 @@ public class RegExFilter implements Filter, ObjectFilter
 
     public boolean accept(MuleMessage message)
     {
-        return accept(message.getPayload());
+        try
+        {
+            return accept(message.getPayloadAsString());
+        }
+        catch (Exception e)
+        {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public boolean accept(Object object)

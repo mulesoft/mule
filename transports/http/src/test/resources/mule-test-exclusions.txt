@@ -19,6 +19,3 @@ org.mule.transport.http.functional.HttpsFunctionalTestCase
 #
 # MULE-2625
 org.mule.transport.http.functional.HttpContentLengthPropagationTestCase
-
-# MULE-3450
-org.mule.transport.http.components.RestErrorExpressionTestCase
