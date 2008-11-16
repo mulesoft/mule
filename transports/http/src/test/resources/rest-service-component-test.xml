@@ -14,7 +14,9 @@
         <service name="WORMS">
             <http:rest-service-component serviceUrl="#[header:serviceUrl]" httpMethod="POST">
                 <http:error-filter>
-                    <wildcard-filter pattern="*xyz*" not="true"/>
+                    <not-filter>
+                        <wildcard-filter pattern="*xyz*"/>
+                    </not-filter>
                 </http:error-filter>
 
                 <http:payloadParameterName value="test-property1"/>
