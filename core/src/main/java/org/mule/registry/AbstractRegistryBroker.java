@@ -10,8 +10,6 @@
 
 package org.mule.registry;
 
-import org.mule.MuleServer;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
@@ -111,12 +109,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
     }
 
     public void registerObject(String key, Object value, Object metadata) throws RegistrationException
-    {
-        if (value instanceof MuleContextAware)
-        {
-            ((MuleContextAware) value).setMuleContext(MuleServer.getMuleContext());
-        }
-        
+    {   
         Iterator it = getRegistries().iterator(); 
         Registry reg;
         while (it.hasNext())
