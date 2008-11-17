@@ -24,7 +24,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
-import org.mule.transport.jdbc.sqlstrategy.SQLStrategyFactory;
+import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
@@ -53,7 +53,7 @@ public class JdbcConnector extends AbstractConnector
 
     private static final Pattern STATEMENT_ARGS = TemplateParser.WIGGLY_MULE_TEMPLATE_PATTERN;
 
-    protected SQLStrategyFactory sqlStrategyFactory = new SQLStrategyFactory();
+    protected DefaultSqlStatementStrategyFactory sqlStrategyFactory = new DefaultSqlStatementStrategyFactory();
 
 
     /* Register the SQL Exception reader if this class gets loaded */
@@ -433,7 +433,7 @@ public class JdbcConnector extends AbstractConnector
         this.queries = queries;
     }
 
-    public SQLStrategyFactory getSqlStrategyFactory()
+    public DefaultSqlStatementStrategyFactory getSqlStrategyFactory()
     {
         return sqlStrategyFactory;
     }

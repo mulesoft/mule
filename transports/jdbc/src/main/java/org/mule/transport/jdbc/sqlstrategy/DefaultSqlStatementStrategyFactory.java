@@ -15,7 +15,7 @@ package org.mule.transport.jdbc.sqlstrategy;
  */
 
 
-public class SQLStrategyFactory 
+public class DefaultSqlStatementStrategyFactory
 {
 
 
@@ -23,7 +23,7 @@ public class SQLStrategyFactory
     protected SelectSqlStatementStrategy selectSQLStrategy;
     protected CallableSqlStatementStrategy callableSQLStrategy;
 
-    public SQLStrategyFactory()
+    public DefaultSqlStatementStrategyFactory()
     {
         simpleUpdateSQLStrategy = new SimpleUpdateSqlStatementStrategy();
         selectSQLStrategy = new SelectSqlStatementStrategy();

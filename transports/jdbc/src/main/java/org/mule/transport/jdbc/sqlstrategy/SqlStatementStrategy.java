@@ -13,7 +13,7 @@ package org.mule.transport.jdbc.sqlstrategy;
 /**
  * Interface for classes implementing strategies for handling SQL statements.
  *
-* @see SQLStrategyFactory
+* @see DefaultSqlStatementStrategyFactory
  */
 
 import org.mule.api.MuleEvent;
