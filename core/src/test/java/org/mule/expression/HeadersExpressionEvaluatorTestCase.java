@@ -11,6 +11,7 @@ package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.HashMap;
@@ -39,8 +40,19 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(result);
         assertEquals("moo", result);
 
-        result = eval.evaluate("fool", message);
+        result = eval.evaluate("fool*", message);
         assertNull(result);
+
+        try
+        {
+            result = eval.evaluate("fool", message);
+            fail("required value");
+        }
+        catch (Exception e)
+        {
+            //Expected
+        }
+
 
     }
 
@@ -58,8 +70,18 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((Map)result).values().contains("maz"));
         assertFalse(((Map)result).values().contains("mar"));
 
-        result = eval.evaluate("fool", message);
+        result = eval.evaluate("fool*", message);
         assertNull(result);
+
+        try
+        {
+            result = eval.evaluate("fool", message);
+            fail("required value");
+        }
+        catch (Exception e)
+        {
+            //Expected
+        }
     }
 
     public void testListHeaders() throws Exception
@@ -75,8 +97,18 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((List)result).contains("maz"));
         assertFalse(((List)result).contains("mar"));
 
-        result = eval.evaluate("fool", message);
+        result = eval.evaluate("fool*", message);
         assertNull(result);
+
+        try
+        {
+            result = eval.evaluate("fool", message);
+            fail("required value");
+        }
+        catch (Exception e)
+        {
+            //Expected
+        }
     }
 
 
@@ -88,8 +120,19 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(result);
         assertEquals("moo", result);
 
-        result = muleContext.getExpressionManager().evaluate("#[header:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[header:fool*]", message);
         assertNull(result);
+
+        try
+        {
+            result = muleContext.getExpressionManager().evaluate("#[header:fool]", message);
+            fail("Required value");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            //exprected
+        }
+
     }
 
     public void testMapHeadersUsingManager() throws Exception
@@ -105,8 +148,18 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((Map)result).values().contains("maz"));
         assertFalse(((Map)result).values().contains("mar"));
 
-        result = muleContext.getExpressionManager().evaluate("#[headers:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[headers:fool*]", message);
         assertNull(result);
+
+        try
+        {
+            result = muleContext.getExpressionManager().evaluate("#[headers:fool]", message);
+            fail("Required value");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            //exprected
+        }
     }
 
     public void testListHeadersUsingManager() throws Exception
@@ -121,7 +174,17 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((List)result).contains("maz"));
         assertFalse(((List)result).contains("mar"));
 
-        result = muleContext.getExpressionManager().evaluate("#[headers-list:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[headers-list:fool*]", message);
         assertNull(result);
+
+        try
+        {
+            result = muleContext.getExpressionManager().evaluate("#[headers-list:fool]", message);
+            fail("Required value");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            //exprected
+        }
     }
 }

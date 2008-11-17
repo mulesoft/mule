@@ -11,6 +11,7 @@ package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -57,8 +58,18 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         ((DataHandler)result).writeTo(baos);
         assertEquals("moo", baos.toString());
         
-        result = eval.evaluate("fool", message);
+        result = eval.evaluate("fool*", message);
         assertNull(result);
+
+        try
+        {
+            result = eval.evaluate("fool", message);
+            fail("required value");
+        }
+        catch (Exception e)
+        {
+            //Expected
+        }
     }
 
     public void testMapHeaders() throws Exception
@@ -84,8 +95,18 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         dh.writeTo(baos);
         assertEquals("maz", baos.toString());
 
-        result = eval.evaluate("fool", message);
+        result = eval.evaluate("fool*", message);
         assertNull(result);
+
+        try
+        {
+            result = eval.evaluate("fool", message);
+            fail("required value");
+        }
+        catch (Exception e)
+        {
+            //Expected
+        }
     }
 
     public void testListHeaders() throws Exception
@@ -109,8 +130,18 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         dh.writeTo(baos);
         assertEquals("maz", baos.toString());
 
-        result = eval.evaluate("fool", message);
+        result = eval.evaluate("fool*", message);
         assertNull(result);
+
+        try
+        {
+            result = eval.evaluate("fool", message);
+            fail("required value");
+        }
+        catch (Exception e)
+        {
+            //Expected
+        }
     }
 
     public void testSingleAttachmentUsingManager() throws Exception
@@ -122,8 +153,18 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         ((DataHandler)result).writeTo(baos);
         assertEquals("moo", baos.toString());
 
-        result = muleContext.getExpressionManager().evaluate("#[attachment:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[attachment:fool*]", message);
         assertNull(result);
+
+        try
+        {
+            result = muleContext.getExpressionManager().evaluate("#[attachment:fool]", message);
+            fail("Required value");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            //exprected
+        }
     }
 
     public void testMapHeadersUsingManager() throws Exception
@@ -147,8 +188,18 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         dh.writeTo(baos);
         assertEquals("maz", baos.toString());
 
-        result = muleContext.getExpressionManager().evaluate("#[attachments:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[attachments:fool*]", message);
         assertNull(result);
+
+        try
+        {
+            result = muleContext.getExpressionManager().evaluate("#[attachments:fool]", message);
+            fail("Required value");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            //exprected
+        }
     }
 
     public void testListHeadersUsingManager() throws Exception
@@ -170,8 +221,18 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         dh.writeTo(baos);
         assertEquals("maz", baos.toString());
 
-        result = muleContext.getExpressionManager().evaluate("#[attachments-list:fool]", message);
+        result = muleContext.getExpressionManager().evaluate("#[attachments-list:fool*]", message);
         assertNull(result);
+
+        try
+        {
+            result = muleContext.getExpressionManager().evaluate("#[attachments-list:fool]", message);
+            fail("Required value");
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            //exprected
+        }
     }
 
     // silly little fake DataSource so that we don't need to use javamail
