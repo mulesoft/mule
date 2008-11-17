@@ -13,7 +13,6 @@ package org.mule.expression;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
@@ -50,69 +49,57 @@ public class MessageExpressionEvaluator implements ExpressionEvaluator
 
     public Object evaluate(String expression, MuleMessage message)
     {
-        if (message instanceof MuleMessage)
+        if (StringUtils.isEmpty(expression) || message==null)
         {
-            if (StringUtils.isEmpty(expression))
-            {
-                return message;
-            }
-            else
-            {
-                if (expression.equals("id"))
-                {
-                    return ((MuleMessage) message).getUniqueId();
-                }
-                else if (expression.equals("correlationId"))
-                {
-                    return ((MuleMessage) message).getCorrelationId();
-                }
-                else if (expression.equals("correlationSequence"))
-                {
-                    return ((MuleMessage) message).getCorrelationSequence();
-                }
-                else if (expression.equals("correlationGroupSize"))
-                {
-                    return ((MuleMessage) message).getCorrelationGroupSize();
-                }
-                else if (expression.equals("replyTo"))
-                {
-                    return ((MuleMessage) message).getReplyTo();
-                }
-                else if (expression.equals("payload"))
-                {
-                    return ((MuleMessage) message).getPayload();
-                }
-                else if (expression.equals("encoding"))
-                {
-                    return ((MuleMessage) message).getEncoding();
-                }
-                else if (expression.equals("exception"))
-                {
-                    ExceptionPayload ep = ((MuleMessage) message).getExceptionPayload();
-                    if (ep != null)
-                    {
-                        return ep.getException();
-                    }
-                    return null;
-                }
-                else
-                {
-                    throw new IllegalArgumentException(expression);
-                }
-
-            }
+            return message;
         }
         else
         {
-            logger.warn("Message is not of type MuleMessage, the expression will return the object without modification");
-            if (message instanceof MessageAdapter)
+            if (expression.equals("id"))
             {
-                return ((MessageAdapter) message).getPayload();
+                return message.getUniqueId();
             }
-        }
-        return message;
+            else if (expression.equals("correlationId"))
+            {
+                return message.getCorrelationId();
+            }
+            else if (expression.equals("correlationSequence"))
+            {
+                return message.getCorrelationSequence();
+            }
+            else if (expression.equals("correlationGroupSize"))
+            {
+                return message.getCorrelationGroupSize();
+            }
+            else if (expression.equals("replyTo"))
+            {
+                return message.getReplyTo();
+            }
+            else if (expression.equals("payload"))
+            {
+                return message.getPayload();
+            }
+            else if (expression.equals("encoding"))
+            {
+                return message.getEncoding();
+            }
+            else if (expression.equals("exception"))
+            {
+                ExceptionPayload ep = message.getExceptionPayload();
+                if (ep != null)
+                {
+                    return ep.getException();
+                }
+                return null;
+            }
+            else
+            {
+                throw new IllegalArgumentException(expression);
+            }
 
+        }
     }
+
 
     /**
      * {@inheritDoc}

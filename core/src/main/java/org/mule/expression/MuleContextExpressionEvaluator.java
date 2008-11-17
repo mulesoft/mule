@@ -34,7 +34,7 @@ import org.mule.config.i18n.CoreMessages;
  */
 public class MuleContextExpressionEvaluator implements ExpressionEvaluator
 {
-    public static final String NAME = "mule";
+    public static final String NAME = "context";
 
     /**
      * Extracts a single property from the message

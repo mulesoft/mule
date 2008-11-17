@@ -2596,6 +2596,7 @@
                     <xsd:enumeration value="message"/>
                     <xsd:enumeration value="map-payload"/>
                     <xsd:enumeration value="payload"/>
+                    <xsd:enumeration value="mule"/>
                     <xsd:enumeration value="xpath"/>
                     <xsd:enumeration value="jxpath"/>
                     <xsd:enumeration value="bean"/>

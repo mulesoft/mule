@@ -120,26 +120,19 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
         {
             return new Long(count.getAndIncrement());
         }
-        else if (message instanceof MuleMessage)
+        else if (name.equalsIgnoreCase(PAYLOAD_CLASS_FUNCTION))
         {
-            if (name.equalsIgnoreCase(PAYLOAD_CLASS_FUNCTION))
-            {
-                return ((MuleMessage) message).getPayload().getClass().getName();
-            }
-            else if (name.equalsIgnoreCase(SHORT_PAYLOAD_CLASS_FUNCTION))
-            {
-                return ClassUtils.getClassName(((MuleMessage) message).getPayload().getClass());
-            }
-            else
-            {
-                throw new IllegalArgumentException(name);
-            }
+            return ((MuleMessage) message).getPayload().getClass().getName();
+        }
+        else if (name.equalsIgnoreCase(SHORT_PAYLOAD_CLASS_FUNCTION))
+        {
+            return ClassUtils.getClassName(((MuleMessage) message).getPayload().getClass());
         }
         else
         {
             throw new IllegalArgumentException(name);
         }
-    }
+    }    
 
     /**
      * Gts the name of the object

@@ -13,10 +13,10 @@ package org.mule.expression;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -36,53 +36,67 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
 
     public Object evaluate(String expression, MuleMessage message)
     {
-        boolean required = false;
+        boolean required = true;
 
-        //This is a bit of a hack to manage required headers
-        if(expression.endsWith("required"))
+        List result;
+        if (expression.equals("all"))
         {
-            required = true;
-            expression = expression.substring(0, expression.length() - 8);
+            result = new ArrayList(message.getAttachmentNames().size());
+            for (Iterator iterator = message.getAttachmentNames().iterator(); iterator.hasNext();)
+            {
+                String name = (String) iterator.next();
+                result.add(message.getAttachment(name));
+            }
         }
-        
-        if (message instanceof MessageAdapter)
+        else
         {
-
             StringTokenizer tokenizer = new StringTokenizer(expression, DELIM);
-            List result = new ArrayList(tokenizer.countTokens());
-            while(tokenizer.hasMoreTokens())
+            result = new ArrayList(tokenizer.countTokens());
+            while (tokenizer.hasMoreTokens())
             {
                 String s = tokenizer.nextToken();
                 s = s.trim();
-                Object val = ((MessageAdapter) message).getAttachment(s);
+                if (s.endsWith("*"))
+                {
+                    s = s.substring(s.length() - 1);
+                    required = false;
+                }
+                else
+                {
+                    required = true;
+                }
+                Object val = message.getAttachment(s);
                 if (val != null)
                 {
                     result.add(val);
                 }
-                else if(required)
+                else if (required)
                 {
                     throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(NAME, expression));
                 }
             }
-            if(result.size()==0)
-            {
-                return null;
-            }
-            else
-            {
-                return result;
-            }
         }
-        return null;
+        if (result.size() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            return result;
+        }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public String getName()
     {
         return NAME;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void setName(String name)
     {
         throw new UnsupportedOperationException("setName");

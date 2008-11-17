@@ -13,7 +13,8 @@ package org.mule.expression;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.transport.MessageAdapter;
+import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.config.i18n.CoreMessages;
 
 /**
  * Looks up the property on the message using the property name given.  If the call on the messgae returns null,
@@ -31,16 +32,28 @@ public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
     public Object evaluate(String expression, MuleMessage message)
     {
         Object result = null;
-        if (message instanceof MessageAdapter)
+        boolean required;
+        if (expression.endsWith("*"))
         {
-            result = ((MessageAdapter) message).getProperty(expression);
-            //Should this fallback be in its own expression evaluator i.e. #[endpoint-param:foo] ??
-            //I'm not sure becaus ethis way there is a fallback where the message doesn't have a value the
-            //endpoint can define a default
-            if (result == null && RequestContext.getEventContext() != null)
-            {
-                result = RequestContext.getEventContext().getEndpointURI().getParams().get(expression);
-            }
+            expression = expression.substring(expression.length() - 1);
+            required = false;
+        }
+        else
+        {
+            required = true;
+        }
+        result = message.getProperty(expression);
+        //Should this fallback be in its own expression evaluator i.e. #[endpoint-param:foo] ??
+        //I'm not sure becaus ethis way there is a fallback where the message doesn't have a value the
+        //endpoint can define a default
+        if (result == null && RequestContext.getEventContext() != null)
+        {
+            result = RequestContext.getEventContext().getEndpointURI().getParams().get(expression);
+        }
+
+        if (result == null && required)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(NAME, expression));
         }
         return result;
     }

@@ -12,7 +12,8 @@ package org.mule.expression;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.transport.MessageAdapter;
+import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.config.i18n.CoreMessages;
 
 import javax.activation.DataHandler;
 
@@ -28,23 +29,43 @@ public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
 {
     public static final String NAME = "attachment";
 
-    public Object evaluate(String name, MuleMessage message)
+    public Object evaluate(String expression, MuleMessage message)
     {
-        if (message instanceof MessageAdapter)
+        if (expression == null)
         {
-            DataHandler dh = ((MessageAdapter) message).getAttachment(name);
-            return dh;
+            return null;
         }
-        return null;
+
+        boolean required;
+        if (expression.endsWith("*"))
+        {
+            expression = expression.substring(expression.length() - 1);
+            required = false;
+        }
+        else
+        {
+            required = true;
+        }
+        DataHandler dh = message.getAttachment(expression);
+
+        if (dh == null && required)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(NAME, expression));
+        }
+        return dh;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public String getName()
     {
         return NAME;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void setName(String name)
     {
         throw new UnsupportedOperationException("setName");
