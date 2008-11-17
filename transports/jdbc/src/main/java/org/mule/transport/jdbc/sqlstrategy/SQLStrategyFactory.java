@@ -19,18 +19,18 @@ public class SQLStrategyFactory
 {
 
 
-    protected SimpleUpdateSQLStrategy simpleUpdateSQLStrategy;
-    protected SelectSQLStrategy selectSQLStrategy;
-    protected CallableSQLStrategy callableSQLStrategy;
+    protected SimpleUpdateSqlStatementStrategy simpleUpdateSQLStrategy;
+    protected SelectSqlStatementStrategy selectSQLStrategy;
+    protected CallableSqlStatementStrategy callableSQLStrategy;
 
     public SQLStrategyFactory()
     {
-        simpleUpdateSQLStrategy = new SimpleUpdateSQLStrategy();
-        selectSQLStrategy = new SelectSQLStrategy();
-        callableSQLStrategy = new CallableSQLStrategy();
+        simpleUpdateSQLStrategy = new SimpleUpdateSqlStatementStrategy();
+        selectSQLStrategy = new SelectSqlStatementStrategy();
+        callableSQLStrategy = new CallableSqlStatementStrategy();
     }
 
-    public SQLStrategy create(String sql,Object payload)
+    public SqlStatementStrategy create(String sql, Object payload)
         throws Exception
     {
         String sqlLowerCase = sql.toLowerCase();

@@ -14,7 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
-import org.mule.transport.jdbc.sqlstrategy.SQLStrategy;
+import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategy;
 
 
 public class JdbcMessageRequester extends AbstractMessageRequester
@@ -65,7 +65,7 @@ public class JdbcMessageRequester extends AbstractMessageRequester
      */
     protected MuleMessage doRequest(long timeout, MuleEvent event) throws Exception
     {
-        SQLStrategy strategy = connector.getSqlStrategyFactory().create("select", null);
+        SqlStatementStrategy strategy = connector.getSqlStrategyFactory().create("select", null);
         return strategy.executeStatement(connector, endpoint, event, timeout);        
     }
 

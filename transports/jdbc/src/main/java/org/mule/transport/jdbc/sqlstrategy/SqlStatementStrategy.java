@@ -11,9 +11,9 @@
 package org.mule.transport.jdbc.sqlstrategy;
 
 /**
- * Interface for classes implementing strategies for handling SQL statements.  See 
- * <code>SQLStrategyFactory</code> for how a strategy is selected.   
- * 
+ * Interface for classes implementing strategies for handling SQL statements.
+ *
+* @see SQLStrategyFactory
  */
 
 import org.mule.api.MuleEvent;
@@ -21,7 +21,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.jdbc.JdbcConnector;
 
-public interface SQLStrategy 
+public interface SqlStatementStrategy 
 {
     
     public MuleMessage executeStatement(JdbcConnector connector,

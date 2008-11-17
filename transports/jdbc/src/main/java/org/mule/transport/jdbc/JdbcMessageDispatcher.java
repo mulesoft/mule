@@ -16,7 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.transport.AbstractMessageDispatcher;
-import org.mule.transport.jdbc.sqlstrategy.SQLStrategy;
+import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,7 +63,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         JdbcConnector connector = (JdbcConnector) endpoint.getConnector();
         String statement = connector.getStatement(endpoint);
 
-        SQLStrategy strategy = connector.getSqlStrategyFactory().create(statement, event.getMessage().getPayload());
+        SqlStatementStrategy strategy = connector.getSqlStrategyFactory().create(statement, event.getMessage().getPayload());
         return strategy.executeStatement(connector, endpoint, event, event.getTimeout());
       
     }

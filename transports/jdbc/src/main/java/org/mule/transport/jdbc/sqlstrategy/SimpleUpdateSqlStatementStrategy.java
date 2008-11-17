@@ -29,9 +29,9 @@ import org.apache.log4j.Logger;
  * Implements strategy for handling individual insert, update, and delete statements
  *
  */
-public  class SimpleUpdateSQLStrategy  implements SQLStrategy
+public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
 {
-    protected static Logger logger = Logger.getLogger(SelectSQLStrategy.class);
+    protected static Logger logger = Logger.getLogger(SelectSqlStatementStrategy.class);
 
     public MuleMessage executeStatement(JdbcConnector connector,
             ImmutableEndpoint endpoint, MuleEvent event,long timeout) throws Exception

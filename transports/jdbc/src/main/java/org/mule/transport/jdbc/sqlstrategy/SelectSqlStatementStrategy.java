@@ -33,11 +33,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-public  class SelectSQLStrategy 
-    implements SQLStrategy
+public  class SelectSqlStatementStrategy
+    implements SqlStatementStrategy
 {
 
-    protected static Logger logger = Logger.getLogger(SelectSQLStrategy.class);
+    protected static Logger logger = Logger.getLogger(SelectSqlStatementStrategy.class);
 
 
 
