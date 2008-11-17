@@ -10,8 +10,16 @@
 
 package org.mule.module.xml.expression;
 
+import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.module.xml.i18n.XmlMessages;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.w3c.dom.Document;
 
 /**
  * Will select the text of a single node based on the property name
@@ -20,17 +28,42 @@ public class XPathNodeExpressionEvaluator extends XPathExpressionEvaluator
 {
     public static final String NAME = "xpath-node";
 
-    protected Object extractResultFromNode(Object result)
+    private DocumentBuilder builder;
+
+    public XPathNodeExpressionEvaluator()
     {
-        if(result instanceof Element)
+        try
         {
-            ((Element)result).detach();
-            return DocumentHelper.createDocument((Element)result);
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         }
-        return result;
+        catch (ParserConfigurationException e)
+        {
+            throw new ExpressionRuntimeException(XmlMessages.failedToCreateDocumentBuilder(), e);
+        }
     }
 
-    /** {@inheritDoc} */
+    protected Object extractResultFromNode(Object result)
+    {
+        if (result instanceof Element)
+        {
+            ((Element) result).detach();
+            return DocumentHelper.createDocument((Element) result);
+        }
+        else if (result instanceof org.w3c.dom.Element)
+        {
+            Document doc = builder.newDocument();
+            doc.appendChild((org.w3c.dom.Element) result);
+            return doc;
+        }
+        else
+        {
+            return result;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String getName()
     {
         return NAME;

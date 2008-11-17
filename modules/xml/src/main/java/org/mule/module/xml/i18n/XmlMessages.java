@@ -37,4 +37,9 @@ public class XmlMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 4, prefix, uri);
     }
+
+    public static Message failedToCreateDocumentBuilder()
+    {
+        return factory.createMessage(BUNDLE_PATH, 5);
+    }
 }
