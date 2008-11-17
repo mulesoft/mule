@@ -55,7 +55,7 @@
                     connectionFactory-ref="connectionFactory"
                     redeliveryHandlerFactory-ref="redeliveryHandlerFactory"/>
 
-    <jms:endpoint name="endpoint1" queue="blah" connector-ref="jmsConnectorDefaults">
+    <jms:endpoint name="endpoint1" queue="blah" connector-ref="jmsConnectorDefaults" disableTemporaryReplyToDestinations="true">
         <jms:selector expression="foo"/>
     </jms:endpoint>
 

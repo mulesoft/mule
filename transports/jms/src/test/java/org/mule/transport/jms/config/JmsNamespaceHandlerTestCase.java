@@ -21,6 +21,7 @@ import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.jms.DefaultRedeliveryHandler;
 import org.mule.transport.jms.DefaultRedeliveryHandlerFactory;
 import org.mule.transport.jms.JmsConnector;
+import org.mule.transport.jms.JmsConstants;
 import org.mule.transport.jms.filters.JmsPropertyFilter;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
 import org.mule.transport.jms.test.TestConnectionFactory;
@@ -136,6 +137,9 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         Filter filter1 = endpoint1.getFilter();
         assertNotNull(filter1);
         assertTrue(filter1 instanceof JmsSelectorFilter);
+        assertEquals(1, endpoint1.getProperties().size());
+        assertEquals("true", endpoint1.getProperty(JmsConstants.DISABLE_TEMP_DESTINATIONS_PROPERTY));
+        
         ImmutableEndpoint endpoint2 = muleContext.getRegistry().lookupEndpointBuilder("endpoint2").buildOutboundEndpoint();
         assertNotNull(endpoint2);
         Filter filter2 = endpoint2.getFilter();

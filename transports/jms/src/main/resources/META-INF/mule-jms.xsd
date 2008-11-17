@@ -237,6 +237,14 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="disableTemporaryReplyToDestinations" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    If this is set to false (the default), when Mule performs request/response calls a temporary destination
+                    will automatically be set up to receive a response from the remote JMS call.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <!-- these include option/repeats - should be embedded once -->

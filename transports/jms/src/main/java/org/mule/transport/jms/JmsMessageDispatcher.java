@@ -52,11 +52,14 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
     private JmsConnector connector;
     private Session cachedSession;
+    private boolean disableTemporaryDestinations = false;
 
     public JmsMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (JmsConnector) endpoint.getConnector();
+        disableTemporaryDestinations = connector.isDisableTemporaryReplyToDestinations() ||
+                ("true".equals(endpoint.getProperty(JmsConstants.DISABLE_TEMP_DESTINATIONS_PROPERTY)));
     }
 
     protected void doDispatch(MuleEvent event) throws Exception
@@ -199,7 +202,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     }
                 }
                 // Are we going to wait for a return event ?
-                if (remoteSync && replyTo == null && !connector.isDisableTemporaryReplyToDestinations())
+                if (remoteSync && replyTo == null && !disableTemporaryDestinations)
                 {
                     replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
                 }
