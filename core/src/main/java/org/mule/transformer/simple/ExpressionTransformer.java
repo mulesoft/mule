@@ -13,6 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -109,6 +110,10 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer imple
             try
             {
                 results[i] = muleContext.getExpressionManager().evaluate(argument.getFullExpression(), message);
+            }
+            catch (RequiredValueException e)
+            {
+                logger.warn(e.getMessage());
             }
             catch (ExpressionRuntimeException e)
             {
@@ -224,12 +229,6 @@ public class ExpressionTransformer extends AbstractMessageAwareTransformer imple
 
         protected String getFullExpression()
         {
-            //Sprecial handling of these evaluators since they don't retuen nul if some headers or attachments were found
-            if (!optional && (evaluator.equals("headers") || evaluator.equals("headers-list") ||
-                    (evaluator.equals("attachments") || evaluator.equals("attachments-list"))))
-            {
-                return evaluator + EVAL_TOKEN + expression + "required";
-            }
             return evaluator + EVAL_TOKEN + expression;
         }
 

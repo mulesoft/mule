@@ -14,7 +14,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
@@ -53,45 +52,34 @@ public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator
 
     public Object evaluate(String expression, MuleMessage message)
     {
-        if (message instanceof MuleMessage)
+        if(message==null) return null;
+        
+        if (StringUtils.isEmpty(expression))
         {
-            if (StringUtils.isEmpty(expression))
-            {
-                return ((MuleMessage) message).getPayload();
-            }
-            else
-            {
-                try
-                {
-                    if (expression.equals(BYTE_ARRAY))
-                    {
-                        return ((MuleMessage) message).getPayload(byte[].class);
-                    }
-                    else
-                    {
-                        return ((MuleMessage) message).getPayload(ClassUtils.loadClass(expression, getClass()));
-                    }
-                }
-                catch (TransformerException e)
-                {
-                    throw new MuleRuntimeException(CoreMessages.failedToProcessExtractorFunction(expression), e);
-                }
-                catch (ClassNotFoundException e)
-                {
-                    throw new MuleRuntimeException(CoreMessages.failedToProcessExtractorFunction(expression), e);
-                }
-            }
+            return message.getPayload();
         }
         else
         {
-            logger.warn("Message is not of type MuleMessage, the expression will return the object without modification");
-            if (message instanceof MessageAdapter)
+            try
             {
-                return ((MessageAdapter) message).getPayload();
+                if (expression.equals(BYTE_ARRAY))
+                {
+                    return message.getPayload(byte[].class);
+                }
+                else
+                {
+                    return message.getPayload(ClassUtils.loadClass(expression, getClass()));
+                }
+            }
+            catch (TransformerException e)
+            {
+                throw new MuleRuntimeException(CoreMessages.failedToProcessExtractorFunction(expression), e);
+            }
+            catch (ClassNotFoundException e)
+            {
+                throw new MuleRuntimeException(CoreMessages.failedToProcessExtractorFunction(expression), e);
             }
         }
-        return message;
-
     }
 
     /**

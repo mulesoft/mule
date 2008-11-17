@@ -38,7 +38,7 @@
                 <vm:inbound-endpoint path="service1.queue"/>
             </inbound>
             <test:component>
-                <test:return-data>#[function:shortPayloadClass] Received in #[mule:serviceName]</test:return-data>
+                <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
@@ -52,7 +52,7 @@
                 <vm:inbound-endpoint path="service2.queue"/>
             </inbound>
             <test:component>
-                <test:return-data>#[function:shortPayloadClass] Received in #[mule:serviceName]</test:return-data>
+                <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
@@ -66,7 +66,7 @@
                 <vm:inbound-endpoint path="service3.queue"/>
             </inbound>
             <test:component>
-                <test:return-data>#[function:shortPayloadClass] Received in #[mule:serviceName]</test:return-data>
+                <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>

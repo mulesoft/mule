@@ -12,7 +12,7 @@ package org.mule.expression;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
 
@@ -81,7 +81,7 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
         }
         else if (required)
         {
-            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(NAME, key));
+            throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull(NAME, key));
         }
         return null;
     }

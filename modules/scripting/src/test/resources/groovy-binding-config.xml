@@ -50,14 +50,14 @@
             <inbound>
                 <inbound-endpoint ref="callout_1"/>
             </inbound>
-            <test:component appendString=" Received by #[mule:serviceName]"/>
+            <test:component appendString=" Received by #[mule:context.serviceName]"/>
         </service>
 
         <service name="Callout2">
             <inbound>
                 <inbound-endpoint ref="callout_2"/>
             </inbound>
-            <test:component appendString=" Received by #[mule:serviceName]"/>
+            <test:component appendString=" Received by #[mule:context.serviceName]"/>
         </service>
         <!--// END SNIPPET: binding-config -->
     </model>

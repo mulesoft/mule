@@ -61,7 +61,7 @@
             <inbound>
                 <inbound-endpoint address="vm://component1"/>
             </inbound>
-            <test:component appendString=" Received #[mule:serviceName]"/>
+            <test:component appendString=" Received #[mule:context.serviceName]"/>
         </service>
 
         <service name="component1Fail">
@@ -75,7 +75,7 @@
             <inbound>
                 <inbound-endpoint address="vm://component2Pass"/>
             </inbound>
-            <test:component appendString=" Received #[mule:serviceName]"/>
+            <test:component appendString=" Received #[mule:context.serviceName]"/>
         </service>
 
         <service name="component2Fail">

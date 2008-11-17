@@ -12,7 +12,7 @@
 
     <expression-transformer name="testTransformer">
         <return-argument evaluator="payload" expression="org.mule.tck.testmodels.fruit.FruitBasket" optional="false"/>
-        <return-argument evaluator="headers" expression="foo,bar" optional="true"/>
+        <return-argument evaluator="headers" expression="foo,bar*" optional="true"/>
     </expression-transformer>
 
     <expression-transformer name="testTransformer2">

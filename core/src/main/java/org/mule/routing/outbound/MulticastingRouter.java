@@ -60,13 +60,18 @@ public class MulticastingRouter extends FilteringOutboundRouter
             for (int i = 0; i < endpoints.size(); i++)
             {
                 endpoint = (OutboundEndpoint) endpoints.get(i);
-                if (endpoint.isSynchronous())
+                if(endpoint.getFilter()==null || (endpoint.getFilter()!=null && endpoint.getFilter().accept(message)))
                 {
-                    results.add(send(session, new DefaultMuleMessage(message.getPayload(), message), endpoint));
-                }
-                else
-                {
-                    dispatch(session, message, endpoint);
+
+                    MuleMessage clonedMessage = new DefaultMuleMessage(message.getPayload(), message);
+                    if (endpoint.isSynchronous())
+                    {
+                        results.add(send(session, clonedMessage, endpoint));
+                    }
+                    else
+                    {
+                        dispatch(session, clonedMessage, endpoint);
+                    }
                 }
             }
         }

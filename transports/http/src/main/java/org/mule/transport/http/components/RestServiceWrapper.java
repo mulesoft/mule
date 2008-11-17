@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.component.AbstractComponent;
@@ -265,11 +266,18 @@ public class RestServiceWrapper extends AbstractComponent
             Map.Entry entry = (Map.Entry) iterator.next();
             String name = (String) entry.getKey();
             String exp = (String) entry.getValue();
-            Object value;
+            Object value = null;
 
             if(muleContext.getExpressionManager().isValidExpression(exp))
             {
-                value = muleContext.getExpressionManager().evaluate(exp, msg);
+                try
+                {
+                    value = muleContext.getExpressionManager().evaluate(exp, msg);
+                }
+                catch (RequiredValueException e)
+                {
+                    //ignore
+                }
             }
             else
             {

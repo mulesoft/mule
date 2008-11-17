@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
@@ -61,7 +62,16 @@ public class EndpointSelector extends FilteringOutboundRouter
                     CoreMessages.expressionInvalidForProperty("expression", prop), message, null);
         }
 
-        Object property = muleContext.getExpressionManager().evaluate(prop, message);
+        Object property = null;
+        try
+        {
+            property = muleContext.getExpressionManager().evaluate(prop, message);
+        }
+        catch (ExpressionRuntimeException e)
+        {
+            logger.error(e.getMessage());
+        }
+        
         if (property == null)
         {
             throw new CouldNotRouteOutboundMessageException(

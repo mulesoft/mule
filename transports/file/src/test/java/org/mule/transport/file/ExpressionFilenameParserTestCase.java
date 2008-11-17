@@ -61,8 +61,18 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         result = parser.getFilename(adapter, "Test8_#[header:foo].txt");
         assertEquals("Test8_bar.txt", result);
 
-        result = parser.getFilename(adapter, "Test9_#[header:xxx].txt");
-        assertEquals("Test9_#[header:xxx].txt", result);
+        result = parser.getFilename(adapter, "Test9_#[header:xxx*].txt");
+        assertEquals("Test9_#[header:xxx*].txt", result);
+
+        try
+        {
+            result = parser.getFilename(adapter, "Test9_#[header:xxx].txt");
+            fail("Property xxx is not available");
+        }
+        catch (Exception e)
+        {
+            //Expected
+        }
 
     }
 
@@ -92,8 +102,18 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         result = parser.getFilename(adapter, "Test8_[header:foo].txt");
         assertEquals("Test8_bar.txt", result);
 
-        result = parser.getFilename(adapter, "Test9_[header:xxx].txt");
-        assertEquals("Test9_[header:xxx].txt", result);
+        try
+        {
+            result = parser.getFilename(adapter, "Test9_[header:xxx].txt");
+            fail("Property xxx is not available");
+        }
+        catch (Exception e)
+        {
+            //Expected
+        }
+
+        result = parser.getFilename(adapter, "Test9_[header:xxx*].txt");
+        assertEquals("Test9_[header:xxx*].txt", result);
     }
 
 }

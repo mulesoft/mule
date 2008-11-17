@@ -13,7 +13,7 @@ package org.mule.expression;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
 
 /**
@@ -53,7 +53,7 @@ public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
 
         if (result == null && required)
         {
-            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(NAME, expression));
+            throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull(NAME, expression));
         }
         return result;
     }

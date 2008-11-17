@@ -12,7 +12,7 @@ package org.mule.expression;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.HashMap;
@@ -57,7 +57,7 @@ public class MessageHeadersExpressionEvaluator implements ExpressionEvaluator
                 s = s.trim();
                 if (s.endsWith("*"))
                 {
-                    s = s.substring(s.length() - 1);
+                    s = s.substring(0, s.length() - 1);
                     required = false;
                 }
                 else
@@ -71,7 +71,7 @@ public class MessageHeadersExpressionEvaluator implements ExpressionEvaluator
                 }
                 else if (required)
                 {
-                    throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(NAME, expression));
+                    throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull(NAME, expression));
                 }
             }
         }

@@ -27,7 +27,7 @@
         </service>
 
         <service name="testService3">
-            <test:component enableMessageHistory="false" appendString=" #[mule:serviceName]"/>
+            <test:component enableMessageHistory="false" appendString=" #[mule:context.serviceName]"/>
         </service>
     </model>
 </mule>
