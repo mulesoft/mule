@@ -55,6 +55,23 @@
             </outbound>
         </service>
 
+
+        <service name="JMSService4">
+            <inbound>
+                <vm:inbound-endpoint path="in4" synchronous="true"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint queue="test1.in" connector-ref="jmsConnector2"/>
+                    <reply-to address="jms://replies"/>
+                </pass-through-router>
+            </outbound>
+            <async-reply>
+                <jms:inbound-endpoint queue="replies" connector-ref="jmsConnector2"/>
+                <single-async-reply-router/>
+            </async-reply>
+        </service>
+
         <service name="TestService1">
             <inbound>
                 <jms:inbound-endpoint queue="test1.in" synchronous="true" connector-ref="jmsConnector1"/>

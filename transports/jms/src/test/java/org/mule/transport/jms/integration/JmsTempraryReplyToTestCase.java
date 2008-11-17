@@ -41,8 +41,17 @@ public class JmsTempraryReplyToTestCase extends FunctionalTestCase
     {
         MuleClient muleClient = new MuleClient();
         MuleMessage response = muleClient.send("vm://in3", TEST_MESSAGE, null);
-        //We get the original message back, not the result from the remote component        
+        //We get the original message back, not the result from the remote component
         assertEquals(TEST_MESSAGE, response.getPayload());
+
+    }
+
+    public void testExplicitReplyToAsyncSet() throws MuleException
+    {
+        MuleClient muleClient = new MuleClient();
+        MuleMessage response = muleClient.send("vm://in4", TEST_MESSAGE, null);
+        //We get the original message back, not the result from the remote component
+        assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
 
     }
 
