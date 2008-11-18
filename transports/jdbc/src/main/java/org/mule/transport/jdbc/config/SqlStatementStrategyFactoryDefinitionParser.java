@@ -10,6 +10,7 @@
 
 package org.mule.transport.jdbc.config;
 
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
@@ -27,8 +28,8 @@ public class SqlStatementStrategyFactoryDefinitionParser extends AbstractBeanDef
     {
         final MutablePropertyValues parentProps = parserContext.getContainingBeanDefinition().getPropertyValues();
 
-        final String ref = element.getAttribute("ref");
-        final String clazz = element.getAttribute("class");
+        final String ref = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
+        final String clazz = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS);
         if (StringUtils.isBlank(ref) && StringUtils.isBlank(clazz))
         {
             throw new IllegalArgumentException("Neither ref nor class attribute specified for the sqlStatementStrategyFactory element");

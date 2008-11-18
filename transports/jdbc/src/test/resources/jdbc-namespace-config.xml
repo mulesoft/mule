@@ -17,6 +17,7 @@
     <jdbc:connector name="jdbcConnector2" dataSource-ref="testDS2"/>
 
     <jdbc:connector name="jdbcConnector3" dataSource-ref="testDS1">
+        <spring:property name="sqlStatementStrategyFactory" ref="someRef"/>
         <jdbc:query key="getTest"
                     value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL" />
         <jdbc:query key="getTest2"
