@@ -74,7 +74,7 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     @Override
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
-        if (getParentContext() != null)
+        if (getParentContext() == null)
         {
             setParentContext(loadParentContext(context));
         }
