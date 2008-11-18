@@ -50,7 +50,6 @@ import org.springframework.web.context.support.ServletContextResource;
  */
 public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBuilder
 {
-
     /**
      * Logger used by this class
      */
@@ -70,6 +69,17 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     {
         super(configResources);
         context = servletContext;
+    }
+
+    @Override
+    protected void doConfigure(MuleContext muleContext) throws Exception
+    {
+        if (getParentContext() != null)
+        {
+            setParentContext(loadParentContext(context));
+        }
+
+        super.doConfigure(muleContext);
     }
 
     protected ConfigResource[] loadConfigResources(String[] configs) throws ConfigurationException
@@ -97,9 +107,6 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
             servletContextResources[i] = new ServletContextOrClassPathResource(context, configResources[i].getResourceName());
         }
 
-        // TODO Do we still need support for a parent context?
-        //parentContext = loadParentContext(context);
-
         return new MuleApplicationContext(muleContext, servletContextResources);
     }
 
@@ -114,7 +121,6 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
      */
     protected ApplicationContext loadParentContext(ServletContext servletContext) throws BeansException
     {
-
         ApplicationContext parentContext = null;
         String locatorFactorySelector = servletContext.getInitParameter(ContextLoader.LOCATOR_FACTORY_SELECTOR_PARAM);
         String parentContextKey = servletContext.getInitParameter(ContextLoader.LOCATOR_FACTORY_KEY_PARAM);

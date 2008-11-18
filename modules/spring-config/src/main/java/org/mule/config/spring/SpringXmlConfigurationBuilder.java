@@ -117,6 +117,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         this.useDefaultConfigResource = useDefaultConfigResource;
     }
 
+    protected ApplicationContext getParentContext()
+    {
+        return parentContext;
+    }
+    
     public void setParentContext(ApplicationContext parentContext)
     {
         this.parentContext = parentContext;
