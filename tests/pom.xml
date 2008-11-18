@@ -18,16 +18,4 @@
         <module>functional</module>
         <module>integration</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>jdk15</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <modules>
-                <module>integration-jdk5</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

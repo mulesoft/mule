@@ -1,3 +1,0 @@
-
-# MULE-3695
-org.mule.transport.soap.cxf.ServiceUsingAxisEndpointTestCase
