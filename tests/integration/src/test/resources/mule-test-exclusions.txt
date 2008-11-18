@@ -38,6 +38,9 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # @ in URI is not getting replaced (1 of 3 tests fails)
 org.mule.test.integration.util.ObjectNameHelperTestCase
 
+# MULE-3695
+org.mule.transport.soap.cxf.ServiceUsingAxisEndpointTestCase
+
 ##########################################################################
 # Low priority
 ##########################################################################
