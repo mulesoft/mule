@@ -10,12 +10,12 @@
 
 package org.mule.config.spring;
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.GenericLifecycleManager;
@@ -26,8 +26,8 @@ import org.mule.util.StringUtils;
 import java.util.Collection;
 import java.util.Map;
 
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -62,6 +62,20 @@ public class SpringRegistry extends AbstractRegistry
     public SpringRegistry(String id, ApplicationContext applicationContext)
     {
         super(id);
+        this.applicationContext = applicationContext;
+    }
+
+    public SpringRegistry(ConfigurableApplicationContext applicationContext, ApplicationContext parentContext)
+    {
+        super(REGISTRY_ID);
+        applicationContext.setParent(parentContext);
+        this.applicationContext = applicationContext;
+    }
+
+    public SpringRegistry(String id, ConfigurableApplicationContext applicationContext, ApplicationContext parentContext)
+    {
+        super(id);
+        applicationContext.setParent(parentContext);
         this.applicationContext = applicationContext;
     }
 

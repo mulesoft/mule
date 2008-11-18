@@ -36,7 +36,7 @@ public class Orange implements Fruit, Callable
     private boolean bitten = false;
     private Integer segments = new Integer(10);
     private Double radius = new Double(4.34);
-    private String brand;
+    private String brand = "Pirulo";
 
     private FruitCleaner cleaner;
 

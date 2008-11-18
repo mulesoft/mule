@@ -17,8 +17,10 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.registry.Registry;
 import org.mule.config.ConfigResource;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
+import org.mule.config.i18n.MessageFactory;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * <code>SpringXmlConfigurationBuilder</code> enables Mule to be configured from a
@@ -33,6 +35,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     private boolean useDefaultConfigResource = true;
 
     private Registry registry;
+    
+    private ApplicationContext parentContext;
     
     public SpringXmlConfigurationBuilder(String[] configResources) throws ConfigurationException
     {
@@ -72,7 +76,22 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     
     protected void createSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext) throws Exception
     {
-        registry = new SpringRegistry(applicationContext);
+        if (parentContext != null)
+        {
+            if (applicationContext instanceof ConfigurableApplicationContext)
+            {
+                registry = new SpringRegistry((ConfigurableApplicationContext) applicationContext, parentContext);
+            }
+            else
+            {
+                throw new ConfigurationException(MessageFactory.createStaticMessage("Cannot set a parent context if the ApplicationContext does not implement ConfigurableApplicationContext"));
+            }
+        }
+        else
+        {
+            registry = new SpringRegistry(applicationContext);
+        }
+
         // Note: The SpringRegistry must be created before applicationContext.refresh() gets called because
         // some beans may try to look up other beans via the Registry during preInstantiateSingletons().
         muleContext.addRegistry(1, registry);
@@ -96,5 +115,10 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     public void setUseDefaultConfigResource(boolean useDefaultConfigResource)
     {
         this.useDefaultConfigResource = useDefaultConfigResource;
+    }
+
+    public void setParentContext(ApplicationContext parentContext)
+    {
+        this.parentContext = parentContext;
     }
 }
