@@ -209,4 +209,9 @@ public class JndiObjectFactory implements ObjectFactory
     {
         return false;
     }
+
+    public boolean isExternallyManagedLifecycle()
+    {
+        return false;
+    }
 }

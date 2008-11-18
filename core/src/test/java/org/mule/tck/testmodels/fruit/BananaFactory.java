@@ -48,4 +48,9 @@ public class BananaFactory implements ObjectFactory
     {
         return false;
     }
+
+    public boolean isExternallyManagedLifecycle()
+    {
+        return false;
+    }
 }

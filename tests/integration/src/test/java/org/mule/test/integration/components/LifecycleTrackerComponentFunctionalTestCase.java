@@ -28,24 +28,40 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
 
     /**
      * ASSERT:
-     * - Mule lifecycle methods invoked
+     * - Mule stop/start lifecycle methods invoked
+     * - Mule initialize/dipose lifecycle methods NOT invoked
      * - Spring lifecycle methods invoked
-     * - MuleContext is injected (Component implements MuleContextAware + Component is in registry)
-     * - Service is injected (Component implements MuleContextAware + Component is in registry)
-     * - Start + Stop lifecyle methods are invoked twice (See MULE-3888)
+     * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
+     * NOTE: muleContext is injected twice, once by registry and once by lifecycleAdaptor
      * @throws Exception
      */
     public void testSpringBeanServiceLifecycle() throws Exception
     {
         testComponentLifecycle(
             "SpringBeanService",
-            "[setProperty, setMuleContext, springInitialize, setService, setMuleContext, initialise, start, start, stop, stop, dispose, springDestroy]");
+            "[setProperty, setMuleContext, springInitialize, setService, setMuleContext, start, stop, springDestroy]");
     }
 
     /**
      * ASSERT:
+     * - Mule stop/start lifecycle methods invoked
+     * - Mule initialize/dipose lifecycle methods NOT invoked
+     * - Spring lifecycle methods NOT invoked
+     * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
+     * NOTE: muleContext is injected twice, once by registry and once by lifecycleAdaptor
+     * @throws Exception
+     */
+    public void testSpringBeanService2Lifecycle() throws Exception
+    {
+        testComponentLifecycle(
+            "SpringBeanService2",
+            "[setProperty, setMuleContext, setService, setMuleContext, start, stop]");
+    }
+    
+    /**
+     * ASSERT:
      * - Mule lifecycle methods invoked
-     * - Service is injected (Component implements ServiceAware)
+     * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * @throws Exception
      */
     public void testSingletonServiceLifecycle() throws Exception
@@ -57,7 +73,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
     /**
      * ASSERT:
      * - Mule lifecycle methods invoked
-     * - Service is injected (Component implements ServiceAware)
+     * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * @throws Exception
      */
     public void testMulePrototypeServiceLifecycle() throws Exception
@@ -68,13 +84,24 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
 
     /**
      * ASSERT:
-     * - Mule lifecycle methods aren't invoked (They are invoked JIT with non-singleton components)
-     * - Service is injected (Component implements ServiceAware)
+     * - Mule lifecycle methods invoked
+     * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * @throws Exception
      */
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePooledPrototypeService", "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]");
+    }
+    
+    /**
+     * ASSERT:
+     * - Mule lifecycle methods invoked each time singleton is used to create new object in pool
+     * - Service and muleContext injected each time singleton is used to create new object in pool (Component implements ServiceAware/MuleContextAware)
+     * @throws Exception
+     */
+    public void testMulePooledSingletonServiceLifecycle() throws Exception
+    {
+        testComponentLifecycle("MulePooledSingletonService", "[setProperty, setService, setMuleContext, initialise, setService, setMuleContext, initialise, setService, setMuleContext, initialise, start, start, start, stop, stop, stop, dispose, dispose, dispose]");
     }
 
     private void testComponentLifecycle(final String serviceName, final String expectedLifeCycle)

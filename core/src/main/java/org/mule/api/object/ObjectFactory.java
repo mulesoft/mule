@@ -43,6 +43,16 @@ public interface ObjectFactory extends Initialisable, Disposable
     boolean isSingleton();
 
     /**
+     * Returns true if Mule should not manage the life-cycle the object instance returned from the ObjectFactory.
+     * This is normally false except when an ObjectFactory implementation obtains instance from containers
+     * (e.g. Spring) that already manages the objects lifecycle.
+     * instance.
+     * 
+     * @return
+     */
+    boolean isExternallyManagedLifecycle();
+    
+    /**
      * Register a custom initialiser
      */
     void addObjectInitialisationCallback(InitialisationCallback callback);

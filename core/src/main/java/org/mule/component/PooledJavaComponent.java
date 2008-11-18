@@ -140,6 +140,11 @@ public class PooledJavaComponent extends AbstractJavaComponent
         {
             return false;
         }
+
+        public boolean isExternallyManagedLifecycle()
+        {
+            return objectFactory.isExternallyManagedLifecycle();
+        }
     }
 
 }

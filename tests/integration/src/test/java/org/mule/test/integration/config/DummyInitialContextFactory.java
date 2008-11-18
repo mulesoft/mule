@@ -68,4 +68,9 @@ public class DummyInitialContextFactory implements ObjectFactory
     {
         return false;
     }
+
+    public boolean isExternallyManagedLifecycle()
+    {
+        return false;
+    }
 }

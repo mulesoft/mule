@@ -13,7 +13,6 @@ package org.mule.config.spring.util;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.object.AbstractObjectFactory;
-
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -102,5 +101,11 @@ public class SpringBeanLookup extends AbstractObjectFactory implements Applicati
     public boolean isSingleton()
     {
         return applicationContext.isSingleton(bean);
+    }
+
+    @Override
+    public boolean isExternallyManagedLifecycle()
+    {
+        return true;
     }
 }
