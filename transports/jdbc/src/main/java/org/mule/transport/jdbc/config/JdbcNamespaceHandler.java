@@ -27,12 +27,14 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public static final String QUERY_KEY = "queryKey";
     public static final String[] ADDRESS_ATTRIBUTES = new String[]{QUERY_KEY};
+    public static final String ATTRIBUTE_SQL_STATEMENT_FACTORY = "sqlStatementStrategyFactory";
 
     public void init()
     {
         registerStandardTransportEndpoints(JdbcConnector.JDBC, ADDRESS_ATTRIBUTES).addAlias(QUERY_KEY, URIBuilder.PATH);
         registerConnectorDefinitionParser(JdbcConnector.class);
         registerBeanDefinitionParser("dataSource", new ObjectFactoryWrapper("dataSourceFactory"));
+        registerBeanDefinitionParser(ATTRIBUTE_SQL_STATEMENT_FACTORY, new SqlStatementStrategyFactoryDefinitionParser());
         MuleDefinitionParser connectorQuery = new ChildSingletonMapDefinitionParser("query");
         MuleDefinitionParser endpointQuery = new NestedMapDefinitionParser("properties", "queries");
         endpointQuery.addCollection("properties");

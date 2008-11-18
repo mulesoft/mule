@@ -38,6 +38,16 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
+                    <xsd:element name="sqlStatementStrategyFactory" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>Override the default SqlStatementStrategyFactory. Determines the
+                                execution strategy based on the SQL provided.</xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:attribute name="class" use="optional"/>
+                            <xsd:attribute name="ref" type="xsd:NMTOKEN" use="optional"/>
+                        </xsd:complexType>
+                    </xsd:element>
                     <xsd:element ref="abstract-query" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>Defines a set of queries. Each query has a key

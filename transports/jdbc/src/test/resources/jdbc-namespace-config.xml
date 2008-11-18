@@ -25,6 +25,14 @@
                     value="UPDATE TEST SET ACK = #[function:NOW]WHERE ID = #[id] AND TYPE = #[type] AND DATA = #[data]" />
     </jdbc:connector>
 
+    <jdbc:connector name="jdbcConnector4" dataSource-ref="testDS2">
+        <jdbc:sqlStatementStrategyFactory class="org.mule.transport.jdbc.config.JdbcNamespaceHandlerTestCase$TestSqlStatementStrategyFactory"/>
+    </jdbc:connector>
+
+    <jdbc:connector name="jdbcConnector5" dataSource-ref="testDS2">
+        <jdbc:sqlStatementStrategyFactory ref="sqlStatementStrategyFactory"/>
+    </jdbc:connector>
+
     <jdbc:endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
         <jdbc:query key="getTest2" value="OVERRIDDEN VALUE" />
         <jdbc:query key="getTest3" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL" />
@@ -39,6 +47,7 @@
     </jdbc:endpoint>
     
     <spring:bean id="testDS1" class="org.mule.transport.jdbc.test.TestDataSource" />
+    <spring:bean name="sqlStatementStrategyFactory" class="org.mule.transport.jdbc.config.JdbcNamespaceHandlerTestCase$TestSqlStatementStrategyFactory"/>
 
     <spring:beans>
         <jee:jndi-lookup id="testDS2" jndi-name="jdbc/testDS" environment-ref="jndiEnv" />

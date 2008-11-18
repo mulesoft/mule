@@ -15,6 +15,7 @@ import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcTransactionFactory;
+import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.test.TestDataSource;
 
 
@@ -58,7 +59,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         
         assertNotNull(c.getQueries());
         assertEquals(3, c.getQueries().size());
-        
+
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
     }
@@ -107,4 +108,21 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
             endpoint.getTransactionConfig().getAction());
     }
 
+    public void testSqlStatementStrategyFactoryOverride() throws Exception
+    {
+        // class config
+        JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector4");
+        assertNotNull(c.getSqlStatementStrategyFactory());
+        assertTrue(c.getSqlStatementStrategyFactory() instanceof TestSqlStatementStrategyFactory);
+
+        // ref config
+        c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector5");
+        assertNotNull(c.getSqlStatementStrategyFactory());
+        assertTrue(c.getSqlStatementStrategyFactory() instanceof TestSqlStatementStrategyFactory);
+    }
+
+    public static class TestSqlStatementStrategyFactory extends DefaultSqlStatementStrategyFactory
+    {
+        
+    }
 }

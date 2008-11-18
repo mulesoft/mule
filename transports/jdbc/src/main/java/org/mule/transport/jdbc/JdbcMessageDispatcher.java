@@ -63,7 +63,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         JdbcConnector connector = (JdbcConnector) endpoint.getConnector();
         String statement = connector.getStatement(endpoint);
 
-        SqlStatementStrategy strategy = connector.getSqlStrategyFactory().create(statement, event.getMessage().getPayload());
+        SqlStatementStrategy strategy = connector.getSqlStatementStrategyFactory().create(statement, event.getMessage().getPayload());
         return strategy.executeStatement(connector, endpoint, event, event.getTimeout());
       
     }

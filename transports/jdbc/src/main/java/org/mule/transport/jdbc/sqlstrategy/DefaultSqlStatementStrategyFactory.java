@@ -10,12 +10,7 @@
 
 package org.mule.transport.jdbc.sqlstrategy;
 
-/**
- * Factory that selects appropriate implementation of SQLStrategy for a particular SQL string
- */
-
-
-public class DefaultSqlStatementStrategyFactory
+public class DefaultSqlStatementStrategyFactory implements SqlStatementStrategyFactory
 {
 
 

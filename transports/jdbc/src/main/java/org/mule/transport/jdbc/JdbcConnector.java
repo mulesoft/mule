@@ -25,6 +25,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
+import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategyFactory;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
@@ -53,7 +54,7 @@ public class JdbcConnector extends AbstractConnector
 
     private static final Pattern STATEMENT_ARGS = TemplateParser.WIGGLY_MULE_TEMPLATE_PATTERN;
 
-    protected DefaultSqlStatementStrategyFactory sqlStrategyFactory = new DefaultSqlStatementStrategyFactory();
+    private SqlStatementStrategyFactory sqlStatementStrategyFactory = new DefaultSqlStatementStrategyFactory();
 
 
     /* Register the SQL Exception reader if this class gets loaded */
@@ -433,9 +434,14 @@ public class JdbcConnector extends AbstractConnector
         this.queries = queries;
     }
 
-    public DefaultSqlStatementStrategyFactory getSqlStrategyFactory()
+    public SqlStatementStrategyFactory getSqlStatementStrategyFactory()
     {
-        return sqlStrategyFactory;
+        return sqlStatementStrategyFactory;
+    }
+
+    public void setSqlStatementStrategyFactory(SqlStatementStrategyFactory sqlStatementStrategyFactory)
+    {
+        this.sqlStatementStrategyFactory = sqlStatementStrategyFactory;
     }
 
     public String getStatement(ImmutableEndpoint endpoint)
