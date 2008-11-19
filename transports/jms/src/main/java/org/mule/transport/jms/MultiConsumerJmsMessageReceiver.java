@@ -42,10 +42,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This is an experimental rework of the <code>transacted.message.receiver</code>
- * (it may work with non-transacted sessions as well,
- * just hasn't been tested and load-tested yet.
- * <p/>
  * In Mule an endpoint corresponds to a single receiver. It's up to the receiver to do multithreaded consumption and
  * resource allocation, if needed. This class honors the <code>numberOfConcurrentTransactedReceivers</code> strictly
  * and will create exactly this number of consumers.
