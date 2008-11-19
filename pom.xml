@@ -52,6 +52,16 @@
         <url>http://svn.mule.codehaus.org</url>
     </scm>
 
+    <modules>
+        <module>buildtools</module>
+        <module>core</module>
+        <module>examples</module>
+        <module>modules</module>
+        <module>tests</module>
+        <module>tools</module>
+        <module>transports</module>
+    </modules>
+
     <properties>
         <!--
             The above project.url will not be picked up in the manifest,
@@ -895,8 +905,8 @@
                                     <version>[2.0.8,)</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <!-- minimum version is 1.4.2, Java 5 and higher not allowed -->
-                                    <version>[1.4.2,1.5.0)</version>
+                                    <!-- Java version must be 1.5 or higher, JDK6 not allowed -->
+                                    <version>[1.5.0,1.6.0)</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -905,15 +915,15 @@
             </plugin>
 
             <!-- 
-                Default is still to compile to JDK 1.4. Individual modules may override
+                Default is to compile to JDK 5. Individual modules may override
                 this setting.
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.4</source>
-                    <target>1.4</target>
+                    <source>1.5</source>
+                    <target>1.5</target>
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
@@ -980,8 +990,9 @@
                 <configuration>
                     <!-- by default download all sources when generating project files -->
                     <downloadSources>true</downloadSources>
+                    <!-- configure a JDK named 'jdk5' for this project -->
                     <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk15Name}</classpathContainer>
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk5Name}</classpathContainer>
                     </classpathContainers>
                 </configuration>
             </plugin>
@@ -1017,7 +1028,7 @@
                     </instructions>
                 </configuration>
             </plugin>
-            
+
             <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules 
                 where <packaging>jar</packaging> is used (i.e., those which are 
                 not OSGi bundles). -->  
@@ -1048,7 +1059,7 @@
                             <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
                             <!--Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date-->
                             <!-- include repository revision from buildnumber plugin -->
-                            
+
                             <!-- MULE-3783 Exclude for now as otherwise bundle manifest don't get these properties
                                  Only a few jars that are not converted to bundles yet will have these entries missing 
                                  and more important bundles will now have this entry.
@@ -1194,107 +1205,6 @@
     </reporting>
 
     <profiles>
-        <profile>
-            <id>jdk14</id>
-            <activation>
-                <property>
-                    <!--
-                        This profile is always active and is NOT activated by JDK
-                        on purpose. We always want to compile at least the 1.4 compatible
-                        sources as the bottom line.
-
-                        To disable this profile specify -DskipJDK14=true on the commandline
-                        -->
-                    <name>!skipJDK14</name>
-                </property>
-            </activation>
-            <modules>
-                <module>buildtools</module>
-                <module>core</module>
-                <module>modules</module>
-                <module>transports</module>
-                <module>tests</module>
-                <module>examples</module>
-                <module>tools</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>jdk15</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <!-- MULE-2070: 1.0-alpha-3 is broke so enforce previous version  -->
-                        <version>1.0-alpha-2</version>
-                        <executions>
-                            <execution>
-                                <id>enforce-maven-version</id>
-                                <goals>
-                                    <goal>enforce-once</goal>
-                                </goals>
-                                <configuration>
-                                    <rules>
-                                        <requireMavenVersion>
-                                            <!-- minimum version is 2.0.8, higher versions allowed -->
-                                            <version>[2.0.8,)</version>
-                                        </requireMavenVersion>
-                                        <requireJavaVersion>
-                                            <!-- Java version must be 1.5 or higher -->
-                                            <version>[1.5.0,)</version>
-                                        </requireJavaVersion>
-                                    </rules>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- 
-                        If this profile is activated, all classes will be compiled using
-                        JDK 1.5 compatability.
-                    -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <source>1.5</source>
-                            <target>1.5</target>
-                            <encoding>ISO-8859-1</encoding>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <source>1.5</source>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-eclipse-plugin</artifactId>
-                        <version>${eclipsePluginVersion}</version>
-                        <configuration>
-                            <!-- by default download all sources when generating project files -->
-                            <downloadSources>true</downloadSources>
-                            <!-- configure a JDK named 'jdk5' for this project -->
-                            <classpathContainers>
-                                <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk5Name}</classpathContainer>
-                            </classpathContainers>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-            <modules>
-                <module>examples</module>
-                <module>modules</module>
-                <module>transports</module>
-                <module>tests</module>
-            </modules>
-        </profile>
-
         <profile>
             <id>distributions</id>
             <modules>

@@ -16,8 +16,14 @@
 
     <modules>
         <module>all-examples</module>
+        <module>bookstore</module>
+        <module>echo</module>
         <module>errorhandler</module>
         <module>hello</module>
+        <module>loanbroker</module>
+        <module>scripting</module>
+        <module>stockquote</module>
+        <module>webapp</module>
     </modules>
 
     <build>
@@ -43,6 +49,7 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
@@ -75,23 +82,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>jdk15</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <modules>
-                <!-- All these examples depend on the CXF transport which is JDK5 -->
-                <module>echo</module>
-                <module>loanbroker</module>
-                <module>stockquote</module>
-                <module>webapp</module>
-                <!-- Uses a Groovy script with JDK 5 syntax -->
-                <module>scripting</module>
-                <module>bookstore</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

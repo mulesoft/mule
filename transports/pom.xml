@@ -13,6 +13,33 @@
     <packaging>pom</packaging>
     <name>Mule Transports</name>
 
+    <modules>
+        <module>all-transports</module>
+        <module>axis</module>
+        <module>bpm</module>
+        <module>cxf</module>
+        <module>ejb</module>
+        <module>email</module>
+        <module>file</module>
+        <module>ftp</module>
+        <module>http</module>
+        <module>jbpm</module>
+        <module>jdbc</module>
+        <module>jetty</module>
+        <module>jms</module>
+        <module>multicast</module>
+        <module>quartz</module>
+        <module>rmi</module>
+        <module>servlet</module>
+        <module>soap</module>
+        <module>ssl</module>
+        <module>stdio</module>
+        <module>tcp</module>
+        <module>udp</module>
+        <module>vm</module>
+        <module>xmpp</module>
+    </modules>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -41,56 +68,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>jdk14</id>
-            <activation>
-                <property>
-                    <!--
-                        This profile is always active and is NOT activated by JDK
-                        on purpose. We always want to compile at least the 1.4 compatible
-                        sources as the bottom line.
-
-                        To disable this profile specify -DskipJDK14=true on the commandline
-                        -->
-                    <name>!skipJDK14</name>
-                </property>
-            </activation>
-            <modules>
-                <module>all-transports</module>
-                <module>axis</module>
-                <module>bpm</module>
-                <module>ejb</module>
-                <module>email</module>
-                <module>file</module>
-                <module>ftp</module>
-                <module>http</module>
-                <module>jbpm</module>
-                <module>jdbc</module>
-                <module>jetty</module>
-                <module>jms</module>
-                <module>multicast</module>
-                <module>quartz</module>
-                <module>rmi</module>
-                <module>servlet</module>
-                <module>soap</module>
-                <module>ssl</module>
-                <module>stdio</module>
-                <module>tcp</module>
-                <module>udp</module>
-                <module>vm</module>
-                <module>xmpp</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>jdk15</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <modules>
-                <module>cxf</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>
