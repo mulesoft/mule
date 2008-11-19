@@ -186,8 +186,8 @@
         <xsd:attributeGroup ref="sqlStatementStrategyFactoryAttributes"/>
     </xsd:complexType>
     <xsd:attributeGroup name="sqlStatementStrategyFactoryAttributes">
-        <xsd:attribute name="class" type="mule:substitutableClass"/>
-        <xsd:attribute name="ref" type="mule:referenceType"/>
+        <xsd:attribute name="class" type="mule:substitutableClass" use="optional"/>
+        <xsd:attribute name="ref" use="optional" type="xsd:NMTOKEN"/>
     </xsd:attributeGroup>
 
 </xsd:schema>
