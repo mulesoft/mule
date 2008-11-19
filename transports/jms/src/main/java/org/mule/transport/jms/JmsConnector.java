@@ -143,6 +143,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     private RedeliveryHandlerFactory redeliveryHandlerFactory;
 
+    /** determines whether a temporary JMSReplyTo destination will be used when using synchronous outbound JMS endpoints */
     private boolean disableTemporaryReplyToDestinations = false;
 
     ////////////////////////////////////////////////////////////////////////
