@@ -26,10 +26,10 @@ public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
 {
     protected static final String[] TEST_VALUES = {"Test", "The Moon", "Terra"};
 
+    protected JdbcConnector jdbcConnector;
+
     private boolean populateTestData = true;
-    
-    JdbcConnector jdbcConnector = null;
-    
+
     protected String getConfigResources()
     {
         return "jdbc-connector.xml";
