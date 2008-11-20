@@ -171,6 +171,10 @@ public class DefaultExpressionManager implements ExpressionManager
         {
             throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(evaluator, expression));
         }
+        if(logger.isDebugEnabled())
+        {
+             logger.debug("Result of expression: " + evaluator + ":" + expression + " is: " + result );
+        }
         return result;
     }
 

@@ -85,7 +85,12 @@ public class ExpressionFilter implements Filter, MuleContextAware
         String expr = getFullExpression();
         if (delegateFilter != null)
         {
-            return delegateFilter.accept(message);
+            boolean result = delegateFilter.accept(message);
+            if(logger.isDebugEnabled())
+            {
+                logger.debug("Result of expression filter: " + expr + " is: " + result);
+            }
+            return result;
         }
 
         Object result = muleContext.getExpressionManager().evaluate(expr, message);
