@@ -34,8 +34,8 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
     public static final String NAME = "attachments";
     public static final String DELIM = ",";
 
-    public static final String ALL_ARGUMENT = "all";
-    public static final String COUNT_ARGUMENT = "count";
+    public static final String ALL_ARGUMENT = "{all}";
+    public static final String COUNT_ARGUMENT = "{count}";
 
     public Object evaluate(String expression, MuleMessage message)
     {

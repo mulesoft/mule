@@ -33,12 +33,14 @@ public class MessageHeadersListExpressionEvaluator implements ExpressionEvaluato
     public static final String NAME = "headers-list";
     public static final String DELIM = ",";
 
+    public static final String ALL_ARGUMENT = "{all}";
+
     public Object evaluate(String expression, MuleMessage message)
     {
         boolean required;
 
         List result;
-        if (expression.equals("all"))
+        if (ALL_ARGUMENT.equals(expression))
         {
             result = new ArrayList(message.getPropertyNames().size());
             for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)

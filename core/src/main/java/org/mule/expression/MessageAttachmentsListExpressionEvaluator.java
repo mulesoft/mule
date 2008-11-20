@@ -34,12 +34,14 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
     public static final String NAME = "attachments-list";
     public static final String DELIM = ",";
 
+    public static final String ALL_ARGUMENT = "{all}";
+
     public Object evaluate(String expression, MuleMessage message)
     {
         boolean required;
 
         List result;
-        if (expression.equals("all"))
+        if (ALL_ARGUMENT.equals(expression))
         {
             result = new ArrayList(message.getAttachmentNames().size());
             for (Iterator iterator = message.getAttachmentNames().iterator(); iterator.hasNext();)

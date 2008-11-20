@@ -271,12 +271,12 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
         eval.setMuleContext(muleContext);
 
-        Object result = eval.evaluate("message.attachments(all)", createMessageWithAttachments());
+        Object result = eval.evaluate("message.attachments({all})", createMessageWithAttachments());
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(3, ((Map)result).size());
 
-        result = eval.evaluate("message.attachments-list(all)", createMessageWithAttachments());
+        result = eval.evaluate("message.attachments-list({all})", createMessageWithAttachments());
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(3, ((List)result).size());
@@ -285,12 +285,12 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testGettingAllAttachmentsUsingManager() throws Exception
     {
-        Object result = muleContext.getExpressionManager().evaluate("#[mule:message.attachments(all)]", createMessageWithAttachments());
+        Object result = muleContext.getExpressionManager().evaluate("#[mule:message.attachments({all})]", createMessageWithAttachments());
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(3, ((Map)result).size());
 
-        result = muleContext.getExpressionManager().evaluate("#[mule:message.attachments-list(all)]", createMessageWithAttachments());
+        result = muleContext.getExpressionManager().evaluate("#[mule:message.attachments-list({all})]", createMessageWithAttachments());
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(3, ((List)result).size());
@@ -430,12 +430,12 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage("test", props);
 
-        Object result = eval.evaluate("message.headers(all)", message);
+        Object result = eval.evaluate("message.headers({all})", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(3, ((Map)result).size());
 
-        result = eval.evaluate("message.headers-list(all)", message);
+        result = eval.evaluate("message.headers-list({all})", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(3, ((List)result).size());
@@ -446,12 +446,12 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage("test", props);
 
-        Object result = muleContext.getExpressionManager().evaluate("#[mule:message.headers(all)]", message);
+        Object result = muleContext.getExpressionManager().evaluate("#[mule:message.headers({all})]", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(3, ((Map)result).size());
 
-        result = muleContext.getExpressionManager().evaluate("#[mule:message.headers-list(all)]", message);
+        result = muleContext.getExpressionManager().evaluate("#[mule:message.headers-list({all})]", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(3, ((List)result).size());

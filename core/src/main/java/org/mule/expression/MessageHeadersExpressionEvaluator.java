@@ -33,8 +33,8 @@ public class MessageHeadersExpressionEvaluator implements ExpressionEvaluator
     public static final String NAME = "headers";
     public static final String DELIM = ",";
 
-    public static final String ALL_ARGUMENT = "all";
-    public static final String COUNT_ARGUMENT = "count";
+    public static final String ALL_ARGUMENT = "{all}";
+    public static final String COUNT_ARGUMENT = "{count}";
 
     public Object evaluate(String expression, MuleMessage message)
     {
