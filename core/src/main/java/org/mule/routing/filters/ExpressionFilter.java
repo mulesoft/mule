@@ -15,6 +15,8 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.CoreMessages;
 
+import java.text.MessageFormat;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -86,9 +88,9 @@ public class ExpressionFilter implements Filter, MuleContextAware
         if (delegateFilter != null)
         {
             boolean result = delegateFilter.accept(message);
-            if(logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
             {
-                logger.debug("Result of expression filter: " + expr + " is: " + result);
+                logger.debug(MessageFormat.format("Result of expression filter: {0} is: {1}", expr, result));
             }
             return result;
         }
@@ -100,7 +102,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
         }
         else if (result instanceof Boolean)
         {
-            return ((Boolean) result).booleanValue();
+            return (Boolean) result;
         }
         else if (result instanceof String)
         {

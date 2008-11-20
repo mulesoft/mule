@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.TemplateParser;
 
+import java.text.MessageFormat;
 import java.util.Iterator;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
@@ -171,9 +172,9 @@ public class DefaultExpressionManager implements ExpressionManager
         {
             throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(evaluator, expression));
         }
-        if(logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
         {
-             logger.debug("Result of expression: " + evaluator + ":" + expression + " is: " + result );
+             logger.debug(MessageFormat.format("Result of expression: {0}:{1} is: {2}", evaluator, expression, result));
         }
         return result;
     }
