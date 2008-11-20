@@ -72,7 +72,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
-    public void testMapHeaders() throws Exception
+    public void testMapAttachments() throws Exception
     {
         MessageAttachmentsExpressionEvaluator eval = new MessageAttachmentsExpressionEvaluator();
 
@@ -107,9 +107,12 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         {
             //Expected
         }
+
+        assertEquals(3, eval.evaluate("count", message));
+
     }
 
-    public void testListHeaders() throws Exception
+    public void testListAttachments() throws Exception
     {
         MessageAttachmentsListExpressionEvaluator eval = new MessageAttachmentsListExpressionEvaluator();
 
@@ -167,7 +170,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
-    public void testMapHeadersUsingManager() throws Exception
+    public void testMapAttachmentsUsingManager() throws Exception
     {
         Object result = muleContext.getExpressionManager().evaluate("#[attachments:foo, baz]", message);
         assertNotNull(result);
@@ -200,9 +203,11 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         {
             //exprected
         }
+        assertEquals(3, muleContext.getExpressionManager().evaluate("#[attachments:count]", message));
+
     }
 
-    public void testListHeadersUsingManager() throws Exception
+    public void testListAttachmentsUsingManager() throws Exception
     {
         Object result = muleContext.getExpressionManager().evaluate("#[attachments-list:foo,baz]", message);
         assertNotNull(result);

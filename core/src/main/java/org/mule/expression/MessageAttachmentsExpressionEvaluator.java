@@ -34,12 +34,15 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
     public static final String NAME = "attachments";
     public static final String DELIM = ",";
 
+    public static final String ALL_ARGUMENT = "all";
+    public static final String COUNT_ARGUMENT = "count";
+
     public Object evaluate(String expression, MuleMessage message)
     {
         boolean required;
 
         Map result;
-        if (expression.equals("all"))
+        if (ALL_ARGUMENT.equals(expression))
         {
             result = new HashMap(message.getAttachmentNames().size());
             for (Iterator iterator = message.getAttachmentNames().iterator(); iterator.hasNext();)
@@ -47,6 +50,10 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
                 String name = (String) iterator.next();
                 result.put(name, message.getAttachment(name));
             }
+        }
+        else if(COUNT_ARGUMENT.equals(expression))
+        {
+            return message.getAttachmentNames().size();
         }
         else
         {

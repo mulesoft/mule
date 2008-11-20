@@ -33,12 +33,15 @@ public class MessageHeadersExpressionEvaluator implements ExpressionEvaluator
     public static final String NAME = "headers";
     public static final String DELIM = ",";
 
+    public static final String ALL_ARGUMENT = "all";
+    public static final String COUNT_ARGUMENT = "count";
+
     public Object evaluate(String expression, MuleMessage message)
     {
         boolean required;
 
         Map result;
-        if (expression.equals("all"))
+        if (ALL_ARGUMENT.equals(expression))
         {
             result = new HashMap(message.getPropertyNames().size());
             for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
@@ -46,6 +49,10 @@ public class MessageHeadersExpressionEvaluator implements ExpressionEvaluator
                 String name = (String) iterator.next();
                 result.put(name, message.getProperty(name));
             }
+        }
+        else if(COUNT_ARGUMENT.equals(expression))
+        {
+            return message.getPropertyNames().size();
         }
         else
         {
