@@ -1156,4 +1156,9 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 276, expression);
     }
+
+    public static Message propertyDoesNotExistOnObject(String property, Object object)
+    {
+        return factory.createMessage(BUNDLE_PATH, 277, property, object);
+    }
 }

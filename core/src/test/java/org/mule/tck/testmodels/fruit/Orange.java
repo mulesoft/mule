@@ -21,7 +21,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class Orange implements Fruit, Callable
+public class Orange implements Callable, OrangeInterface
 {
     /**
      * Serial version

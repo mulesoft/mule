@@ -10,6 +10,13 @@
 
 package org.mule.object;
 
+import org.mule.api.lifecycle.InitialisationCallback;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.object.ObjectFactory;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.util.BeanUtils;
+import org.mule.util.ClassUtils;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,12 +24,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.api.lifecycle.InitialisationCallback;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.object.ObjectFactory;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.util.BeanUtils;
-import org.mule.util.ClassUtils;
 
 /**
  * Creates object instances based on the class and sets any properties.
@@ -109,7 +110,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory
 
         if (properties != null)
         {
-            BeanUtils.populate(object, properties);
+            BeanUtils.populateWithoutFail(object, properties, true);
         }
 
         fireInitialisationCallbacks(object);

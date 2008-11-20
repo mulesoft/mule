@@ -10,7 +10,10 @@
 
 package org.mule.util;
 
+import org.mule.config.i18n.CoreMessages;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,10 +30,17 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
 {
     public static final String SET_PROPERTIES_METHOD = "setProperties";
 
-    /** logger used by this class */
+    /**
+     * logger used by this class
+     */
     private static final Log logger = LogFactory.getLog(BeanUtils.class);
 
-    /** Exception safe version of BeanUtils.populateWithoutFail */
+    /**
+     * Exception safe version of BeanUtils.populate()
+     * @param object the object to set the properties on
+     * @param props the map of properties to set
+     * @param logWarnings whether exception warnings should be logged
+     */
     public static void populateWithoutFail(Object object, Map props, boolean logWarnings)
     {
         // Check to see if our object has a setProperties method where the properties
@@ -71,6 +81,39 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * This will overlay a map of properties on a bean.  This method will validate that all properties are available
+     * on the bean before setting the properties
+     * @param bean the bean on which to set the properties
+     * @param props a Map of properties to set on the bean
+     *
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public static void populate(Object bean, Map props) throws IllegalAccessException, InvocationTargetException
+    {
+        // Check to see if our object has a setProperties method where the properties
+        // map should be set
+        if (ClassUtils.getMethod(bean.getClass(), SET_PROPERTIES_METHOD, new Class[]{Map.class}) != null)
+        {
+            BeanUtils.setProperty(bean, "properties", props);
+        }
+        else
+        {
+            Map master = describe(bean);
+            for (Iterator iterator = props.keySet().iterator(); iterator.hasNext();)
+            {
+                Object o =  iterator.next();
+                if(!master.containsKey(o))
+                {
+                    throw new IllegalArgumentException(CoreMessages.propertyDoesNotExistOnObject(o.toString(), bean).getMessage());
+                }
+
+            }
+            org.apache.commons.beanutils.BeanUtils.populate(bean, props);
         }
     }
 

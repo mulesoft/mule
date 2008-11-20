@@ -14,10 +14,16 @@ import org.mule.api.context.MuleContextAware;
 
 public class DummyComponent
 {
+    private MuleContextAware property;
+
+    public MuleContextAware getProperty()
+    {
+        return property;
+    }
 
     public void setProperty(MuleContextAware dummy)
     {
-        // empty
+        this.property = dummy;
     }
 
 }
