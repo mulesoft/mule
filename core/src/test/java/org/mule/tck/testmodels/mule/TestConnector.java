@@ -31,11 +31,17 @@ import org.mule.transport.service.TransportServiceDescriptor;
  */
 public class TestConnector extends AbstractConnector
 {
-
     public static final String TEST = "test";
 
     private String someProperty;
 
+    private int initialiseCount = 0;
+    private int connectCount = 0;
+    private int startCount = 0;
+    private int stopCount = 0;
+    private int disconnectCount = 0;
+    private int disposeCount = 0;
+    
     public TestConnector()
     {
         super();
@@ -48,39 +54,39 @@ public class TestConnector extends AbstractConnector
         });
     }
 
-    protected void doInitialise() throws InitialisationException
-    {
-        // template method
-    }
-
-    protected void doDispose()
-    {
-        // template method
-    }
-
-    protected void doConnect() throws Exception
-    {
-        // template method
-    }
-
-    protected void doDisconnect() throws Exception
-    {
-        // template method
-    }
-
-    protected void doStart() throws MuleException
-    {
-        // template method
-    }
-
-    protected void doStop() throws MuleException
-    {
-        // template method
-    }
-
     public String getProtocol()
     {
         return TEST;
+    }
+
+    protected void doInitialise() 
+    {
+        initialiseCount++;
+    }
+
+    protected void doConnect() 
+    {
+        connectCount++;
+    }
+
+    protected void doStart() 
+    {
+        startCount++;
+    }
+
+    protected void doStop() 
+    {
+        stopCount++;
+    }
+
+    protected void doDisconnect() 
+    {
+        disconnectCount++;
+    }
+
+    protected void doDispose() 
+    {
+        disposeCount++;
     }
 
     public MessageAdapter getMessageAdapter(Object message) throws MessagingException
@@ -190,4 +196,33 @@ public class TestConnector extends AbstractConnector
         }
     }
 
+    public int getInitialiseCount() 
+    {
+        return initialiseCount;
+    }
+    
+    public int getConnectCount() 
+    {
+        return connectCount;
+    }
+    
+    public int getStartCount() 
+    {
+        return startCount;
+    }
+    
+    public int getStopCount() 
+    {
+        return stopCount;
+    }
+    
+    public int getDisconnectCount() 
+    {
+        return disconnectCount;
+    }
+    
+    public int getDisposeCount() 
+    {
+        return disposeCount;
+    }
 }

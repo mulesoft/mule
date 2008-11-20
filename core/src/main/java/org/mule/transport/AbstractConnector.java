@@ -361,6 +361,12 @@ public abstract class AbstractConnector
 
     public final synchronized void start() throws MuleException
     {
+        if (this.isStarted())
+        {
+            logger.warn("Attempting to start a connector which is already started");
+            return;
+        }
+        
         this.checkDisposed();
 
         if (!this.isConnected())
@@ -425,37 +431,40 @@ public abstract class AbstractConnector
 
     public final synchronized void stop() throws MuleException
     {
+        if (this.isStarted() == false)
+        {
+            logger.warn("Attempting to stop a connector which is not started");
+            return;
+        }
+        
         if (this.isDisposed())
         {
             return;
         }
 
-        if (this.isStarted())
+        if (logger.isInfoEnabled())
         {
-            if (logger.isInfoEnabled())
+            logger.info("Stopping: " + this);
+        }
+
+        // shutdown our scheduler service
+        ((ScheduledExecutorService) scheduler.get()).shutdown();
+
+        this.doStop();
+        started.set(false);
+
+        // Stop all the receivers on this connector (this will cause them to
+        // disconnect too)
+        if (receivers != null)
+        {
+            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
             {
-                logger.info("Stopping: " + this);
-            }
-
-            // shutdown our scheduler service
-            ((ScheduledExecutorService) scheduler.get()).shutdown();
-
-            this.doStop();
-            started.set(false);
-
-            // Stop all the receivers on this connector (this will cause them to
-            // disconnect too)
-            if (receivers != null)
-            {
-                for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
+                MessageReceiver mr = (MessageReceiver) iterator.next();
+                if (logger.isDebugEnabled())
                 {
-                    MessageReceiver mr = (MessageReceiver) iterator.next();
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Stopping receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
-                    }
-                    mr.stop();
+                    logger.debug("Stopping receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
                 }
+                mr.stop();
             }
         }
 
@@ -493,19 +502,28 @@ public abstract class AbstractConnector
      */
     public final synchronized void dispose()
     {
+        if (this.isDisposed())
+        {
+            logger.warn("Attempting to dispose a connector which is already disposed");
+            return;
+        }
+        
         if (logger.isInfoEnabled())
         {
             logger.info("Disposing: " + this);
         }
 
-        try
+        if (this.isStarted())
         {
-            this.stop();
-        }
-        catch (MuleException e)
-        {
-            // TODO MULE-863: What should we really do?
-            logger.warn("Failed to stop during shutdown: " + e.getMessage(), e);
+            try
+            {
+                this.stop();
+            }
+            catch (MuleException e)
+            {
+                // TODO MULE-863: What should we really do?
+                logger.warn("Failed to stop during shutdown: " + e.getMessage(), e);
+            }
         }
 
         this.disposeReceivers();
@@ -1405,14 +1423,21 @@ public abstract class AbstractConnector
                 for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
                 {
                     MessageReceiver receiver = (MessageReceiver) iterator.next();
-                    if (logger.isDebugEnabled())
+                    // TODO MULE-3969
+                    if (receiver instanceof AbstractMessageReceiver && ((AbstractMessageReceiver) receiver).isStarted())
                     {
-                        logger.debug("Stopping receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Stopping receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                        }
+                        receiver.stop();
                     }
-                    receiver.stop();
                 }
             }
-            this.stop();
+            if (this.isStarted())
+            {
+                this.stop();
+            }
         }
 
         logger.info("Disconnected: " + this.getConnectionDescription());
