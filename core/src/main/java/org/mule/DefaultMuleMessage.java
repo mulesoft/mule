@@ -611,7 +611,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
                     {
                         setPayload(result);
                     }
-                    }
+                }
                 else
                 {
                     if (logger.isDebugEnabled())

@@ -523,14 +523,6 @@ public class FileConnector extends AbstractConnector
             throws MuleException
     {
         String address = endpoint.getEndpointURI().getAddress();
-
-        /*String template = endpoint.getEndpointURI().toString();
-        String prefix = getProtocol() + "://";
-        String part = template.substring(prefix.length());
-
-
-        Object result = ExpressionEvaluatorManager.evaluate(part, message);*/
-
         String writeToDirectory = message.getStringProperty(FileConnector.PROPERTY_WRITE_TO_DIRECTORY, null);
         if (writeToDirectory == null)
         {
