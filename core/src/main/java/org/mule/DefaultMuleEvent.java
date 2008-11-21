@@ -116,6 +116,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.synchronous = previousEvent.isSynchronous();
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
+        this.stopFurtherProcessing = previousEvent.isStopFurtherProcessing();
         fillProperties(previousEvent);
     }
 
@@ -195,6 +196,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         {
             this.transformedMessage = ((DefaultMuleEvent) rewriteEvent).getCachedMessage();
         }
+        this.stopFurtherProcessing = rewriteEvent.isStopFurtherProcessing();
         fillProperties(rewriteEvent);
     }
 
