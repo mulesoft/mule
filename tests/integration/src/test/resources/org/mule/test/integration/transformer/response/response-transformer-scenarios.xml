@@ -142,7 +142,7 @@
                 <inbound-endpoint address="vm://nestedRouterOutboundEndpointResponseTransformer" synchronous="true" />
             </inbound>
             <component>
-                <singleton-object class="org.mule.test.integration.transformer.response.NestedRouterComponent" />
+                <singleton-object class="org.mule.test.integration.transformer.response.BindingInterfaceComponent" />
                 <binding interface="org.mule.test.integration.transformer.response.BindingInterface" method="hello1">
                     <outbound-endpoint address="vm://echo" responseTransformer-refs="customResponse" synchronous="true" />
                 </binding>

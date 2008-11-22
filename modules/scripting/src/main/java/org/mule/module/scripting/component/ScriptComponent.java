@@ -12,13 +12,12 @@ package org.mule.module.scripting.component;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.routing.NestedRouter;
-import org.mule.api.routing.NestedRouterCollection;
+import org.mule.api.routing.BindingCollection;
+import org.mule.api.routing.InterfaceBinding;
 import org.mule.component.AbstractComponent;
-import org.mule.routing.nested.DefaultNestedRouterCollection;
-import org.mule.routing.nested.NestedInvocationHandler;
+import org.mule.routing.binding.BindingInvocationHandler;
+import org.mule.routing.binding.DefaultBindingCollection;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Proxy;
@@ -35,7 +34,7 @@ import javax.script.Bindings;
 public class ScriptComponent extends AbstractComponent
 {
 
-    protected NestedRouterCollection nestedRouter = new DefaultNestedRouterCollection();
+    protected BindingCollection bindingCollection = new DefaultBindingCollection();
 
     private Scriptable script;
 
@@ -79,14 +78,14 @@ public class ScriptComponent extends AbstractComponent
         this.script = script;
     }
 
-    public NestedRouterCollection getNestedRouter()
+    public BindingCollection getBindingCollection()
     {
-        return nestedRouter;
+        return bindingCollection;
     }
 
-    public void setNestedRouter(NestedRouterCollection nestedRouter)
+    public void setBindingCollection(BindingCollection bindingCollection)
     {
-        this.nestedRouter = nestedRouter;
+        this.bindingCollection = bindingCollection;
     }
 
     protected void configureComponentBindings() throws MuleException
@@ -94,22 +93,22 @@ public class ScriptComponent extends AbstractComponent
         proxies = new HashMap();
         // Initialise the nested router and bind the endpoints to the methods using a
         // Proxy
-        if (nestedRouter != null && nestedRouter.getRouters().size() > 0)
+        if (bindingCollection != null && bindingCollection.getRouters().size() > 0)
         {
-            for (Iterator it = nestedRouter.getRouters().iterator(); it.hasNext();)
+            for (Iterator it = bindingCollection.getRouters().iterator(); it.hasNext();)
             {
-                NestedRouter nestedRouter = (NestedRouter) it.next();
-                String bindingName = ClassUtils.getSimpleName(nestedRouter.getInterface());
+                InterfaceBinding interfaceBinding = (InterfaceBinding) it.next();
+                String bindingName = ClassUtils.getSimpleName(interfaceBinding.getInterface());
                 if (proxies.containsKey(bindingName))
                 {
                     Object proxy = proxies.get(bindingName);
-                    NestedInvocationHandler handler = (NestedInvocationHandler) Proxy.getInvocationHandler(proxy);
-                    handler.addRouterForInterface(nestedRouter);
+                    BindingInvocationHandler handler = (BindingInvocationHandler) Proxy.getInvocationHandler(proxy);
+                    handler.addRouterForInterface(interfaceBinding);
                 }
                 else
                 {
-                    Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{nestedRouter.getInterface()},
-                            new NestedInvocationHandler(nestedRouter));
+                    Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{interfaceBinding.getInterface()},
+                            new BindingInvocationHandler(interfaceBinding));
                     proxies.put(bindingName, proxy);
                 }
 

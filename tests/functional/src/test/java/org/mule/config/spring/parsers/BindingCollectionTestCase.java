@@ -14,7 +14,7 @@ import org.mule.config.spring.parsers.beans.OrphanBean;
 
 import java.util.Collection;
 
-public class NestedCollectionTestCase extends AbstractNamespaceTestCase
+public class BindingCollectionTestCase extends AbstractNamespaceTestCase
 {
 
     protected String getConfigResources()

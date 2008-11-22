@@ -8,13 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.nested;
+package org.mule.routing.binding;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.routing.NestedRouter;
+import org.mule.api.routing.InterfaceBinding;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringMessageUtils;
@@ -27,21 +27,21 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class NestedInvocationHandler implements InvocationHandler
+public class BindingInvocationHandler implements InvocationHandler
 {
 
     public static final String DEFAULT_METHOD_NAME_TOKEN = "default";
 
-    protected static Log logger = LogFactory.getLog(NestedInvocationHandler.class);
+    protected static Log logger = LogFactory.getLog(BindingInvocationHandler.class);
 
     protected Map routers = new ConcurrentHashMap();
 
-    public NestedInvocationHandler(NestedRouter router)
+    public BindingInvocationHandler(InterfaceBinding router)
     {
         addRouterForInterface(router);
     }
 
-    public void addRouterForInterface(NestedRouter router)
+    public void addRouterForInterface(InterfaceBinding router)
     {
         if (router.getMethod() == null)
         {
@@ -83,10 +83,10 @@ public class NestedInvocationHandler implements InvocationHandler
         }
 
 
-        NestedRouter router = (NestedRouter) routers.get(method.getName());
+        InterfaceBinding router = (InterfaceBinding) routers.get(method.getName());
         if (router == null)
         {
-            router = (NestedRouter) routers.get(DEFAULT_METHOD_NAME_TOKEN);
+            router = (InterfaceBinding) routers.get(DEFAULT_METHOD_NAME_TOKEN);
         }
 
         if (router == null)
@@ -118,7 +118,7 @@ public class NestedInvocationHandler implements InvocationHandler
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();
-        sb.append("NestedInvocation");
+        sb.append("BindingInvocation");
         sb.append("{routers='").append(StringMessageUtils.toString(routers));
         sb.append('}');
         return sb.toString();

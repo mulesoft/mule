@@ -11,14 +11,13 @@
 package org.mule.component;
 
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.ModelException;
 import org.mule.api.object.ObjectFactory;
-import org.mule.api.routing.NestedRouterCollection;
+import org.mule.api.routing.BindingCollection;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 
@@ -44,9 +43,9 @@ public class DefaultJavaComponent extends AbstractJavaComponent
 
     public DefaultJavaComponent(ObjectFactory objectFactory,
                                 EntryPointResolverSet entryPointResolverSet,
-                                NestedRouterCollection nestedRouterCollection)
+                                BindingCollection bindingCollection)
     {
-        super(objectFactory, entryPointResolverSet, nestedRouterCollection);
+        super(objectFactory, entryPointResolverSet, bindingCollection);
     }
 
     protected void doStart() throws MuleException

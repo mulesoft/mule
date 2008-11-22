@@ -11,7 +11,7 @@
     <!-- Testing with ActiveMq -->
     <jms:activemq-connector name="jmsConnector"/>
 
-    <model name="NestedRouter">
+    <model name="main">
 
         <service name="HelloComponent">
             <inbound>

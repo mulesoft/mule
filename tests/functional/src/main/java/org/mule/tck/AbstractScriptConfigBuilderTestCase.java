@@ -16,9 +16,9 @@ import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
+import org.mule.api.routing.BindingCollection;
 import org.mule.api.routing.InboundRouterCollection;
-import org.mule.api.routing.NestedRouter;
-import org.mule.api.routing.NestedRouterCollection;
+import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouter;
@@ -203,23 +203,23 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(1, route1.getEndpoints().size());
     }
 
-    public void testNestedRouterConfig()
+    public void testBindingConfig()
     {
         // test outbound message router
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
         assertNotNull(service.getComponent());
         assertTrue(service.getComponent() instanceof JavaComponent);
-        NestedRouterCollection router = ((JavaComponent) service.getComponent()).getNestedRouter();
+        BindingCollection router = ((JavaComponent) service.getComponent()).getBindingCollection();
         assertNotNull(router);
 
         assertEquals(2, router.getRouters().size());
         // check first Router
-        NestedRouter route1 = (NestedRouter) router.getRouters().get(0);
+        InterfaceBinding route1 = (InterfaceBinding) router.getRouters().get(0);
         assertEquals(FruitCleaner.class, route1.getInterface());
         assertEquals("wash", route1.getMethod());
         assertNotNull(route1.getEndpoint());
         // check second Router
-        NestedRouter route2 = (NestedRouter) router.getRouters().get(1);
+        InterfaceBinding route2 = (InterfaceBinding) router.getRouters().get(1);
         assertEquals(FruitCleaner.class, route2.getInterface());
         assertEquals("polish", route2.getMethod());
         assertNotNull(route1.getEndpoint());

@@ -11,10 +11,9 @@
 package org.mule.api.routing;
 
 /**
- * <code>NestedRouterCollection</code> manages a collection of nested routers.
+ * <code>BindingCollection</code> manages a collection of component bindings.
  */
-
-public interface NestedRouterCollection extends RouterCollection
+public interface BindingCollection extends RouterCollection
 {
     // no additional methods
 }

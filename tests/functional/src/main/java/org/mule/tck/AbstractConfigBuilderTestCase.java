@@ -20,7 +20,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.InboundRouterCollection;
-import org.mule.api.routing.NestedRouter;
+import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.filter.Filter;
@@ -336,13 +336,13 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     }
 
 
-    public void testNestedRouterProxyCreation()
+    public void testBindngProxyCreation()
     {
         //Test that the proxy object was created and set on the service object
         Service orange = muleContext.getRegistry().lookupService("orangeComponent");
         assertNotNull(orange);
         assertTrue(orange.getComponent() instanceof JavaComponent);
-        NestedRouter r = (NestedRouter) ((JavaComponent) orange.getComponent()).getNestedRouter().getRouters().get(0);
+        InterfaceBinding r = (InterfaceBinding) ((JavaComponent) orange.getComponent()).getBindingCollection().getRouters().get(0);
         assertNotNull(r);
 
         //TODO Grab an instance of the service object itself and test that the proxy has been injected

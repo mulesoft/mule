@@ -86,6 +86,7 @@ import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
+import org.mule.routing.binding.DefaultInterfaceBinding;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.ExceptionTypeFilter;
 import org.mule.routing.filters.ExpressionFilter;
@@ -105,7 +106,6 @@ import org.mule.routing.inbound.MessageChunkingAggregator;
 import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.routing.inbound.SimpleCollectionAggregator;
 import org.mule.routing.inbound.WireTap;
-import org.mule.routing.nested.DefaultNestedRouter;
 import org.mule.routing.outbound.ChainingRouter;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.EndpointSelector;
@@ -277,7 +277,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaComponent.class));
         registerBeanDefinitionParser("pooled-component", new ComponentDelegatingDefinitionParser(PooledJavaComponent.class));
 
-        registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("nestedRouter.routers", DefaultNestedRouter.class)).addCollection("nestedRouter.routers");
+        registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("bindingCollection.routers", DefaultInterfaceBinding.class)).addCollection("bindingCollection.routers");
 
         // Simple Components
         registerBeanDefinitionParser("bridge-component", new ComponentDefinitionParser(PassThroughComponent.class));

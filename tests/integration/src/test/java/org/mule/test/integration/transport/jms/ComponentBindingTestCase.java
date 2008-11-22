@@ -15,14 +15,14 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-public class NestedRouterTestCase extends FunctionalTestCase
+public class ComponentBindingTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
         return "org/mule/test/integration/providers/jms/nestedrouter-test.xml";
     }
 
-    public void testNestedRouter() throws MuleException
+    public void testBinding() throws MuleException
     {
         MuleClient client = new MuleClient();
         String message = "Mule";

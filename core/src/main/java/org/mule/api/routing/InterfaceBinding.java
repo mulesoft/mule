@@ -15,7 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 
-public interface NestedRouter extends Router
+public interface InterfaceBinding extends Router
 {
 
     /**

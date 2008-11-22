@@ -36,7 +36,7 @@ public class RouterStatistics implements Statistics
     public static final int TYPE_INBOUND = 1;
     public static final int TYPE_OUTBOUND = 2;
     public static final int TYPE_RESPONSE = 3;
-    public static final int TYPE_NESTED = 4;
+    public static final int TYPE_BINDING = 4;
 
     private boolean enabled;
     private long notRouted;

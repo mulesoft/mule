@@ -14,7 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-public class NestedRouterTestCase extends FunctionalTestCase
+public class ComponentBindingTestCase extends FunctionalTestCase
 {
     private static final int RECEIVE_TIMEOUT = 7000;
 
@@ -22,7 +22,7 @@ public class NestedRouterTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/routing/nested/nestedrouter-test.xml";
+        return "org/mule/test/integration/routing/nested/interface-binding-test.xml";
     }
 
     private void internalTest(String prefix) throws Exception
@@ -36,17 +36,17 @@ public class NestedRouterTestCase extends FunctionalTestCase
         assertEquals("Received: Hello " + message + " " + number, reply.getPayload());
     }
 
-    public void testNestedRouter() throws Exception
+    public void testBinding() throws Exception
     {
         internalTest("vm://");
     }
 
-    public void testJmsQueueNestedRouter() throws Exception
+    public void testJmsQueueBinding() throws Exception
     {
         internalTest("jms://");
     }
 
-    public void testJmsTopicNestedRouter() throws Exception
+    public void testJmsTopicBinding() throws Exception
     {
         internalTest("jms://topic:t");
     }

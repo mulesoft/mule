@@ -19,17 +19,17 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
-import org.mule.api.routing.NestedRouterCollection;
+import org.mule.api.routing.BindingCollection;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
-import org.mule.routing.nested.DefaultNestedRouterCollection;
+import org.mule.routing.binding.DefaultBindingCollection;
 
 import java.util.Collection;
 import java.util.Iterator;
 
 /**
  * Abstract implementation of JavaComponent adds JavaComponent specific's:
- * {@link EntryPointResolverSet}, {@link NestedRouterCollection} and
+ * {@link EntryPointResolverSet}, {@link org.mule.api.routing.BindingCollection} and
  * {@link ObjectFactory}. Provides default implementations of doOnCall and doOnEvent
  * and defines abstract template methods provided for obtaining and returning the
  * component object instance.
@@ -39,7 +39,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
 
     protected EntryPointResolverSet entryPointResolverSet;
 
-    protected NestedRouterCollection nestedRouter = new DefaultNestedRouterCollection();
+    protected BindingCollection bindingCollection = new DefaultBindingCollection();
 
     protected ObjectFactory objectFactory;
 
@@ -58,14 +58,14 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
 
     public AbstractJavaComponent(ObjectFactory objectFactory,
                                  EntryPointResolverSet entryPointResolverSet,
-                                 NestedRouterCollection nestedRouterCollection)
+                                 BindingCollection bindingCollection)
     {
         super();
         this.objectFactory = objectFactory;
         this.entryPointResolverSet = entryPointResolverSet;
-        if (nestedRouterCollection != null)
+        if (bindingCollection != null)
         {
-            this.nestedRouter = nestedRouterCollection;
+            this.bindingCollection = bindingCollection;
         }
     }
 
@@ -171,9 +171,9 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         return entryPointResolverSet;
     }
 
-    public NestedRouterCollection getNestedRouter()
+    public BindingCollection getBindingCollection()
     {
-        return nestedRouter;
+        return bindingCollection;
     }
 
     public void setEntryPointResolverSet(EntryPointResolverSet entryPointResolverSet)
@@ -181,9 +181,9 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         this.entryPointResolverSet = entryPointResolverSet;
     }
 
-    public void setNestedRouter(NestedRouterCollection nestedRouter)
+    public void setBindingCollection(BindingCollection bindingCollection)
     {
-        this.nestedRouter = nestedRouter;
+        this.bindingCollection = bindingCollection;
     }
 
     /**

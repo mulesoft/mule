@@ -26,14 +26,14 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.EntryPointResolverSet;
-import org.mule.api.routing.NestedRouter;
+import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.service.ServiceAware;
 import org.mule.api.service.ServiceException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.model.resolvers.NoSatisfiableMethodsException;
 import org.mule.model.resolvers.TooManySatisfiableMethodsException;
-import org.mule.routing.nested.NestedInvocationHandler;
+import org.mule.routing.binding.BindingInvocationHandler;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -103,7 +103,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         {
             ((MuleContextAware) componentObject).setMuleContext(muleContext);
         }
-        configureNestedRouter();
+        configureBinding();
     }
 
     /**
@@ -234,17 +234,17 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         }
     }
 
-    protected void configureNestedRouter() throws MuleException
+    protected void configureBinding() throws MuleException
     {
         // Initialise the nested router and bind the endpoints to the methods using a
         // Proxy
-        if (component.getNestedRouter() != null)
+        if (component.getBindingCollection() != null)
         {
             Map bindings = new HashMap();
-            for (Iterator it = component.getNestedRouter().getRouters().iterator(); it.hasNext();)
+            for (Iterator it = component.getBindingCollection().getRouters().iterator(); it.hasNext();)
             {
-                NestedRouter nestedRouter = (NestedRouter) it.next();
-                Object proxy = bindings.get(nestedRouter.getInterface());
+                InterfaceBinding interfaceBinding = (InterfaceBinding) it.next();
+                Object proxy = bindings.get(interfaceBinding.getInterface());
 
                 if (proxy == null)
                 {
@@ -252,14 +252,14 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
                     // and just routes away using a mule client
                     // ( using the high level Mule client is probably
                     // a bit agricultural but this is just POC stuff )
-                    proxy = nestedRouter.createProxy(componentObject);
-                    bindings.put(nestedRouter.getInterface(), proxy);
+                    proxy = interfaceBinding.createProxy(componentObject);
+                    bindings.put(interfaceBinding.getInterface(), proxy);
 
                     // Now lets set the proxy on the Service object
                     Method setterMethod;
 
                     List methods = ClassUtils.getSatisfiableMethods(componentObject.getClass(),
-                        new Class[]{nestedRouter.getInterface()}, true, false, null);
+                        new Class[]{interfaceBinding.getInterface()}, true, false, null);
                     if (methods.size() == 1)
                     {
                         setterMethod = (Method) methods.get(0);
@@ -267,12 +267,12 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
                     else if (methods.size() > 1)
                     {
                         throw new TooManySatisfiableMethodsException(componentObject.getClass(),
-                            new Class[]{nestedRouter.getInterface()});
+                            new Class[]{interfaceBinding.getInterface()});
                     }
                     else
                     {
                         throw new NoSatisfiableMethodsException(componentObject.getClass(),
-                            new Class[]{nestedRouter.getInterface()});
+                            new Class[]{interfaceBinding.getInterface()});
                     }
 
                     try
@@ -281,14 +281,14 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
                     }
                     catch (Exception e)
                     {
-                        throw new InitialisationException(CoreMessages.failedToSetProxyOnService(nestedRouter,
+                        throw new InitialisationException(CoreMessages.failedToSetProxyOnService(interfaceBinding,
                             componentObject.getClass()), e, this);
                     }
                 }
                 else
                 {
-                    NestedInvocationHandler handler = (NestedInvocationHandler) Proxy.getInvocationHandler(proxy);
-                    handler.addRouterForInterface(nestedRouter);
+                    BindingInvocationHandler handler = (BindingInvocationHandler) Proxy.getInvocationHandler(proxy);
+                    handler.addRouterForInterface(interfaceBinding);
                 }
             }
         }

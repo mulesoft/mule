@@ -1,44 +1,42 @@
-package org.mule.config.builders;
+package org.mule.config.builders
 
-import org.mule.tck.testmodels.mule.TestTransactionManagerFactory
-import org.mule.tck.testmodels.mule.TestConnector
-import org.mule.tck.testmodels.mule.TestExceptionStrategy
-import org.mule.tck.testmodels.mule.TestCompressionTransformer
-import org.mule.routing.filters.MessagePropertyFilter
-import org.mule.api.endpoint.EndpointBuilder
-import org.mule.endpoint.EndpointURIEndpointBuilder
-import org.mule.model.seda.SedaModel
-import org.mule.tck.testmodels.fruit.FruitCleaner;
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory
-import org.mule.tck.testmodels.mule.TestEntryPointResolverSet
-import org.mule.object.SingletonObjectFactory
-import org.mule.routing.filters.PayloadTypeFilter
-import org.mule.routing.ForwardingCatchAllStrategy
-import org.mule.tck.testmodels.mule.TestResponseAggregator
-import org.mule.routing.outbound.OutboundPassThroughRouter
-import org.mule.api.endpoint.ImmutableEndpoint
+import org.mule.api.config.MuleProperties
+import org.mule.api.config.ThreadingProfile
 import org.mule.api.endpoint.InboundEndpoint
 import org.mule.api.endpoint.OutboundEndpoint
 import org.mule.api.model.Model
 import org.mule.api.service.Service
 import org.mule.component.DefaultJavaComponent
-import org.mule.interceptor.InterceptorStack
-import org.mule.model.seda.SedaService
-import org.mule.routing.inbound.DefaultInboundRouterCollection
-import org.mule.routing.nested.DefaultNestedRouterCollection
-import org.mule.routing.nested.DefaultNestedRouter
-import org.mule.routing.response.DefaultResponseRouterCollection
-import org.mule.service.DefaultServiceExceptionStrategy
-import org.mule.util.queue.QueueManager
-import org.mule.util.queue.TransactionalQueueManager
-import org.mule.util.queue.MemoryPersistenceStrategy
-import org.mule.security.MuleSecurityManager
+import org.mule.config.ChainedThreadingProfile
 import org.mule.endpoint.DefaultEndpointFactory
-import org.mule.api.config.MuleProperties;
-import org.mule.api.config.ThreadingProfile;
-import org.mule.config.ChainedThreadingProfile;
-import org.mule.retry.policies.NoRetryPolicyTemplate;
+import org.mule.endpoint.EndpointURIEndpointBuilder
+import org.mule.interceptor.InterceptorStack
+import org.mule.model.seda.SedaModel
+import org.mule.model.seda.SedaService
+import org.mule.object.SingletonObjectFactory
+import org.mule.retry.policies.NoRetryPolicyTemplate
+import org.mule.routing.ForwardingCatchAllStrategy
+import org.mule.routing.binding.DefaultBindingCollection
+import org.mule.routing.binding.DefaultInterfaceBinding
+import org.mule.routing.filters.MessagePropertyFilter
+import org.mule.routing.filters.PayloadTypeFilter
+import org.mule.routing.inbound.DefaultInboundRouterCollection
+import org.mule.routing.outbound.OutboundPassThroughRouter
+import org.mule.routing.response.DefaultResponseRouterCollection
+import org.mule.security.MuleSecurityManager
+import org.mule.service.DefaultServiceExceptionStrategy
+import org.mule.tck.testmodels.fruit.FruitCleaner
+import org.mule.tck.testmodels.fruit.Orange
+import org.mule.tck.testmodels.mule.TestCompressionTransformer
+import org.mule.tck.testmodels.mule.TestConnector
+import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory
+import org.mule.tck.testmodels.mule.TestEntryPointResolverSet
+import org.mule.tck.testmodels.mule.TestExceptionStrategy
+import org.mule.tck.testmodels.mule.TestResponseAggregator
+import org.mule.tck.testmodels.mule.TestTransactionManagerFactory
+import org.mule.util.queue.MemoryPersistenceStrategy
+import org.mule.util.queue.QueueManager
+import org.mule.util.queue.TransactionalQueueManager;
 
 // Set up defaults / system objects
 QueueManager queueManager = new TransactionalQueueManager();
@@ -180,18 +178,18 @@ catchAllStrategy.endpoint = createOutboundEndpoint("test://catch.all", null)
 service.inboundRouter.catchAllStrategy = catchAllStrategy
 
 //Nested Router
-nestedRouter = new DefaultNestedRouterCollection();
-nr = new DefaultNestedRouter();
+bindingCollection = new DefaultBindingCollection();
+nr = new DefaultInterfaceBinding();
 nr.endpoint = createOutboundEndpoint("test://do.wash", null)
 nr.setInterface(FruitCleaner.class);
 nr.method = "wash"
-nestedRouter.addRouter(nr);
-nr = new DefaultNestedRouter();
+bindingCollection.addRouter(nr);
+nr = new DefaultInterfaceBinding();
 nr.endpoint = createOutboundEndpoint("test://do.polish", null)
 nr.setInterface(FruitCleaner.class);
 nr.method = "polish"
-nestedRouter.addRouter(nr);
-service.component.nestedRouter = nestedRouter
+bindingCollection.addRouter(nr);
+service.component.bindingCollection = bindingCollection
 
 //Outbound Router
 outboundRouter = new OutboundPassThroughRouter()

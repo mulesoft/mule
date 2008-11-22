@@ -13,7 +13,7 @@
 
     <vm:connector name="vmConnector" queueEvents="true" />
 
-    <model name="NestedRouter">
+    <model>
 
         <service name="HelloComponent">
             <inbound>

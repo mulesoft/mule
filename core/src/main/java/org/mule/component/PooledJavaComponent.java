@@ -16,7 +16,7 @@ import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
-import org.mule.api.routing.NestedRouterCollection;
+import org.mule.api.routing.BindingCollection;
 import org.mule.config.PoolingProfile;
 import org.mule.util.pool.DefaultLifecycleEnabledObjectPool;
 import org.mule.util.pool.LifecyleEnabledObjectPool;
@@ -49,9 +49,9 @@ public class PooledJavaComponent extends AbstractJavaComponent
     public PooledJavaComponent(ObjectFactory objectFactory,
                                PoolingProfile poolingProfile,
                                EntryPointResolverSet entryPointResolverSet,
-                               NestedRouterCollection nestedRouterCollection)
+                               BindingCollection bindingCollection)
     {
-        super(objectFactory, entryPointResolverSet, nestedRouterCollection);
+        super(objectFactory, entryPointResolverSet, bindingCollection);
         this.poolingProfile = poolingProfile;
     }
 

@@ -12,7 +12,7 @@ package org.mule.api.component;
 
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
-import org.mule.api.routing.NestedRouterCollection;
+import org.mule.api.routing.BindingCollection;
 import org.mule.component.PooledJavaComponent;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
@@ -52,13 +52,9 @@ public interface JavaComponent extends Component
      */
     void setEntryPointResolverSet(EntryPointResolverSet entryPointResolverSet);
 
-    // TODO This should be renamed to something like "Bindings", moved up to
-    // Component. NestedRouter should also be renamed to "Binding" and made more
-    // generic so as to support other types of bindings e.g. wsdl port -> ws-endpont,
-    // or script context variable -> outbound endpoint etc. See MULE-3114
-    NestedRouterCollection getNestedRouter();
+    BindingCollection getBindingCollection();
 
-    void setNestedRouter(NestedRouterCollection nestedRouter);
+    void setBindingCollection(BindingCollection bindingCollection);
 
     /**
      * The object factory used to obtain the component object instance. Mule core

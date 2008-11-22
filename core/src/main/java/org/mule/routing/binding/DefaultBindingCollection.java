@@ -7,19 +7,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing.nested;
+package org.mule.routing.binding;
 
-import org.mule.api.routing.NestedRouterCollection;
+import org.mule.api.routing.BindingCollection;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 
 /**
  * TODO
  */
-public class DefaultNestedRouterCollection extends AbstractRouterCollection implements NestedRouterCollection
+public class DefaultBindingCollection extends AbstractRouterCollection implements BindingCollection
 {
 
-    public DefaultNestedRouterCollection()
+    public DefaultBindingCollection()
     {
         super(RouterStatistics.TYPE_INBOUND);
     }

@@ -17,7 +17,7 @@ import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.module.scripting.component.ScriptComponent;
 import org.mule.module.scripting.transformer.ScriptTransformer;
-import org.mule.routing.nested.DefaultNestedRouter;
+import org.mule.routing.binding.DefaultInterfaceBinding;
 
 
 public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler
@@ -27,7 +27,7 @@ public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("script", new ScriptDefinitionParser());
         registerBeanDefinitionParser("text", new TextDefinitionParser("scriptText"));
         registerBeanDefinitionParser("component", new ComponentDefinitionParser(ScriptComponent.class));
-        registerMuleBeanDefinitionParser("java-interface-binding", new BindingDefinitionParser("nestedRouter.routers", DefaultNestedRouter.class)).addCollection("nestedRouter.routers");
+        registerMuleBeanDefinitionParser("java-interface-binding", new BindingDefinitionParser("bindingCollection.routers", DefaultInterfaceBinding.class)).addCollection("bindingCollection.routers");
 
         registerBeanDefinitionParser("transformer", new TransformerDefinitionParser(ScriptTransformer.class));
 

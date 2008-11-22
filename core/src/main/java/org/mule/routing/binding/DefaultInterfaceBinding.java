@@ -8,14 +8,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.nested;
+package org.mule.routing.binding;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.NestedRouter;
+import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
@@ -27,10 +27,10 @@ import java.lang.reflect.Proxy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DefaultNestedRouter extends AbstractRouter implements NestedRouter
+public class DefaultInterfaceBinding extends AbstractRouter implements InterfaceBinding
 {
 
-    private static final Log logger = LogFactory.getLog(DefaultNestedRouter.class);
+    private static final Log logger = LogFactory.getLog(DefaultInterfaceBinding.class);
 
     private Class interfaceClass;
 
@@ -39,9 +39,9 @@ public class DefaultNestedRouter extends AbstractRouter implements NestedRouter
     // The router used to actually dispatch the message
     protected OutboundRouter outboundRouter;
 
-    public DefaultNestedRouter()
+    public DefaultInterfaceBinding()
     {
-        setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_NESTED));
+        setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_BINDING));
     }
 
     public MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException
@@ -72,7 +72,7 @@ public class DefaultNestedRouter extends AbstractRouter implements NestedRouter
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.api.routing.NestedRouter#createProxy(java.lang.Object,
+     * @see org.mule.api.routing.InterfaceBinding#createProxy(java.lang.Object,
      *      UMODescriptor descriptor java.lang.Class)
      */
     public Object createProxy(Object target)
@@ -80,7 +80,7 @@ public class DefaultNestedRouter extends AbstractRouter implements NestedRouter
         try
         {
             Object proxy = Proxy.newProxyInstance(getInterface().getClassLoader(), new Class[]{getInterface()},
-                new NestedInvocationHandler(this));
+                new BindingInvocationHandler(this));
             logger.debug("Have proxy?: " + (null != proxy));
             return proxy;
 
@@ -106,7 +106,7 @@ public class DefaultNestedRouter extends AbstractRouter implements NestedRouter
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();
-        sb.append("DefaultNestedRouter");
+        sb.append("DefaultInterfaceBinding");
         sb.append("{method='").append(methodName).append('\'');
         sb.append(", interface=").append(interfaceClass);
         sb.append('}');

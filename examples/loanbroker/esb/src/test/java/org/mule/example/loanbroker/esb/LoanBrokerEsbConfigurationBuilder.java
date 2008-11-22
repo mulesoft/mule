@@ -38,10 +38,10 @@ import org.mule.example.loanbroker.transformers.SetLendersAsRecipients;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
+import org.mule.routing.binding.DefaultBindingCollection;
+import org.mule.routing.binding.DefaultInterfaceBinding;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
-import org.mule.routing.nested.DefaultNestedRouter;
-import org.mule.routing.nested.DefaultNestedRouterCollection;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
@@ -197,12 +197,12 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         responseTransformers.add(CreditProfileXmlToCreditProfile);
         eb2.setResponseTransformers(responseTransformers);
         //Create Binding
-        component.setNestedRouter(new DefaultNestedRouterCollection());
-        DefaultNestedRouter binding = new DefaultNestedRouter();
+        component.setBindingCollection(new DefaultBindingCollection());
+        DefaultInterfaceBinding binding = new DefaultInterfaceBinding();
         binding.setInterface(CreditAgencyService.class);
         binding.setMethod("getCreditProfile");
         binding.setEndpoint(eb2.buildOutboundEndpoint());
-        component.getNestedRouter().addRouter(binding);
+        component.getBindingCollection().addRouter(binding);
 
         // out
         OutboundRouterCollection creditAgencyGatewayServiceOutbound = new DefaultOutboundRouterCollection();

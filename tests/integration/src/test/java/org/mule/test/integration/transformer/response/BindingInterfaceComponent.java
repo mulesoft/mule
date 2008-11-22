@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.transformer.response;
 
-public class NestedRouterComponent
+public class BindingInterfaceComponent
 {
 
     BindingInterface binding;
