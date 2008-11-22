@@ -137,6 +137,6 @@ public class ExpressionConfig
 
     public void setExpression(String expression)
     {
-        this.expression = StringUtils.trimToNull(expression);
+        this.expression = StringUtils.trimToEmpty(expression);
     }
 }

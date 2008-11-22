@@ -19,4 +19,10 @@
         <return-argument evaluator="headers-list" expression="foo,bar" optional="false"/>
     </expression-transformer>
 
+    <bean-builder-transformer name="testTransformer3" beanClass="org.mule.tck.testmodels.fruit.Orange">
+        <bean-property name="brand" evaluator="mule" expression="message.payload"/>
+        <bean-property name="segments" evaluator="mule" expression="message.header(SEGMENTS)" optional="true"/>
+        <bean-property name="radius" evaluator="mule" expression="message.header(RADIUS)"/>
+    </bean-builder-transformer>
+
 </mule>

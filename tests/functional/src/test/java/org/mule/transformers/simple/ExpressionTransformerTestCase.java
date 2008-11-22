@@ -14,12 +14,14 @@ import org.mule.DefaultMuleMessage;
 import org.mule.RegistryContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.expression.transformers.BeanBuilderTransformer;
+import org.mule.expression.transformers.ExpressionArgument;
+import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBowl;
-import org.mule.transformer.simple.ExpressionTransformer;
 
 import java.util.List;
 import java.util.Map;
@@ -38,14 +40,34 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
         assertNotNull(transformer);
         assertNotNull(transformer.getArguments());
         assertEquals(2, transformer.getArguments().size());
-        ExpressionTransformer.Argument arg1 = (ExpressionTransformer.Argument) transformer.getArguments().get(0);
+        ExpressionArgument arg1 = transformer.getArguments().get(0);
         assertEquals("payload", arg1.getEvaluator());
         assertEquals("org.mule.tck.testmodels.fruit.FruitBasket", arg1.getExpression());
         assertFalse(arg1.isOptional());
 
-        ExpressionTransformer.Argument arg2 = (ExpressionTransformer.Argument) transformer.getArguments().get(1);
+        ExpressionArgument arg2 = transformer.getArguments().get(1);
         assertEquals("headers", arg2.getEvaluator());
         assertEquals("foo,bar*", arg2.getExpression());
+        assertTrue(arg2.isOptional());
+
+    }
+
+    public void testBeanBuilderTransformerConfig() throws Exception
+    {
+        BeanBuilderTransformer transformer = (BeanBuilderTransformer) RegistryContext.getRegistry().lookupTransformer("testTransformer3");
+        assertNotNull(transformer);
+        assertNotNull(transformer.getArguments());
+        assertEquals(3, transformer.getArguments().size());
+        ExpressionArgument arg1 = transformer.getArguments().get(0);
+        assertEquals("brand", arg1.getName());
+        assertEquals("mule", arg1.getEvaluator());
+        assertEquals("message.payload", arg1.getExpression());
+        assertFalse(arg1.isOptional());
+
+        ExpressionArgument arg2 = transformer.getArguments().get(1);
+        assertEquals("segments", arg2.getName());
+        assertEquals("mule", arg2.getEvaluator());
+        assertEquals("message.header(SEGMENTS)", arg2.getExpression());
         assertTrue(arg2.isOptional());
 
     }

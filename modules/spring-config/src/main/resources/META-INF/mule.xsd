@@ -2538,6 +2538,56 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="bean-builder-transformer" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that uses expressions to configure a simple bean object.  The user can specify a bean class
+                or factory to create and one or more expressions that are used to configure properties on the bean.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractTransformerType">
+                    <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                        <xsd:element name="bean-property">
+                            <xsd:complexType>
+                                <xsd:attribute name="name" type="xsd:NMTOKEN" use="required">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            The name of the bean property
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                </xsd:attribute>
+                                <xsd:attributeGroup ref="expressionAttributes"/>
+                                <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
+                                    <xsd:annotation>
+                                        <xsd:documentation>An optional expression means that if the expression evaluates
+                                            to null, it will continue to the next expression without error.
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                </xsd:attribute>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:attribute name="beanClass" type="xsd:NMTOKEN">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The bean class to create
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="beanFactory-ref" type="xsd:NMTOKEN">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A Bean factory to use when creating the bean object.  The factory must implement {{org.mule.api.object.ObjectFactory}}.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:element name="expression-transformer" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
@@ -2594,6 +2644,7 @@
                     <xsd:enumeration value="attachments"/>
                     <xsd:enumeration value="attachments-list"/>
                     <xsd:enumeration value="message"/>
+                    <xsd:enumeration value="string"/>
                     <xsd:enumeration value="map-payload"/>
                     <xsd:enumeration value="payload"/>
                     <xsd:enumeration value="mule"/>
@@ -2601,7 +2652,13 @@
                     <xsd:enumeration value="jxpath"/>
                     <xsd:enumeration value="bean"/>
                     <xsd:enumeration value="ognl"/>
-                    <xsd:enumeration value="function"/>
+                    <xsd:enumeration value="function">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Foo Bar
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="custom"/>
                 </xsd:restriction>
             </xsd:simpleType>
