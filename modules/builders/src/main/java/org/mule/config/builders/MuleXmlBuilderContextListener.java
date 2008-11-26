@@ -77,7 +77,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
 
         try
         {
-            muleContext = createManager(config, context);
+            muleContext = createMuleContext(config, context);
             muleContext.start();
         }
         catch (MuleException ex)
@@ -99,14 +99,10 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
     }
 
     /**
-     * Used to actually construct the UMOManager instance
-     * 
-     * @param configResource the location of the config resource, this can be on the
-     *            local file system or on the classpath.
-     * @return A configured UMOManager instance
-     * @throws InitialisationException 
+     * Creates the MuleContext based on the configuration resource(s) and possibly 
+     * init parameters for the Servlet.
      */
-    protected MuleContext createManager(String configResource, ServletContext context)
+    protected MuleContext createMuleContext(String configResource, ServletContext context)
         throws ConfigurationException, InitialisationException
     {
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context, configResource);
