@@ -13,7 +13,8 @@ package org.mule.example.rest;
 import org.mule.component.simple.StaticComponent;
 
 /**
- * TODO This is a bogus class that has been put here so that the Corbertura plugin
+ * TODO MULE-3990 
+ * This is a bogus class that has been put here so that the Corbertura plugin
  * does not barf, we need to find a way to get this plug in to ignore certain modules
  */
 public class RestTester extends StaticComponent
