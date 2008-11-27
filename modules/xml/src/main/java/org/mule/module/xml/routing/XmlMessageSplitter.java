@@ -113,6 +113,7 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
     @Override
     public void initialise() throws InitialisationException
     {
+        logger.warn("Deprecation warning: The XmlMessageSplitter router has been deprecating in Mule 2.2 in favour of using the <expression-splitter> router.");
         if (StringUtils.isBlank(splitExpression))
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("splitExpression").getMessage());
