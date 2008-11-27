@@ -14,12 +14,22 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.SystemUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class JettyContinuationsTwoEndpointsSinglePortTestCase extends FunctionalTestCase
 {
+
+    /**
+     * MULE-3992: this test hangs on JDK6
+     */
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        return SystemUtils.IS_JAVA_1_6;
+    }
 
     protected String getConfigResources()
     {
