@@ -43,7 +43,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         dest2 = getTestOutboundEndpoint("dest2");
         dest3 = getTestOutboundEndpoint("dest3");
 
-        List endpoints = new ArrayList();
+        List<ImmutableEndpoint> endpoints = new ArrayList<ImmutableEndpoint>();
         endpoints.add(dest1);
         endpoints.add(dest2);
         endpoints.add(dest3);
@@ -56,7 +56,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
     public void testSelectEndpointDefaultProperty() throws Exception
     {
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("apple", "red");
         props.put(EndpointSelector.DEFAULT_SELECTOR_EXPRESSION, "dest3");
         props.put("banana", "yellow");
@@ -75,7 +75,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         router.setExpression("wayOut");
         router.setEvaluator("header");
 
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("apple", "red");
         props.put("wayOut", "dest2");
         props.put("banana", "yellow");
@@ -89,7 +89,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
     public void testSelectEndpointNoMatch() throws Exception
     {
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put(EndpointSelector.DEFAULT_SELECTOR_EXPRESSION, "dest5");
 
         try
@@ -104,6 +104,18 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         {
             // expected
         }
+    }
+
+    public void testSelectEndpointNoMatchUseDefault() throws Exception
+    {
+        Map props = new HashMap();
+        MuleMessage message = new DefaultMuleMessage("test event", props);
+        router.setDefaultEndpointName("dest3");
+
+        assertTrue(router.isMatch(message));
+        session.expect("dispatchEvent", C.eq(message, dest3));
+        router.route(message, (MuleSession) session.proxy());
+        session.verify();
     }
 
     public void testSelectEndpointNoPropertySet() throws Exception

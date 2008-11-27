@@ -3686,6 +3686,14 @@
         <xsd:complexContent>
             <xsd:extension base="multipleEndpointFilteringOutboundRouterType">
                 <xsd:attributeGroup ref="expressionAttributes"/>
+                <xsd:attribute name="default" type="xsd:NMTOKEN" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the default endpoint to use if the expression returns null. This can be used as
+                            an 'else' condition to route messages that don't contain the expected routing information.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

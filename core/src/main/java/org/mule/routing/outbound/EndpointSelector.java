@@ -13,6 +13,8 @@ package org.mule.routing.outbound;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.endpoint.EndpointNotFoundException;
+import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
@@ -47,12 +49,14 @@ public class EndpointSelector extends FilteringOutboundRouter
     public static final String DEFAULT_SELECTOR_EVALUATOR = "header";
     public static final String DEFAULT_SELECTOR_EXPRESSION = "endpoint";
 
+    private String defaultEndpointName;
+
     private ExpressionConfig expressionConfig = new ExpressionConfig(DEFAULT_SELECTOR_EXPRESSION, DEFAULT_SELECTOR_EVALUATOR, null);
 
     public MuleMessage route(MuleMessage message, MuleSession session)
             throws RoutingException
     {
-        List endpoints;
+        List<Object> endpoints;
         String endpointName;
 
         String prop = expressionConfig.getFullExpression(expressionManager);
@@ -72,20 +76,25 @@ public class EndpointSelector extends FilteringOutboundRouter
             logger.error(e.getMessage());
         }
         
-        if (property == null)
+        if (property == null && getDefaultEndpointName() == null)
         {
             throw new CouldNotRouteOutboundMessageException(
                     CoreMessages.expressionResultWasNull(expressionConfig.getFullExpression(expressionManager)), message, null);
         }
+        else if(property==null)
+        {
+            logger.info("Expression: " + prop + " returned null, using default endpoint: " + getDefaultEndpointName());
+            property = getDefaultEndpointName();
+        }
 
         if (property instanceof String)
         {
-            endpoints = new ArrayList(1);
+            endpoints = new ArrayList<Object>(1);
             endpoints.add(property);
         }
         else if (property instanceof List)
         {
-            endpoints = (List) property;
+            endpoints = (List<Object>) property;
         }
         else
         {
@@ -93,10 +102,9 @@ public class EndpointSelector extends FilteringOutboundRouter
                     expressionConfig.getFullExpression(expressionManager), new Class[]{String.class, List.class}, property.getClass()), message, null);
         }
 
-        MuleMessage result = null;
-        List results = new ArrayList(endpoints.size());
+        List<MuleMessage> results = new ArrayList<MuleMessage>(endpoints.size());
 
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
+        for (Iterator<Object> iterator = endpoints.iterator(); iterator.hasNext();)
         {
             endpointName = iterator.next().toString();
 
@@ -139,7 +147,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         {
             ep = (OutboundEndpoint) iterator.next();
             // Endpoint identifier (deprecated)
-            if (endpointName.equals(ep.getEndpointURI().getEndpointName()))
+            if (endpointName.equals(ep.getName()))
             {
                 return ep;
             }
@@ -153,7 +161,14 @@ public class EndpointSelector extends FilteringOutboundRouter
                 return ep;
             }
         }
-        return getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
+        try
+        {
+            return getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
+        }
+        catch (MalformedEndpointException e)
+        {
+            throw new EndpointNotFoundException(CoreMessages.endpointNotFound(endpointName), e);
+        }
     }
 
 
@@ -186,5 +201,15 @@ public class EndpointSelector extends FilteringOutboundRouter
     public void setEvaluator(String evaluator)
     {
         expressionConfig.setEvaluator(evaluator);
+    }
+
+    public String getDefaultEndpointName()
+    {
+        return defaultEndpointName;
+    }
+
+    public void setDefaultEndpointName(String defaultEndpointName)
+    {
+        this.defaultEndpointName = defaultEndpointName;
     }
 }
