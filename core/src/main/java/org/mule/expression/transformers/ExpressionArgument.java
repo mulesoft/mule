@@ -12,6 +12,8 @@ package org.mule.expression.transformers;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.expression.ExpressionConfig;
 
 /**
@@ -22,6 +24,7 @@ public class ExpressionArgument implements MuleContextAware
     private ExpressionConfig expressionConfig = new ExpressionConfig();
     private String name;
     private boolean optional;
+    private Class returnClass;
 
     private MuleContext muleContext;
 
@@ -31,9 +34,15 @@ public class ExpressionArgument implements MuleContextAware
 
     public ExpressionArgument(String name, ExpressionConfig expressionConfig, boolean optional)
     {
+        this(name, expressionConfig, optional, null);
+    }
+
+    public ExpressionArgument(String name, ExpressionConfig expressionConfig, boolean optional, Class returnClass)
+    {
         this.expressionConfig = expressionConfig;
         this.name = name;
         this.optional = optional;
+        this.returnClass = returnClass;
     }
 
     public void setMuleContext(MuleContext context)
@@ -81,9 +90,24 @@ public class ExpressionArgument implements MuleContextAware
         expressionConfig.validate(muleContext.getExpressionManager());
     }
 
-    public Object evaluate(MuleMessage message)
+    /**
+     * Evaluates this Expression agianst the passed in Message.  If a returnClass is set on this Expression Argument it
+     * will be checked to ensure the Argument returns the correct class type.
+     * @param message the message to execute the expression on
+     * @return the result of the expression
+     * @throws ExpressionRuntimeException if the wrong return type is returned from the expression.
+     */
+    public Object evaluate(MuleMessage message) throws ExpressionRuntimeException
     {
-        return muleContext.getExpressionManager().evaluate(getExpression(), getEvaluator(), message, isOptional());
+        Object result = muleContext.getExpressionManager().evaluate(getExpression(), getEvaluator(), message, isOptional());
+        if(getReturnClass()!=null && result != null)
+        {
+            if (!getReturnClass().isInstance(result))
+            {
+                throw new ExpressionRuntimeException(CoreMessages.transformUnexpectedType(result.getClass(), getReturnClass()));
+            }
+        }
+        return result;
     }
 
     public String getExpression()
@@ -116,5 +140,13 @@ public class ExpressionArgument implements MuleContextAware
         return expressionConfig.getCustomEvaluator();
     }
 
+    public Class getReturnClass()
+    {
+        return returnClass;
+    }
 
+    public void setReturnClass(Class returnClass)
+    {
+        this.returnClass = returnClass;
+    }
 }
