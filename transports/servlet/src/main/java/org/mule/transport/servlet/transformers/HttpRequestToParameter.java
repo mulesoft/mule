@@ -8,11 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.servlet;
+package org.mule.transport.servlet.transformers;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transport.servlet.AbstractReceiverServlet;
+import org.mule.transport.servlet.HttpRequestMessageAdapter;
 import org.mule.util.SystemUtils;
 
 import java.io.BufferedReader;
