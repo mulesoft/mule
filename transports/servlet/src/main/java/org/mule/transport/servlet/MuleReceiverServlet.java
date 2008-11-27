@@ -42,7 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Receives Http requests via a Servlet and routes the to listeners with servlet://
+ * Receives Http requests via a Servlet and routes them to listeners with servlet://
  * endpoints
  * <p/>
  * There needs to be a ServletConnector configured on the Mule Server, this connector
