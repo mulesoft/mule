@@ -14,6 +14,9 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class VMRequestorTestCase extends FunctionalTestCase
 {
     
@@ -24,14 +27,38 @@ public class VMRequestorTestCase extends FunctionalTestCase
 
     public void testRequestorWithUpdateonMessage() throws Exception
     {
+
+        for (int i = 0; i < 10; i++)
+        {
+            makeClientRequest("test" + i);
+        }
+
+        MuleClient client = new MuleClient();
+        List results = new ArrayList();
+        MuleMessage result = null;
+        for (int i = 0; i < 10; i++)
+        {
+            result = client.request("vm://out", 3000L);
+            assertNotNull(result);
+            results.add(result.getPayloadAsString());
+        }
+
+        assertEquals(10, results.size());
+
+        //This would fail if the owner thread info was not updated
+        result.setProperty("foo", "bar");
+    }
+
+    protected void makeClientRequest(final String message) throws MuleException
+    {
         final MuleClient client = new MuleClient();
-        Thread t = new Thread(new Runnable() 
+        Thread t = new Thread(new Runnable()
         {
             public void run()
             {
                 try
                 {
-                    client.send("vm://in", "test", null);
+                    client.send("vm://in", message, null);
                 }
                 catch (MuleException e)
                 {
@@ -41,12 +68,6 @@ public class VMRequestorTestCase extends FunctionalTestCase
             }
         }, "test-thread");
         t.start();
-        
-        MuleMessage result = client.request("vm://out", 3000L);
-        assertNotNull(result);
-
-        //This would fail if the owner thread info was not updated
-        result.setProperty("foo", "bar");
     }
     
 }

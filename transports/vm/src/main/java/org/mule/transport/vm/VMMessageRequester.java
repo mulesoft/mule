@@ -83,9 +83,7 @@ public class VMMessageRequester extends AbstractMessageRequester
                     //The message will contain old thread information, we need to reset it
                     if(message instanceof ThreadSafeAccess)
                     {
-                        //TODO: would it be ok just to reset access control here? i.e.
                         ((ThreadSafeAccess)message).resetAccessControl();
-//                        message = (MuleMessage)((ThreadSafeAccess)message).newThreadCopy();
                     }
                     if (logger.isDebugEnabled())
                     {
