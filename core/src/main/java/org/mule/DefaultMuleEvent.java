@@ -30,7 +30,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.security.MuleCredentials;
-import org.mule.util.MapUtils;
 import org.mule.util.UUID;
 
 import java.io.IOException;
@@ -43,7 +42,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -227,10 +225,20 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                 // don't overwrite property on the message
                 if (!ignoreProperty(prop))
                 {
+                    //inbound endpoint properties are in the invocation scope
                     message.setProperty(prop, value, PropertyScope.INVOCATION);
                 }
             }
         }
+        //TODO MULE-3999. Should session properties be copied to the message?
+//        if (session != null)
+//        {
+//            for (Iterator iterator = session.getPropertyNames(); iterator.hasNext();)
+//            {
+//                String prop = (String) iterator.next();
+//                message.setProperty(prop, session.getProperty(prop), PropertyScope.SESSION);
+//            }
+//        }
 
         setCredentials();
     }
@@ -414,45 +422,27 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     }
 
     /**
-     * @see org.mule.api.MuleEvent#getProperty(java.lang.String, boolean)
+     * @see org.mule.api.MuleEvent#getProperty(java.lang.String)
      */
-    public Object getProperty(String name, boolean exhaustiveSearch)
+    public Object getProperty(String name)
     {
-        return getProperty(name, /* defaultValue */null, exhaustiveSearch);
+        return getProperty(name, /* defaultValue */null);
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.api.MuleEvent#getProperty(java.lang.String, java.lang.Object,
-     *      boolean)
+     * @see org.mule.api.MuleEvent#getProperty(java.lang.String, java.lang.Object)
      */
-    public Object getProperty(String name, Object defaultValue, boolean exhaustiveSearch)
+    public Object getProperty(String name, Object defaultValue)
     {
         Object property = message.getProperty(name);
 
-        if (exhaustiveSearch)
+        if(property==null)
         {
-            // Search the endpoint
-            if (property == null)
-            {
-                property = MapUtils.getObject(getEndpoint().getEndpointURI().getParams(), name, null);
-            }
-
-            // Search the connector
-            if (property == null)
-            {
-                try
-                {
-                    property = PropertyUtils.getProperty(getEndpoint().getConnector(), name);
-                }
-                catch (Exception e)
-                {
-                    // Ignore this exception, it just means that the connector has no
-                    // such property.
-                }
-            }
+            property = session.getProperty(name);
         }
+
         return (property == null ? defaultValue : property);
     }
 

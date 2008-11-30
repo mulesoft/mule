@@ -104,21 +104,22 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         }
 
         // Retrieve the parameters
-        Object processType = event.getProperty(ProcessConnector.PROPERTY_PROCESS_TYPE, /* exhaustiveSearch */
-        true);
+        Object processType = event.getProperty(ProcessConnector.PROPERTY_PROCESS_TYPE);
         processVariables.remove(ProcessConnector.PROPERTY_PROCESS_TYPE);
 
         // TODO MULE-1220 The processId for BPM is sort of like a session and so we could probably use
         // Mule's SessionHandler interface for managing this.  
         Object processId;
         String processIdField = connector.getProcessIdField();
+
+        //TODO this is redundent but I'm not sure what the correct behaviour is
         if (StringUtils.isNotEmpty(processIdField))
         {
-            processId = event.getProperty(processIdField, /* exhaustiveSearch */false);
+            processId = event.getProperty(processIdField);
         }
         // If processId is explicitly set for the message, this overrides the
         // processIdField.
-        processId = event.getProperty(ProcessConnector.PROPERTY_PROCESS_ID, /* exhaustiveSearch */true);
+        processId = event.getProperty(ProcessConnector.PROPERTY_PROCESS_ID);
         processVariables.remove(ProcessConnector.PROPERTY_PROCESS_ID);
 
         // Default action is "advance"

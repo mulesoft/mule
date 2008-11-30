@@ -123,29 +123,22 @@ public interface MuleEvent
     String getId();
 
     /**
-     * Gets a property associated with the current event. If
-     * <code>exhaustiveSearch</code> is true, the endpoint and connector associated
-     * with the event will also be searched for the property.
+     * Gets a property associated with the current event. This method will check all property scopes on the currnet message
+     * and the current session
      * 
      * @param name the property name
-     * @param exhaustiveSearch also search the endpoint and connector for the
-     *            property
      * @return the property value or null if the property does not exist
      */
-    Object getProperty(String name, boolean exhaustiveSearch);
+    Object getProperty(String name);
 
     /**
-     * Gets a property associated with the current event. If
-     * <code>exhaustiveSearch</code> is true, the endpoint and connector associated
-     * with the event will also be searched for the property.
-     * 
+     * Gets a property associated with the current event. This method will check all property scopes on the currnet message
+     * and the current session
      * @param name the property name
      * @param defaultValue a default value if the property doesn't exist in the event
-     * @param exhaustiveSearch also search the endpoint and connector for the
-     *            property
      * @return the property value or the defaultValue if the property does not exist
      */
-    Object getProperty(String name, Object defaultValue, boolean exhaustiveSearch);
+    Object getProperty(String name, Object defaultValue);
 
     /**
      * Gets the endpoint associated with this event

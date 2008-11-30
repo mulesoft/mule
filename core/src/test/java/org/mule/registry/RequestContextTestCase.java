@@ -151,12 +151,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase
             return null;  
         }
 
-        public Object getProperty(String name, boolean exhaustiveSearch)
+        public Object getProperty(String name)
         {
             return null;  
         }
 
-        public Object getProperty(String name, Object defaultValue, boolean exhaustiveSearch)
+        public Object getProperty(String name, Object defaultValue)
         {
             return null;  
         }
