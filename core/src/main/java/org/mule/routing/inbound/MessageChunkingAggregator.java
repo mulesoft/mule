@@ -14,8 +14,8 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.routing.AggregationException;
-import org.mule.routing.EventCorrelatorCallback;
 import org.mule.routing.CollectionCorrelatorCallback;
+import org.mule.routing.EventCorrelatorCallback;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -31,11 +31,13 @@ public class MessageChunkingAggregator extends AbstractEventAggregator
 {
     public static final int DEFAULT_BUFFER_SIZE = 4096;
 
-    protected final Comparator eventComparator = new CorrelationSequenceComparator();
+
+    protected Comparator eventComparator;
 
     public MessageChunkingAggregator()
     {
         super();
+        eventComparator= new CorrelationSequenceComparator();
     }
 
     protected EventCorrelatorCallback getCorrelatorCallback()

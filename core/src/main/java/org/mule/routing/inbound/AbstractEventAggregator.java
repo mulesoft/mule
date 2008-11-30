@@ -27,7 +27,7 @@ import javax.resource.spi.work.WorkException;
 
 public abstract class AbstractEventAggregator extends SelectiveConsumer
 {
-    private EventCorrelator eventCorrelator;
+    protected EventCorrelator eventCorrelator;
 
     private int timeout = 0;
 

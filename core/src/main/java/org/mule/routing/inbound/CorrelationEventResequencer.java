@@ -10,8 +10,15 @@
 
 package org.mule.routing.inbound;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.routing.EventCorrelatorCallback;
+import org.mule.routing.ResequenceCorrelatorCallback;
 
+import java.util.Comparator;
 
 /**
  * <code>CorrelationEventResequencer</code> is used to resequence events according
@@ -20,32 +27,50 @@ import org.mule.api.MuleEvent;
  * parts so that another router such as the <i>CorrelationEventResequencer</i> can
  * receive the parts and reorder or merge them.
  */
-public class CorrelationEventResequencer extends AbstractEventResequencer
+public abstract class CorrelationEventResequencer extends AbstractEventAggregator
 {
+    protected Comparator eventComparator;
 
     public CorrelationEventResequencer()
     {
         super();
-        this.setComparator(new CorrelationSequenceComparator());
+        this.setEventComparator(new CorrelationSequenceComparator());
     }
 
-    protected boolean shouldResequenceEvents(EventGroup events)
+    @Override
+    public void initialise() throws InitialisationException
     {
-        MuleEvent event = (MuleEvent) events.iterator().next();
-
-        if (event == null)
+        if (eventComparator == null)
         {
-            // nothing to resequence
-            return false;
+            throw new InitialisationException(CoreMessages.objectIsNull("eventComparator"), this);
         }
+        super.initialise();
 
-        int size = event.getMessage().getCorrelationGroupSize();
-        if (size == -1)
-        {
-            logger.warn("Correlation Group Size not set, but CorrelationResequencer is being used.  This can cause messages to be held indefinitely");
-        }
-
-        return size == events.size();
     }
 
+    public Comparator getEventComparator()
+    {
+        return eventComparator;
+    }
+
+    public void setEventComparator(Comparator eventComparator)
+    {
+        this.eventComparator = eventComparator;
+    }
+
+    protected EventCorrelatorCallback getCorrelatorCallback()
+    {
+        return new ResequenceCorrelatorCallback(getEventComparator());
+    }
+
+    @Override
+    public MuleEvent[] process(MuleEvent event) throws MessagingException
+    {
+        MuleMessage msg = eventCorrelator.process(event);
+        if (msg == null)
+        {
+            return null;
+        }
+        return (MuleEvent[]) msg.getPayload();
+    }
 }
