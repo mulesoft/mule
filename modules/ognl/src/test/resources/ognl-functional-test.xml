@@ -28,5 +28,17 @@
                 </filtering-router>
             </outbound>
         </service>
+
+        <service name="OGNLServiceWrapper2">
+            <inbound>
+                <inbound-endpoint address="vm://in2" connector-ref="VMConnector"/>
+            </inbound>
+            <outbound>
+                <filtering-router>
+                    <outbound-endpoint address="vm://out2" connector-ref="VMConnector"/>
+                    <expression-filter evaluator="ognl" expression="equals('foo') || content.endsWith('bar')"/>
+                </filtering-router>
+            </outbound>
+        </service>
     </model>
 </mule>

@@ -108,6 +108,38 @@ public class OGNLFilterTestCase extends FunctionalTestCase
     }
 
 
+    public void testFunctionalTestUsingExpressionFilter() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        try
+        {
+            client.dispatch("vm://in2", FIRST_MESSAGE, null);
+            MuleMessage message = client.request("vm://out2", TIMEOUT);
+            assertNotNull(message);
+            assertNotNull(message.getPayload());
+            assertNull(message.getExceptionPayload());
+            assertEquals(FIRST_MESSAGE, message.getPayload());
+
+            Dummy payload = new Dummy();
+            payload.setContent(SECOND_MESSAGE);
+            client.dispatch("vm://in2", new DefaultMuleMessage(payload));
+            message = client.request("vm://out2", TIMEOUT);
+            assertNotNull(message);
+            assertNotNull(message.getPayload());
+            assertNull(message.getExceptionPayload());
+            assertEquals(SECOND_MESSAGE, ((Dummy) message.getPayload()).getContent());
+
+            client.dispatch("vm://in2", THIRD_MESSAGE, null);
+            message = client.request("vm://out2", TIMEOUT);
+            assertNull(message);
+        }
+        finally
+        {
+            client.dispose();
+        }
+
+    }
+
     public void testInvalidObjectExpression()
     {
         try
