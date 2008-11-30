@@ -18,6 +18,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.OutputHandler;
+import org.mule.api.transport.PropertyScope;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.http.transformers.ObjectToHttpClientMethodRequest;
@@ -193,7 +194,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     protected void setPropertyFromEndpoint(MuleEvent event, MuleMessage msg, String prop)
     {
-        Object o = msg.getProperty(prop, null);
+        Object o = msg.getProperty(prop, PropertyScope.OUTBOUND);
         if (o == null) 
         {
             o = event.getEndpoint().getProperty(prop);

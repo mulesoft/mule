@@ -18,6 +18,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
@@ -300,7 +301,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         if (!(msg.getPayload() instanceof NullPayload))
         {
             // See if we have a MIME type set
-            String mimeType = msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+            String mimeType = (String)msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND);
 
             if (src instanceof String)
             {
@@ -381,12 +382,16 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         // Standard requestHeaders
         String headerValue;
         String headerName;
+
         for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
         {
             headerName = (String) iterator.next();
 
             if (headerName.equalsIgnoreCase(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY))
             {
+                logger.warn("Deprecation warning:  There is not need to set custom headers using: " + HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY
+                + " you can now add the properties directly to the outbound endpoint or use the OUTBOUND property scope on the message.");
+
                 Map customHeaders = (Map) msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
                 if (customHeaders != null)
                 {   
@@ -418,6 +423,20 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         {
             // must set this for receiver to properly parse attachments
             httpMethod.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, "multipart/related");
+        }
+
+        //attach the outbound prorperties to the message
+        Object value;
+        for (Iterator iterator = msg.getPropertyNames(PropertyScope.OUTBOUND).iterator(); iterator.hasNext();)
+        {
+            headerName = (String) iterator.next();
+
+                value = msg.getProperty(headerName, PropertyScope.OUTBOUND);
+                if(value!=null)
+                {
+                    httpMethod.addRequestHeader(headerName, value.toString());
+                }
+            
         }
     }
 

@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.MuleManifest;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transport.NullPayload;
@@ -67,7 +68,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         else
         {
             server = MuleManifest.getProductName() + "/"
-                     + MuleManifest.getProductVersion();
+                    + MuleManifest.getProductVersion();
         }
     }
 
@@ -93,7 +94,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             HttpResponse response;
             if (src instanceof HttpResponse)
             {
-                response = (HttpResponse)src;
+                response = (HttpResponse) src;
             }
             else
             {
@@ -104,12 +105,12 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             if (!response.containsHeader(HttpConstants.HEADER_CONTENT_TYPE))
             {
                 response.addHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE,
-                    HttpConstants.DEFAULT_CONTENT_TYPE));
+                        HttpConstants.DEFAULT_CONTENT_TYPE));
             }
 
             // Ensure there's a content length or transfer encoding header
             if (!response.containsHeader(HttpConstants.HEADER_CONTENT_LENGTH)
-                && !response.containsHeader(HttpConstants.HEADER_TRANSFER_ENCODING))
+                    && !response.containsHeader(HttpConstants.HEADER_TRANSFER_ENCODING))
             {
                 if (response.hasBody())
                 {
@@ -119,7 +120,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
                         if (response.getHttpVersion().lessEquals(HttpVersion.HTTP_1_0))
                         {
                             throw new IOException("Chunked encoding not supported for HTTP version "
-                                                  + response.getHttpVersion());
+                                    + response.getHttpVersion());
                         }
                         Header header = new Header(HttpConstants.HEADER_TRANSFER_ENCODING, "chunked");
                         response.addHeader(header);
@@ -150,7 +151,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
                     response.setKeepAlive(false);
                 }
             }
-            
+
             if ("HEAD".equalsIgnoreCase(msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, null)))
             {
                 // this is a head request, we don't want to send the actual content
@@ -166,22 +167,45 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
     }
 
     protected HttpResponse createResponse(Object src, String encoding, MuleMessage msg)
-        throws IOException, TransformerException
+            throws IOException, TransformerException
     {
         HttpResponse response = new HttpResponse();
 
-        int status = msg.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_OK);
-        String version = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
-        String etag = msg.getStringProperty(HttpConstants.HEADER_ETAG, null);
-        
+        Object tmp = msg.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, PropertyScope.OUTBOUND);
+        int status = HttpConstants.SC_OK;
+        if (tmp != null)
+        {
+            status = Integer.valueOf(tmp.toString());
+        }
+        String version = (String) msg.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, PropertyScope.OUTBOUND);
+        if (version == null)
+        {
+            version = HttpConstants.HTTP11;
+        }
+        String etag = (String) msg.getProperty(HttpConstants.HEADER_ETAG, PropertyScope.OUTBOUND);
+
         String date;
         synchronized (format)
         {
             date = format.format(new Date());
         }
 
-        String contentType = msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE,
-            HttpConstants.DEFAULT_CONTENT_TYPE);
+        String contentType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND);
+        if (contentType == null)
+        {
+            contentType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INVOCATION);
+        }
+
+        if (contentType == null)
+        {
+            contentType = HttpConstants.DEFAULT_CONTENT_TYPE;
+
+            if (encoding != null)
+            {
+                contentType += "; charset=" + encoding;
+            }
+            logger.warn("Content-Type was not set, defaulting to: " + contentType);
+        }
 
         response.setStatusLine(HttpVersion.parse(version), status);
         response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, contentType));
@@ -201,7 +225,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         String headerName, value;
         for (Iterator iterator = headerNames.iterator(); iterator.hasNext();)
         {
-            headerName = (String)iterator.next();
+            headerName = (String) iterator.next();
             value = msg.getStringProperty(headerName, null);
             if (value != null)
             {
@@ -209,18 +233,32 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             }
         }
 
+        //TODO: This is the legacy way of setting custom headers and can be removed in 3.0
         // Custom responseHeaderNames
-        Map customHeaders = (Map)msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+        Map customHeaders = (Map) msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
         if (customHeaders != null)
         {
             Map.Entry entry;
             for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();)
             {
-                entry = (Map.Entry)iterator.next();
+                entry = (Map.Entry) iterator.next();
                 if (entry.getValue() != null)
                 {
                     response.setHeader(new Header(entry.getKey().toString(), entry.getValue().toString()));
                 }
+            }
+        }
+
+        //attach the outbound prorperties to the message
+        Object v;
+        for (Iterator iterator = msg.getPropertyNames(PropertyScope.OUTBOUND).iterator(); iterator.hasNext();)
+        {
+            headerName = (String) iterator.next();
+
+            v = msg.getProperty(headerName, PropertyScope.OUTBOUND);
+            if (v != null)
+            {
+                response.setHeader(new Header(headerName, v.toString()));
             }
         }
 
@@ -233,22 +271,22 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         if (msg.getCorrelationId() != null)
         {
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_ID_PROPERTY,
-                msg.getCorrelationId()));
+                    msg.getCorrelationId()));
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX
-                                          + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-                String.valueOf(msg.getCorrelationGroupSize())));
+                    + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
+                    String.valueOf(msg.getCorrelationGroupSize())));
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX
-                                          + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
-                String.valueOf(msg.getCorrelationSequence())));
+                    + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
+                    String.valueOf(msg.getCorrelationSequence())));
         }
         if (msg.getReplyTo() != null)
         {
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_REPLY_TO_PROPERTY,
-                msg.getReplyTo().toString()));
+                    msg.getReplyTo().toString()));
         }
-        
+
         response.setBody(msg);
-        
+
         return response;
     }
 

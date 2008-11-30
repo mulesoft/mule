@@ -23,18 +23,34 @@ public class HttpHeadersTestCase extends FunctionalTestCase
         return "http-headers-config.xml";
     }
 
-    public void testJettyHeaders() throws Exception 
-    { 
-        MuleClient client = new MuleClient(); 
-        MuleMessage result = client.send("clientEndpoint", null, null); 
-        assertNotNull(result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_TYPE)); 
+    public void testJettyHeaders() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        MuleMessage result = client.send("clientEndpoint", null, null);
+        assertNotNull(result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_TYPE));
         assertEquals("application/x-download",
-            result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_TYPE)); 
-        assertNotNull(result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_DISPOSITION)); 
+            result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_TYPE));
+        assertNotNull(result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_DISPOSITION));
         assertEquals("attachment; filename=foo.zip",
-            result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_DISPOSITION)); 
+            result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_DISPOSITION));
     }
 
+    public void testClientHeaders() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        client.dispatch("clientEndpoint2", null, null); 
+
+        MuleMessage result = client.request("vm://out", 5000);
+        assertNotNull(result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_TYPE));
+        assertEquals("application/xml",
+            result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_TYPE));
+        assertNotNull(result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_DISPOSITION));
+        assertEquals("attachment; filename=foo.zip",
+            result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_DISPOSITION));
+
+        assertNotNull(result.getAdapter().getProperty("X-Test"));
+        assertEquals("foo", result.getAdapter().getProperty("X-Test"));
+    }
 }
 
 
