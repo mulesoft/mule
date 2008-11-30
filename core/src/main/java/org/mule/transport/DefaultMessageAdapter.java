@@ -10,6 +10,7 @@
 
 package org.mule.transport;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.transport.MessageAdapter;
@@ -102,27 +103,37 @@ public final class DefaultMessageAdapter extends AbstractMessageAdapter implemen
                     throw new MuleRuntimeException(CoreMessages.failedToReadPayload(), e);
                 }
             }
-            for (Iterator iterator = previous.getPropertyNames().iterator(); iterator.hasNext();)
+
+            if(previous instanceof AbstractMessageAdapter)
             {
-                String name = (String) iterator.next();
-                try
-                {
-                    Object value = previous.getProperty(name);
-                    if (null == value)
-                    {
-                        logger.warn("Detected concurrent access to property " + name + " for " + previous);
-//                        new Throwable().printStackTrace();
-                    }
-                    else
-                    {
-                        setProperty(name, value);
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new MuleRuntimeException(CoreMessages.failedToReadPayload(), e);
-                }
+                properties = ((AbstractMessageAdapter)previous).getPropertiesContext();
             }
+            else
+            {
+                properties = ((AbstractMessageAdapter)((DefaultMuleMessage)previous).getAdapter()).getPropertiesContext();
+            }
+//RM*
+//            for (Iterator iterator = previous.getPropertyNames().iterator(); iterator.hasNext();)
+//            {
+//                String name = (String) iterator.next();
+//                try
+//                {
+//                    Object value = previous.getProperty(name);
+//                    if (null == value)
+//                    {
+//                        logger.warn("Detected concurrent access to property " + name + " for " + previous);
+////                        new Throwable().printStackTrace();
+//                    }
+//                    else
+//                    {
+//                        setProperty(name, value);
+//                    }
+//                }
+//                catch (Exception e)
+//                {
+//                    throw new MuleRuntimeException(CoreMessages.failedToReadPayload(), e);
+//                }
+//            }
         }
         else
         {
