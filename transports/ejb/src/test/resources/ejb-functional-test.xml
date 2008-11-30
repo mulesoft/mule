@@ -25,4 +25,18 @@
 
     <ejb:connector name="ejb" jndiContext-ref="jndiContext" securityPolicy="rmi.policy"/>
 
+    <model>
+        <service name="Test">
+            <inbound>
+                <vm:inbound-endpoint path="in" synchronous="true"/>
+            </inbound>
+            <component class="org.mule.transport.ejb.TestComponentWithBinding">
+                <binding interface="org.mule.container.DummyEjb" method="reverseString">
+                    <!-- there should be no need to set the method on the binding and the endpooint -->
+                    <outbound-endpoint address="ejb://localhost/TestService" synchronous="true"/>
+                </binding>
+            </component>
+        </service>
+    </model>
+
 </mule>

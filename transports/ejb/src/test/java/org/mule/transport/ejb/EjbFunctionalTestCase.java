@@ -10,18 +10,19 @@
 
 package org.mule.transport.ejb;
 
-import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.module.client.MuleClient;
 import org.mule.transport.AbstractFunctionalTestCase;
 import org.mule.transport.rmi.RmiConnector;
 
 import java.util.Properties;
 
 /**
- * test RMI object invocations
+ * test EJB object invocations
  */
 public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
 {
@@ -30,10 +31,12 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
         super("ejb", "ejb-functional-test.xml");
     }
 
-    @Override
     public void testCase() throws Exception
     {
-        // TODO
+        MuleClient client = new MuleClient();
+        MuleMessage result = client.send("vm://in", "1234567890", null);
+        assertNotNull(result);
+        assertEquals("0987654321", result.getPayloadAsString());
     }
     
     @Override
