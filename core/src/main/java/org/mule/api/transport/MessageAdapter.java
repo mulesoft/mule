@@ -84,6 +84,13 @@ public interface MessageAdapter extends Serializable
     Set getPropertyNames();
 
     /**
+     * Gets all property names in a given scope
+     * @param scope the scope of property names
+     * @return all property keys on this message
+     */
+    Set getPropertyNames(PropertyScope scope);
+
+    /**
      * @return the current message
      */
     Object getPayload();
@@ -107,6 +114,15 @@ public interface MessageAdapter extends Serializable
      */
     Object getProperty(String name, Object defaultValue);
 
+    /**
+     * Gets a property from the message with a given scope
+     *
+     * @param name the name or key of the property
+     * @param scope The scope of the property to retrieve
+     * @return the property value or the defaultValue if the property does not exist in the specificed scope
+     */
+    Object getProperty(String name, PropertyScope scope);
+    
     /**
      * Gets an integer property from the message
      * 

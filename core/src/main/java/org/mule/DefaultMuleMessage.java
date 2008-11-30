@@ -318,6 +318,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         return adapter.getPropertyNames();
     }
 
+    /** {@inheritDoc} */
+    public Set getPropertyNames(PropertyScope scope)
+    {
+        return adapter.getPropertyNames(scope);
+    }
+
     //** {@inheritDoc} */
     public double getDoubleProperty(String name, double defaultValue)
     {
@@ -340,6 +346,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
     public Object getProperty(String name, Object defaultValue)
     {
         return adapter.getProperty(name, defaultValue);
+    }
+
+    /** {@inheritDoc} */
+    public Object getProperty(String name, PropertyScope scope)
+    {
+        return adapter.getProperty(name, scope);
     }
 
     /** {@inheritDoc} */

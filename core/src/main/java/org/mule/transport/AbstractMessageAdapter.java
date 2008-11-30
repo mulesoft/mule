@@ -10,6 +10,7 @@
 
 package org.mule.transport;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
@@ -36,7 +37,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -86,19 +86,17 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
         logger = LogFactory.getLog(getClass());
         if (null != template)
         {
-            Iterator propertyNames = template.getPropertyNames().iterator();
-            while (propertyNames.hasNext())
+            //AbstractMessageAdapter is used by all transports, the DefaultMuleMessage uses delegation, so we need to
+            //check for both types
+            if(template instanceof AbstractMessageAdapter)
             {
-                String key = (String) propertyNames.next();
-                try
-                {
-                    setProperty(key, template.getProperty(key));
-                }
-                catch (Exception e)
-                {
-                    throw new MuleRuntimeException(CoreMessages.failedToReadPayload(), e);
-                }
+                properties = ((AbstractMessageAdapter)template).getPropertiesContext();
             }
+            else
+            {
+                properties = ((AbstractMessageAdapter)((DefaultMuleMessage)template).getAdapter()).getPropertiesContext();                
+            }
+
             Iterator attachmentNames = template.getAttachmentNames().iterator();
             while (attachmentNames.hasNext())
             {
@@ -124,6 +122,16 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
                 // Don't copy the id if it's not supported.
             }
         }
+    }
+
+    /**
+     * Returns a copy of the {@link org.mule.transport.MessagePropertiesContext} object.  This is usful when copying messages
+     * rather than using the Messaging API directly. This provides a faster method of copying message properties.
+     * @return a copy of the properties on this message
+     */
+    MessagePropertiesContext getPropertiesContext()
+    {
+        return properties.copy();
     }
 
     @Override
@@ -183,6 +191,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
             }
         }
     }
+
     /**
      * A convenience method for extending classes to Set inbound scoped properties on the message
      * properties that arrive on the inbound message should be set as inbound-scoped properties. These are
@@ -221,6 +230,13 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     {
         assertAccess(READ);
         return properties.getPropertyNames();
+    }
+
+    /** {@inheritDoc} */
+    public Set getPropertyNames(PropertyScope scope)
+    {
+        assertAccess(READ);
+        return properties.getScopedProperties(scope).keySet();
     }
 
     /** {@inheritDoc} */
@@ -287,6 +303,13 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     {
         assertAccess(READ);
         return properties.getProperty(name, defaultValue);
+    }
+
+    /** {@inheritDoc} */
+    public Object getProperty(String name, PropertyScope scope)
+    {
+        assertAccess(READ);
+        return properties.getProperty(name, scope);
     }
 
     /** {@inheritDoc} */
