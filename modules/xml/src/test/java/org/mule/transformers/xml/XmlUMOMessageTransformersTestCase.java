@@ -124,9 +124,8 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
                + "       <string>object</string>\n"
                + "       <string>string</string>\n"
                + "     </keySet>\n"
-               + "     <applicationProperties class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\"/>\n"
                + "     <defaultScope reference=\"../scopedMap/entry[3]/org.mule.api.transport.PropertyScope\"/>\n"
-               + "     <fallbackToRegistry>false</fallbackToRegistry>\n" + "   </properties>\n"
+               + "   </properties>\n"
                + "   <attachments class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\"/>\n"
                + "   <encoding>UTF-8</encoding>\n" + "   <id>3be5fe5a-87f8-11dc-a153-0b6db396665f</id>\n"
                + " </adapter>\n" + " </org.mule.DefaultMuleMessage>\n";

@@ -22,25 +22,13 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 /** TODO */
 public class MessagePropertiesContext implements Serializable
 {
     protected Map scopedMap;
     protected Set keySet;
 
-    //TODO RM*: Map these to a RegistryMapView, currently in another branch :(
-    //Treat Application properites as a special call
-    Map applicationProperties = new ConcurrentHashMap(0);
-
-    private PropertyScope defaultScope = PropertyScope.OUTBOUND;
-
-    /**
-     * if a property is not available in any ther scope, should we check the registry.
-     * Note there will be performance implementations is this is enabled
-     */
-    private boolean fallbackToRegistry = false;
+    protected PropertyScope defaultScope = PropertyScope.OUTBOUND;
 
     public MessagePropertiesContext()
     {
@@ -59,6 +47,19 @@ public class MessagePropertiesContext implements Serializable
         this();
         //We can't set a read only scope as default
         checkScopeForWriteAccess(defaultScope);
+        this.defaultScope = defaultScope;
+    }
+
+    /**
+     * Ctor used for copying only
+     * @param defaultScope
+     * @param keySet
+     * @param scopedMap
+     */
+    private MessagePropertiesContext(PropertyScope defaultScope, Set keySet, Map scopedMap)
+    {
+        this.keySet = keySet;
+        this.scopedMap = scopedMap;
         this.defaultScope = defaultScope;
     }
 
@@ -117,20 +118,11 @@ public class MessagePropertiesContext implements Serializable
                 break;
             }
         }
-        if (value == null && fallbackToRegistry)
-        {
-            value = applicationProperties.get(key);
-        }
         return value;
     }
 
     public Object getProperty(String key, PropertyScope scope)
     {
-        if (PropertyScope.APPLICATION.equals(scope))
-        {
-            return applicationProperties.get(key);
-        }
-
         Map props = getScopedProperties(scope);
         return props.get(key);
     }
@@ -277,6 +269,20 @@ public class MessagePropertiesContext implements Serializable
     public String getStringProperty(String name, String defaultValue)
     {
         return ObjectUtils.getString(getProperty(name), defaultValue);
+    }
+
+    MessagePropertiesContext copy()
+    {
+        Set<String> keySet = new TreeSet<String>(getPropertyNames());
+
+        Map scopedMap = new TreeMap(new PropertyScope.ScopeComparator());
+
+        scopedMap.put(PropertyScope.INVOCATION, new HashMap(getScopedProperties(PropertyScope.INVOCATION)));
+        scopedMap.put(PropertyScope.INBOUND, new HashMap(getScopedProperties(PropertyScope.INBOUND)));
+        scopedMap.put(PropertyScope.OUTBOUND, new HashMap(getScopedProperties(PropertyScope.OUTBOUND)));
+        scopedMap.put(PropertyScope.SESSION, new HashMap(getScopedProperties(PropertyScope.SESSION)));
+
+        return new MessagePropertiesContext(getDefaultScope(), keySet, scopedMap);
     }
 
     public String toString()
