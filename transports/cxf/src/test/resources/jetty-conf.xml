@@ -1,0 +1,30 @@
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:spring="http://www.springframework.org/schema/beans"
+  xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+  xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd">
+  
+  <cxf:endpoint 
+      name="clientEndpoint" 
+      address="http://localhost:63081/services/greeter"
+      clientClass="org.apache.hello_world_soap_http.SOAPService" 
+      wsdlPort="SoapPort" 
+      wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+      synchronous="true"/>
+      
+  <model name="TestCxfModel">
+  
+    <service name="greeterService">
+      <inbound>
+          <cxf:inbound-endpoint address="jetty://localhost:63081/services/greeter" synchronous="true" />
+      </inbound>
+      <component>
+        <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
+      </component>
+    </service>
+
+  </model>
+</mule>
