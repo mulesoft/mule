@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.examples</groupId>
+        <artifactId>mule-examples</artifactId>
+        <version>2.2.0-SNAPSHOT</version>
+    </parent>
+    <properties>
+        <muleVersion>2.2.0-SNAPSHOT</muleVersion>
+        <cxfVersion>2.0.6</cxfVersion>
+    </properties>
+
+    <artifactId>mule-example-bookstore</artifactId>
+    <name>Mule Bookstore Demo</name>
+    <description>
+        Demo for Mule's web service capabilities.
+    </description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.mule.transports</groupId>
+      <artifactId>mule-transport-cxf</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <!-- for integrtion tests -->
+    <dependency>
+      <groupId>org.mule.transports</groupId>
+      <artifactId>mule-transport-vm</artifactId>
+      <version>${muleVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mule.transports</groupId>
+      <artifactId>mule-transport-file</artifactId>
+      <version>${muleVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mule.transports</groupId>
+      <artifactId>mule-transport-quartz</artifactId>
+      <version>${muleVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mule.transports</groupId>
+      <artifactId>mule-transport-email</artifactId>
+      <version>${muleVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mule.transports</groupId>
+      <artifactId>mule-transport-http</artifactId>
+      <version>${muleVersion}</version>
+    </dependency>
+  </dependencies> 
+  <repositories>
+    <repository>
+      <id>apache-incubating</id>
+      <name>Apache Incubating Repository</name>
+      <url>http://people.apache.org/repo/m2-incubating-repository/</url>
+    </repository>
+    <repository>
+      <id>muleforge</id>
+      <name>Muleforge Repository</name>
+      <url>http://repository.muleforge.org/</url>
+    </repository>
+  </repositories>
+
+
+</project>
