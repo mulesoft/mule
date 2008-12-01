@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.examples</groupId>
-        <artifactId>mule-examples</artifactId>
+        <artifactId>mule-example-bookstore-parent</artifactId>
         <version>2.2.0-SNAPSHOT</version>
     </parent>
     <properties>
@@ -10,10 +10,11 @@
         <cxfVersion>2.0.6</cxfVersion>
     </properties>
 
-    <artifactId>mule-example-bookstore</artifactId>
-    <name>Mule Bookstore Demo</name>
+    <artifactId>mule-example-bookstore-backend</artifactId>
+    <name>Bookstore Example: Backend</name>
     <description>
-        Demo for Mule's web service capabilities.
+        The Back-end portion of the Bookstore example.  
+        This is where the domain object live, the data is stored, and the processing happens.
     </description>
 
   <build>

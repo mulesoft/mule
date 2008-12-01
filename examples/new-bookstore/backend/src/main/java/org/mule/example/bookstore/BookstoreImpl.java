@@ -74,4 +74,9 @@ public class BookstoreImpl implements Bookstore
             throw new RuntimeException(e);
         }
     }
+    
+    public String sanityCheck(Object in)
+    {
+        return "Received object: " + in;
+    }   
 }

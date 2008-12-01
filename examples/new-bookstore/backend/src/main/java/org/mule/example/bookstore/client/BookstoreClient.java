@@ -49,7 +49,8 @@ public class BookstoreClient
         bookstore = (Bookstore) pf.create();
         
         // add a book to the bookstore
-        Book book = new Book(1,"J.R.R. Tolkien","The Lord of the Rings");
+        Book book = new Book("J.R.R. Tolkien", "The Lord of the Rings");
+        book.setId(1);
         bookstore.addBook(book);
     }
 
@@ -161,8 +162,10 @@ public class BookstoreClient
             System.out.println("\n" + LocaleMessage.getAuthorNamePrompt());
             author = getInput();
         }
-        
-        return new Book(generateBookId(),title,author);
+
+        Book book = new Book(title,author);
+        book.setId(generateBookId());
+        return book;
     }
     
     private static int getSelection() throws IOException
