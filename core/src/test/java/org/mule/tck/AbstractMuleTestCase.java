@@ -52,11 +52,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -75,6 +73,17 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      * recovery service object store.
      */
     public static final String[] IGNORED_DOT_MULE_DIRS = new String[]{"transaction-log"};
+
+    /**
+     * Name of a property to override the default test watchdog timeout.
+     * @see #DEFAULT_MULE_TEST_TIMEOUT_SECS 
+     */
+    public static final String PROPERTY_MULE_TEST_TIMEOUT = "mule.test.timeoutSecs";
+    
+    /**
+     * Default test watchdog timeout in seconds.
+     */
+    public static final int DEFAULT_MULE_TEST_TIMEOUT_SECS = 60;
 
     protected static MuleContext muleContext;
 
@@ -149,7 +158,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      * a warning.
      */
     private boolean failOnTimeout = true;
-    
+
     public AbstractMuleTestCase()
     {
         super();
@@ -298,7 +307,18 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     protected TestCaseWatchdog createWatchdog()
     {
-        return new TestCaseWatchdog(1, TimeUnit.MINUTES, this);
+
+        int timeoutSecs;
+        try
+        {
+            timeoutSecs = Integer.parseInt(System.getProperty(PROPERTY_MULE_TEST_TIMEOUT, "" + DEFAULT_MULE_TEST_TIMEOUT_SECS));
+        }
+        catch (NumberFormatException e)
+        {
+            // if something went wrong
+            timeoutSecs = DEFAULT_MULE_TEST_TIMEOUT_SECS;
+        }
+        return new TestCaseWatchdog(timeoutSecs, TimeUnit.SECONDS, this);
     }
 
     public void handleTimeout(long timeout, TimeUnit unit)
