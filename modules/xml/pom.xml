@@ -27,7 +27,7 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>dom4j</groupId>  
+            <groupId>dom4j</groupId>
             <artifactId>dom4j.osgi</artifactId>
             <version>${dom4jVersion}</version>
         </dependency>
@@ -49,7 +49,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-stax-api_1.0_spec</artifactId>            
+            <artifactId>geronimo-stax-api_1.0_spec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
@@ -71,7 +71,7 @@
             <artifactId>saxon-all.osgi</artifactId>
             <version>${saxonVersion}</version>
         </dependency>
-        
+
         <!-- Unit tests -->
         <dependency>
             <groupId>org.mule</groupId>
@@ -89,6 +89,11 @@
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

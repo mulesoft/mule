@@ -52,7 +52,7 @@
             <version>${geronimoSpecsVersion}</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- Unit tests -->
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -77,6 +77,11 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-stdio</artifactId>
             <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -118,11 +118,16 @@
             <version>${version}</version>
         </dependency>
 
-        <!-- For Jetty unit test --> 
+        <!-- For Jetty unit test -->
         <dependency>
           <groupId>org.mortbay.jetty</groupId>
           <artifactId>jetty</artifactId>
           <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects-core</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
