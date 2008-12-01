@@ -31,10 +31,11 @@ public class MulticastConnector extends UdpConnector
     }
 
 
-    @java.lang.Override
+    @Override
     protected void doInitialise() throws InitialisationException
     {
-        dispatcherSocketsPool.setFactory(new MulticastSocketFactory());
+        socketFactory = new MulticastSocketFactory();
+        dispatcherSocketsPool.setFactory(socketFactory);
         dispatcherSocketsPool.setTestOnBorrow(false);
         dispatcherSocketsPool.setTestOnReturn(true);
         //For clarity, note that the max active value does not need to be 1 since you can have multiple
@@ -64,7 +65,7 @@ public class MulticastConnector extends UdpConnector
     }
 
 
-    @java.lang.Override
+    @Override
     protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         //you can have multiple Multicast sockets bound to a single port,
