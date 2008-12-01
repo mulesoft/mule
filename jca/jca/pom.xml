@@ -47,11 +47,39 @@
         </plugins>
     </build>
 
+    <!--
+        Declare dependencies, that should not end up in the .rar as provided here
+    -->
     <dependencies>
         <dependency>
             <groupId>org.mule.modules.jca</groupId>
             <artifactId>mule-module-jca-jboss</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl104-over-slf4j</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
