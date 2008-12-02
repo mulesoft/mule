@@ -18,7 +18,7 @@
             <groupId>quartz</groupId>
             <artifactId>quartz-all.osgi</artifactId>
             <version>${quartzVersion}</version>
-        </dependency>                
+        </dependency>
         <!-- The Mule client is needed for EndpointPollingJob and ScheduledDispatchJob -->
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -37,6 +37,11 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
