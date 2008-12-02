@@ -12,4 +12,12 @@
     <packaging>bundle</packaging>
     <name>System I/O Transport</name>
     <description>A Mule transport used as the interface to Java's System.out and System.in objects, typically for testing purposes.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
