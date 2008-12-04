@@ -197,7 +197,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
             finally
             {
-                logger.info("Closing HTTP connection.");
+                logger.debug("Closing HTTP connection.");
 
                 if (conn.isOpen())
                 {

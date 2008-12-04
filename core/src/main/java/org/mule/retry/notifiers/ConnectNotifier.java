@@ -28,9 +28,9 @@ public class ConnectNotifier implements RetryNotifier
 
     public void sucess(RetryContext context)
     {
-        if (logger.isInfoEnabled())
+        if (logger.isDebugEnabled())
         {
-            logger.info("Successfully connected to " + context.getDescription());
+            logger.debug("Successfully connected to " + context.getDescription());
         }
 
         fireConnectNotification(ConnectionNotification.CONNECTION_CONNECTED, context.getDescription());
