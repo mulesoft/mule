@@ -93,4 +93,7 @@
             </spring:map>
         </spring:property>
     </jms:connector>
+
+    <jms:activemq-connector name="jmsActiveMqConnector" numberOfConsumers="1"/>
+    <jms:activemq-xa-connector name="jmsActiveMqConnectorXa" numberOfConsumers="1"/>
 </mule>

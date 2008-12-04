@@ -1152,4 +1152,22 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
        this.connectionFactoryProperties = connectionFactoryProperties;
    }
 
+    /**
+     * A synonym for {@link #numberOfConcurrentTransactedReceivers}. Note that
+     * it affects both transactional and non-transactional scenarios.
+     * @param count number of consumers
+     */
+    public void setNumberOfConsumers(int count)
+    {
+        this.numberOfConcurrentTransactedReceivers = count;
+    }
+
+    /**
+     * A synonym for {@link #numberOfConcurrentTransactedReceivers}.
+     * @return number of consumers
+     */
+    public int getNumberOfConsumers()
+    {
+        return this.numberOfConcurrentTransactedReceivers;
+    }
 }

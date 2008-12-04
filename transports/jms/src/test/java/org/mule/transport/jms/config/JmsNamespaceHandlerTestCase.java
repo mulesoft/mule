@@ -183,4 +183,17 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("customValue", connector.getConnectionFactoryProperties().get("customProperty"));
         assertEquals("customValue", ((TestConnectionFactory) connector.getConnectionFactory()).getCustomProperty());
     }
+
+    public void testActiveMqConnectorConfig() throws Exception
+    {
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsActiveMqConnector");
+        assertNotNull(c);
+
+        assertEquals(1, c.getNumberOfConsumers());
+
+        c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsActiveMqConnectorXa");
+        assertNotNull(c);
+
+        assertEquals(1, c.getNumberOfConsumers());
+    }
 }
