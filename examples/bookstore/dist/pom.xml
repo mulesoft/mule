@@ -98,21 +98,6 @@
       <artifactId>mule-transport-http</artifactId>
       <version>${muleVersion}</version>
     </dependency>
-    
-    <!-- 
-     Bug in CXF 2.0.2 which requires this to use the ClientMain.
-     Should be fixed in 2.0.3.  
-     -->
-    <dependency>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-transports-http-jetty</artifactId>
-      <version>${cxfVersion}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk14</artifactId>
-      <version>1.4.3</version>
-    </dependency>
   </dependencies>
   
   <repositories>
