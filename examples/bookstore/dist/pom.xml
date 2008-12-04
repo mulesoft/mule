@@ -3,7 +3,7 @@
 
     <properties>
         <muleVersion>2.2.0-SNAPSHOT</muleVersion>
-        <cxfVersion>2.0.6</cxfVersion>
+        <cxfVersion>2.1.2</cxfVersion>
     </properties>
 
     <groupId>org.mule.examples</groupId>
