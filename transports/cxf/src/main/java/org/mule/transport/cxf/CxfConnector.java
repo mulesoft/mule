@@ -10,18 +10,14 @@
 
 package org.mule.transport.cxf;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
-import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.config.spring.SpringRegistry;
@@ -43,7 +39,6 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import edu.emory.mathcs.backport.java.util.Collections;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -375,5 +370,5 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
     {
         this.initializeStaticBusInstance = initializeStaticBusInstance;
     }
-    
+
 }
