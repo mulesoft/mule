@@ -19,7 +19,6 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -160,9 +159,12 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             }
             
             servletResponse.setContentType(contentType);
-            OutputHandler outputHandler = httpResponse.getBody();
             
-            outputHandler.write(RequestContext.getEvent(), servletResponse.getOutputStream());
+            if (httpResponse.hasBody())
+            {
+                OutputHandler outputHandler = httpResponse.getBody();
+                outputHandler.write(RequestContext.getEvent(), servletResponse.getOutputStream());
+            }
         }
         servletResponse.flushBuffer();
     }
