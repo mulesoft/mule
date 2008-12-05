@@ -98,6 +98,8 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="gmail-connector" type="smtpConnectorType" substitutionGroup="mule:abstract-connector"/>
+
     <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>

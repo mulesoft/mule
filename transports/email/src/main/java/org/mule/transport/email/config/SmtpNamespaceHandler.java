@@ -11,13 +11,14 @@ package org.mule.transport.email.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.endpoint.URIBuilder;
+import org.mule.transport.email.GmailSmtpConnector;
 import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.SmtpConnector;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
- *
+ * Namespace handler for the <smtp:xxx> namespace
  */
 public class SmtpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -32,5 +33,6 @@ public class SmtpNamespaceHandler extends AbstractMuleNamespaceHandler
                 .addAlias("replyTo", MailProperties.REPLY_TO_ADDRESSES_PROPERTY);
         registerConnectorDefinitionParser(SmtpConnector.class);
         registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "key", "value"));
+        registerBeanDefinitionParser("gmail-connector", new MuleOrphanDefinitionParser(GmailSmtpConnector.class, true));
     }
 }

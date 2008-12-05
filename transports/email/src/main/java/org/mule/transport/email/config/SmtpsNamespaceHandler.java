@@ -18,8 +18,7 @@ import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.SmtpsConnector;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
- *
+ * Namespace handler for the <smtps:xxx> namespace
  */
 public class SmtpsNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -37,5 +36,4 @@ public class SmtpsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("tls-trust-store", new TrustStoreDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ClientKeyStoreDefinitionParser());
     }
-    
 }
