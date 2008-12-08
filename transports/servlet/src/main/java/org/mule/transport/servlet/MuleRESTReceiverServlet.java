@@ -58,9 +58,9 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
     {
         try
         {
-            if (httpServletRequest.getParameter("endpoint") != null)
+            InboundEndpoint endpoint = getEndpointForURI(httpServletRequest);
+            if (endpoint != null)
             {
-                InboundEndpoint endpoint = getEndpointForURI(httpServletRequest);
                 String timeoutString = httpServletRequest.getParameter("timeout");
                 long to = timeout;
 
@@ -179,7 +179,13 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         String endpointName = httpServletRequest.getParameter("endpoint");
         if (endpointName == null)
         {
-            throw new EndpointException(HttpMessages.httpParameterNotSet("endpoint"));
+            // Let's try stripping the path and only use the last path element
+            String uri = httpServletRequest.getPathInfo();
+            int i = uri.lastIndexOf("/");
+            if (i > -1)
+            {
+            	endpointName = uri.substring(i + 1);
+            }
         }
 
         InboundEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointName);
@@ -189,13 +195,10 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             // servlet receivers
             MessageReceiver receiver = (MessageReceiver)getReceivers().get(endpointName);
             
-            if (receiver == null)
+            if (receiver != null)
             {
-                throw new EndpointNotFoundException(endpointName);
+                endpoint = receiver.getEndpoint();
             }
-            
-            endpoint = receiver.getEndpoint();
-
         }
         return endpoint;
     }
