@@ -79,10 +79,14 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         registerSupportedProtocol("https");
         registerSupportedProtocol("jms");
         registerSupportedProtocol("vm");
-        registerSupportedProtocol("servlet");
-        registerSupportedProtocol("jetty");
     }
-
+    
+    public boolean supportsProtocol(String protocol)
+    {
+        // we can listen on any protocol
+        return protocol.startsWith("cxf:") || super.supportsProtocol(protocol);
+    }
+    
     public String getProtocol()
     {
         return CXF;
