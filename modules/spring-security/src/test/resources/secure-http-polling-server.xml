@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
+       xmlns:spring-security="http://www.mulesource.org/schema/mule/spring-security/2.2"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
+       http://www.mulesource.org/schema/mule/spring-security/2.2 http://www.mulesource.org/schema/mule/spring-security/2.2/mule-spring-security.xsd">
+
+    <spring:bean id="daoAuthenticationProvider" class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
+        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
+    </spring:bean>
+
+    <spring:bean id="inMemoryDaoImpl" class="org.springframework.security.userdetails.memory.InMemoryDaoImpl">
+        <spring:property name="userMap" value="marie=marie,ROLE_ADMIN"/>
+    </spring:bean>
+
+    <spring-security:security-manager>
+        <spring-security:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
+    </spring-security:security-manager>
+
+    <http:connector name="HttpConnector"/>
+
+    <model name="http secured test model">
+        <service name="SecureUMO">
+            <inbound>
+                <inbound-endpoint address="http://localhost:4567" synchronous="true" connector-ref="HttpConnector">
+                    <spring-security:http-security-filter realm="mule-realm"/>
+                </inbound-endpoint>
+            </inbound>
+            <test:component>
+                <test:return-data>foo</test:return-data>
+            </test:component>
+        </service>
+    </model>
+
+</mule>

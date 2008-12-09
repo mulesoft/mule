@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <bean id="inMemoryDaoImpl" class='org.springframework.security.userdetails.memory.InMemoryDaoImpl'>
+        <property name="userMap">
+            <value>
+                marie=marie,ROLE_ADMIN
+                stan=stan,ROLE_ADMIN
+                cindy=cindy,ROLE_USER
+                anon=anon,ROLE_ANONYMOUS
+            </value>
+        </property>
+    </bean>
+
+    <bean id="daoAuthenticationProvider" class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
+        <property name="userDetailsService" ref="inMemoryDaoImpl"/>
+    </bean>
+
+    <bean id="authenticationManager" class="org.springframework.security.providers.ProviderManager">
+        <property name="providers">
+            <list>
+                <ref local="daoAuthenticationProvider"/>
+            </list>
+         </property>
+    </bean>
+
+    <bean id="accessDecisionManager" class='org.springframework.security.vote.AffirmativeBased'>
+        <property name="decisionVoters">
+            <list>
+                <ref bean="roleVoter" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="roleVoter" class="org.springframework.security.vote.RoleVoter"/>
+
+    <bean id="echoComponent" class="org.mule.component.simple.EchoComponent"/>
+
+    <bean id="echoComponentSecurity" class="org.springframework.security.intercept.method.aopalliance.MethodSecurityInterceptor">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="accessDecisionManager" ref="accessDecisionManager"/>
+        <property name="objectDefinitionSource" value="org.mule.api.lifecycle.Callable.onCall=ROLE_ADMIN"/>
+    </bean>
+
+    <bean id="autoProxyCreator" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="interceptorNames">
+            <list><value>echoComponentSecurity</value></list>
+        </property>
+        <property name="beanNames">
+            <list><value>echoComponent</value></list>
+        </property>
+    </bean>
+
+</beans>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
+       xmlns:spring-security="http://www.mulesource.org/schema/mule/spring-security/2.2"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
+       http://www.mulesource.org/schema/mule/spring-security/2.2 http://www.mulesource.org/schema/mule/spring-security/2.2/mule-spring-security.xsd
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd">
+
+    <spring:bean id="inMemoryDaoImpl" class="org.springframework.security.userdetails.memory.InMemoryDaoImpl">
+        <spring:property name="userMap">
+            <spring:value>
+                ross=ross,ROLE_ADMIN
+                anon=anon,ROLE_ANONYMOUS
+            </spring:value>
+        </spring:property>
+    </spring:bean>
+
+    <spring:bean id="daoAuthenticationProvider" class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
+        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
+    </spring:bean>
+
+    <spring-security:security-manager>
+        <spring-security:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
+    </spring-security:security-manager>
+
+    <security-manager>
+        <password-encryption-strategy name="PBE" password="mule"/>
+    </security-manager>
+
+    <model name="test">
+        <service name="echo">
+            <inbound>
+                <vm:inbound-endpoint path="my.queue">
+                    <encryption-security-filter strategy-ref="PBE"/>
+                </vm:inbound-endpoint>
+                <inbound-endpoint address="http://localhost:4567">
+                    <encryption-security-filter strategy-ref="PBE"/>
+                </inbound-endpoint>
+            </inbound>
+            <component class="org.mule.component.simple.EchoComponent"/>
+        </service>
+    </model>
+
+</mule>

@@ -1,0 +1,35 @@
+/*
+ * $Id: AcegiNamespaceHandler.java 10662 2008-02-01 13:10:14Z romikk $
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.module.spring.security.config;
+
+import org.mule.api.config.MuleProperties;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.DescendentDefinitionParser;
+import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
+import org.mule.module.spring.security.SpringProviderAdapter;
+import org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter;
+
+import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+
+/**
+ * Registers a Bean Definition Parser for handling Acegi related elements.
+ */
+public class SpringSecurityNamespaceHandler extends NamespaceHandlerSupport
+{
+    public void init()
+    {
+        registerBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER));
+        registerBeanDefinitionParser("delegate-security-provider", new ChildDefinitionParser("provider", SpringProviderAdapter.class));
+        registerBeanDefinitionParser("http-security-filter", new DescendentDefinitionParser("securityFilter", HttpBasicAuthenticationFilter.class));
+        registerBeanDefinitionParser("security-property", new ChildMapEntryDefinitionParser("securityProperty", "name", "value"));
+    }
+
+}
