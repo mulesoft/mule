@@ -14,11 +14,21 @@
          we still use the http transport on the client side-->
     <http:endpoint address="http://localhost:60203/services/Foo" name="clientEndpoint" synchronous="true"/>
     <jetty:endpoint address="http://localhost:60203/services/Foo" name="serverEndpoint" synchronous="false"/>
+    
+    <http:endpoint address="http://localhost:60203/bar/baz" name="anotherClientEndpoint" synchronous="true"/>
+    <jetty:endpoint address="http://localhost:60203/bar*" name="anotherServerEndpoint" synchronous="false"/>
 
     <model name="main">
         <service name="testComponent">
             <inbound>
                 <inbound-endpoint ref="serverEndpoint"/>
+            </inbound>
+            <test:component appendString=" Received"/>
+        </service>
+        
+        <service name="anotherComponent">
+            <inbound>
+                <inbound-endpoint ref="anotherServerEndpoint"/>
             </inbound>
             <test:component appendString=" Received"/>
         </service>
