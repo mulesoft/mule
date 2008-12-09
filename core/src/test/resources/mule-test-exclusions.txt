@@ -16,4 +16,5 @@ org.mule.registry.DuplicateRegistrationTestCase
 # MULE-2964: MuleMessage does not serialize attachments
 org.mule.MuleMessageAttachmentSerializationTestCase
 
-
+# MULE-4034
+org.mule.util.TimedSocketTestCase
