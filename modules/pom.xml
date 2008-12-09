@@ -29,6 +29,7 @@
         <module>scripting</module>
         <module>spring-extras</module>
         <module>spring-config</module>
+        <module>spring-security</module>
         <module>sxc</module>
         <module>xml</module>
     </modules>

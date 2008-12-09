@@ -150,7 +150,7 @@
         <springVersion>2.5.6</springVersion>
         <springModulesVersion>0.9</springModulesVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
-        <sxcVersion>0.7.2</sxcVersion>
+        <sxcVersion>0.7.3</sxcVersion>
         <woodstoxVersion>3.2.6</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <wsCommonsAxiomVersion>1.2.7</wsCommonsAxiomVersion>

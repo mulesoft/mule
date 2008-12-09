@@ -141,7 +141,7 @@ spring-orm-2.5.6
 spring-tx-2.5.6
 spring-web-2.5.6
 stax-utils.osgi-20080702
-sxc-xpath.osgi-0.7.2
+sxc-xpath.osgi-0.7.3
 wrapper.osgi-3.2.3
 wsdl4j.osgi-1.6.1
 wss4j.osgi-1.5.4
