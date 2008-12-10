@@ -149,6 +149,7 @@
         <springOsgiVersion>1.0.2</springOsgiVersion>
         <springVersion>2.5.6</springVersion>
         <springModulesVersion>0.9</springModulesVersion>
+        <springSecurityVersion>2.0.4</springSecurityVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <sxcVersion>0.7.3</sxcVersion>
         <woodstoxVersion>3.2.6</woodstoxVersion>
