@@ -25,6 +25,8 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * <code>MuleXmlBuilderContextListener</code> is a bootstrap listener used to
@@ -107,6 +109,14 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
     {
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context, configResource);
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+
+        // Support Spring-first configuration in webapps
+        final ApplicationContext parentContext = (ApplicationContext) context.getAttribute(
+                                                        WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+        if (parentContext != null)
+        {
+            builder.setParentContext(parentContext);
+        }
         return muleContextFactory.createMuleContext(builder);
     }
 
