@@ -68,7 +68,6 @@ log4j-1.2.14
 mail.osgi-1.4
 mule-core
 mule-core-tests
-mule-example-bookstore
 mule-example-echo
 mule-example-errorhandler
 mule-example-hello
