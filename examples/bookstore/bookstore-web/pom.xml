@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.examples</groupId>
+        <artifactId>mule-example-bookstore-parent</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>mule-example-bookstore-webapp</artifactId>
+    <packaging>war</packaging>
+    <name>Bookstore Example: Customer Webapp</name>
+    <description>This is a webapp which runs in the customer-facing DMZ and communicates with Mule via secure web services.</description>
+
+    <properties>
+        <webappName>bookstore</webappName>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <warName>${webappName}</warName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- Bookstore domain objects + interfaces -->
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-bookstore-api</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <!-- CXF deps -->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${cxfVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxfVersion}</version>
+        </dependency>
+
+        <!-- CXF assumes you have an XSLT engine available -->
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>${xalanVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>serializer</artifactId>
+            <version>${xalanVersion}</version>
+        </dependency>
+    </dependencies>
+</project>
