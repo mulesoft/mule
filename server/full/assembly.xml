@@ -290,19 +290,9 @@
       Mule Examples: Bookstore
     ============================
     -->
-
     <fileSet>
         <directory>../../../examples/bookstore/dist</directory>
         <outputDirectory>examples/bookstore</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../../examples/bookstore/dist</directory>
-        <outputDirectory>examples/bookstore</outputDirectory>
-        <fileMode>755</fileMode>
-        <includes>
-            <include>bookstore</include>
-            <include>bookstore.bat</include>
-        </includes>
     </fileSet>
   </fileSets>
 
