@@ -185,7 +185,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     // Test Scenarios
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     
-    interface Scenario
+    protected interface Scenario
     {
         String getBrokerUrl();
 
@@ -206,7 +206,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         boolean isTransacted();
     }
 
-    abstract class AbstractScenario implements Scenario
+    protected abstract class AbstractScenario implements Scenario
     {
         private String inputQueue = DEFAULT_INPUT_MQ_QUEUE_NAME;
         private String outputQueue = DEFAULT_OUTPUT_MQ_QUEUE_NAME;
@@ -261,7 +261,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     protected Scenario scenarioNoTx = new NonTransactedScenario();
-    class NonTransactedScenario extends AbstractScenario
+    protected class NonTransactedScenario extends AbstractScenario
     {
         public boolean isTransacted()
         {
@@ -275,7 +275,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     protected Scenario scenarioCommit = new ScenarioCommit();
-    class ScenarioCommit extends AbstractScenario
+    protected class ScenarioCommit extends AbstractScenario
     {
         public boolean isTransacted()
         {
@@ -289,7 +289,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     protected Scenario scenarioRollback = new ScenarioRollback();
-    class ScenarioRollback extends AbstractScenario
+    protected class ScenarioRollback extends AbstractScenario
     {
         public boolean isTransacted()
         {
@@ -303,9 +303,9 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     protected Scenario scenarioNotReceive = new ScenarioNotReceive();
-    class ScenarioNotReceive extends NonTransactedScenario
+    protected class ScenarioNotReceive extends NonTransactedScenario
     {
-        // @Override
+        @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
             Message message = consumer.receive(SMALL_TIMEOUT);

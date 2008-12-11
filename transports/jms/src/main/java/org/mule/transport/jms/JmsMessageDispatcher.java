@@ -15,11 +15,13 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageAdapter;
+import org.mule.transaction.TransactionCollection;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.ClassUtils;
@@ -87,6 +89,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         boolean cached = false;
         boolean remoteSync = returnResponse(event);
 
+        final Transaction muleTx = TransactionCoordination.getInstance().getTransaction();
+
         if (logger.isDebugEnabled())
         {
             logger.debug("dispatching on endpoint: " + event.getEndpoint().getEndpointURI()
@@ -94,6 +98,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     + ". Outbound transformers are: " + event.getEndpoint().getTransformers());
         }
 
+        // assume session is transacted first, and thus, managed
+        boolean sessionManaged = true;
         try
         {
             session = connector.getSessionFromTransaction();
@@ -109,6 +115,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             else if (event.getMessage().getBooleanProperty(JmsConstants.CACHE_JMS_SESSIONS_PROPERTY,
                     connector.isCacheJmsSessions()))
             {
+                sessionManaged = false;
                 cached = true;
                 if (cachedSession != null)
                 {
@@ -122,14 +129,15 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             }
             else
             {
+                // by now we're running with a different connector and connection
+                sessionManaged = muleTx != null && muleTx.isXA();
+
                 session = connector.getSession(event.getEndpoint());
                 if (event.getEndpoint().getTransactionConfig().isTransacted())
                 {
                     transacted = true;
                 }
             }
-
-            EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
             boolean topic = connector.getTopicResolver().isTopic(event.getEndpoint(), true);
 
@@ -341,6 +349,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
 
+            if (!sessionManaged && transacted && muleTx instanceof TransactionCollection) {
+                handleMultiTx(session);
+            }
+
+
             // If the session is from the current transaction, it is up to the
             // transaction to close it.
             if (session != null && !cached && !transacted)
@@ -348,6 +361,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 connector.closeQuietly(session);
             }
         }
+    }
+
+    protected void handleMultiTx(Session session) throws Exception
+    {
+        logger.debug("Multi-transaction support is not available in Mule Community Edition.");
     }
 
     protected MuleMessage doSend(MuleEvent event) throws Exception

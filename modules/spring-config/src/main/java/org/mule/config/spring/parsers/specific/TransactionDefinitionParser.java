@@ -10,11 +10,15 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.api.MuleRuntimeException;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.config.spring.handlers.MuleNamespaceHandler;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.processors.BlockAttribute;
+import org.mule.util.ClassUtils;
 
 /**
  * Generates a transaction config with embedded factory.  If no factory is defined, it's taken from the
@@ -32,6 +36,32 @@ public class TransactionDefinitionParser extends AbstractSingleParentFamilyDefin
     public TransactionDefinitionParser()
     {
         commonInit(null);
+    }
+
+    public TransactionDefinitionParser(String factoryClassName)
+    {
+        Class factoryClass;
+        try
+        {
+            factoryClass = ClassUtils.loadClass(factoryClassName, getClass());
+        }
+        catch (ClassNotFoundException e)
+        {
+            if (MuleNamespaceHandler.TRANSACTION_COLLECTION_FACTORY_CLASSNAME.equals(factoryClassName))
+            {
+                throw new UnsupportedOperationException("Multi-transaction support is an EE-only feature. " +
+                                                        "Please consider upgrading to Mule EE.");
+            }
+            else
+            {
+                throw new MuleRuntimeException(
+                        MessageFactory.createStaticMessage("Failed to load factory class " + factoryClassName), e);
+            }
+        }
+        commonInit(factoryClass);
+        MuleDefinitionParser factoryParser = getDelegate(1);
+        // don't allow these if the class is specified in the constructor
+        factoryParser.registerPreProcessor(new BlockAttribute(new String[]{FACTORY_CLASS, FACTORY_REF}));
     }
 
     public TransactionDefinitionParser(Class factoryClass)

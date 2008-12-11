@@ -87,7 +87,7 @@ public class MessagePropertiesContext implements Serializable
         return map;
     }
 
-    void registerInvocationProperties(Map properties)
+    protected void registerInvocationProperties(Map properties)
     {
         if (properties != null)
         {
@@ -101,7 +101,7 @@ public class MessagePropertiesContext implements Serializable
         return defaultScope;
     }
 
-    void addInboundProperties(Map properties)
+    protected void addInboundProperties(Map properties)
     {
         if (properties != null)
         {
@@ -110,7 +110,7 @@ public class MessagePropertiesContext implements Serializable
         }
     }
 
-    void registerSessionProperties(Map properties)
+    protected void registerSessionProperties(Map properties)
     {
         if (properties != null)
         {
@@ -285,7 +285,7 @@ public class MessagePropertiesContext implements Serializable
         return ObjectUtils.getString(getProperty(name), defaultValue);
     }
 
-    MessagePropertiesContext copy()
+    protected MessagePropertiesContext copy()
     {
         Set<String> keySet = new TreeSet<String>(getPropertyNames());
 

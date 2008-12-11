@@ -152,6 +152,7 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.util.ClassUtils;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
 
@@ -161,6 +162,8 @@ import org.mule.util.store.TextFileObjectStore;
  */
 public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+
+    public static final String TRANSACTION_COLLECTION_FACTORY_CLASSNAME = "org.mule.transaction.TransactionCollectionFactory";
 
     public void init()
     {
@@ -248,6 +251,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("outbound-endpoint", new GenericEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
         registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));
+        if (ClassUtils.isClassOnPath(TRANSACTION_COLLECTION_FACTORY_CLASSNAME, getClass()))
+        {
+            registerBeanDefinitionParser("multi-transaction", new TransactionDefinitionParser(TRANSACTION_COLLECTION_FACTORY_CLASSNAME));
+        }
 
         // Models
         registerBeanDefinitionParser("model", new ModelDefinitionParser());

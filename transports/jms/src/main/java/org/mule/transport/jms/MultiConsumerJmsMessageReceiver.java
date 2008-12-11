@@ -20,6 +20,7 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.transaction.TransactionCollection;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverWorker;
 import org.mule.transport.ConnectException;
@@ -62,7 +63,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         jmsConnector = (JmsConnector) connector;
 
         final boolean isTopic = jmsConnector.getTopicResolver().isTopic(endpoint, true);
-        receiversCount = jmsConnector.getNumberOfConcurrentTransactedReceivers();
+        receiversCount = jmsConnector.getNumberOfConsumers();
         if (isTopic && receiversCount != 1)
         {
             if (logger.isInfoEnabled())
@@ -332,7 +333,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         protected void bindTransaction(Transaction tx) throws TransactionException
         {
-            if (tx instanceof JmsTransaction)
+            if (tx instanceof JmsTransaction || tx instanceof TransactionCollection)
             {
                 if (logger.isDebugEnabled())
                 {

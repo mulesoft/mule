@@ -10,17 +10,19 @@
 
 package org.mule.config.spring.parsers.delegate;
 
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.util.ArrayUtils;
 
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -39,6 +41,8 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
     implements MuleDefinitionParser
 {
 
+    protected Log logger = LogFactory.getLog(getClass());
+    
     private MuleDefinitionParser[] delegates;
 
     protected AbstractDelegatingDefinitionParser()

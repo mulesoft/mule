@@ -149,7 +149,7 @@ public abstract class AbstractTransaction implements Transaction
 
     /**
      * Fires a server notification to all registered
-     * {@link org.mule.api.context.notification.listener.TransactionNotificationListener}s.
+     * {@link org.mule.api.context.notification.TransactionNotificationListener}s.
      *
      */
     protected void fireNotification(TransactionNotification notification)
@@ -171,5 +171,20 @@ public abstract class AbstractTransaction implements Transaction
     public javax.transaction.Transaction suspend() throws TransactionException
     {
         throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(this));
+    }
+
+    @Override
+    public String toString()
+    {
+        int status;
+        try
+        {
+            status = getStatus();
+        }
+        catch (TransactionException e)
+        {
+            status = -1;
+        }
+        return super.toString() + "[status=" + status + "]";
     }
 }

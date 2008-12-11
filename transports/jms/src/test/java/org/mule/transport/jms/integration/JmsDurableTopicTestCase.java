@@ -11,12 +11,12 @@ package org.mule.transport.jms.integration;
 
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.jms.Topic;
 import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicSession;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.command.ActiveMQTopic;
 
 public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
@@ -75,16 +75,12 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
             try
             {
                 session = connection.createTopicSession(scenario.isTransacted(), scenario.getAcknowledge());
-                ActiveMQTopic destination = new ActiveMQTopic(scenario.getOutputQueue());
+                Topic destination = session.createTopic(scenario.getOutputQueue());
                 MessageConsumer consumer = null;
                 try
                 {
                     consumer = session.createDurableSubscriber(destination, getClientId());
                     return scenario.receive(session, consumer);
-                }
-                catch (Exception e)
-                {
-                    throw e;
                 }
                 finally
                 {
@@ -94,10 +90,6 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
                     }
                 }
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
             finally
             {
                 if (session != null)
@@ -105,10 +97,6 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
                     session.close();
                 }
             }
-        }
-        catch (Exception e)
-        {
-            throw e;
         }
         finally
         {

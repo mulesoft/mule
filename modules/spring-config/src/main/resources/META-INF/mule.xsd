@@ -1377,6 +1377,17 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+    <xsd:element name="abstract-multi-transaction" abstract="true" type="abstractTransactionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for multi-transaction elements.
+                Multi-transactions allow a series of operations to be grouped together spanning different
+                transports, e.g. JMS and JDBC, but without the overhead of XA. The trade-off is that XA
+                reliability guarantees aren't available, and services must be ready to handle duplicates.
+                This is very similar to a 1.5 PC concept. EE-only feature.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="abstractTransactionType">
         <xsd:attribute name="action">
             <xsd:annotation>
@@ -1459,6 +1470,23 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="xaTransactionType">
+        <xsd:complexContent>
+            <xsd:extension base="baseTransactionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="multi-transaction" type="multiTxType" substitutionGroup="abstract-transaction">
+        <xsd:annotation>
+            <xsd:documentation>
+                Multi-transactions allow a series of operations to be grouped together spanning multiple
+                connections of the same transport or different transports altogether (e.g. JMS and JDBC);
+                however without the overhead of XA. The trade-off is that XA
+                reliability guarantees aren't provided, and services must be ready to handle duplicates.
+                This is very similar to a 1.5 PC concept. EE-only feature.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="multiTxType">
         <xsd:complexContent>
             <xsd:extension base="baseTransactionType"/>
         </xsd:complexContent>

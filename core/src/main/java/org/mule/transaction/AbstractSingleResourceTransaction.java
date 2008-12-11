@@ -112,4 +112,24 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     {
         return key;
     }
+
+    @Override
+    public String toString()
+    {
+        int status;
+        try
+        {
+            status = getStatus();
+        }
+        catch (TransactionException e)
+        {
+            status = -1;
+        }
+        return new StringBuilder().append(getClass().getName())
+                .append('@').append(System.identityHashCode(this))
+                .append("[status=").append(status == -1 ? "*undefined*" : status)
+                .append(", key=").append(key)
+                .append(", resource=").append(resource)
+                .append("]").toString();
+    }
 }

@@ -23,7 +23,7 @@ public final class TransactionCoordination
 
     private static final TransactionCoordination instance = new TransactionCoordination();
 
-    private static final ThreadLocal transactions = new ThreadLocal();
+    private static final ThreadLocal<Transaction> transactions = new ThreadLocal<Transaction>();
 
     // @GuardedBy("this")
     private int txCounter = 0;
@@ -41,14 +41,24 @@ public final class TransactionCoordination
 
     public Transaction getTransaction()
     {
-        return (Transaction) transactions.get();
+        return transactions.get();
     }
 
     public void unbindTransaction(Transaction transaction) throws TransactionException
     {
+        Transaction oldTx = transactions.get();
+
+        if (oldTx instanceof TransactionCollection)
+        {
+            // if there are more in-flight aggregated transactions, do nothing yet
+            if (!((TransactionCollection) oldTx).getTxCollection().isEmpty())
+            {
+                return;
+            }
+        }
+
         try
         {
-            Transaction oldTx = (Transaction) transactions.get();
             if (oldTx != null && !oldTx.equals(transaction))
             {
                 throw new IllegalTransactionStateException(CoreMessages.transactionCannotUnbind());
@@ -70,10 +80,25 @@ public final class TransactionCoordination
 
     public void bindTransaction(Transaction transaction) throws TransactionException
     {
-        Transaction oldTx = (Transaction) transactions.get();
-        if (oldTx != null)
+        Transaction oldTx = transactions.get();
+        // special handling for transaction collection
+        if (oldTx != null && !(oldTx instanceof TransactionCollection))
         {
             throw new IllegalTransactionStateException(CoreMessages.transactionAlreadyBound());
+        }
+
+        if (oldTx instanceof TransactionCollection)
+        {
+            TransactionCollection txCollection = (TransactionCollection) oldTx;
+            if (txCollection.getTxCollection().contains(transaction)) {
+                // TODO improve the error message with more TX details
+                throw new IllegalTransactionStateException(CoreMessages.transactionAlreadyBound());
+            }
+            else
+            {
+                // will be aggregated next
+                return;
+            }
         }
 
         transactions.set(transaction);
@@ -87,6 +112,9 @@ public final class TransactionCoordination
                 logger.debug("Binding new transaction (" + txCounter + ") " + transaction);
             }
         }
+
+
+        //
     }
 
 }
