@@ -39,7 +39,9 @@ public class JettyContinuationsTwoEndpointsSinglePortTestCase extends Functional
     public void testSendToEach() throws Exception
     {
 
+        System.out.println("Sending to ep1");
         sendWithResponse("http://localhost:60211/mycomponent1", "test", "mycomponent1", 10);
+        System.out.println("Sending to ep2");
         sendWithResponse("http://localhost:60211/mycomponent2", "test", "mycomponent2", 10);
     }
 
@@ -71,7 +73,6 @@ public class JettyContinuationsTwoEndpointsSinglePortTestCase extends Functional
         {
             results.add(client.send(endpoint, message, null).getPayload(byte[].class));
         }
-
         assertEquals(noOfMessages, results.size());
         for (int i = 0; i < noOfMessages; i++)
         {
