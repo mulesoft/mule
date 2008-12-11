@@ -176,14 +176,17 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         if (tmp != null)
         {
             status = Integer.valueOf(tmp.toString());
+        } 
+        else if (msg.getExceptionPayload() != null) 
+        {
+            status = HttpConstants.SC_INTERNAL_SERVER_ERROR;
         }
+        
         String version = (String) msg.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, PropertyScope.OUTBOUND);
         if (version == null)
         {
             version = HttpConstants.HTTP11;
         }
-        String etag = (String) msg.getProperty(HttpConstants.HEADER_ETAG, PropertyScope.OUTBOUND);
-
         String date;
         synchronized (format)
         {
@@ -215,6 +218,8 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         {
             response.setHeader(new Header(HttpConstants.HEADER_EXPIRES, date));
         }
+        
+        String etag = (String) msg.getProperty(HttpConstants.HEADER_ETAG, PropertyScope.OUTBOUND);
         if (etag != null)
         {
             response.setHeader(new Header(HttpConstants.HEADER_ETAG, etag));

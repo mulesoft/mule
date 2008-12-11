@@ -14,6 +14,9 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.TestCaseWatchdog;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class RESTTestCase extends FunctionalTestCase
 {
@@ -25,7 +28,7 @@ public class RESTTestCase extends FunctionalTestCase
         // that the 3rd-party web service is off-line.
         setFailOnTimeout(false);
     }
-    
+
     protected String getConfigResources()
     {
         return "rest-functional-test.xml";

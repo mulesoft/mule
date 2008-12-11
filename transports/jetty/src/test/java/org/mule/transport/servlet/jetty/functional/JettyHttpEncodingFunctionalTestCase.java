@@ -28,7 +28,7 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         return "jetty-http-encoding-test.xml";
     }
 
-    public void testSend() throws Exception
+    public void testSendWithProperResponseContentType() throws Exception
     {
         MuleClient client = new MuleClient();
         Map messageProperties = new HashMap();
@@ -36,9 +36,24 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         MuleMessage reply = client.send("clientEndpoint", TEST_MESSAGE, messageProperties);
         assertNotNull(reply);
         assertEquals("200", reply.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
-        assertEquals(TEST_MESSAGE + " Received", reply.getPayloadAsString());
         assertEquals("text/baz;charset=UTF-16BE", reply.getProperty(HttpConstants.HEADER_CONTENT_TYPE).toString());
         assertEquals("UTF-16BE", reply.getEncoding());
+        assertEquals(TEST_MESSAGE + " Received", reply.getPayloadAsString());
+    }
+    
+    /**
+     * MULE-4031 - ensure the content type isn't copied
+     */
+    public void testSendWithInvalidResponseContentType() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Map messageProperties = new HashMap();
+        messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, getSendEncoding());
+        MuleMessage reply = client.send("clientEndpoint2", TEST_MESSAGE, messageProperties);
+        assertNotNull(reply);
+        assertEquals("200", reply.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals("text/plain;charset=UTF-8", reply.getProperty(HttpConstants.HEADER_CONTENT_TYPE).toString());
+        assertEquals("UTF-8", reply.getEncoding());
     }
 
     protected String getSendEncoding()

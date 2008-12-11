@@ -12,11 +12,12 @@ package org.mule.transport.servlet;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.config.ExceptionHelper;
-import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
+import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 
 import java.io.IOException;
 
@@ -59,6 +60,8 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     protected boolean feedback = true;
     protected String defaultContentType = HttpConstants.DEFAULT_CONTENT_TYPE;
 
+    private MuleMessageToHttpResponse responseTransformer = new MuleMessageToHttpResponse();
+    
     public final void init() throws ServletException
     {
         doInit();
@@ -94,6 +97,15 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         }
         logger.info("Using payload param name: " + payloadParameterName);
 
+        try
+        {
+            responseTransformer.initialise();
+        }
+        catch (InitialisationException e)
+        {
+            throw new ServletException(e);
+        }
+        
         doInit(servletConfig);
     }
 
@@ -104,7 +116,6 @@ public abstract class AbstractReceiverServlet extends HttpServlet
 
     protected void doInit() throws ServletException
     {
-        // nothing to do
     }
 
     protected void writeResponse(HttpServletResponse servletResponse, MuleMessage message) throws Exception
@@ -125,25 +136,18 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             if (message.getPayload() instanceof HttpResponse)
             {
                 httpResponse = (HttpResponse)message.getPayload();
+
             }
             else
             {
-                httpResponse = new HttpResponse();
-                
-                String ct = message.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
-                if (ct != null)
-                {
-                    httpResponse.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, ct));
-                }
-                httpResponse.setStatusLine(httpResponse.getHttpVersion(), 
-                    message.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpServletResponse.SC_OK));
-                httpResponse.setBody(message);
+                httpResponse = (HttpResponse) responseTransformer.transform(message);
             }
-
+            
+            // Map the HttpResponse to the ServletResponse
+            
             // TODO MULE-4031 There is an issue here with headers getting propagated from a previous message
             // or something, causing the response type to always be "text/xml" in the Bookstore example.
-            //Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
-            Header contentTypeHeader = null;
+            Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
             
             String contentType = null;
             if (contentTypeHeader == null)
@@ -154,14 +158,15 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             {
                 contentType = contentTypeHeader.getValue();
             }
+            
+            servletResponse.setContentType(contentType);
+            
             servletResponse = setHttpHeadersOnServletResponse(httpResponse, servletResponse);
             
             if (!servletResponse.isCommitted())
             {
                 servletResponse.setStatus(httpResponse.getStatusCode());
             }
-            
-            servletResponse.setContentType(contentType);
             
             if (httpResponse.hasBody())
             {
