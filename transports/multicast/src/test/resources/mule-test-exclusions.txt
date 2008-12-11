@@ -4,4 +4,4 @@
 
 # MULE-3686
 # Disable Multicast tests unless configured
-#org.mule.transport.multicast.MulticastConnectorFunctionalTestCase
+org.mule.transport.multicast.MulticastConnectorFunctionalTestCase
