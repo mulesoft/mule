@@ -144,9 +144,6 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             }
             
             // Map the HttpResponse to the ServletResponse
-            
-            // TODO MULE-4031 There is an issue here with headers getting propagated from a previous message
-            // or something, causing the response type to always be "text/xml" in the Bookstore example.
             Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
             
             String contentType = null;
