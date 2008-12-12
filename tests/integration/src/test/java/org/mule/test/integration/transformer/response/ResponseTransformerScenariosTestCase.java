@@ -13,7 +13,12 @@ package org.mule.test.integration.transformer.response;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpMessageAdapter;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 {
@@ -81,9 +86,15 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         MuleMessage message = client.send("http://localhost:4446", "request", null);
         assertNotNull(message);
         // Ensure MuleMessageToHttpResponse was used before sending response
-        assertTrue(message.getAdapter() instanceof HttpMessageAdapter);
-        assertEquals("text/plain; charset=UTF-8", ((HttpMessageAdapter) message.getAdapter()).getHeader("Content-Type")
-            .getValue());
+
+        String server = ((HttpMessageAdapter) message.getAdapter()).getHeader(HttpConstants.HEADER_SERVER).getValue();
+        assertTrue(server.startsWith("Mule"));
+        
+        String dateStr = ((HttpMessageAdapter) message.getAdapter()).getHeader(HttpConstants.HEADER_DATE).getValue();
+        SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+        Date msgDate = format.parse(dateStr);
+        assertTrue(new Date().after(msgDate));
+        
         assertEquals("request", message.getPayloadAsString());
     }
 
@@ -98,8 +109,15 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         // explict response transformer afterwards in HttpMessageReciever.doRequest(HttpRequest request,
         // RequestLine requestLine) before returning result to client
         assertTrue(message.getAdapter() instanceof HttpMessageAdapter);
-        assertEquals("text/plain; charset=UTF-8", ((HttpMessageAdapter) message.getAdapter()).getHeader("Content-Type")
-            .getValue());
+
+        String server = ((HttpMessageAdapter) message.getAdapter()).getHeader(HttpConstants.HEADER_SERVER).getValue();
+        assertTrue(server.startsWith("Mule"));
+        
+        String dateStr = ((HttpMessageAdapter) message.getAdapter()).getHeader(HttpConstants.HEADER_DATE).getValue();
+        SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
+        Date msgDate = format.parse(dateStr);
+        assertTrue(new Date().after(msgDate));
+        
         assertEquals("request" + CUSTOM_RESPONSE, message.getPayloadAsString());
     }
 
