@@ -86,6 +86,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         String ct = servletConfig.getInitParameter(DEFAULT_CONTENT_TYPE_PROPERTY);
         if (ct != null)
         {
+            logger.debug("Using default content type configured on the servlet (" + DEFAULT_CONTENT_TYPE_PROPERTY + ") = " + ct); 
             defaultContentType = ct;
         }
         logger.info("Default content type is: " + defaultContentType);
@@ -147,13 +148,14 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
             
             String contentType = null;
-            if (contentTypeHeader == null)
+            if (contentTypeHeader != null && contentTypeHeader.getValue() != null)
             {
-                contentType = defaultContentType;
+                logger.debug("Using Content-Type from message header = " + contentTypeHeader.getValue()); 
+                contentType = contentTypeHeader.getValue();
             }
             else
             {
-                contentType = contentTypeHeader.getValue();
+                contentType = defaultContentType;
             }
             
             servletResponse.setContentType(contentType);
