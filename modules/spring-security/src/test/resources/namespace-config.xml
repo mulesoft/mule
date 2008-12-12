@@ -3,40 +3,40 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
-       xmlns:spring-security="http://www.mulesource.org/schema/mule/spring-security/2.2"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+       xmlns:mule-ss="http://www.mulesource.org/schema/mule/spring-security/2.2"
+       xmlns:ss="http://www.springframework.org/schema/security"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
-       http://www.mulesource.org/schema/mule/spring-security/2.2 http://www.mulesource.org/schema/mule/spring-security/2.2/mule-spring-security.xsd">
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/spring-security/2.2 http://www.mulesource.org/schema/mule/spring-security/2.2/mule-spring-security.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
+    <spring:beans>
+        <ss:authentication-manager alias="authenticationManager"/>
 
-    <spring:bean id="inMemoryDaoImpl" class="org.springframework.security.userdetails.memory.InMemoryDaoImpl">
-        <spring:property name="userMap">
-            <spring:value>
-                ross=ross,ROLE_ADMIN
-                anon=anon,ROLE_ANONYMOUS
-            </spring:value>
-        </spring:property>
-    </spring:bean>
+	    <ss:authentication-provider>
+		    <ss:user-service id="userService">
+		        <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
+		        <ss:user name="anon" password="anon" authorities="ROLE_ANON" />
+		    </ss:user-service>
+	    </ss:authentication-provider>
+    </spring:beans>
 
-    <spring:bean id="daoAuthenticationProvider" class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
-        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
-    </spring:bean>
-
+    <mule-ss:security-manager>
+        <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
+    </mule-ss:security-manager>
+    
     <spring:bean name="echoComponent" class="org.mule.component.simple.EchoComponent"/>
-
-    <spring-security:security-manager>
-        <spring-security:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
-    </spring-security:security-manager>
-
 
     <!-- this sets the same provider three times, once through spring-security's provider and twice
          through a custom provider.  in normal use it should be set just once, through
          the spring-security schema - this is just for extra test coverage -->
 
     <spring:bean id="explicitCreation1" class="org.mule.module.spring.security.SpringProviderAdapter">
-        <spring:property name="delegate" ref="daoAuthenticationProvider"/>
+        <spring:property name="delegate" ref="authenticationManager"/>
         <spring:property name="name" value="customProvider"/>
     </spring:bean>
 
@@ -45,7 +45,7 @@
     </security-manager>
 
     <spring:bean id="explicitCreation2" class="org.mule.module.spring.security.SpringProviderAdapter">
-        <spring:property name="delegate" ref="daoAuthenticationProvider"/>
+        <spring:property name="delegate" ref="authenticationManager"/>
     </spring:bean>
 
     <security-manager>

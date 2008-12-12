@@ -17,7 +17,7 @@
     <mule:mule>
 
         <spring-security:security-manager>
-            <spring-security:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
+            <spring-security:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
         </spring-security:security-manager>
 
         <mule:security-manager>

@@ -18,6 +18,7 @@ import org.mule.security.AbstractSecurityProvider;
 import java.util.Map;
 
 import org.springframework.security.AuthenticationException;
+import org.springframework.security.AuthenticationManager;
 import org.springframework.security.providers.AuthenticationProvider;
 import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
 
@@ -27,21 +28,21 @@ import org.springframework.security.providers.UsernamePasswordAuthenticationToke
  */
 public class SpringProviderAdapter extends AbstractSecurityProvider implements AuthenticationProvider
 {
-    private AuthenticationProvider delegate;
+    private AuthenticationManager delegate;
     private Map securityProperties;
 
     /** For Spring IoC only */
     public SpringProviderAdapter()
     {
-        super("acegi");
+        super("spring-security");
     }
 
-    public SpringProviderAdapter(AuthenticationProvider delegate)
+    public SpringProviderAdapter(AuthenticationManager delegate)
     {
-        this(delegate, "acegi");
+        this(delegate, "spring-security");
     }
 
-    public SpringProviderAdapter(AuthenticationProvider delegate, String name)
+    public SpringProviderAdapter(AuthenticationManager delegate, String name)
     {
         super(name);
         this.delegate = delegate;
@@ -74,12 +75,12 @@ public class SpringProviderAdapter extends AbstractSecurityProvider implements A
         return delegate.authenticate(authentication);
     }
 
-    public AuthenticationProvider getDelegate()
+    public AuthenticationManager getDelegate()
     {
         return delegate;
     }
 
-    public void setDelegate(AuthenticationProvider delegate)
+    public void setDelegate(AuthenticationManager delegate)
     {
         this.delegate = delegate;
     }

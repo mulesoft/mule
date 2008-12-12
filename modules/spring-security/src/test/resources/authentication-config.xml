@@ -13,33 +13,20 @@
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
     <mule-ss:security-manager>
-        <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
+        <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
     </mule-ss:security-manager>
     
-    <spring:bean id="inMemoryDaoImpl" class="org.springframework.security.userdetails.memory.InMemoryDaoImpl">
-        <spring:property name="userMap">
-            <spring:value>
-                ross=ross,ROLE_ADMIN
-                anon=anon,ROLE_ANONYMOUS
-            </spring:value>
-        </spring:property>
-    </spring:bean>
-
-    <spring:bean id="daoAuthenticationProvider" class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
-        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
-    </spring:bean>
-    
-    <!-- Can't use this yet http://jira.springframework.org/browse/SEC-1053 -->
-    <!-- 
     <spring:beans>
+        <ss:authentication-manager alias="authenticationManager"/>
+
 	    <ss:authentication-provider>
-	        <ss:user-service>
+		    <ss:user-service id="userService">
 		        <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
 		        <ss:user name="anon" password="anon" authorities="ROLE_ANON" />
 		    </ss:user-service>
 	    </ss:authentication-provider>
     </spring:beans>
-    -->
+
     
     <model name="test">
         <service name="echo">

@@ -16,6 +16,7 @@ import org.mule.tck.FunctionalTestCase;
 
 import java.util.Iterator;
 
+import org.springframework.security.AuthenticationManager;
 import org.springframework.security.providers.dao.DaoAuthenticationProvider;
 
 public class NamespaceHandlerTestCase extends FunctionalTestCase
@@ -56,7 +57,7 @@ public class NamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(provider instanceof SpringProviderAdapter);
         SpringProviderAdapter adapter = (SpringProviderAdapter) provider;
         assertNotNull(adapter.getDelegate());
-        assertTrue(adapter.getDelegate() instanceof DaoAuthenticationProvider);
+        assertTrue(adapter.getDelegate() instanceof AuthenticationManager);
     }
 
 }

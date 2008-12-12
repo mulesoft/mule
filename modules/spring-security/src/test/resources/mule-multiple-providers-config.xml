@@ -1,63 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2" 
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans" 
-      xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
-      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2" 
-      xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
-      xmlns:spring-security="http://www.mulesource.org/schema/mule/spring-security/2.2"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+       xmlns:mule-ss="http://www.mulesource.org/schema/mule/spring-security/2.2"
+       xmlns:ss="http://www.springframework.org/schema/security"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
        http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
-       http://www.mulesource.org/schema/mule/spring-security/2.2 http://www.mulesource.org/schema/mule/spring-security/2.2/mule-spring-security.xsd      
-       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd">
-    
-    <spring:bean id="inMemoryDaoImpl" class="org.springframework.security.userdetails.memory.InMemoryDaoImpl">
-        <spring:property name="userMap">
-            <spring:value>
-                ross=ross,ROLE_ADMIN
-                anon=anon,ROLE_ANONYMOUS
-                admin1=admin1,ROLE_ADMIN          
-            </spring:value>
-        </spring:property>
-    </spring:bean>
-    
-    <spring:bean id="inMemoryDaoImpl2" class="org.springframework.security.userdetails.memory.InMemoryDaoImpl">
-        <spring:property name="userMap">
-            <spring:value>
-                admin2=admin2,ROLE_ADMIN                
-            </spring:value>
-        </spring:property>
-    </spring:bean>
-    
-    <spring:bean id="daoAuthenticationProvider" class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
-        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
-    </spring:bean>
-    
-    <spring:bean id="daoAuthenticationProvider2" class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
-        <spring:property name="userDetailsService" ref="inMemoryDaoImpl2"/>
-    </spring:bean>
-              
-    <!--
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/spring-security/2.2 http://www.mulesource.org/schema/mule/spring-security/2.2/mule-spring-security.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
+
+    <spring:beans xmlns="http://www.springframework.org/schema/beans">
+    	<bean id="authenticationManager1" class="org.springframework.security.providers.ProviderManager">
+    	    <property name="providers">
+			    <bean class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
+			        <property name="userDetailsService" ref="userService1"/>
+			    </bean>
+    	    </property>
+    	</bean>
+    	
+    	<bean id="authenticationManager2" class="org.springframework.security.providers.ProviderManager">
+    	    <property name="providers">
+			    <bean class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
+			        <property name="userDetailsService" ref="userService2"/>
+			    </bean>
+    	    </property>
+    	</bean>
+        
+	    <ss:user-service id="userService1">
+	        <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
+	        <ss:user name="admin1" password="admin1" authorities="ROLE_ADMIN" />
+	        <ss:user name="anon" password="anon" authorities="ROLE_ANONYMOUS" />
+	    </ss:user-service>
+	    
+	    <ss:user-service id="userService2">
+	        <ss:user name="admin2" password="admin2" authorities="ROLE_ADMIN" />
+	    </ss:user-service>
+    </spring:beans>
+
+	<!-- 
         Mule configuration
     -->
     <configuration defaultSynchronousEndpoints="false"/>
     
-    <spring-security:security-manager>
-        <spring-security:delegate-security-provider name="daoAuthenticationSecurityProvider2" delegate-ref="daoAuthenticationProvider2"/>
-    </spring-security:security-manager>
+    <mule-ss:security-manager>
+        <mule-ss:delegate-security-provider name="daoAuthenticationSecurityProvider2" delegate-ref="authenticationManager2"/>
+    </mule-ss:security-manager>
 
-    <spring-security:security-manager>
-        <spring-security:delegate-security-provider name="daoAuthenticationSecurityProvider1" delegate-ref="daoAuthenticationProvider"/>
-    </spring-security:security-manager>
-    
+    <mule-ss:security-manager>
+        <mule-ss:delegate-security-provider name="daoAuthenticationSecurityProvider1" delegate-ref="authenticationManager1"/>
+    </mule-ss:security-manager>
+
     <model name="sample-mule-app">
         <service name="flow">
             <inbound>
                 <http:inbound-endpoint address="http://localhost:4445" synchronous="true">
-                    <spring-security:http-security-filter realm="mule-realm" 
+                    <mule-ss:http-security-filter realm="mule-realm" 
                         securityProviders="daoAuthenticationSecurityProvider1"/>
                 </http:inbound-endpoint>
             </inbound>
@@ -71,7 +73,7 @@
         <service name="flow2">
             <inbound>
                 <http:inbound-endpoint address="http://localhost:4446" synchronous="true">
-                    <spring-security:http-security-filter realm="mule-realm" 
+                    <mule-ss:http-security-filter realm="mule-realm" 
                         securityProviders="daoAuthenticationSecurityProvider2"/>
                 </http:inbound-endpoint>
             </inbound>
@@ -85,7 +87,7 @@
         <service name="flow3">
             <inbound>
                 <http:inbound-endpoint address="http://localhost:4447" synchronous="true">
-                    <spring-security:http-security-filter realm="mule-realm" 
+                    <mule-ss:http-security-filter realm="mule-realm" 
                         securityProviders="daoAuthenticationSecurityProvider2,daoAuthenticationSecurityProvider1"/>
                 </http:inbound-endpoint>
             </inbound>
