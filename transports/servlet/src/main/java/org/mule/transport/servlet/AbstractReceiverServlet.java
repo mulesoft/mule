@@ -74,29 +74,44 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         {
             timeout = Long.parseLong(timeoutString);
         }
-        logger.info("Default request timeout for GET methods is: " + timeout);
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Default request timeout for GET methods is: " + timeout);
+        }
 
         String feedbackString = servletConfig.getInitParameter(FEEDBACK_PROPERTY);
         if (feedbackString != null)
         {
-            feedback = Boolean.valueOf(feedbackString).booleanValue();
+            feedback = Boolean.valueOf(feedbackString);
         }
-        logger.info("feedback is set to: " + feedback);
+        if (logger.isInfoEnabled())
+        {
+            logger.info("feedback is set to: " + feedback);
+        }
 
         String ct = servletConfig.getInitParameter(DEFAULT_CONTENT_TYPE_PROPERTY);
         if (ct != null)
         {
-            logger.debug("Using default content type configured on the servlet (" + DEFAULT_CONTENT_TYPE_PROPERTY + ") = " + ct); 
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Using default content type configured on the servlet (" + DEFAULT_CONTENT_TYPE_PROPERTY + ") = " + ct);
+            }
             defaultContentType = ct;
         }
-        logger.info("Default content type is: " + defaultContentType);
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Default content type is: " + defaultContentType);
+        }
 
         payloadParameterName = servletConfig.getInitParameter(PAYLOAD_PARAMETER_NAME);
         if (payloadParameterName == null)
         {
             payloadParameterName = DEFAULT_PAYLOAD_PARAMETER_NAME;
         }
-        logger.info("Using payload param name: " + payloadParameterName);
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Using payload param name: " + payloadParameterName);
+        }
 
         try
         {
@@ -147,10 +162,13 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             // Map the HttpResponse to the ServletResponse
             Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
             
-            String contentType = null;
+            String contentType;
             if (contentTypeHeader != null && contentTypeHeader.getValue() != null)
             {
-                logger.debug("Using Content-Type from message header = " + contentTypeHeader.getValue()); 
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Using Content-Type from message header = " + contentTypeHeader.getValue());
+                }
                 contentType = contentTypeHeader.getValue();
             }
             else
@@ -179,10 +197,10 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     protected HttpServletResponse setHttpHeadersOnServletResponse(HttpResponse httpResponse, HttpServletResponse servletResponse)
     {
         Header[] headers = httpResponse.getHeaders();
-        
-        for (int i = 0; i < headers.length; i++)
+
+        for (Header header : headers)
         {
-            servletResponse.setHeader(headers[i].getName(), headers[i].getValue());
+            servletResponse.setHeader(header.getName(), header.getValue());
         }
         return servletResponse;
     }
@@ -190,7 +208,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     protected void handleException(Throwable exception, String message, HttpServletResponse response)
     {
         logger.error("message: " + exception.getMessage(), exception);
-        int code = Integer.valueOf(ExceptionHelper.getErrorMapping("http", exception.getClass())).intValue();
+        int code = Integer.valueOf(ExceptionHelper.getErrorMapping("http", exception.getClass()));
         response.setStatus(code);
         try
         {
