@@ -41,6 +41,25 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <downloadUrl>http://mule.mulesource.org/display/MULE/Download</downloadUrl>
+        <repository>
+            <id>mule-releases</id>
+            <name>Mule Release Repository</name>
+            <url>dav:https://dav.codehaus.org/repository/mule/</url>
+        </repository>
+        <snapshotRepository>
+            <id>mule-snapshots</id>
+            <name>Mule Snapshot Repository</name>
+            <url>dav:https://dav.codehaus.org/snapshots.repository/mule/</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <site>
+            <id>mule-site</id>
+            <name>Mule Website</name>
+            <url>dav:https://dav.codehaus.org/mule/docs/${version}</url>
+        </site>
+    </distributionManagement>
     <repositories>
         <repository>
             <id>codehaus</id>
