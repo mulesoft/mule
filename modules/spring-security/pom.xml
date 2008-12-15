@@ -50,29 +50,29 @@
             <version>${springSecurityVersion}</version>
             <exclusions>
                 <exclusion>
-		            <groupId>commons-collections</groupId>
-		            <artifactId>commons-collections</artifactId>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
                 </exclusion>
                 <exclusion>
-		            <groupId>commons-codec</groupId>
-		            <artifactId>commons-codec</artifactId>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
                 </exclusion>
                 <exclusion>
-		            <groupId>commons-logging</groupId>
-		            <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-		            <groupId>org.springframework</groupId>
-		            <artifactId>spring-support</artifactId>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-support</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-	    <dependency> 
-	        <groupId>org.aspectj</groupId> 
-			<artifactId>aspectjrt</artifactId> 
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
             <version>1.5.4</version>
-	    </dependency>
-	    
+        </dependency>
+
         <!-- Unit tests -->
         <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
                 mule-tests-functional -> mule-module-builders -> mule-tests-functional -->

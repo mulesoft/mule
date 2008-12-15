@@ -22,14 +22,14 @@ import javax.jws.WebService;
 @WebService
 public interface CatalogService
 {
-	/** The catalog will be accesible as a web service at this URL */
-	static final String URL = "http://localhost:8777/services/catalog";
+    /** The catalog will be accesible as a web service at this URL */
+    static final String URL = "http://localhost:8777/services/catalog";
 
-	/** Return a collection of all books in the catalog */
+    /** Return a collection of all books in the catalog */
     @WebResult(name="books") 
     Collection<Book> getBooks();
 
-	/** Look up the details for a particular book by ID */
+    /** Look up the details for a particular book by ID */
     @WebResult(name="book") 
     Book getBook(@WebParam(name="bookId") long bookId);
 }

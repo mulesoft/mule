@@ -50,7 +50,6 @@ import java.util.Map;
 import javax.resource.spi.work.Work;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
@@ -301,16 +300,16 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 if (connectionHeader != null)
                 {
                     String value = connectionHeader.getValue();
-					if ("keep-alive".equalsIgnoreCase(value) && !endpointOverride) 
+                    if ("keep-alive".equalsIgnoreCase(value) && !endpointOverride)
                     {
-                    	response.setKeepAlive(true);
+                        response.setKeepAlive(true);
                         Header header = new Header(HttpConstants.HEADER_KEEP_ALIVE, "timeout=" 
                             + ((HttpConnector) connector).getKeepAliveTimeout());
                         response.addHeader(header);   
                     }
                     else if ("close".equalsIgnoreCase(value))
                     {
-                    	response.setKeepAlive(false);
+                        response.setKeepAlive(false);
                     } 
                     else if (response.getHttpVersion().greaterEquals(HttpVersion.HTTP_1_1))
                     {

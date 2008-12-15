@@ -15,11 +15,8 @@ import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.EndpointException;
-import org.mule.api.endpoint.EndpointNotFoundException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.transport.http.i18n.HttpMessages;
 
 import java.io.IOException;
 
@@ -184,7 +181,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             int i = uri.lastIndexOf("/");
             if (i > -1)
             {
-            	endpointName = uri.substring(i + 1);
+                endpointName = uri.substring(i + 1);
             }
         }
 

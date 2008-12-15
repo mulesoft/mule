@@ -1,9 +1,9 @@
 <%@ page import="org.mule.example.bookstore.Book,
- 				 org.mule.example.bookstore.CatalogService,
- 				 java.util.ArrayList,
- 				 java.util.Collection,
-				 java.util.Iterator,
-				 org.apache.cxf.jaxws.JaxWsProxyFactoryBean"%>
+                  org.mule.example.bookstore.CatalogService,
+                  java.util.ArrayList,
+                  java.util.Collection,
+                 java.util.Iterator,
+                 org.apache.cxf.jaxws.JaxWsProxyFactoryBean"%>
 <%@ page language="java" %>
 
 <head>
@@ -28,15 +28,15 @@
 <form method="POST" name="submitRequest" action="">
     <table>
         <tr>
-        	<td>Title: </td>
-        	<td><input type="text" name="title" value="<%=title%>"/></td>
-       	</tr>
+            <td>Title: </td>
+            <td><input type="text" name="title" value="<%=title%>"/></td>
+           </tr>
         <tr>
-        	<td>Author: </td>
-        	<td><input type="text" name="author" value="<%=author%>"/></td>
+            <td>Author: </td>
+            <td><input type="text" name="author" value="<%=author%>"/></td>
         </tr>
     </table>
-	<input type="hidden" name="submitted" value="true"/>
+    <input type="hidden" name="submitted" value="true"/>
     <input type="submit" name="submit" value="Search" />
 </form>
 
@@ -45,7 +45,7 @@
 
     if (submitted != null) 
     {
-	    // Invoke the CXF web service
+        // Invoke the CXF web service
         JaxWsProxyFactoryBean pf = new JaxWsProxyFactoryBean();
         pf.setServiceClass(CatalogService.class);
         pf.setAddress(CatalogService.URL);
@@ -61,8 +61,8 @@
         Your search returned the following book(s):<br/>
         <br/>
 
-		<table>
-		<tr><th>Title</th><th>Author</th><th>Price</th><th/></tr>
+        <table>
+        <tr><th>Title</th><th>Author</th><th>Price</th><th/></tr>
         <%
         Book book;
         for (Iterator<Book> i = books.iterator(); i.hasNext();)
@@ -71,14 +71,14 @@
             if (book.getTitle().contains(title) && book.getAuthor().contains(author))
             {
             %>
-	            <tr>
-	            	<td><%=book.getTitle()%></td>
-	            	<td><%=book.getAuthor()%></td>
-	            	<td>$<%=book.getPrice()%></td>
-	            	<td><a href="order.jsp?id=<%=book.getId()%>">Order this book</a></td>
-	           	</tr>
+                <tr>
+                    <td><%=book.getTitle()%></td>
+                    <td><%=book.getAuthor()%></td>
+                    <td>$<%=book.getPrice()%></td>
+                    <td><a href="order.jsp?id=<%=book.getId()%>">Order this book</a></td>
+                   </tr>
         <%
-        	}
+            }
         }
         %>
         </table>

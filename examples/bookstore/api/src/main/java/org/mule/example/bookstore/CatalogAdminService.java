@@ -17,9 +17,9 @@ import java.util.Collection;
  */
 public interface CatalogAdminService
 {
-	/** Add a new book to the catalog */
+    /** Add a new book to the catalog */
     long addBook(Book book);
 
-	/** Add a group of new books to the catalog */
+    /** Add a group of new books to the catalog */
     Collection <Long> addBooks(Collection <Book> books);
 }

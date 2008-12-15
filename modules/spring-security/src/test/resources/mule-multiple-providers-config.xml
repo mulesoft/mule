@@ -15,34 +15,34 @@
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
     <spring:beans xmlns="http://www.springframework.org/schema/beans">
-    	<bean id="authenticationManager1" class="org.springframework.security.providers.ProviderManager">
-    	    <property name="providers">
-			    <bean class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
-			        <property name="userDetailsService" ref="userService1"/>
-			    </bean>
-    	    </property>
-    	</bean>
-    	
-    	<bean id="authenticationManager2" class="org.springframework.security.providers.ProviderManager">
-    	    <property name="providers">
-			    <bean class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
-			        <property name="userDetailsService" ref="userService2"/>
-			    </bean>
-    	    </property>
-    	</bean>
+        <bean id="authenticationManager1" class="org.springframework.security.providers.ProviderManager">
+            <property name="providers">
+                <bean class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
+                    <property name="userDetailsService" ref="userService1"/>
+                </bean>
+            </property>
+        </bean>
+
+        <bean id="authenticationManager2" class="org.springframework.security.providers.ProviderManager">
+            <property name="providers">
+                <bean class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
+                    <property name="userDetailsService" ref="userService2"/>
+                </bean>
+            </property>
+        </bean>
         
-	    <ss:user-service id="userService1">
-	        <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
-	        <ss:user name="admin1" password="admin1" authorities="ROLE_ADMIN" />
-	        <ss:user name="anon" password="anon" authorities="ROLE_ANONYMOUS" />
-	    </ss:user-service>
-	    
-	    <ss:user-service id="userService2">
-	        <ss:user name="admin2" password="admin2" authorities="ROLE_ADMIN" />
-	    </ss:user-service>
+        <ss:user-service id="userService1">
+            <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
+            <ss:user name="admin1" password="admin1" authorities="ROLE_ADMIN" />
+            <ss:user name="anon" password="anon" authorities="ROLE_ANONYMOUS" />
+        </ss:user-service>
+
+        <ss:user-service id="userService2">
+            <ss:user name="admin2" password="admin2" authorities="ROLE_ADMIN" />
+        </ss:user-service>
     </spring:beans>
 
-	<!-- 
+    <!--
         Mule configuration
     -->
     <configuration defaultSynchronousEndpoints="false"/>

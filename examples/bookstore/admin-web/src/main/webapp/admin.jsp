@@ -1,8 +1,3 @@
-<%@ page import="org.mule.api.MuleMessage,
-                 org.mule.example.bookstore.Book,
- 				 org.mule.example.bookstore.CatalogService,
- 				 java.util.Collection,
-				 java.util.Iterator"%>
 <%@ page language="java" %>
 
 <head>
@@ -23,16 +18,16 @@
 <form method="POST" name="addBook" action="/bookstore-admin/services/catalog">
     <table>
         <tr>
-        	<td>Title: </td>
-        	<td><input type="text" name="title"/></td>
+            <td>Title: </td>
+            <td><input type="text" name="title"/></td>
         </tr>
         <tr>
-        	<td>Author: </td>
-        	<td><input type="text" name="author"/></td>
+            <td>Author: </td>
+            <td><input type="text" name="author"/></td>
         </tr>
         <tr>
-        	<td>Price: </td>
-        	<td><input type="text" name="price"/></td>
+            <td>Price: </td>
+            <td><input type="text" name="price"/></td>
         </tr>
     </table>
     <input type="submit" name="submit" value="Add book" />

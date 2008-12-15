@@ -10,6 +10,9 @@
 
 package org.mule.example.bookstore;
 
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,9 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.jws.WebService;
-
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
 
 /**
  * Bookstore catalog service which implements both the public interface for 
@@ -31,7 +31,7 @@ import org.mule.api.lifecycle.InitialisationException;
 @WebService(serviceName="CatalogService", endpointInterface="org.mule.example.bookstore.CatalogService")
 public class CatalogServiceImpl implements CatalogService, CatalogAdminService, Initialisable
 {
-	/** Simple hashmap used to store the catalog, in real life this would be a database */
+    /** Simple hashmap used to store the catalog, in real life this would be a database */
     private Map <Long, Book> books = new HashMap <Long, Book> ();
     
     public void initialise() throws InitialisationException

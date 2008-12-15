@@ -10,12 +10,12 @@
 
 package org.mule.example.bookstore;
 
+import org.mule.example.bookstore.web.HtmlTemplate;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.mule.example.bookstore.web.HtmlTemplate;
 
 /**
  * Tracks statistics on book orders.
@@ -39,11 +39,11 @@ public class DataWarehouse
         Integer quantity = sales.get(title);
         if (quantity == null)
         {
-        	sales.put(title, order.getQuantity());
+            sales.put(title, order.getQuantity());
         }
         else
         {
-        	sales.put(title, quantity + order.getQuantity());
+            sales.put(title, quantity + order.getQuantity());
         }
         bestSeller = getBestSeller();
         
@@ -53,20 +53,20 @@ public class DataWarehouse
 
     protected String getBestSeller()
     {
-    	String title = "";
-    	int quantity = 0;
-    	Iterator it = sales.entrySet().iterator();
-    	Entry <String, Integer> entry;
-    	while (it.hasNext())
-    	{
-    		entry = (Entry <String, Integer>) it.next();
-    		if (entry.getValue() > quantity)
-    		{
-    			title = entry.getKey();
-    			quantity = entry.getValue();
-    		}    		
-    	}
-    	return title;
+        String title = "";
+        int quantity = 0;
+        Iterator it = sales.entrySet().iterator();
+        Entry <String, Integer> entry;
+        while (it.hasNext())
+        {
+            entry = (Entry <String, Integer>) it.next();
+            if (entry.getValue() > quantity)
+            {
+                title = entry.getKey();
+                quantity = entry.getValue();
+            }
+        }
+        return title;
     }
     
     protected String printHtmlStats()

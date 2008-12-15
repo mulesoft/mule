@@ -15,12 +15,12 @@
     <ss:authentication-manager alias="authenticationManager"/>
 
     <ss:authentication-provider>
-	    <ss:user-service id="userService">
-	        <ss:user name="marie" password="marie" authorities="ROLE_ADMIN" />
-	        <ss:user name="stan" password="stan" authorities="ROLE_ADMIN" />
-	        <ss:user name="cindy" password="cindy" authorities="ROLE_ADMIN" />
-	        <ss:user name="anon" password="anon" authorities="ROLE_ANONYMOUS" />
-	    </ss:user-service>
+        <ss:user-service id="userService">
+            <ss:user name="marie" password="marie" authorities="ROLE_ADMIN" />
+            <ss:user name="stan" password="stan" authorities="ROLE_ADMIN" />
+            <ss:user name="cindy" password="cindy" authorities="ROLE_ADMIN" />
+            <ss:user name="anon" password="anon" authorities="ROLE_ANONYMOUS" />
+        </ss:user-service>
     </ss:authentication-provider>
 
     <bean id="accessDecisionManager" class='org.springframework.security.vote.AffirmativeBased'>

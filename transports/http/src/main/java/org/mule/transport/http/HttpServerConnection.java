@@ -27,7 +27,6 @@ import java.util.Iterator;
 import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
-import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.StatusLine;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -253,14 +252,14 @@ public class HttpServerConnection
         
         if (response.isKeepAlive()) 
         {
-	        Header header = new Header(HttpConstants.HEADER_CONNECTION, "keep-alive");
-	        response.setHeader(header);
-	        // if there was a timeout set
+            Header header = new Header(HttpConstants.HEADER_CONNECTION, "keep-alive");
+            response.setHeader(header);
+            // if there was a timeout set
         }
         else
         {
-	        Header header = new Header(HttpConstants.HEADER_CONNECTION, "close");
-	        response.setHeader(header);
+            Header header = new Header(HttpConstants.HEADER_CONNECTION, "close");
+            response.setHeader(header);
         }
         
         setKeepAlive(response.isKeepAlive());

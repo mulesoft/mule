@@ -20,12 +20,12 @@ import javax.jws.WebService;
 @WebService
 public interface OrderService
 {
-	/** The order service will be accesible as a web service at this URL */
-	static final String URL = "http://localhost:8777/services/order";
+    /** The order service will be accesible as a web service at this URL */
+    static final String URL = "http://localhost:8777/services/order";
 
-	/** Place a book order */
+    /** Place a book order */
     @WebResult(name="order") 
-	Order orderBook(@WebParam(name="book") Book book, 
+    Order orderBook(@WebParam(name="book") Book book,
                     @WebParam(name="quantity") int quantity, 
                     @WebParam(name="address") String address,
                     @WebParam(name="email") String email);

@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-	<bean id="apple" class="org.mule.tck.testmodels.fruit.Apple"/>
+    <bean id="apple" class="org.mule.tck.testmodels.fruit.Apple"/>
     
     <bean id="banana" class="org.mule.tck.testmodels.fruit.Banana"/>
     

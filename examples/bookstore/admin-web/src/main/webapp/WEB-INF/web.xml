@@ -4,19 +4,19 @@
     <display-name>Bookstore Administration</display-name>
     <description>Administration console for the Mule-powered On-line Bookstore</description>
 
-	<!-- The Mule configuration is provided as a context parameter -->
+    <!-- The Mule configuration is provided as a context parameter -->
     <context-param>
         <param-name>org.mule.config</param-name>
         <param-value>bookstore-config.xml</param-value>
     </context-param>
 
-	<!-- This listener will start up Mule inside the webapp -->
+    <!-- This listener will start up Mule inside the webapp -->
     <listener>
         <listener-class>org.mule.config.builders.MuleXmlBuilderContextListener</listener-class>
     </listener>
 
-	<!-- This servlet will route a URL of "/bookstore-admin/services/foo" 
-		 to the inbound endpoint "servlet://foo" in Mule -->
+    <!-- This servlet will route a URL of "/bookstore-admin/services/foo"
+         to the inbound endpoint "servlet://foo" in Mule -->
     <servlet>
         <servlet-name>muleServlet</servlet-name>
         <servlet-class>org.mule.transport.servlet.MuleRESTReceiverServlet</servlet-class>

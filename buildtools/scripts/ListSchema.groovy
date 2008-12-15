@@ -24,8 +24,6 @@
   $Id$
 */
 
-import org.codehaus.groovy.runtime.InvokerHelper
-
 // Schema version
 def version = 2.2
 
@@ -65,17 +63,17 @@ def checkCurrentDirectory = {
 }
 
 def scanForSchemaAndInferDestinations = {
-	println "# "
-	println "# scanning for schema"
-	println "# "
-	for (f in new AntBuilder().fileScanner {
+    println "# "
+    println "# scanning for schema"
+    println "# "
+    for (f in new AntBuilder().fileScanner {
           fileset(dir: root) {
             include(name:"**/*.xsd")
             exclude(name:"**/src/test/**/*.xsd")
             exclude(name:"**/target/**/*.xsd")
           }
         }) 
-	{
+    {
     if (f.absolutePath ==~ corexsd) {
       schemaNames << "core"
       schemaSources.put("core", f)

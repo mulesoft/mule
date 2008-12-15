@@ -32,7 +32,7 @@ public class InboundRouterSyncAsyncClientTestCase extends FunctionalTestCase
         assertEquals("testSync OK", result.getPayload());
     }
 
-	public void testAsync() throws Exception
+    public void testAsync() throws Exception
     {
         MuleClient client = new MuleClient();
         DefaultMuleMessage messsage = new DefaultMuleMessage("testAsync");

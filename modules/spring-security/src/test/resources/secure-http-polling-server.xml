@@ -17,11 +17,11 @@
     <spring:beans>
         <ss:authentication-manager alias="authenticationManager"/>
 
-	    <ss:authentication-provider>
-		    <ss:user-service id="userService">
-		        <ss:user name="marie" password="marie" authorities="ROLE_ADMIN" />
-		    </ss:user-service>
-	    </ss:authentication-provider>
+        <ss:authentication-provider>
+            <ss:user-service id="userService">
+                <ss:user name="marie" password="marie" authorities="ROLE_ADMIN" />
+            </ss:user-service>
+        </ss:authentication-provider>
     </spring:beans>
 
     <mule-ss:security-manager>
