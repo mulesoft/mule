@@ -87,9 +87,9 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
                 // Workaround for containers that strip the port from the Host header.
                 // This is needed so Mule components can figure out what port they're on.
                 String value = request.getHeader(key);
-                if ("Host".equalsIgnoreCase(key)) 
+                if (HttpConstants.HEADER_HOST.equalsIgnoreCase(key)) 
                 {
-                    realKey = "Host";
+                    realKey = HttpConstants.HEADER_HOST;
                     int port = request.getLocalPort();
                     if (!value.contains(":") && port != 80 && port != 443)
                     {
