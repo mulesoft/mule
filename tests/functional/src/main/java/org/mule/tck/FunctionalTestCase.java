@@ -50,6 +50,12 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
 
     protected abstract String getConfigResources();
     
+    /**
+      * Returns an instance of the service's component object.  Note that depending
+      * on the type of ObjectFactory used for the component, this may create a new
+      * instance of the object.  If you plan to set properties on the returned object, 
+      * make sure your component is declared as a singleton, otherwise this will not work.  
+      */
     protected Object getComponent(String serviceName) throws Exception
     {
         Service service = muleContext.getRegistry().lookupService(serviceName);
@@ -63,6 +69,12 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         }
     }
     
+    /**
+      * Returns an instance of the service's component object.  Note that depending
+      * on the type of ObjectFactory used for the component, this may create a new
+      * instance of the object.  If you plan to set properties on the returned object, 
+      * make sure your component is declared as a singleton, otherwise this will not work.  
+      */
     protected Object getComponent(Service service) throws Exception
     {
         if (service.getComponent() instanceof JavaComponent)
