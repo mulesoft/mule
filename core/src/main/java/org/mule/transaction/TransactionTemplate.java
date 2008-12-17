@@ -168,12 +168,18 @@ public class TransactionTemplate
     {
         if (tx.isRollbackOnly())
         {
-            logger.debug("Transaction has been marked rollbackOnly, rolling it back: " + tx);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Transaction has been marked rollbackOnly, rolling it back: " + tx);
+            }
             tx.rollback();
         }
         else
         {
-            logger.debug("Committing transaction " + tx);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Committing transaction " + tx);
+            }
             tx.commit();
         }
     }
