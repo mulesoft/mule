@@ -337,7 +337,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug(">>> !!  Binding " + subReceiver.session + " to " + jmsConnector.getConnection());
+                    logger.debug("Binding " + subReceiver.session + " to " + jmsConnector.getConnection());
                 }
                 tx.bindResource(jmsConnector.getConnection(), subReceiver.session);
             }
