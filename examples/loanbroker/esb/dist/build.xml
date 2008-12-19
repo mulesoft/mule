@@ -17,7 +17,7 @@
     <property name="dir.common.tests" value="../common-tests"/>
 
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
-    <property name="url.maven.repo2" value="http://people.apache.org/repo/m2-incubating-repository"/>
+    <property name="url.maven.repo2" value="https://maven.atlassian.com/repository/public/"/>
 
 
     <target name="clean"
@@ -29,12 +29,8 @@
     <target name="get.libraries">
 
         <!-- ActiveMQ -->            
-        <get src="${url.maven.repo2}/org/apache/activemq/activemq-core/4.1.0-incubator/activemq-core-4.1.0-incubator.jar"
-             dest="${dir.user.lib}/activemq-core-4.1.0-incubator.jar"
-             verbose="true"
-             usetimestamp="true"/>
-        <get src="${url.maven.repo2}/org/apache/activemq/activeio-core/3.0.0-incubator/activeio-core-3.0.0-incubator.jar"
-             dest="${dir.user.lib}/activeio-core-3.0.0-incubator.jar"
+        <get src="${url.maven.repo2}/org/apache/activemq/activemq-core/4.1.2/activemq-core-4.1.2.jar"
+             dest="${dir.user.lib}/activemq-core-4.1.2.jar"
              verbose="true"
              usetimestamp="true"/>
 

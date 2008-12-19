@@ -17,8 +17,7 @@
     <property name="dir.classes" value="${dir.build}/classes"/>
 
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
-
-    <property name="url.apache.repo" value="http://people.apache.org/repo/m2-incubating-repository"/>
+    <property name="url.maven.repo2" value="https://maven.atlassian.com/repository/public/"/>
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">
@@ -28,13 +27,8 @@
     <!-- Download any additional libraries needed to run the application -->
     <target name="get.libraries">
 
-        <get src="${url.apache.repo}/org/apache/activemq/activemq-core/4.1.0-incubator/activemq-core-4.1.0-incubator.jar"
-             dest="${dir.user.lib}/activemq-core-4.1.0-incubator.jar"
-             verbose="true"
-             usetimestamp="true"/>
-        <!-- Used by ActiveMQ -->
-        <get src="${url.maven.repo}/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar"
-             dest="${dir.user.lib}/concurrent-1.3.4.jar"
+        <get src="${url.maven.repo2}/org/apache/activemq/activemq-core/4.1.2/activemq-core-4.1.2.jar"
+             dest="${dir.user.lib}/activemq-core-4.1.2.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>

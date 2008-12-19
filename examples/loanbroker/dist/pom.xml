@@ -13,6 +13,7 @@
 
     <properties>
         <muleVersion>2.2.0-SNAPSHOT</muleVersion>
+        <activemqVersion>4.1.2</activemqVersion>
     </properties>
 
     <modules>

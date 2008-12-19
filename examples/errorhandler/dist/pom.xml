@@ -12,7 +12,7 @@
 
     <properties>
         <muleVersion>2.2.0-SNAPSHOT</muleVersion>
-        <activemqVersion>4.1.0-incubator</activemqVersion>
+        <activemqVersion>4.1.2</activemqVersion>
     </properties>
 
     <dependencies>
@@ -312,11 +312,6 @@
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-core</artifactId>
                                     <version>${activemqVersion}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>concurrent</groupId>
-                                    <artifactId>concurrent</artifactId>
-                                    <version>1.3.4</version>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

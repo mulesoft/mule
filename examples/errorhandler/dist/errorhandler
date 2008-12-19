@@ -19,7 +19,7 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-ACTIVEMQ=activemq-core-4.1.0-incubator.jar
+ACTIVEMQ=activemq-core-4.1.2.jar
 
 if [ -f "$MULE_BASE/lib/user/${ACTIVEMQ}" ]; then
     exec "$MULE_BASE/bin/mule" -config error-config.xml

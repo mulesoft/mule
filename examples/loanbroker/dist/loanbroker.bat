@@ -17,7 +17,7 @@ REM Any changes to the files in .\conf will take precedence over those deployed 
 SET MULE_LIB=.\conf
 
 REM 3rd party libraries for LoanBroker ESB
-SET ACTIVEMQ=activemq-core-4.1.0-incubator.jar
+SET ACTIVEMQ=activemq-core-4.1.2.jar
 SET OPENEJB=openejb-core-1.0.jar
 REM 3rd party libraries for LoanBroker BPM
 SET BSH=bsh-1.3.0.jar
