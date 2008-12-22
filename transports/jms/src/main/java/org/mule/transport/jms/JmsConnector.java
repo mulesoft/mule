@@ -688,7 +688,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         catch (JMSException e)
         {
-            logger.warn("Failed to close jms message consumer: " + e.getMessage());
+            logger.error("Failed to close jms message consumer", e);
         }
     }
 
