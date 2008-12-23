@@ -25,7 +25,15 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
 
     public static void main(String[] args) throws Exception
     {
-        LoanBrokerApp loanBrokerApp = new LoanBrokerApp("loan-broker-bpm-mule-config.xml");
+        LoanBrokerApp loanBrokerApp = null;
+        if(args != null && args.length > 0)
+        {
+            loanBrokerApp = new LoanBrokerApp(args[0]);
+        }
+        else
+        {
+            loanBrokerApp = new LoanBrokerApp("loan-broker-bpm-mule-config.xml");
+        }
         loanBrokerApp.run(false);
     }
 
