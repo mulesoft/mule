@@ -94,7 +94,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.error(status.getThrowable());
+                    logger.debug(status.getThrowable());
                 }
             }
         }
