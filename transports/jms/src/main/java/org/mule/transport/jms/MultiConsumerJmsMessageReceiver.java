@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.FatalException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -90,8 +91,14 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         for (int i = 0; i < receiversCount; i++)
         {
             SubReceiver sub = (SubReceiver) consumers.removeFirst();
-            sub.doStart();
-            consumers.addLast(sub);
+            try
+            {
+                sub.doStart();
+            }
+            finally
+            {
+                consumers.addLast(sub);
+            }
         }
     }
 
@@ -101,8 +108,14 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         for (int i = 0; i < receiversCount; i++)
         {
             SubReceiver sub = (SubReceiver) consumers.removeFirst();
-            sub.doStop();
-            consumers.addLast(sub);
+            try
+            {
+                sub.doStop();
+            }
+            finally
+            {
+                consumers.addLast(sub);
+            }
         }
     }
 
@@ -112,8 +125,19 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         for (int i = 0; i < receiversCount; i++)
         {
             SubReceiver sub = (SubReceiver) consumers.removeFirst();
-            sub.doConnect();
-            consumers.addLast(sub);
+            try
+            {
+                sub.doConnect();
+            }
+            catch (FatalException fex)
+            {
+                sub.doDisconnect();
+                throw fex;
+            }
+            finally
+            {
+                consumers.addLast(sub);
+            }
         }
     }
 
@@ -123,8 +147,14 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         for (int i = 0; i < receiversCount; i++)
         {
             SubReceiver sub = (SubReceiver) consumers.removeFirst();
-            sub.doDisconnect();
-            consumers.addLast(sub);
+            try
+            {
+                sub.doDisconnect();
+            }
+            finally
+            {
+                consumers.addLast(sub);
+            }
         }
 
     }
@@ -154,6 +184,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         protected void doDisconnect() throws Exception
         {
+            subLogger.debug("SUB doDisconnect()");
             closeConsumer();
         }
 
@@ -167,6 +198,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         protected void doStart() throws MuleException
         {
+            subLogger.debug("SUB doStart()");
+
             try
             { 
                 // If the consumer is null it means that the connection strategy is being
@@ -190,6 +223,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         protected void doStop() throws MuleException
         {
+            subLogger.debug("SUB doStop()");
+
             try
             {
                 if (consumer != null)
@@ -209,6 +244,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
          */
         protected void createConsumer() throws Exception
         {
+            subLogger.debug("SUB createConsumer()");
+            
             try
             {
                 JmsSupport jmsSupport = jmsConnector.getJmsSupport();

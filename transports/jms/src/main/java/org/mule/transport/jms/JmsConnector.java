@@ -529,10 +529,6 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     public Session getSession(boolean transacted, boolean topic) throws ConnectException, JMSException
     {
-        if (!isConnected())
-        {
-            throw new ConnectException(CoreMessages.notConnectedYet("JMS connector"), this);
-        }
         Session session = getSessionFromTransaction();
         if (session != null)
         {

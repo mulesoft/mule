@@ -403,12 +403,29 @@ public abstract class AbstractConnector
         {
             for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
             {
-                MessageReceiver mr = (MessageReceiver) iterator.next();
-                if (logger.isDebugEnabled())
+                final List<MuleException> errors = new ArrayList<MuleException>();
+                try
                 {
-                    logger.debug("Starting receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
+                    MessageReceiver mr = (MessageReceiver) iterator.next();
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Starting receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
+                    }
+                    mr.start();
                 }
-                mr.start();
+                catch (MuleException e)
+                {
+                    logger.error(e);
+                    errors.add(e);
+                }
+
+                if (!errors.isEmpty())
+                {
+                    // throw the first one in order not to break the reconnection strategy logic,
+                    // every exception has been logged above already
+                    // api needs refactoring to support the multi-cause exception here
+                    throw errors.get(0);
+                }
             }
         }
 
