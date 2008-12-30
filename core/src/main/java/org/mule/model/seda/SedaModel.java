@@ -50,7 +50,7 @@ public class SedaModel extends AbstractModel
 
     public void initialise() throws InitialisationException
     {
-        queueTimeout = muleContext.getConfiguration().getDefaultSynchronousEventTimeout();
+        queueTimeout = muleContext.getConfiguration().getDefaultResponseTimeout();
         if (queueProfile == null)
         {
             queueProfile = new QueueProfile();

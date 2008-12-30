@@ -53,7 +53,7 @@ public class MuleConfigurationTestCase extends TestCase
         config.setDefaultEncoding("UTF-16");
         config.setDefaultSynchronousEndpoints(true);
         config.setSystemModelType("direct");
-        config.setDefaultSynchronousEventTimeout(30000);
+        config.setDefaultResponseTimeout(30000);
         config.setDefaultTransactionTimeout(60000);
         config.setWorkingDirectory("/some/directory");
         config.setClientMode(true);
@@ -138,7 +138,7 @@ public class MuleConfigurationTestCase extends TestCase
         // These are OK to change after init but before start
         mutableConfig.setDefaultSynchronousEndpoints(true);
         mutableConfig.setSystemModelType("direct");
-        mutableConfig.setDefaultSynchronousEventTimeout(30000);
+        mutableConfig.setDefaultResponseTimeout(30000);
         mutableConfig.setDefaultTransactionTimeout(60000);
         mutableConfig.setClientMode(true);
 
@@ -154,7 +154,7 @@ public class MuleConfigurationTestCase extends TestCase
         // These are OK to change after init but before start
         assertTrue(config.isDefaultSynchronousEndpoints());
         assertEquals("direct", config.getSystemModelType());
-        assertEquals(30000, config.getDefaultSynchronousEventTimeout());
+        assertEquals(30000, config.getDefaultResponseTimeout());
         assertEquals(60000, config.getDefaultTransactionTimeout());
         assertTrue(config.isClientMode());
         
@@ -175,14 +175,14 @@ public class MuleConfigurationTestCase extends TestCase
         DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
         mutableConfig.setDefaultSynchronousEndpoints(true);
         mutableConfig.setSystemModelType("direct");
-        mutableConfig.setDefaultSynchronousEventTimeout(30000);
+        mutableConfig.setDefaultResponseTimeout(30000);
         mutableConfig.setDefaultTransactionTimeout(60000);
         mutableConfig.setClientMode(true);
 
         MuleConfiguration config = muleContext.getConfiguration();
         assertFalse(config.isDefaultSynchronousEndpoints());
         assertFalse("direct".equals(config.getSystemModelType()));
-        assertFalse(30000 == config.getDefaultSynchronousEventTimeout());
+        assertFalse(30000 == config.getDefaultResponseTimeout());
         assertFalse(60000 == config.getDefaultTransactionTimeout());
         assertFalse(config.isClientMode());
     }
@@ -193,7 +193,7 @@ public class MuleConfigurationTestCase extends TestCase
         assertEquals("UTF-16", config.getDefaultEncoding());
         assertTrue(config.isDefaultSynchronousEndpoints());
         assertEquals("direct", config.getSystemModelType());
-        assertEquals(30000, config.getDefaultSynchronousEventTimeout());
+        assertEquals(30000, config.getDefaultResponseTimeout());
         assertEquals(60000, config.getDefaultTransactionTimeout());
         assertEquals("/some/directory", config.getWorkingDirectory());
         assertTrue(config.isClientMode());

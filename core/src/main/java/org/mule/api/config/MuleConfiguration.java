@@ -23,7 +23,7 @@ public interface MuleConfiguration
 
     boolean isDefaultSynchronousEndpoints();
 
-    int getDefaultSynchronousEventTimeout();
+    int getDefaultResponseTimeout();
 
     String getWorkingDirectory();
 

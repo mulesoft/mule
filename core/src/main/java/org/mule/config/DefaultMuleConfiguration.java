@@ -53,7 +53,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration
      * When running sychonously, return events can be received over transports that
      * support ack or replyTo This property determines how long to wait for a receive
      */
-    private int synchronousEventTimeout = 10000;
+    private int responseTimeout = 10000;
 
     /**
      * The default transaction timeout value used if no specific transaction time out
@@ -158,7 +158,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "timeout.synchronous");
         if (p != null)
         {
-            synchronousEventTimeout = NumberUtils.toInt(p);
+            responseTimeout = NumberUtils.toInt(p);
         }
         p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "timeout.transaction");
         if (p != null)
@@ -255,16 +255,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
-    public int getDefaultSynchronousEventTimeout()
+    public int getDefaultResponseTimeout()
     {
-        return synchronousEventTimeout;
+        return responseTimeout;
     }
 
-    public void setDefaultSynchronousEventTimeout(int synchronousEventTimeout)
+    public void setDefaultResponseTimeout(int responseTimeout)
     {
         if (verifyContextNotStarted())
         {
-            this.synchronousEventTimeout = synchronousEventTimeout;
+            this.responseTimeout = responseTimeout;
         }
     }
 

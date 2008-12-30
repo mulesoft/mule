@@ -40,7 +40,7 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
 
     public int getSynchronousEventTimeout()
     {
-        return muleConfiguration.getDefaultSynchronousEventTimeout();
+        return muleConfiguration.getDefaultResponseTimeout();
     }
 
     public String getWorkingDirectory()

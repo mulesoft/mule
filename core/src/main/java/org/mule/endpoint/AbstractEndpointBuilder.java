@@ -334,7 +334,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected int getDefaultResponseTimeout(Connector connector)
     {
-        return muleContext.getConfiguration().getDefaultSynchronousEventTimeout();
+        return muleContext.getConfiguration().getDefaultResponseTimeout();
     }
 
     protected List getInboundTransformers(Connector connector, EndpointURI endpointURI)

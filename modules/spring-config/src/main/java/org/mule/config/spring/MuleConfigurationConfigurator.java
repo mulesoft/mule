@@ -59,7 +59,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
         if (configuration instanceof DefaultMuleConfiguration)
         {
             ((DefaultMuleConfiguration) configuration).setDefaultSynchronousEndpoints(config.isDefaultSynchronousEndpoints());
-            ((DefaultMuleConfiguration) configuration).setDefaultSynchronousEventTimeout(config.getDefaultSynchronousEventTimeout());
+            ((DefaultMuleConfiguration) configuration).setDefaultResponseTimeout(config.getDefaultResponseTimeout());
             ((DefaultMuleConfiguration) configuration).setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
             return configuration;
         }
@@ -84,9 +84,9 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
         config.setDefaultSynchronousEndpoints(synchronous);
     }
     
-    public void setDefaultSynchronousEventTimeout(int synchronousEventTimeout)
+    public void setDefaultResponseTimeout(int responseTimeout)
     {
-        config.setDefaultSynchronousEventTimeout(synchronousEventTimeout);
+        config.setDefaultResponseTimeout(responseTimeout);
     }
     
     

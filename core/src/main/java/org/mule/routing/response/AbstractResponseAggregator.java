@@ -41,7 +41,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     {
         if (timeout == -1) // undefined
         {
-            setTimeout(muleContext.getConfiguration().getDefaultSynchronousEventTimeout());
+            setTimeout(muleContext.getConfiguration().getDefaultResponseTimeout());
         }
         eventCorrelator = new EventCorrelator(getCorrelatorCallback(), messageInfoMapping, muleContext);
         eventCorrelator.setTimeout(getTimeout());

@@ -50,7 +50,7 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
     {
         if (timeout == -1) // undefined
         {
-            setTimeout(muleContext.getConfiguration().getDefaultSynchronousEventTimeout());
+            setTimeout(muleContext.getConfiguration().getDefaultResponseTimeout());
         }
         super.initialise();
     }

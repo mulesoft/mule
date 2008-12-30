@@ -10,6 +10,14 @@
 
 package org.mule.module.client;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.Map;
+
+import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
@@ -43,16 +51,8 @@ import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.Map;
-
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-import org.apache.commons.lang.SerializationUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>RemoteDispatcher</code> is used to make and receive requests to a remote
@@ -236,7 +236,7 @@ public class RemoteDispatcher implements Disposable
     public MuleMessage sendRemote(String endpoint, Object payload, Map messageProperties) throws MuleException
     {
         return doToRemote(endpoint, payload, messageProperties, true, 
-            MuleServer.getMuleContext().getConfiguration().getDefaultSynchronousEventTimeout());
+            MuleServer.getMuleContext().getConfiguration().getDefaultResponseTimeout());
     }
 
     public void dispatchRemote(String endpoint, Object payload, Map messageProperties) throws MuleException
@@ -308,7 +308,7 @@ public class RemoteDispatcher implements Disposable
         RemoteDispatcherNotification action = new RemoteDispatcherNotification(message, RemoteDispatcherNotification.ACTION_INVOKE,
             "mule://" + component);
         return dispatchAction(action, synchronous, 
-            MuleServer.getMuleContext().getConfiguration().getDefaultSynchronousEventTimeout());
+            MuleServer.getMuleContext().getConfiguration().getDefaultResponseTimeout());
     }
 
     protected MuleMessage doToRemote(String endpoint,

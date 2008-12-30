@@ -418,7 +418,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="defaultSynchronousEventTimeout" type="xsd:string" default="3000">
+        <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="3000">
             <xsd:annotation>
                 <xsd:documentation>
                     The default period (ms) to wait for a synchronous response.
