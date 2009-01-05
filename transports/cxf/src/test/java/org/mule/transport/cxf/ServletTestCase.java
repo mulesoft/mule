@@ -13,7 +13,11 @@ package org.mule.transport.cxf;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.MuleReceiverServlet;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.ServletHandler;
@@ -63,9 +67,9 @@ public class ServletTestCase extends FunctionalTestCase
             "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " +
             "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
             "<soap:Body>" +
-            "<echo xmlns=\"http://simple.component.mule.org/\">" +
-            "<echo>Test String</echo>" +
-            "</echo>" +
+            "<ns1:echo xmlns:ns1=\"http://testmodels.cxf.transport.mule.org/\">" +
+            "<text>Test String</text>" +
+            "</ns1:echo>" +
             "</soap:Body>" +
             "</soap:Envelope>";
         
@@ -73,10 +77,21 @@ public class ServletTestCase extends FunctionalTestCase
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT
                                         + "/services/mycomponent", request, null);
         String res = result.getPayloadAsString();
-        
+
+        System.out.println(res);
         assertTrue(res.indexOf("Test String") != -1);
     }
 
+    public void testHttpGet() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+        MuleMessage result = client.send("http://localhost:" + HTTP_PORT
+                                        + "/services/mycomponent/echo/text/Test String", "", props);
+        String res = result.getPayloadAsString();
+        assertTrue(res.indexOf("Test String") != -1);
+    }
 }
 
 

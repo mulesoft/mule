@@ -137,7 +137,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         throws EndpointNotFoundException, IOException
     {
         // TODO: Is there a way to make this not so ugly?       
-        String ctxUri = eventContext.getEndpointURI().getPath();
+        String ctxUri = (String) eventContext.getMessage().getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
         String wsdlUri = getWsdlUri(eventContext, req);
         String serviceUri = wsdlUri.substring(0, wsdlUri.indexOf('?'));
         
@@ -187,8 +187,8 @@ public class CxfServiceComponent implements Callable, Lifecycle
     {
         EndpointURI epUri = eventContext.getEndpointURI();
         String host = (String) eventContext.getMessage().getProperty("Host", epUri.getHost());
-        
-        return epUri.getScheme() + "://" + host + reqPath;
+        String ctx = (String) eventContext.getMessage().getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        return epUri.getScheme() + "://" + host + ctx;
     }
     
     protected Object sendToDestination(MuleEventContext ctx) throws MuleException, IOException
@@ -205,7 +205,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
                 m.put(Message.CONTENT_TYPE, ct);
             }
             
-            String path = (String) muleReqMsg.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+            String path = (String) muleReqMsg.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
             if (path == null) 
             {
                 path = "";
@@ -215,7 +215,8 @@ public class CxfServiceComponent implements Callable, Lifecycle
             {
                 m.put(Message.HTTP_REQUEST_METHOD, method);
                 m.put(Message.PATH_INFO, path);
-                m.put(Message.BASE_PATH, ctx.getEndpointURI().getPath());
+                Object basePath = muleReqMsg.getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+                m.put(Message.BASE_PATH, basePath);
                 
                 method = method.toUpperCase();
             }

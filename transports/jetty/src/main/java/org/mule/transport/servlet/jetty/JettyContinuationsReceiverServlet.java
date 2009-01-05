@@ -41,7 +41,7 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
             requestMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
             //This will allow Mule to continue the response once the service has do its processing
             requestMessage.setReplyTo(continuation);
-            setupRequestMessage(request, requestMessage);
+            setupRequestMessage(request, requestMessage, receiver);
 
             //we force asynchronous in the {@link #routeMessage} method
             routeMessage(receiver, requestMessage, request);

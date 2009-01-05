@@ -69,7 +69,22 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_VERSION_PROPERTY = HTTP_PREFIX + "version";
     public static final String HTTP_CUSTOM_HEADERS_MAP_PROPERTY = HTTP_PREFIX + "custom.headers";
     public static final String HTTP_METHOD_PROPERTY = HTTP_PREFIX + "method";
+    
+    /**
+     * The path and query portions of the URL being accessed. 
+     */
     public static final String HTTP_REQUEST_PROPERTY = HTTP_PREFIX + "request";
+    
+    /**
+     * The path portion of the URL being accessed. No query string is included.
+     */
+    public static final String HTTP_REQUEST_PATH_PROPERTY = HTTP_PREFIX + "request.path";
+    
+    /**
+     * The context path of the endpoint being accessed. This is the path that the 
+     * HTTP endpoint is listening on.
+     */
+    public static final String HTTP_CONTEXT_PATH_PROPERTY = HTTP_PREFIX + "context.path";
 
     /**
      * Allows the user to set a {@link org.apache.commons.httpclient.params.HttpMethodParams} object in the client
@@ -363,4 +378,18 @@ public class HttpConnector extends TcpConnector
         }
     }
 
+    /**
+     * Ensures that the supplied URL starts with a '/'.
+     * @param url
+     * @return
+     */
+    public static String normalizeUrl(String url)
+    {
+        if (url == null) {
+            url = "/";
+        } else if (!url.startsWith("/")) {
+            url = "/" + url;
+        }
+        return url;
+    }
 }

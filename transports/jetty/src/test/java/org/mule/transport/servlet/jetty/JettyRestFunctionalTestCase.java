@@ -15,6 +15,14 @@ import org.mule.transport.http.functional.HttpFunctionalTestCase;
 public class JettyRestFunctionalTestCase extends HttpFunctionalTestCase
 {
     @Override
+    protected void doSetUp() throws Exception
+    {
+        checkPathProperties = false;
+        
+        super.doSetUp();
+    }
+
+    @Override
     protected String getConfigResources()
     {
         return "jetty-rest-functional-test.xml";
