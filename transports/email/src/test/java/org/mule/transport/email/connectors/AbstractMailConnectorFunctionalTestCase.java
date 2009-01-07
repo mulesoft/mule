@@ -98,7 +98,14 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     {
         if (null != servers)
         {
-            servers.stop();
+            try
+            {
+                servers.stop();
+            } 
+            catch (RuntimeException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
