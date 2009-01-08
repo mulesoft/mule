@@ -15,7 +15,6 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.transport.http.HttpMessageReceiver;
 import org.mule.transport.servlet.MuleReceiverServlet;
-import org.mule.util.MapUtils;
 import org.mule.util.StringUtils;
 
 import javax.servlet.ServletConfig;
