@@ -13,11 +13,10 @@ package org.mule.transport.servlet.jetty;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
-import org.mule.routing.filters.WildcardFilter;
+import org.mule.transport.http.HttpMessageReceiver;
 import org.mule.transport.servlet.MuleReceiverServlet;
+import org.mule.util.MapUtils;
 import org.mule.util.StringUtils;
-
-import java.util.Iterator;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -45,25 +44,19 @@ public class JettyReceiverServlet extends MuleReceiverServlet
     protected MessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
         throws EndpointException
     {
-        String key = httpServletRequest.getLocalPort() + httpServletRequest.getPathInfo();
+        String key = httpServletRequest.getPathInfo();
 
         MessageReceiver receiver = (MessageReceiver)receivers.get(key);
         if (receiver == null)
         {
-            for (Iterator iterator = receivers.keySet().iterator(); iterator.hasNext();)
-            {
-                String s = (String) iterator.next();
-                if(new WildcardFilter(s).accept(key))
-                {
-                    receiver = (MessageReceiver)receivers.get(s);
-                    break;
-                }
-            }
-            if (receiver == null)
-            {
-                throw new NoReceiverForEndpointException(httpServletRequest.getPathInfo());
-            }
+            receiver = HttpMessageReceiver.findReceiverByStem(receivers, key);
         }
+        
+        if (receiver == null)
+        {
+            throw new NoReceiverForEndpointException(httpServletRequest.getPathInfo());
+        }
+        
         return receiver;
     }
 
@@ -84,6 +77,6 @@ public class JettyReceiverServlet extends MuleReceiverServlet
         {
             key = "/";
         }
-        return receiver.getEndpointURI().getPort() + key;
+        return key;
     }
 }

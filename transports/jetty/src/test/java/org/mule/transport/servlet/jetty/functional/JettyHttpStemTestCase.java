@@ -27,29 +27,15 @@ public class JettyHttpStemTestCase extends FunctionalTestCase
     public void testStemMatchingHttp() throws Exception
     {
         MuleClient client = new MuleClient();
-        doTest(client, "http://localhost:60200/foo");
-        doTest(client, "http://localhost:60200/foo/bar");
+        doTest(client, "http://localhost:60200/foo", "Hello World");
+        doTest(client, "http://localhost:60200/foo/bar", "Hello World");
+        doTest(client, "http://localhost:60200/foo/bestmatch", "Hello World Best Match");
     }
 
-    public void testStemMatchingWthoutWildcards() throws Exception
-    {
-        MuleClient client = new MuleClient();
-        doTest(client, "http://localhost:60202/foo");
-        try
-        {
-            doTest(client, "http://localhost:60202/foo/bar");
-            fail("endpoint not using a wildcard, the request should not be matched");
-        }
-        catch (Throwable e)
-        {
-            //Expected
-        }
-    }
-
-    protected void doTest(MuleClient client, String url) throws Exception
+    protected void doTest(MuleClient client, String url, String value) throws Exception
     {
         MuleMessage result = client.send(url, "Hello", null);
-        assertEquals("Hello World", result.getPayloadAsString());
+        assertEquals(value, result.getPayloadAsString());
         assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
 

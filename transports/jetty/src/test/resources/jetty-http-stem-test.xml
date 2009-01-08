@@ -15,16 +15,24 @@
     <model name="main">
         <service name="httpIn">
             <inbound>
-                <jetty:inbound-endpoint address="http://localhost:60200/foo*" synchronous="true"/>
+                <jetty:inbound-endpoint address="http://localhost:60200/foo" synchronous="true"/>
             </inbound>
             <test:component appendString=" World"/>
         </service>
 
-        <service name="httpInNoWildcard">
+        <service name="httpBestMatch">
             <inbound>
-                <jetty:inbound-endpoint address="http://localhost:60202/foo" synchronous="true"/>
+                <jetty:inbound-endpoint address="http://localhost:60200/foo/bestmatch" synchronous="true"/>
             </inbound>
-            <test:component appendString=" World"/>
+            <test:component appendString=" World Best Match"/>
         </service>
+        
+        <service name="httpDifferentPort">
+            <inbound>
+                <jetty:inbound-endpoint address="http://localhost:60202/foo/bestmatch" synchronous="true"/>
+            </inbound>
+            <test:component appendString=" World Best Match 2"/>
+        </service>
+        
     </model>
 </mule>
