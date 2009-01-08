@@ -131,7 +131,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 
         // Let mule finish up with the rest of the messages until seda queue is empty
         muleContext.start();
-        Thread.sleep(WAIT_TIME_MILLIS * 8);
+        Thread.sleep(WAIT_TIME_MILLIS * 14);
         muleContext.stop();
 
         assertNoLostMessages(NUM_MESSAGES, service);
