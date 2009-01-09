@@ -29,7 +29,7 @@ public class ConnectNotifier implements RetryNotifier
      */
     protected transient final Log logger = LogFactory.getLog(ConnectNotifier.class);
 
-    public void sucess(RetryContext context)
+    public void onSuccess(RetryContext context)
     {
         if (logger.isDebugEnabled())
         {
@@ -39,7 +39,7 @@ public class ConnectNotifier implements RetryNotifier
         fireConnectNotification(ConnectionNotification.CONNECTION_CONNECTED, context.getDescription());
     }
 
-    public void failed(RetryContext context, Throwable e)
+    public void onFailure(RetryContext context, Throwable e)
     {
         fireConnectNotification(ConnectionNotification.CONNECTION_FAILED, context.getDescription());
 

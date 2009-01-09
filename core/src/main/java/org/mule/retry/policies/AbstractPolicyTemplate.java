@@ -51,7 +51,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
                     callback.doWork(context);
                     if (notifier != null)
                     {
-                        notifier.sucess(context);
+                        notifier.onSuccess(context);
                     }
                     break;
                 }
@@ -64,7 +64,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
                     }
                     if (notifier != null)
                     {
-                        notifier.failed(context, cause);
+                        notifier.onFailure(context, cause);
                     }
                     if (cause instanceof InterruptedException || cause instanceof InterruptedIOException)
                     {

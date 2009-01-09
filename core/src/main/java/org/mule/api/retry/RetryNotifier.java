@@ -17,8 +17,8 @@ package org.mule.api.retry;
 public interface RetryNotifier
 {
     /** Called each time a retry attempt fails. */
-    public void failed(RetryContext context, Throwable e);
+    public void onFailure(RetryContext context, Throwable e);
 
     /** Called when a retry attempt finally suceeds. */
-    public void sucess(RetryContext context);
+    public void onSuccess(RetryContext context);
 }
