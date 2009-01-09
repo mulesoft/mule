@@ -98,7 +98,7 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
         }
         catch (MuleException e)
         {
-            connector.handleException(e);
+            handleException(e);
             return null;
         }
     }

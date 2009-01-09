@@ -340,7 +340,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
                     logger.warn("Request was made but was not authenticated: " + e.getMessage(), e);
                     connector.fireNotification(new SecurityNotification(e,
                             SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                    connector.handleException(e);
+                    handleException(e);
                     resultMessage = RequestContext.getEvent().getMessage();
                 }
             }

@@ -181,7 +181,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             }
             catch (Exception e)
             {
-                connector.handleException(e);
+                handleException(e);
             }
             finally
             {

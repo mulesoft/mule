@@ -37,7 +37,7 @@ public class PollingReceiverWorkerSchedule implements Runnable
         }
         catch (Exception e)
         {
-            receiver.getConnector().handleException(e);
+            receiver.handleException(e);
         }
     }
 
