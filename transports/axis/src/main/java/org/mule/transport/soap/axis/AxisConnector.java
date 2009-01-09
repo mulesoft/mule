@@ -365,7 +365,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         // info directly without appending a service name
         String endpoint;
         String scheme = ep.getScheme().toLowerCase();
-        if (scheme.equals("jms") || scheme.equals("vm"))
+        if (scheme.equals("jms") || scheme.equals("vm") || scheme.equals("servlet"))
         {
             endpoint = ep.toString();
         }

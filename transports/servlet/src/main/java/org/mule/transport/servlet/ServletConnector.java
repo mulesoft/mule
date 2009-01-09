@@ -11,7 +11,10 @@
 package org.mule.transport.servlet;
 
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpsConnector;
@@ -93,8 +96,9 @@ public class ServletConnector extends AbstractConnector
         this.servletUrl = servletUrl;
     }
 
-//    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
-//    {
-//        return service.getName();
-//    }
+    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
+    {
+        EndpointURI uri = endpoint.getEndpointURI();
+        return uri.getAddress() + uri.getPath();
+    }
 }

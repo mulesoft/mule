@@ -28,6 +28,13 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
         }
     }
 
+    @Override
+    public void testRequestResponse() throws Throwable
+    {
+        // TODO Auto-generated method stub
+        super.testRequestResponse();
+    }
+
     public String getConfigResources()
     {
         return "axis-" + getTransportProtocol() + "-mule-config.xml";

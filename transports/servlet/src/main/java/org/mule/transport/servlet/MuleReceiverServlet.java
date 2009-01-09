@@ -32,7 +32,6 @@ import org.mule.transport.servlet.i18n.ServletMessages;
 import org.mule.util.PropertiesUtils;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -303,51 +302,13 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
         if (receiver == null)
         {
-            // Nothing found lets try stripping the path and only use the last
-            // path element
-            int i = uri.lastIndexOf("/");
-            if (i > -1)
-            {
-                String tempUri = uri.substring(i + 1);
-                receiver = (AbstractMessageReceiver) getReceivers().get(tempUri);
-            }
-
+            receiver = (AbstractMessageReceiver) getReceivers().get(uri);
+            
             // Lets see if the uri matches up with the last part of
             // any of the receiver keys.
             if (receiver == null)
             {
                 receiver = HttpMessageReceiver.findReceiverByStem(connector.getReceivers(), uri);
-            }
-
-            // This is some bizarre piece of code so the XFire Servlet code works.
-            // We should remove this at some point (see XFireWsdlCallTestCase for a failure
-            // if this code is removed).
-            if (receiver == null)
-            {
-                receiver = HttpMessageReceiver.findReceiverByStem(connector.getReceivers(), uri);
-            }
-
-            // This is some bizarre piece of code so the XFire Servlet code works.
-            // We should remove this at some point (see XFireWsdlCallTestCase for a failure
-            // if this code is removed).
-            if (receiver == null)
-            {
-                Map receivers = getReceivers();
-                Iterator iter = receivers.keySet().iterator();
-                while (iter.hasNext())
-                {
-                    String key = iter.next().toString();
-                    i = key.lastIndexOf("/");
-                    if (i > -1)
-                    {
-                        String key2 = key.substring(i + 1);
-                        if (key2.equals(uri))
-                        {
-                            receiver = (AbstractMessageReceiver) receivers.get(key);
-                            break;
-                        }
-                    }
-                }
             }
 
             if (receiver == null)
