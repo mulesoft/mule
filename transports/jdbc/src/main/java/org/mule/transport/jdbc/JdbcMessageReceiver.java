@@ -20,14 +20,12 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransactionFactory;
-import org.mule.transport.ConnectException;
 import org.mule.transport.TransactedPollingMessageReceiver;
 import org.mule.transport.jdbc.i18n.JdbcMessages;
 import org.mule.util.ArrayUtils;
 import org.mule.util.MapUtils;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,17 +101,13 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         {
             con = this.connector.getConnection();
         }
-        catch (Exception e)
-        {
-            throw new ConnectException(e, this);
-        }
         finally
         {
             JdbcUtils.close(con);
         }
     }
 
-    protected void doDisconnect() throws ConnectException
+    protected void doDisconnect() throws Exception
     {
         // noop
     }
@@ -178,14 +172,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         Connection con = null;
         try
         {
-            try
-            {
-                con = this.connector.getConnection();
-            }
-            catch (SQLException e)
-            {
-                throw new ConnectException(e, this);
-            }
+            con = this.connector.getConnection();
 
             Object[] readParams = connector.getParams(endpoint, this.readParams, null, this.endpoint.getEndpointURI().getAddress());
             if (logger.isDebugEnabled())

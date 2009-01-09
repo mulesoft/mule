@@ -24,6 +24,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
+import org.mule.transport.ConnectException;
 import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.sqlstrategy.SqlStatementStrategyFactory;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
@@ -214,7 +215,16 @@ public class JdbcConnector extends AbstractConnector
             }
         }
         logger.debug("Retrieving new connection from data source");
-        Connection con = dataSource.getConnection();
+        
+        Connection con;
+        try
+        {
+            con = dataSource.getConnection();
+        }
+        catch (Exception e)
+        {
+            throw new ConnectException(e, this);
+        }
 
         if (tx != null)
         {
@@ -338,7 +348,17 @@ public class JdbcConnector extends AbstractConnector
 
     protected void doConnect() throws Exception
     {
-        // template method
+        // Simply verify that we are able to connect to the DataSource (needed for retry policies)
+        Connection con;
+        try
+        {
+            con = getConnection();
+            if (con != null) con.close();
+        }
+        finally
+        {
+            con = null;
+        }
     }
 
     protected void doDisconnect() throws Exception
