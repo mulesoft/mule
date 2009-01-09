@@ -429,42 +429,30 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
     }
 
-    protected void doConnect() throws ConnectException
+    @Override
+    protected void doConnect() throws Exception
     {
-        try
+        if (jmsSupport == null)
         {
-            if (jmsSupport == null)
+            if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification))
             {
-                if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification))
-                {
-                    jmsSupport = new Jms102bSupport(this);
-                }
-                else
-                {
-                    jmsSupport = new Jms11Support(this);
-                }
+                jmsSupport = new Jms102bSupport(this);
             }
-        }
-        catch (Exception e)
-        {
-            throw new ConnectException(CoreMessages.failedToCreate("Jms Connector"), e, this);
+            else
+            {
+                jmsSupport = new Jms11Support(this);
+            }
         }
 
-        try
+        connection = createConnection();
+        if (started.get())
         {
-            connection = createConnection();
-            if (started.get())
-            {
-                connection.start();
-            }
-        }
-        catch (Exception e)
-        {
-            throw new ConnectException(e, this);
+            connection.start();
         }
     }
 
-    protected void doDisconnect() throws ConnectException
+    @Override
+    protected void doDisconnect() throws Exception
     {
         try
         {
@@ -472,10 +460,6 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             {
                 connection.close();
             }
-        }
-        catch (Exception e)
-        {
-            throw new ConnectException(e, this);
         }
         finally
         {
@@ -521,13 +505,13 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         return null;
     }
 
-    public Session getSession(ImmutableEndpoint endpoint) throws ConnectException, JMSException
+    public Session getSession(ImmutableEndpoint endpoint) throws JMSException
     {
         final boolean topic = getTopicResolver().isTopic(endpoint);
         return getSession(endpoint.getTransactionConfig().isTransacted(), topic);
     }
 
-    public Session getSession(boolean transacted, boolean topic) throws ConnectException, JMSException
+    public Session getSession(boolean transacted, boolean topic) throws JMSException
     {
         Session session = getSessionFromTransaction();
         if (session != null)
@@ -716,7 +700,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         catch (JMSException e)
         {
-            logger.error("Failed to close jms session consumer", e);
+            logger.warn("Failed to close jms session consumer", e);
         }
     }
 
@@ -748,7 +732,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         catch (JMSException e)
         {
-            if (logger.isErrorEnabled())
+            if (logger.isWarnEnabled())
             {
                 String queueName = "";
                 try
@@ -759,7 +743,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                 {
                     // ignore, we are just trying to get the queue name
                 }
-                logger.info(MessageFormat.format(
+                logger.warn(MessageFormat.format(
                         "Faled to delete a temporary queue '{0}' Reason: {1}",
                         queueName, e.getMessage()));
             }
@@ -794,7 +778,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         catch (JMSException e)
         {
-            if (logger.isErrorEnabled())
+            if (logger.isWarnEnabled())
             {
                 String topicName = "";
                 try
@@ -805,7 +789,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                 {
                     // ignore, we are just trying to get the topic name
                 }
-                logger.error("Faled to delete a temporary topic " + topicName, e);
+                logger.warn("Faled to delete a temporary topic " + topicName, e);
             }
         }
     }
