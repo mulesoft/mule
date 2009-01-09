@@ -353,7 +353,10 @@ public class JdbcConnector extends AbstractConnector
         try
         {
             con = getConnection();
-            if (con != null) con.close();
+            if (con != null)
+            {
+                con.close();
+            }
         }
         finally
         {
