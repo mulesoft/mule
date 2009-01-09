@@ -36,7 +36,10 @@ import org.apache.log4j.Logger;
 public  class SelectSqlStatementStrategy
     implements SqlStatementStrategy
 {
-    protected transient Logger logger = Logger.getLogger(getClass());
+
+    protected static Logger logger = Logger.getLogger(SelectSqlStatementStrategy.class);
+
+
 
     public MuleMessage executeStatement(JdbcConnector connector,
             ImmutableEndpoint endpoint,MuleEvent event,long timeout) throws Exception
@@ -81,9 +84,9 @@ public  class SelectSqlStatementStrategy
                     event!=null ? event.getMessage() : null,
                     endpoint.getEndpointURI().getAddress());
                 
-                if (logger.isInfoEnabled())
+                if (logger.isDebugEnabled())
                 {
-                    logger.info("SQL QUERY: " + readStmt + ", params = " + ArrayUtils.toString(params));
+                    logger.debug("SQL QUERY: " + readStmt + ", params = " + ArrayUtils.toString(params));
                 }
 
                 //Perform actual query
@@ -119,9 +122,9 @@ public  class SelectSqlStatementStrategy
             if (ackStmt != null)
             {
                 Object[] params = connector.getParams(endpoint, ackParams, new DefaultMuleMessage(result, (Map)null), ackStmt);
-                if (logger.isInfoEnabled())
+                if (logger.isDebugEnabled())
                 {
-                    logger.info("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(params));
+                    logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(params));
                 }
                 int nbRows = connector.getQueryRunner().update(con, ackStmt, params);
                 if (nbRows != 1)
