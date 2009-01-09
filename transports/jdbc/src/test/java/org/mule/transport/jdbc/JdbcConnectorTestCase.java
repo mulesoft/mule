@@ -11,8 +11,8 @@
 package org.mule.transport.jdbc;
 
 import org.mule.api.transport.Connector;
+import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.jdbc.JdbcConnector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,12 +21,28 @@ import org.apache.derby.jdbc.EmbeddedDataSource;
 
 public class JdbcConnectorTestCase extends AbstractConnectorTestCase
 {
-    // @Override
+
+    private static final String DATABASE_NAME = "embeddedDb";
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        MuleDerbyTestUtils.createDataBase(DATABASE_NAME);
+        super.doSetUp();
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        // TODO a bit weird api for test utils, refactor
+        MuleDerbyTestUtils.cleanupDerbyDb(MuleDerbyTestUtils.setDerbyHome(), DATABASE_NAME);
+    }
+    @Override
     public Connector createConnector() throws Exception
     {
         JdbcConnector c = new JdbcConnector();
         EmbeddedDataSource embeddedDS = new EmbeddedDataSource();
-        embeddedDS.setDatabaseName("embeddedDB");
+        embeddedDS.setDatabaseName(DATABASE_NAME);
         c.setName("JdbcConnector");
         c.setDataSource(embeddedDS);
         c.setPollingFrequency(1000);
