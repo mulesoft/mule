@@ -89,12 +89,12 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
                 connector.fireNotification(new SecurityNotification(e,
                     SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                handleException(e);
+                connector.handleException(e);
                 return;
             }
             catch (MuleException e)
             {
-                handleException(new DispatchException(event.getMessage(), event.getEndpoint(), e));
+                connector.handleException(new DispatchException(event.getMessage(), event.getEndpoint(), e));
                 return;
             }
         }
@@ -115,7 +115,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
         catch (Exception e)
         {
-            handleException(new DispatchException(event.getMessage(), event.getEndpoint(), e));
+            connector.handleException(new DispatchException(event.getMessage(), event.getEndpoint(), e));
         }
     }
 
@@ -145,7 +145,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
                 connector.fireNotification(new SecurityNotification(e,
                     SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                handleException(e);
+                connector.handleException(e);
                 return event.getMessage();
             }
             catch (MuleException e)
@@ -277,7 +277,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             }
             catch (Exception e)
             {
-                handleException(e);
+                connector.handleException(e);
             }
         }
 

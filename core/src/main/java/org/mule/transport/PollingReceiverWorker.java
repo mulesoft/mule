@@ -53,7 +53,7 @@ public class PollingReceiverWorker implements Work
             }
             catch (Exception e)
             {
-               receiver.handleException(e);
+               receiver.getConnector().handleException(e);
             }
             finally
             {
