@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  */
 public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
 {
-    protected static Logger logger = Logger.getLogger(SelectSqlStatementStrategy.class);
+    protected transient Logger logger = Logger.getLogger(getClass());
 
     public MuleMessage executeStatement(JdbcConnector connector,
             ImmutableEndpoint endpoint, MuleEvent event,long timeout) throws Exception
@@ -61,9 +61,9 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
             con = connector.getConnection();
             
             
-            if (logger.isDebugEnabled())
+            if (logger.isInfoEnabled())
             {
-                logger.debug("SQL UPDATE: " + sql + ", params = " + ArrayUtils.toString(paramValues));
+                logger.info("SQL UPDATE: " + sql + ", params = " + ArrayUtils.toString(paramValues));
             }
             
             int nbRows = connector.getQueryRunner().update(con, sql, paramValues);
