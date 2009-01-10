@@ -1475,23 +1475,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="multi-transaction" type="multiTxType" substitutionGroup="abstract-transaction">
-        <xsd:annotation>
-            <xsd:documentation>
-                Multi-transactions allow a series of operations to be grouped together spanning multiple
-                connections of the same transport or different transports altogether (e.g. JMS and JDBC);
-                however without the overhead of XA. The trade-off is that XA
-                reliability guarantees aren't provided, and services must be ready to handle duplicates.
-                This is very similar to a 1.5 PC concept. EE-only feature.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="multiTxType">
-        <xsd:complexContent>
-            <xsd:extension base="baseTransactionType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:complexType name="transactionManagerType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransactionManagerType">
@@ -1709,6 +1692,7 @@
                 <xsd:element ref="abstract-filter" minOccurs="0"/>
                 <xsd:element ref="abstract-security-filter" minOccurs="0"/>
                 <xsd:element ref="abstract-retry-policy" minOccurs="0"/>
+                <xsd:element ref="abstract-multi-transaction" minOccurs="0"/>
                 <xsd:group ref="propertiesGroup"/>
             </xsd:sequence>
         </xsd:sequence>
