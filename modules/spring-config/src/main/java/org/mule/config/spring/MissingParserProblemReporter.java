@@ -24,7 +24,6 @@ public class MissingParserProblemReporter extends FailFastProblemReporter
 {
 
     public static final String NO_PARSER_PREFIX = "Cannot locate BeanDefinitionParser";
-    protected static final String MULTI_TRANSACTION_CONFIG_ELEMENT = "multi-transaction";
 
     // @Override
     public void fatal(Problem problem)
@@ -48,15 +47,6 @@ public class MissingParserProblemReporter extends FailFastProblemReporter
         try
         {
             String element = ((Element) problem.getLocation().getSource()).getLocalName();
-
-            // special handling for multi-transactin config element in CE
-            if (MULTI_TRANSACTION_CONFIG_ELEMENT.equals(element))
-            {
-                return new Problem("Multi-transaction support is an EE-only feature. " +
-                                   "Please consider upgrading to Mule EE.",
-                                   problem.getLocation(), problem.getParseState());
-            }
-
             String namespace = ((Element) problem.getLocation().getSource()).getNamespaceURI();
             String message = "The element '" + element + "' does not have an associated Bean Definition Parser."
                     +"  Is the module or transport associated with " + namespace + " present on the classpath?";
