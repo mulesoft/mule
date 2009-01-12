@@ -91,31 +91,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
 
     public void handleException(Exception exception)
     {
-        if (exception instanceof ConnectException)
-        {
-            logger.info("Exception caught is a ConnectException, disconnecting receiver and invoking ReconnectStrategy");
-            try
-            {
-                disconnect();
-            }
-            catch (Exception e)
-            {
-                connector.getExceptionListener().exceptionThrown(e);
-            }
-        }
-        connector.getExceptionListener().exceptionThrown(exception);
-        if (exception instanceof ConnectException)
-        {
-            try
-            {
-                logger.warn("Reconnecting after exception: " + exception.getMessage(), exception);
-                connect();
-            }
-            catch (Exception e)
-            {
-                connector.getExceptionListener().exceptionThrown(e);
-            }
-        }
+        connector.handleException(exception);
     }
 
     public boolean validate()
