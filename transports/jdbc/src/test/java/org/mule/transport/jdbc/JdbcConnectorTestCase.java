@@ -36,7 +36,9 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
     {
         // TODO a bit weird api for test utils, refactor
         MuleDerbyTestUtils.cleanupDerbyDb(MuleDerbyTestUtils.setDerbyHome(), DATABASE_NAME);
+        super.doTearDown();
     }
+    
     @Override
     public Connector createConnector() throws Exception
     {
