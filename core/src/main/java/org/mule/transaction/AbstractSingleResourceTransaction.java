@@ -13,6 +13,13 @@ package org.mule.transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.transaction.Status;
+
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -22,6 +29,13 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 public abstract class AbstractSingleResourceTransaction extends AbstractTransaction
 {
 
+    /**
+     * TX status code to human-readable string mappings.
+     *
+     * @see javax.transaction.Status
+     */
+    protected static Map<Integer, String> txStatusMappings = new HashMap<Integer, String>(10); // populated later
+
     protected volatile Object key;
     protected volatile Object resource;
 
@@ -29,6 +43,24 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     protected final AtomicBoolean committed = new AtomicBoolean(false);
     protected final AtomicBoolean rolledBack = new AtomicBoolean(false);
     protected final AtomicBoolean rollbackOnly = new AtomicBoolean(false);
+
+    static
+    {
+        Field[] fields = Status.class.getFields();
+        for (Field field : fields)
+        {
+            try
+            {
+                txStatusMappings.put(field.getInt(Status.class), field.getName());
+            }
+            catch (IllegalAccessException e)
+            {
+                // ignore
+            }
+        }
+
+        txStatusMappings = Collections.unmodifiableMap(txStatusMappings);
+    }
 
     public void begin() throws TransactionException
     {
@@ -125,9 +157,18 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
         {
             status = -1;
         }
+
+        // map status to a human-readable string
+
+        String statusName = txStatusMappings.get(status);
+        if (statusName == null)
+        {
+            statusName = "*undefined*";
+        }
+
         return new StringBuilder().append(getClass().getName())
                 .append('@').append(System.identityHashCode(this))
-                .append("[status=").append(status == -1 ? "*undefined*" : status)
+                .append("[status=").append(statusName)
                 .append(", key=").append(key)
                 .append(", resource=").append(resource)
                 .append("]").toString();
