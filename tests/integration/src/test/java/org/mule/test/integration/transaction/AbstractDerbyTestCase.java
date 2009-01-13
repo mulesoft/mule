@@ -11,8 +11,8 @@
 package org.mule.test.integration.transaction;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.jdbc.JdbcUtils;
-import org.mule.transport.jdbc.util.MuleDerbyUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -28,9 +28,9 @@ public abstract class AbstractDerbyTestCase extends FunctionalTestCase
 
     protected void suitePreSetUp() throws Exception
     {
-        String dbName = MuleDerbyUtils.loadDatabaseName("derby.properties", "database.name");
+        String dbName = MuleDerbyTestUtils.loadDatabaseName("derby.properties", "database.name");
     
-        MuleDerbyUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
+        MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
         connectionString = "jdbc:derby:" + dbName;
     
         super.suitePreSetUp();

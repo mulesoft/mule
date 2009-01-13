@@ -12,9 +12,9 @@ package org.mule.transport.jdbc.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcUtils;
-import org.mule.transport.jdbc.util.MuleDerbyUtils;
 
 import java.sql.Connection;
 import java.util.List;
@@ -94,7 +94,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
     // @Override
     protected void suitePreSetUp() throws Exception
     {
-        MuleDerbyUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
+        MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
         super.suitePreSetUp();
     }
 
