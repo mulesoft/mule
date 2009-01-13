@@ -91,6 +91,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -683,11 +684,9 @@ public abstract class AbstractConnector
      */
     public void handleException(Exception exception)
     {
-        boolean retry = 
-            exception instanceof ConnectException 
-            && !(retryPolicyTemplate instanceof NoRetryPolicyTemplate);
-            
-        if (retry)
+        if (isConnected() &&
+            exception instanceof ConnectException &&      
+            !(retryPolicyTemplate instanceof NoRetryPolicyTemplate))
         {
             logger.info("Exception caught is a ConnectException, attempting to reconnect...");
             try
