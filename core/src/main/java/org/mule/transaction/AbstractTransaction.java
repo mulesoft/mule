@@ -173,6 +173,11 @@ public abstract class AbstractTransaction implements Transaction
         throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(this));
     }
 
+    public String getId()
+    {
+        return String.valueOf(this.hashCode());
+    }
+
     @Override
     public String toString()
     {

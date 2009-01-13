@@ -140,11 +140,6 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
         rollbackOnly.set(true);
     }
 
-    public Object getId()
-    {
-        return key;
-    }
-
     @Override
     public String toString()
     {

@@ -79,4 +79,9 @@ public interface Transaction
      * @throws TransactionException if any error
      */
     javax.transaction.Transaction suspend() throws TransactionException;
+
+    /**
+     * @return TX identification.
+     */
+    String getId();
 }

@@ -26,6 +26,10 @@ public class TransactionNotificationsTestCase extends AbstractMuleTestCase
     {
         final CountDownLatch latch = new CountDownLatch(3);
 
+        // the code is simple and deceptive :) The trick is this dummy transaction is handled by
+        // a global TransactionCoordination instance, which binds it to the current thread.
+        Transaction transaction = new DummyTransaction();
+
         muleContext.registerListener(new TransactionNotificationListener()
         {
             public void onNotification(ServerNotification notification)
@@ -51,13 +55,10 @@ public class TransactionNotificationsTestCase extends AbstractMuleTestCase
                         }
                     }
                 }
-
             }
-        });
+        }, transaction.getId());
 
-        // the code is simple and deceptive :) The trick is this dummy transaction is handled by
-        // a global TransactionCoordination instance, which binds it to the current thread.
-        Transaction transaction = new DummyTransaction();
+
         transaction.begin();
         transaction.commit();
         transaction.rollback();
@@ -68,47 +69,23 @@ public class TransactionNotificationsTestCase extends AbstractMuleTestCase
     }
 
 
-    private class DummyTransaction extends AbstractTransaction
+    private class DummyTransaction extends AbstractSingleResourceTransaction
     {
+
 
         protected void doBegin() throws TransactionException
         {
-            // nothing to do
+
         }
 
         protected void doCommit() throws TransactionException
         {
-            // nothing to do
+
         }
 
         protected void doRollback() throws TransactionException
         {
-            // nothing to do
-        }
-
-        public int getStatus() throws TransactionException
-        {
-            return 0;
-        }
-
-        public Object getResource(Object key)
-        {
-            return null;
-        }
-
-        public boolean hasResource(Object key)
-        {
-            return false;
-        }
-
-        public void bindResource(Object key, Object resource) throws TransactionException
-        {
-            // nothing to do
-        }
-
-        public void setRollbackOnly() throws TransactionException
-        {
-            // nothing to do
+            
         }
     }
 
