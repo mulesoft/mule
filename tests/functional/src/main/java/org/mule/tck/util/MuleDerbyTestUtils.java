@@ -17,10 +17,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
+
+import javax.sql.DataSource;
 
 /**
  * NOTE: Don't forget to duplicate all the changes in {@link org.mule.example.loanbroker.bpm.DbUtils}
@@ -28,6 +32,7 @@ import java.util.Properties;
 public class MuleDerbyTestUtils
 {
     private static final String DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver";
+    private static final String DERBY_DATASOURCE_CLASS = "org.apache.derby.jdbc.EmbeddedDataSource";
     
     //class cannot be instantiated
     private MuleDerbyTestUtils()
@@ -80,25 +85,81 @@ public class MuleDerbyTestUtils
         }
     }
     
+    public static void cleanupDerbyDb(String databaseName) throws IOException, SQLException
+    {
+        cleanupDerbyDb(setDerbyHome());
+    }
+    
     public static void cleanupDerbyDb(String derbySystemHome, String databaseName) throws IOException, SQLException
     {
         stopDatabase();
         FileUtils.deleteTree(new File(derbySystemHome + File.separator + databaseName));
     }
     
+    /** Start a previously created (and stopped) database */
+    public static void startDataBase(String databaseName) throws Exception
+    {
+        Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS, new Object[0]);        
+
+        Method connectMethod = derbyDriver.getClass().getMethod("connect", 
+            new Class[] { String.class, Properties.class });
+        
+        String connectionName = "jdbc:derby:" + databaseName;
+        connectMethod.invoke(derbyDriver, new Object[] { connectionName, null });
+    }
+
     public static void createDataBase(String databaseName) throws SQLException
+    {
+        createDataBase(databaseName, null);
+    }
+    
+    /**
+     * Create a new embedded database
+     * @param databaseName
+     * @param creationSql - SQL used to create and populate initial database tables
+     * @throws SQLException
+     */
+    public static void createDataBase(String databaseName, String creationSql) throws SQLException
     {
         // Do not use the EmbeddedDriver class here directly to avoid compile time references
         // on derby.jar
         try
         {
-            Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS, new Object[0]);
-            
-            Method connectMethod = derbyDriver.getClass().getMethod("connect", 
-                new Class[] { String.class, Properties.class });
-            
             String connectionName = "jdbc:derby:" + databaseName + ";create=true";
+            /*
+             * EmbeddedDriver derbyDriver = new EmbeddedDriver();
+             * derbyDriver.connect(connectionName, null);
+             */
+            Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS, new Object[0]);            
+            Method connectMethod = derbyDriver.getClass().getMethod("connect", new Class[] { String.class, Properties.class });            
             connectMethod.invoke(derbyDriver, new Object[] { connectionName, null });
+
+            if (creationSql != null)
+            {
+                /*
+                 * EmbeddedDataSource embeddedDS = new EmbeddedDataSource();
+                 * embeddedDS.setDatabaseName(databaseName);
+                 */
+                DataSource embeddedDS = (DataSource) ClassUtils.instanciateClass(DERBY_DATASOURCE_CLASS, new Object[0]);
+                Method m = embeddedDS.getClass().getMethod("setDatabaseName", new Class[] { String.class });
+                m.invoke(embeddedDS, new Object[] { databaseName });
+
+                Connection con = null;
+                try
+                {
+                    con = embeddedDS.getConnection();
+                    Statement st = con.createStatement();
+                    st.execute(creationSql);
+                    con.commit();
+                }
+                finally
+                {
+                    if (con != null && !con.isClosed())
+                    {
+                        con.close();
+                    }
+                }
+            }
         }
         catch (Exception ex)
         {
