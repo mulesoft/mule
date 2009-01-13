@@ -61,7 +61,7 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
     {
         if (resource == null)
         {
-            logger.warn(CoreMessages.noBindingResource());
+            logger.warn(CoreMessages.commitTxButNoResource(this));
             return;
         }
         
@@ -79,7 +79,7 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
     {
         if (resource == null)
         {
-            logger.warn(CoreMessages.noBindingResource());
+            logger.warn(CoreMessages.rollbackTxButNoResource(this));
             return;
         }
 

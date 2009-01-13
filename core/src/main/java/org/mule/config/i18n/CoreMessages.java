@@ -20,6 +20,7 @@ import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
+import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.MuleManifest;
 import org.mule.util.ClassUtils;
@@ -1111,6 +1112,12 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 267, clazz, transformerName);
     }
 
+    /**
+     * 
+     * @deprecated Use more specific {@link #commitTxButNoResource} or
+     * {@link #rollbackTxButNoResource}
+     */
+    @Deprecated
     public static Message noBindingResource()
     {
         return factory.createMessage(BUNDLE_PATH, 268);
@@ -1160,5 +1167,15 @@ public class CoreMessages extends MessageFactory
     public static Message propertyDoesNotExistOnObject(String property, Object object)
     {
         return factory.createMessage(BUNDLE_PATH, 277, property, object);
+    }
+
+    public static Message commitTxButNoResource(Transaction tx)
+    {
+        return factory.createMessage(BUNDLE_PATH, 300, tx);
+    }
+
+    public static Message rollbackTxButNoResource(Transaction tx)
+    {
+        return factory.createMessage(BUNDLE_PATH, 301, tx);
     }
 }
