@@ -87,7 +87,7 @@ public class MuleDerbyTestUtils
     
     public static void cleanupDerbyDb(String databaseName) throws IOException, SQLException
     {
-        cleanupDerbyDb(setDerbyHome());
+        cleanupDerbyDb(setDerbyHome(), databaseName);
     }
     
     public static void cleanupDerbyDb(String derbySystemHome, String databaseName) throws IOException, SQLException
@@ -108,9 +108,25 @@ public class MuleDerbyTestUtils
         connectMethod.invoke(derbyDriver, new Object[] { connectionName, null });
     }
 
+    /**
+     * Create a new embedded database
+     * @param databaseName
+     * @throws SQLException
+     */
     public static void createDataBase(String databaseName) throws SQLException
     {
-        createDataBase(databaseName, null);
+        createDataBase(databaseName, (String[]) null);
+    }
+
+    /**
+     * Create a new embedded database
+     * @param databaseName
+     * @param creationSql - SQL used to create and populate initial database tables
+     * @throws SQLException
+     */
+    public static void createDataBase(String databaseName, String creationSql) throws SQLException
+    {
+        createDataBase(databaseName, new String[] { creationSql } );
     }
     
     /**
@@ -119,7 +135,7 @@ public class MuleDerbyTestUtils
      * @param creationSql - SQL used to create and populate initial database tables
      * @throws SQLException
      */
-    public static void createDataBase(String databaseName, String creationSql) throws SQLException
+    public static void createDataBase(String databaseName, String[] creationSql) throws SQLException
     {
         // Do not use the EmbeddedDriver class here directly to avoid compile time references
         // on derby.jar
@@ -149,7 +165,10 @@ public class MuleDerbyTestUtils
                 {
                     con = embeddedDS.getConnection();
                     Statement st = con.createStatement();
-                    st.execute(creationSql);
+                    for (int i = 0; i < creationSql.length; ++i)
+                    {
+                        st.execute(creationSql[i]);
+                    }
                     con.commit();
                 }
                 finally
