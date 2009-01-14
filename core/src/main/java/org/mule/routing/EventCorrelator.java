@@ -34,6 +34,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,6 +52,9 @@ public class EventCorrelator
     public static final String NO_CORRELATION_ID = "no-id";
     
     public static final int MAX_PROCESSED_GROUPS = 50000;
+
+    protected static final long MILLI_TO_NANO_MULTIPLIER = 1000000L;
+
     /**
      * A map of EventGroup objects. These represent one or more messages to be
      * agregated, keyed by message id. There will be one response message for every
@@ -128,7 +132,7 @@ public class EventCorrelator
                     for (Iterator iterator = eventGroups.values().iterator(); iterator.hasNext();)
                     {
                         EventGroup group = (EventGroup) iterator.next();
-                        if ((group.getCreated() + getTimeout()) < System.currentTimeMillis())
+                        if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < Utils.nanoTime())
                         {
                             expired.add(group);
                         }
