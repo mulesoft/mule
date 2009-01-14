@@ -34,7 +34,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -108,67 +107,68 @@ public class EventCorrelator
 
     public void enableTimeoutMonitor() throws WorkException
     {
-        if (!timerStarted.get())
+        if (timerStarted.get())
         {
+            return;
+        }
 
-            this.context.getWorkManager().scheduleWork(new Work()
+        this.context.getWorkManager().scheduleWork(new Work()
+        {
+            public void release()
             {
-                public void release()
-                {
-                    //no op
-                }
+                //no op
+            }
 
 
-                public void run()
+            public void run()
+            {
+                while (true)
                 {
-                    while (true)
+                    List expired = new ArrayList(1);
+                    for (Iterator iterator = eventGroups.values().iterator(); iterator.hasNext();)
                     {
-                        List expired = new ArrayList(1);
-                        for (Iterator iterator = eventGroups.values().iterator(); iterator.hasNext();)
+                        EventGroup group = (EventGroup) iterator.next();
+                        if ((group.getCreated() + getTimeout()) < System.currentTimeMillis())
+                        {
+                            expired.add(group);
+                        }
+                    }
+                    if (expired.size() > 0)
+                    {
+                        for (Iterator iterator = expired.iterator(); iterator.hasNext();)
                         {
                             EventGroup group = (EventGroup) iterator.next();
-                            if ((group.getCreated() + getTimeout()) < System.currentTimeMillis())
-                            {
-                                expired.add(group);
-                            }
-                        }
-                        if (expired.size() > 0)
-                        {
-                            for (Iterator iterator = expired.iterator(); iterator.hasNext();)
-                            {
-                                EventGroup group = (EventGroup) iterator.next();
-                                eventGroups.remove(group.getGroupId());
-                                locks.remove(group.getGroupId());
+                            eventGroups.remove(group.getGroupId());
+                            locks.remove(group.getGroupId());
 
-                                context.fireNotification(new RoutingNotification(group.toMessageCollection(), null,
-                                        RoutingNotification.CORRELATION_TIMEOUT));
+                            context.fireNotification(new RoutingNotification(group.toMessageCollection(), null,
+                                    RoutingNotification.CORRELATION_TIMEOUT));
 
 //                            if(isFailOnTimeout())
 //                            {
-                                group.toArray()[0].getService().getExceptionListener().exceptionThrown(
-                                        new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
-                                                group.toMessageCollection()));
+                            group.toArray()[0].getService().getExceptionListener().exceptionThrown(
+                                    new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
+                                            group.toMessageCollection()));
 //                            }
 //                            else
 //                            {
 //                                //We could invoke a callback on the compoennt here or just dispatch the events??
 //                            }
-                            }
                         }
-                        try
-                        {
-                            Thread.sleep(100);
-                        }
-                        catch (InterruptedException e)
-                        {
-                            break;
-                        }
+                    }
+                    try
+                    {
+                        Thread.sleep(100);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        break;
                     }
                 }
             }
-
-            );
         }
+
+        );
     }
 
     /**
