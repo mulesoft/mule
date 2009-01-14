@@ -10,10 +10,10 @@
 
 package org.mule.routing.inbound;
 
+import org.mule.DefaultMessageCollection;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessageCollection;
 import org.mule.util.ClassUtils;
-import org.mule.DefaultMessageCollection;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
-
 import org.apache.commons.collections.IteratorUtils;
 
 /**
@@ -202,10 +201,10 @@ public class EventGroup implements Comparable, Serializable
     }
 
     /**
-     * Return the creation timestamp of the current group.
+     * Return the creation timestamp of the current group in nanoseconds.
      * 
      * @return the timestamp when this group was instantiated.
-     * @see {@link Utils#nanoTime()}
+     * @see Utils#nanoTime()
      */
     public long getCreated()
     {
