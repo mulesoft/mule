@@ -21,6 +21,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class InboundAggregationWithTimeoutTestCase extends FunctionalTestCase
 {
+
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/multi-inbound-aggregator-with-timeout.xml";
@@ -30,10 +31,11 @@ public class InboundAggregationWithTimeoutTestCase extends FunctionalTestCase
     {
         final CountDownLatch latch = new CountDownLatch(1);
 
-        muleContext.registerListener(new RoutingNotificationListener() {
+        muleContext.registerListener(new RoutingNotificationListener()
+        {
             public void onNotification(ServerNotification notification)
             {
-                if(notification.getAction() == RoutingNotification.CORRELATION_TIMEOUT)
+                if (notification.getAction() == RoutingNotification.CORRELATION_TIMEOUT)
                 {
                     latch.countDown();
                 }
@@ -42,8 +44,8 @@ public class InboundAggregationWithTimeoutTestCase extends FunctionalTestCase
 
         String message = "test";
         MuleClient client = new MuleClient();
-         client.dispatch("vm://distributor.queue", message, null);
+        client.dispatch("vm://distributor.queue", message, null);
 
-        assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+        assertTrue(latch.await(5000, TimeUnit.MILLISECONDS));
     }
 }
