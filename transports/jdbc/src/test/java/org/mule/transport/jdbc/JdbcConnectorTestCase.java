@@ -34,8 +34,7 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
     @Override
     protected void doTearDown() throws Exception
     {
-        // TODO a bit weird api for test utils, refactor
-        MuleDerbyTestUtils.cleanupDerbyDb(MuleDerbyTestUtils.setDerbyHome(), DATABASE_NAME);
+        MuleDerbyTestUtils.cleanupDerbyDb(DATABASE_NAME);
         super.doTearDown();
     }
     
