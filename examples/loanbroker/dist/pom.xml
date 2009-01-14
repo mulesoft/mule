@@ -36,6 +36,12 @@
             <artifactId>mule-module-client</artifactId>
             <version>${muleVersion}</version>
         </dependency>
+        <!-- Needed for MuleDerbyTestUtils in Loanbroker BPM -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
