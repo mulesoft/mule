@@ -87,10 +87,10 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         this.connector = (JmsConnector) umoConnector;
         this.timeout = endpoint.getTransactionConfig().getTimeout();
 
-        // If reconnection is set, default reuse strategy to false
+        // If no reconnection is configured, default reuse strategy to true
         // as some jms brokers will not detect lost connections if the
         // same consumer / session is used
-        if (retryTemplate instanceof NoRetryPolicyTemplate)
+        if (retryTemplate == null || retryTemplate instanceof NoRetryPolicyTemplate)
         {
             this.reuseConsumer = true;
             this.reuseSession = true;
