@@ -20,7 +20,6 @@
     <xsd:complexType name="sxcFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:patternFilterType">
-                <xsd:attribute name="expectedValue" type="xsd:string"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
