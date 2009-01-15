@@ -27,6 +27,7 @@ import org.mule.util.MapUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /** TODO */
@@ -42,6 +43,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
     protected List readParams;
     protected List ackParams;
     public boolean receiveMessagesInXaTransaction = false;
+    private volatile boolean aggregateResult;
     
     public JdbcMessageReceiver(Connector connector,
                                Service service,
@@ -96,15 +98,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 
     protected void doConnect() throws Exception
     {
-        Connection con = null;
-        try
-        {
-            con = this.connector.getConnection();
-        }
-        finally
-        {
-            JdbcUtils.close(con);
-        }
+        // template method
     }
 
     protected void doDisconnect() throws Exception
@@ -123,15 +117,41 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             MuleMessage umoMessage = new DefaultMuleMessage(msgAdapter);
             if (this.ackStmt != null)
             {
-                Object[] ackParams = connector.getParams(endpoint, this.ackParams, umoMessage, this.endpoint.getEndpointURI().getAddress());
-                if (logger.isDebugEnabled())
+                if (aggregateResult)
                 {
-                    logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(ackParams));
+                    List rows = (List) message;
+                    Object[][] paramValuesArray = new Object[rows.size()][];
+
+                    HashMap record;
+                    for (int i = 0; i <  rows.size(); i++)
+                    {
+                        record = (HashMap) rows.get(i);
+                        paramValuesArray[i] = connector.getParams(endpoint, this.ackParams, new DefaultMuleMessage(record), this.endpoint.getEndpointURI().getAddress());
+                    }
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(ackParams));
+                    }
+                    int[] nbRows = connector.getQueryRunner().batch(con, this.ackStmt, paramValuesArray);
+                    if (nbRows[0] == 0)
+                    {
+                        logger.warn(".ack statement did not update any rows");
+                    }
+                    // Reset this flag
+                    aggregateResult = false;
                 }
-                int nbRows = connector.getQueryRunner().update(con, this.ackStmt, ackParams);
-                if (nbRows != 1)
+                else
                 {
-                    logger.warn("Row count for ack should be 1 and not " + nbRows);
+                    Object[] paramValues = connector.getParams(endpoint, this.ackParams, umoMessage, this.endpoint.getEndpointURI().getAddress());
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(paramValues));
+                    }
+                    int nbRows = connector.getQueryRunner().update(con, this.ackStmt, paramValues);
+                    if (nbRows == 0)
+                    {
+                        logger.warn(".ack statement did not update any rows");
+                    }
                 }
             }
             routeMessage(umoMessage, tx, tx != null || endpoint.isSynchronous());
@@ -185,6 +205,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             List resultList = (List) results;
             if (resultList != null && resultList.size() > 1 && isReceiveMessagesInTransaction() && !receiveMessagesInXaTransaction)
             {
+                aggregateResult = true;
                 logger.warn(JdbcMessages.moreThanOneMessageInTransaction(RECEIVE_MESSAGE_IN_TRANSCTION, RECEIVE_MESSAGES_IN_XA_TRANSCTION));
                 List singleResultList = new ArrayList(1);
                 singleResultList.add(resultList);
