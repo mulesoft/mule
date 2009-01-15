@@ -90,7 +90,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         // If reconnection is set, default reuse strategy to false
         // as some jms brokers will not detect lost connections if the
         // same consumer / session is used
-        if (retryTemplate != null && retryTemplate instanceof NoRetryPolicyTemplate)
+        if (retryTemplate instanceof NoRetryPolicyTemplate)
         {
             this.reuseConsumer = true;
             this.reuseSession = true;
