@@ -92,9 +92,9 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 handleException(e);
                 return;
             }
-            catch (MuleException e)
+            catch (Exception e)
             {
-                handleException(new DispatchException(event.getMessage(), event.getEndpoint(), e));
+                handleException(e);
                 return;
             }
         }
@@ -115,7 +115,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
         catch (Exception e)
         {
-            handleException(new DispatchException(event.getMessage(), event.getEndpoint(), e));
+            handleException(e);
         }
     }
 
@@ -148,9 +148,9 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 handleException(e);
                 return event.getMessage();
             }
-            catch (MuleException e)
+            catch (Exception e)
             {
-                disposeAndLogException();
+                handleException(e);
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
         }
@@ -177,12 +177,12 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
         catch (DispatchException e)
         {
-            disposeAndLogException();
+            handleException(e);
             throw e;
         }
         catch (Exception e)
         {
-            disposeAndLogException();
+            handleException(e);
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
     }
