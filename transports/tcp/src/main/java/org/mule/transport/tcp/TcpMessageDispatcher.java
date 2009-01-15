@@ -55,6 +55,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     protected synchronized MuleMessage doSend(MuleEvent event) throws Exception
     {
         Socket socket = connector.getSocket(event.getEndpoint());
+        socket.setTcpNoDelay(true);
         dispatchToSocket(socket, event);
 
         try 

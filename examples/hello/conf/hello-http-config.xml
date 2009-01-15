@@ -57,14 +57,24 @@
         -->
         <service name="GreeterUMO">
             <inbound>
-                <!-- Incoming HTTP requests -->
+                <!-- 
+                  Incoming HTTP requests
+                  
+                  Note: the REST endpoint currently only works on the servlet transport only
+                  since the HttpRequestToParameter transformer only supports servlets.
+                 -->
                 <inbound-endpoint address="http://localhost:8888" transformer-refs="HttpRequestToNameString" synchronous="true">
                     <not-filter>
                         <wildcard-filter pattern="/favicon.ico"/>   
                     </not-filter>
                 </inbound-endpoint>
-
+                
                 <!-- Incoming Servlet requests -->
+                <inbound-endpoint address="servlet://name" transformer-refs="HttpRequestToNameString" synchronous="true">
+                    <not-filter>
+                        <wildcard-filter pattern="/favicon.ico"/>   
+                    </not-filter>
+                </inbound-endpoint>
                 <inbound-endpoint address="servlet://rest" transformer-refs="HttpRequestToParameter StringToNameString" responseTransformer-refs="PlainTextResponseTransformer" synchronous="true"/>
 
                 <!-- Incoming VM requests -->

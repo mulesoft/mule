@@ -503,7 +503,13 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             requestUri.append(endpoint.getProtocol()).append("://");
             requestUri.append(endpoint.getEndpointURI().getHost());
             requestUri.append(':').append(endpoint.getEndpointURI().getPort());
+            
+            if (!"/".equals(path)) {
+                requestUri.append(path);
+            }
         }
+        
+        String uriStr = requestUri.toString();
         // first check that there is a receiver on the root address
         if (logger.isTraceEnabled())
         {
@@ -511,32 +517,17 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     + requestUri.toString());
         }
 
-        MessageReceiver receiver = connector.lookupReceiver(requestUri.toString());
+        MessageReceiver receiver = connector.lookupReceiver(uriStr);
 
         // If no receiver on the root and there is a request path, look up the
         // received based on the root plus request path
         if (receiver == null && !"/".equals(path))
         {
-            // remove anything after the last '/'
-            int x = path.lastIndexOf('/');
-            if (x > 1 && path.indexOf('.') > x)
-            {
-                requestUri.append(path.substring(0, x));
-            }
-            else
-            {
-                requestUri.append(path);
-            }
-
             if (logger.isDebugEnabled())
             {
                 logger.debug("Secondary lookup of receiver on connector: " + connector.getName()
                         + " with URI key: " + requestUri.toString());
             }
-
-            // try again
-            String uriStr = requestUri.toString();
-            receiver = connector.lookupReceiver(uriStr);
 
             if (receiver == null)
             {
