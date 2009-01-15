@@ -81,7 +81,10 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
         {
             Object proxy = Proxy.newProxyInstance(getInterface().getClassLoader(), new Class[]{getInterface()},
                 new BindingInvocationHandler(this));
-            logger.debug("Have proxy?: " + (null != proxy));
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Have proxy?: " + (null != proxy));
+            }
             return proxy;
 
         }
