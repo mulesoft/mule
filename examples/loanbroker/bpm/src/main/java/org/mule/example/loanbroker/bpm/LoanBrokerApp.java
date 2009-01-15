@@ -25,7 +25,16 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
 
     public static void main(String[] args) throws Exception
     {
-        LoanBrokerApp loanBrokerApp = new LoanBrokerApp("loan-broker-bpm-mule-config.xml");
+        String configFile = "loan-broker-bpm-mule-config.xml";
+    
+        if (args != null && args.length > 0 
+            // This is a hack for MULE-4082 which assumes that if the parameter is a 
+            // Mule config file, it will contain a "." in the name
+            && args[0].contains("."))
+        {
+            configFile = args[0];
+        }
+        LoanBrokerApp loanBrokerApp = new LoanBrokerApp(configFile);
         loanBrokerApp.run(false);
     }
 
