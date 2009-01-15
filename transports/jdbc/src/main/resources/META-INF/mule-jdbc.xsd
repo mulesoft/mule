@@ -77,6 +77,14 @@
                                                 </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="transactionPerMessage" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        Should each DB record be received in a separate transaction or should there be a single transaction for the entire ResultSet?  default = true
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

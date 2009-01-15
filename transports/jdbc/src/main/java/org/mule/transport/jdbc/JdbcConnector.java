@@ -70,6 +70,10 @@ public class JdbcConnector extends AbstractConnector
     protected DataSource dataSource;
     protected ResultSetHandler resultSetHandler;
     protected QueryRunner queryRunner;
+    /** 
+     * Should each DB record be received in a separate transaction or should 
+     * there be a single transaction for the entire ResultSet? 
+     */
     protected boolean transactionPerMessage = true;
 
     protected void doInitialise() throws InitialisationException
