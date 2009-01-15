@@ -67,11 +67,18 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
             }
             
             int nbRows = connector.getQueryRunner().update(con, sql, paramValues);
-            
-            if (nbRows != 1)
+            if (logger.isInfoEnabled())
             {
-                logger.warn("Row count for write should be 1 and not " + nbRows);
+                logger.info("Executing SQL statement: " + nbRows + " row(s) updated");
             }
+            
+            // TODO Why should it always be 1?  Can't we update more than one row at a time with
+            // an update statement?  Or no rows depending on the contents of the table and/or 
+            // parameters?
+            //if (nbRows != 1)
+            //{
+            //    logger.warn("Row count for write should be 1 and not " + nbRows);
+            //}
             if (tx == null)
             {
                 JdbcUtils.commitAndClose(con);

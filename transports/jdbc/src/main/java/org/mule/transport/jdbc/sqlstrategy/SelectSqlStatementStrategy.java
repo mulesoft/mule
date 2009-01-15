@@ -93,7 +93,11 @@ public  class SelectSqlStatementStrategy
                 {
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Received: " + result);
+                        logger.debug("SQL query received a result: " + result);
+                    }
+                    else if (logger.isInfoEnabled())
+                    {
+                        logger.info("SQL query received a result");
                     }
                     break;
                 }
