@@ -257,7 +257,6 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             }
 
             server = sfb.create();
-            server.getEndpoint().getService().put(CxfConstants.PROXY, proxy);
         }
         catch (MuleException e)
         {

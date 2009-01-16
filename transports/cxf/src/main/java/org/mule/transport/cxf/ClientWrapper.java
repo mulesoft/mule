@@ -22,6 +22,7 @@ import org.mule.transport.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.transport.cxf.support.OutputPayloadInterceptor;
 import org.mule.transport.cxf.support.ProxyService;
+import org.mule.transport.cxf.transport.MuleUniversalConduit;
 import org.mule.transport.soap.i18n.SoapMessages;
 
 import java.lang.reflect.Constructor;
@@ -116,6 +117,7 @@ public class ClientWrapper
         if (proxy)
         {
             client.getOutInterceptors().add(new OutputPayloadInterceptor());
+            ((MuleUniversalConduit)client.getConduit()).setCloseInput(false);
         }
         
         List<AbstractFeature> features = (List<AbstractFeature>) endpoint.getProperty(CxfConstants.OUT_FAULT_INTERCEPTORS);

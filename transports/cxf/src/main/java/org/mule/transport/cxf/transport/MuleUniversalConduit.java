@@ -76,6 +76,8 @@ public class MuleUniversalConduit extends AbstractConduit
 
     private int decoupledDestinationRefCount;
 
+    private boolean closeInput;
+
     /**
      * @param ei The Endpoint being invoked by this destination.
      * @param t The EPR associated with this Conduit - i.e. the reply destination.
@@ -99,7 +101,7 @@ public class MuleUniversalConduit extends AbstractConduit
             os.close();
         }
         
-        if (!isProxy(msg)) 
+        if (closeInput) 
         {
             InputStream in = msg.getContent(InputStream.class);
             if (in != null)
@@ -107,11 +109,6 @@ public class MuleUniversalConduit extends AbstractConduit
                 in.close();
             }
         }
-    }
-    
-    protected boolean isProxy(Message msg)
-    {
-        return Boolean.TRUE.equals(msg.getContextualProperty(CxfConstants.PROXY));
     }
 
     @Override
@@ -378,20 +375,14 @@ public class MuleUniversalConduit extends AbstractConduit
             incomingObserver.onMessage(inMessage);
         }
     }
+    public void setCloseInput(boolean closeInput)
+    {
+        this.closeInput = closeInput;
+    }
 
     protected CxfConnector getConnector()
     {
         return connector;
-    }
-
-    protected Destination getDecoupledDestination()
-    {
-        return decoupledDestination;
-    }
-
-    protected int getDecoupledDestinationRefCount()
-    {
-        return decoupledDestinationRefCount;
     }
 
     protected EndpointInfo getEndpoint()
