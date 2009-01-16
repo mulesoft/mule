@@ -127,7 +127,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                 }
             }
 
-            ServerFactoryBean sfb = null;
+            ServerFactoryBean sfb;
             if (CxfConstants.SIMPLE_FRONTEND.equals(frontend))
             {
                 sfb = new ServerFactoryBean();
@@ -257,7 +257,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             }
 
             server = sfb.create();
-            server.getEndpoint().getService().put(CxfConstants.PROXY, new Boolean(proxy));
+            server.getEndpoint().getService().put(CxfConstants.PROXY, proxy);
         }
         catch (MuleException e)
         {
