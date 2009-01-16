@@ -15,6 +15,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
 import org.mule.component.SimpleCallableJavaComponent;
+import org.mule.component.simple.DelayComponent;
 import org.mule.component.simple.EchoComponent;
 import org.mule.component.simple.LogComponent;
 import org.mule.component.simple.NullComponent;
@@ -284,6 +285,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("pass-through-component", new ComponentDefinitionParser(PassThroughComponent.class));
         registerBeanDefinitionParser("log-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, LogComponent.class));
         registerBeanDefinitionParser("null-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, NullComponent.class));
+        registerBeanDefinitionParser("delay-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, DelayComponent.class));
 
         // We need to use DefaultJavaComponent for the echo comonent because some tests invoke EchoComponent with method name and therefore we need an entry point resolver
         registerBeanDefinitionParser("echo-component", new SimpleComponentDefinitionParser(DefaultJavaComponent.class, EchoComponent.class));

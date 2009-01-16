@@ -1355,6 +1355,28 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="delay-component" type="delayComponentType" substitutionGroup="abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                Passes on a message only after a specified delay time.  
+                It can be useful for simulating a long-running operation when testing.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="delayComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="defaultComponentType">
+                <xsd:attribute name="delay" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Time to delay (in ms)
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 
     <!--==============================================================-->
     <!--   Transactions                                               -->
