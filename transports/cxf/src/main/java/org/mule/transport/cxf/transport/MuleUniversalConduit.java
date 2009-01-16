@@ -10,8 +10,6 @@
 
 package org.mule.transport.cxf.transport;
 
-import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
@@ -44,10 +42,10 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
+import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.Destination;
@@ -111,7 +109,7 @@ public class MuleUniversalConduit extends AbstractConduit
         }
     }
     
-    private boolean isProxy(Message msg)
+    protected boolean isProxy(Message msg)
     {
         return Boolean.TRUE.equals(msg.getContextualProperty(CxfConstants.PROXY));
     }
@@ -131,7 +129,7 @@ public class MuleUniversalConduit extends AbstractConduit
         return decoupledDestination;
     }
 
-    private void setUpDecoupledDestination()
+    protected void setUpDecoupledDestination()
     {
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress(decoupledEndpoint);
@@ -231,12 +229,12 @@ public class MuleUniversalConduit extends AbstractConduit
         }
     }
 
-    private boolean isOneway(Exchange exchange)
+    protected boolean isOneway(Exchange exchange)
     {
         return exchange != null && exchange.isOneWay();
     }
     
-    private String setupURL(Message message) throws MalformedURLException
+    protected String setupURL(Message message) throws MalformedURLException
     {
         String value = (String) message.get(Message.ENDPOINT_ADDRESS);
         String pathInfo = (String) message.get(Message.PATH_INFO);
@@ -256,7 +254,7 @@ public class MuleUniversalConduit extends AbstractConduit
         return result;
     }
 
-    private String getTargetOrEndpoint()
+    protected String getTargetOrEndpoint()
     {
         if (target != null)
         {
@@ -303,12 +301,12 @@ public class MuleUniversalConduit extends AbstractConduit
         }
     }
 
-    private synchronized void duplicateDecoupledDestination()
+    protected synchronized void duplicateDecoupledDestination()
     {
         decoupledDestinationRefCount++;
     }
 
-    private synchronized void releaseDecoupledDestination()
+    protected synchronized void releaseDecoupledDestination()
     {
         if (--decoupledDestinationRefCount == 0)
         {
@@ -379,5 +377,30 @@ public class MuleUniversalConduit extends AbstractConduit
 
             incomingObserver.onMessage(inMessage);
         }
+    }
+
+    protected CxfConnector getConnector()
+    {
+        return connector;
+    }
+
+    protected Destination getDecoupledDestination()
+    {
+        return decoupledDestination;
+    }
+
+    protected int getDecoupledDestinationRefCount()
+    {
+        return decoupledDestinationRefCount;
+    }
+
+    protected EndpointInfo getEndpoint()
+    {
+        return endpoint;
+    }
+
+    protected MuleUniversalTransport getTransport()
+    {
+        return transport;
     }
 }
