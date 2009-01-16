@@ -47,6 +47,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.Destination;
@@ -90,6 +91,29 @@ public class MuleUniversalConduit extends AbstractConduit
         this.transport = transport;
         this.endpoint = ei;
         this.connector = connector;
+    }
+    
+    public void close(Message msg) throws IOException
+    {
+        OutputStream os = msg.getContent(OutputStream.class);
+        if (os != null)
+        {
+            os.close();
+        }
+        
+        if (!isProxy(msg)) 
+        {
+            InputStream in = msg.getContent(InputStream.class);
+            if (in != null)
+            {
+                in.close();
+            }
+        }
+    }
+    
+    private boolean isProxy(Message msg)
+    {
+        return Boolean.TRUE.equals(msg.getContextualProperty(CxfConstants.PROXY));
     }
 
     @Override
