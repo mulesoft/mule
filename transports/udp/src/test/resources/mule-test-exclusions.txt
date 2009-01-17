@@ -1,3 +1,5 @@
 #
 # Test cases listed in this file are not run.
 #
+# MULE-4077
+org.mule.transport.udp.functional.UdpDynamicEPTestCase
