@@ -3,11 +3,13 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
                http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
+               http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
                http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd">
 
     <description>
@@ -15,6 +17,11 @@
     Here we define components and endpoints using the CXF transport.
     </description>
 
+    <http:connector name="http.connector">
+        <receiver-threading-profile maxThreadsActive="100"/>
+        <dispatcher-threading-profile maxThreadsActive="100"/>
+    </http:connector>
+    
     <!-- 
       Tell the CXF connector to use the 'simple' frontend. This frontend does 
       not require the JAX-WS annotations the that the default 'jaxws' frontend
@@ -30,24 +37,24 @@
 
     <vm:endpoint name="CustomerRequests" path="customer.requests" connector-ref="syncVm"/>
     <vm:endpoint name="LoanBrokerQuotes" path="loan.quotes" connector-ref="syncVm"/>
-    <endpoint name="CreditAgency" address="cxf:http://localhost:18080/mule/TheCreditAgencyService?method=getCreditProfile"/>
-    <endpoint name="CreditAgencyIn" address="cxf:http://localhost:18080/mule/TheCreditAgencyService"/>
+    <endpoint name="CreditAgency" address="cxf:http://localhost:18080/mule/TheCreditAgencyService?method=getCreditProfile" synchronous="true"/>
+    <endpoint name="CreditAgencyIn" address="cxf:http://localhost:18080/mule/TheCreditAgencyService" synchronous="true"/>
     <vm:endpoint name="LenderService" path="lender.service?method=setLenderList" connector-ref="syncVm"/>
     <vm:endpoint name="BankGateway" path="bank.gateway" connector-ref="syncVm"/>
 
-    <endpoint name="Bank1" address="cxf:http://localhost:10080/mule/TheBank1?method=getLoanQuote"/>
-    <endpoint name="Bank1In" address="cxf:http://localhost:10080/mule/TheBank1"/>
+    <endpoint name="Bank1" address="cxf:http://localhost:10080/mule/TheBank1?method=getLoanQuote" synchronous="true"/>
+    <endpoint name="Bank1In" address="cxf:http://localhost:10080/mule/TheBank1" synchronous="true"/>
 
-    <endpoint name="Bank2" address="cxf:http://localhost:20080/mule/TheBank2?method=getLoanQuote"/>
-    <endpoint name="Bank2In" address="cxf:http://localhost:20080/mule/TheBank2"/>
+    <endpoint name="Bank2" address="cxf:http://localhost:20080/mule/TheBank2?method=getLoanQuote" synchronous="true"/>
+    <endpoint name="Bank2In" address="cxf:http://localhost:20080/mule/TheBank2" synchronous="true"/>
 
-    <endpoint name="Bank3" address="cxf:http://localhost:30080/mule/TheBank3?method=getLoanQuote"/>
-    <endpoint name="Bank3In" address="cxf:http://localhost:30080/mule/TheBank3"/>
+    <endpoint name="Bank3" address="cxf:http://localhost:30080/mule/TheBank3?method=getLoanQuote" synchronous="true"/>
+    <endpoint name="Bank3In" address="cxf:http://localhost:30080/mule/TheBank3" synchronous="true"/>
 
-    <endpoint name="Bank4" address="cxf:http://localhost:40080/mule/TheBank4?method=getLoanQuote"/>
-    <endpoint name="Bank4In" address="cxf:http://localhost:40080/mule/TheBank4"/>
+    <endpoint name="Bank4" address="cxf:http://localhost:40080/mule/TheBank4?method=getLoanQuote" synchronous="true"/>
+    <endpoint name="Bank4In" address="cxf:http://localhost:40080/mule/TheBank4" synchronous="true"/>
 
-    <endpoint name="Bank5" address="cxf:http://localhost:50080/mule/TheBank5?method=getLoanQuote"/>
-    <endpoint name="Bank5In" address="cxf:http://localhost:50080/mule/TheBank5"/>
+    <endpoint name="Bank5" address="cxf:http://localhost:50080/mule/TheBank5?method=getLoanQuote" synchronous="true"/>
+    <endpoint name="Bank5In" address="cxf:http://localhost:50080/mule/TheBank5" synchronous="true"/>
 
 </mule>
