@@ -30,7 +30,7 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
     {
         HttpClient client = new HttpClient();
         client.getParams().setAuthenticationPreemptive(true);
-        GetMethod get = new GetMethod("http://localhost:4567/index.html");
+        GetMethod get = new GetMethod(getUrl());
 
         get.setDoAuthentication(false);
 
@@ -38,7 +38,7 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(get);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertEquals("/index.html", get.getResponseBodyAsString());
+            assertTrue(get.getResponseBodyAsString().contains("/index.html"));
         }
         finally
         {
@@ -48,27 +48,32 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
 
     public void testAuthenticationFailureBadCredentials() throws Exception
     {
-        doRequest(null, "localhost", "anonX", "anonX", "http://localhost:4567/index.html", true, false, 401);
+        doRequest(null, "localhost", "anonX", "anonX", getUrl(), true, false, 401);
+    }
+
+    protected String getUrl()
+    {
+        return "http://localhost:4567/index.html";
     }
 
     public void testAuthenticationAuthorised() throws Exception
     {
-        doRequest(null, "localhost", "anon", "anon", "http://localhost:4567/index.html", false, true, 200);
+        doRequest(null, "localhost", "anon", "anon", getUrl(), false, true, 200);
     }
 
     public void testAuthenticationAuthorisedWithHandshake() throws Exception
     {
-        doRequest(null, "localhost", "anon", "anon", "http://localhost:4567/index.html", true, false, 200);
+        doRequest(null, "localhost", "anon", "anon", getUrl(), true, false, 200);
     }
 
     public void testAuthenticationAuthorisedWithHandshakeAndBadRealm() throws Exception
     {
-        doRequest("blah", "localhost", "anon", "anon", "http://localhost:4567/index.html", true, false, 401);
+        doRequest("blah", "localhost", "anon", "anon", getUrl(), true, false, 401);
     }
 
     public void testAuthenticationAuthorisedWithHandshakeAndRealm() throws Exception
     {
-        doRequest("mule-realm", "localhost", "ross", "ross", "http://localhost:4567/index.html", true, false,
+        doRequest("mule-realm", "localhost", "ross", "ross", getUrl(), true, false,
             200);
     }
 
