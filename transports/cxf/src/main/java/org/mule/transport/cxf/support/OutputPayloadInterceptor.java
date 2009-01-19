@@ -63,7 +63,10 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                 {
                     public void write(XMLStreamWriter writer) throws Fault, XMLStreamException
                     {
-                        StaxUtils.copy((XMLStreamReader)o, writer);                        
+                        XMLStreamReader xsr = (XMLStreamReader)o;
+                        StaxUtils.copy(xsr, writer);      
+                        writer.flush();
+                        xsr.close();
                     }
                 });
             } 

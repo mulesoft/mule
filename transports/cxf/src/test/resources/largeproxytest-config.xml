@@ -19,17 +19,20 @@
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
   <!--<cxf:connector name="cxfConnector" configurationLocation="cxf.xml" initializeStaticBusInstance="false" /> -->
-  <!--<http:connector name="HttpConnector" keepAlive="true" sendTcpNoDelay="false" receiveBufferSize="0" sendBufferSize="0" />-->
-
+  <http:connector name="HttpConnector" keepAlive="true" sendTcpNoDelay="false" receiveBufferSize="0" sendBufferSize="0" />
+  <jetty:connector name="jettyConnector"/>
+  
   <model name="proxies">
 
     <service name="echoProxy">
       <inbound>
-        <cxf:inbound-endpoint address="http://localhost:63082/services/EchoProxy" proxy="true" />
+        <cxf:inbound-endpoint address="jetty://localhost:63082/services/EchoProxy" proxy="true" synchronous="true" protocolConnector="jettyConnector">
+
+        </cxf:inbound-endpoint>
       </inbound>
       <outbound>
         <pass-through-router>
-          <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" proxy="true" />
+          <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" proxy="true" synchronous="true" protocolConnector="HttpConnector"/>
         </pass-through-router>
       </outbound>
     </service>
@@ -37,7 +40,7 @@
     <service name="echoService">
       <inbound>
         <cxf:inbound-endpoint
-          address="http://localhost:63081/services/Echo" frontend="simple"/>
+          address="jetty://localhost:63081/services/Echo" frontend="simple" synchronous="true"  protocolConnector="jettyConnector"/>
       </inbound>
       <component class="org.mule.component.simple.EchoComponent" />
     </service>
