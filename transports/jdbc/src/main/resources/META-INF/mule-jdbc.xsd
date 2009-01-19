@@ -80,7 +80,7 @@
                 <xsd:attribute name="transactionPerMessage" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                        Should each DB record be received in a separate transaction or should there be a single transaction for the entire ResultSet?  default = true
+                        Whether each database record should be received in a separate transaction. If false, there will be a single transaction for the entire result set. Default is true.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
