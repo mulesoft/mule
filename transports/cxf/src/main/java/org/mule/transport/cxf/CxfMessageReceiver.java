@@ -28,6 +28,7 @@ import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.transport.cxf.support.OutputPayloadInterceptor;
 import org.mule.transport.cxf.support.ProxyService;
+import org.mule.transport.cxf.support.ProxyServiceFactoryBean;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
@@ -159,6 +160,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             {
                 sfb.setDataBinding(new StaxDataBinding());
                 sfb.getFeatures().add(new StaxDataBindingFeature());
+                sfb.setServiceFactory(new ProxyServiceFactoryBean());
             }
            
             // The binding - i.e. SOAP, XML, HTTP Binding, etc
