@@ -165,7 +165,13 @@
     </xsd:complexType>
 
     <xsd:element name="filter-based-splitter" type="filterBasedSplitterType"
-                 substitutionGroup="mule:abstract-outbound-router"/>
+                 substitutionGroup="mule:abstract-outbound-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                The filter-based splitter router will select the endpoint where you want to send part of a message by filtering parts using the endpoint filters.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="filterBasedSplitterType">
         <xsd:complexContent>
             <xsd:extension base="messageSplitterType">
@@ -184,7 +190,7 @@
                  substitutionGroup="mule:abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The round robin message splitter will split a DOM4J document into nodes based on the {{splitExpression}} property. It will then send these document fragments to the list of endpoints specified in a round robbin fashion. Optionally, you can specify a namespaces property map that contain prefix/namespace mappings.
+                The round robin message splitter will split a DOM4J document into nodes based on the {{splitExpression}} property. It will then send these document fragments to the list of specified endpoints in a round-robin fashion. Optionally, you can specify a namespaces property map that contain prefix/namespace mappings.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

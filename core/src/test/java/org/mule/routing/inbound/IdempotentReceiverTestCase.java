@@ -12,12 +12,14 @@ package org.mule.routing.inbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
+import org.mule.api.store.ObjectStore;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -26,14 +28,58 @@ import org.mule.tck.testmodels.fruit.Apple;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
+import java.util.Map;
+
+import org.apache.commons.collections.map.HashedMap;
+
 public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 {
 
-    public void testIdempotentReceiver() throws Exception
+    public void testIdempotentReceiverDefaultInMemoryObjectStore() throws Exception
     {
         IdempotentReceiver router = new IdempotentReceiver();
         router.setMuleContext(muleContext);
 
+        testIdempotentRouter(router);
+    }
+
+    public void testIdempotentReceiverCustomIDStore() throws Exception
+    {
+        IdempotentReceiver router = new IdempotentReceiver();
+        router.setStore(new ObjectStore()
+        {
+            private Map store = new HashedMap();
+
+            public boolean storeObject(String id, Object item) throws Exception
+            {
+                store.put(id, item);
+                return true;
+            }
+
+            public Object retrieveObject(String id) throws Exception
+            {
+                return store.get(id);
+            }
+
+            public boolean removeObject(String id) throws Exception
+            {
+                store.remove(id);
+                return true;
+            }
+
+            public boolean containsObject(String id) throws Exception
+            {
+                return store.containsKey(id);
+            }
+        });
+
+        router.initialise();
+
+        testIdempotentRouter(router);
+    }
+
+    protected void testIdempotentRouter(IdempotentReceiver router) throws Exception, MessagingException
+    {
         Mock session = MuleTestUtils.getMockSession();
         Service testService = getTestService("test", Apple.class);
 

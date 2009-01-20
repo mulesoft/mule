@@ -9,9 +9,12 @@
  */
 package org.mule.mule.model;
 
+import org.mule.api.MuleEventContext;
 import org.mule.api.model.InvocationResult;
 import org.mule.model.resolvers.ExplicitMethodEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Fruit;
 
 public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCase
 {
@@ -52,6 +55,35 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
         catch (IllegalStateException e)
         {
             //Expected
+        }
+    }
+    
+    /**
+     * If a method with correct name is available then it should be used is the
+     * parameter type is assignable from the payload type and not just if there is an
+     * exact match. See MULE-3636.
+     * 
+     * @throws Exception
+     */
+    public void testMethodPropertyParameterAssignableFromPayload() throws Exception
+    {
+        ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
+        resolver.addMethod("wash");
+        MuleEventContext ctx = getTestEventContext(new Apple());
+        InvocationResult result = resolver.invoke(new TestFruitCleaner(), ctx);
+        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+    }
+
+    public static class TestFruitCleaner
+    {
+        public void wash(Fruit fruit)
+        {
+            // dummy
+        }
+
+        public void polish(Fruit fruit)
+        {
+            // dummy
         }
     }
 }

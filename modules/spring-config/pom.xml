@@ -39,5 +39,17 @@
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
+        <dependency>
+            <groupId>dom4j</groupId>  
+            <artifactId>dom4j.osgi</artifactId>
+            <version>${dom4jVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen.osgi</artifactId>
+            <version>${jaxenVersion}</version>
+            <scope>test</scope>
+        </dependency>
 </dependencies>
 </project>

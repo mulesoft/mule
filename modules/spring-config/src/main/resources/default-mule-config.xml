@@ -85,14 +85,7 @@
 
     <bean name="_muleStreamCloserService" class="org.mule.util.DefaultStreamCloserService"/>
 
-    <bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <property name="threadWaitTimeout" value="30"/>
-        <property name="maxThreadsActive" value="10"/>
-        <property name="maxThreadsIdle" value="10"/>
-        <property name="maxBufferSize" value="0"/>
-        <property name="threadTTL" value="60000"/>
-        <property name="poolExhaustedAction" value="4"/>
-    </bean>
+    <bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile"/>
 
     <bean name="_defaultMessageDispatcherThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
         <constructor-arg ref="_defaultThreadingProfile"/>

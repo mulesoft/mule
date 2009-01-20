@@ -67,12 +67,6 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE, new DefaultStreamCloserService());
         
         ThreadingProfile defaultThreadingProfile = new ChainedThreadingProfile();
-        defaultThreadingProfile.setThreadWaitTimeout(30);
-        defaultThreadingProfile.setMaxThreadsActive(10);
-        defaultThreadingProfile.setMaxThreadsIdle(10);
-        defaultThreadingProfile.setMaxBufferSize(0);
-        defaultThreadingProfile.setThreadTTL(60000);
-        defaultThreadingProfile.setPoolExhaustedAction(ThreadingProfile.WHEN_EXHAUSTED_RUN);
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE, defaultThreadingProfile);
         registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE,
             new ChainedThreadingProfile(defaultThreadingProfile));

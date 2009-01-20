@@ -10,14 +10,20 @@
 
 package org.mule.model.seda;
 
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.config.ThreadingProfile;
+import org.mule.api.lifecycle.Callable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.component.DefaultJavaComponent;
+import org.mule.component.SimpleCallableJavaComponent;
+import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
 
@@ -30,6 +36,8 @@ import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
 import junit.framework.AssertionFailedError;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractServiceTestCase
 {
@@ -53,10 +61,8 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
     // }
 
     /**
-     * ENSURE THAT: 
-     * 1) The queueProfile set on the SedaService is used to configure
-     * the queue that is used.
-     * 2) The queue used by the SedaService has the correct
+     * ENSURE THAT: 1) The queueProfile set on the SedaService is used to configure
+     * the queue that is used. 2) The queue used by the SedaService has the correct
      * name.
      */
     public void testQueueConfiguration() throws Exception
@@ -142,6 +148,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
 
     /**
      * SEE MULE-3684
+     * 
      * @throws Exception
      */
     public void testDispatchToPausedService() throws Exception
@@ -152,9 +159,118 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
         service.dispatchEvent(getTestInboundEvent("test"));
 
         // This test will timeout and fail if dispatch() blocks
-        
+
     }
-    
+
+    /**
+     * SEE MULE-3974
+     * 
+     * @throws Exception
+     */
+    public void testMaxActiveThreadsEqualsOneWhenExhaustedActionWait() throws Exception
+    {
+        final Latch latch = new Latch();
+
+        SedaService service = new SedaService();
+        service.setName("testMaxActiveThreadsEqualsOne");
+        service.setModel(muleContext.getRegistry().lookupSystemModel());
+        ChainedThreadingProfile threadingProfile = (ChainedThreadingProfile) muleContext.getDefaultServiceThreadingProfile();
+        threadingProfile.setMaxThreadsActive(1);
+        threadingProfile.setThreadWaitTimeout(200);
+        threadingProfile.setPoolExhaustedAction(ThreadingProfile.WHEN_EXHAUSTED_WAIT);
+        service.setThreadingProfile(threadingProfile);
+        service.setComponent(new SimpleCallableJavaComponent(new Callable()
+        {
+
+            public Object onCall(MuleEventContext eventContext) throws Exception
+            {
+                latch.countDown();
+                return null;
+            }
+        }));
+        muleContext.getRegistry().registerService(service);
+        service.start();
+
+        service.dispatchEvent(getTestInboundEvent("test"));
+
+        assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
+
+        // This test will fail with RejectedExcecutionException if dispatch() blocks
+
+    }
+
+    /**
+     * SEE MULE-3975
+     * 
+     * @throws Exception
+     */
+    public void testDoThreadingFalse() throws Exception
+    {
+        final Latch latch = new Latch();
+        final String serviceName = "testDoThreadingFalse";
+        final String serviceThreadName = serviceName + ".1";
+
+        SedaService service = new SedaService();
+        service.setName(serviceName);
+        service.setModel(muleContext.getRegistry().lookupSystemModel());
+        ChainedThreadingProfile threadingProfile = (ChainedThreadingProfile) muleContext.getDefaultServiceThreadingProfile();
+        threadingProfile.setDoThreading(false);
+        service.setThreadingProfile(threadingProfile);
+        service.setComponent(new SimpleCallableJavaComponent(new Callable()
+        {
+
+            public Object onCall(MuleEventContext eventContext) throws Exception
+            {
+                assertEquals(serviceThreadName, Thread.currentThread().getName());
+                latch.countDown();
+                return null;
+            }
+        }));
+        muleContext.getRegistry().registerService(service);
+        service.start();
+
+        service.dispatchEvent(getTestInboundEvent("test"));
+
+        assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
+
+    }
+
+    /**
+     * SEE MULE-3975
+     * 
+     * @throws Exception
+     */
+    public void testDoThreadingTrue() throws Exception
+    {
+        final Latch latch = new Latch();
+        final String serviceName = "testDoThreadingFalse";
+        final String serviceThreadName = serviceName + ".1";
+
+        SedaService service = new SedaService();
+        service.setName(serviceName);
+        service.setModel(muleContext.getRegistry().lookupSystemModel());
+        ChainedThreadingProfile threadingProfile = (ChainedThreadingProfile) muleContext.getDefaultServiceThreadingProfile();
+        threadingProfile.setDoThreading(true);
+        service.setThreadingProfile(threadingProfile);
+        service.setComponent(new SimpleCallableJavaComponent(new Callable()
+        {
+
+            public Object onCall(MuleEventContext eventContext) throws Exception
+            {
+                assertFalse(serviceThreadName.equals(Thread.currentThread().getName()));
+                latch.countDown();
+                return null;
+            }
+        }));
+        muleContext.getRegistry().registerService(service);
+        service.start();
+
+        service.dispatchEvent(getTestInboundEvent("test"));
+
+        assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
+
+    }
+
     private WorkEvent getTestWorkEvent()
     {
         return new WorkEvent(this, // source

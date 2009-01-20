@@ -44,9 +44,12 @@ public class IdempotentReceiver extends SelectiveConsumer
 
     protected void initialize(MuleEvent event) throws RoutingException
     {
-        if (assignedComponentName == null && store == null)
+        if (assignedComponentName == null)
         {
             this.assignedComponentName = event.getService().getName();
+        }
+        if (store == null)
+        {
             try
             {
                 this.store = this.createMessageIdStore();
@@ -78,7 +81,7 @@ public class IdempotentReceiver extends SelectiveConsumer
         }
         else
         {
-            if (store == null)
+            if (store == null || assignedComponentName == null)
             {
                 // we need to load this on the first request as we need the service
                 // name
