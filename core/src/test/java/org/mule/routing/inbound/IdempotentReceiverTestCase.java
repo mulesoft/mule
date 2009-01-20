@@ -10,6 +10,9 @@
 
 package org.mule.routing.inbound;
 
+import java.util.Map;
+
+import org.apache.commons.collections.map.HashedMap;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
@@ -28,10 +31,6 @@ import org.mule.tck.testmodels.fruit.Apple;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
-import java.util.Map;
-
-import org.apache.commons.collections.map.HashedMap;
-
 public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 {
 
@@ -46,6 +45,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
     public void testIdempotentReceiverCustomIDStore() throws Exception
     {
         IdempotentReceiver router = new IdempotentReceiver();
+        router.setMuleContext(muleContext);
         router.setStore(new ObjectStore()
         {
             private Map store = new HashedMap();
