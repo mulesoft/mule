@@ -278,7 +278,7 @@
         </snapshotRepository>
         <site>
             <id>muleforge.webdav.sites</id>
-            <url>dav:https://dav.muleforge.org/${ModuleNameLower}/</url>
+            <url>dav:https://dav.muleforge.org/${ModuleNameLower}/maven/${version}/</url>
         </site>
     </distributionManagement>
 

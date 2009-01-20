@@ -124,7 +124,7 @@
                 </xsd:attribute>
                 <xsd:attribute name="discardEmptyContent" type="mule:substitutableBoolean">
                     <xsd:annotation>
-                        <xsd:documentation>Whether Mule should discard any messages from the remote server that have a zero content length. For many services a zero length would mean there was no data to return. If the remote HTTP server does return content to say that that the request is empty, users can configure a conent filter on the endpoint to filter these messages out.
+                        <xsd:documentation>Whether Mule should discard any messages from the remote server that have a zero content length. For many services a zero length would mean there was no data to return. If the remote HTTP server does return content to say that that the request is empty, users can configure a content filter on the endpoint to filter these messages out.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

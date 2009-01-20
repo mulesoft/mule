@@ -2,15 +2,51 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/${MuleMajorMinorVersion}"
             targetNamespace="http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.springframework.org/schema/beans"
-                schemaLocation="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}/mule.xsd" />
+    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/${MuleMajorMinorVersion}"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/${MuleMajorMinorVersion}/mule-schemadoc.xsd"/>
 
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}"/>
+    <xsd:annotation>
+        <xsd:documentation>${description}</xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>${ModuleName}</schemadoc:short-name>
+            <schemadoc:page-title>${ModuleName} ${ModuleType}</schemadoc:page-title>
+#if($ModuleType == "Transport")
+ #set($receive = "false")
+#if($hasReceiver == "y")
+  #set($receive = "true")
+#end
+#set($dispatch = "false")
+#if($hasDispatcher == "y")
+  #set($dispatcher = "true")
+#end
+#set($request = "false")
+#if($hasRequestor == "y")
+  #set($request = "true")
+#end
+#set($transactions = "false")
+#if($hasTransactions == "y")
+  #set($transactions = "true")
+#end
+#set($response = "true")
+#set($streaming = "false")
+            <schemadoc:transport-features
+            receiveEvents="${receive}" dispatchEvents="${dispatch}" responseEvents="${response}"
+                                          requestEvents="${request}"
+                                          transactions="${transactions}" streaming="${streaming}">
+                <schemadoc:inboundMEPs in-only="${receiver}" in-optional-out="${response}" in-out="${response}"/>
+                <schemadoc:outboundMEPs out-only="${dispatcher}" out-in="${response}" out-optional-in="${response}"/>
+            </schemadoc:transport-features>
+#end
+        </xsd:appinfo>
+    </xsd:annotation>
 
     <xsd:element name="connector" type="${ModuleNameLower}ConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>

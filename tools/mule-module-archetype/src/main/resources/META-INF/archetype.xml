@@ -108,7 +108,7 @@ spring-extras, sxc, xml):
             <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
-            <file>src/main/resources/META-INF/services/org/mule/config/registry-bootstrap.properties</file>
+            <file>src/main/resources/META-INF/services/org/mule/config/registry-bootstrap.properties.vm</file>
             <output>src/main/resources/META-INF/services/org/mule/config/registry-bootstrap.properties</output>
             <dependsOnVar>hasBootstrap=y</dependsOnVar>
         </template>

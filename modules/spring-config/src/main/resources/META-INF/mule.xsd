@@ -431,7 +431,7 @@
         <xsd:attribute name="dynamic" type="substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    If the notification manager is dynamic, listeners can be registered dynamically at runtime via the MuleContext, and the configured notiification can be changed. Otherwise, some parts of Mule will cache notification configuration for efficiency and will not generate events for newly enabled notifications or listeners. The default value is false.
+                    If the notification manager is dynamic, listeners can be registered dynamically at runtime via the MuleContext, and the configured notification can be changed. Otherwise, some parts of Mule will cache notification configuration for efficiency and will not generate events for newly enabled notifications or listeners. The default value is false.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -623,7 +623,7 @@
                  substitutionGroup="abstract-entry-point-resolver-set">
         <xsd:annotation>
             <xsd:documentation>
-                An extensible set of entry point resolvers. These determine how a message is passed to a component in Java. Each entry point resolver is tried in turn until one succeeds in delivering the messge to the component. This element can be set on the model or component; the model value provides a default that individual component values can override.
+                An extensible set of entry point resolvers. These determine how a message is passed to a component in Java. Each entry point resolver is tried in turn until one succeeds in delivering the message to the component. This element can be set on the model or component; the model value provides a default that individual component values can override.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1200,7 +1200,7 @@
     <xsd:element name="bridge-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                Transfers a message from inbound to outbound endpoints. This element is provided for backward compatability - it is equivalent to not specifying any component.
+                Transfers a message from inbound to outbound endpoints. This element is provided for backward compatibility - it is equivalent to not specifying any component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2475,7 +2475,7 @@
     <xsd:attributeGroup name="expressionAttributes">
         <xsd:attribute name="evaluator" use="required">
             <xsd:annotation>
-                <xsd:documentation>The expression evaluator to use. Expression evaluators must be registered with the ExpressionEvaluatorManager before thay can be used. Using the custom evaluator allows you to define your own evaluator with the 'custom-evaluator' attribute. Note that some evaluators such as xpath, groovy, and bean are loaded from other Mule modules (XML and Scripting, respectively). These modules must be on your classpath before the evaluator can be used.
+                <xsd:documentation>The expression evaluator to use. Expression evaluators must be registered with the ExpressionEvaluatorManager before they can be used. Using the custom evaluator allows you to define your own evaluator with the 'custom-evaluator' attribute. Note that some evaluators such as xpath, groovy, and bean are loaded from other Mule modules (XML and Scripting, respectively). These modules must be on your classpath before the evaluator can be used.
                 </xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
@@ -3131,7 +3131,7 @@
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Fully qualified class name of the custom correlation agregator router to be used.
+                            Fully qualified class name of the custom correlation aggregator router to be used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
