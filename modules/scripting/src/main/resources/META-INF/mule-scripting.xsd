@@ -13,22 +13,17 @@
 
     <xsd:annotation>
         <xsd:documentation>
-            The scripting module provides facilities for using scripting languages in Mule. Any scripting languages that
-            supports [JSR-223|http://www.jcp.org/en/jsr/detail?id=223] can be used inside Mule. Scripts can be used as
-            implementations of service components or transformers. Also, scripts can be used for expression evaluations
-            meaning message routing can be controlled using script evaluations on the current message. You can even
-            configure Mule instances from scripts.
+            The scripting module provides facilities for using scripting languages in Mule. Any scripting languages that supports [JSR-223|http://www.jcp.org/en/jsr/detail?id=223] can be used inside Mule. Scripts can be used as implementations of service components or transformers. Also, scripts can be used for expression evaluations, meaning message routing can be controlled using script evaluations on the current message. You can even configure Mule instances from scripts.
         </xsd:documentation>
 
         <xsd:appinfo>
-            <schemadoc:short-name>scripting</schemadoc:short-name>
+            <schemadoc:short-name>Scripting</schemadoc:short-name>
             <schemadoc:page-title>Scripting Module</schemadoc:page-title>
-
+            
             <schemadoc:additional-documentation where="after-common-elements">
                 h2. Script Context Bindings
 
-                When run inside Mule, scripts have a number of objects available to them in the script context. These
-                are:
+                When run inside Mule, scripts have a number of objects available to them in the script context. These are:
 
                 ||Name||Description||
                 |log|a logger that can be used to write to Mule's log file.|
@@ -36,34 +31,31 @@
                 |eventContext| A reference to the eventcontext. This allows you to dispatch events progammatically from your script|
                 |message|the current message.|
                 |originalPayload|the payload of the current message before any transforms.|
-                |payload|the transformed payload of the current message if a transformer is configured on the service.
-                Otherwise this is the same value as _originalPayload_.|
+                |payload|the transformed payload of the current message if a transformer is configured on the service. Otherwise this is the same value as _originalPayload_.|
                 |src|same as _payload_, kept for backward compatability.|
                 |service|a reference to the current service object.|
                 |id|the current event id.|
-                |result|a placeholder object where the result of the script can be written to. Usually it's better to
-                just return a value from the script unless the script method doesn't have a return value.|
+                |result|a placeholder object where the result of the script can be written to. Usually it's better to just return a value from the script unless the script method doesn't have a return value.|
             </schemadoc:additional-documentation>
 
             <schemadoc:additional-documentation where="after-specific-elements">
                 h2. Script Configuration Builder
 
-                The {javadoc:mule-module-scripting-builders}ScriptConfigurationBuilder{javadoc} allows developers to
-                create a mule instance from a JSR-223 compliant script. To load the manager from Groovy:
+                The {javadoc:mule/module/scripting/builders|ScriptConfigurationBuilder}ScriptConfigurationBuilder{javadoc} allows developers to create a Mule instance from a JSR-223 compliant script. To load the manager from Groovy:
 
                 {code:java}
                 ConfigurationBuilder builder = new ScriptConfigurationBuilder("groovy", "../conf/mule-config.groovy");
                 MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext(builder);
                 {code}
 
-                Or to start the server from the command line -
+                Or to start the server from the command line:
                 {code}
                 mule -M-Dorg.mule.script.engine=groovy
                 -builder org.mule.module.scripting.builders.ScriptConfigurationBuilder
                 -config ../conf/mule-config.groovy
                 {code}
 
-                For more information about configuring a Mule instance from code or script see [Configuring Mule Programmatically].
+                For more information about configuring a Mule instance from code or script see [Configuration Overview].
             </schemadoc:additional-documentation>
         </xsd:appinfo>
     </xsd:annotation>
@@ -93,25 +85,20 @@
                 <xsd:sequence>
                     <xsd:element name="script" type="scriptType" minOccurs="0">
                         <xsd:annotation>
-                            <xsd:documentation>A script to be executed by a JSR-223 compliant script engine such as
-                                Groovy, JavaScript(Rhino), Python, Ruby or Beanshell (etc).</xsd:documentation>
+                            <xsd:documentation>A script to be executed by a JSR-223 compliant script engine such as Groovy, JavaScript(Rhino), Python, Ruby or Beanshell (etc).</xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:element name="java-interface-binding" type="mule:pojoBindingType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
-                                A binding associates a Mule endpoint with an injected Java interface
-                                (this is like using Spring to inject a bean, but instead of calling a
-                                method on the bean a message is sent to an endpoint). Script bindings will only work
-                                with Java-based scripting languages. Right now there is no validation on when languages
-                                support java bindinngs since there are so many scripting languages.
+                                A binding associates a Mule endpoint with an injected Java interface (this is like using Spring to inject a bean, but instead of calling a method on the bean a message is sent to an endpoint). Script bindings will only work with Java-based scripting languages. Right now there is no validation on when languages support java bindinngs since there are so many scripting languages.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="script-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
-                        <xsd:documentation>A reference to a script object bean. i.e. a &lt;script:script ...&gt; definition.
+                        <xsd:documentation>A reference to a script object bean, that is, a &lt;script:script ...&gt; definition.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -129,8 +116,7 @@
 
     <xsd:complexType name="scriptType">
         <xsd:annotation>
-            <xsd:documentation>The script to execute as a service. When run inside Mule, scripts have a
-                number of objects available to them in the script context. These are:
+            <xsd:documentation>The script to execute as a service. When run inside Mule, scripts have a number of objects available to them in the script context. These are:
                 {html}
                 <table>
                     <tr>
@@ -181,32 +167,26 @@
                     <xsd:group ref="mule:propertiesGroup" minOccurs="0"/>
                     <xsd:element name="text" type="xsd:string" minOccurs="0">
                         <xsd:annotation>
-                            <xsd:documentation>Used for embedding script code inside the XML. This is useful for simple
-                                scripts where you are just mocking up a quick application.
+                            <xsd:documentation>Used for embedding script code inside the XML. This is useful for simple scripts where you are just mocking up a quick application.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="xsd:string">
                     <xsd:annotation>
-                        <xsd:documentation>The name used to identify this script object. This is used when you want to
-                            refercne this script object from a component or transformer.
+                        <xsd:documentation>The name used to identify this script object. This is used when you want to reference this script object from a component or transformer.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="engine" type="xsd:string">
                     <xsd:annotation>
-                        <xsd:documentation>The nme of the script engine being used. All scripting languages that support
-                            JSR-223 have a script engine name such as groovy, ruby, python, etc. If this value is not
-                            set, but a script file is configured, Mule will attempt to load the correct script engine
-                            according to the script file's extension.
+                        <xsd:documentation>The name of the script engine being used. All scripting languages that support JSR-223 have a script engine name such as groovy, ruby, python, etc. If this value is not set, but a script file is configured, Mule will attempt to load the correct script engine according to the script file's extension.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="file" type="xsd:string">
                     <xsd:annotation>
-                        <xsd:documentation>The script file to load for this object. The file can be on the classpath or
-                            local file system.
+                        <xsd:documentation>The script file to load for this object. The file can be on the classpath or local file system.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -232,7 +212,8 @@
                 <xsd:sequence>
                     <xsd:element name="script" type="scriptType">
                         <xsd:annotation>
-                            <xsd:documentation>A script to be executed by a JSR-223 compliant script engine such as Groovy, JavaScript(Rhino), Python, Ruby or Beanshell (etc).
+                            <xsd:documentation>
+                                A script to be executed by a JSR-223 compliant script engine such as Groovy, JavaScript(Rhino), Python, Ruby or Beanshell (etc).
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -243,7 +224,8 @@
 
     <xsd:element name="groovy-refreshable" type="groovyRefreshableType" substitutionGroup="mule:abstract-extension">
         <xsd:annotation>
-            <xsd:documentation>A wrapper for a component object that allows the underlying object to be reloaded at runtime. This makes it possible to hot-deploy new component logic without restarting.
+            <xsd:documentation>
+                A wrapper for a component object that allows the underlying object to be reloaded at runtime. This makes it possible to hot-deploy new component logic without restarting.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

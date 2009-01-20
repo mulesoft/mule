@@ -25,9 +25,7 @@
     <xsd:element name="mule" type="muleType">
         <xsd:annotation>
             <xsd:documentation>
-                Either the root element of a Mule configuration,
-                or a "top-level" element in a Spring configuration,
-                that contains further Mule elements.
+                Either the root element of a Mule configuration, or a "top-level" element in a Spring configuration, that contains further Mule elements.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -36,8 +34,7 @@
             <xsd:element name="description" type="descriptionType" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        This can hold any kind of documentation consistent with the overall XML format).
-                        It is intended to be "human readable" only and is not used by the system.
+                        This can hold any kind of documentation consistent with the overall XML format). It is intended to be "human readable" only and is not used by the system.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -79,10 +76,7 @@
             <xsd:element name="global-property" type="globalPropertyType">
                 <xsd:annotation>
                     <xsd:documentation>
-                        A global property is a named string.
-                        It can be used inserted in most attribute values using the ${...} syntax.
-                        So the attribute value "${foo}" would be replaced by the value associated with
-                        the property named "foo".
+                        A global property is a named string. It can be inserted in most attribute values using the ${...} syntax. So the attribute value "${foo}" would be replaced by the value associated with the property named "foo".
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -96,8 +90,7 @@
             <xsd:element name="notifications" type="notificationManagerType">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Register listeners for notifications
-                        and associate interfaces with particular events.
+                        Register listeners for notifications and associate interfaces with particular events.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -122,10 +115,7 @@
     <xsd:element name="abstract-extension" abstract="true" type="abstractExtensionType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for arbitrary extensions as children of the mule element.
-                Other transports and modules may extend this if they need to add global
-                elements to the configuration (but consider the more specific elements
-                like abstract-connector first).
+                A placeholder for arbitrary extensions as children of the mule element. Other transports and modules may extend this if they need to add global elements to the configuration (but consider the more specific elements like abstract-connector first).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -134,11 +124,7 @@
     <xsd:element name="abstract-connector" abstract="true" type="abstractConnectorType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for connector elements.
-                Connector elements allow properties to be configured across all endpoints that
-                use the same transport.
-                If multiple connectors are defined for the same transport then each endpoint
-                must name which connector is being used.
+                A placeholder for connector elements. Connector elements allow properties to be configured across all endpoints that use the same transport. If multiple connectors are defined for the same transport then each endpoint must name which connector is being used.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -155,10 +141,7 @@
     <xsd:element name="abstract-global-endpoint" abstract="true" type="abstractGlobalEndpointType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for global endpoint elements.
-                Global endpoints are named templates that allow us to define an endpoint once
-                and refer to it in several places.
-                Currently the same template is used for both inbound and outbound endpoints.
+                A placeholder for global endpoint elements. Global endpoints are named templates that allow us to define an endpoint once and refer to it in several places. Currently the same template is used for both inbound and outbound endpoints.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -166,8 +149,7 @@
         <xsd:attribute name="name" type="substitutableName" use="required">
             <xsd:annotation>
                 <xsd:documentation>
-                    Identifies the endpoint so that other elements can reference it.
-                    This name can also be referenced in MuleClient.
+                    Identifies the endpoint so that other elements can reference it. This name can also be referenced in MuleClient.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -176,9 +158,7 @@
     <xsd:element name="abstract-inbound-endpoint" abstract="true" type="abstractInboundEndpointType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for inbound endpoint elements.
-                Inbound endpoints receive messages from the underlying transport.
-                The message payload is then delivered to the component for processing.
+                A placeholder for inbound endpoint elements. Inbound endpoints receive messages from the underlying transport. The message payload is then delivered to the component for processing.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -186,9 +166,7 @@
         <xsd:attribute name="name" type="substitutableName">
             <xsd:annotation>
                 <xsd:documentation>
-                    Identifies the inbound endpoint in the registry, but is of relatively little use
-                    - it cannot be referred to from MuleClient, for example.
-                    For more useful aliases, use global endpoints.
+                    Identifies the inbound endpoint in the registry, but is of relatively little use - it cannot be referred to from MuleClient, for example. For more useful aliases, use global endpoints.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -197,8 +175,7 @@
     <xsd:element name="abstract-outbound-endpoint" abstract="true" type="abstractOutboundEndpointType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for outbound endpoint elements.
-                Outbound endpoints dispatch messages to the underlying transport.
+                A placeholder for outbound endpoint elements. Outbound endpoints dispatch messages to the underlying transport.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -206,9 +183,7 @@
         <xsd:attribute name="name" type="substitutableName">
             <xsd:annotation>
                 <xsd:documentation>
-                    Identifies the outbound endpoint in the registry, but is of relatively little use
-                    - it cannot be referred to from MuleClient, for example.
-                    For more useful aliases, use global endpoints.
+                    Identifies the outbound endpoint in the registry, but is of relatively little use - it cannot be referred to from MuleClient, for example. For more useful aliases, use global endpoints.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -217,8 +192,7 @@
     <xsd:element name="abstract-transformer" abstract="true" type="abstractTransformerType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for transformer elements.
-                Transformers convert message payloads.
+                A placeholder for transformer elements. Transformers convert message payloads.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -226,17 +200,14 @@
         <xsd:attribute name="name" type="substitutableName">
             <xsd:annotation>
                 <xsd:documentation>
-                    Identifies the transformer so that other elements can reference it.
-                    Required if the transformer is defined at the global level.
+                    Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="returnClass" type="substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
-                    The class of the message generated by the transformer.
-                    This is used if transformers are auto-selected
-                    (which is somewhat incomplete at the moment?).
+                    The class of the message generated by the transformer. This is used if transformers are auto-selected (which is somewhat incomplete at the moment).
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -253,16 +224,14 @@
         <xsd:attribute name="name" type="substitutableName" use="required">
             <xsd:annotation>
                 <xsd:documentation>
-                    The name of the property.
-                    This is used inside ${...}.
+                    The name of the property. This is used inside ${...}.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="value" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation>
-                    The value of the property.
-                    This replaces each occurence of ${...}.
+                    The value of the property. This replaces each occurence of ${...}.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -278,8 +247,7 @@
         <xsd:attribute name="matchAll" type="substitutableBoolean" default="true">
             <xsd:annotation>
                 <xsd:documentation>
-                    If true, the input message will be passed through inbound routers, otherwise only
-                    the first matching router is used.
+                    If true, the input message will be passed through inbound routers, otherwise only the first matching router is used.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -297,8 +265,7 @@
     <xsd:element name="abstract-inbound-router" abstract="true" type="abstractInboundRouterType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for inbound router elements.
-                Inbound routers control how incoming messages are handled.
+                A placeholder for inbound router elements. Inbound routers control how incoming messages are handled.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -307,8 +274,7 @@
     <xsd:element name="abstract-filter" abstract="true" type="abstractFilterType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for filter elements.
-                Filters are used to make decisions within the Mule framework.
+                A placeholder for filter elements. Filters are used to make decisions within the Mule framework.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -316,8 +282,7 @@
         <xsd:attribute name="name" type="substitutableName">
             <xsd:annotation>
                 <xsd:documentation>
-                    Identifies the filter so that other elements can reference it.
-                    Required if the filter is defined at the global level.
+                    Identifies the filter so that other elements can reference it. Required if the filter is defined at the global level.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -338,8 +303,7 @@
         <xsd:attribute name="matchAll" type="substitutableBoolean" default="false">
             <xsd:annotation>
                 <xsd:documentation>
-                    If true, the output message will be sent to all routers, otherwise only
-                    the first matching router is used.
+                    If true, the output message will be sent to all routers, otherwise only the first matching router is used.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -348,8 +312,7 @@
     <xsd:element name="abstract-outbound-router" abstract="true" type="abstractOutboundRouterType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for outbound router elements.
-                Outbound routers control how outgoing messages are delivered to the outbound endpoints.
+                A placeholder for outbound router elements. Outbound routers control how outgoing messages are delivered to the outbound endpoints.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -358,8 +321,7 @@
     <xsd:element name="abstract-transaction-manager" abstract="true" type="abstractTransactionManagerType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for transaction manager elements.
-                Transaction managers are used to co-ordinate transactions.
+                A placeholder for transaction manager elements. Transaction managers are used to co-ordinate transactions.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -370,43 +332,35 @@
             <xsd:element name="default-threading-profile" type="threadingProfileType" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The default threading profile,
-                        used by components and by endpoints for dispatching and receiving
-                        if no more specific configuration is given.
+                        The default threading profile, used by components and by endpoints for dispatching and receiving if no more specific configuration is given.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element name="default-dispatcher-threading-profile" type="threadingProfileType" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The default dispatching threading profile, modifies the default-threading-profile
-                        values and is used by endpoints for dispatching
-                        if no more specific configuration is given.
+                        The default dispatching threading profile, modifies the default-threading-profile values and is used by endpoints for dispatching if no more specific configuration is given.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element name="default-receiver-threading-profile" type="threadingProfileType" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The default receiving threading profile, modifies the default-threading-profile
-                        values and is used by endpoints for receiving
-                        if no more specific configuration is given.
+                        The default receiving threading profile, modifies the default-threading-profile values and is used by endpoints for receiving if no more specific configuration is given.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element name="default-service-threading-profile" type="threadingProfileType" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The default service threading profile, modifies the default-threading-profile
-                        values and is used if no more specific configuration is given.
+                        The default service threading profile, modifies the default-threading-profile values and is used if no more specific configuration is given.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element ref="abstract-retry-policy" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The default retry policy, used by connectors and endpoints if no more
-                        specific policy is configured for them.
+                        The default retry policy, used by connectors and endpoints if no more specific policy is configured for them.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -428,8 +382,7 @@
         <xsd:attribute name="defaultTransactionTimeout" type="xsd:string" default="5000">
             <xsd:annotation>
                 <xsd:documentation>
-                    The default timeout for transactions,
-                    used if no more specific configuration is given.
+                    The default timeout for transactions, used if no more specific configuration is given.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -440,28 +393,21 @@
             <xsd:element name="notification" type="defineNotificationType" minOccurs="0" maxOccurs="unbounded">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Associate an event with an interface.
-                        Listeners which implement the interface will receive instances of the event.
+                        Associate an event with an interface. Listeners which implement the interface will receive instances of the event.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element name="disable-notification" type="disableNotificationType" minOccurs="0" maxOccurs="unbounded">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Block the association of an event with a particular interface.
-                        This filters events after the association with a particular interface
-                        (and so takes precedence).
+                        Block the association of an event with a particular interface. This filters events after the association with a particular interface (and so takes precedence).
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element name="notification-listener" minOccurs="0" maxOccurs="unbounded">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Register a bean as a listener with the notification system.
-                        Events are dispatched by reflection - the listener will receive all events
-                        associated with any interfaces it implements.
-                        The relationship between interfaces and events is configured by the
-                        notification and disable-notification elements.
+                        Register a bean as a listener with the notification system. Events are dispatched by reflection - the listener will receive all events associated with any interfaces it implements. The relationship between interfaces and events is configured by the notification and disable-notification elements.
                     </xsd:documentation>
                 </xsd:annotation>
                 <xsd:complexType>
@@ -475,9 +421,7 @@
                     <xsd:attribute name="subscription" type="xsd:string">
                         <xsd:annotation>
                             <xsd:documentation>
-                                An optional string that is compared with the event resource identifier.
-                                Only events with matching identifiers will be sent.
-                                If no value is given, all events are sent.
+                                An optional string that is compared with the event resource identifier. Only events with matching identifiers will be sent. If no value is given, all events are sent.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -487,11 +431,7 @@
         <xsd:attribute name="dynamic" type="substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    If the notification manager is dynamic then programatic updates to the manager
-                    (ie via Java code) will affect all messages.
-                    Otherwise, some parts of the system may cache state for
-                    efficiency and so not generate newly enabled notifications.
-                    The default value is false.
+                    If the notification manager is dynamic then programatic updates to the manager (ie via Java code) will affect all messages. Otherwise, some parts of the system may cache state for efficiency and so not generate newly enabled notifications. The default value is false.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -501,8 +441,7 @@
         <xsd:attribute name="event-class" type="substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
-                    The class associated with a notification event that will be delivered to the interface.
-                    This can be used instead of the event attribute to specify a custom class.
+                    The class associated with a notification event that will be delivered to the interface. This can be used instead of the event attribute to specify a custom class.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -533,8 +472,7 @@
         <xsd:attribute name="event-class" type="substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
-                    The class associated with an event that will no longer be delivered to any interface.
-                    This can be used instead of the event attribute to specify a custom class.
+                    The class associated with an event that will no longer be delivered to any interface. This can be used instead of the event attribute to specify a custom class.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -588,8 +526,7 @@
     <xsd:element name="abstract-model" abstract="true" type="abstractModelType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for model elements.
-                A model provides basic settings and processing for all the services it contains.
+                A placeholder for model elements. A model provides basic settings and processing for all the services it contains.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -611,8 +548,7 @@
     <xsd:element name="seda-model" type="sedaModelType" substitutionGroup="abstract-model">
         <xsd:annotation>
             <xsd:documentation>
-                A SEDA (Staged Event Drivern Architecture) model has separate threads and
-                queues for each component.
+                A SEDA (Staged Event Drivern Architecture) model has separate threads and queues for each component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -625,8 +561,7 @@
                 <xsd:attribute name="inherit" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If true then this model element is an extension of a previous model
-                            element with the same name.
+                            If true then this model element is an extension of a previous model element with the same name.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -652,8 +587,7 @@
     <xsd:element name="abstract-queue-profile" abstract="true" type="abstractQueueProfileType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for queue profile elements.
-                A queue profile controls how messages are queued before being processed.
+                A placeholder for queue profile elements. A queue profile controls how messages are queued before being processed.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -671,8 +605,7 @@
     <xsd:element name="abstract-entry-point-resolver-set" abstract="true" type="abstractEntryPointResolverSetType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for entry point resolver set elements.
-                These combine a group of entry point resolvers, trying them in turn until one succeeds.
+                A placeholder for entry point resolver set elements. These combine a group of entry point resolvers, trying them in turn until one succeeds.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -682,13 +615,7 @@
                  substitutionGroup="abstract-entry-point-resolver-set">
         <xsd:annotation>
             <xsd:documentation>
-                An extensible set of entry point resolvers (which determine how a message is passed to a component in
-                Java)
-                that already contains resolvers to implement the standard logic.
-                This is already provided by default and is only needed explicitly if
-                it will be extended with other entry point resolvers.
-                This element can be set on the model or component;
-                the model value provides a default which individual component values can override.
+                An extensible set of entry point resolvers (which determine how a message is passed to a component in Java) that already contains resolvers to implement the standard logic. This is already provided by default and is only needed explicitly if it will be extended with other entry point resolvers. This element can be set on the model or component; the model value provides a default which individual component values can override.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -696,11 +623,7 @@
                  substitutionGroup="abstract-entry-point-resolver-set">
         <xsd:annotation>
             <xsd:documentation>
-                An extensible set of entry point resolvers.
-                These determine how a message is passed to a component in Java.
-                Each entry point resolver is tried in turn until one succeeds in delivering the messge to the component.
-                This element can be set on the model or component;
-                the model value provides a default which individual component values can override.
+                An extensible set of entry point resolvers. These determine how a message is passed to a component in Java. Each entry point resolver is tried in turn until one succeeds in delivering the messge to the component. This element can be set on the model or component; the model value provides a default which individual component values can override.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -718,10 +641,7 @@
                  substitutionGroup="abstract-entry-point-resolver-set">
         <xsd:annotation>
             <xsd:documentation>
-                A custom entry point resolver set.
-                This allows user-supplied code to determine how a message is passed to a component in Java.
-                This element can be set on the model or component;
-                the model value provides a default which individual component values can override.
+                A custom entry point resolver set. This allows user-supplied code to determine how a message is passed to a component in Java. This element can be set on the model or component; the model value provides a default which individual component values can override.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -745,9 +665,7 @@
     <xsd:element name="abstract-entry-point-resolver" abstract="true" type="abstractEntryPointResolverType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for an entry point resolver element.
-                Entry point resolvers define how payloads are delivered to Java code
-                (ie they choose the method to call).
+                A placeholder for an entry point resolver element. Entry point resolvers define how payloads are delivered to Java code by choosing the method to call.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -755,12 +673,7 @@
                  substitutionGroup="abstract-entry-point-resolver">
         <xsd:annotation>
             <xsd:documentation>
-                An entry point resolver for components that implement the Callable interface.
-                This passes a MuleEventContext to the component.
-                This element can be set on the model or component;
-                the model value provides a default which individual component values can override.
-                This element can also be used directly or as part of a set of resolvers;
-                the resolvers in a set are used in turn until one is successful.
+                An entry point resolver for components that implement the Callable interface. This passes a MuleEventContext to the component. This element can be set on the model or component; the model value provides a default which individual component values can override. This element can also be used directly or as part of a set of resolvers; the resolvers in a set are used in turn until one is successful.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -770,12 +683,7 @@
                  substitutionGroup="abstract-entry-point-resolver">
         <xsd:annotation>
             <xsd:documentation>
-                A custom entry point resolver.
-                This allows user-supplied code to determine how a message is passed to a component in Java.
-                This element can be set on the model or component;
-                the model value provides a default which individual component values can override.
-                This element can also be used directly or as part of a set of resolvers;
-                the resolvers in a set are used in turn until one is successful.
+                A custom entry point resolver. This allows user-supplied code to determine how a message is passed to a component in Java. This element can be set on the model or component; the model value provides a default which individual component values can override. This element can also be used directly or as part of a set of resolvers; the resolvers in a set are used in turn until one is successful.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -802,16 +710,14 @@
                 <xsd:attribute name="transformFirst" type="substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Should the message be transformer before being delivered to the component?
-                            By default, messages are transformed.
+                            Whether the message should be transformed before being delivered to the component. By default, messages are transformed.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="acceptVoidMethods" type="substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Should the resolver call void methods?
-                            By default, void methods are not considered as possible candidates for message delivery.
+                            Whether the resolver should call void methods. By default, void methods are not considered as possible candidates for message delivery.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -823,11 +729,7 @@
                  substitutionGroup="abstract-entry-point-resolver">
         <xsd:annotation>
             <xsd:documentation>
-                Use a message property to select the component method to be called.
-                This element can be set on the model or component;
-                the model value provides a default which individual component values can override.
-                This element can also be used directly or as part of a set of resolvers;
-                the resolvers in a set are used in turn until one is successful.
+                Use a message property to select the component method to be called. This element can be set on the model or component; the model value provides a default which individual component values can override. This element can also be used directly or as part of a set of resolvers; the resolvers in a set are used in turn until one is successful.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -849,11 +751,7 @@
                  substitutionGroup="abstract-entry-point-resolver">
         <xsd:annotation>
             <xsd:documentation>
-                Deliver the message to a named method.
-                This element can be set on the model or component;
-                the model value provides a default which individual component values can override.
-                This element can also be used directly or as part of a set of resolvers;
-                the resolvers in a set are used in turn until one is successful.
+                Deliver the message to a named method. This element can be set on the model or component; the model value provides a default which individual component values can override. This element can also be used directly or as part of a set of resolvers; the resolvers in a set are used in turn until one is successful.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -871,11 +769,7 @@
                  substitutionGroup="abstract-entry-point-resolver">
         <xsd:annotation>
             <xsd:documentation>
-                Generate a list of candidate methods from the component via reflections.
-                This element can be set on the model or component;
-                the model value provides a default which individual component values can override.
-                This element can also be used directly or as part of a set of resolvers;
-                the resolvers in a set are used in turn until one is successful.
+                Generate a list of candidate methods from the component via reflections. This element can be set on the model or component; the model value provides a default which individual component values can override. This element can also be used directly or as part of a set of resolvers; the resolvers in a set are used in turn until one is successful.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -886,8 +780,7 @@
                     <xsd:element name="exclude-object-methods" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                If specified, methods in the Java Object interface are not included in
-                                the list of possible methods that can receive the message.
+                                If specified, methods in the Java Object interface are not included in the list of possible methods that can receive the message.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -907,11 +800,7 @@
                  substitutionGroup="abstract-entry-point-resolver">
         <xsd:annotation>
             <xsd:documentation>
-                Deliver the message to a method which takes a single array as argument.
-                This element can be set on the model or component;
-                the model value provides a default which individual component values can override.
-                This element can also be used directly or as part of a set of resolvers;
-                the resolvers in a set are used in turn until one is successful.
+                Deliver the message to a method which takes a single array as argument. This element can be set on the model or component; the model value provides a default which individual component values can override. This element can also be used directly or as part of a set of resolvers; the resolvers in a set are used in turn until one is successful.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -959,8 +848,7 @@
     <xsd:element name="abstract-service" abstract="true" type="abstractServiceType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for a service element.
-                Services combine message routing with a Java (typically) component.
+                A placeholder for a service element. Services combine message routing with a Java (typically) component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -986,8 +874,7 @@
                     <xsd:element name="description" type="descriptionType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                This can hold any kind of documentation consistent with the overall XML format).
-                                It is intended to be "human readable" only and is not used by the system.
+                                This can hold any kind of documentation consistent with the overall XML format). It is intended to be "human readable" only and is not used by the system.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -1019,10 +906,7 @@
                 <xsd:attribute name="initialState" default="started">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The initial state of the service.
-                            Usually a service is started automatically, but this attribute can block any
-                            initial startup ("stopped") or stop the service immediately after initial
-                            startup ("paused").
+                            The initial state of the service. Usually a service is started automatically, but this attribute can block any initial startup ("stopped") or stop the service immediately after initial startup ("paused").
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
@@ -1040,8 +924,7 @@
     <xsd:element name="abstract-exception-strategy" abstract="true" type="abstractExceptionStrategyType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for an exception strategy element.
-                Exception strategies define how Mule should react to errors.
+                A placeholder for an exception strategy element. Exception strategies define how Mule should react to errors.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1050,27 +933,20 @@
         <xsd:sequence>
             <xsd:element name="commit-transaction" type="exceptionPatternType" maxOccurs="1" minOccurs="0">
                 <xsd:annotation>
-                    <xsd:documentation>Defines when a current transaction gets rolled-back depending on the name of the
-                        exception caught. Users can set a comma delimited list of wildcard patterns that wil be matched
-                        angainst the fully qualified classname of the current exception. Patterns defined for this
-                        element will leave the current transaction (if any) untouched and llow it to be committed.
+                    <xsd:documentation>Defines when a current transaction gets rolled-back depending on the name of the exception caught. Users can set a comma delimited list of wildcard patterns that wil be matched angainst the fully qualified classname of the current exception. Patterns defined for this element will leave the current transaction (if any) untouched and llow it to be committed.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element name="rollback-transaction" type="exceptionPatternType" maxOccurs="1" minOccurs="0">
                 <xsd:annotation>
-                    <xsd:documentation>Defines when a current transaction gets rolled-back depending on the name of the
-                        exception caught. Users can set a comma delimited list of wildcard patterns that wil be matched
-                        angainst the fully qualified classname of the current exception. Patterns defined for this
-                        element will rollback the current transaction (if any).
+                    <xsd:documentation>Defines when a current transaction gets rolled-back depending on the name of the exception caught. Users can set a comma delimited list of wildcard patterns that wil be matched angainst the fully qualified classname of the current exception. Patterns defined for this element will rollback the current transaction (if any).
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="enableNotifications" type="xsd:boolean">
             <xsd:annotation>
-                <xsd:documentation>Determines whether ExceptionNotifications wil be fired from this strategy when an
-                    exception occurs.
+                <xsd:documentation>Determines whether ExceptionNotifications wil be fired from this strategy when an exception occurs.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1079,8 +955,7 @@
     <xsd:complexType name="exceptionPatternType">
         <xsd:attribute name="exception-pattern" type="xsd:string" use="required">
             <xsd:annotation>
-                <xsd:documentation>A comma-separate list of wildcard expressions that will be matched against the
-                    fully qualified cassname of the current exception received by the ExceptionStrategy.
+                <xsd:documentation>A comma-separate list of wildcard expressions that will be matched against the fully qualified cassname of the current exception received by the ExceptionStrategy.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1089,8 +964,7 @@
     <xsd:element name="abstract-retry-policy" abstract="true" type="abstractRetryPolicyType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for a retry policy element.
-                Retry policies define how Mule should retry a failed message send/dispatch/request.
+                A placeholder for a retry policy element. Retry policies define how Mule should retry a failed message send/dispatch/request.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1103,9 +977,7 @@
     <xsd:element name="abstract-retry-notifier" abstract="true" type="abstractRetryNotifierType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for a retry notifier element.
-                The RetryNotifier interface is a callback that allows actions to be performed after each retry.
-                For example, when retrying connections Mule will fire server notification events on success or failure.
+                A placeholder for a retry notifier element. The RetryNotifier interface is a callback that allows actions to be performed after each retry. For example, when retrying connections Mule will fire server notification events on success or failure.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1128,8 +1000,7 @@
         <xsd:attribute name="failOnTimeout" type="substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    If the router times out before all expected events have been received should an exception be thrown
-                    or should the current events be returned for processing. The default is false.
+                    If the router times out before all expected events have been received should an exception be thrown or should the current events be returned for processing. The default is false.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1138,8 +1009,7 @@
     <xsd:element name="abstract-async-reply-router" abstract="true" type="abstractAsyncReplyRouterType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for an async reply router element.
-                Asynchronous replies are handled via this router.
+                A placeholder for an async reply router element. Asynchronous replies are handled via this router.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1148,9 +1018,7 @@
     <xsd:element name="service" type="sedaServiceType" substitutionGroup="abstract-service">
         <xsd:annotation>
             <xsd:documentation>
-                The standard SEDA service.
-                A service describes how to receive messages, deliver them to
-                a component, and handle the results (if any).
+                The standard SEDA service. A service describes how to receive messages, deliver them to a component, and handle the results (if any).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1175,8 +1043,7 @@
     <xsd:element name="custom-service" type="customServiceType" substitutionGroup="abstract-service">
         <xsd:annotation>
             <xsd:documentation>
-                A user-implemeted service
-                (typically used only in testing).
+                A user-implemeted service (typically used only in testing).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1198,8 +1065,7 @@
                  type="abstractServiceThreadingProfileType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for service threading profile element.
-                Threading profiles define how thread pools interact with the component.
+                A placeholder for service threading profile element. Threading profiles define how thread pools interact with the component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1212,8 +1078,7 @@
     <xsd:element name="abstract-component" abstract="true" type="abstractComponentType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for component element.
-                A component processes data. Typically it is a Java object.
+                A placeholder for component element. A component processes data. Typically it is a Java object.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1224,9 +1089,7 @@
     <xsd:element name="component" type="defaultJavaComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                A simple POJO (Plain Old Java Object) component
-                that will be invoked by Mule when a message is received.
-                The instance can be specified via a factory, or via a class.
+                A simple POJO (Plain Old Java Object) component that will be invoked by Mule when a message is received. The instance can be specified via a factory, or via a class.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1240,9 +1103,7 @@
                     <xsd:element name="binding" type="pojoBindingType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
-                                A binding associates a Mule endpoint with an injected Java interface
-                                (this is like using Spring to inject a bean, but instead of calling a
-                                method on the bean a message is sent to an endpoint).
+                                A binding associates a Mule endpoint with an injected Java interface. This is like using Spring to inject a bean, but instead of calling a method on the bean a message is sent to an endpoint.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -1250,8 +1111,7 @@
                 <xsd:attribute name="class" type="substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Specify a component class.
-                            This is a shortcut that is equivalent to providing a prototype-object element.
+                            Specify a component class. This is a shortcut that is equivalent to providing a prototype-object element.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1262,9 +1122,7 @@
     <xsd:element name="pooled-component" type="pooledJavaComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                A pooled POJO (Plain Old Java Object) component
-                that will be invoked by Mule when a message is received.
-                The instance can be specified via a factory, or via a class.
+                A pooled POJO (Plain Old Java Object) component that will be invoked by Mule when a message is received. The instance can be specified via a factory, or via a class.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1290,16 +1148,14 @@
         <xsd:attribute name="interface" use="required" type="substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
-                    The interface to be injected.
-                    A proxy will be created that implements this interface by calling out to the endpoint.
+                    The interface to be injected. A proxy will be created that implements this interface by calling out to the endpoint.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="method" use="optional">
             <xsd:annotation>
                 <xsd:documentation>
-                    The method on the interface that should be used.
-                    This can be omitted if the interface has a single method.
+                    The method on the interface that should be used. This can be omitted if the interface has a single method.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1314,8 +1170,7 @@
     <xsd:element name="bridge-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                This transfers a message from inbound to outbound endpoints.
-                This name is provided for backwards compatability - it is equivalent to not specifying any component.
+                This transfers a message from inbound to outbound endpoints. This name is provided for backwards compatability - it is equivalent to not specifying any component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1385,17 +1240,14 @@
     <xsd:element name="abstract-transaction" abstract="true" type="abstractTransactionType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for transaction elements.
-                Transactions allow a series of operations to be grouped together.
+                A placeholder for transaction elements. Transactions allow a series of operations to be grouped together.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="abstract-xa-transaction" abstract="true" type="abstractTransactionType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for XA transaction elements.
-                XA Transactions allow a series of operations to be grouped together spanning different
-                transports, e.g. JMS and JDBC.
+                A placeholder for XA transaction elements. XA Transactions allow a series of operations to be grouped together spanning different transports, e.g. JMS and JDBC.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1453,7 +1305,7 @@
     <xsd:element name="custom-transaction" type="customTransactionType" substitutionGroup="abstract-transaction">
         <xsd:annotation>
             <xsd:documentation>
-                Allow access to user-defined or otherwise unsupported third party transactions.
+                Allow access to user-defined or otherwise unsupported third-party transactions.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1463,20 +1315,14 @@
                 <xsd:attribute name="factory-class" type="substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A class that implements the TransactionFactory interface that will be
-                            instantiated and used to generate a transaction.
-                            This attribute and the "factory-ref" attribute are mutually exclusive;
-                            one of the two is required.
+                            A class that implements the TransactionFactory interface that will be instantiated and used to generate a transaction. This attribute and the "factory-ref" attribute are mutually exclusive; one of the two is required.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="factory-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A bean that implements the TransactionFactory interface that will be
-                            used to generate a transaction.
-                            This attribute and the "factory-class" attribute are mutually exclusive;
-                            one of the two is required.
+                            A bean that implements the TransactionFactory interface that will be used to generate a transaction. This attribute and the "factory-class" attribute are mutually exclusive; one of the two is required.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1503,8 +1349,7 @@
                 <xsd:attribute name="name" type="substitutableName" default="transactionManager" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            An optional name for the transaction manager.
-                            The default value is "transactionManager".
+                            An optional name for the transaction manager. The default value is "transactionManager".
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1516,7 +1361,7 @@
                  substitutionGroup="abstract-transaction-manager">
         <xsd:annotation>
             <xsd:documentation>
-                The Websphere transaction manager.
+                The WebSphere transaction manager.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1549,7 +1394,7 @@
                  substitutionGroup="abstract-transaction-manager">
         <xsd:annotation>
             <xsd:documentation>
-                The Weblogic transaction manager.
+                The WebLogic transaction manager.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1624,11 +1469,7 @@
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="abstract-global-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                An endpoint "template" which can be used to construct an inbound or outbound endpoint
-                elsewhere in the configuration by referencing the endpoint name.
-                Each transport implements its own endpoint element, with a more friendly syntax,
-                but this generic element can be used with any transport by supplying the correct
-                address URI. For example, "vm://foo" describes a VM transport endpoint.
+                An endpoint "template" that can be used to construct an inbound or outbound endpoint elsewhere in the configuration by referencing the endpoint name. Each transport implements its own endpoint element, with a more friendly syntax, but this generic element can be used with any transport by supplying the correct address URI. For example, "vm://foo" describes a VM transport endpoint.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1653,10 +1494,7 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                An inbound endpoint receives messages from the associated transport.
-                Each transport implements its own inbound endpoint element, with a more friendly syntax,
-                but this generic element can be used with any transport by supplying the correct
-                address URI. For example, "vm://foo" describes a VM transport endpoint.
+                An inbound endpoint receives messages from the associated transport. Each transport implements its own inbound endpoint element, with a more friendly syntax, but this generic element can be used with any transport by supplying the correct address URI. For example, "vm://foo" describes a VM transport endpoint.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1681,10 +1519,7 @@
     <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                An outbound endpoint sends messages to the associated transport.
-                Each transport implements its own outbound endpoint element, with a more friendly syntax,
-                but this generic element can be used with any transport by supplying the correct
-                address URI. For example, "vm://foo" describes a VM transport endpoint.
+                An outbound endpoint sends messages to the associated transport. Each transport implements its own outbound endpoint element, with a more friendly syntax, but this generic element can be used with any transport by supplying the correct address URI. For example, "vm://foo" describes a VM transport endpoint.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1735,8 +1570,7 @@
     <xsd:element name="abstract-security-filter" abstract="true" type="abstractSecurityFilterType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for security filter elements.
-                Security filters can control access to the system, etc.
+                A placeholder for security filter elements. Security filters can control access to the system, etc.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1750,11 +1584,7 @@
         <xsd:attribute name="ref" type="xsd:NMTOKEN">
             <xsd:annotation>
                 <xsd:documentation>
-                    A reference to a global endpoint.
-                    If this attribute is used then the endpoint is used as a template to construct this endpoint.
-                    A template fixes the address (protocol, path, host, etc), and may specify initial values for
-                    various properties, but further properties can be defined locally (as long as they do not
-                    change the address in any way).
+                    A reference to a global endpoint. If this attribute is used then the endpoint is used as a template to construct this endpoint. A template fixes the address (protocol, path, host, etc.), and may specify initial values for various properties, but further properties can be defined locally (as long as they do not change the address in any way).
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1762,12 +1592,7 @@
         <xsd:attribute name="address" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The generic address for this endpoint.
-                    If this attribute is used then the protocol must be specified as part of the URI.
-                    Alternatively, most transports provide alternative attributes for specifying the address
-                    (path, host etc).
-                    Note that the address attribute cannot be combined with "ref" or with the transport-provided
-                    alternative attributes.
+                    The generic address for this endpoint. If this attribute is used, the protocol must be specified as part of the URI. Alternatively, most transports provide their own attributes for specifying the address (path, host, etc.). Note that the address attribute cannot be combined with "ref" or with the transport-provided alternative attributes.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1777,8 +1602,7 @@
         <xsd:attribute name="synchronous" type="substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    If true the result from the component processing the incoming message will be
-                    returned as a response.
+                    If true, the result from the component processing the incoming message will be returned as a response.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1800,24 +1624,21 @@
         <xsd:attribute name="connector-ref" type="xsd:NMTOKEN">
             <xsd:annotation>
                 <xsd:documentation>
-                    The name of the connector associated with this endpoint.
-                    This must be specified if more than one connector is defined for this transport.
+                    The name of the connector associated with this endpoint. This must be specified if more than one connector is defined for this transport.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS">
             <xsd:annotation>
                 <xsd:documentation>
-                    A list of transformers which will be applied in order to the message before it is
-                    delivered to the component.
+                    A list of the transformers that will be applied to the message in order before it is delivered to the component.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="responseTransformer-refs" type="xsd:NMTOKENS">
             <xsd:annotation>
                 <xsd:documentation>
-                    A list of transformers which will be applied in order to the synchronous response
-                    before it is returned via the transport.
+                    A list of the transformers that will be applied to the synchronous response in order before it is returned via the transport.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1834,10 +1655,7 @@
         <xsd:attribute name="ref" type="xsd:NMTOKEN">
             <xsd:annotation>
                 <xsd:documentation>
-                    The reference name of a global endpoint to use. If this EndpointRef will be associated to a message
-                    such as a Reply-To address, this endpoint ref has to be available on the remote Mule instance that
-                    reads the
-                    Reply-To address.
+                    The reference name of a global endpoint to use. If this EndpointRef will be associated to a message such as a Reply-To address, this endpoint ref has to be available on the remote Mule instance that reads the Reply-To address.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1846,8 +1664,7 @@
     <xsd:group name="endpointTransformers">
         <xsd:annotation>
             <xsd:documentation>
-                This allows the user to specify either a simple list of (normal) transformers or
-                separate bracketed lists of normal and response transformers.
+                Allows the user to specify either a simple list of (normal) transformers or separate bracketed lists of normal and response transformers.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:choice>
@@ -1856,12 +1673,7 @@
                 <xsd:element name="transformers" minOccurs="0">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A list of transformer elements that will be applied to the message
-                            before it is delivered to the component.
-                            Note that a list of transformers can also be specified directly
-                            (without the "transformers" element), but then it is not possible
-                            to also specify response transformers
-                            (using the "response-transformers" element).
+                            A list of transformer elements that will be applied to the message before it is delivered to the component. Note that a list of transformers can also be specified directly (without the "transformers" element), but then it is not possible to also specify response transformers (using the "response-transformers" element).
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:complexType>
@@ -1871,8 +1683,7 @@
                 <xsd:element name="response-transformers" minOccurs="0">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A list of transformer elements that will be applied to the response message
-                            returned from the component.
+                            A list of transformer elements that will be applied to the response message returned from the component.
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:complexType>
@@ -1922,8 +1733,7 @@
     <xsd:element name="not-filter" type="unitaryFilterType" substitutionGroup="abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                Invert the enclosed filter
-                (so if it returns true for some message, this will return false, and vice-versa).
+                Invert the enclosed filter (so if it returns true for some message, this will return false, and vice-versa).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1964,12 +1774,7 @@
     <xsd:element name="wildcard-filter" type="wildcardFilterType" substitutionGroup="abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                A filter that matches string messages against wildcards.
-                It performs matches with "*", i.e. "jms.events.*" would catch "jms.events.customer"
-                and "jms.events.receipts".
-                This filter accepts a comma-separated list of patterns, so more than one filter pattern can be
-                matched for a given argument: "jms.events.*, jms.actions.*" will match "jms.events.system"
-                and "jms.actions" but not "jms.queue".
+                A filter that matches string messages against wildcards. It performs matches with "*", for example, "jms.events.*" would catch "jms.events.customer" and "jms.events.receipts". This filter accepts a comma-separated list of patterns, so more than one filter pattern can be matched for a given argument: "jms.events.*, jms.actions.*" will match "jms.events.system" and "jms.actions" but not "jms.queue".
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1982,8 +1787,7 @@
     <xsd:element name="expression-filter" type="expressionFilterType" substitutionGroup="abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                A filter that can evaluate a range of expressions. It supports some base expression types
-                such as header, payload (payload type), regex, and wildcard.
+                A filter that can evaluate a range of expressions. It supports some base expression types such as header, payload (payload type), regex, and wildcard.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1992,11 +1796,7 @@
             <xsd:extension base="abstractFilterType">
                 <xsd:attribute name="evaluator" use="required">
                     <xsd:annotation>
-                        <xsd:documentation>The expression evaluator to use. The expression filter supports some types
-                            such as header, payload, exception, wildcard and regex, that are in-built filters not
-                            registered with the ExpressionEvaluatorManager. All others are registered with the
-                            ExpressionEvaluatorManager. Where XPath, bean and ongl are used, the expression should be a
-                            boolean expression.
+                        <xsd:documentation>The expression evaluator to use. The expression filter supports some types such as header, payload, exception, wildcard and regex, that are in-built filters not registered with the ExpressionEvaluatorManager. All others are registered with the ExpressionEvaluatorManager. Where XPath, bean, and ONGL are used, the expression should be a boolean expression.
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
@@ -2017,23 +1817,19 @@
                 </xsd:attribute>
                 <xsd:attribute name="expression" type="xsd:string" use="required">
                     <xsd:annotation>
-                        <xsd:documentation>The expression that will be evaluated. This should always be a boolean
-                            expression. The syntax of the exprsssion will be determined by the exprsssion langage being
-                            used.
+                        <xsd:documentation>The expression that will be evaluated. This should always be a boolean expression. The syntax of the expression will be determined by the expression language being used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="customEvaluator" type="substitutableName">
                     <xsd:annotation>
-                        <xsd:documentation>Must be set if the evaluator is set to custom. Also the custom evaluator
-                            must be registered with the ExpressionEvaluatorManager if it is to be used here.
+                        <xsd:documentation>Must be set if the evaluator is set to custom. The custom evaluator must be registered with the ExpressionEvaluatorManager if it is to be used here.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="nullReturnsTrue" type="substitutableBoolean">
                     <xsd:annotation>
-                        <xsd:documentation>If the specified expression returns null should the filter return true or
-                            false.
+                        <xsd:documentation>Whether the filter should return true if the specified expression returns null.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2045,8 +1841,7 @@
     <xsd:element name="regex-filter" type="patternFilterType" substitutionGroup="abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                A filter that matches string messages against a regular expression.
-                The Java regular expression engine (java.util.regex.Pattern) is used.
+                A filter that matches string messages against a regular expression. The Java regular expression engine (java.util.regex.Pattern) is used.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2056,9 +1851,7 @@
                 <xsd:attribute name="pattern" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The property name and possibly value to use when matching. If the expression is just a
-                            property name, the filter will check that the property exists.  Users can also uses '=' and
-                            '!=' to determine a specific value for a property.
+                            The property name and possibly value to use when matching. If the expression is just a property name, the filter will check that the property exists. Users can also uses '=' and '!=' to determine a specific value for a property.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2070,13 +1863,7 @@
                  substitutionGroup="abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                A filter that matches properties on an event.
-                This can be very useful as the event properties represent all the meta information about the event
-                from the underlying transport, so for an event received over HTTP you can check for HTTP headers etc.
-                The pattern should be expressed as a key/value pair, i.e. "propertyName=value".
-                If you want to compare more than one property you can use the logic filters for And, Or and Not
-                expressions.
-                By default the comparison is case sensitive; you can set the caseSensitive property to override this.
+                A filter that matches properties on a message. This can be very useful as the message properties represent all the meta information about the message from the underlying transport, so for a message received over HTTP, you can check for HTTP headers and so forth. The pattern should be expressed as a key/value pair, such as "propertyName=value". If you want to compare more than one property, you can use the logic filters for And, Or, and Not expressions. By default the comparison is case sensitive, which you can override with the caseSensitive property.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2202,14 +1989,14 @@
     <xsd:element name="timer-interceptor" type="abstractInterceptorType" substitutionGroup="abstract-interceptor">
         <xsd:annotation>
             <xsd:documentation>
-                The timer interceptor ported from 1.x.
+                The timer interceptor (ported from 1.x).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="logging-interceptor" type="abstractInterceptorType" substitutionGroup="abstract-interceptor">
         <xsd:annotation>
             <xsd:documentation>
-                The logging interceptor ported from 1.x.
+                The logging interceptor (ported from 1.x).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2244,7 +2031,7 @@
                  substitutionGroup="abstract-security-filter">
         <xsd:annotation>
             <xsd:documentation>
-                A filter that provides password based encyption.
+                A filter that provides password-based encyption.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2254,9 +2041,7 @@
                 <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The name of the encryption strategy to use.
-                            This should be configured using the password-encryption-strategy element,
-                            inside a security-manager element at the top level.
+                            The name of the encryption strategy to use. This should be configured using the password-encryption-strategy element, inside a security-manager element at the top level.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2282,7 +2067,7 @@
                 <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The name of the transformer to use,
+                            The name of the transformer to use.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2293,9 +2078,7 @@
     <xsd:element name="auto-transformer" type="abstractTransformerType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that uses the transform discovery mechanism to convert the message payload. This
-                transformer works much better when transforming custom object types rather that java types since there
-                is less chance for ambiguity.
+                A transformer that uses the transform discovery mechanism to convert the message payload. This transformer works much better when transforming custom object types rather than Java types, because there is less chance for ambiguity.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2487,7 +2270,7 @@
                  substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that converts a byte array to an object (ie deserializing the object).
+                A transformer that converts a byte array to an object (deserializing the object).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2496,7 +2279,7 @@
                  substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that converts an object to a byte array (ie serializing the object).
+                A transformer that converts an object to a byte array (serializing the object).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2562,9 +2345,7 @@
                 <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The name of the encryption strategy to use.
-                            This should be configured using the password-encryption-strategy element,
-                            inside a security-manager element at the top level.
+                            The name of the encryption strategy to use. This should be configured using the password-encryption-strategy element, inside a security-manager element at the top level.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2575,8 +2356,7 @@
     <xsd:element name="bean-builder-transformer" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that uses expressions to configure a simple bean object.  The user can specify a bean class
-                or factory to create and one or more expressions that are used to configure properties on the bean.
+                A transformer that uses expressions to configure a simple bean object.  The user can specify a bean class or factory to create and one or more expressions that are used to configure properties on the bean.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -2595,8 +2375,7 @@
                                 <xsd:attributeGroup ref="expressionAttributes"/>
                                 <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
                                     <xsd:annotation>
-                                        <xsd:documentation>An optional expression means that if the expression evaluates
-                                            to null, it will continue to the next expression without error.
+                                        <xsd:documentation>If the expression evaluates to null, whether to continue to the next expression without error.
                                         </xsd:documentation>
                                     </xsd:annotation>
                                 </xsd:attribute>
@@ -2625,8 +2404,7 @@
     <xsd:element name="expression-transformer" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that evaluates one or more expressions on the current event. Each expression equates to a
-                parameter in the return message. The return message for 2 or more expressions will be an Object[].
+                A transformer that evaluates one or more expressions on the current event. Each expression equates to a parameter in the return message. The return message for two or more expressions will be an Object[].
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -2638,8 +2416,7 @@
                                 <xsd:attributeGroup ref="expressionAttributes"/>
                                 <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
                                     <xsd:annotation>
-                                        <xsd:documentation>An optional expression means that if the expression evaluates
-                                            to null, it will continue to the next expression without error.
+                                        <xsd:documentation>If the expression evaluates to null, whether to continue to the next expression without error.
                                         </xsd:documentation>
                                     </xsd:annotation>
                                 </xsd:attribute>
@@ -2648,8 +2425,7 @@
                     </xsd:sequence>
                     <xsd:attribute name="returnSourceIfNull" type="xsd:boolean" use="optional">
                         <xsd:annotation>
-                            <xsd:documentation>If all expressions return null on this transformer, this flag will cause
-                                the source payload to be returned without modification.
+                            <xsd:documentation>If all expressions return null on this transformer, this flag will cause the source payload to be returned without modification.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -2661,11 +2437,7 @@
     <xsd:attributeGroup name="expressionAttributes">
         <xsd:attribute name="evaluator" use="required">
             <xsd:annotation>
-                <xsd:documentation>The expression evaluator to use. Expression Evaluators must be registered with the
-                    ExpressionEvaluatrManager before thay can be used. Using the custom evaluator allows the developer
-                    to define their on in the 'custom-evaluator' attribute. Note that some evaluators such as xpath,
-                    groovy and bean are loaded from other mule modules (xml and scripting respectively), these modules
-                    wll need to be on your classpath before the evaluator can be used.
+                <xsd:documentation>The expression evaluator to use. Expression Evaluators must be registered with the ExpressionEvaluatrManager before thay can be used. Using the custom evaluator allows the developer to define their own in the 'custom-evaluator' attribute. Note that some evaluators such as xpath, groovy, and bean are loaded from other Mule modules (XML and Scripting, respectively). These modules must be on your classpath before the evaluator can be used.
                 </xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
@@ -2699,16 +2471,13 @@
         </xsd:attribute>
         <xsd:attribute name="expression" type="xsd:string" use="required">
             <xsd:annotation>
-                <xsd:documentation>The expression to evaluate. The syntax of this attribute will change depending on the
-                    evaluator being used.
+                <xsd:documentation>The expression to evaluate. The syntax of this attribute will change depending on the evaluator being used.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="custom-evaluator" type="substitutableName" use="optional">
             <xsd:annotation>
-                <xsd:documentation>The name of the custom evaluator to use. This attribute is only used when the
-                    evaluator attribute is set to custom. Users can plug in their own expression evaluators by
-                    registering them with the ExpressionEvaluatorManager.
+                <xsd:documentation>The name of the custom evaluator to use. This attribute is only used when the evaluator attribute is set to custom. You can plug in your own expression evaluators by registering them with the ExpressionEvaluatorManager.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -2721,7 +2490,7 @@
     <xsd:element name="queue-profile" type="queueProfileType" substitutionGroup="abstract-queue-profile">
         <xsd:annotation>
             <xsd:documentation>
-                A Queue Profile is used to describe the properties of an internal Mule queue. Internal queues are used to queue events for each component managed by Mule.
+                Specifies the properties of an internal Mule queue. Internal queues are used to queue messages for each component managed by Mule.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2749,10 +2518,7 @@
     <xsd:element name="abstract-security-manager" type="abstractSecurityManagerType" abstract="true">
         <xsd:annotation>
             <xsd:documentation>
-                A security manager is a container for security providers. More than one
-                security manager may be configured; each contains providers from a particular
-                module and has that module type. This element is abstract - a security
-                related module or transport will provide a suitable implementation.
+                A security manager is a container for security providers. More than one security manager may be configured; each contains providers from a particular module and has that module type. This element is abstract - a security-related module or transport will provide a suitable implementation.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2760,12 +2526,7 @@
     <xsd:complexType name="abstractSecurityManagerType">
         <xsd:annotation>
             <xsd:documentation>
-                This is an empty holder that can be extended by modules that want to
-                provide security managers. Typically it will contain elements called
-                module:type-security-provider which extend securityProviderType
-                where "module" might be "acegi" and "type" might de "delegate", for example.
-                Alternatively (or in addition) it may contain encryption strategies,
-                which should follow a similar scheme and extend encryptionStrategyType.
+                An empty holder that can be extended by modules that want to provide security managers. Typically it will contain elements called module:type-security-provider, which extend securityProviderType where "module" might be "acegi" and "type" might de "delegate", for example. It can also contain encryption strategies, which should follow a similar scheme and extend encryptionStrategyType.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="id" fixed="_muleSecurityManager"/>
@@ -2783,9 +2544,7 @@
     <xsd:complexType name="securityManagerType">
         <xsd:annotation>
             <xsd:documentation>
-                The default security manager (type mule:defaultSecurityManagerType) provides
-                basic support for security functions. Other modules (eg Acegi, JAAS, PGP)
-                provide more advanced functionality.
+                The default security manager (type mule:defaultSecurityManagerType) provides basic support for security functions. Other modules (Acegi, JAAS, PGP) provide more advanced functionality.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
@@ -2794,14 +2553,14 @@
                     <xsd:element name="custom-security-provider" type="customSecurityProviderType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Allow any implementation of UMOSecurityProvider to be used.
+                                Allow any implementation of SecurityProvider to be used.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:element name="custom-encryption-strategy" type="customEncryptionStrategyType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Allow any implementation of UMOEncryptionStrategy to be used.
+                                Allow any implementation of EncryptionStrategy to be used.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -2817,9 +2576,7 @@
                                  minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Provides password-based encryption using JCE. Users must specify a password and
-                                optionally a salt and iteration count as well. The default algorithm is
-                                PBEWithMD5AndDES, but users can specify any valid algorithm supported by JCE.
+                                Provides password-based encryption using JCE. Users must specify a password and optionally a salt and iteration count as well. The default algorithm is PBEWithMD5AndDES, but users can specify any valid algorithm supported by JCE.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -2831,7 +2588,7 @@
     <xsd:complexType name="securityProviderType">
         <xsd:annotation>
             <xsd:documentation>
-                A security provider is a source of a particular security-related functionality.
+                A security provider is a source of specific security-related functionality.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="name" type="substitutableName" use="required"/>
@@ -2840,7 +2597,7 @@
     <xsd:complexType name="encryptionStrategyType">
         <xsd:annotation>
             <xsd:documentation>
-                An encryption strategy provides support for a particular encryption algorithm.
+                An encryption strategy provides support for a specific encryption algorithm.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="name" type="substitutableName" use="required"/>
@@ -2872,8 +2629,7 @@
                 <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A reference to the encryption strategy (which may be a Spring bean that
-                            implements the EncryptionStrategy interface).
+                            A reference to the encryption strategy (which may be a Spring bean that implements the EncryptionStrategy interface).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2915,17 +2671,14 @@
                 <xsd:attribute name="key" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The key to use.
-                            This and the keyFactory-ref attribute are mutually exclusive.
+                            The key to use. This and the keyFactory-ref attribute are mutually exclusive.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="keyFactory-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The name of the key factory to use.
-                            This should implement the ObjectFactory interface and return a byte array.
-                            This and the key attribute are mutually exclusive.
+                            The name of the key factory to use. This should implement the ObjectFactory interface and return a byte array. This and the key attribute are mutually exclusive.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3056,9 +2809,7 @@
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A class that implements the ExceptionListener interface.
-                            In addition, if an outbound-endpoint element is specified,
-                            it is set as an "endpoint" bean property.
+                            A class that implements the ExceptionListener interface. In addition, if an outbound-endpoint element is specified, it is set as an "endpoint" bean property.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3099,7 +2850,7 @@
         <xsd:element name="abstract-object-store" abstract="true" type="abstractObjectStoreType">
             <xsd:annotation>
                 <xsd:documentation>
-                    A placeholder for an object store that can be used by routers to maintain state
+                    A placeholder for an object store that can be used by routers to maintain state.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:element>
@@ -3108,10 +2859,7 @@
                      substitutionGroup="abstract-object-store">
             <xsd:annotation>
                 <xsd:documentation>
-                    An optionally bounded in-memory store for message IDs with periodic expiry of old entries. The bounded
-                    size is a _soft_ limit and only enforced periodically by the expiry process; this means that the store
-                    may temporarily exceed its maximum size between expiry runs, but will eventually shrink to its
-                    configured size.
+                    An optionally bounded in-memory store for message IDs with periodic expiry of old entries. The bounded size is a soft limit and is only enforced periodically by the expiry process; this means that the store may temporarily exceed its maximum size between expiry runs but will eventually shrink to its configured size.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:element>
@@ -3119,9 +2867,7 @@
         <xsd:element name="simple-text-file-store" type="textFileObjectStoreType" substitutionGroup="abstract-object-store">
             <xsd:annotation>
                 <xsd:documentation>
-                    A Simple object store that stores String objects by key to a text file. This store is only suitable for
-                    storing simple key value pair strings. This store is backed by an in-memory store and supports the
-                    ability to expire and apply TTL to objects in the store.
+                    A Simple object store that stores String objects by key to a text file. This store is only suitable for storing simple key value pair strings. This store is backed by an in-memory store and supports the ability to expire and apply TTL to objects in the store.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:element>
@@ -3132,8 +2878,7 @@
                     <xsd:attribute name="directory" type="xsd:string">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The file location (directory) where the object store will be saved. If this value is not set
-                                Mule will default to using the {{mule.working.dir/objectstore}}.
+                                The file location (directory) where the object store will be saved. If this value is not set, Mule defaults to using the {{mule.working.dir/objectstore}}.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -3147,33 +2892,28 @@
                     <xsd:attribute name="name" type="xsd:string">
                         <xsd:annotation>
                             <xsd:documentation>
-                                An id for this store, can be used for logging and identification purposes.
+                                An ID for this store that can be used for logging and identification purposes.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
                     <xsd:attribute name="maxEntries" type="substitutableInt">
                         <xsd:annotation>
                             <xsd:documentation>
-                                the maximum number of entries that this store keeps around. Specify {{-1}} if the store is
-                                supposed to be "unbounded".
+                                The maximum number of entries that this store keeps around. Specify {{-1}} if the store is supposed to be "unbounded".
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
                     <xsd:attribute name="entryTTL" type="substitutableInt">
                         <xsd:annotation>
                             <xsd:documentation>
-                                the time-to-live for each message ID, specified in seconds, or {{-1}} for entries that
-                                should never expire. DO NOT combine this with an unbounded store!
+                                The time-to-live for each message ID, specified in seconds, or {{-1}} for entries that should never expire. DO NOT combine this with an unbounded store!
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
                     <xsd:attribute name="expirationInterval" type="substitutableInt">
                         <xsd:annotation>
                             <xsd:documentation>
-                                the interval for periodic bounded size enforcement and entry expiration, specified in
-                                seconds. Arbitrary positive values between 1 second and several hours or days are possible,
-                                but should be chosen carefully according to the expected message rate to prevent OutOfMemory
-                                conditions.
+                                The interval for periodic bounded size enforcement and entry expiration, specified in seconds. Arbitrary positive values between one second and several hours or days are possible, but should be chosen carefully according to the expected message rate to prevent OutOfMemory conditions.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
@@ -3187,8 +2927,7 @@
 
     <xsd:element name="abstract-message-info-mapping" abstract="true" type="abstractMessageInfoMappingType">
         <xsd:annotation>
-            <xsd:documentation>A Message info mapping element is used to map the attributes of the current message to
-                known message elements in Mule; namely, Message ID, CrrelationID.
+            <xsd:documentation>Maps the attributes of the current message to known message elements in Mule; namely, Message ID, CorrrelationID.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3211,11 +2950,7 @@
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                Ensures that only unique messages are received by a service. It does this by checking the unique ID of
-                the incoming message. Note that The id used to can be generated from the message using an expression
-                defined in the _idExpression_ attribute. By default, the expression used is #\[message:id\], which means
-                the underlying endpoint must support unique message IDs for this to work, otherwise a
-                {{UniqueIdNotSupportedException}} is thrown.
+                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the {{idExpression}} attribute. By default, the expression used is #\[message:id\], which means the underlying endpoint must support unique message IDs for this to work. Otherwise, a {{UniqueIdNotSupportedException}} is thrown.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3224,14 +2959,7 @@
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                Ensures that only unique messages are received by a service by calculating the
-                hash of the message itself using a message digest algorithm. This provides a value with an
-                infinitesimally small chance of a collision.
-                This can be used to filter message duplicates. Please keep in mind that the hash is calculated over the
-                entire byte array representing the message, so any leading or trailing spaces or extraneous bytes (like
-                padding) can produce different hash values for the same semantic message content. Care should be taken
-                to ensure that messages do not contain extraneous bytes. This class is useful when the message does not
-                support unique identifiers.
+                Ensures that only unique messages are received by a service by calculating the hash of the message itself using a message digest algorithm. This provides a value with an infinitesimally small chance of a collision. This can be used to filter message duplicates. Keep in mind that the hash is calculated over the entire byte array representing the message, so any leading or trailing spaces or extraneous bytes (like padding) can produce different hash values for the same semantic message content. Care should be taken to ensure that messages do not contain extraneous bytes. This class is useful when the message does not support unique identifiers.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3245,13 +2973,7 @@
                 <xsd:attribute name="idExpression" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Defines one or more expressions to use when extrating the ID from the message. For example,
-                            it would be possible to combine to headers as the id of the message to provide idempotency
-                            against:
-                            "#\[headers:foo,bar\]" or
-                            combine the message ide with a header:
-                            "#\[message:id\]-#[header:foo]".
-                            If this property is not set "#\[message:id\]" will be used by default.
+                            Defines one or more expressions to use when extrating the ID from the message. For example, it would be possible to combine to headers as the ID of the message to provide idempotency: "#\[headers:foo,bar\]". Or, you could combine the message ID with a header: "#\[message:id\]-#[header:foo]". If this property is not set, "#\[message:id\]" will be used by default.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3268,7 +2990,7 @@
                 <xsd:attribute name="messageDigestAlgorithm" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The secure hashing algorithm to use. If not set this will default to SHA-256.
+                            The secure hashing algorithm to use. If not set, the default is SHA-256.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3280,8 +3002,7 @@
     <xsd:element name="wire-tap-router" type="wireTapRouterType" substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The WireTap inbound router allows you to route certain messages to a different endpoint as well as to
-                the component.
+                The WireTap inbound router allows you to route certain messages to a different endpoint as well as to the component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3308,9 +3029,7 @@
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                Applies one or more filters to the incoming message. If the filters match, the message is forwarded to
-                the component. Otherwise, the message is forwarded to the catch-all strategy on the router. If no
-                catch-all strategy is configured, the message is ignored and a warning is logged.
+                Applies one or more filters to the incoming message. If the filters match, the message is forwarded to the component. Otherwise, the message is forwarded to the catch-all strategy on the router. If no catch-all strategy is configured, the message is ignored and a warning is logged.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3319,7 +3038,7 @@
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                Holds back a group of messages and resequence them using the messages correlation sequence property.
+                Holds back a group of messages and resequences them using each message's correlation sequence property.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3345,10 +3064,7 @@
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                This aggregator combines two or more messages into a single message by matching messages with a given
-                Correlation Id. Correlation IDs are set on messages when they are dispatched by certain outbound
-                routers such as the Recipient List and Message Splitter routers. These messages can be aggregated back
-                together again using this router.
+                Combines two or more messages into a single message by matching messages with a given Correlation ID. Correlation IDs are set on messages when they are dispatched by certain outbound routers, such as the Recipient List and Message Splitter routers. These messages can be aggregated back together again using this router.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3367,9 +3083,7 @@
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                This router is used to configure a custom message aggregator.  Mule provides an abstract implementation
-                that has a template method that performs the message aggregation. A common use of the aggregator router
-                is to combine the results of multiple requests such as "ask this set of vendors for the best price of X".
+                Configures a custom message aggregator. Mule provides an abstract implementation that has a template method that performs the message aggregation. A common use of the aggregator router is to combine the results of multiple requests such as "ask this set of vendors for the best price of X".
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3391,8 +3105,7 @@
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                Configures a Collection Response Router. This will return a MuleMessageCollection message
-                type that will contain all events received for a each correlation group.
+                Configures a Collection Response Router. This will return a MuleMessageCollection message type that will contain all events received for a each correlation group.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3401,7 +3114,7 @@
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                Allows a custom {{org.mule.api.InboundRouterCollection}} to be cnfigured by the user. The property should contain the fully qualified Java class name of the router.  This property should NOT be used unless you are absolutely sure you know what you are doing.
+                Allows for custom inbound routers to be configured.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3413,8 +3126,7 @@
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Spring-style property elements so that custom configuration can be configured on the
-                                custom router.
+                                Spring-style property elements so that custom configuration can be configured on the custom router.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -3422,7 +3134,7 @@
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            An implementation of {{org.mule.api.routing.inbound.InboundRouter}} (Java fully qualified class name). It is good practice to create custom inbound routers by extending the {{org.mule.routing.inbound.SelectiveConsumer}}.
+                            An implementation of InboundRouter (fully qualified Java class name)
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3450,8 +3162,7 @@
                  substitutionGroup="abstract-async-reply-router">
         <xsd:annotation>
             <xsd:documentation>
-                Configures a Single Response Router. This will return the first event it receives on a
-                reply endpoint and will discard the rest.
+                Configures a Single Response Router. This will return the first message it receives on a reply endpoint and will discard the rest.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3460,8 +3171,7 @@
                  substitutionGroup="abstract-async-reply-router">
         <xsd:annotation>
             <xsd:documentation>
-                Configures a Collection Response Router. This will return a MuleMessageCollection message
-                type that will contain all events received for the current correlation.
+                Configures a Collection Response Router. This will return a MuleMessageCollection message type that will contain all messages received for the current correlation.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3480,9 +3190,7 @@
                     <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The message info mapper used to extract key bits of the message information, such as
-                                Message ID or Correlation ID.  these properties are used by some routers and this mapping
-                                information tells Mule where to get the information from in the current message.
+                                The message info mapper used to extract key bits of the message information, such as Message ID or Correlation ID.  these properties are used by some routers and this mapping information tells Mule where to get the information from in the current message.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -3500,8 +3208,7 @@
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Spring-style property elements so that custom configuration can be configured on the
-                                custom router.
+                                Spring-style property elements so that custom configuration can be configured on the custom router.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -3509,9 +3216,7 @@
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A fully qualified Java class name of the router to use. The router should either extend
-                            {{org.mule.routing.response.AbstractResponseRouter}} or
-                            {{org.mule.routing.response.AbstractResponseAggregator}}.
+                            A fully qualified Java class name of the router to use. The router should either extend {{org.mule.routing.response.AbstractResponseRouter}} or {{org.mule.routing.response.AbstractResponseAggregator}}.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3529,7 +3234,7 @@
             <xsd:element name="reply-to" type="endpointRefType" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Defines where the message should be routed to after the recipient of the message this service dispatches to has finished with it
+                        Defines where the message should be routed after the recipient of the message this service dispatches to has finished with it.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -3543,9 +3248,7 @@
             <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The message info mapper used to extract key bits of the message information, such as
-                        Message ID or Correlation ID.  these properties are used by some routers and this mapping
-                        information tells Mule where to get the information from in the current message.
+                        The message info mapper used to extract key bits of the message information, such as Message ID or Correlation ID.  these properties are used by some routers and this mapping information tells Mule where to get the information from in the current message.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -3558,7 +3261,7 @@
             <xsd:element ref="abstract-filter" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Filter used to filter message.
+                        Filters the messages to be processed by this router.
                         @Deprecated since 2.2.  Configure the filter on the endpoint instead of the router.
                     </xsd:documentation>
                 </xsd:annotation>
@@ -3566,8 +3269,7 @@
             <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Filters are applied before message transformations.  A transformer can be configured here to
-                        transform messages before they are filtered.
+                        Filters are applied before message transformations. A transformer can be configured here to transform messages before they are filtered.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -3578,9 +3280,7 @@
         <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
             <xsd:annotation>
                 <xsd:documentation>
-                    Determines whether correlation information should be attached to the current message. For instance, sometimes
-                    external applications will configure a correlation ID on a JMS message, setting 'enableCorrelation=IF_NOT_SET' will ensure
-                    that Mule will only set a correlation ID if one isn't already present.
+                    Determines whether correlation information should be attached to the current message. For instance, sometimes external applications will configure a correlation ID on a JMS message, setting 'enableCorrelation=IF_NOT_SET' will ensure that Mule will only set a correlation ID if one isn't already present.
                 </xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
@@ -3662,7 +3362,7 @@
     <xsd:element name="filtering-router" type="singleEndpointFilteringOutboundRouterType" substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                This router uses filters to determine whether the message matches a particular criteria and if so will route the message to the endpoint configured on the router
+                Uses filters to determine whether the message matches a particular criteria and if so will route the message to the endpoint configured on the router.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3671,9 +3371,7 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The TemplateEndpointRouter allows endpoints to be altered at runtime based on properties set on the
-                current event or fallback values set on the endpoint properties.  Templated values are expressed using
-                square braces around a property name,
+                Allows endpoints to be altered at runtime based on properties set on the current message or fallback values set on the endpoint properties. Templated values are expressed using square braces around a property name.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3682,8 +3380,7 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The Chaining router can be used to send the message through multiple endpoints using the result of the
-                first invocation as the input for the next. When a Chaining router is configured all but the last endpoint will be invoked synchronously.  For the last endpoint the synchronous flag on that endpoint will be used to determine how to dispatch the message.
+                Sends the message through multiple endpoints using the result of the first invocation as the input for the next.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3692,8 +3389,7 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The Exception Based router can be used to send a message over an endpoint by selecting the first
-                endpoint that can connect to the transport.
+                Sends a message over an endpoint by selecting the first endpoint that can connect to the transport.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3702,7 +3398,7 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The Multicasting router can be used to send the same message over multiple endpoints.
+                Sends the same message over multiple endpoints.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3711,8 +3407,7 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The Endpoint Selector router will choose one of the endpoints configured on this router based on an
-                expression evaluated on the current message.
+                The Endpoint Selector router will choose one of the endpoints configured on this router based on an expression evaluated on the current message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3723,8 +3418,7 @@
                 <xsd:attribute name="default" type="xsd:NMTOKEN" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The name of the default endpoint to use if the expression returns null. This can be used as
-                            an 'else' condition to route messages that don't contain the expected routing information.
+                            The name of the default endpoint to use if the expression returns null. This can be used as an 'else' condition to route messages that don't contain the expected routing information.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3749,28 +3443,21 @@
                 <xsd:attribute name="deterministic" type="substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If 'disableRoundRobin' is false and this option is true (the default)
-                            then the first message part if routed to the first endpoint, the
-                            second part to the second endpoint, etc, with the nth part going to
-                            the (n modulo number of endpoints) endpoint.
-                            If false then the messages will be distributed equally amongst all
-                            endpoints.
+                            If 'disableRoundRobin' is false and this option is true (the default) then the first message part if routed to the first endpoint, the second part to the second endpoint, etc, with the nth part going to the (n modulo number of endpoints) endpoint. If false then the messages will be distributed equally amongst all endpoints.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="disableRoundRobin" type="substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If filters are being used on endpoints then round robin behaviour is probably not desirable.
-                            This flag switches round robin behaviour off, it is on by default.
+                            If filters are being used on endpoints then round robin behaviour is probably not desirable. This flag switches round robin behaviour off, it is on by default.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="failIfNoMatch" type="substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If 'disableRoundRobin' is true, there may be situations where the current split message does not match
-                            any endpoints.  this flag controls whether an exception should be thrown when a match is not found.
+                            If 'disableRoundRobin' is true, there may be situations where the current split message does not match any endpoints.  this flag controls whether an exception should be thrown when a match is not found.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3782,8 +3469,7 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The Filtering List Message Splitter accepts a list of objects that is split each object being routed to
-                different endpoints.
+                The Filtering List Message Splitter accepts a list of objects that is split each object being routed to different endpoints.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3792,8 +3478,7 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The Filtering List Message Splitter that will split the message based on an expression.  The expression
-                needs to return one or more message parts in order to be effective.
+                Splits the message based on an expression. The expression must return one or more message parts in order to be effective.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3811,8 +3496,7 @@
     <xsd:element name="message-chunking-router" type="chunkingRouterType" substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                This router allows you to split a single message into a number of fixed-length messages that will all
-                be routed to the same endpoint.
+                Allows you to split a single message into a number of fixed-length messages that will all be routed to the same endpoint.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3840,10 +3524,7 @@
     <xsd:element name="static-recipient-list-router" type="staticRecipientListRouterType" substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The recipient list router can be used to send the same message to multiple endpoints over the same
-                endpoint or to implement routing-slip behaviour where the next destination for the message is
-                determined from message properties or the payload. It uses a static list of recipient endpoints
-                which are specified via the attribute recipientsProperty and delimited by the attribute recipientsDelimieter.
+                Sends the same message to multiple endpoints over the same endpoint or to implement routing-slip behaviour where the next destination for the message is determined from message properties or the payload. It uses a static list of recipient endpoints, which are specified via the attribute recipientsProperty and delimited by the attribute recipientsDelimieter.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3855,8 +3536,7 @@
                     <xsd:element name="recipients" type="listOrSetType" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>
-                                A static list of endpoint names or URIs that will be used as recipients of the current message.
-                                Usually, if this list is set there is no need to set the 'recipientsProperty'.
+                                A static list of endpoint names or URIs that will be used as recipients of the current message. Usually, if this list is set there is no need to set the 'recipientsProperty'.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -3865,28 +3545,22 @@
                 <xsd:attribute name="recipientsProperty" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Defines a property name on the current message where a list of endpoint names (or URIs) can
-                            be obtained. This property can return a {{java.util.List}} of values or a delimited {{java.lang.String}}.
-                            If the 'recipientsProperty' returns a string then the 'recipientsDelimiter' property is used
-                            to split the string.
-                            If the entries in the String or List define endpoint names, these will be looked up at runtime.
-                            If the entries define endpoint URIs these endpoints will be created at runtime.
+                            Defines a property name on the current message where a list of endpoint names (or URIs) can be obtained. This property can return a {{java.util.List}} of values or a delimited {{java.lang.String}}. If the 'recipientsProperty' returns a string then the 'recipientsDelimiter' property is used to split the string.
+                            If the entries in the String or List define endpoint names, these will be looked up at runtime. If the entries define endpoint URIs these endpoints will be created at runtime.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="recipientsDelimiter" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The delimiter to use when splitting a String list of recipients.  the default is ','.
-                            This property is only used with the 'recipientsProperty'.
+                            The delimiter to use when splitting a String list of recipients.  the default is ','. This property is only used with the 'recipientsProperty'.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="synchronous" type="xsd:boolean">
                     <xsd:annotation>
-                        <xsd:documentation>This flag controls whether the message will be sent to the recipients
-                            synchronously. Unlike other routers th recipient list router doesn't have pre-configured endpoints
-                            so the synchronicity of the endpoint cannot be honoured.
+                        <xsd:documentation>
+                            This flag controls whether the message will be sent to the recipients synchronously. Unlike other routers th recipient list router doesn't have pre-configured endpoints so the synchronicity of the endpoint cannot be honoured.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3898,10 +3572,7 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                The expression recipient list router can be used to send the same message to multiple endpoints over the same
-                endpoint or to implement routing-slip behaviour where the next destination for the message is
-                determined from message properties or the payload. It uses a list of recipients endpoints
-                which are extracted from the message using an expression. (As of 2.1)
+                Sends the same message to multiple endpoints over the same endpoint or implements routing-slip behaviour where the next destination for the message is determined from message properties or the payload. It uses a list of recipients endpoints, which are extracted from the message using an expression. (As of 2.1)
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3914,8 +3585,7 @@
                     <xsd:element name="recipients" type="listOrSetType" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>
-                                A static list of endpoint names or URIs that will be used as recipients of the current message.
-                                If the expression on this router returns a list of endpoint names, the endpoints here will be checked as well as any global endpoints.
+                                A static list of endpoint names or URIs that will be used as recipients of the current message. If the expression on this router returns a list of endpoint names, the endpoints here will be checked as well as any global endpoints.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -3924,10 +3594,7 @@
                 <xsd:attributeGroup ref="expressionAttributes"/>
                 <xsd:attribute name="synchronous" type="xsd:boolean">
                     <xsd:annotation>
-                        <xsd:documentation>This flag controls whether the message will be sent to the recipients
-                            synchronously. Unlike other routers th recipient list router doesn't have pre-configured endpoints
-                            so the synchronicity of the endpoint cannot be honoured.
-                        </xsd:documentation>
+                        <xsd:documentation>This flag controls whether the message will be sent to the recipients synchronously. Unlike other routers th recipient list router doesn't have pre-configured endpoints so the synchronicity of the endpoint cannot be honoured.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
@@ -3939,7 +3606,7 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                Allows a custom {{org.mule.api.OutboundRouterCollection}} to be cnfigured by the user. The property should contain the fully qualified Java class name of the router.  This property should NOT be used unless you are absolutely sure you know what you are doing.
+                Allows you to configure a custom outbound router by specifying the custom router class and by using Spring properties. 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3962,7 +3629,7 @@
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Allows a custom {{org.mule.api.OutboundRouter}} to be cnfigured by the user. The property should contain the fully qualified Java class name of the router.  It is generally good practice for this custom router to extend {{org.mule.rounting.outbound.FilteringOutboundRouter}}.
+                            An implementation of OutboundRouter (fully qualified Java class name)
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3975,8 +3642,7 @@
     <xsd:element name="logging-catch-all-strategy" type="loggingCatchAllStrategyType" substitutionGroup="abstract-catch-all-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                 This catch all strategy does nothing with the event and logs (using the _WARN_ log level) the fact
-                 that the event was not dispatched due to the fact there was no routing path defined.
+                Does nothing with the message but simply logs (using the WARN log level) the fact that the message was not dispatched because no routing path was defined.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -4003,8 +3669,7 @@
                  substitutionGroup="abstract-catch-all-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                This catch all strategy is used to forward the event to an endpoint that is configured if no outbound
-                routers match.
+                Forwards the message to the specified endpoint if no outbound routers match.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -4055,7 +3720,7 @@
                  substitutionGroup="abstract-message-info-mapping">
         <xsd:annotation>
             <xsd:documentation>
-                This allows configuraton of a custom implementation of MessageInfoMapping
+                Allows configuraton of a custom implementation of MessageInfoMapping.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -4115,14 +3780,14 @@
     <xsd:complexType name="abstractObjectFactoryType">
         <xsd:annotation>
             <xsd:documentation>
-                A factory which will be used by Mule to create new instances of this object
+                A factory that will be used by Mule to create new instances of this object.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:sequence>
             <xsd:group ref="propertiesGroup">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Properties to be set on the created object
+                        Properties to be set on the created object.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:group>
@@ -4141,7 +3806,7 @@
             <xsd:extension base="abstractObjectFactoryType">
                 <xsd:attribute name="bean" type="substitutableName">
                     <xsd:annotation>
-                        <xsd:documentation>Name of Spring bean to look up</xsd:documentation>
+                        <xsd:documentation>Name of Spring bean to look up.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
@@ -4251,21 +3916,13 @@
     <xsd:complexType name="tlsClientKeyStoreType">
         <xsd:annotation>
             <xsd:documentation>
-                Configure client key stores.
-                TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a
-                certificate - this interface specifies how a keystore can be used to provide the certificates
-                (and associated private keys) necessary for identification.
-                This is also used as the trust store if no other trust store is specified and the
-                explicitTrustStoreOnly parameter in the server trust store configuration is false.
-                WARNING - due to restrictions in library implementations the values specified here typically apply
-                to all connectors using this transport.
+                Configure client key stores. TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a certificate - this interface specifies how a keystore can be used to provide the certificates (and associated private keys) necessary for identification. This is also used as the trust store if no other trust store is specified and the explicitTrustStoreOnly parameter in the server trust store configuration is false. WARNING - due to restrictions in library implementations the values specified here typically apply to all connectors using this transport.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The location (which will be resolved relative to the current classpath and file system, if
-                    possible) of the keystore that contains public certificates and private keys for identification.
+                    The location (which will be resolved relative to the current classpath and file system, if possible) of the keystore that contains public certificates and private keys for identification.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -4289,17 +3946,13 @@
     <xsd:complexType name="tlsKeyStoreType">
         <xsd:annotation>
             <xsd:documentation>
-                Configure key stores.
-                TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a
-                certificate - this interface specifies how a keystore can be used to provide the certificates
-                (and associated private keys) necessary for identification.
+                Configures key stores. TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a certificate - this interface specifies how a keystore can be used to provide the certificates (and associated private keys) necessary for identification.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The location (which will be resolved relative to the current classpath and file system, if
-                    possible) of the keystore that contains public certificates and private keys for identification.
+                    The location (which will be resolved relative to the current classpath and file system, if possible) of the keystore that contains public certificates and private keys for identification.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -4337,17 +3990,13 @@
     <xsd:complexType name="tlsTrustStoreType">
         <xsd:annotation>
             <xsd:documentation>
-                Configure a trust store.
-                TLS/SSL connections are made to trusted systems - the public certificates of trusted systems are store
-                in a keystore (called a trust store) and used to verify that the connection made to a remote system
-                "really is" the expected identity.
+                Configures a trust store. TLS/SSL connections are made to trusted systems - the public certificates of trusted systems are store in a keystore (called a trust store) and used to verify that the connection made to a remote system "really is" the expected identity.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The location (which will be resolved relative to the current classpath and file system, if
-                    possible) of the keystore that contains public certificates of trusted servers.
+                    The location (which will be resolved relative to the current classpath and file system, if possible) of the keystore that contains public certificates of trusted servers.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -4379,14 +4028,13 @@
     <xsd:complexType name="tlsProtocolHandler">
         <xsd:annotation>
             <xsd:documentation>
-                Configure the global Java protocol handler.
-                WARNING - Untested.
+                Configures the global Java protocol handler. WARNING - Untested.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="property" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    Set the java.protocol.handler.pkgs system property.
+                    Sets the java.protocol.handler.pkgs system property.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -4406,8 +4054,7 @@
     <xsd:simpleType name="substitutableClass">
         <xsd:annotation>
             <xsd:documentation>
-                A custom xsd:NMTOKEN-like type that also allows for Ant-style property placeholders
-                and a leading [
+                A custom xsd:NMTOKEN-like type that also allows for Ant-style property placeholders and a leading [
             </xsd:documentation>
         </xsd:annotation>
         <xsd:union>
@@ -4425,8 +4072,7 @@
     <xsd:simpleType name="nonBlankString">
         <xsd:annotation>
             <xsd:documentation>
-                A custom xsd:string-like type that cannot be empty
-                (is there a better way?)
+                A custom xsd:string-like type that cannot be empty.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:union>
@@ -4457,8 +4103,7 @@
     <xsd:simpleType name="substitutablePortNumber">
         <xsd:annotation>
             <xsd:documentation>
-                A custom xsd:int type that also allows for Ant-style property placeholders and restrict the
-                int value to a valid port number
+                A custom xsd:int type that also allows for Ant-style property placeholders and restricts the int value to a valid port number.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:union>
@@ -4477,7 +4122,7 @@
     <xsd:simpleType name="substitutableInt">
         <xsd:annotation>
             <xsd:documentation>
-                A custom xsd:int type that also allows for Ant-style property placeholders
+                A custom xsd:int type that also allows for Ant-style property placeholders.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:union>
@@ -4493,7 +4138,7 @@
     <xsd:simpleType name="substitutableLong">
         <xsd:annotation>
             <xsd:documentation>
-                A custom xsd:long type that also allows for Ant-style property placeholders
+                A custom xsd:long type that also allows for Ant-style property placeholders.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:union>
@@ -4509,7 +4154,7 @@
     <xsd:simpleType name="substitutableBoolean">
         <xsd:annotation>
             <xsd:documentation>
-                A custom xsd:boolean type that also allows for Ant-style property placeholders
+                A custom xsd:boolean type that also allows for Ant-style property placeholders.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:union>
@@ -4536,13 +4181,7 @@
     <xsd:element name="properties" type="mapType">
         <xsd:annotation>
             <xsd:documentation>
-                Set Mule properties.
-                These are name/value pairs that can be set on components, services, etc,
-                and which provide a generic way of configuring the system.
-                In Mule v2 you typically shouldn't need to use generic properties like
-                this, since almost all functionality is exposed via dedicated elements.
-                However, they can be useful in configuring obscure or overlooked options
-                and in configuring transports from the generic endpoint elements.
+                Sets Mule properties. These are name/value pairs that can be set on components, services, etc., and which provide a generic way of configuring the system. In Mule 2.x, you shouldn't need to use generic properties like this, since almost all functionality is exposed via dedicated elements. However, they can be useful in configuring obscure or overlooked options and in configuring transports from the generic endpoint elements.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -4557,13 +4196,7 @@
             <xsd:element name="property" type="keyValueType" minOccurs="0" maxOccurs="unbounded">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Set a Mule property.
-                        This is a name/value pair that can be set on components, services, etc,
-                        and which provide a generic way of configuring the system.
-                        In Mule v2 you typically shouldn't need to use a generic property like
-                        this, since almost all functionality is exposed via dedicated elements.
-                        However, it can be useful in configuring obscure or overlooked options
-                        and in configuring transports from the generic endpoint elements.
+                        Sets a Mule property. This is a name/value pair that can be set on components, services, etc., and which provide a generic way of configuring the system. In Mule 2.x, you shouldn't need to use a generic property like this, since almost all functionality is exposed via dedicated elements. However, it can be useful in configuring obscure or overlooked options and in configuring transports from the generic endpoint elements.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -4663,8 +4296,7 @@
                     <xsd:element name="jndi-provider-properties" type="mapType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Direct setting of JNDI properties
-                                (this allows access to the full Spring map entry).
+                                Direct setting of JNDI properties (allows access to the full Spring map entry).
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -4679,28 +4311,21 @@
                 <xsd:attribute name="jndiInitialFactory" type="substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The initial context factory to use. The value
-                            of the property should be the fully qualified class name
-                            of the factory class that will create an initial context.
+                            The initial context factory to use. The value of the property should be the fully qualified class name of the factory class that will create an initial context.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="jndiProviderUrl" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The service provider to use. The value of the property
-                            should contain a URL string (e.g. "ldap://somehost:389").
+                            The service provider to use. The value of the property should contain a URL string (such as "ldap://somehost:389").
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="jndiUrlPkgPrefixes" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The list of package prefixes to use when
-                            loading in URL context factories. The value
-                            of the property should be a colon-separated list of package
-                            prefixes for the class name of the factory class that will create
-                            a URL context factory.
+                            The list of package prefixes to use when loading in URL context factories. The value of the property should be a colon-separated list of package prefixes for the class name of the factory class that will create a URL context factory.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
