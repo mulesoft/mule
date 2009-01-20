@@ -42,7 +42,7 @@
     </endpoint>
 
     <endpoint name="ep4" address="test://ep4">
-        <http:object-to-http-client-request-transformer ignoreBadInput="true" name="test4" returnClass="java.lang.Object"/>
+        <http:object-to-http-request-transformer ignoreBadInput="true" name="test4" returnClass="java.lang.Object"/>
     </endpoint>
     
 </mule>

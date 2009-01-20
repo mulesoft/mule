@@ -211,7 +211,7 @@
         </xsd:annotation>
     </xsd:element>
     <!-- TODO: MULE-3440 rename to object-to-http-request-transformer -->
-    <xsd:element name="object-to-http-client-request-transformer" type="mule:abstractTransformerType"
+    <xsd:element name="object-to-http-request-transformer" type="mule:abstractTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
