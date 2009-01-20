@@ -16,17 +16,17 @@
                 </variable>
                 <variable>
                     <name>muleVersion</name>
-                    <description>Which version of Mule is this project targeted at?</description>
+                    <description>Which version of Mule is this module targeted at?</description>
                     <defvalue>${muleVersion}</defvalue>
                 </variable>
                 <variable>
                     <name>forgeProject</name>
-                    <description>Will this project be hosted on MuleForge? [y] or [n]</description>
+                    <description>Will this module be hosted on MuleForge? [y] or [n]</description>
                     <defvalue>y</defvalue>
                 </variable>
                 <variable>
                     <name>transports</name>
-                    <description>Which Mule transports do you want to include in this project?
+                    <description>Which Mule transports do you want to include in this module?
 
 (options: axis, cxf, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
           jetty, jetty-ssl, jms, jnp, multicast, pop3, pop3s, quartz, rmi, servlet,
@@ -37,7 +37,7 @@
                 </variable>
                 <variable>
                     <name>modules</name>
-                    <description>Which Mule modules do you want to include in this project?
+                    <description>Which Mule modules do you want to include in this module?
 
 (options: bulders, client, jaas, jbossts, management, ognl, pgp, scripting,
 spring-extras, sxc, xml):
@@ -49,15 +49,12 @@ spring-extras, sxc, xml):
         </variable>
         <variable>
             <name>hasCustomSchema</name>
-            <description>Will This project have a custom schema for configuring the module in Xml? [y] or [n]
-            </description>
+            <description>Will this module have a custom schema for configuring the module in Xml? [y] or [n]</description>
             <defvalue>y</defvalue>
         </variable>
         <variable>
             <name>hasBootstrap</name>
-            <description>Will This project need to make objects available in the Registry as soon as it's loaded? [y] or
-                [n]
-            </description>
+            <description>Will this module make objects available in the Registry as soon as it's loaded? [y] or [n]</description>
             <defvalue>n</defvalue>
         </variable>
     </variables>

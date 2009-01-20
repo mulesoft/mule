@@ -58,7 +58,7 @@ public class ProjectArchetypeMojo extends AbstractMojo
     private String archetypeGroupId;
 
     /**
-     * @parameter expression="${archetypeArtifactId}" default-value="mule-project-archetype"
+     * @parameter expression="${archetypeArtifactId}" default-value="mule-module-archetype"
      * @required
      */
     private String archetypeArtifactId;
