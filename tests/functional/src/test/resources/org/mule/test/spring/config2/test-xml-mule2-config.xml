@@ -186,6 +186,13 @@
                 </mule:default-connector-exception-strategy>
             </mule:service>
 
+            <!-- MULE-3932 Ensure interceptors can be used with shortcut component config  -->
+            <mule:service name="MULE3932Service">
+                <mule:component class="org.mule.tck.testmodels.fruit.Apple">
+                    <mule:logging-interceptor/>
+                </mule:component>
+            </mule:service>
+
             <mule:service name="appleComponent">
 
                 <mule:inbound>

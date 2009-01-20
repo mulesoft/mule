@@ -20,7 +20,10 @@ import org.mule.api.transport.ReceiveException;
 import org.mule.context.notification.EndpointMessageNotification;
 
 /**
- * Provide a default dispatch (client) support for handling threads lifecycle and validation.
+ * The Message Requester is used to explicitly request messages from a message channel or
+ * resource rather than subscribing to inbound events or polling for messages.
+ * This is often used programatically but will not be used for inbound endpoints
+ * configured on services.
  */
 public abstract class AbstractMessageRequester extends AbstractConnectable implements MessageRequester
 {

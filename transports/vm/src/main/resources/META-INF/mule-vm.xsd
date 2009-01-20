@@ -38,21 +38,39 @@
                             <xsd:documentation>DEPRECATED. USE "&lt;queue-profile&gt;" instead.</xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element name="queue-profile" type="mule:queueProfileType" minOccurs="0"/>
+                    <xsd:element name="queue-profile" type="mule:queueProfileType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Configures the properties of this connector's queue (see [Configuring Queues]).
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="queueEvents" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Determines whether queues should be set up for listeners on the connector. If set to false, the connector simply forwards events to components via the Mule server. If it is set to true, the queues are configured using the queuing profile.
+                            Determines whether queues should be set up for listeners on the connector. If set to false, the connector simply forwards messsages to components via the Mule server. If it is set to true, the queues are configured using the queuing profile.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="queueTimeout" type="xsd:positiveInteger"/>
+                <xsd:attribute name="queueTimeout" type="xsd:positiveInteger">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The timeout setting for the queue.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
    </xsd:complexType>
  
-    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                The endpoint on which this connector receives messages from the transport.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:inboundEndpointWithXaType">
@@ -61,7 +79,13 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                The endpoint to which this connector sends messages.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointWithXaType">
@@ -70,7 +94,13 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                An endpoint "template" that can be used to construct an inbound or outbound endpoint elsewhere in the configuration by referencing the endpoint name. 
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointWithXaType">
@@ -80,8 +110,20 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="addressAttributes">
-        <xsd:attribute name="path" type="xsd:string"/>
+        <xsd:attribute name="path" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The queue path, such as {{dispatchInQueue}} to create the address {{vm://dispatchInQueue}}.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:element name="transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
+    <xsd:element name="transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction">
+        <xsd:annotation>
+            <xsd:documentation>
+                The transaction configuration.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 </xsd:schema>

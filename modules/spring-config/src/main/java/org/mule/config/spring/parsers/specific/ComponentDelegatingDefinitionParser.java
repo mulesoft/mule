@@ -71,20 +71,19 @@ public class ComponentDelegatingDefinitionParser extends AbstractParallelDelegat
 
     /**
      * Given that the service object-factory is extensible and new object factory
-     * types can be implemented and used by substitution, the only extensible way of
-     * checking for the existence of an object-factory child element is by exclusion.<br>
+     * types can be implemented and used by substitution, the only way of checking
+     * for the existence of an object-factory if by object factory element
+     * convention.<br>
      * This pre-processor checks for the existence of a <i>"class"</i> attribute on
-     * the service, and throws an exception if the service has any child elements
-     * that are not binding's.
+     * the service, and throws an exception if the service has any elements that
+     * match the object factory element convention (i.e. that end in "object"). NOTE:
+     * We used to test by exclusion here allowing all other elements, but that no
+     * longer works now extensible interceptors elements can be used.
      */
     class CheckExclusiveClassAttributeObjectFactory implements PreProcessor
     {
 
-        private static final String BINDING_CHILD_ELEMENT = "binding";
-        private static final String POOLING_PROFILE_CHILD_ELEMENT = "pooling-profile";
-        private static final String LIFECYCLE_ADAPTER_FACTORT_CHILD_ELEMENT = "lifecycle-adapter-factory";
-        private static final String ENTRY_POINT_RESOLVER_CHILD_ELEMENT = "entry-point-resolver";
-        private static final String ENTRY_POINT_RESOLVER_SET_CHILD_ELEMENT = "entry-point-resolver-set";
+        private static final String OBJECT_FACTORY_ELEMENT_CONVENTION_SUFFIX = "object";
 
         public void preProcess(PropertyConfiguration config, Element element)
         {
@@ -98,11 +97,7 @@ public class ComponentDelegatingDefinitionParser extends AbstractParallelDelegat
                     {
                         Node child = element.getChildNodes().item(j);
                         if (child instanceof Element
-                            && !(child.getLocalName().equals(BINDING_CHILD_ELEMENT)
-                                 || child.getLocalName().equals(POOLING_PROFILE_CHILD_ELEMENT)
-                                 || child.getLocalName().equals(ENTRY_POINT_RESOLVER_CHILD_ELEMENT)
-                                 || child.getLocalName().equals(ENTRY_POINT_RESOLVER_SET_CHILD_ELEMENT) || child.getLocalName()
-                                .endsWith(LIFECYCLE_ADAPTER_FACTORT_CHILD_ELEMENT)))
+                            && child.getLocalName().endsWith(OBJECT_FACTORY_ELEMENT_CONVENTION_SUFFIX))
                         {
                             StringBuffer message = new StringBuffer("The child element '");
                             message.append(child.getLocalName());
@@ -113,7 +108,6 @@ public class ComponentDelegatingDefinitionParser extends AbstractParallelDelegat
                             throw new CheckExclusiveClassAttributeObjectFactoryException(message.toString());
                         }
                     }
-
                 }
             }
         }
