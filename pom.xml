@@ -839,11 +839,6 @@
             </snapshots>
         </repository>
         -->
-        <repository>
-            <id>atlassian</id>
-            <name>Atlassian Repository</name>
-            <url>https://maven.atlassian.com/repository/public/</url>
-        </repository>        
     </repositories>
 
     <pluginRepositories>
