@@ -186,7 +186,7 @@ public abstract class MuleException extends Exception
         // print exception stack
         buf.append(StringUtils.repeat('*', 80)).append(SystemUtils.LINE_SEPARATOR);
         buf.append(CoreMessages.exceptionStackIs()).append(SystemUtils.LINE_SEPARATOR);
-        buf.append(ExceptionHelper.getExceptionStack(this));
+        buf.append(StringUtils.abbreviate(ExceptionHelper.getExceptionStack(this), 5000));
 
         buf.append(StringUtils.repeat('*', 80)).append(SystemUtils.LINE_SEPARATOR);
         buf.append(CoreMessages.rootStackTrace()).append(SystemUtils.LINE_SEPARATOR);
@@ -194,7 +194,7 @@ public abstract class MuleException extends Exception
         StringWriter w = new StringWriter();
         PrintWriter p = new PrintWriter(w);
         root.printStackTrace(p);
-        buf.append(w.toString()).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(StringUtils.abbreviate(w.toString(), 5000)).append(SystemUtils.LINE_SEPARATOR);
         buf.append(StringUtils.repeat('*', 80)).append(SystemUtils.LINE_SEPARATOR);
 
         return buf.toString();

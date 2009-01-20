@@ -16,6 +16,7 @@ import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.transport.NullPayload;
+import org.mule.util.StringUtils;
 
 import java.util.Map;
 
@@ -96,7 +97,7 @@ public class MessagingException extends MuleException
             }
 
             buf.append(CoreMessages.messageIsOfType(payload.getClass()).getMessage());
-            addInfo("Payload", payload.toString());
+            addInfo("Payload", StringUtils.abbreviate(payload.toString(), 1000));
         }
         else
         {
