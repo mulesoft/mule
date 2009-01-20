@@ -8,16 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.${TransportNameLower};
+package org.mule.transport.${ModuleNameLower};
 
 import org.mule.transport.AbstractConnector;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 
 /**
- * <code>${TransportName}Connector</code> TODO document
+ * <code>${ModuleName}Connector</code> TODO document
  */
-public class ${TransportName}Connector extends AbstractConnector
+public class ${ModuleName}Connector extends AbstractConnector
 {
 
     /* For general guidelines on writing transports see
@@ -82,7 +82,7 @@ public class ${TransportName}Connector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "${TransportNameLower}";
+        return "${ModuleNameLower}";
     }
 
 }

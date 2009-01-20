@@ -8,13 +8,13 @@
  * LICENSE.txt file.
  */
 
-#set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1)}")
-package org.mule.transport.${TransportName.toLowerCase()};
+#set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1)}")
+package org.mule.transport.${ModuleName.toLowerCase()};
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
 
-public class ${TransportName}ConnectorTestCase extends AbstractConnectorTestCase
+public class ${ModuleName}ConnectorTestCase extends AbstractConnectorTestCase
 {
 
     /* For general guidelines on writing transports see
@@ -25,7 +25,7 @@ public class ${TransportName}ConnectorTestCase extends AbstractConnectorTestCase
         /* IMPLEMENTATION NOTE: Create and initialise an instance of your
            connector here. Do not actually call the connect method. */
 
-        ${TransportName}Connector c = new ${TransportName}Connector();
+        ${ModuleName}Connector c = new ${ModuleName}Connector();
         c.setName("Test");
         // TODO Set any additional properties on the connector here
         return c;

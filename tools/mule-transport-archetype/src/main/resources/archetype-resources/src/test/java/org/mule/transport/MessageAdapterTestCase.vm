@@ -8,14 +8,14 @@
  * LICENSE.txt file.
  */
 
-#set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1)}")
-package org.mule.transport.${TransportName.toLowerCase()};
+#set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1)}")
+package org.mule.transport.${ModuleName.toLowerCase()};
 
 import org.mule.transport.AbstractMessageAdapterTestCase;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.MessagingException;
 
-public class ${TransportName}MessageAdapterTestCase extends AbstractMessageAdapterTestCase
+public class ${ModuleName}MessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
 
     /* For general guidelines on writing transports see
@@ -29,7 +29,7 @@ public class ${TransportName}MessageAdapterTestCase extends AbstractMessageAdapt
 
     public MessageAdapter createAdapter(Object payload) throws MessagingException
     {
-        return new ${TransportName}MessageAdapter(payload);
+        return new ${ModuleName}MessageAdapter(payload);
     }
 
 }

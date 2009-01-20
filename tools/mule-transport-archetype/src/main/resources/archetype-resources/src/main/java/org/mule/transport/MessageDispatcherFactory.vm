@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.${TransportNameLower};
+package org.mule.transport.${ModuleNameLower};
 
 import org.mule.transport.AbstractMessageDispatcherFactory;
 import org.mule.api.MuleException;
@@ -16,10 +16,10 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageDispatcher;
 
 /**
- * <code>${TransportName}MessageDispatcherFactory</code> Todo document
+ * <code>${ModuleName}MessageDispatcherFactory</code> Todo document
  */
 
-public class ${TransportName}MessageDispatcherFactory extends AbstractMessageDispatcherFactory
+public class ${ModuleName}MessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
 
     /* For general guidelines on writing transports see
@@ -27,7 +27,7 @@ public class ${TransportName}MessageDispatcherFactory extends AbstractMessageDis
 
     public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
-        return new ${TransportName}MessageDispatcher(endpoint);
+        return new ${ModuleName}MessageDispatcher(endpoint);
     }
 
 }

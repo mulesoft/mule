@@ -8,12 +8,12 @@
  * LICENSE.txt file.
  */
 
-#set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1)}")
-package org.mule.transport.${TransportName.toLowerCase()};
+#set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1)}")
+package org.mule.transport.${ModuleName.toLowerCase()};
 
 import org.mule.tck.AbstractMuleTestCase;
 
-public class ${TransportName}EndpointTestCase extends AbstractMuleTestCase
+public class ${ModuleName}EndpointTestCase extends AbstractMuleTestCase
 {
 
     /* For general guidelines on writing transports see

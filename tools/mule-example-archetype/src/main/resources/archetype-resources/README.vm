@@ -1,0 +1,110 @@
+#* Common variables for all archetypes *#
+#set($ModuleName = "$artifactId")
+#set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1).toLowerCase()}")
+#set($ModuleNameLower = "${ModuleName.toLowerCase()}")
+#set($MuleVersion = "$muleVersion")
+
+#set($MuleMajorMinorVersion = "$MuleVersion.substring(0, 3)")
+
+#set($transports = $transports.replaceAll(" ", ""))
+#set($modules = $modules.replaceAll(" ", ""))
+
+#if($transports.indexOf("vm") == -1)
+  #set($transports = "$transports,vm")
+#end
+
+#if($transports.indexOf("stdio") == -1)
+  #set($transports = "$transports,stdio")
+#end
+#set( $transportArray = $transports.split(",") )
+
+#if($modules.indexOf("client") == -1)
+  #set($modules = "$modules,client")
+#end
+#set( $moduleArray = $modules.split(",") )
+
+#* Setting specifict to this archetype *#
+#set($package = "org/mule/example")
+#set($groupId = "org.mule.examples")
+#set($artifactId = "mule-example-${ModuleNameLower}")
+#set($ModuleType = "Example")
+
+WELCOME
+=======
+Congratulations you have just created a new Mule example project!
+
+This wizard created a number of new classes and resources useful for new Mule examples.  Each of the created files
+contains documentation and _todo_ items where necessary.  Here is an overview of what was created.
+
+./pom.xml:
+A maven project descriptor that describes how to build this example.  If you enabled this example for the
+MuleForge, this file will contain additional information about the project on MuleForge.
+
+./assembly.xml:
+A maven assembly descriptor that defines how this project will be packaged when you make a release.
+
+./LICENSE.txt:
+The open source license text for this example.
+
+./dist:
+This directory contains files used when distributing the example.  IT includes a Maven POM and Ant build file
+for building the example. There are also batch (windows) and shell (*nix) scripts for running the application.
+
+
+-----------------------------------------------------------------
+./conf/${ModuleNameLower}-config.xml
+
+The configuration file for the example project.
+
+TESTING
+=======
+
+This  project also contains test classes that can be run as part of a test suite.
+
+-----------------------------------------------------------------
+./src/test/java/${package}/${ModuleNameLower}/${ModuleName}TestCase.java
+
+This is an example functional test case.  The test will work as is, but you need to configure it to actually test your
+code.  For more information about testing see: http://www.mulesource.org/display/MULE2USER/Functional+Testing.
+
+-----------------------------------------------------------------
+./src/test/resources/${ModuleNameLower}-functional-test-config.xml
+
+Defines the Mule configuration for the ${ModuleName}TestCase.java.
+
+ADDITIONAL RESOURCES
+====================
+Everything you need to know about getting started with Mule can be found here:
+http://www.mulesource.org/display/MULE2INTRO/Home
+
+For information about working with Mule inside and IDE with maven can be found here:
+http://www.mulesource.org/display/MULE2INTRO/Setting+Up+Eclipse
+
+Remember if you get stuck you can try getting help on the Mule user list:
+http://www.mulesource.org/display/MULE/Mailing+Lists
+
+Also, MuleSource, the company behind Mule, offers 24x7 support options:
+http://www.mulesource.com/services/subscriptions.php
+
+Enjoy your Mule ride!
+
+The Mule Team
+
+--------------------------------------------------------------------
+This project was auto-genrated by the mule-project-archetype.
+
+artifactId=${artifactId}
+description=${description}
+muleVersion=${muleVersion}
+hasCustomSchema=${hasCustomSchema}
+hasBootstrap=${hasBootstrap}
+projectType=${projectType}
+packagePath=${packagePath}
+forgeProject=${forgeProject}
+transports=${transports}
+modules=${modules}
+
+version=${version}
+groupId=${groupId}
+basedir=${basedir}
+--------------------------------------------------------------------

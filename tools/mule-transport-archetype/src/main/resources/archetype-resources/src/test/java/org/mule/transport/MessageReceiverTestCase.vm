@@ -8,8 +8,8 @@
  * LICENSE.txt file.
  */
 
-#set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1)}")
-package org.mule.transport.${TransportName.toLowerCase()};
+#set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1)}")
+package org.mule.transport.${ModuleName.toLowerCase()};
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
@@ -19,7 +19,7 @@ import org.mule.transport.AbstractMessageReceiverTestCase;
 import com.mockobjects.dynamic.Mock;
 
 
-public class ${TransportName}MessageReceiverTestCase extends AbstractMessageReceiverTestCase
+public class ${ModuleName}MessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
 
     /* For general guidelines on writing transports see
@@ -29,7 +29,7 @@ public class ${TransportName}MessageReceiverTestCase extends AbstractMessageRece
     {
         Mock mockService = new Mock(Service.class);
         mockService.expectAndReturn("getResponseTransformer", null);
-        return new ${TransportName}MessageReceiver(endpoint.getConnector(), (Service) mockService.proxy(), endpoint);
+        return new ${ModuleName}MessageReceiver(endpoint.getConnector(), (Service) mockService.proxy(), endpoint);
     }
 
     public InboundEndpoint getEndpoint() throws Exception

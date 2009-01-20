@@ -8,18 +8,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.${TransportNameLower};
+package org.mule.transport.${ModuleNameLower};
 
 import org.mule.api.transaction.TransactionException;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 
 /**
- * <code>${TransportName}Transaction</code> is a wrapper for a
- * ${TransportName} local transaction. This object holds the tx resource and
+ * <code>${ModuleName}Transaction</code> is a wrapper for a
+ * ${ModuleName} local transaction. This object holds the tx resource and
  * controls the when the transaction committed or rolled back.
  *
  */
-public class ${TransportName}Transaction extends AbstractSingleResourceTransaction
+public class ${ModuleName}Transaction extends AbstractSingleResourceTransaction
 {
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */

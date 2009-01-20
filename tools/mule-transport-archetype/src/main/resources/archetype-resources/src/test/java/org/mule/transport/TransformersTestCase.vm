@@ -8,13 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.${TransportNameLower}.transformers;
+package org.mule.transport.${ModuleNameLower}.transformers;
 
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.api.transformer.Transformer;
 
 
-public class ${TransportName}TransformersTestCase extends AbstractTransformerTestCase
+public class ${ModuleName}TransformersTestCase extends AbstractTransformerTestCase
 {
 
     /* For general guidelines on writing transports see

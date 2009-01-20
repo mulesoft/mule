@@ -8,15 +8,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.${TransportNameLower};
+package org.mule.transport.${ModuleNameLower};
 
 import org.mule.api.MessagingException;
 import org.mule.transport.AbstractMessageAdapter;
 
 /**
- * <code>${TransportName}MessageAdapter</code> TODO document
+ * <code>${ModuleName}MessageAdapter</code> TODO document
  */
-public class ${TransportName}MessageAdapter extends AbstractMessageAdapter
+public class ${ModuleName}MessageAdapter extends AbstractMessageAdapter
 {
  
     /* For general guidelines on writing transports see
@@ -30,7 +30,7 @@ public class ${TransportName}MessageAdapter extends AbstractMessageAdapter
         it is recommended that you pass the stream object into the MessageAdapter as the payload.
         This will ensure that Mule will use streaming where possible. */
     
-    public ${TransportName}MessageAdapter(Object message) throws MessagingException
+    public ${ModuleName}MessageAdapter(Object message) throws MessagingException
     {
         /* IMPLEMENTATION NOTE: The constructor should determine that the
            message is of the correct type or throw an exception i.e.

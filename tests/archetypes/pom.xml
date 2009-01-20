@@ -16,6 +16,8 @@
     <modules>
         <module>transport-archetype</module>
         <module>project-archetype</module>
+        <module>example-archetype</module>
+        <module>module-archetype</module>
     </modules>
 
     <build>

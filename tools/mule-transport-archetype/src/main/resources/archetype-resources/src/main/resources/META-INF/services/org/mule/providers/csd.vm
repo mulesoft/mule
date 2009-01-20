@@ -5,40 +5,43 @@
 # http://mule.mulesource.org/x/FwKV
 
 # The connector class for your transport. This is alwas required
-connector=org.mule.transport.${TransportNameLower}.${TransportName}Connector
+connector=org.mule.transport.${ModuleNameLower}.${ModuleName}Connector
 
 # The message adapter is used as the Mule internal representation of a message received or sent by 
 # your transport. This is always required.
-message.adapter=org.mule.transport.${TransportNameLower}.${TransportName}MessageAdapter
+message.adapter=org.mule.transport.${ModuleNameLower}.${ModuleName}MessageAdapter
 
 #if( $hasDispatcher == "y")
 # The factory used to create dispatchers responsible for sending events from the underlying technology
-dispatcher.factory=org.mule.transport.${TransportNameLower}.${TransportName}MessageDispatcherFactory
+dispatcher.factory=org.mule.transport.${ModuleNameLower}.${ModuleName}MessageDispatcherFactory
 #end
 
 #if( $hasReceiver == "y")
 # The standard message receiver used to consume events from the underlying technology
-message.receiver=org.mule.transport.${TransportNameLower}.${TransportName}MessageReceiver
+message.receiver=org.mule.transport.${ModuleNameLower}.${ModuleName}MessageReceiver
 #end
 
 #if( $hasRequester == "y" )
 #The standard message requester used to request data from the underlying technology
-requester.factory=org.mule.transport.${TransportNameLower}.${TransportName}MessageRequesterFactory
+requester.factory=org.mule.transport.${ModuleNameLower}.${ModuleName}MessageRequesterFactory
 #end
 
 #if( $hasTransactions == "y")
 # The message receiver to use if the endpoint is marked as transacted.
-transacted.message.receiver=org.mule.transport.${TransportNameLower}.${TransportName}TransactedMessageReceiver
+transacted.message.receiver=org.mule.transport.${ModuleNameLower}.${ModuleName}TransactedMessageReceiver
 #end
 
 #if( $inboundTransformer && $inboundTransformer != "n")
 # The Default inbound transformer for this component
-inbound.transformer=org.mule.transport.${TransportNameLower}.transformers.$inboundTransformer
+inbound.transformer=org.mule.transport.${ModuleNameLower}.transformers.$inboundTransformer
 #end
 
 #if( $outboundTransformer && $outboundTransformer != "n")
 # The Default outbound transformer for this component
-outbound.transformer=org.mule.transport.${TransportNameLower}.transformers.$outboundTransformer
+outbound.transformer=org.mule.transport.${ModuleNameLower}.transformers.$outboundTransformer
+
+# The response transformer is used to convert a response back to a client, usually the outbound transformer does the same thing
+response.transformer=org.mule.transport.${ModuleNameLower}.transformers.$outboundTransformer
 #end
 
 # Defines the way in which endpoints for your transport will be constructed
@@ -54,7 +57,7 @@ endpoint.builder=org.mule.endpoint.UrlEndpointURIBuilder
 #elseif($endpointBuilder == "s")
 endpoint.builder=org.mule.endpoint.SocketEndpointURIBuilder
 #else
-endpoint.builder=org.mule.transport.${TransportNameLower}.${TransportName}EndpointURIBuilder
+endpoint.builder=org.mule.transport.${ModuleNameLower}.${ModuleName}EndpointURIBuilder
 #end
 
 # For more information see - http://mule.mulesource.org/x/3YDR

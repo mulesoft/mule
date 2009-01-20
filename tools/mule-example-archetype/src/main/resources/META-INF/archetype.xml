@@ -1,0 +1,118 @@
+<archetype>
+    <id>maven-archetype-mule-example</id>
+    <variables>
+        <variable>
+            <name>description</name>
+            <description>Provide a description of what the example does:</description>
+            <!-- Note that you always need a <defValue> element for -Dinteractive=false to work -->
+            <defvalue/>
+        </variable>
+        <variable>
+            <name>muleVersion</name>
+            <description>Which version of Mule is this example targeted at?</description>
+            <defvalue>${muleVersion}</defvalue>
+        </variable>
+        <variable>
+            <name>forgeProject</name>
+            <description>Will this example be hosted on MuleForge? [y] or [n]</description>
+            <defvalue>y</defvalue>
+        </variable>
+        <variable>
+            <name>transports</name>
+            <description>Which Mule transports do you want to include in this project?
+
+(options: axis, cxf, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
+          jetty, jetty-ssl, jms, jnp, multicast, pop3, pop3s, quartz, rmi, servlet,
+          smtp, smtps, servlet, ssl, tls, stdio, tcp, udp, vm, xmpp):
+
+            </description>
+            <defvalue>cxf,file,http,jdbc,jms,stdio,vm</defvalue>
+        </variable>
+        <variable>
+            <name>modules</name>
+            <description>Which Mule transports do you want to include in this project?
+
+(options: bulders, client, jaas, jbossts, management, ognl, pgp, scripting,
+          spring-extras, sxc, xml):
+
+            </description>
+            <defvalue>client,management,scripting,sxc,xml</defvalue>
+        </variable>
+    </variables>
+
+    <templates>
+        <!-- the template README should be run first since it sets up other variables and is always included -->
+        <template>
+            <file>README.vm</file>
+            <output>MULE-README.txt</output>
+        </template>
+        <template>
+            <file>pom.vm</file>
+            <output>pom.xml</output>
+        </template>
+        <template>
+            <file>LICENSE.vm</file>
+            <output>LICENSE.txt</output>
+        </template>
+        <!--<template>-->
+            <!--<file>assembly.xml.vm</file>-->
+            <!--<output>assembly.xml</output>-->
+        <!--</template>-->
+
+        <template>
+            <file>dist/build.xml.vm</file>
+            <output>dist/build.xml</output>
+        </template>
+        <template>
+            <file>dist/pom.xml.vm</file>
+            <output>dist/pom.xml</output>
+        </template>
+        <template>
+            <file>dist/exec.bat.vm</file>
+            <output>dist/${ModuleNameLower}.bat</output>
+        </template>
+        <template>
+            <file>dist/exec.sh.vm</file>
+            <output>dist/${ModuleNameLower}</output>
+        </template>
+        <template>
+            <file>dist/README.txt.vm</file>
+            <output>dist/README.txt</output>
+        </template>
+
+        <template>
+            <file>src/main/resources/config.xml.vm</file>
+            <output>
+                conf/${ModuleNameLower}-config.xml
+            </output>
+        </template>
+
+        <template>
+            <file>src/main/java/org/mule/example/package.vm</file>
+            <output>
+                src/main/java/${package}/${ModuleNameLower}/package.html
+            </output>
+        </template>
+
+        <!-- Test Cases -->
+        <template>
+            <file>src/test/java/org/mule/example/FunctionalTestCase.vm</file>
+            <output>
+                src/test/java/${package}/${ModuleNameLower}/${ModuleName}TestCase.java
+            </output>
+        </template>
+        <template>
+            <file>src/test/resources/functional-test-config.xml.vm</file>
+            <output>
+                src/test/resources/${ModuleNameLower}-functional-test-config.xml
+            </output>
+        </template>
+        <template>
+            <file>src/test/resources/log4j.properties</file>
+            <output>
+                src/test/resources/log4j.properties
+            </output>
+        </template>
+    </templates>
+</archetype>
+

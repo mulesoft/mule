@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.${TransportNameLower};
+package org.mule.transport.${ModuleNameLower};
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -16,14 +16,14 @@ import org.mule.api.transport.MessageRequester;
 import org.mule.transport.AbstractMessageRequesterFactory;
 
 /**
- * <code>${TransportName}MessageRequester</code> TODO document
+ * <code>${ModuleName}MessageRequester</code> TODO document
  */
-public class ${TransportName}MessageRequesterFactory extends AbstractMessageRequesterFactory
+public class ${ModuleName}MessageRequesterFactory extends AbstractMessageRequesterFactory
 {
 
     public MessageRequester create(InboundEndpoint endpoint) throws MuleException
     {
-        return new ${TransportName}MessageRequester(endpoint);
+        return new ${ModuleName}MessageRequester(endpoint);
     }
 
 }

@@ -18,7 +18,7 @@
     <model name="Sample">
         <service name="Console I/O">
             <inbound>
-                <stdio:inbound-endpoint system="IN"/>
+                <stdio:inbound-endpoint system="IN" synchronous="true"/>
             </inbound>
             <outbound>
                 <!--

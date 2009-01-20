@@ -8,14 +8,14 @@
  * LICENSE.txt file.
  */
 
-#set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1)}")
-package org.mule.transport.${TransportName.toLowerCase()};
+#set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1)}")
+package org.mule.transport.${ModuleName.toLowerCase()};
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 
 
-public class ${TransportName}ConnectorFactoryTestCase extends AbstractMuleTestCase
+public class ${ModuleName}ConnectorFactoryTestCase extends AbstractMuleTestCase
 {
 
     /* For general guidelines on writing transports see
@@ -27,7 +27,7 @@ public class ${TransportName}ConnectorFactoryTestCase extends AbstractMuleTestCa
                 .lookupEndpointFactory().getInboundEndpoint(getEndpointURI());
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
-        assertTrue(endpoint.getConnector() instanceof ${TransportName}Connector);
+        assertTrue(endpoint.getConnector() instanceof ${ModuleName}Connector);
         assertEquals(getEndpointURI(), endpoint.getEndpointURI().getAddress());
     }
 

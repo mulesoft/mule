@@ -1,5 +1,5 @@
 <html>
-<head><title>Mule - ${TransportName} Transport</title>
+<head><title>Mule - ${ModuleName} Transport</title>
 </head>
 <body>
 <p>${description}</p>

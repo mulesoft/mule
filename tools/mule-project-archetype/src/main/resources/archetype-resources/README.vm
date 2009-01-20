@@ -1,21 +1,38 @@
+#* Common variables for all archetypes *#
 #set($ModuleName = "$artifactId")
 #set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1).toLowerCase()}")
 #set($ModuleNameLower = "${ModuleName.toLowerCase()}")
 #set($MuleVersion = "$muleVersion")
-#set($id = "")
-#set($groupId = "$package.replaceAll('/', '.')")
-#if($projectType == "m")
-  #set($artifactId = "mule-module-${ModuleNameLower}")
-  #set($ModuleType = "Module")
-#elseif($projectType == "u")
-  #set($artifactId = "Update-Existing")
-  #set($ModuleType = "Update")
-  #set($basedir = ".")
-#else
-  #set($artifactId = "${ModuleNameLower}")
-  #set($ModuleType = "Application")
-#end
+
 #set($MuleMajorMinorVersion = "$MuleVersion.substring(0, 3)")
+
+#set($transports = $transports.replaceAll(" ", ""))
+#set($modules = $modules.replaceAll(" ", ""))
+
+#if($transports.indexOf("vm") == -1)
+  #set($transports = "$transports,vm")
+#end
+
+#if($transports.indexOf("stdio") == -1)
+  #set($transports = "$transports,stdio")
+#end
+#set( $transportArray = $transports.split(",") )
+
+#if($modules.indexOf("client") == -1)
+  #set($modules = "$modules,client")
+#end
+#set( $moduleArray = $modules.split(",") )
+
+
+#* Setting specifict to this archetype *#
+#if($package == "")
+  #set($package = "org/mule/application")
+#end
+#set($groupId = "$package.replaceAll('/', '.')")
+
+#set($artifactId = ${ModuleNameLower})
+#set($ModuleType = "Application")
+
 
 WELCOME
 =======
@@ -31,9 +48,6 @@ MuleForge, this file will contain additional information about the project on Mu
 
 ./assembly.xml:
 A maven assembly descriptor that defines how this project will be packaged when you make a release.
-
-./LICENSE.txt:
-The open source license text for this project.
 
 -----------------------------------------------------------------
 ./src/main/java/${package}/${ModuleNameLower}/i18n/${ModuleName}Messages.java:
@@ -196,6 +210,8 @@ hasBootstrap=${hasBootstrap}
 projectType=${projectType}
 packagePath=${packagePath}
 forgeProject=${forgeProject}
+transports=${transports}
+modules=${modules}
 
 version=${version}
 groupId=${groupId}

@@ -8,13 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.${TransportNameLower}.i18n;
+package org.mule.transport.${ModuleNameLower}.i18n;
 
 import org.mule.config.i18n.MessageFactory;
 
-public class ${TransportName}Messages extends MessageFactory
+public class ${ModuleName}Messages extends MessageFactory
 {
-    private static final String BUNDLE_PATH = getBundlePath("${TransportNameLower}");
+    private static final String BUNDLE_PATH = getBundlePath("${ModuleNameLower}");
 
     /*
     public static Message exampleMessage()

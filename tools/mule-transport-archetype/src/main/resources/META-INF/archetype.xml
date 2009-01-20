@@ -18,11 +18,11 @@
         </variable>
         <variable>
             <name>hasCustomSchema</name>
-            <description>Will this transport have a custom schema for configuring the transport in Xml? 
+            <description>Will this transport have a custom schema for configuring the transport in Xml?
 [y] or [n]</description>
             <defvalue>y</defvalue>
         </variable>
-        
+
         <variable>
             <name>hasReceiver</name>
             <description>Can the transport receive inbound requests? [y] or [n]</description>
@@ -110,10 +110,37 @@ transformer? (i.e. ObjectToJmsMessage)
             </description>
             <defvalue>r</defvalue>
         </variable>
+        <variable>
+            <name>transports</name>
+            <description>
+Which Mule transports do you want to include in this project? If you intend extending a transport you should add it here:
+
+(options: axis, cxf, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
+          jetty, jetty-ssl, jms, jnp, multicast, pop3, pop3s, quartz, rmi, servlet,
+          smtp, smtps, servlet, ssl, tls, stdio, tcp, udp, vm, xmpp):
+
+            </description>
+            <defvalue>vm</defvalue>
+        </variable>
+        <variable>
+            <name>modules</name>
+            <description>
+Which Mule modules do you want to include in this project? The client is added for testing:
+
+(options: bulders, client, jaas, jbossts, management, ognl, pgp, scripting,
+          spring-extras, sxc, xml):
+
+            </description>
+            <defvalue>client</defvalue>
+        </variable>
     </variables>
 
     <templates>
-        <!-- the template pom should be run fisrt since it sets up some other variables -->
+        <!-- the template README should be run first since it sets up other variables and is always included -->
+        <template>
+            <file>README.vm</file>
+            <output>MULE-README.txt</output>
+        </template>
         <template>
             <file>pom.vm</file>
             <output>pom.xml</output>
@@ -124,17 +151,17 @@ transformer? (i.e. ObjectToJmsMessage)
         </template>
         <template>
             <file>src/main/resources/META-INF/services/org/mule/providers/csd.vm</file>
-            <output>src/main/resources/META-INF/services/org/mule/providers/${TransportNameLower}.properties</output>
+            <output>src/main/resources/META-INF/services/org/mule/providers/${ModuleNameLower}.properties</output>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/Messages.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/i18n/${TransportName}Messages.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/i18n/${ModuleName}Messages.java
             </output>
         </template>
         <template>
             <file>src/main/resources/META-INF/services/org/mule/i18n/messages.vm</file>
-            <output>src/main/resources/META-INF/services/org/mule/i18n/${TransportNameLower}-messages.properties
+            <output>src/main/resources/META-INF/services/org/mule/i18n/${ModuleNameLower}-messages.properties
             </output>
         </template>
         <template>
@@ -149,67 +176,67 @@ transformer? (i.e. ObjectToJmsMessage)
         </template>
         <template>
             <file>src/main/resources/META-INF/schema.vm</file>
-            <output>src/main/resources/META-INF/mule-${TransportNameLower}.xsd</output>
+            <output>src/main/resources/META-INF/mule-${ModuleNameLower}.xsd</output>
             <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/Connector.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}Connector.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}Connector.java
             </output>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/config/NamespaceHandler.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/config/${TransportName}NamespaceHandler.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/config/${ModuleName}NamespaceHandler.java
             </output>
             <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/MessageAdapter.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageAdapter.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageAdapter.java
             </output>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/MessageDispatcher.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageDispatcher.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageDispatcher.java
             </output>
             <dependsOnVar>hasDispatcher=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/MessageDispatcherFactory.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageDispatcherFactory.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageDispatcherFactory.java
             </output>
             <dependsOnVar>hasDispatcher=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/MessageReceiver.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageReceiver.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageReceiver.java
             </output>
             <dependsOnVar>hasReceiver=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/MessageRequester.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageRequester.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageRequester.java
             </output>
             <dependsOnVar>hasRequester=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/MessageRequesterFactory.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageRequesterFactory.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageRequesterFactory.java
             </output>
             <dependsOnVar>hasRequester=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/TransactedMessageReceiver.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}TransactedMessageReceiver.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}TransactedMessageReceiver.java
             </output>
             <dependsOnVar>hasTransactions=y</dependsOnVar>
         </template>
@@ -217,7 +244,7 @@ transformer? (i.e. ObjectToJmsMessage)
         <template>
             <file>src/main/java/org/mule/transport/TransactionFactory.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}TransactionFactory.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}TransactionFactory.java
             </output>
             <dependsOnVar>hasCustomTransactions=y</dependsOnVar>
         </template>
@@ -225,28 +252,28 @@ transformer? (i.e. ObjectToJmsMessage)
         <template>
             <file>src/main/java/org/mule/transport/Transaction.vm</file>
             <output>
-                src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}Transaction.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}Transaction.java
             </output>
             <dependsOnVar>hasCustomTransactions=y</dependsOnVar>
         </template>
 
         <template>
             <file>src/main/java/org/mule/transport/InboundTransformer.vm</file>
-            <output>src/main/java/org/mule/transport/${TransportNameLower}/transformers/${inboundTransformer}.java
+            <output>src/main/java/org/mule/transport/${ModuleNameLower}/transformers/${inboundTransformer}.java
             </output>
             <dependsOnVar>inboundTransformer!=n</dependsOnVar>
         </template>
 
         <template>
             <file>src/main/java/org/mule/transport/OutboundTransformer.vm</file>
-            <output>src/main/java/org/mule/transport/${TransportNameLower}/transformers/${outboundTransformer}.java
+            <output>src/main/java/org/mule/transport/${ModuleNameLower}/transformers/${outboundTransformer}.java
             </output>
             <dependsOnVar>outboundTransformer!=n</dependsOnVar>
         </template>
 
         <template>
             <file>src/main/java/org/mule/transport/EndpointURIBuilder.vm</file>
-            <output>src/main/java/org/mule/transport/${TransportNameLower}/${TransportName}EndpointURIBuilder.java</output>
+            <output>src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}EndpointURIBuilder.java</output>
             <dependsOnVar>endpointBuilder=c</dependsOnVar>
         </template>
 
@@ -254,59 +281,59 @@ transformer? (i.e. ObjectToJmsMessage)
         <template>
             <file>src/test/java/org/mule/transport/ConnectorFactoryTestCase.vm</file>
             <output>
-                src/test/java/org/mule/transport/${TransportNameLower}/${TransportName}ConnectorFactoryTestCase.java
+                src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}ConnectorFactoryTestCase.java
             </output>
         </template>
         <template>
             <file>src/test/java/org/mule/transport/ConnectorTestCase.vm</file>
             <output>
-                src/test/java/org/mule/transport/${TransportNameLower}/${TransportName}ConnectorTestCase.java
+                src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}ConnectorTestCase.java
             </output>
         </template>
         <template>
             <file>src/test/java/org/mule/transport/EndpointTestCase.vm</file>
             <output>
-                src/test/java/org/mule/transport/${TransportNameLower}/${TransportName}EndpointTestCase.java
+                src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}EndpointTestCase.java
             </output>
         </template>
         <template>
             <file>src/test/java/org/mule/transport/MessageAdapterTestCase.vm</file>
             <output>
-                src/test/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageAdapterTestCase.java
+                src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageAdapterTestCase.java
             </output>
         </template>
         <template>
             <file>src/test/java/org/mule/transport/NamespaceHandlerTestCase.vm</file>
             <output>
-                src/test/java/org/mule/transport/${TransportNameLower}/${TransportName}NamespaceHandlerTestCase.java
+                src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}NamespaceHandlerTestCase.java
             </output>
             <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
         <template>
             <file>src/test/resources/namespace-config.xml.vm</file>
             <output>
-                src/test/resources/${TransportNameLower}-namespace-config.xml
+                src/test/resources/${ModuleNameLower}-namespace-config.xml
             </output>
             <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
         <template>
             <file>src/test/java/org/mule/transport/MessageReceiverTestCase.vm</file>
             <output>
-                src/test/java/org/mule/transport/${TransportNameLower}/${TransportName}MessageReceiverTestCase.java
+                src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageReceiverTestCase.java
             </output>
             <dependsOnVar>hasReceiver=y</dependsOnVar>
         </template>
         <template>
             <file>src/test/java/org/mule/transport/TransformersTestCase.vm</file>
             <output>
-                src/test/java/org/mule/transport/${TransportNameLower}/transformers/${TransportName}TransformersTestCase.java
+                src/test/java/org/mule/transport/${ModuleNameLower}/transformers/${ModuleName}TransformersTestCase.java
             </output>
             <dependsOnVar>inboundTransformer!=n</dependsOnVar>
         </template>
         <template>
             <file>src/test/java/org/mule/transport/TransformersTestCase.vm</file>
             <output>
-                src/test/java/org/mule/transport/${TransportNameLower}/transformers/${TransportName}TransformersTestCase.java
+                src/test/java/org/mule/transport/${ModuleNameLower}/transformers/${ModuleName}TransformersTestCase.java
             </output>
             <dependsOnVar>outboundTransformer!=n</dependsOnVar>
         </template>

@@ -1,17 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-#set($TransportName = "$transportId")
-#set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1).toLowerCase()}")
-#set($TransportNameLower = "${TransportName.toLowerCase()}")
-#set($MuleVersion = "$muleVersion")
-#set($id = "")
-#if(!$groupId)
-  #set($groupId = "org.mule.transports")
-#end
-#if(!$artifactId)
-  #set($artifactId = "mule-transport-${TransportNameLower}")
-#end
-
-#set($MuleMajorMinorVersion = "$MuleVersion.substring(0, 3)")
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -20,237 +7,230 @@
    <groupId>${groupId}</groupId>
    <artifactId>${artifactId}</artifactId>
    <packaging>jar</packaging>
-   <name>Mule ${TransportName} Transport</name>
+   <name>Mule ${ModuleName} ${ModuleType}</name>
    <version>${version}</version>
    <description>${description}</description>
 
-   <properties>
-       <mule.version>${MuleVersion}</mule.version>
-   </properties>
+<properties>
+        <mule.version>${MuleVersion}</mule.version>
+        <!-- Tools properties -->
+        <eclipsePluginVersion>2.5</eclipsePluginVersion>
+        <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
+        <jdk5Name>jdk5</jdk5Name>
+        <jdk.version>1.5</jdk.version>
+    </properties>
 
-#if($forgeProject == "y")
-   <!-- Mule Forge Configuration -->
-   <issueManagement>
-       <system>Jira</system>
-       <url>http://mule.mulesource.org/jira/browse/${TransportName.toUpperCase()}</url>
-   </issueManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <finalName>${artifactId}-${version}</finalName>
+                    <descriptors>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-   <scm>
-       <connection>scm:svn:http://svn.muleforge.org/${TransportNameLower}/</connection>
-       <developerConnection>scm:svn:https://svn.muleforge.org/${TransportNameLower}/</developerConnection>
-       <tag>HEAD</tag>
-       <url>http://svn.${TransportNameLower}.muleforge.org/</url>
-   </scm>
 
-
-   <ciManagement>
-       <system>Bamboo</system>
-       <url>http://bamboo.muleforge.org/browse/${TransportName.toUpperCase()}-FORGE</url>
-       <notifiers/>
-   </ciManagement>
-
-   <distributionManagement>
-       <repository>
-           <id>muleforge.webdav.releases</id>
-           <url>dav:https://dav.muleforge.org/repository/${TransportNameLower}/</url>
-       </repository>
-       <snapshotRepository>
-           <id>muleforge.webdav.snapshots</id>
-           <url>dav:https://dav.muleforge.org/snapshots.repository/${TransportNameLower}/</url>
-       </snapshotRepository>
-       <site>
-           <id>muleforge.webdav.sites</id>
-           <url>dav:https://dav.muleforge.org/${TransportNameLower}/</url>
-       </site>
-   </distributionManagement>
-
-   <repositories>
-       <repository>
-           <id>muleforge-repo</id>
-           <name>MuleForge Repository</name>
-           <url>http://repository.muleforge.org</url>
-           <layout>default</layout>
-       </repository>
-
-       <repository>
-           <id>codehaus-repo</id>
-           <name>Codehaus Repository</name>
-           <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-           <layout>default</layout>
-       </repository>
-       <repository>
-           <!-- local repository for this transport. Users can upload dependencies here when the artifact
-                is not available on any other repository. Its the users' responsibility to make sure that no
-                licenses are violated by uploading dependencies to this location
-           -->
-           <id>${TransportNameLower}-deps</id>
-           <name>${TransportName} Dependencies</name>
-           <url>http://dist.muleforge.org/${artifactId}/dependencies/maven2</url>
-           <snapshots>
-               <enabled>false</enabled>
-           </snapshots>
-       </repository>
-   </repositories>
-
-   <!-- End of MuleForge Configuration -->
-#end
-
-   <build>
-        <extensions>
-            <!-- WebDAV for remote deployment -->
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-webdav</artifactId>
-            </extension>
-        </extensions>
-
-       <plugins>
-           <plugin>
-               <artifactId>maven-assembly-plugin</artifactId>
-               <configuration>
-                   <finalName>${artifactId}-${version}</finalName>
-                   <descriptors>
-                       <descriptor>assembly.xml</descriptor>
-                   </descriptors>
-                   <appendAssemblyId>false</appendAssemblyId>
-               </configuration>
-           </plugin>
-
-           <!-- When we build an IDEA project make sure we attach sources for convenience -->
-           <plugin>
+    <!-- plugins for creating site reports -->
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>${eclipsePluginVersion}</version>
+                <configuration>
+                    <!-- by default download all sources when generating project files -->
+                    <downloadSources>true</downloadSources>
+                    <classpathContainers>
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk15Name}
+                        </classpathContainer>
+                    </classpathContainers>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-idea-plugin</artifactId>
                 <configuration>
                     <downloadSources>true</downloadSources>
+                    <jdkName>${jdk.version}</jdkName>
                 </configuration>
             </plugin>
-
-            <!-- When we build an Eclipse project make sure we attach sources for convenience -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <downloadSources>true</downloadSources>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
-       </plugins>
-   </build>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <source>${jdk.version}</source>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>http://mulesource.org/download/attachments/92/checkstyle.xml?version=1
+                    </configLocation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <targetJdk>${jdk.version}</targetJdk>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>taglist-maven-plugin</artifactId>
+                <configuration>
+                    <tags>
+                        <tag>TODO</tag>
+                        <tag>@todo</tag>
+                        <tag>FIXME</tag>
+                        <tag>@fixme</tag>
+                        <tag>@deprecated</tag>
+                    </tags>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links>
+                        <link>http://java.sun.com/j2ee/1.4/docs/api</link>
+                        <link>http://java.sun.com/j2se/1.4.2/docs/api</link>
+                        <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+                    </links>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jdepend-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </reporting>
 
-   <!-- plugins for creating site reports -->
-   <reporting>
-       <plugins>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-surefire-report-plugin</artifactId>
-           </plugin>
-#if($forgeProject == "y")
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-checkstyle-plugin</artifactId>
-               <configuration>
-                   <configLocation>http://www.muleforge.org/download/checkstyle.xml</configLocation>
-               </configuration>
-           </plugin>
-#end
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-pmd-plugin</artifactId>
-               <configuration>
-                   <targetJdk>1.5</targetJdk>
-               </configuration>
-           </plugin>
-           <plugin>
-               <groupId>org.codehaus.mojo</groupId>
-               <artifactId>cobertura-maven-plugin</artifactId>
-           </plugin>
-           <plugin>
-               <groupId>org.codehaus.mojo</groupId>
-               <artifactId>taglist-maven-plugin</artifactId>
-               <configuration>
-                   <tags>
-                       <tag>TODO</tag>
-                       <tag>@todo</tag>
-                       <tag>FIXME</tag>
-                       <tag>@fixme</tag>
-                       <tag>@deprecated</tag>
-                   </tags>
-               </configuration>
-           </plugin>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-jxr-plugin</artifactId>
-           </plugin>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-javadoc-plugin</artifactId>
-               <configuration>
-                   <links>
-                       <link>http://java.sun.com/j2ee/1.4/docs/api</link>
-                       <link>http://java.sun.com/j2se/1.4.2/docs/api</link>
-                       <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-                   </links>
-               </configuration>
-           </plugin>
-           <plugin>
-               <groupId>org.codehaus.mojo</groupId>
-               <artifactId>jdepend-maven-plugin</artifactId>
-           </plugin>
-           <plugin>
-               <groupId>org.codehaus.mojo</groupId>
-               <artifactId>findbugs-maven-plugin</artifactId>
-           </plugin>
-       </plugins>
-   </reporting>
-
-   <!-- Common Dependencies -->
-   <dependencies>
-       <dependency>
-           <groupId>org.mule</groupId>
-           <artifactId>mule-core</artifactId>
-           <version>${mule.version}</version>
-       </dependency>
-       <dependency>
-           <groupId>org.mule.modules</groupId>
-           <artifactId>mule-module-spring-config</artifactId>
-           <version>${mule.version}</version>
-       </dependency>
-
-       <!-- Seems these are required here, as transative dependencies 
-       don't work the same with bundles? How can we use version variables?-->
-       <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>2.5.3</version>
-       </dependency>
-       <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
-            <version>1.1</version>
-            <scope>provided</scope>
-        </dependency>
+    <!-- Mule Dependencies -->
+    <dependencies>
+        <!-- Mule Modules: You will need to add and remove as necessary -->
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-            <version>1.1</version>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${mule.version}</version>
         </dependency>
+        <!-- Xml configuration -->
         <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>backport-util-concurrent</groupId>
-            <artifactId>backport-util-concurrent</artifactId>
-            <version>3.1</version>
-            <scope>provided</scope>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${mule.version}</version>
         </dependency>
 
+        <!-- Mule Transports -->
+
+        #set($emailDepSet = false)
+        #set($sslDepSet = false)
+        #set($httpDepSet = false)
+        #set($jettyDepSet = false)
+        #set($rmiDepSet = false)
+        #foreach($item in $transportArray)
+          #if($item == 'smtp' || $item == 'smtps' || $item == 'pop3' || $item == 'pop3s' || $item == 'imap' || $item == 'imaps')
+            #if($emailDepSet == false)
         <dependency>
-           <groupId>junit</groupId>
-           <artifactId>junit</artifactId>
-           <version>3.8.1</version>
-           <scope>test</scope>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-email</artifactId>
+            <version>${mule.version}</version>
+        </dependency>
+              #set($emailDepSet = true)
+            #end
+          #elseif($item == 'ssl' || $item == 'tls')
+            #if($sslDepSet == false)
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-ssl</artifactId>
+            <version>${mule.version}</version>
+        </dependency>
+              #set($sslDepSet = true)
+            #end
+          #elseif($item == 'http' || $item == 'https')
+            #if($httpDepSet == false)
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
+            <version>${mule.version}</version>
+        </dependency>
+              #set($httpDepSet = true)
+            #end
+          #elseif($item == 'jetty' || $item == 'jetty-ssl')
+            #if($jettyDepSet == false)
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jetty</artifactId>
+            <version>${mule.version}</version>
+        </dependency>
+              #set($jettyDepSet = true)
+            #end
+          #elseif($item == 'rmi' || $item == 'jnp')
+            #if($rmiDepSet == false)
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-rmi</artifactId>
+            <version>${mule.version}</version>
+        </dependency>
+              #set($rmiDepSet = true)
+            #end
+          #else
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-${item}</artifactId>
+            <version>${mule.version}</version>
+        </dependency>
+          #end
+        #end
+        <!-- Mule Modules -->
+
+        #foreach($item in $moduleArray)
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-${item}</artifactId>
+            <version>${mule.version}</version>
+        </dependency>
+
+        #end
+
+        <!-- for testing -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${mule.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>mockobjects</groupId>
@@ -259,17 +239,78 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${mule.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${mule.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    #if($forgeProject == "y")
+    <!-- Mule Forge Configuration -->
+    <issueManagement>
+        <system>Jira</system>
+        <url>http://www.mulesource.org/jira/browse/${ModuleName.toUpperCase()}</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:svn:http://svn.muleforge.org/${ModuleNameLower}/</connection>
+        <developerConnection>scm:svn:https://svn.muleforge.org/${ModuleNameLower}/</developerConnection>
+        <tag>HEAD</tag>
+        <url>http://svn.${ModuleNameLower}.muleforge.org/</url>
+    </scm>
+
+
+    <ciManagement>
+        <system>Bamboo</system>
+        <url>http://bamboo.muleforge.org/browse/${ModuleName.toUpperCase()}-FORGE</url>
+        <notifiers/>
+    </ciManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>muleforge.webdav.releases</id>
+            <url>dav:https://dav.muleforge.org/repository/${ModuleNameLower}/</url>
+        </repository>
+        <snapshotRepository>
+            <id>muleforge.webdav.snapshots</id>
+            <url>dav:https://dav.muleforge.org/snapshots.repository/${ModuleNameLower}/</url>
+        </snapshotRepository>
+        <site>
+            <id>muleforge.webdav.sites</id>
+            <url>dav:https://dav.muleforge.org/${ModuleNameLower}/</url>
+        </site>
+    </distributionManagement>
+
+    <!-- End of MuleForge Configuration -->
+    #end
+    <repositories>
+        <repository>
+            <id>muleforge-repo</id>
+            <name>MuleForge Repository</name>
+            <url>http://repository.muleforge.org</url>
+            <layout>default</layout>
+        </repository>
+
+        <repository>
+            <id>codehaus-repo</id>
+            <name>Codehaus Repository</name>
+            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
+            <layout>default</layout>
+        </repository>
+        #if($forgeProject == "y")
+        <repository>
+            <!-- local repository for this forge project. Users can upload dependencies here when the artifact
+                 is not available on any other repository. Its the users' responsibility to make sure that no
+                 licenses are violated by uploading dependencies to this location
+            -->
+            <id>${ModuleNameLower}-deps</id>
+            <name>${ModuleName} Dependencies</name>
+            <url>http://dist.muleforge.org/${artifactId}/dependencies/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        #end
+    </repositories>
 </project>

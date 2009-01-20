@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.${TransportNameLower};
+package org.mule.transport.${ModuleNameLower};
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -22,16 +22,16 @@ import org.mule.transport.TransactedPollingMessageReceiver;
 import java.util.List;
 
 /**
- * <code>${TransportName}</code> Todo Document
+ * <code>${ModuleName}</code> Todo Document
  *
  */
-public class ${TransportName}TransactedMessageReceiver extends TransactedPollingMessageReceiver
+public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMessageReceiver
 {
 
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
-    public ${TransportName}TransactedMessageReceiver(Connector connector,
+    public ${ModuleName}TransactedMessageReceiver(Connector connector,
                                           Service service,
                                           final InboundEndpoint endpoint) throws CreateException
     {

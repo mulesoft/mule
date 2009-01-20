@@ -7,9 +7,9 @@
 #Arguments can be placed in the message using {0}, {1}, etc placeholders
 #
 #To get a message listed here use the following -
-# new Message("${TransportName}", "<message id>" [, <arg 1>, <arg 2>]);
+# new Message("${ModuleName}", "<message id>" [, <arg 1>, <arg 2>]);
 #
-# "${TransportName}" is the protocol of this transport
+# "${ModuleName}" is the protocol of this transport
 # <message id> is the id of the message in this file
 # <arg x> is a list of String arguments to pass to the message
 #

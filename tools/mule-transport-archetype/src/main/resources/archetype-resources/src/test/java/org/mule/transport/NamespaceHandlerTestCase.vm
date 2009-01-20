@@ -7,24 +7,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.${TransportNameLower};
+package org.mule.transport.${ModuleNameLower};
 
 import org.mule.tck.FunctionalTestCase;
 
 /**
  * TODO
  */
-public class ${TransportName}NamespaceHandlerTestCase extends FunctionalTestCase
+public class ${ModuleName}NamespaceHandlerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
         //TODO You'll need to edit this file to configure the properties specific to your transport
-        return "${TransportNameLower}-namespace-config.xml";
+        return "${ModuleNameLower}-namespace-config.xml";
     }
 
-    public void test${TransportName}Config() throws Exception
+    public void test${ModuleName}Config() throws Exception
     {
-        ${TransportName}Connector c = (${TransportName}Connector) muleContext.getRegistry().lookupConnector("${TransportNameLower}Connector");
+        ${ModuleName}Connector c = (${ModuleName}Connector) muleContext.getRegistry().lookupConnector("${ModuleNameLower}Connector");
         assertNotNull(c);
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());

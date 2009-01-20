@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.${TransportNameLower}.transformers;
+package org.mule.transport.${ModuleNameLower}.transformers;
 
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.api.MuleMessage;

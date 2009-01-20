@@ -8,22 +8,22 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.${TransportNameLower};
+package org.mule.transport.${ModuleNameLower};
 
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 
 /**
- * <code>${TransportName}MessageRequester</code> TODO document
+ * <code>${ModuleName}MessageRequester</code> TODO document
  */
-public class ${TransportName}MessageRequester extends AbstractMessageRequester
+public class ${ModuleName}MessageRequester extends AbstractMessageRequester
 {
 
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
-    public ${TransportName}MessageRequester(InboundEndpoint endpoint)
+    public ${ModuleName}MessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
     }

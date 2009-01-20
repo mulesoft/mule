@@ -66,7 +66,7 @@
                     </xsd:element>
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>A property that wil be made available to the filter context. Expression Evaluators can be used to grab these properties from the message at runtime.
+                            <xsd:documentation>A property that will be made available to the filter context. Expression Evaluators can be used to grab these properties from the message at runtime.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>

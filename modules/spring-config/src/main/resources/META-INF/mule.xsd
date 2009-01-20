@@ -945,13 +945,13 @@
         <xsd:sequence>
             <xsd:element name="commit-transaction" type="exceptionPatternType" maxOccurs="1" minOccurs="0">
                 <xsd:annotation>
-                    <xsd:documentation>Defines when a current transaction gets committed based on the name of the exception caught. Users can set a comma-separated list of wildcard patterns that wil be matched angainst the fully qualified classname of the current exception. Patterns defined for this element will leave the current transaction (if any) untouched and allow it to be committed.
+                    <xsd:documentation>Defines when a current transaction gets committed based on the name of the exception caught. You can set a comma-separated list of wildcard patterns that will be matched against the fully qualified classname of the current exception. Patterns defined for this element will leave the current transaction (if any) untouched and allow it to be committed.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element name="rollback-transaction" type="exceptionPatternType" maxOccurs="1" minOccurs="0">
                 <xsd:annotation>
-                    <xsd:documentation>Defines when a current transaction gets rolled back based on the name of the exception caught. Users can set a comma-separated list of wildcard patterns that wil be matched angainst the fully qualified classname of the current exception. Patterns defined for this element will roll back the current transaction (if any).
+                    <xsd:documentation>Defines when a current transaction gets rolled back based on the name of the exception caught. You can set a comma-separated list of wildcard patterns that will be matched against the fully qualified classname of the current exception. Patterns defined for this element will roll back the current transaction (if any).
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -2834,7 +2834,7 @@
                  substitutionGroup="abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                A user-defined exception stratgey.
+                A user-defined exception strategy.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

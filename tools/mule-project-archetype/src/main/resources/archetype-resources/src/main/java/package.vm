@@ -1,0 +1,7 @@
+<html>
+<head><title>Mule - ${ModuleName}</title>
+</head>
+<body>
+<p>${description}</p>
+</body>
+</html>
