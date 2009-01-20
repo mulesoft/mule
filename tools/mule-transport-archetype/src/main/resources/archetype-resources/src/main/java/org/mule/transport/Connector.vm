@@ -20,7 +20,7 @@ import org.mule.api.lifecycle.InitialisationException;
 public class ${ModuleName}Connector extends AbstractConnector
 {
     /* This constant defines the main transport protocol identifier */
-    public static final String ${ModuleName}.toUpperCase() = "${ModuleNameLower}";
+    public static final String ${ModuleName.toUpperCase()} = "${ModuleNameLower}";
 
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
@@ -84,7 +84,7 @@ public class ${ModuleName}Connector extends AbstractConnector
 
     public String getProtocol()
     {
-        return ${ModuleName}.toUpperCase();
+        return ${ModuleName.toUpperCase()};
     }
 
 }

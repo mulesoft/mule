@@ -2762,7 +2762,7 @@
                 <xsd:attribute name="poolExhaustedAction">
                     <xsd:annotation>
                         <xsd:documentation>
-                            When the maximum pool size or queue size is bounded, this value determines how to handle incoming tasks. Possible values are: WAIT (wait until a thread becomes available--don't use this value if the minimum number of threads is zero, in which case a thread may never become available), DISCARD (throw away the current request and return), DISCARD_OLDEST (throw away the oldest request and return), ABORT (throw a RuntimeException), and RUN (the thread making the execute request runs the task itself, which helps guard against lockup).
+                            When the maximum pool size or queue size is bounded, this value determines how to handle incoming tasks. Possible values are: WAIT (wait until a thread becomes available; don't use this value if the minimum number of threads is zero, in which case a thread may never become available), DISCARD (throw away the current request and return), DISCARD_OLDEST (throw away the oldest request and return), ABORT (throw a RuntimeException), and RUN (the default; the thread making the execute request runs the task itself, which helps guard against lockup).
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>

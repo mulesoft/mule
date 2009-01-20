@@ -27,7 +27,7 @@ public class ${ModuleName}NamespaceHandler extends AbstractMuleNamespaceHandler
            The defaults are sufficient unless you have endpoint styles different from the Mule standard ones
            The URIBuilder as constants for common required attributes, but you can also pass in a user-defined String[].
          */
-        registerStandardTransportEndpoints(${ModuleName}Connector.${ModuleName}.toUpperCase(), URIBuilder.PATH_ATTRIBUTES);
+        registerStandardTransportEndpoints(${ModuleName}Connector.${ModuleName.toUpperCase()}, URIBuilder.PATH_ATTRIBUTES);
 
         /* This will create the handler for your custom 'connector' element.  You will need to add handlers for any other
            xml elements you define.  For more information see:
