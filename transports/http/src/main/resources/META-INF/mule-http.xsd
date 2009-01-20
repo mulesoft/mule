@@ -196,7 +196,7 @@
     </xsd:complexType>
 
     <!-- TODO MULE-3439: this should be renamed to http-response-to-message -->
-    <xsd:element name="http-client-response-to-object-transformer" type="mule:abstractTransformerType"
+    <xsd:element name="http-response-to-object-transformer" type="mule:abstractTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>A transformer that converts an HTTP response to a Mule Message. The payload may be a String, stream, or byte array.

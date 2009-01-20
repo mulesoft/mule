@@ -47,7 +47,7 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("requiredParameter", new ChildMapEntryDefinitionParser("requiredParams"));
         registerBeanDefinitionParser("optionalParameter", new ChildMapEntryDefinitionParser("optionalParams"));
         
-        registerBeanDefinitionParser("http-client-response-to-object-transformer", new TransformerDefinitionParser(HttpClientMethodResponseToObject.class));
+        registerBeanDefinitionParser("http-response-to-object-transformer", new TransformerDefinitionParser(HttpClientMethodResponseToObject.class));
         registerBeanDefinitionParser("http-response-to-string-transformer", new TransformerDefinitionParser(HttpResponseToString.class));
         registerBeanDefinitionParser("object-to-http-client-request-transformer", new TransformerDefinitionParser(ObjectToHttpClientMethodRequest.class));
         registerBeanDefinitionParser("message-to-http-response-transformer", new TransformerDefinitionParser(MuleMessageToHttpResponse.class));
