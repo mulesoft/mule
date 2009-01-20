@@ -5,7 +5,8 @@
     <variables>
         <variable>
             <name>newProject</name>
-            <description>Are you creating a new transport (rather than updating an existing one)? [y] or [n]</description>
+            <description>Are you creating a new transport? [y] or [n]
+(rather than updating an existing one)</description>
             <defvalue>y</defvalue>
             <variables>
                 <variable>
@@ -27,7 +28,7 @@
                 <variable>
                     <name>hasReceiver</name>
                     <description>Can the transport receive inbound requests? [y] or [n]</description>
-                    <defvalue>y</defvalue>
+                    <defvalue>n</defvalue>
 
                     <variables>
                         <variable>
@@ -44,7 +45,7 @@
                                 odd indentation when actually running the archetype.
                             -->
                             <description>If this transport will have a default inbound transformer, enter the name of the
-        transformer? (i.e. JmsMessageToObject)
+transformer? (i.e. JmsMessageToObject)
                             </description>
                             <defvalue>n</defvalue>
                         </variable>
@@ -54,7 +55,7 @@
                 <variable>
                     <name>hasDispatcher</name>
                     <description>Can the transport dispatch outbound requests? [y] or [n]</description>
-                    <defvalue>y</defvalue>
+                    <defvalue>n</defvalue>
 
                     <variables>
                         <variable>
@@ -64,7 +65,7 @@
                                 odd indentation when actually running the archetype.
                             -->
                             <description>If this transport will have a default outbound transformer, enter the name of the
-        transformer? (i.e. ObjectToJmsMessage)
+transformer? (i.e. ObjectToJmsMessage)
                             </description>
                             <defvalue>n</defvalue>
                         </variable>
@@ -74,35 +75,9 @@
                 <variable>
                     <name>hasCustomMessageAdapter</name>
                     <description>Does the transport need a custom MessageAdapter? [y] or [n]
-        (This is usually only required if the underlying transport has an API that has a message object
-                        i.e. JMSMessage or HttpServletRequest)</description>
+(This is usually only required if the underlying transport has an API that has a message object
+i.e. JMSMessage or HttpServletRequest)</description>
                     <defvalue>n</defvalue>
-                </variable>
-
-                <variable>
-                    <name>hasRequestor</name>
-                    <description>Can the transport request individual messages from the underlying resource? [y] or [n]</description>
-                    <defvalue>y</defvalue>
-                </variable>
-
-                <variable>
-                    <name>hasTransactions</name>
-                    <description>Does this transport support transactions? [y] or [n]</description>
-                    <defvalue>n</defvalue>
-
-                    <variables>
-                        <variable>
-                            <name>hasCustomTransactions</name>
-                            <!--
-                                Indentation matters here! Do not indent the second line as this will cause
-                                odd indentation when actually running the archetype.
-                            -->
-                            <description>Does this transport use a non-JTA Transaction manager? [y] or [n]
-        (i.e. needs to wrap proprietary transaction management)
-                            </description>
-                            <defvalue>n</defvalue>
-                        </variable>
-                    </variables>
                 </variable>
 
                 <variable>
@@ -122,11 +97,11 @@
                 <variable>
                     <name>transports</name>
                     <description>
-        Which Mule transports do you want to include in this project? If you intend extending a transport you should add it here:
+Which Mule transports do you want to include in this project? If you intend extending a transport you should add it here:
 
-        (options: axis, cxf, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
-                  jetty, jetty-ssl, jms, jnp, multicast, pop3, pop3s, quartz, rmi, servlet,
-                  smtp, smtps, servlet, ssl, tls, stdio, tcp, udp, vm, xmpp):
+(options: axis, cxf, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
+          jetty, jetty-ssl, jms, jnp, multicast, pop3, pop3s, quartz, rmi, servlet,
+          smtp, smtps, servlet, ssl, tls, stdio, tcp, udp, vm, xmpp):
 
                     </description>
                     <defvalue>vm</defvalue>
@@ -134,13 +109,41 @@
                 <variable>
                     <name>modules</name>
                     <description>
-        Which Mule modules do you want to include in this project? The client is added for testing:
+Which Mule modules do you want to include in this project? The client is added for testing:
 
-        (options: bulders, client, jaas, jbossts, management, ognl, pgp, scripting,
-                  spring-extras, sxc, xml):
+(options: bulders, client, jaas, jbossts, management, ognl, pgp, scripting,
+          spring-extras, sxc, xml):
 
                     </description>
                     <defvalue>client</defvalue>
+                </variable>
+            </variables>
+        </variable>
+        <variable>
+            <name>hasRequestor</name>
+            <description>Can the transport request individual messages from the underlying resource? [y] or [n]
+(If you are upgrading a 1.x transport, select this if your transport implemented the receive()
+method on the Dispatcher)
+            </description>
+            <defvalue>n</defvalue>
+        </variable>
+
+        <variable>
+            <name>hasTransactions</name>
+            <description>Does this transport support transactions? [y] or [n]</description>
+            <defvalue>n</defvalue>
+
+            <variables>
+                <variable>
+                    <name>hasCustomTransactions</name>
+                    <!--
+                        Indentation matters here! Do not indent the second line as this will cause
+                        odd indentation when actually running the archetype.
+                    -->
+                    <description>Does this transport use a non-JTA Transaction manager? [y] or [n]
+(i.e. needs to wrap proprietary transaction management)
+                    </description>
+                    <defvalue>n</defvalue>
                 </variable>
             </variables>
         </variable>
@@ -329,14 +332,14 @@
             <output>
                 src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}ConnectorTestCase.java
             </output>
-            <dependsOnVar>newProject=y</dependsOnVar>            
+            <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
             <file>src/test/java/org/mule/transport/EndpointTestCase.vm</file>
             <output>
                 src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}EndpointTestCase.java
             </output>
-            <dependsOnVar>newProject=y</dependsOnVar>            
+            <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
             <file>src/test/java/org/mule/transport/MessageAdapterTestCase.vm</file>

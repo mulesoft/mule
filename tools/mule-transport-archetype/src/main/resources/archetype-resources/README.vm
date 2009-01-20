@@ -35,9 +35,6 @@
 #set($ModuleType = "Transport")
 
 #if($newProject == "n")
-  #set($hasReceiver = "n")
-  #set($hasDispatcher = "n")
-  #set($hasRequestor = "n")
   #set($description = "TODO")
 #end
 WELCOME
@@ -98,6 +95,7 @@ does not have a specific message type you do not need this class (see ${ModuleNa
 This transformer should convert the otbound message into a type supported by the underlying technology.  For example,
 in the case of JMS this class would would convert a MuleMessage to a JMSMessage.  If your transport
 does not have a specific message type you do not need this class.
+#end
 
 #if($hasCustomMessageAdapter == "y")
 -----------------------------------------------------------------
@@ -107,6 +105,7 @@ This class is used to wrap inbound messages and access the data in the message i
 access to the payload, message headers and attachments.
 #end
 
+#if($hasDispatcher == "y")
 -----------------------------------------------------------------
 ./src/main/java/${package}/${ModuleNameLower}/${ModuleName}MessageDispatcher.java
 
@@ -117,20 +116,23 @@ dispatch messages over the underlying transport.
 ./src/main/java/${package}/${ModuleNameLower}/${ModuleName}MessageDispatcherFactory.java
 
 The factory used to create ${ModuleName}MessageDispatcher instances.
-
+#end
+#if($hasReceiver == "y")
 -----------------------------------------------------------------
 ./src/main/java/${package}/${ModuleNameLower}/${ModuleName}MessageReceiver.java
 
 This part of the transport responsible for inbound endpoints.  This class should implement the logic need to
 receive messages from the underlying transport.  Mule supports polling receivers, that pull events from the transport, but
 users can implement listener interfaces to have events pushed to the receiver.
-
+#if($hasTransactions == "y")
 -----------------------------------------------------------------
 ./src/main/java/${package}/${ModuleNameLower}/${ModuleName}TransactedMessageReceiver.java
 
 This class should implement the logic need to receive messages from the underlying transport using a transaction.
 If the underlying transport does not support Transactions, this receiver is not required.
-
+#end
+#end
+#if($hasRequestor == "y")
 -----------------------------------------------------------------
 ./src/main/java/${package}/${ModuleNameLower}/${ModuleName}MessageRequester.java
 
@@ -141,7 +143,8 @@ should implement the logic needed to make this type of request via the transport
 ./src/main/java/${package}/${ModuleNameLower}/${ModuleName}MessageRequesterFactory.java
 
 The factory used to create ${ModuleName}MessageRequester instances.
-
+#end
+#if($hasTransactions == "y")
 -----------------------------------------------------------------
 ./src/main/java/${package}/${ModuleNameLower}/${ModuleName}Transaction.java
 
@@ -201,13 +204,6 @@ code.  For more information about testing see: http://www.mulesource.org/display
 
 Defines the Mule configuration for the ${ModuleName}TestCase.java.
 
-    #if($hasCustomMessageAdapter == "y")
------------------------------------------------------------------
-./src/test/java/${package}/${ModuleNameLower}/${ModuleName}MessageAdapterTestCase.java
-
-The test case for testing the custom message adapter for this transport.
-    #end
-
 -----------------------------------------------------------------
 ./src/test/java/${package}/${ModuleNameLower}/${ModuleName}ConnectorTestCase.java
 
@@ -217,23 +213,29 @@ The unit test case for testing the connecotr object for this transport.
 ./src/test/java/${package}/${ModuleNameLower}/${ModuleName}EndpointTestCase.java
 
 The unit test case for testing the endpoint builder object for this transport.
+#end
+#if($hasCustomMessageAdapter == "y")
+-----------------------------------------------------------------
+./src/test/java/${package}/${ModuleNameLower}/${ModuleName}MessageAdapterTestCase.java
 
-    #if($hasReceiver == "y")
+The test case for testing the custom message adapter for this transport.
+#end
+
+#if($hasReceiver == "y")
 -----------------------------------------------------------------
 ./src/test/java/${package}/${ModuleNameLower}/${ModuleName}MessageReceiverTestCase.java
 
 The unit test case for testing the message receiver object for this transport.
-    #end
+#end
 
-    #if($inboundTransformer == "y" || $outboundTransformer == "y")
+#if($inboundTransformer == "y" || $outboundTransformer == "y")
 -----------------------------------------------------------------
 ./src/test/java/${package}/${ModuleNameLower}/${ModuleName}TransformersTestCase.java
 
 The unit test case for testing the transformer object for this transport. This test will perform a
 full round trip test is there are corresponding inbound and outbound transformers.
-    #end
 #end
- #if($hasCustomSchema == "y")
+#if($hasCustomSchema == "y")
 -----------------------------------------------------------------
 ./src/test/java/${package}/${ModuleNameLower}/${ModuleName}NamespaceHandlerTestCase.java
 
@@ -243,7 +245,7 @@ A test case that is used to test each of the configuration elements inside your 
 ./src/test/resources/${ModuleNameLower}-namespace-config.xml
 
 The configuration file for the ${ModuleName}NamespaceHandlerTestCase.java testcase.
-    #end
+#end
 
 
 ADDITIONAL RESOURCES

@@ -1,5 +1,5 @@
 <!--
-    Assembly descriptor for the full distribution.
+Assembly descriptor for the full distribution.
 -->
 <assembly>
     <id>${ModuleName}</id>
@@ -9,42 +9,58 @@
     </formats>
     <fileSets>
         <fileSet>
+            <directory>src</directory>
             <outputDirectory>src</outputDirectory>
+        </fileSet>
+        <!-- If a licenses directory is present, copy it.  this would contain text files describing the licenses for each
+             non-Mule dependencies -->
+        <fileSet>
+            <directory>licenses</directory>
+            <outputDirectory>licenses</outputDirectory>
+        </fileSet>
+
+        <!-- Example Dist and execs -->
+        <fileSet>
+            <directory>dist</directory>
+            <outputDirectory>dist</outputDirectory>
+            <excludes>
+                <exclude>${ModuleNameLower}</exclude>
+                <exclude>${ModuleNameLower}.bat</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>dist</directory>
+            <outputDirectory></outputDirectory>
+            <fileMode>755</fileMode>
             <includes>
-                <include>pom.xml</include>
-                <include>src/**</include>
+                <include>${ModuleNameLower}</include>
+                <include>${ModuleNameLower}.bat</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>target</directory>
-            <outputDirectory>.</outputDirectory>
+            <directory>dist</directory>
+            <outputDirectory></outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>README.txt</include>
             </includes>
         </fileSet>
-        <fileSet>
-            <directory>target/site</directory>
-            <outputDirectory>site</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>examples/target</directory>
-            <outputDirectory>examples</outputDirectory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
-        </fileSet>
+
     </fileSets>
     <dependencySets>
-        <!-- Mule libraries -->
         <dependencySet>
             <outputDirectory>lib/user</outputDirectory>
-            <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
-            <scope>test</scope>
+            <scope>runtime</scope>
+            <!-- Include only the non-Mule libraries needed by your application -->
             <includes>
-                <include>org.mule.tests:mule-tests-functional</include>
-            </includes>
-        </dependencySet>
-        <!-- Non-Mule libraries -->
+                <!-- Make sure we include this project's artifact -->
+                <include>${groupId}:${artifactId}</include>
 
+                <!--
+                Add any 3rd party libraries here.  Note you can use wildcards i.e.
+                <include>net.sf.someproject:*</include>
+                -->
+            </includes>
+
+        </dependencySet>
     </dependencySets>
 </assembly>

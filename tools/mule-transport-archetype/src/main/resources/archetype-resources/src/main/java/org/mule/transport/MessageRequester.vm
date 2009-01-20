@@ -21,7 +21,18 @@ public class ${ModuleName}MessageRequester extends AbstractMessageRequester
 {
 
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       http://mule.mulesource.org/display/MULE/Writing+Transports
+
+        #if($newProject == "n")
+        IMPORTANT TODO: Since you added this class to an existing transport, you need to add
+        a reference to it on the service discriptor located at:
+        META-INF/services/org/mule/providers/${ModuleNameLower}.properties
+        
+        You need to add the following lines:
+        #The standard message requester used to request data from the underlying technology
+        requester.factory=org.mule.transport.${ModuleNameLower}.${ModuleName}MessageRequesterFactory
+        #end
+     */
 
     public ${ModuleName}MessageRequester(InboundEndpoint endpoint)
     {
