@@ -38,7 +38,6 @@ import org.mule.transport.AbstractConnector;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
-import org.mule.util.CharSetUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapCombiner;
 import org.mule.util.ObjectNameHelper;
@@ -294,14 +293,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected String getDefaultEndpointEncoding(Connector connector)
     {
-        if (muleContext != null)
-        {
-            return muleContext.getConfiguration().getDefaultEncoding();
-        }
-        else
-        {
-            return CharSetUtils.defaultCharsetName();
-        }
+        return null;
     }
 
     protected Filter getFilter(Connector connector)

@@ -37,7 +37,8 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
         props.put("number", new Integer(1));
         props.put("string", "hello");
         testObject = new DefaultMuleMessage("test", props);
-        
+        testObject.setEncoding("UTF-8");
+  
         RequestContext.setEvent(new DefaultMuleEvent(testObject, getTestOutboundEndpoint("test"), MuleTestUtils
             .getTestSession(muleContext), true));
     }
@@ -94,6 +95,10 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
                + "         </org.mule.api.transport.PropertyScope>\n"
                + "         <map>\n"
                + "           <entry>\n"
+               + "             <string>MULE_ENCODING</string>\n"
+               + "             <string>UTF-8</string>\n"
+               + "           </entry>\n"
+               + "           <entry>\n"
                + "             <string>object</string>\n"
                + "             <org.mule.tck.testmodels.fruit.Apple>\n"
                + "               <bitten>false</bitten>\n"
@@ -127,7 +132,7 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
                + "     <defaultScope reference=\"../scopedMap/entry[3]/org.mule.api.transport.PropertyScope\"/>\n"
                + "   </properties>\n"
                + "   <attachments class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\"/>\n"
-               + "   <encoding>UTF-8</encoding>\n" + "   <id>3be5fe5a-87f8-11dc-a153-0b6db396665f</id>\n"
+               + "   <id>3be5fe5a-87f8-11dc-a153-0b6db396665f</id>\n"
                + " </adapter>\n" + " </org.mule.DefaultMuleMessage>\n";
     }
 
@@ -144,7 +149,7 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
             // apparently the generic XML comparison did not work, so check again with XPath
             try
             {
-                XMLAssert.assertXpathEvaluatesTo("3", "count(//adapter/properties/scopedMap/entry/map/entry)", (String)result);
+                XMLAssert.assertXpathEvaluatesTo("4", "count(//adapter/properties/scopedMap/entry/map/entry)", (String)result);
                 XMLAssert.assertXpathEvaluatesTo("false", "//adapter/properties/scopedMap/entry/map/entry/org.mule.tck.testmodels.fruit.Apple/bitten", (String)result);
             }
             catch (Exception ex)
