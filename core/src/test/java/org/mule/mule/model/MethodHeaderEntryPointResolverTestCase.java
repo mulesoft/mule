@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.mule.model;
 
 import org.mule.api.MuleEventContext;
@@ -14,6 +15,7 @@ import org.mule.api.model.InvocationResult;
 import org.mule.model.resolvers.MethodHeaderPropertyEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.transport.NullPayload;
 
 public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
@@ -74,6 +76,35 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
         ctx.getMessage().setProperty("method", "noMethod");
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_FAILED);
+    }
+
+    /**
+     * If a method with correct name is available then it should be used is the
+     * parameter type is assignable from the payload type and not just if there is an
+     * exact match. See MULE-3636.
+     * 
+     * @throws Exception
+     */
+    public void testMethodPropertyParameterAssignableFromPayload() throws Exception
+    {
+        MethodHeaderPropertyEntryPointResolver resolver = new MethodHeaderPropertyEntryPointResolver();
+        MuleEventContext ctx = getTestEventContext(new Apple());
+        ctx.getMessage().setProperty("method", "wash");
+        InvocationResult result = resolver.invoke(new TestFruitCleaner(), ctx);
+        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+    }
+
+    public static class TestFruitCleaner
+    {
+        public void wash(Fruit fruit)
+        {
+            // dummy
+        }
+
+        public void polish(Fruit fruit)
+        {
+            // dummy
+        }
     }
 
 }

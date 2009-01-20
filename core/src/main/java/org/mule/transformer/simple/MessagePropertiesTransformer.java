@@ -113,7 +113,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                     {
                         if (logger.isDebugEnabled())
                         {
-                            if (!propertyNames.contains(key))
+                            if (propertyNames.contains(key))
                             {
                                 logger.debug("Overwriting message property " + key);
                             }

@@ -20,20 +20,8 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractSecurityManagerType">
                 <xsd:sequence>
-                    <xsd:element ref="security-provider">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Reference to the security provider to use with this security manager.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element ref="keybased-encryption-strategy">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Reference to the key-based encryption strategy to use with this security manager.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:element ref="security-provider"/>
+                    <xsd:element ref="keybased-encryption-strategy"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -63,7 +51,7 @@
     <xsd:element name="keybased-encryption-strategy" type="keyBasedEncryptionStrategyType">
         <xsd:annotation>
             <xsd:documentation>
-                A key-based PGP encryption strategy. Specifies the key manager and credentials accessor to use for this strategy.
+               The key-based PGP encryption strategy to use.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

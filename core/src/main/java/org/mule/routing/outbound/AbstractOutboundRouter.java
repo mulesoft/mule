@@ -55,6 +55,9 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
     protected String replyTo = null;
 
+    /**
+     * Determines if Mule stamps outgoing message with a correlation ID or not.
+     */
     protected int enableCorrelation = ENABLE_CORRELATION_IF_NOT_SET;
 
     protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();

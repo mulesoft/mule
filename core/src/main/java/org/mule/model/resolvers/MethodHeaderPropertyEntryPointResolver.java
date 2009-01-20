@@ -17,6 +17,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.apache.commons.lang.BooleanUtils;
 
@@ -87,17 +88,29 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         if (method == null)
         {
             Class[] classTypes = ClassUtils.getClassTypes(payload);
-            try
+
+            // Use all satisfiable methods and then filter by name. This ensures that
+            // the payload does not have to be exactly the same type as the method
+            // argument but can also be any type that extends or implements parameter
+            // class or interface. See MULE-3646.
+            List<Method> list = ClassUtils.getSatisfiableMethods(component.getClass(), classTypes, true,
+                false, null);
+            for (Method methodCandidate : list)
             {
-                method = component.getClass().getMethod(methodName, classTypes);
+                if (methodCandidate.getName().equals(methodName))
+                {
+                    method = methodCandidate;
+                    break;
+                }
             }
-            catch (NoSuchMethodException e)
+            
+            if (method == null)
             {
                 InvocationResult result = new InvocationResult(InvocationResult.STATE_INVOKED_FAILED);
                 result.setErrorNoMatchingMethods(component, classTypes, this);
                 return result;
-
             }
+
         }
 
         validateMethod(component, method);
