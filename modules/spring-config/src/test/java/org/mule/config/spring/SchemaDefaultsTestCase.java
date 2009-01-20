@@ -36,11 +36,8 @@ public class SchemaDefaultsTestCase extends AbstractMuleTestCase
         assertEquals(Boolean.toString(muleContext.getConfiguration().isDefaultSynchronousEndpoints()),
             configurationType.selectSingleNode("xsd:attribute[@name='defaultSynchronousEndpoints']/@default")
                 .getStringValue());
-        assertEquals(Boolean.toString(muleContext.getConfiguration().isDefaultRemoteSync()),
-            configurationType.selectSingleNode("xsd:attribute[@name='defaultRemoteSync']/@default")
-                .getStringValue());
-        assertEquals(muleContext.getConfiguration().getDefaultSynchronousEventTimeout(),
-            configurationType.numberValueOf("xsd:attribute[@name='defaultSynchronousEventTimeout']/@default")
+        assertEquals(muleContext.getConfiguration().getDefaultResponseTimeout(),
+            configurationType.numberValueOf("xsd:attribute[@name='defaultResponseTimeout']/@default")
                 .intValue());
         assertEquals(muleContext.getConfiguration().getDefaultTransactionTimeout(),
             configurationType.numberValueOf("xsd:attribute[@name='defaultTransactionTimeout']/@default")

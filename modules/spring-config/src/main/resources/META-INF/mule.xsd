@@ -372,14 +372,14 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="3000">
+        <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="10000">
             <xsd:annotation>
                 <xsd:documentation>
                     The default period (ms) to wait for a synchronous response.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="defaultTransactionTimeout" type="xsd:string" default="5000">
+        <xsd:attribute name="defaultTransactionTimeout" type="xsd:string" default="30000">
             <xsd:annotation>
                 <xsd:documentation>
                     The default timeout (ms) for transactions. This can also be configured on transactions, in which case the transaction configuration is used instead of this default.
