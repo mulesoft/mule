@@ -895,7 +895,7 @@
                     <xsd:element ref="abstract-component" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The service component that is invoked when incoming messages are received. If this element is not present, the service implementation bridges inbound and outbound using a pass-through component.
+                                The service component that is invoked when incoming messages are received. If this element is not present, the service simply bridges the inbound and outbound using a pass-through component.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>

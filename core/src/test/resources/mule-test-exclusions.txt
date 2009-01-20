@@ -27,3 +27,6 @@ org.mule.util.store.InMemoryStoreTestCase
 
 # MULE-4078
 org.mule.context.DefaultMuleContextTestCase
+
+#Fails on CE CI server MULE-4008
+org.mule.util.TimedSocketTestCase

@@ -1,63 +1,79 @@
 <archetype>
+    <!-- allows us to update an existing project if the archetype is run from the project directory -->
+    <allowPartial>true</allowPartial>
     <id>maven-archetype-mule-project</id>
     <variables>
         <variable>
-            <name>description</name>
-            <description>Provide a description of what the project does:</description>
-            <!-- Note that you always need a <defValue> element for -Dinteractive=false to work -->
-            <defvalue></defvalue>
-        </variable>
-        <variable>
-            <name>muleVersion</name>
-            <description>Which version of Mule is this module targeted at?</description>
-            <defvalue>${muleVersion}</defvalue>
+            <name>newProject</name>
+            <description>Are you creating a new project (rather than updating an existing one)? [y] or [n]</description>
+            <defvalue>y</defvalue>
+            <variables>
+                <variable>
+                    <name>description</name>
+                    <description>Provide a description of what the project does:</description>
+                    <!-- Note that you always need a <defValue> element for -Dinteractive=false to work -->
+                    <defvalue/>
+                </variable>
+                <variable>
+                    <name>muleVersion</name>
+                    <description>Which version of Mule is this project targeted at?</description>
+                    <defvalue>${muleVersion}</defvalue>
+                </variable>
+                <variable>
+                    <name>forgeProject</name>
+                    <description>Will this project be hosted on MuleForge? [y] or [n]</description>
+                    <defvalue>y</defvalue>
+                </variable>
+                <variable>
+                    <name>projectType</name>
+                    <description>What type of project is this?
+                        - [s]tand alone project
+                        - [m]ule module to be hosted on the MuleForge on in the Mule distribution
+                    </description>
+                    <defvalue>s</defvalue>
+                </variable>
+            </variables>
         </variable>
         <variable>
             <name>package</name>
-            <description>What is the base Java package path for this module? (i.e. org/mule/modules or
-                org/mule/examples):
+            <description>What is the base Java package path for this project? (i.e. com/mycompany/project):
             </description>
-            <defvalue>org/mule/applications</defvalue>
-        </variable>
-        <variable>
-            <name>forgeProject</name>
-            <description>Will This project be hosted on MuleForge? [y] or [n]</description>
-            <defvalue>y</defvalue>
-        </variable>
-        <variable>
-            <name>projectType</name>
-            <description>What type of project is this?
-                - [s]tand alone project
-                - [m]ule module to be hosted on the MuleForge on in the Mule distribution
-            </description>
-            <defvalue>s</defvalue>
+            <defvalue>org/mule/module</defvalue>
         </variable>
         <variable>
             <name>hasCustomSchema</name>
-            <description>Will This project have a custom schema for configuring the module in Xml?</description>
-            <defvalue>n</defvalue>
+            <description>Will This project have a custom schema for configuring the module in Xml? [y] or [n]
+            </description>
+            <defvalue>y</defvalue>
         </variable>
         <variable>
             <name>hasBootstrap</name>
-            <description>Will This project need to make objects available in the Registry as soon as it's loaded?
+            <description>Will This project need to make objects available in the Registry as soon as it's loaded? [y] or [n]
             </description>
             <defvalue>n</defvalue>
         </variable>
     </variables>
 
     <templates>
-        <!-- the template pom should be run fisrt since it sets up some other variables -->
+        <!-- the template README should be run first since it sets up other variables and is always included -->
+        <template>
+            <file>README.vm</file>
+            <output>MULE-README.txt</output>
+        </template>
         <template>
             <file>pom.vm</file>
             <output>pom.xml</output>
+            <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
             <file>LICENSE.vm</file>
             <output>LICENSE.txt</output>
+            <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
             <file>assembly.xml.vm</file>
             <output>assembly.xml</output>
+            <dependsOnVar>newProject=y</dependsOnVar>
         </template>
 
         <template>
@@ -65,11 +81,13 @@
             <output>
                 src/main/java/${package}/${ModuleNameLower}/i18n/${ModuleName}Messages.java
             </output>
+            <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/resources/META-INF/services/org/mule/i18n/messages.vm</file>
             <output>src/main/resources/META-INF/services/org/mule/i18n/${ModuleNameLower}-messages.properties
             </output>
+            <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/resources/META-INF/services/org/mule/config/registry-bootstrap.properties</file>
@@ -105,12 +123,14 @@
             <output>
                 src/test/java/${package}/${ModuleNameLower}/${ModuleName}TestCase.java
             </output>
+            <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
             <file>src/test/resources/functional-test-config.xml.vm</file>
             <output>
                 src/test/resources/${ModuleNameLower}-functional-test-config.xml
             </output>
+            <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
             <file>src/test/java/org/mule/modules/NamespaceHandlerTestCase.vm</file>

@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-#set($ModuleName = "$artifactId")
-#set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1).toLowerCase()}")
-#set($ModuleNameLower = "${ModuleName.toLowerCase()}")
-#set($MuleVersion = "$muleVersion")
-#set($id = "")
-#set($groupId = "$package.replaceAll('/', '.')")
-#if($projectType == "m")
-  #set($artifactId = "mule-module-${ModuleNameLower}")
-  #set($ModuleType = "Module")
-#else
-  #set($artifactId = "${ModuleNameLower}")
-  #set($ModuleType = "Application")
-#end
-#set($MuleMajorMinorVersion = "$MuleVersion.substring(0, 3)")
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">

@@ -44,16 +44,7 @@
         &lt;outbound-endpoint address="ejb://localhost:1099/SomeService?method=remoteMethod"/&gt;
         {code}
 
-        If the {{remoteMethod}} can take one or more input arguments, you configure them on the endpoint as list properties. A recommended approach is to use a list of comma-separated values in the property methodArgumentTypes.
-        {code:xml}
-        &lt;properties&gt;
-            &lt;list name="methodArgumentTypes"&gt;
-            &lt;entry value="java.lang.String,java.lang.String,java.math.BigInteger"/&gt;
-            &lt;/list&gt;
-        &lt;/properties&gt;
-        {code}
-
-        Multiple arguments are passed in as an array of objects as the payload of the Mule event.
+        If the method can take one or more input arguments, you configure their types as a comma-separated list using the {{methodArgumentTypes}} attribute. Multiple arguments are passed in as an array of objects as the payload of the Mule event.
 
         h2. Transformers
 

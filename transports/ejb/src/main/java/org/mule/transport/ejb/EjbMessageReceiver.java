@@ -19,7 +19,7 @@ import org.mule.transport.rmi.RmiMessageReceiver;
 /**
  * Will repeatedly call a method on an EJB object. If the method takes parameters A
  * List of objects can be specified on the endpoint called
- * <code>methodArgumentsList</code>, If this property is ommitted it is assumed
+ * <code>methodArgumentTypes</code>, If this property is ommitted it is assumed
  * that the method takes no parameters
  */
 

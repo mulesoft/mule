@@ -70,7 +70,7 @@ public class ProjectArchetypeMojo extends AbstractMojo
     private String archetypeVersion;
 
     /**
-     * @parameter expression="${muleVersion}" default-value="2.0.0-RC1-SNAPSHOT"
+     * @parameter expression="${muleVersion}"
      * @required
      */
     private String muleVersion;

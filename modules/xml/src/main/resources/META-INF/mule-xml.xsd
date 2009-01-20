@@ -201,7 +201,7 @@
                 <xsd:attribute name="deterministic" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If endpointFiltering is false and this option is true (the default), the first message part is routed to the first endpoint, the second part routes to the second endpoint, and so on with the nth part going to the (n modulo number of endpoints) endpoint. If false, the messages will be distributed equally among all endpoints.
+                            If there is no endpoint filtering and this attribute is true (the default), the first message part is routed to the first endpoint, the second part routes to the second endpoint, and so on with the nth part going to the (n modulo number of endpoints) endpoint. If false, the messages will be distributed equally among all endpoints.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -440,8 +440,7 @@
                 <xsd:attribute name="indentSize" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The number of indent strings to use for each indent, such as "2" if indentString is set to
-                            an empty space and you want to use two empty spaces for each indent.
+                            The number of indent strings to use for each indent, such as "2" if {{indentString}} is set to an empty space and you want to use two empty spaces for each indent.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -503,8 +502,7 @@
                 <xsd:attribute name="XHTML" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether to use the XHTML standard, which is like HTML but passes an XML parser with real,
-                            closed tags, and outputs CDATA sections with CDATA delimiters.
+                            Whether to use the XHTML standard, which is like HTML but passes an XML parser with real closed tags, and outputs CDATA sections with CDATA delimiters.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

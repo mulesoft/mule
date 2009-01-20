@@ -475,13 +475,13 @@ public class BobberArchetype
                 if (var.getVariables() != null)
                 {
                     //keep processing the variables picking up the default values
-                    processVariables(var.getVariables().iterator(), context, interactiveMode);
+                    processVariables(var.getVariables().iterator(), context, false);
 
                 }
             }
             else if (var.getVariables() != null)
             {
-                //keep processing the variables picking up the default values
+                //keep processing the variables in the current interaction mode
                 processVariables(var.getVariables().iterator(), context, interactiveMode);
 
             }

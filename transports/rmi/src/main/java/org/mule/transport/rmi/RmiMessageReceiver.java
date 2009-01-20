@@ -31,7 +31,7 @@ import org.apache.commons.collections.MapUtils;
 /**
  * Will repeatedly call a method on a Remote object. If the method takes parameters A
  * List of objects can be specified on the endpoint called
- * <code>methodArgumentsList</code>, If this property is ommitted it is assumed
+ * <code>methodArgumentTypes</code>, If this property is ommitted it is assumed
  * that the method takes no parameters
  */
 
