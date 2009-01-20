@@ -1,6 +1,6 @@
 #* Common variables for all archetypes *#
 #set($ModuleName = "$artifactId")
-#set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1).toLowerCase()}")
+#set($ModuleName = $ModuleName.replaceAll("[-_!@#$%^&*()+:; ]", ""))
 #set($ModuleNameLower = "${ModuleName.toLowerCase()}")
 #set($MuleVersion = "$muleVersion")
 
@@ -32,21 +32,24 @@
 
 #set($artifactId = ${ModuleNameLower})
 #set($ModuleType = "Application")
+#set($forgeProject = "n")
 
 
 WELCOME
 =======
-#if($newProject == "y")
+
 Congratulations you have just created a new Mule project!
 
 This wizard created a number of new classes and resources useful for new Mule projects.  Each of the created files
 contains documentation and _todo_ items where necessary.  Here is an overview of what was created.
 
 ./pom.xml:
+
 A maven project descriptor that describes how to build this project.  If you enabled this project for the
 MuleForge, this file will contain additional information about the project on MuleForge.
 
 ./assembly.xml:
+
 A maven assembly descriptor that defines how this project will be packaged when you make a release.
 
 -----------------------------------------------------------------
@@ -59,37 +62,6 @@ The ${ModuleName}Messages java class contains methods for access i18n messages e
 
 These message properties contain i18n strings used by ${ModuleName}Messages.java.
 
-    #if($hasBootstrap == "y")
------------------------------------------------------------------
-./src/main/resources/META-INF/services/org/mule/config/registry-bootstrap.properties
-
-This file contains key value pairs of objects that will be stored in the Mule registry when this module is loaded.  These
-objects are useful for loading module objects such as transformers or expression evaluators that you want to make
-available inside the Mule context automatically.
-These properties are defined in the form of: "objectName=fully qualified class name".
-    #end
-
-    #if($hasCustomSchema == "y")
------------------------------------------------------------------
-./src/main/resources/META-INF/mule-${ModuleNameLower}.xsd
-
-The configuration schema file for this module. All configuration elements should be defined in this schema.
-
------------------------------------------------------------------
-./src/main/resources/META-INF/spring.schemas
-
-Contains a mapping of the Namespace URI for this projects schema.
-
------------------------------------------------------------------
-./src/main/resources/META-INF/spring.handlers
-
-Contains a mapping of the namespace handler to use for the schema in this project.
-
------------------------------------------------------------------
-./src/main/java/${package}/${ModuleNameLower}/config/${ModuleName}NamespaceHandler.java
-
-The implmentation of the namespace handler used to parse elements defined in mule-${ModuleNameLower}.xsd.
-    #end
 
 TESTING
 =======
@@ -107,79 +79,6 @@ code.  For more information about testing see: http://www.mulesource.org/display
 
 Defines the Mule configuration for the ${ModuleName}TestCase.java.
 
-    #if($hasCustomSchema == "y")
------------------------------------------------------------------
-./src/test/java/${package}/${ModuleNameLower}/${ModuleName}NamespaceHandlerTestCase.java
-
-A test case that is used to test each of the configuration elements inside your mule-${ModuleNameLower}.xsd schema file.
-
------------------------------------------------------------------
-./src/test/resources/${ModuleNameLower}-namespace-config.xml
-
-The configuration file for the ${ModuleName}NamespaceHandlerTestCase.java testcase.
-    #end
-#else
-Congratulations you have just added some new features to your Mule project!
-
-This wizard created a number of new classes and resources useful for migrating a Mule project to the Mule 2 platform.
-Each of the created files contains documentation and _todo_ items where necessary.
-
-Now you need to make sure that you update you pom.xml to use version ${muleVersion} of Mule. This will ensure you are
-compiling against the correct version of Mule and you will avoid issues arising from not being about to find
-configuration schemas for this project.
-
-Here is an overview of what files were created:
-
-    #if($hasBootstrap == "y")
------------------------------------------------------------------
-./src/main/resources/META-INF/services/org/mule/config/registry-bootstrap.properties
-
-This file contains key value pairs of objects that will be stored in the Mule registry when this module is loaded.  These
-objects are useful for loading module objects such as transformers or expression evaluators that you want to make
-available inside the Mule context automatically.
-These properties are defined in the form of: "objectName=fully qualified class name".
-    #end
-
-    #if($hasCustomSchema == "y")
------------------------------------------------------------------
-./src/main/resources/META-INF/mule-${ModuleNameLower}.xsd
-
-The configuration schema file for this module. All configuration elements should be defined in this schema.
-
------------------------------------------------------------------
-./src/main/resources/META-INF/spring.schemas
-
-Contains a mapping of the Namespace URI for this projects schema.
-
------------------------------------------------------------------
-./src/main/resources/META-INF/spring.handlers
-
-Contains a mapping of the namespace handler to use for the schema in this project.
-
------------------------------------------------------------------
-./src/main/java/${package}/${ModuleNameLower}/config/${ModuleName}NamespaceHandler.java
-
-The implmentation of the namespace handler used to parse elements defined in mule-${ModuleNameLower}.xsd.
-    #end
-    
-TESTING
-=======
-
-This  project also contains test classes that can be run as part of a test suite.
-
-    #if($hasCustomSchema == "y")
-
------------------------------------------------------------------
-./src/test/java/${package}/${ModuleNameLower}/${ModuleName}NamespaceHandlerTestCase.java
-
-A test case that is used to test each of the configuration elements inside your mule-${ModuleNameLower}.xsd schema file.
-
------------------------------------------------------------------
-./src/test/resources/${ModuleNameLower}-namespace-config.xml
-
-The configuration file for the ${ModuleName}NamespaceHandlerTestCase.java testcase.
-    #end
-#end
 
 ADDITIONAL RESOURCES
 ====================
@@ -205,8 +104,6 @@ This project was auto-genrated by the mule-project-archetype.
 artifactId=${artifactId}
 description=${description}
 muleVersion=${muleVersion}
-hasCustomSchema=${hasCustomSchema}
-hasBootstrap=${hasBootstrap}
 projectType=${projectType}
 packagePath=${packagePath}
 forgeProject=${forgeProject}

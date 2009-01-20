@@ -5,7 +5,7 @@
 #else
   #set($ModuleName = "$artifactId")
 #end
-#set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1).toLowerCase()}")
+#set($ModuleName = $ModuleName.replaceAll("[-_!@#$%^&*()+:; ]", ""))
 #set($ModuleNameLower = "${ModuleName.toLowerCase()}")
 #set($MuleVersion = "$muleVersion")
 
@@ -205,6 +205,15 @@ ADDITIONAL RESOURCES
 Everything you need to know about getting started with Mule can be found here:
 http://www.mulesource.org/display/MULE2INTRO/Home
 
+There further useful information about extending Mule here:
+http://mule.mulesource.org/display/MULE2USER/Introduction+to+Extending+Mule
+
+We recommend you read the page on writing Mule transports if you have not done so already:
+http://mule.mulesource.org/display/MULE2USER/Creating+Transports
+
+There is also detailed information about creating Mule configuration schemas here:
+http://mule.mulesource.org/display/MULE2USER/Creating+a+Custom+XML+Namespace
+
 For information about working with Mule inside and IDE with maven can be found here:
 http://www.mulesource.org/display/MULE2INTRO/Setting+Up+Eclipse
 
@@ -219,7 +228,7 @@ Enjoy your Mule ride!
 The Mule Team
 
 --------------------------------------------------------------------
-This project was auto-genrated by the mule-project-archetype.
+This project was auto-genrated by the mule-transport-archetype.
 
 artifactId=${artifactId}
 description=${description}

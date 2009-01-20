@@ -1,6 +1,4 @@
 <archetype>
-    <!-- allows us to update an existing project if the archetype is run from the project directory -->
-    <allowPartial>true</allowPartial>
     <id>maven-archetype-mule-project</id>
     <variables>
         <variable>
@@ -16,7 +14,7 @@
         </variable>
         <variable>
             <name>package</name>
-            <description>What is the base Java package path for this project? (i.e. com/mycomapny/project):</description>
+            <description>What is the base Java package path for this project? (i.e. com/mycompany/project):</description>
             <defvalue/>
         </variable>
         <variable>

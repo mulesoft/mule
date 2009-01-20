@@ -30,7 +30,7 @@
         </variable>
         <variable>
             <name>modules</name>
-            <description>Which Mule transports do you want to include in this project?
+            <description>Which Mule modules do you want to include in this project?
 
 (options: bulders, client, jaas, jbossts, management, ognl, pgp, scripting,
           spring-extras, sxc, xml):

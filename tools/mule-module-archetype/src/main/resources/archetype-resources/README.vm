@@ -1,6 +1,6 @@
 #* Common variables for all archetypes *#
 #set($ModuleName = "$artifactId")
-#set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1).toLowerCase()}")
+#set($ModuleName = $ModuleName.replaceAll("[-_!@#$%^&*()+:; ]", ""))
 #set($ModuleNameLower = "${ModuleName.toLowerCase()}")
 #set($MuleVersion = "$muleVersion")
 
@@ -119,7 +119,7 @@ A test case that is used to test each of the configuration elements inside your 
 The configuration file for the ${ModuleName}NamespaceHandlerTestCase.java testcase.
     #end
 #else
-Congratulations you have just added some new features to your Mule project!
+Congratulations you have just added some new features to your Mule module!
 
 This wizard created a number of new classes and resources useful for migrating a Mule project to the Mule 2 platform.
 Each of the created files contains documentation and _todo_ items where necessary.
@@ -186,6 +186,14 @@ ADDITIONAL RESOURCES
 Everything you need to know about getting started with Mule can be found here:
 http://www.mulesource.org/display/MULE2INTRO/Home
 
+There further useful information about extending Mule here:
+http://mule.mulesource.org/display/MULE2USER/Introduction+to+Extending+Mule
+
+  #if($hasCustomSchema == "y")
+There is detailed information about creating Mule configuration schemas here:
+http://mule.mulesource.org/display/MULE2USER/Creating+a+Custom+XML+Namespace
+  #end
+  
 For information about working with Mule inside and IDE with maven can be found here:
 http://www.mulesource.org/display/MULE2INTRO/Setting+Up+Eclipse
 
@@ -200,7 +208,7 @@ Enjoy your Mule ride!
 The Mule Team
 
 --------------------------------------------------------------------
-This project was auto-genrated by the mule-project-archetype.
+This project was auto-genrated by the mule-module-archetype.
 
 artifactId=${artifactId}
 description=${description}
