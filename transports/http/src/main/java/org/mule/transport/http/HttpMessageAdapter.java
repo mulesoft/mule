@@ -98,7 +98,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
                 NameValuePair param = values[0].getParameterByName("charset");
                 if (param != null)
                 {
-                    encoding = param.getValue();
+                    setEncoding(param.getValue());
                 }
             }
         }
