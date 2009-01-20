@@ -1,11 +1,11 @@
 #* Common variables for all archetypes *#
-#set($ModuleName = "$artifactId")
 #if($transportId != "")
   #set($ModuleName = "$transportId")
 #else
   #set($ModuleName = "$artifactId")
 #end
 #set($ModuleName = $ModuleName.replaceAll("[-_!@#$%^&*()+:; ]", ""))
+#set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1)}")
 #set($ModuleNameLower = "${ModuleName.toLowerCase()}")
 #set($MuleVersion = "$muleVersion")
 
@@ -120,11 +120,13 @@ This transformer should convert the otbound message into a type supported by the
 in the case of JMS this class would would convert a MuleMessage to a JMSMessage.  If your transport
 does not have a specific message type you do not need this class.
 
+#if($hasCustomMessageAdapter == "y")
 -----------------------------------------------------------------
 ./src/main/java/${package}/${ModuleNameLower}/${ModuleName}MessageAdapter.java
 
 This class is used to wrap inbound messages and access the data in the message in a unified way.  The MessageAdapter provides
 access to the payload, message headers and attachments.
+#end
 
 -----------------------------------------------------------------
 ./src/main/java/${package}/${ModuleNameLower}/${ModuleName}MessageDispatcher.java
@@ -200,6 +202,39 @@ A test case that is used to test each of the configuration elements inside your 
 The configuration file for the ${ModuleName}NamespaceHandlerTestCase.java testcase.
     #end
 
+    #if($hasCustomMessageAdapter == "y")
+-----------------------------------------------------------------
+./src/test/java/${package}/${ModuleNameLower}/${ModuleName}MessageAdapterTestCase.java
+
+The test case for testing the custom message adapter for this transport.
+    #end
+
+-----------------------------------------------------------------
+./src/test/java/${package}/${ModuleNameLower}/${ModuleName}ConnectorTestCase.java
+
+The unit test case for testing the connecotr object for this transport.
+
+-----------------------------------------------------------------
+./src/test/java/${package}/${ModuleNameLower}/${ModuleName}EndpointTestCase.java
+
+The unit test case for testing the endpoint builder object for this transport.
+
+    #if($hasReceiver == "y")
+-----------------------------------------------------------------
+./src/test/java/${package}/${ModuleNameLower}/${ModuleName}MessageReceiverTestCase.java
+
+The unit test case for testing the message receiver object for this transport.
+    #end
+
+    #if($inboundTransformer == "y" || $outboundTransformer == "y")
+-----------------------------------------------------------------
+./src/test/java/${package}/${ModuleNameLower}/${ModuleName}TransformersTestCase.java
+
+The unit test case for testing the transformer object for this transport. This test will perform a
+full round trip test is there are corresponding inbound and outbound transformers.
+    #end
+
+
 ADDITIONAL RESOURCES
 ====================
 Everything you need to know about getting started with Mule can be found here:
@@ -234,7 +269,15 @@ artifactId=${artifactId}
 description=${description}
 muleVersion=${muleVersion}
 hasCustomSchema=${hasCustomSchema}
+hasReceiver=${hasReceiver}
+hasDispatcher=${hasDispatcher}
+hasRequestor=${hasRequestor}
+hasCustomMessageAdapter=${hasCustomMessageAdapter}
 hasBootstrap=${hasBootstrap}
+hasTransactions=${hasTransactions}
+hasCustomTransactions=${hasCustomTransactions}
+inboundTransformer=${inboundTransformer}
+outboundTransformer=${outboundTransformer}
 projectType=${projectType}
 packagePath=${packagePath}
 forgeProject=${forgeProject}

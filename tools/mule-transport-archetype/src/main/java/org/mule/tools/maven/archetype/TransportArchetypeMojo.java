@@ -76,22 +76,22 @@ public class TransportArchetypeMojo extends AbstractMojo
     private String muleVersion;
 
     /**
-     * @parameter expression="${transportId}"
-     * @required
-     */
-    private String transportId;
-
-    /**
      * @parameter expression="${groupId}" alias="newGroupId" default-value="org.mule.transport.${transportId}
      * @require
      */
     private String groupId;
 
     /**
-     * @parameter expression="${artifactId}" alias="newArtifactId" default-value="mule-transport-${transportId}"
+     * @parameter expression="${artifactId}"
      * @require
      */
     private String artifactId;
+
+    /**
+     * @parameter expression="${transportId}" default-value="${artifactId}
+     * @require
+     */
+    private String transportId;
 
     /**
      * @parameter expression="${version}" alias="newVersion" default-value="1.0-SNAPSHOT"
@@ -134,6 +134,11 @@ public class TransportArchetypeMojo extends AbstractMojo
         // TODO: context mojo more appropriate?
         Map map = new HashMap();
 
+        if(artifactId == null)
+        {
+            artifactId = transportId;
+        }
+
         map.put("basedir", basedir);
 
         map.put("package", packageName);
@@ -142,12 +147,13 @@ public class TransportArchetypeMojo extends AbstractMojo
 
         map.put("groupId", groupId);
 
-        map.put("artifactId", artifactId);
-
         map.put("version", version);
         map.put("muleVersion", muleVersion);
-        map.put("transportId", transportId);
+        map.put("transportId", artifactId);
 
+        artifactId = "mule-transport-" + artifactId;
+
+        map.put("artifactId", artifactId);
 
         try
         {

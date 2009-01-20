@@ -64,6 +64,12 @@ spring-extras, sxc, xml):
         <template>
             <file>README.vm</file>
             <output>MULE-README.txt</output>
+            <dependsOnVar>newProject=y</dependsOnVar>
+        </template>
+        <template>
+            <file>README.vm</file>
+            <output>MULE-UPDATE-README.txt</output>
+            <dependsOnVar>newProject=n</dependsOnVar>
         </template>
         <template>
             <file>pom.vm</file>

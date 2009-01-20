@@ -7,9 +7,13 @@
 # The connector class for your transport. This is alwas required
 connector=org.mule.transport.${ModuleNameLower}.${ModuleName}Connector
 
+#if( $hasCustomMessageAdapter == "y")
 # The message adapter is used as the Mule internal representation of a message received or sent by 
 # your transport. This is always required.
 message.adapter=org.mule.transport.${ModuleNameLower}.${ModuleName}MessageAdapter
+#else
+message.adapter=org.mule.transport.DefaultMessageAdapter
+#end
 
 #if( $hasDispatcher == "y")
 # The factory used to create dispatchers responsible for sending events from the underlying technology

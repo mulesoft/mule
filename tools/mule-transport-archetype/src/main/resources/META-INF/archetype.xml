@@ -71,8 +71,16 @@ transformer? (i.e. ObjectToJmsMessage)
         </variable>
 
         <variable>
+            <name>hasCustomMessageAdapter</name>
+            <description>Does the transport need a custom MessageAdapter? [y] or [n]
+(This is usually only required if the underlying transport has an API that has a message object
+                i.e. JMSMessage or HttpServletRequest)</description>
+            <defvalue>n</defvalue>
+        </variable>
+
+        <variable>
             <name>hasRequester</name>
-            <description>Can the transport request incoming messages programmatically? [y] or [n]</description>
+            <description>Can the transport request individual messages from the underlying resource? [y] or [n]</description>
             <defvalue>y</defvalue>
         </variable>
 
@@ -197,6 +205,7 @@ Which Mule modules do you want to include in this project? The client is added f
             <output>
                 src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageAdapter.java
             </output>
+            <dependsOnVar>hasCustomMessageAdapter=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/MessageDispatcher.vm</file>
@@ -301,6 +310,7 @@ Which Mule modules do you want to include in this project? The client is added f
             <output>
                 src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageAdapterTestCase.java
             </output>
+            <dependsOnVar>hasCustomMessageAdapter=y</dependsOnVar>
         </template>
         <template>
             <file>src/test/java/org/mule/transport/NamespaceHandlerTestCase.vm</file>
