@@ -36,6 +36,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
+import javax.transaction.xa.XAException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
@@ -184,6 +185,11 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                     Transaction tx = TransactionCoordination.getInstance().getTransaction();
                     if (ctx.session != null && tx instanceof XaTransaction.MuleXaObject)
                     {
+                        if (!(ctx.session instanceof XaTransaction.MuleXaObject))
+                        {
+                            ctx.session = null;
+                            throw new XAException("Session should be XA, but is of type " + ctx.session.getClass().getName());
+                        }
                         ((XaTransaction.MuleXaObject) ctx.session).setReuseObject(false);
                     }
                     ctx.session = null;
@@ -324,8 +330,12 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             else
             {
                 session = this.connector.getSession(endpoint);
-                if (tx != null)
+                if (session != null && tx != null)
                 {
+                    if (!(session instanceof XaTransaction.MuleXaObject))
+                    {
+                        throw new XAException("Session should be XA, but is of type " + session.getClass().getName());
+                    }
                     ((XaTransaction.MuleXaObject) session).setReuseObject(reuseSession);
                 }
             }
