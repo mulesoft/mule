@@ -229,7 +229,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             addIgnoredMethods(svcFac, Disposable.class.getName());
             addIgnoredMethods(svcFac, ServiceAware.class.getName());
 
-            String name = (String) endpointProps.get(CxfConstants.SERVICE_NAME);
+            String name = (String) endpointProps.get(CxfConstants.NAME);
             // check if there is the namespace property on the service
             String namespace = (String) endpointProps.get(CxfConstants.NAMESPACE);
 

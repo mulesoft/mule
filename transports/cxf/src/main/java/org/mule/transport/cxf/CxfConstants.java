@@ -20,7 +20,7 @@ public interface CxfConstants
     String SIMPLE_FRONTEND = "simple";
     String WSDL_LOCATION = "wsdlLocation";
     String NAMESPACE = "namespace";
-    String SERVICE_NAME = "serviceName";
+    String NAME = "name";
     String CLIENT_CLASS = "clientClass";
     String SERVICE_INTERFACE = "serviceInterface";
     String CLIENT_PORT = "wsdlPort";

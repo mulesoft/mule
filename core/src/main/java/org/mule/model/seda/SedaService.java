@@ -11,6 +11,7 @@
 package org.mule.model.seda;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.FailedToQueueEventException;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
@@ -34,6 +35,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.service.AbstractService;
+import org.mule.transport.NullPayload;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
@@ -265,7 +267,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
                 // important that we pull event from request context here as it may
                 // have been modified
                 // (necessary to avoid scribbling between threads)
-                result = RequestContext.getEvent().getMessage();
+                result = new DefaultMuleMessage(NullPayload.getInstance(), RequestContext.getEvent().getMessage());
             }
             ExceptionPayload exceptionPayload = result.getExceptionPayload();
             if (exceptionPayload == null)

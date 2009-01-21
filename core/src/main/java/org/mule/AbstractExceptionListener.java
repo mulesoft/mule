@@ -45,6 +45,7 @@ import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -327,10 +328,6 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         {
             handleTransaction(t);
             closeStream(message);
-            //If no routing occurred set payload to null, since the current message is not valid
-            //This isn't fool-proof since the the dispatch above could (theoretically) be asynchronosu, but the current
-            //impl always fires the event synchronously.
-            message.setPayload(NullPayload.getInstance());
         }
     }
 
