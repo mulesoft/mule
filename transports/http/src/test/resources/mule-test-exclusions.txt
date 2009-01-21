@@ -19,6 +19,3 @@ org.mule.transport.http.functional.HttpsFunctionalTestCase
 #
 # MULE-2625
 org.mule.transport.http.functional.HttpContentLengthPropagationTestCase
-
-# MULE-4117
-org.mule.transport.http.functional.HttpEncodingFunctionalTestCase

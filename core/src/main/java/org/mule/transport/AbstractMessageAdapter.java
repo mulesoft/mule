@@ -32,7 +32,6 @@ import org.mule.api.transport.UniqueIdNotSupportedException;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.CharSetUtils;
-import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
@@ -495,7 +494,9 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     public String getEncoding()
     {
         assertAccess(READ);
-        String encoding = getStringProperty(MuleProperties.MULE_ENCODING_PROPERTY, null);
+        // TODO Temporary fix for MULE-4117
+        //String encoding =  getStringProperty(MuleProperties.MULE_ENCODING_PROPERTY, null);
+        String encoding =  (String) getProperty(MuleProperties.MULE_ENCODING_PROPERTY, PropertyScope.OUTBOUND);
         if (encoding != null)
         {
             return encoding;
