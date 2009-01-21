@@ -10,6 +10,13 @@
 
 package org.mule.endpoint;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.mule.RegistryContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -38,16 +45,10 @@ import org.mule.transport.AbstractConnector;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
+import org.mule.util.CharSetUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapCombiner;
 import org.mule.util.ObjectNameHelper;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Abstract endpoint builder used for externalizing the complex creation logic of
@@ -293,7 +294,14 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected String getDefaultEndpointEncoding(Connector connector)
     {
-        return null;
+        if (muleContext != null)
+        {
+            return muleContext.getConfiguration().getDefaultEncoding();
+        }
+        else
+        {
+            return CharSetUtils.defaultCharsetName();
+        }
     }
 
     protected Filter getFilter(Connector connector)
