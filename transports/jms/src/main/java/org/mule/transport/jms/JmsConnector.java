@@ -91,9 +91,6 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /** Whether to create a consumer on connect. */
     private boolean eagerConsumer = true;
 
-    /** Only used by XaTransactedJmsMessageReceiver which is a polling receiver. */
-    private long pollingFrequency = 100;
-    
     ////////////////////////////////////////////////////////////////////////
     // JMS Connection
     ////////////////////////////////////////////////////////////////////////
@@ -1152,15 +1149,5 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     public int getNumberOfConsumers()
     {
         return this.numberOfConcurrentTransactedReceivers;
-    }
-
-    public long getPollingFrequency()
-    {
-        return pollingFrequency;
-    }
-
-    public void setPollingFrequency(long pollingFrequency)
-    {
-        this.pollingFrequency = pollingFrequency;
     }
 }
