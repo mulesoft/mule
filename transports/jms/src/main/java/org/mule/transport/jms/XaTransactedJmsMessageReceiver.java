@@ -82,8 +82,9 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         super(umoConnector, service, endpoint);
         // TODO AP: find appropriate value for polling frequency with the scheduler;
         // see setFrequency/setTimeUnit & VMMessageReceiver for more
-        this.setFrequency(DEFAULT_JMS_POLL_FREQUENCY);
         this.setTimeUnit(DEFAULT_JMS_POLL_TIMEUNIT);
+        this.setFrequency(MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency", DEFAULT_JMS_POLL_FREQUENCY));
+
         this.connector = (JmsConnector) umoConnector;
         this.timeout = endpoint.getTransactionConfig().getTimeout();
 
@@ -157,6 +158,8 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
      */
     public void poll() throws Exception
     {
+        logger.debug("Polling...");
+        
         TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(), 
             connector.getExceptionListener(), connector.getMuleContext());
         TransactionCallback cb = new TransactionCallback()
