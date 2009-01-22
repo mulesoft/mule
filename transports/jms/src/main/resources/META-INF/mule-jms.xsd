@@ -230,6 +230,14 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Frequency (in ms) at which to poll for new incoming events, only used if a polling 
+                    receiver is configured (such as XaTransactedJmsMessageReceiver). 
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
 

@@ -37,13 +37,8 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
 {
-    public static final long DEFAULT_JMS_POLL_FREQUENCY = 100;
-    public static final TimeUnit DEFAULT_JMS_POLL_TIMEUNIT = TimeUnit.MILLISECONDS;
-    
     protected final JmsConnector connector;
     protected boolean reuseConsumer;
     protected boolean reuseSession;
@@ -80,13 +75,12 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         throws CreateException
     {
         super(umoConnector, service, endpoint);
-        // TODO AP: find appropriate value for polling frequency with the scheduler;
-        // see setFrequency/setTimeUnit & VMMessageReceiver for more
-        this.setFrequency(DEFAULT_JMS_POLL_FREQUENCY);
-        this.setTimeUnit(DEFAULT_JMS_POLL_TIMEUNIT);
+
         this.connector = (JmsConnector) umoConnector;
         this.timeout = endpoint.getTransactionConfig().getTimeout();
 
+        this.setFrequency(connector.getPollingFrequency());
+        
         // If no reconnection is configured, default reuse strategy to true
         // as some jms brokers will not detect lost connections if the
         // same consumer / session is used
