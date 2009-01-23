@@ -34,6 +34,7 @@
             <groupId>org.mule</groupId>
             <artifactId>osgi-libs</artifactId>
             <version>${version}</version>
+            <type>pom</type>
         </dependency>
         
         <dependency>
