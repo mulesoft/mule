@@ -261,7 +261,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     Message result = consumer.receive(timeout);
                     if (result == null)
                     {
-                        logger.debug("No message was returned via replyTo destination");
+                        logger.debug("No message was returned via replyTo destination " + replyTo);
                         return null;
                     }
                     else
