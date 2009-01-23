@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.transports</groupId>
@@ -23,44 +21,44 @@
         <!-- jBPM --> 
         <dependency>
             <groupId>org.jbpm</groupId>
-            <artifactId>jbpm-jpdl.osgi</artifactId>
-            <version>${jbpmVersion}</version>
+            <artifactId>jbpm-jpdl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate.osgi</artifactId>
+            <artifactId>hibernate</artifactId>
         </dependency>
-        <dependency>
+         <dependency>
             <groupId>cglib</groupId>
-            <artifactId>cglib-nodep.osgi</artifactId>
-            <version>${cglibVersion}</version>
+            <artifactId>cglib-nodep</artifactId>
+            <version>${cglibVersion}-osgi</version>
         </dependency>
-        <dependency>
+         <dependency>
             <groupId>antlr</groupId>
-            <artifactId>antlr.osgi</artifactId>
-            <version>${antlrVersion}</version>
-        </dependency>        
-        <dependency>
+            <artifactId>antlr</artifactId>
+            <version>${antlrVersion}-osgi</version>
+        </dependency>
+         <dependency>
             <groupId>javax.jcr</groupId>
-            <artifactId>jcr.osgi</artifactId>
-            <version>${jcrVersion}</version>
-        </dependency>        
-        <dependency>
-            <groupId>bsh</groupId>
-            <artifactId>bsh.osgi</artifactId>
-            <version>${bshVersion}</version>
+            <artifactId>jcr</artifactId>
+            <version>${jcrVersion}-osgi</version>
+        </dependency>
+         <dependency>
+            <groupId>org.beanshell</groupId>
+            <artifactId>bsh</artifactId>
+            <version>${bshVersion}-osgi</version>
         </dependency>
         <!-- Needed for org.mule.transport.bpm.jbpm.actions.SendMuleEvent -->
         <dependency>
             <groupId>commons-jxpath</groupId>
-            <artifactId>commons-jxpath.osgi</artifactId>
+            <artifactId>commons-jxpath</artifactId>
         </dependency>
         <!-- Only needed for Spring-based configuration -->
         <dependency>
             <groupId>org.springmodules</groupId>
-            <artifactId>spring-modules-jbpm31.osgi</artifactId>
-            <version>${springModulesVersion}</version>
+            <artifactId>spring-modules-jbpm31</artifactId>
+            <version>${springModulesVersion}-osgi</version>
         </dependency>
+        
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>

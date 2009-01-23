@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.modules</groupId>
@@ -26,15 +24,16 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
+        
         <dependency>
             <groupId>ognl</groupId>
-            <artifactId>ognl.osgi</artifactId>
-            <version>${ognlVersion}</version>
+            <artifactId>ognl</artifactId>
+            <version>${ognlVersion}-osgi</version>
         </dependency>
-        <dependency>
+         <dependency>
             <groupId>jboss</groupId>
-            <artifactId>javassist.osgi</artifactId>
-            <version>${javassistVersion}</version>
+            <artifactId>javassist</artifactId>
+            <version>${javassistVersion}-osgi</version>
         </dependency>
         
         <!-- Unit tests -->
@@ -56,5 +55,6 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-    </dependencies>
+
+         </dependencies>
 </project>

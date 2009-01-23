@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.transports</groupId>
@@ -103,50 +102,13 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
-                <!-- We have OSGi enabled versions -->
                 <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>commons-lang</groupId>
-                  <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity-dep</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jdom</groupId>
-                  <artifactId>jdom</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>wsdl4j</groupId>
-                  <artifactId>wsdl4j</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.codehaus.woodstox</groupId>
-                  <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.bind</groupId>
-                  <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-xjc</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>xml-resolver</groupId>
-                  <artifactId>xml-resolver</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity-dep</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -180,58 +142,13 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
-                <!-- We have OSGi enabled versions -->
                 <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>commons-lang</groupId>
-                  <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity-dep</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jdom</groupId>
-                  <artifactId>jdom</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>wsdl4j</groupId>
-                  <artifactId>wsdl4j</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.codehaus.woodstox</groupId>
-                  <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.bind</groupId>
-                  <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-xjc</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.soap</groupId>
-                  <artifactId>saaj-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.messaging.saaj</groupId>
-                  <artifactId>saaj-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>xml-resolver</groupId>
-                  <artifactId>xml-resolver</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity-dep</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -265,62 +182,13 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
-                <!-- We have OSGi enabled versions -->
                 <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>commons-lang</groupId>
-                  <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity-dep</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jaxen</groupId>
-                  <artifactId>jaxen</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jdom</groupId>
-                  <artifactId>jdom</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>wsdl4j</groupId>
-                  <artifactId>wsdl4j</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.codehaus.woodstox</groupId>
-                  <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.bind</groupId>
-                  <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-xjc</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.soap</groupId>
-                  <artifactId>saaj-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.messaging.saaj</groupId>
-                  <artifactId>saaj-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>xml-resolver</groupId>
-                  <artifactId>xml-resolver</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity-dep</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -354,66 +222,13 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
-                <!-- We have OSGi enabled versions -->
                 <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>commons-lang</groupId>
-                  <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity-dep</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jaxen</groupId>
-                  <artifactId>jaxen</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jdom</groupId>
-                  <artifactId>jdom</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>wsdl4j</groupId>
-                  <artifactId>wsdl4j</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.codehaus.woodstox</groupId>
-                  <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.bind</groupId>
-                  <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-xjc</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.soap</groupId>
-                  <artifactId>saaj-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.messaging.saaj</groupId>
-                  <artifactId>saaj-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>xml-resolver</groupId>
-                  <artifactId>xml-resolver</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.java.dev.stax-utils</groupId>
-                    <artifactId>stax-utils</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity-dep</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -447,63 +262,6 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
-                <!-- We have OSGi enabled versions -->
-                <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>commons-lang</groupId>
-                  <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity-dep</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jaxen</groupId>
-                  <artifactId>jaxen</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jdom</groupId>
-                  <artifactId>jdom</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>wsdl4j</groupId>
-                  <artifactId>wsdl4j</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.codehaus.woodstox</groupId>
-                  <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.bind</groupId>
-                  <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-xjc</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.soap</groupId>
-                  <artifactId>saaj-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.messaging.saaj</groupId>
-                  <artifactId>saaj-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>xml-resolver</groupId>
-                  <artifactId>xml-resolver</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -536,62 +294,13 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
-                <!-- We have OSGi enabled versions -->
                 <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>commons-lang</groupId>
-                  <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity-dep</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jaxen</groupId>
-                  <artifactId>jaxen</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jdom</groupId>
-                  <artifactId>jdom</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>wsdl4j</groupId>
-                  <artifactId>wsdl4j</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.codehaus.woodstox</groupId>
-                  <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.bind</groupId>
-                  <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-xjc</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.soap</groupId>
-                  <artifactId>saaj-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.messaging.saaj</groupId>
-                  <artifactId>saaj-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>xml-resolver</groupId>
-                  <artifactId>xml-resolver</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity-dep</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -627,81 +336,20 @@
                 </exclusion>
                 <!-- This should be endorsed -->
                 <exclusion>
-                    <groupId>xalan</groupId>
-                    <artifactId>xalan</artifactId>
-                </exclusion>
-                <!-- We have OSGi enabled versions -->
-                <exclusion>
-                    <groupId>opensaml</groupId>
-                    <artifactId>opensaml</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.ws.security</groupId>
-                    <artifactId>wss4j</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>bouncycastle</groupId>
                     <artifactId>bcprov-jdk14</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.santuario</groupId>
-                    <artifactId>xmlsec</artifactId>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>commons-lang</groupId>
-                  <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>velocity</groupId>
-                  <artifactId>velocity-dep</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jaxen</groupId>
-                  <artifactId>jaxen</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jdom</groupId>
-                  <artifactId>jdom</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>wsdl4j</groupId>
-                  <artifactId>wsdl4j</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.codehaus.woodstox</groupId>
-                  <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.bind</groupId>
-                  <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-xjc</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>javax.xml.soap</groupId>
-                  <artifactId>saaj-api</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>com.sun.xml.messaging.saaj</groupId>
-                  <artifactId>saaj-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>xml-resolver</groupId>
-                  <artifactId>xml-resolver</artifactId>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity-dep</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -733,149 +381,7 @@
             <artifactId>mule-transport-tcp</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail.osgi</artifactId>
-            <version>${javaMailVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.xml.ws</groupId>
-            <artifactId>jaxws-api.osgi</artifactId>
-            <version>${javaXmlWsVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j.osgi</artifactId>
-            <version>${javaWsdlVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-all.osgi</artifactId>
-            <version>${javaXmlBindVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.java.dev.stax-utils</groupId>
-            <artifactId>stax-utils.osgi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xml-resolver</groupId>
-            <artifactId>xml-resolver.osgi</artifactId>    
-            <version>${xmlResolverVersion}</version>    
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ws.security</groupId>
-            <artifactId>wss4j.osgi</artifactId>
-            <version>${wss4jVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.santuario</groupId>
-            <artifactId>xmlsec.osgi</artifactId>
-            <version>${xmlSecurityVersion}</version>
-        </dependency>
-        <dependency>  
-            <groupId>opensaml</groupId>  
-            <artifactId>opensaml.osgi</artifactId>  
-            <version>${openSamlVersion}</version> 
-        </dependency>
-        <dependency>
-            <!-- OSGi-ready -->
-            <groupId>org.apache.ws.commons.schema</groupId>
-            <artifactId>XmlSchema</artifactId>
-            <version>${wsCommonsSchemaVersion}</version>
-        </dependency>
-        <dependency>
-            <!-- OSGi-ready -->
-            <groupId>org.apache.neethi</groupId>
-            <artifactId>neethi</artifactId>
-            <version>${neethiVersion}</version>
-            <exclusions>
-                <!-- We include these explicitly below -->
-                <exclusion>
-                    <groupId>org.apache.ws.commons.axiom</groupId>
-                    <artifactId>axiom-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.ws.commons.axiom</groupId>
-                    <artifactId>axiom-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>wsdl4j</groupId>
-                    <artifactId>wsdl4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jaxen</groupId>
-                  <artifactId>jaxen</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <!-- OSGi-ready -->
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-api</artifactId>
-            <version>${wsCommonsAxiomVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-activation_1.1_spec</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>jaxen</groupId>
-                  <artifactId>jaxen</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <!-- OSGi-ready -->
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-impl</artifactId>
-            <version>${wsCommonsAxiomVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-activation_1.1_spec</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        
         <!--  We should reenable this as it makes CXF faster
         <dependency>  
             <groupId>asm</groupId>  
@@ -883,21 +389,13 @@
             <version>${asmVersion}</version> 
         </dependency>
          -->
-        <dependency>
-            <groupId>mx4j</groupId>
-            <artifactId>mx4j-all.osgi</artifactId>
-            <version>${mx4jVersion}</version>
-        </dependency>
+        
         <dependency>
             <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon-all.osgi</artifactId>
-            <version>${saxonVersion}</version>
+            <artifactId>saxon</artifactId>
+            <version>${saxonVersion}-osgi</version>
         </dependency>
-        <dependency>  
-            <groupId>jdom</groupId>  
-            <artifactId>jdom.osgi</artifactId>  
-            <version>${jdomVersion}</version> 
-        </dependency>
+        
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-annotation_1.0_spec</artifactId>
@@ -920,11 +418,7 @@
         </dependency>
         
         <!-- For dynamic client, which compiles stuff on the fly -->
-        <dependency>  
-            <groupId>ant</groupId>  
-            <artifactId>ant.osgi</artifactId>  
-            <version>${antVersion}</version> 
-        </dependency>
+        
 
         <!-- Unit tests -->
         <dependency>
@@ -1018,6 +512,31 @@
             <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>${javaMailVersion}-osgi</version>
+        </dependency>
+         <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+            <version>${javaXmlWsVersion}-osgi</version>
+            <exclusions>
+                <exclusion> 
+                    <groupId>javax.jws</groupId>
+                    <artifactId>jsr181</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <!--  for dynamic client -->
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+
     </dependencies>
 
     <repositories>

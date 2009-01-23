@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.modules</groupId>
@@ -30,21 +29,28 @@
             <artifactId>mule-module-xml</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>tanukisoft</groupId>
-            <artifactId>wrapper.osgi</artifactId>
-        </dependency>
-        <dependency>
+         <dependency>
             <groupId>mx4j</groupId>
-            <artifactId>mx4j-all.osgi</artifactId>
-            <version>${mx4jVersion}</version>
+            <artifactId>mx4j-jmx</artifactId>
         </dependency>
-        <dependency>
+         <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-impl</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-tools</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-remote</artifactId>
+        </dependency>
+         <dependency>
             <groupId>com.yourkit</groupId>
-            <artifactId>yjp-controller-api-redist.osgi</artifactId>
-            <version>${yourKitVersion}</version>
+            <artifactId>yjp-controller-api-redist</artifactId>
+            <version>${yourKitVersion}-osgi</version>
         </dependency>
-
+        
         <!-- Unit tests only -->
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -63,6 +69,11 @@
             <artifactId>mule-transport-vm</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>tanukisoft</groupId>
+            <artifactId>wrapper</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

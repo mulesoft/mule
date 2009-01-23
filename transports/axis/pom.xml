@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.transports</groupId>
@@ -41,50 +39,63 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ssl</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis.osgi</artifactId>
-            <version>${axisVersion}</version>
-        </dependency>
+        
         <!-- 
              org.apache.axis:axis does not declare its dependencies properly. The
              alternative is to use axis:axis but that has dependencies with missing
              POMs. The duplication here seems to be the lesser evil.
              -->
+        
         <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>${axisVersion}-osgi</version>
+            
+            <exclusions>
+                <!-- we like slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jaxrpc_1.1_spec.osgi</artifactId>
+            <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>${commonsDiscoveryVersion}-osgi</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
         </dependency>
         <!-- Use the latest version of WSDL4J as it is compatible with CXF -->
-        <dependency>
+         <dependency>
             <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j.osgi</artifactId>
-            <version>${javaWsdlVersion}</version>
+            <artifactId>wsdl4j</artifactId>
         </dependency>
+        
         <!-- needed by the Axis Service component -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
         </dependency>
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail.osgi</artifactId>
-            <version>${javaMailVersion}</version>
-        </dependency>
-        <!-- Used by org.apache.axis.components.logger.LogFactory -->
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery.osgi</artifactId>
-            <version>${commonsDiscoveryVersion}</version>
-        </dependency>
 
         <!-- Unit tests -->
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient.osgi</artifactId>
-            <version>${commonsHttpClientVersion}</version>
-            <scope>test</scope>
-        </dependency>
+        
         <!-- Needed for common SOAP test classes -->
         <dependency>
             <groupId>org.mule.transports</groupId>

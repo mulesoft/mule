@@ -29,43 +29,46 @@
     </build>
 
     <dependencies>
+        <!-- Ensure our OSGi-ified libs are built -->
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>osgi-libs</artifactId>
+            <version>${version}</version>
+        </dependency>
+        
         <dependency>
             <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils.osgi</artifactId>
-            <version>${commonsBeanUtilsVersion}</version>
+            <artifactId>commons-beanutils</artifactId>
         </dependency>
 
         <!-- UUID generator, only called directly by mule-core -->
         <dependency>
             <groupId>org.safehaus.jug</groupId>
-            <artifactId>jug.osgi</artifactId>
-            <version>${jugVersion}</version>
+            <artifactId>jug</artifactId>
+            <version>${jugVersion}-osgi</version>
         </dependency>
 
         <!--  OTHERS.  group/artifact id only, version and exclusions are specified via dependency management -->
         <dependency>
             <groupId>backport-util-concurrent</groupId>
-            <artifactId>backport-util-concurrent.osgi</artifactId>
-            <version>${backportUtilConcurrentVersion}</version>
+            <artifactId>backport-util-concurrent</artifactId>
         </dependency>
         <!-- TODO MULE-1947 Remove this since command-line parsing is limited to mule-module-boot -->
         <dependency>
             <groupId>commons-cli</groupId>
-            <artifactId>commons-cli.osgi</artifactId>
+            <artifactId>commons-cli</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
-            <artifactId>commons-collections.osgi</artifactId>
-            <version>${commonsCollectionsVersion}</version>
+            <artifactId>commons-collections</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
-            <artifactId>commons-io.osgi</artifactId>
+            <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
-            <artifactId>commons-lang.osgi</artifactId>
-            <version>${commonsLangVersion}</version>
+            <artifactId>commons-lang</artifactId>
         </dependency>
         <dependency>
             <!-- OSGi-ready -->
@@ -74,15 +77,15 @@
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
-            <artifactId>activation.osgi</artifactId>
+            <artifactId>activation</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.0.1B_spec.osgi</artifactId>
+            <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec.osgi</artifactId>
+            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
         </dependency>
 
         <!--

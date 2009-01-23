@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.transports</groupId>
@@ -30,16 +28,18 @@
     </build>
 
     <dependencies>
+        
         <dependency>
             <groupId>commons-net</groupId>
-            <artifactId>commons-net.osgi</artifactId>
-            <version>${commonsNetVersion}</version>
+            <artifactId>commons-net</artifactId>
+            <version>${commonsNetVersion}-osgi</version>
         </dependency>
-        <dependency>
+         <dependency>
             <groupId>oro</groupId>
-            <artifactId>oro.osgi</artifactId>
-            <version>${oroVersion}</version>
+            <artifactId>oro</artifactId>
+            <version>${oroVersion}-osgi</version>
         </dependency>
+        
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-file</artifactId>
@@ -94,5 +94,5 @@
             <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
         </dependency>
-     </dependencies>
+    </dependencies>
 </project>

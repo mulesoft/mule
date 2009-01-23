@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.distributions</groupId>
+        <artifactId>mule-server</artifactId>
+        <version>2.2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-full</artifactId>
+    <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the
+         'package' phase. We bind the assembly plugin here, that's enough. -->
+    <packaging>pom</packaging>
+    <name>Full Distribution</name>
+    <description>Includes the Mule server with all of its modules and transports.</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <!--
+                    Don't upgrade because of http://jira.codehaus.org/browse/MASSEMBLY-194,
+                    Needs to be fixed and then assembly descriptors should be updated.
+                 -->
+                <version>2.1</version>
+                <configuration>
+                    <finalName>mule-${version}</finalName>
+                    <descriptors>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <tarLongFileMode>gnu</tarLongFileMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <!--
+                                'attached' ensures there's only a single run bound to m2's lifecycle.
+                                The default 'assembly' goal would run every plugin in this pom twice.
+                            -->
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+                Create a dummy javadoc folder so the assembly always succeeds
+                even without a full site run.
+             -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="../../../target/site/apidocs"/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>mule-assembly-verifier</artifactId>
+                <!-- version is managed in the pluginManagement of the toplevel pom -->
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <projectOutputFile>mule-${version}.zip</projectOutputFile>
+                    <!-- Default is under src/main/resources, pull it to the root for this project -->
+                    <whitelist>assembly-whitelist.txt</whitelist>
+                    <!--
+                        Blacklisted entries are supposed to be part of the distribution,
+                        but not verified. They are defined by their full path relative to the
+                        distribution *archive*; therefore we need to specify the name of the
+                        toplevel subdirectory in the archive too.
+                    -->
+                    <blacklist>
+                        <entry>mule-${version}/lib/endorsed/xml-apis-1.3.04.jar</entry>
+                        <entry>mule-${version}/lib/endorsed/xercesImpl-2.9.1.jar</entry>
+                        <entry>mule-${version}/lib/endorsed/xml-serializer-2.7.1.jar</entry>
+                        <entry>mule-${version}/lib/endorsed/xalan-2.7.1.jar</entry>
+                    </blacklist>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo.groovy</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                                // splash
+                                log.info '*' * 80
+                                log.info('Repackaging sources'.center(80))
+                                log.info('(full build with a -DperformRelease=true must have run before)'.center(80))
+                                log.info '*' * 80
+
+                                def muleRoot = "$project.build.directory/../../../../"
+
+                                log.info("Mule project root: ${new File(muleRoot).canonicalPath}")
+
+                                def tempDir = "$project.build.directory/sources-temp"
+                                ant.mkdir(dir: tempDir)
+
+                                ant.unjar(dest: tempDir) {
+                                    fileset(dir: muleRoot) {
+                                        include(name: '**/*-sources.jar')
+                                        exclude(name: 'osgi-libs/**/*-sources.jar')
+                                    }
+                                }
+
+                                ant.zip(basedir: tempDir,
+                                        destfile: "$project.build.directory/mule-${project.version}-src.zip")
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+                 We generate a full source bundle using the groovy plugin above. Do not
+                 publish maven's autogenerated and empty sources jar of this module.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <configuration>
+                    <attach>false</attach>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- Mule Core -->
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <!-- Include all Mule Example Apps -->
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-examples-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+        </dependency>
+        <!-- Include all Mule Modules -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-modules-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule.modules.jca</groupId>
+                    <artifactId>mule-module-jca-generic</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.modules.jca</groupId>
+                    <artifactId>mule-module-jca-jboss</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Include all Mule Transports -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transports-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+        </dependency>
+
+        <!--
+            We need to register the endorsed XML jars as dependencies of the
+            distribution, so that they can be referenced in the assembly as in/excludes.
+        -->
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.3.04</version>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xml-serializer</artifactId>
+            <version>2.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.1</version>
+        </dependency>
+
+        <!-- make sure we package the test frameworks, too -->
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+        </dependency>
+    </dependencies>
+</project>

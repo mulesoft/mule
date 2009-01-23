@@ -53,9 +53,9 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
         assertEquals(
                 "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
                     "<soap:Body>" +
-                        "<ns1:echoResponse xmlns:ns1=\"http://testmodels.cxf.transport.mule.org/\">" +                        
+                        "<ns2:echoResponse xmlns:ns2=\"http://testmodels.cxf.transport.mule.org/\">" +                        
                             "<text>hello</text>" +
-                        "</ns1:echoResponse>" +
+                        "</ns2:echoResponse>" +
                     "</soap:Body>" +
                 "</soap:Envelope>", httpMethod.getResponseBodyAsString());
     }

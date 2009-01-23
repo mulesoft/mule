@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.modules</groupId>
@@ -46,44 +44,31 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
-            <groupId>javax.script</groupId>
-            <artifactId>script-api.osgi</artifactId>
-            <version>${javaScriptVersion}</version>
-        </dependency>        
+                
         <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
         <dependency>
             <groupId>javax.script</groupId>
-            <artifactId>groovy-engine.osgi</artifactId>
-            <version>${groovyEngineVersion}</version>
-        </dependency>
-        <!-- This is the actual language implementation -->
-        <dependency>
-            <!-- OSGi-ready -->
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.ant</groupId>
-                    <artifactId>ant</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jline</groupId>
-                    <artifactId>jline</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.ant</groupId>
-                    <artifactId>ant-launcher</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- Annoying: we need to override retrotranslated dependencies -->
-        <dependency>
-            <groupId>backport-util-concurrent</groupId>
-            <artifactId>backport-util-concurrent.osgi</artifactId>
-            <version>${backportUtilConcurrentVersion}</version>
+            <artifactId>script-api</artifactId>
+            <classifier>jdk14</classifier>
         </dependency>
 
+        <!-- This is the actual language implementation -->
+         <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>groovy-engine</artifactId>
+            <!-- we use our own retrotranslated version -->
+            <classifier>jdk14</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>net.sf.retrotranslator</groupId>
+            <artifactId>retrotranslator-runtime</artifactId>
+        </dependency>
+
+        
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -115,5 +100,6 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-    </dependencies>
+
+         </dependencies>
 </project>

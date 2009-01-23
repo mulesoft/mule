@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.modules</groupId>
@@ -26,12 +24,23 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.jboss</groupId>
-            <artifactId>jbossts-all.osgi</artifactId>
-            <version>${jbossTsVersion}</version>
+            <artifactId>jbossts-common</artifactId>
+            <version>${jbossTsVersion}-osgi</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jbossts-jta</artifactId>
+            <version>${jbossTsVersion}-patched-osgi</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jbossts-jta-integration</artifactId>
+            <version>${jbossTsVersion}-osgi</version>
+        </dependency>
+        
         <!-- Unit tests -->
         <dependency>
             <groupId>org.mule.tests</groupId>

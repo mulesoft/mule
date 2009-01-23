@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.modules</groupId>
@@ -26,12 +24,33 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
-        <dependency>
-            <groupId>cryptix</groupId>
-            <artifactId>cryptix-all.osgi</artifactId>
-            <version>${cryptixVersion}</version>
-        </dependency>
 
+        <dependency>
+            <groupId>cryptix-jce</groupId>
+            <artifactId>cryptix-jce-api</artifactId>
+            <version>${cryptixJceVersion}-osgi</version>
+        </dependency>
+        <dependency>
+            <groupId>cryptix-jce</groupId>
+            <artifactId>cryptix-jce-provider</artifactId>
+            <version>${cryptixJceVersion}-osgi</version>
+        </dependency>
+        <dependency>
+            <groupId>cryptix-openpgp</groupId>
+            <artifactId>cryptix-message-api</artifactId>
+            <version>${cryptixVersion}-osgi</version>
+        </dependency>
+        <dependency>
+            <groupId>cryptix-openpgp</groupId>
+            <artifactId>cryptix-openpgp-provider</artifactId>
+            <version>${cryptixVersion}-osgi</version>
+        </dependency>
+        <dependency>
+            <groupId>cryptix-openpgp</groupId>
+            <artifactId>cryptix-pki-api</artifactId>
+            <version>${cryptixVersion}-osgi</version>
+        </dependency>
+        
         <!-- Unit tests -->
         <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency:
              mule-tests-functional -> mule-module-builders -> mule-tests-functional -->

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.modules</groupId>
@@ -39,17 +37,78 @@
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
-        <dependency>
-            <groupId>dom4j</groupId>  
-            <artifactId>dom4j.osgi</artifactId>
+        
+        
+<dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
             <version>${dom4jVersion}</version>
-            <scope>test</scope>
+            
+            <exclusions>
+                <!-- no XML -->
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jaxen</groupId>
+                    <artifactId>jaxen</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>relaxngDatatype</groupId>
+                    <artifactId>relaxngDatatype</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>isorelax</groupId>
+                    <artifactId>isorelax</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>saxpath</groupId>
+                    <artifactId>saxpath</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>msv</groupId>
+                    <artifactId>msv</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <dependency>
+         <dependency>
             <groupId>jaxen</groupId>
-            <artifactId>jaxen.osgi</artifactId>
+            <artifactId>jaxen</artifactId>
             <version>${jaxenVersion}</version>
-            <scope>test</scope>
+            
+            <!-- see http://jira.codehaus.org/browse/MNG-3007
+                 depending on whether jaxen is resolved via dist.codehaus.org
+                 or the central repo we get transitive dependencies that we
+                 don't want here
+                 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>com.ibm.icu</groupId>
+                    <artifactId>icu4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+                <!-- no !"?$ XML parsers whatsoever -->
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xom</groupId>
+                    <artifactId>xom</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-</dependencies>
+         </dependencies>
 </project>

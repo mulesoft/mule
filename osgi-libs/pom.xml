@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
         <version>2.2.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.mule.distributions</groupId>
+    <groupId>org.mule</groupId>
     <artifactId>osgi-libs</artifactId>
     <packaging>pom</packaging>
     <name>3rd-party libs repackaged for OSGi</name>
@@ -22,116 +20,772 @@
     </distributionManagement>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <!-- By default, the bundle-plugin does not put anything in the target directory, which  
-                    means that osgi-libs cannot be built in the same step as the rest of the Mule build. -->
-                    <unpackBundle>true</unpackBundle>
-                    <!-- This would be nice to use but it creates cyclic dependencies in the OSGification POMs 
-                    <classifier>osgi</classifier>
-                    -->
-                    <instructions>
-                        <!-- Include all resources which are not java classes in the jar -->
-                        <Private-Package>!org.*, !com.*, !net.*, !edu.*, !javax.*, !1.0*, *</Private-Package>
-                        <!-- Negate Mule info. from parent POM because these libs are not ours -->
-                        <Bundle-License/>
-                        <Bundle-Description/>
-                        <Bundle-Vendor/>
-                        <Bundle-DocURL>&nbsp;</Bundle-DocURL>
-                    </instructions>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>${eclipsePluginVersion}</version>
-                <configuration>
-                    <!-- 
-                         Do not generate eclipse project files for the osgified libs.
-                         Instead, we want the Mule projects to depend on the jars.
-                    -->
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-        <!-- Don't pull in someone else's MANIFEST.MF file, we're going to generate it ourselves -->
-        <resources>
-            <resource>
-                <directory>${project.basedir}</directory>
-                <excludes>
-                    <exclude>MANIFEST.MF</exclude>
-                    <exclude>INDEX.LIST</exclude>
-                </excludes>
-            </resource>
-        </resources>
-    </build>
-
-    <modules>
-        <module>acegi</module>
-        <module>activation</module>
-        <module>ant</module>
-        <module>antlr</module> 
-        <module>axis</module> 
-        <module>backport</module>
-        <module>bsh</module>
-        <module>cglib</module>
-        <module>commons-beanutils</module>
-        <module>commons-cli</module>
-        <module>commons-codec</module> 
-        <module>commons-collections</module>
-        <module>commons-dbutils</module>
-        <module>commons-discovery</module>
-        <module>commons-httpclient</module>
-        <module>commons-io</module>
-        <module>commons-jxpath</module>
-        <module>commons-lang</module>
-        <module>commons-net</module> 
-        <module>cryptix</module>
-        <module>dom4j</module>
-        <module>geronimo-ejb</module>
-        <module>geronimo-j2ee-connector</module>
-        <module>geronimo-j2ee-management</module>
-        <module>geronimo-jaxrpc</module>
-        <module>geronimo-jms</module>
-        <module>geronimo-jta</module>
-        <module>geronimo-servlet</module>
-        <module>groovy-engine</module>
-        <module>hibernate</module>
-        <module>javassist</module>
-        <module>jaxb</module>
-        <module>jaxen</module>
-        <module>jaxws</module>
-        <module>jcr</module>
-        <module>jbossts</module>
-        <module>jbpm</module>
-        <module>jdom</module> 
-        <module>jug</module>
-        <module>mail</module>
-        <module>mx4j</module>
-        <module>opensaml</module>
-        <module>ognl</module>
-        <module>oro</module> 
-        <module>quartz</module> 
-        <module>saaj</module>
-        <module>saxon</module>
-        <module>script</module>
-        <module>smack</module>
-        <module>smjbpm</module>
-        <module>staxutils</module>
-        <module>sxc</module>
-        <module>woodstox</module>
-        <module>wrapper</module>
-        <module>wsdl</module>       
-        <module>xml-resolver</module>
-        <module>xml-security</module>
-        <module>xmlpull</module>
-        <module>xstream</module>       
-        <module>yourkit</module>
-        <module>xapool</module>
-        <module>wss4j</module>
-    </modules>
+    <plugins>
+      <plugin>
+          <groupId>org.mule</groupId>
+          <artifactId>maven-osgi-plugin</artifactId>
+          <version>0.0.1-SNAPSHOT</version>
+          <configuration>
+          
+            <instructions>
+                <!-- Include all resources which are not java classes in the jar -->
+                <Private-Package>!org.*, !com.*, !net.*, !edu.*, !javax.*, !1.0*, *</Private-Package>
+                <!-- Negate Mule info. from parent POM because these libs are not ours -->
+                <Bundle-License/>
+                <Bundle-Description/>
+                <Bundle-Vendor/>
+                <Bundle-DocURL>&amp;nbsp;</Bundle-DocURL>
+                <!-- We don't have everything on the classpath and Bnd likes to verify every damn thing -->
+                <_failok>true</_failok>
+            </instructions>
+            <versionAppend>osgi</versionAppend>
+            <archives>
+               <archive>
+                <groupId>org.acegisecurity</groupId>
+                <artifactId>acegi-security</artifactId>
+                <version>${acegiVersion}</version>
+                <instructions>
+                    <Export-Package>org.acegisecurity.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.acegisecurity.*, !org.springframework.*, !org.aspectj.*, !net.sf.ehcache, !javax.servlet.*, !edu.yale.its.*, !javax.naming.ldap, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>javax.activation</groupId>
+                <artifactId>activation</artifactId>
+                <version>${javaActivationVersion}</version>
+                <instructions>
+                    <Export-Package>javax.activation.*;version="${version}", com.sun.activation.*;version="${version}"</Export-Package>
+                    <Import-Package>!javax.activation.*, !com.sun.activation.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>${antVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.tools.ant.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.tools.ant.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>antlr</groupId>
+                <artifactId>antlr</artifactId>
+                <version>${antlrVersion}</version>
+                <instructions>
+                    <Export-Package>antlr.*;version="${version}"</Export-Package>
+                    <Import-Package>!antlr.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>${asmVersion}</version>
+                <instructions>
+                    <Export-Package>org.objectweb.asm.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.objectweb.asm.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.apache.axis</groupId>
+                <artifactId>axis</artifactId>
+                <version>${axisVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.axis.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.axis.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>backport-util-concurrent</groupId>
+                <artifactId>backport-util-concurrent</artifactId>
+                <version>${backportUtilConcurrentVersion}</version>
+                <instructions>
+                    <Export-Package>edu.emory.mathcs.backport.*;version="${version}"</Export-Package>
+                    <Import-Package>!edu.emory.mathcs.backport.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.beanshell</groupId>
+                <artifactId>bsh</artifactId>
+                <version>${bshVersion}</version>
+                <instructions>
+                    <Export-Package>bsh.*;version="${version}"</Export-Package>
+                    <Import-Package>!bsh.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>cglib</groupId>
+                <artifactId>cglib-nodep</artifactId>
+                <version>${cglibVersion}</version>
+                <instructions>
+                    <Export-Package>net.sf.cglib.*;version="${version}"</Export-Package>
+                    <Import-Package>!net.sf.cglib.*, !org.codehaus.aspectwerkz.hook, !org.apache.tools.ant.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commonsBeanUtilsVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.commons.beanutils.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.commons.beanutils.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>${commonsCliVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.commons.cli.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.commons.cli.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commonsCodecVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.commons.codec.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.commons.codec.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commonsCollectionsVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.commons.collections.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.commons.collections.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>commons-dbutils</groupId>
+                <artifactId>commons-dbutils</artifactId>
+                <version>${commonsDbUtilsVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.commons.dbutils.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.commons.dbutils.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>commons-discovery</groupId>
+                <artifactId>commons-discovery</artifactId>
+                <version>${commonsDiscoveryVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.commons.discovery.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.commons.discovery.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>commons-httpclient</groupId>
+                <artifactId>commons-httpclient</artifactId>
+                <version>${commonsHttpClientVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.commons.httpclient.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.commons.httpclient.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commonsIoVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.commons.io.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.commons.io.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>commons-jxpath</groupId>
+                <artifactId>commons-jxpath</artifactId>
+                <version>${commonsJxpathVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.commons.jxpath.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.commons.jxpath.*, *;resolution:=optional</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commonsLangVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.commons.lang.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.commons.lang.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commonsNetVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.commons.net.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.commons.net.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>cryptix-jce</groupId>
+                <artifactId>cryptix-jce-api</artifactId>
+                <version>20050328</version>
+                <instructions>
+                    <Export-Package>cryptix.*;version="${version}"</Export-Package>
+                    <Import-Package>!cryptix.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>cryptix-jce</groupId>
+                <artifactId>cryptix-jce-provider</artifactId>
+                <version>20050328</version>
+                <instructions>
+                    <Export-Package>cryptix.*;version="${version}"</Export-Package>
+                    <Import-Package>!cryptix.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>cryptix-openpgp</groupId>
+                <artifactId>cryptix-message-api</artifactId>
+                <version>20050405</version>
+                <instructions>
+                    <Export-Package>cryptix.*;version="${version}"</Export-Package>
+                    <Import-Package>!cryptix.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>cryptix-openpgp</groupId>
+                <artifactId>cryptix-openpgp-provider</artifactId>
+                <version>20050405</version>
+                <instructions>
+                    <Export-Package>cryptix.*;version="${version}"</Export-Package>
+                    <Import-Package>!cryptix.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>cryptix-openpgp</groupId>
+                <artifactId>cryptix-pki-api</artifactId>
+                <version>20050405</version>
+                <instructions>
+                    <Export-Package>cryptix.*;version="${version}"</Export-Package>
+                    <Import-Package>!cryptix.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>${dom4jVersion}</version>
+                <instructions>
+                    <Export-Package>org.dom4j.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.dom4j.*, !org.gjt.*, !org.relaxng.*, !org.xmlpull.*, !javax.xml.bind.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-ejb_2.1_spec</artifactId>
+                <version>${geronimoSpecsVersion}</version>
+                <instructions>
+                    <Export-Package>javax.ejb.*;version="${version}"</Export-Package>
+                    <Import-Package>!javax.xml.rpc.handler.*, !javax.ejb.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+                <version>${geronimoSpecsVersion}</version>
+                <instructions>
+                    <Export-Package>javax.resource.*;version="${version}"</Export-Package>
+                    <Import-Package>!javax.resource.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
+                <version>${geronimoSpecsVersion}</version>
+                <instructions>
+                    <Export-Package>javax.management.j2ee.*;version="${version}"</Export-Package>
+                    <Import-Package>!javax.ejb, !javax.management.j2ee.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
+                <version>${geronimoSpecsVersion}</version>
+                <instructions>
+                    <Export-Package>javax.xml.rpc.*;version="${version}"</Export-Package>
+                    <Import-Package>!javax.xml.rpc.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jms_1.1_spec</artifactId>
+                <version>${geronimoSpecsVersion}</version>
+                <instructions>
+                    <Export-Package>javax.jms.*;version="${version}"</Export-Package>
+                    <Import-Package>!javax.jms.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
+                <version>${geronimoSpecsVersion}</version>
+                <instructions>
+                    <Export-Package>javax.transaction.*;version="${version}"</Export-Package>
+                    <Import-Package>!javax.transaction.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-servlet_2.4_spec</artifactId>
+                <version>${geronimoSpecsVersion}</version>
+                <instructions>
+                    <Export-Package>javax.servlet.*;version="${version}"</Export-Package>
+                    <Import-Package>!javax.servlet.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>1.5.6</version>
+                <instructions>
+                    <Export-Package>groovy.*, groovyjarjarantlr.*, groovyjarjarasm.*, groovyjarjarcommonscli.*, org.codehaus.groovy.*, javax.script.*, com.sun.script.groovy.*</Export-Package>
+                    <Import-Package>!groovy.*, !groovyjarjarantlr.*, !groovyjarjarasm.*, !groovyjarjarcommonscli.*, !org.codehaus.groovy.*, !javax.script.*, !com.sun.script.groovy.*, !com.mockobjects.*, !junit.*, !org.apache.tools.ant.*, !org.apache.bsf.*; !javax.swing.undo.*, !javax.print.attribute.standard.*, !jline.*, !com.thoughtworks.xstream.*, *</Import-Package>
+                </instructions>
+              </archive>
+              <!-- 
+               <archive>
+                <groupId>net.sf.retrotranslator</groupId>
+                <artifactId>retrotranslator-runtime</artifactId>
+                <version>1.2.1</version>
+                <instructions>
+                    <Export-Package>groovy.*, groovyjarjarantlr.*, groovyjarjarasm.*, groovyjarjarcommonscli.*, org.codehaus.groovy.*, javax.script.*, com.sun.script.groovy.*</Export-Package>
+                    <Import-Package>!groovy.*, !groovyjarjarantlr.*, !groovyjarjarasm.*, !groovyjarjarcommonscli.*, !org.codehaus.groovy.*, !javax.script.*, !com.sun.script.groovy.*, !com.mockobjects.*, !junit.*, !org.apache.tools.ant.*, !org.apache.bsf.*; !javax.swing.undo.*, !javax.print.attribute.standard.*, !jline.*, !com.thoughtworks.xstream.*, *</Import-Package>
+                </instructions>
+              </archive>
+               -->
+               <archive>
+                <groupId>javax.script</groupId>
+                <artifactId>script-api</artifactId>
+                <version>1.0</version>
+                <classifier>jdk14</classifier>
+                <instructions>
+                    <Export-Package>groovy.*, groovyjarjarantlr.*, groovyjarjarasm.*, groovyjarjarcommonscli.*, org.codehaus.groovy.*, javax.script.*, com.sun.script.groovy.*</Export-Package>
+                    <Import-Package>!groovy.*, !groovyjarjarantlr.*, !groovyjarjarasm.*, !groovyjarjarcommonscli.*, !org.codehaus.groovy.*, !javax.script.*, !com.sun.script.groovy.*, !com.mockobjects.*, !junit.*, !org.apache.tools.ant.*, !org.apache.bsf.*; !javax.swing.undo.*, !javax.print.attribute.standard.*, !jline.*, !com.thoughtworks.xstream.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>javax.script</groupId>
+                <artifactId>groovy-engine</artifactId>
+                <version>1.1</version>
+                <classifier>jdk14</classifier>
+                <instructions>
+                    <Export-Package>groovy.*, groovyjarjarantlr.*, groovyjarjarasm.*, groovyjarjarcommonscli.*, org.codehaus.groovy.*, javax.script.*, com.sun.script.groovy.*</Export-Package>
+                    <Import-Package>!groovy.*, !groovyjarjarantlr.*, !groovyjarjarasm.*, !groovyjarjarcommonscli.*, !org.codehaus.groovy.*, !javax.script.*, !com.sun.script.groovy.*, !com.mockobjects.*, !junit.*, !org.apache.tools.ant.*, !org.apache.bsf.*; !javax.swing.undo.*, !javax.print.attribute.standard.*, !jline.*, !com.thoughtworks.xstream.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>javax.script</groupId>
+                <artifactId>groovy-engine</artifactId>
+                <version>${groovyEngineVersion}</version>
+                <classifier>jdk14</classifier>
+                <instructions>
+                    <Export-Package>com.sun.script.groovy.*;version="${version}"</Export-Package>
+                    <Import-Package>!com.sun.script.groovy.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate</artifactId>
+                <version>${hibernateVersion}</version>
+                <instructions>
+                    <Export-Package>org.hibernate.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.hibernate.*, !org.objectweb.asm.*, !org.jboss.cache.*, !org.logicalcobwebs.*, !org.apache.tools.ant.*, !net.sf.ehcache.*, !net.sf.swarmcache.*, !javax.security.*, !javax.naming.*, !com.opensymphony.oscache.*, !com.mchange.v2.c3p0.*, !com.ibm.ws.*, !com.ibm.ejs.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>jboss</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassistVersion}</version>
+                <instructions>
+                    <Export-Package>javassist.*;version="${version}"</Export-Package>
+                    <Import-Package>!javassist.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxbApiVersion}</version>
+                <instructions>
+                    <Export-Package>javax.xml.bind.*;version="${version}", com.sun.xml.*;version="${version}", com.sun.tools.xjc.*, com.sun.codemodel.*, com.sun.istack.*, org.relaxng.*, org.kohsuke.*</Export-Package>
+                    <Import-Package>!javax.xml.bind.*, !com.sun.xml.*, !com.sun.tools.xjc.*, !com.sun.codemodel.*, !com.sun.istack.*, !sun.nio.*, !org.jvnet.*, !com.sun.tools.jxc.*, !com.sun.org.apache.xml.internal.*, !com.sun.mirror.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-xjc</artifactId>
+                <version>${javaXmlBindVersion}</version>
+                <instructions>
+                    <Export-Package>javax.xml.bind.*;version="${version}", com.sun.xml.*;version="${version}", com.sun.tools.xjc.*, com.sun.codemodel.*, com.sun.istack.*, org.relaxng.*, org.kohsuke.*</Export-Package>
+                    <Import-Package>!javax.xml.bind.*, !com.sun.xml.*, !com.sun.tools.xjc.*, !com.sun.codemodel.*, !com.sun.istack.*, !sun.nio.*, !org.jvnet.*, !com.sun.tools.jxc.*, !com.sun.org.apache.xml.internal.*, !com.sun.mirror.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${javaXmlBindVersion}</version>
+                <instructions>
+                    <Export-Package>javax.xml.bind.*;version="${version}", com.sun.xml.*;version="${version}", com.sun.tools.xjc.*, com.sun.codemodel.*, com.sun.istack.*, org.relaxng.*, org.kohsuke.*</Export-Package>
+                    <Import-Package>!javax.xml.bind.*, !com.sun.xml.*, !com.sun.tools.xjc.*, !com.sun.codemodel.*, !com.sun.istack.*, !sun.nio.*, !org.jvnet.*, !com.sun.tools.jxc.*, !com.sun.org.apache.xml.internal.*, !com.sun.mirror.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>jaxen</groupId>
+                <artifactId>jaxen</artifactId>
+                <version>${jaxenVersion}</version>
+                <instructions>
+                    <Export-Package>org.jaxen.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.jaxen.*, !org.dom4j.*, !nu.xom, ., *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>javax.xml.ws</groupId>
+                <artifactId>jaxws-api</artifactId>
+                <version>${javaXmlWsVersion}</version>
+                <instructions>
+                    <Export-Package>javax.xml.ws.*;version="${version}"</Export-Package>
+                    <Import-Package>!javax.xml.ws.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.jboss</groupId>
+                <artifactId>jbossts-common</artifactId>
+                <version>${jbossTsVersion}</version>
+                <instructions>
+                    <Export-Package>com.arjuna.*;version="${version}"</Export-Package>
+                    <Import-Package>!com.arjuna.*, !org.jboss.*, !oracle.*, !EDU.oswego.*, !org.apache.xml.serialize, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.jboss</groupId>
+                <artifactId>jbossts-jta</artifactId>
+                <version>${jbossTsVersion}-patched</version>
+                <instructions>
+                    <Export-Package>com.arjuna.*;version="${version}"</Export-Package>
+                    <Import-Package>!com.arjuna.*, !org.jboss.*, !oracle.*, !EDU.oswego.*, !org.apache.xml.serialize, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.jboss</groupId>
+                <artifactId>jbossts-jta-integration</artifactId>
+                <version>${jbossTsVersion}</version>
+                <instructions>
+                    <Export-Package>com.arjuna.*;version="${version}"</Export-Package>
+                    <Import-Package>!com.arjuna.*, !org.jboss.*, !oracle.*, !EDU.oswego.*, !org.apache.xml.serialize, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.jbpm</groupId>
+                <artifactId>jbpm-jpdl</artifactId>
+                <version>${jbpmVersion}</version>
+                <instructions>
+                    <Export-Package>org.jbpm.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.jbpm.*, !org.apache.tools.ant.*, !org.apache.jackrabbit.*, !org.apache.commons.fileupload.*, !javax.jcr.*, !bsh.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>javax.jcr</groupId>
+                <artifactId>jcr</artifactId>
+                <version>${jcrVersion}</version>
+                <instructions>
+                    <Export-Package>javax.jcr.*;version="${version}"</Export-Package>
+                    <Import-Package>!javax.jcr.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>jdom</groupId>
+                <artifactId>jdom</artifactId>
+                <version>${jdomVersion}</version>
+                <instructions>
+                    <Export-Package>org.jdom.*;version="${version}" </Export-Package>
+                    <Import-Package>!org.jdom.*, !oracle.xml.*, ., *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.safehaus.jug</groupId>
+                <artifactId>jug</artifactId>
+                <version>2.0.0</version>
+                <classifier>asl</classifier>
+                <instructions>
+                    <Export-Package>org.safehaus.uuid.*;version="${version}", com.ccg.net.ethernet.*</Export-Package>
+                    <Import-Package>!org.safehaus.uuid.*, !com.ccg.net.ethernet.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>${javaMailVersion}</version>
+                <instructions>
+                    <Export-Package>javax.mail.*;version="${version}", com.sun.mail.*</Export-Package>
+                    <Import-Package>!javax.mail.*, !com.sun.mail.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>mx4j</groupId>
+                <artifactId>mx4j-jmx</artifactId>
+                <version>${mx4jVersion}</version>
+                <instructions>
+                    <Export-Package>mx4j.*;version="${version}"</Export-Package>
+                    <Import-Package>!*</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>mx4j</groupId>
+                <artifactId>mx4j-impl</artifactId>
+                <version>${mx4jVersion}</version>
+                <instructions>
+                    <Export-Package>mx4j.*;version="${version}"</Export-Package>
+                    <Import-Package>!*</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>mx4j</groupId>
+                <artifactId>mx4j-tools</artifactId>
+                <version>${mx4jVersion}</version>
+                <instructions>
+                    <Export-Package>mx4j.*;version="${version}"</Export-Package>
+                    <Import-Package>!*</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>mx4j</groupId>
+                <artifactId>mx4j-remote</artifactId>
+                <version>${mx4jVersion}</version>
+                <instructions>
+                    <Export-Package>mx4j.*;version="${version}"</Export-Package>
+                    <Import-Package>!*</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>ognl</groupId>
+                <artifactId>ognl</artifactId>
+                <version>${ognlVersion}</version>
+                <instructions>
+                    <Export-Package>ognl.*;version="${version}"</Export-Package>
+                    <Import-Package>!ognl.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>opensaml</groupId>
+                <artifactId>opensaml</artifactId>
+                <version>${openSamlVersion}</version>
+                <instructions>
+                    <Export-Package>org.opensaml.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.opensaml.*, !junit.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>oro</groupId>
+                <artifactId>oro</artifactId>
+                <version>${oroVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.oro.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.oro.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>quartz</groupId>
+                <artifactId>quartz-all</artifactId>
+                <version>${quartzVersion}</version>
+                <instructions>
+                    <Export-Package>org.quartz.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.quartz.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>javax.xml.soap</groupId>
+                <artifactId>saaj-api</artifactId>
+                <version>${saajVersion}</version>
+                <instructions>
+                    <Export-Package>com.sun.xml.messaging.saaj.*, javax.xml.soap.*</Export-Package>
+                    <Import-Package>!com.sun.xml.messaging.saaj.*, !javax.xml.soap.*, !*</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>com.sun.xml.messaging.saaj</groupId>
+                <artifactId>saaj-impl</artifactId>
+                <version>${saajVersion}</version>
+                <instructions>
+                    <Export-Package>com.sun.xml.messaging.saaj.*, javax.xml.soap.*</Export-Package>
+                    <Import-Package>!com.sun.xml.messaging.saaj.*, !javax.xml.soap.*, !*</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>net.sf.saxon</groupId>
+                <artifactId>saxon</artifactId>
+                <version>${saxonVersion}</version>
+                <instructions>
+                    <Export-Package>net.sf.saxon.*;version="${version}"</Export-Package>
+                    <Import-Package>!net.sf.saxon.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>net.sf.saxon</groupId>
+                <artifactId>saxon-dom</artifactId>
+                <version>${saxonVersion}</version>
+                <instructions>
+                    <Export-Package>net.sf.saxon.*;version="${version}"</Export-Package>
+                    <Import-Package>!net.sf.saxon.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>javax.script</groupId>
+                <artifactId>script-api</artifactId>
+                <version>${javaScriptVersion}</version>
+                <instructions>
+                    <Export-Package>javax.script.*;version="${version}"</Export-Package>
+                    <Import-Package>!javax.script.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>jivesoftware</groupId>
+                <artifactId>smack</artifactId>
+                <version>${smackVersion}</version>
+                <instructions>
+                    <Export-Package>org.jivesoftware.smack.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.jivesoftware.*, !org.xmlpull.*, !com.jcraft.jzlib.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.springmodules</groupId>
+                <artifactId>spring-modules-jbpm31</artifactId>
+                <version>${springModulesVersion}</version>
+                <instructions>
+                    <Export-Package>org.springmodules.workflow.jbpm31.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.springmodules.workflow.jbpm31.*, !org.springframework.orm.*, !org.springframework.dao.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>net.java.dev.stax-utils</groupId>
+                <artifactId>stax-utils</artifactId>
+                <version>${staxUtilsVersion}</version>
+                <instructions>
+                    <Export-Package>javanet.staxutils.*;version="${version}"</Export-Package>
+                    <Import-Package>!javanet.staxutils.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>com.envoisolutions.sxc</groupId>
+                <artifactId>sxc-xpath</artifactId>
+                <version>${sxcVersion}</version>
+                <instructions>
+                    <Export-Package>com.envoisolutions.sxc.*;version="${version}"</Export-Package>
+                    <Import-Package>!com.envoisolutions.sxc.*, !org.eclipse.*, !junit.*, ., *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>com.envoisolutions.sxc</groupId>
+                <artifactId>sxc-core</artifactId>
+                <version>${sxcVersion}</version>
+                <instructions>
+                    <Export-Package>com.envoisolutions.sxc.*;version="${version}"</Export-Package>
+                    <Import-Package>!com.envoisolutions.sxc.*, !org.eclipse.*, !junit.*, ., *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>com.envoisolutions.sxc</groupId>
+                <artifactId>sxc-runtime</artifactId>
+                <version>${sxcVersion}</version>
+                <instructions>
+                    <Export-Package>com.envoisolutions.sxc.*;version="${version}"</Export-Package>
+                    <Import-Package>!com.envoisolutions.sxc.*, !org.eclipse.*, !junit.*, ., *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.codehaus.woodstox</groupId>
+                <artifactId>wstx-asl</artifactId>
+                <version>${woodstoxVersion}</version>
+                <instructions>
+                    <Export-Package>com.ctc.wstx.*;version="${version}", org.codehaus.stax2.*;version="${version}"</Export-Package>
+                    <Import-Package>!com.ctc.wstx.*, !org.codehaus.stax2.*, !org.relaxng.datatype.*, *</Import-Package>
+                </instructions>
+              </archive>
+              <archive>
+                <groupId>wsdl4j</groupId>
+                <artifactId>wsdl4j</artifactId>
+                <version>${javaWsdlVersion}</version>
+                <instructions>
+                    <Export-Package>javax.wsdl.*;version="${version}",com.ibm.wsdl.*</Export-Package>
+                    <Import-Package>!javax.wsdl.*, !com.ibm.wsdl.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.apache.ws.security</groupId>
+                <artifactId>wss4j</artifactId>
+                <version>${wss4jVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.ws.security.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.ws.security.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>com.experlog</groupId>
+                <artifactId>xapool</artifactId>
+                <version>${xaPoolVersion}</version>
+                <instructions>
+                    <Export-Package>org.enhydra.jdbc.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.enhydra.*, !oracle.jdbc.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>xml-resolver</groupId>
+                <artifactId>xml-resolver</artifactId>
+                <version>${xmlResolverVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.xml.resolver.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.xml.resolver.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>org.apache.santuario</groupId>
+                <artifactId>xmlsec</artifactId>
+                <version>${xmlSecurityVersion}</version>
+                <instructions>
+                    <Export-Package>org.apache.xml.security.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.apache.xml.security.*, !org.bouncycastle.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>xpp3</groupId>
+                <artifactId>xpp3_min</artifactId>
+                <version>${xmlPullVersion}</version>
+                <instructions>
+                    <Export-Package>org.xmlpull.*;version="${version}"</Export-Package>
+                    <Import-Package>!org.xmlpull.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>com.thoughtworks.xstream</groupId>
+                <artifactId>xstream</artifactId>
+                <version>${xstreamVersion}</version>
+                <instructions>
+                    <Export-Package>com.thoughtworks.xstream.*;version="${version}"</Export-Package>
+                    <Import-Package>!com.thoughtworks.xstream.*, *</Import-Package>
+                </instructions>
+              </archive>
+               <archive>
+                <groupId>com.yourkit</groupId>
+                <artifactId>yjp-controller-api-redist</artifactId>
+                <version>${yourKitVersion}</version>
+                <instructions>
+                    <Export-Package>com.yourkit.*;version="${version}"</Export-Package>
+                    <Import-Package>!com.yourkit.*, *</Import-Package>
+                </instructions>
+              </archive>
+            </archives>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>repackage</goal>
+              </goals>
+            </execution>
+          </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
-
