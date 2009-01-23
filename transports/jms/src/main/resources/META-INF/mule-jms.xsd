@@ -425,7 +425,7 @@
                 Sets a selector on the underlying JMS transport. It is not a standard Mule filter and cannot be combined with other filters.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:attribute name="expression" type="xsd:string">
+        <xsd:attribute name="expression" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation>
                     The expression to search for in the property.
