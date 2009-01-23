@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
@@ -70,7 +71,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             }
 
             //This is a work around for JmsTransformers where the current endpoint needs
-            //to be set on the transformer so that a JMSMEssage can be created correctly
+            //to be set on the transformer so that a JMSMessage can be created correctly (the transformer needs a Session)
             Class srcType = returnMessage.getPayload().getClass();
                 for (Iterator iterator = getTransformers().iterator(); iterator.hasNext();)
             {
@@ -95,12 +96,12 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                                                                + "Please report your application server or JMS vendor name and version "
                                                                + "to dev<_at_>mule.codehaus.org or http://mule.mulesource.org/jira"));
             }
-            
+
             final boolean topic = connector.getTopicResolver().isTopic(replyToDestination);
             session = connector.getSession(false, topic);
             Message replyToMessage = JmsMessageUtils.toMessage(payload, session);
 
-            replyToMessage.setJMSReplyTo(null);
+            processMessage(replyToMessage, event);
             if (logger.isDebugEnabled())
             {
                 logger.debug("Sending jms reply to: " + replyToDestination + "("
@@ -113,10 +114,10 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             String ttlString = (String)eventMsg.removeProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
             String priorityString = (String)eventMsg.removeProperty(JmsConstants.PRIORITY_PROPERTY);
             String persistentDeliveryString = (String)eventMsg.removeProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
-            
+
             String correlationIDString = (String)eventMsg.getProperty(JmsConstants.JMS_MESSAGE_ID);
             replyToMessage.setJMSCorrelationID(correlationIDString);
-            
+
             if (ttlString == null && priorityString == null && persistentDeliveryString == null)
             {
                 connector.getJmsSupport().send(replyToProducer, replyToMessage, topic);
@@ -154,6 +155,30 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         {
             connector.closeQuietly(replyToProducer);
             connector.closeQuietly(session);
+        }
+    }
+
+    void processMessage(Message replyToMessage, MuleEvent event) throws JMSException
+    {
+        replyToMessage.setJMSReplyTo(null);
+
+        // Added by Eugene 4.24.08
+        // If JMS correlation ID exists in the incoming message - use it for the
+        // outbound message;
+        // otherwise use JMS Message ID
+        MuleMessage eventMsg = event.getMessage();
+        Object jmsCorrelationId = eventMsg.getProperty("JMSCorrelationID");
+        if (jmsCorrelationId == null)
+        {
+            jmsCorrelationId = eventMsg.getProperty("JMSMessageID");
+}
+        if (jmsCorrelationId != null)
+        {
+            replyToMessage.setJMSCorrelationID(jmsCorrelationId.toString());
+        }
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("replyTomessage is " + replyToMessage);
         }
     }
 }
