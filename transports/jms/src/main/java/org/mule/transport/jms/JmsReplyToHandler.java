@@ -158,13 +158,11 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         }
     }
 
-    void processMessage(Message replyToMessage, MuleEvent event) throws JMSException
+    protected void processMessage(Message replyToMessage, MuleEvent event) throws JMSException
     {
         replyToMessage.setJMSReplyTo(null);
 
-        // Added by Eugene 4.24.08
-        // If JMS correlation ID exists in the incoming message - use it for the
-        // outbound message;
+        // If JMS correlation ID exists in the incoming message - use it for the outbound message;
         // otherwise use JMS Message ID
         MuleMessage eventMsg = event.getMessage();
         Object jmsCorrelationId = eventMsg.getProperty("JMSCorrelationID");
