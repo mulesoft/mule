@@ -87,7 +87,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         Destination replyTo = null;
         boolean transacted = false;
         boolean cached = false;
-        boolean remoteSync = returnResponse(event);
+        boolean useReplyToDestination;
 
         final Transaction muleTx = TransactionCoordination.getInstance().getTransaction();
 
@@ -135,10 +135,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     transacted = true;
                 }
             }
-            //Mutex
+
             // If a transaction is running, we can not receive any messages
-            // in the same transaction using remoteSync
-            remoteSync =! transacted;
+            // in the same transaction using a replyTo destination
+            useReplyToDestination = returnResponse(event) && !transacted;
 
             boolean topic = connector.getTopicResolver().isTopic(event.getEndpoint(), true);
 
@@ -211,7 +211,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     }
                 }
                 // Are we going to wait for a return event ?
-                if (remoteSync && replyTo == null && !disableTemporaryDestinations)
+                if (useReplyToDestination && replyTo == null && !disableTemporaryDestinations)
                 {
                     replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
                 }
@@ -223,7 +223,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
 
                 // Are we going to wait for a return event ?
-                if (remoteSync && replyTo != null)
+                if (useReplyToDestination && replyTo != null)
                 {
                     try
                     {
@@ -351,7 +351,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
 
-            if (!sessionManaged && transacted && muleTx instanceof TransactionCollection) {
+            if (!sessionManaged && transacted && muleTx instanceof TransactionCollection)
+            {
                 handleMultiTx(session);
             }
 
