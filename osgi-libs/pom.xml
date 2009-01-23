@@ -24,7 +24,6 @@
       <plugin>
           <groupId>org.mule</groupId>
           <artifactId>maven-osgi-plugin</artifactId>
-          <version>0.0.1-SNAPSHOT</version>
           <configuration>
           
             <instructions>
