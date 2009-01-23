@@ -77,8 +77,8 @@ public class CreditAgencyBean implements SessionBean
      */
     public String getCreditProfile(String name, Integer ssn)
     {
-        String msg = MessageFormat.format(MSG, new Object[]{name, ssn,
-            new Integer(getCreditScore(ssn.intValue())), new Integer(getCreditHistoryLength(ssn.intValue()))});
+        String msg = MessageFormat.format(MSG, name, ssn,
+                                          getCreditScore(ssn), getCreditHistoryLength(ssn));
         return msg;
     }
 

@@ -76,7 +76,7 @@ public class DirectProtocol extends AbstractByteProtocol
                 {
                     logger.debug(MessageFormat.format(
                             "len/limit/repeat: {0}/{1}/{2}",
-                            new Object[] {new Integer(len), new Integer(limit), Boolean.valueOf(repeat)}));
+                            len, limit, repeat));
                 }
             }
             while (repeat);

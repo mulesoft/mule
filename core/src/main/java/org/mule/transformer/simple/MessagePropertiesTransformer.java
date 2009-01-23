@@ -128,7 +128,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                             {
                                 logger.debug(MessageFormat.format(
                                     "Message already contains the property and overwrite is false, skipping: key={0}, value={1}",
-                                    new Object[]{key, value}));
+                                    key, value));
                             }
                         }
                         else

@@ -46,7 +46,7 @@ public class OlderFirstComparator implements Comparator
         }
         throw new IllegalArgumentException(MessageFormat.format(
                 "Expected java.io.File instance, but was {0} and {1}",
-                new Object[] {ClassUtils.getShortClassName(o1, "<null>"),
-                              ClassUtils.getShortClassName(o2, "<null")}));
+                ClassUtils.getShortClassName(o1, "<null>"),
+                ClassUtils.getShortClassName(o2, "<null")));
     }
 }

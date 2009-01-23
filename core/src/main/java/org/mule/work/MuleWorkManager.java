@@ -45,7 +45,6 @@ import javax.resource.spi.work.WorkListener;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -122,7 +121,7 @@ public class MuleWorkManager implements WorkManager
                     {
                         logger.warn(MessageFormat.format(
                                 "Pool {0} did not terminate in time; {1} work items were cancelled.",
-                                new Object[] {name, outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())}));
+                                name, outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())));
                     }
                 }
             }

@@ -148,13 +148,13 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             if (stream == null)
             {
                 throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
-                        new Object[]{file.getName(), new Integer(client.getReplyCode())}));
+                                                           file.getName(), client.getReplyCode()));
             }
             message = new DefaultMuleMessage(connector.getMessageAdapter(stream));
             
 
             message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
-            message.setProperty(FileConnector.PROPERTY_FILE_SIZE, new Long(file.getSize()));
+            message.setProperty(FileConnector.PROPERTY_FILE_SIZE, file.getSize());
             routeMessage(message);
 
             postProcess(client, file, message);
@@ -174,7 +174,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         if (!client.deleteFile(file.getName()))
         {
             throw new IOException(MessageFormat.format("Failed to delete file {0}. Ftp error: {1}",
-                    new Object[]{file.getName(), new Integer(client.getReplyCode())}));
+                                                       file.getName(), client.getReplyCode()));
         }
         logger.debug("Deleted processed file " + file.getName());
     }

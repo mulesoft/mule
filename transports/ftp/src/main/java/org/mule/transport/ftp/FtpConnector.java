@@ -601,7 +601,7 @@ public class FtpConnector extends AbstractConnector
         if (!client.changeWorkingDirectory(path))
         {
             throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
-                                                       new Object[] {path, new Integer(client.getReplyCode())}));
+                                                       path, new Integer(client.getReplyCode())));
         }
         return client;
     }
