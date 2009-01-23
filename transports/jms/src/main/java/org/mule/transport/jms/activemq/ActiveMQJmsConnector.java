@@ -121,6 +121,7 @@ public class ActiveMQJmsConnector extends JmsConnector
         }
         finally
         {
+            //Is this necessary? It causes a NPE in certain situations
             setConnection(null);
         }
     }

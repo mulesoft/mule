@@ -548,6 +548,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     protected void doStart() throws MuleException
     {
+        //TODO: This should never be null or an exception should be thrown
         if (connection != null)
         {
             try

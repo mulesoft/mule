@@ -106,9 +106,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             if (session != null)
             {
                 transacted = true;
-                // If a transaction is running, we can not receive any messages
-                // in the same transaction using remoteSync
-                remoteSync = false;
             }
             // Should we be caching sessions? Note this is not part of the JMS spec.
             // and is turned off by default.
@@ -138,6 +135,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     transacted = true;
                 }
             }
+            //Mutex
+            // If a transaction is running, we can not receive any messages
+            // in the same transaction using remoteSync
+            remoteSync =! transacted;
 
             boolean topic = connector.getTopicResolver().isTopic(event.getEndpoint(), true);
 
@@ -217,6 +218,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 // Set the replyTo property
                 if (replyTo != null)
                 {
+                    logger.info("Setting replyTo on message: " + replyTo);
                     msg.setJMSReplyTo(replyTo);
                 }
 
@@ -308,9 +310,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 {
                     int timeout = event.getTimeout();
 
-                    if (logger.isDebugEnabled())
+                    if (logger.isInfoEnabled())
                     {
-                        logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
+                        logger.info("Waiting for return event for: " + timeout + " ms on " + replyTo);
                     }
 
                     Message result = consumer.receive(timeout);
