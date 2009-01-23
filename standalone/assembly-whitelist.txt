@@ -70,7 +70,7 @@ jdom-1.0-osgi
 jetty-6.1.11
 jetty-util-6.1.11
 jsr250-api-1.0
-jug-2.0.0-asl
+jug-2.0.0-osgi-asl
 junit-3.8.2
 log4j-1.2.14
 mail-1.4-osgi
