@@ -159,6 +159,8 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      */
     private boolean failOnTimeout = true;
 
+    private int timeoutSecs = DEFAULT_MULE_TEST_TIMEOUT_SECS;
+
     public AbstractMuleTestCase()
     {
         super();
@@ -305,10 +307,14 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         getTestInfo().setDisposeManagerPerSuite(val);
     }
 
+    public int getTimeoutSecs()
+    {
+        return timeoutSecs;
+    }
+
     protected TestCaseWatchdog createWatchdog()
     {
 
-        int timeoutSecs;
         try
         {
             timeoutSecs = Integer.parseInt(System.getProperty(PROPERTY_MULE_TEST_TIMEOUT, "" + DEFAULT_MULE_TEST_TIMEOUT_SECS));
