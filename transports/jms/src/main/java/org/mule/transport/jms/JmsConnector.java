@@ -745,8 +745,8 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                     // ignore, we are just trying to get the queue name
                 }
                 logger.warn(MessageFormat.format(
-                        "Failed to delete a temporary queue '{0}' Reason: {1}",
-                        queueName, e.getMessage()));
+                        "Failed to delete a temporary queue ''{0}'' Reason: {1}",
+                        new Object[] {queueName, e.getMessage()}));
             }
         }
     }
