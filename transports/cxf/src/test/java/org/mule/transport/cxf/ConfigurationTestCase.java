@@ -12,7 +12,6 @@ package org.mule.transport.cxf;
 
 import org.mule.api.transport.Connector;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.cxf.CxfConnector;
 
 import java.util.Collection;
 import java.util.Iterator;

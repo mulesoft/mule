@@ -16,7 +16,6 @@ import org.mule.tck.FunctionalTestCase;
 
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.soap.MTOMFeature;
 
 public class WSATest extends FunctionalTestCase
 {
