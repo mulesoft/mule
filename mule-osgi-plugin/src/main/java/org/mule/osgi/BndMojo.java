@@ -289,7 +289,7 @@ public class BndMojo extends AbstractMojo
             properties.putAll(transformDirectives(archive.getInstructions(), archive));
         }
 
-        header(properties, Analyzer.BUNDLE_NAME, artifact.getArtifactId());
+        header(properties, "Bundle-Name", artifact.getArtifactId());
         header(properties, Analyzer.BUNDLE_VERSION, archive.getVersion());
 
         File bundle = new File(jarFile.getAbsolutePath() + ".osgi");

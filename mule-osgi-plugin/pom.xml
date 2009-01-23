@@ -64,5 +64,12 @@
         </configuration>
       </plugin>
     </plugins>
-  </build>
+  </build> 
+  <repositories>
+  <repository>
+    <id>aqute</id>
+    <name>aQute bnd Repository</name>
+    <url>http://www.aqute.biz/repo/</url> 
+  </repository>
+  </repositories>
 </project>
