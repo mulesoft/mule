@@ -329,6 +329,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         {
             logger.fatal(msg);
             fail(msg);
+            Runtime.getRuntime().halt(1);
         }
         else
         {
