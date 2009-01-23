@@ -46,7 +46,7 @@
         <dependency>
             <groupId>org.safehaus.jug</groupId>
             <artifactId>jug</artifactId>
-            <version>${jugVersion}-osgi</version>
+            <version>${jugVersion}</version>
             <classifier>asl</classifier>
         </dependency>
 
