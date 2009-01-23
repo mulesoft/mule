@@ -14,7 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-public class ReplytoChainIntegration4TestCase extends FunctionalTestCase
+public class ReplyToChainIntegration4TestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources()

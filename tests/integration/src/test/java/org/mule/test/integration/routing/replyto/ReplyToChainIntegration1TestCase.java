@@ -18,7 +18,7 @@ import org.mule.tck.FunctionalTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
+public class ReplyToChainIntegration1TestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources()
