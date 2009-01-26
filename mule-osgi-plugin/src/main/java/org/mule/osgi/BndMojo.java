@@ -235,6 +235,36 @@ public class BndMojo extends AbstractMojo
             {
                 throw new MojoExecutionException("Could not create file.", e);
             }
+
+            try
+            {
+                // Now reattach sources
+                Artifact sources = artifactFactory.createArtifactWithClassifier(
+                    a.getGroupId(), a.getArtifactId(), a.getVersion(), "jar", "sources");
+                resolver.resolve(sources, remoteRepos, local);
+                if (!sources.isResolved()) {
+                    return;
+                }
+
+                // Copy the artifact and ensure there is no old version
+                File sourcesCopy = new File(buildDir, sources.getFile().getName());
+                sourcesCopy.delete();
+                FileUtils.copyFile(sources.getFile(), sourcesCopy);
+
+                attach(a, sourcesCopy, "jar", "sources");
+            }
+            catch (ArtifactResolutionException e)
+            {
+                getLog().error("Could not resolve POM for " + a + ". Skipping.");
+            }
+            catch (ArtifactNotFoundException e)
+            {
+                getLog().error("Could not resolve POM for " + a + ". Skipping.");
+            }
+            catch (IOException e)
+            {
+                throw new MojoExecutionException("Could not create file.", e);
+            }
         }
     }
 
