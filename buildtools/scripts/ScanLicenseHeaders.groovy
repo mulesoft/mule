@@ -8,7 +8,7 @@ public class ScanLicenseHeaders
      */
     static List exceptions = [ "BobberArchetype.java", "BobberArchetypeMojo.java", 
         "ExampleArchetypeMojo.java", "ProjectArchetypeMojo.java", "TransportArchetypeMojo.java", 
-        "XMLStreamReaderToContentHandler.java" ];
+        "XMLStreamReaderToContentHandler.java", "BndMojo.java" ];
 
     static void main(args)
     {
