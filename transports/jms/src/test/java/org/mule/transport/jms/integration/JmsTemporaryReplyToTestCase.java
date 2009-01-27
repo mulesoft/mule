@@ -15,7 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-public class JmsTempraryReplyToTestCase extends FunctionalTestCase
+public class JmsTemporaryReplyToTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
