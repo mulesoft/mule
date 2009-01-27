@@ -1271,7 +1271,7 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractTransactionType">
-        <xsd:attribute name="action">
+        <xsd:attribute name="action" use="required">
             <xsd:annotation>
                 <xsd:documentation>
                     The type of action the transaction should take, one of the following:
