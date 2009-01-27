@@ -209,9 +209,9 @@ public class SedaService extends AbstractService implements Work, WorkListener
         {
             if (stats.isEnabled())
             {
+                enqueue(event);
                 synchronized (queueStatsGuard)
                 {
-                    enqueue(event);
                     stats.incQueuedEvent();
                 }
             }
@@ -338,10 +338,10 @@ public class SedaService extends AbstractService implements Work, WorkListener
 
                 if (stats.isEnabled())
                 {
-                    synchronized (queueStatsGuard)
+                    event = (DefaultMuleEvent) dequeue();
+                    if (event != null)
                     {
-                        event = (DefaultMuleEvent) dequeue();
-                        if (event != null)
+                        synchronized (queueStatsGuard)
                         {
                             stats.decQueuedEvent();
                         }
