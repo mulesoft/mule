@@ -76,19 +76,21 @@ public class JmsMessageRequester extends AbstractMessageRequester
             String selector = null;
             if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)
             {
-                selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
+                final String expressionTemplate = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
+                selector = connector.getMuleContext().getExpressionManager().parse(expressionTemplate, null);
             }
             else if (endpoint.getProperties() != null)
             {
                 // still allow the selector to be set as a property on the endpoint
                 // to be backward compatable
-                selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
+                final String expressionTemplate = (String) endpoint.getProperty(JmsConstants.JMS_SELECTOR_PROPERTY);
+                selector = connector.getMuleContext().getExpressionManager().parse(expressionTemplate, null);
             }
             String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
             boolean durable = connector.isDurable();
             if (tempDurable != null)
             {
-                durable = Boolean.valueOf(tempDurable).booleanValue();
+                durable = Boolean.valueOf(tempDurable);
             }
 
             // Get the durable subscriber name if there is one
