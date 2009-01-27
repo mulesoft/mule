@@ -70,3 +70,10 @@ org.mule.security.MultiuserSecurityTestCase
 # MULE-4072
 org.mule.test.integration.service.ServiceInFlightMessagesTestCase
 
+##########################################################################
+# The following tests will fail if run off-line
+##########################################################################
+#org.mule.config.spring.RootSchemaValidationTestCase
+#org.mule.test.integration.management.ManagementSimpleStartupTestCase
+#org.mule.test.integration.management.ManagementStartupTestCase
+

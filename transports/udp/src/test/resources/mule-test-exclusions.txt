@@ -3,3 +3,10 @@
 #
 # MULE-4077
 org.mule.transport.udp.functional.UdpDynamicEPTestCase
+
+#################################################################################
+# The following tests will fail if UDP is not configured properly on your machine
+#################################################################################
+#org.mule.transport.udp.functional.UdpDynamicEPTestCase
+#org.mule.transport.udp.functional.UdpRoundTripTestCase
+
