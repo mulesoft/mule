@@ -213,7 +213,10 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         //}
 
         response.setStatusLine(HttpVersion.parse(version), status);
-        response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, contentType));
+        if (contentType != null)
+        {
+            response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, contentType));
+        }
         response.setHeader(new Header(HttpConstants.HEADER_DATE, date));
         response.setHeader(new Header(HttpConstants.HEADER_SERVER, server));
         if (msg.getProperty(HttpConstants.HEADER_EXPIRES) == null)
