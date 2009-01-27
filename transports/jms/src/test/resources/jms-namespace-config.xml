@@ -66,7 +66,7 @@
     </jms:endpoint>
 
     <jms:endpoint name="endpoint3" queue="blah" connector-ref="jmsConnectorDefaults">
-        <custom-transaction factory-ref="txFactory"/>
+        <custom-transaction factory-ref="txFactory" action="BEGIN_OR_JOIN"/>
     </jms:endpoint>
 
     <jms:endpoint name="endpoint4" queue="blub" connector-ref="jmsConnectorDefaults">
