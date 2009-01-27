@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
+import org.mule.util.StringUtils;
 
 import javax.jms.Destination;
 import javax.jms.Message;
@@ -77,14 +78,20 @@ public class JmsMessageRequester extends AbstractMessageRequester
             if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)
             {
                 final String expressionTemplate = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
-                selector = connector.getMuleContext().getExpressionManager().parse(expressionTemplate, null);
+                if (StringUtils.isNotBlank(expressionTemplate))
+                {
+                    selector = connector.getMuleContext().getExpressionManager().parse(expressionTemplate, null);
+                }
             }
             else if (endpoint.getProperties() != null)
             {
                 // still allow the selector to be set as a property on the endpoint
                 // to be backward compatable
                 final String expressionTemplate = (String) endpoint.getProperty(JmsConstants.JMS_SELECTOR_PROPERTY);
-                selector = connector.getMuleContext().getExpressionManager().parse(expressionTemplate, null);
+                if (StringUtils.isNotBlank(expressionTemplate))
+                {
+                    selector = connector.getMuleContext().getExpressionManager().parse(expressionTemplate, null);
+                }
             }
             String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
             boolean durable = connector.isDurable();
