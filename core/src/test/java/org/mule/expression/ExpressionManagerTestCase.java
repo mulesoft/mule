@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Map;
 
-public class ExpressionEvaluatorManagerTestCase extends AbstractMuleTestCase
+public class ExpressionManagerTestCase extends AbstractMuleTestCase
 {
     public void testManager() throws Exception
     {
