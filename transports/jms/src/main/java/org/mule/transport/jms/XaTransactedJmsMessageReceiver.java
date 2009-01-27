@@ -134,16 +134,19 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         if (connector.isConnected())
