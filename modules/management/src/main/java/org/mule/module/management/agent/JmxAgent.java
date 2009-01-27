@@ -45,13 +45,13 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.rmi.server.ExportException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
@@ -67,7 +67,6 @@ import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnectorServer;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -102,7 +101,6 @@ public class JmxAgent extends AbstractAgent
     private JMXConnectorServer connectorServer;
     private Map connectorServerProperties = null;
     private boolean enableStatistics = true;
-    private List registeredMBeans = new ArrayList();
     private final AtomicBoolean serverCreated = new AtomicBoolean(false);
     private final AtomicBoolean initialized = new AtomicBoolean(false);
 
@@ -185,32 +183,6 @@ public class JmxAgent extends AbstractAgent
             throw new InitialisationException(ManagementMessages.cannotLocateOrCreateServer(), this);
         }
 
-        // We need to register all the services once the server has initialised
-        MuleContextNotificationListener l = new MuleContextNotificationListener()
-        {
-            public void onNotification(ServerNotification notification)
-            {
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
-                {
-                    try
-                    {
-                        registerWrapperService();
-                        registerStatisticsService();
-                        registerMuleService();
-                        registerConfigurationService();
-                        registerModelServices();
-                        registerServiceServices();
-                        registerEndpointServices();
-                        registerConnectorServices();
-                    }
-                    catch (Exception e)
-                    {
-                        throw new MuleRuntimeException(CoreMessages.objectFailedToInitialise("MBeans"), e);
-                    }
-                }
-            }
-        };
-
         if (StringUtils.isBlank(muleContext.getConfiguration().getId()))
         {
             // TODO i18n the message properly
@@ -220,7 +192,10 @@ public class JmxAgent extends AbstractAgent
 
         try
         {
-            muleContext.registerListener(l);
+            // We need to register all the services once the server has initialised
+            muleContext.registerListener(new MuleContextStartedListener());
+            // and unregister once context stopped
+            muleContext.registerListener(new MuleContextStoppedListener());
         } catch (NotificationException e) {
             throw new InitialisationException(e, this);
         }
@@ -289,31 +264,15 @@ public class JmxAgent extends AbstractAgent
      */
     public void dispose()
     {
-        if (mBeanServer != null)
+        if (serverCreated.get())
         {
-            for (Iterator iterator = registeredMBeans.iterator(); iterator.hasNext();)
-            {
-                ObjectName objectName = (ObjectName) iterator.next();
-                try
-                {
-                    mBeanServer.unregisterMBean(objectName);
-                }
-                catch (Exception e)
-                {
-                    logger.warn("Failed to unregister MBean: " + objectName + ". Error is: " + e.getMessage());
-                }
-            }
-            if (serverCreated.get())
-            {
-                MBeanServerFactory.releaseMBeanServer(mBeanServer);
-            }
-            mBeanServer = null;
+            MBeanServerFactory.releaseMBeanServer(mBeanServer);
         }
-
+        mBeanServer = null;
         initialized.set(false);
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     public void registered()
@@ -353,7 +312,6 @@ public class JmxAgent extends AbstractAgent
         mBean.setEnabled(isEnableStatistics());
         logger.debug("Registering statistics with name: " + on);
         mBeanServer.registerMBean(mBean, on);
-        registeredMBeans.add(on);
     }
 
     protected void registerModelServices() throws NotCompliantMBeanException, MBeanRegistrationException,
@@ -368,7 +326,6 @@ public class JmxAgent extends AbstractAgent
             ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.Model,name=" + name);
             logger.debug("Registering model with name: " + on);
             mBeanServer.registerMBean(serviceMBean, on);
-            registeredMBeans.add(on);
         }
     }
 
@@ -379,7 +336,6 @@ public class JmxAgent extends AbstractAgent
         MuleServiceMBean serviceMBean = new MuleService(muleContext);
         logger.debug("Registering mule with name: " + on);
         mBeanServer.registerMBean(serviceMBean, on);
-        registeredMBeans.add(on);
     }
 
     protected void registerConfigurationService() throws NotCompliantMBeanException, MBeanRegistrationException,
@@ -389,7 +345,6 @@ public class JmxAgent extends AbstractAgent
         MuleConfigurationServiceMBean serviceMBean = new MuleConfigurationService(muleContext.getConfiguration());
         logger.debug("Registering configuration with name: " + on);
         mBeanServer.registerMBean(serviceMBean, on);
-        registeredMBeans.add(on);
     }
 
     protected void registerServiceServices() throws NotCompliantMBeanException, MBeanRegistrationException,
@@ -404,7 +359,6 @@ public class JmxAgent extends AbstractAgent
             ServiceServiceMBean serviceMBean = new ServiceService(rawName);
             logger.debug("Registering service with name: " + on);
             mBeanServer.registerMBean(serviceMBean, on);
-            registeredMBeans.add(on);
         }
 
     }
@@ -436,7 +390,6 @@ public class JmxAgent extends AbstractAgent
                                                     jmxSupport.escape(mBean.getComponentName()) +
                                                     ",name=" + name);
                     mBeanServer.registerMBean(mBean, on);
-                    registeredMBeans.add(on);
                     logger.info("Registered Endpoint Service with name: " + on);
                 }
             }
@@ -469,7 +422,6 @@ public class JmxAgent extends AbstractAgent
             }
             ObjectName oName = jmxSupport.getObjectName(stringName);
             mBeanServer.registerMBean(mBean, oName);
-            registeredMBeans.add(oName);
             logger.info("Registered Connector Service with name " + oName);
         }
     }
@@ -611,5 +563,76 @@ public class JmxAgent extends AbstractAgent
             this.credentials.putAll(newCredentials);
         }
     }
-    
+
+    protected void unregisterMBeansIfNecessary()
+    {
+        if (mBeanServer == null)
+        {
+            return;
+        }
+
+        try
+        {
+            ObjectName query = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":*");
+            Set mbeans = mBeanServer.queryNames(query, null);
+            while (!mbeans.isEmpty())
+            {
+                ObjectName name = (ObjectName) mbeans.iterator().next();
+                try
+                {
+                    mBeanServer.unregisterMBean(name);
+                }
+                catch (Exception e)
+                {
+                    logger.warn(String.format("Failed to unregister MBean: %s. Error is: %s", name, e.getMessage()));
+                }
+
+                // query mbeans again, as some mbeans have cascaded unregister operations,
+                // this prevents duplicate unregister attempts
+                mbeans = mBeanServer.queryNames(query, null);
+            }
+        }
+        catch (MalformedObjectNameException e)
+        {
+            logger.warn("Failed to create ObjectName query", e);
+        }
+    }
+
+    protected class MuleContextStartedListener implements MuleContextNotificationListener
+    {
+
+        public void onNotification(ServerNotification notification)
+        {
+            if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+            {
+                try
+                {
+                    registerWrapperService();
+                    registerStatisticsService();
+                    registerMuleService();
+                    registerConfigurationService();
+                    registerModelServices();
+                    registerServiceServices();
+                    registerEndpointServices();
+                    registerConnectorServices();
+                }
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(CoreMessages.objectFailedToInitialise("MBeans"), e);
+                }
+            }
+        }
+    }
+
+    protected class MuleContextStoppedListener implements MuleContextNotificationListener
+    {
+
+        public void onNotification(ServerNotification notification)
+        {
+            if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED)
+            {
+                unregisterMBeansIfNecessary();
+            }
+        }
+    }
 }

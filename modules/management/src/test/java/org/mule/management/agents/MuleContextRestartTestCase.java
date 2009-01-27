@@ -10,13 +10,20 @@
 
 package org.mule.management.agents;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.module.management.mbean.MBeanServerFactory;
+import org.mule.tck.FunctionalTestCase;
 
-public class MuleContextRestartTestCase extends AbstractMuleTestCase
+import java.util.Set;
+
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+
+public class MuleContextRestartTestCase extends FunctionalTestCase
 {
 
     @Override
-    protected String getConfigurationResources()
+    protected String getConfigResources()
     {
         return "mule-context-restart-config.xml";
     }
@@ -24,7 +31,23 @@ public class MuleContextRestartTestCase extends AbstractMuleTestCase
     public void testContextRestart() throws Exception
     {
         muleContext.stop();
+        checkCleanShutdown();
+
+        // do it again ;)
         muleContext.start();
+        muleContext.stop();
+        checkCleanShutdown();
+    }
+
+    protected void checkCleanShutdown() throws MalformedObjectNameException
+    {
+        // check there are no leftover mbeans in mule domain
+        final String contextId = muleContext.getConfiguration().getId();
+        MBeanServer server = MBeanServerFactory.getOrCreateMBeanServer();
+        ObjectName oname = ObjectName.getInstance("Mule." + contextId + ":*");
+        Set mbeans = server.queryMBeans(oname, null);
+
+        assertEquals("Not all MBeans unregistered on context stop.", 0, mbeans.size());
     }
 
 }

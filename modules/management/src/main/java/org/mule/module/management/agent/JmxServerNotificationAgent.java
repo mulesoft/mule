@@ -72,7 +72,8 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
                 broadcastNotificationMbean.addNotificationListener(mbean, null, null);
                 mBeanServer.registerMBean(mbean, listenerObjectName);
             }
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             throw new InitialisationException(CoreMessages.failedToStart("JMX Server Notification Agent"), e, this);
         }
@@ -84,24 +85,29 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
      */
     public void dispose()
     {
-        try
+        if (listenerObjectName != null && mBeanServer.isRegistered(listenerObjectName))
         {
-            if (listenerObjectName != null)
+            try
             {
                 mBeanServer.unregisterMBean(listenerObjectName);
             }
-        } catch (Exception e)
-        {
-            logger.warn(e.getMessage(), e);
+            catch (Exception e)
+            {
+                logger.warn(e.getMessage(), e);
+            }
         }
-        try
+
+        if (broadcasterObjectName != null && mBeanServer.isRegistered(broadcasterObjectName))
         {
-            mBeanServer.unregisterMBean(broadcasterObjectName);
-        } catch (Exception e)
-        {
-            logger.warn(e.getMessage(), e);
-        }
-        super.dispose();
+            try
+            {
+                mBeanServer.unregisterMBean(broadcasterObjectName);
+            }
+            catch (Exception e)
+            {
+                logger.warn(e.getMessage(), e);
+            }
+        }        super.dispose();
     }
 
     /**
