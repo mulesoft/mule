@@ -353,120 +353,122 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         return connector.supportsProperty(JmsConstants.JMS_REPLY_TO);
     }
 
-    protected MessageConsumer createReplyToConsumer(Message currentMessage, MuleEvent event, Session session, Destination replyTo, boolean topic) throws JMSException
+    protected MessageConsumer createReplyToConsumer(Message currentMessage, MuleEvent event,
+                                                    Session session, Destination replyTo, boolean topic) throws JMSException
+    {
+        String selector = null;
+        //Only used by topics
+        String durableName = null;
+        //If we're not using
+        if (!(replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
         {
-            String selector = null;
-            //Only used by topics
-            String durableName = null;
-            //If we're not using
-            if (!(replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
+            String jmsCorrelationId = currentMessage.getJMSCorrelationID();
+            if (jmsCorrelationId == null)
             {
-                String jmsCorrelationId = currentMessage.getJMSCorrelationID();
-                if (jmsCorrelationId == null)
-                {
-                    jmsCorrelationId = currentMessage.getJMSMessageID();
-                }
-
-                //selector = "JMSCorrelationID='" + jmsCorrelationId + "'";
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("ReplyTo Selector is: " + selector);
-                }
+                jmsCorrelationId = currentMessage.getJMSMessageID();
             }
 
-            //We need to set the durableName and Selector if using topics
-            if (topic)
+            //selector = "JMSCorrelationID='" + jmsCorrelationId + "'";
+            if (logger.isDebugEnabled())
             {
-                String tempDurable = (String) event.getEndpoint().getProperties().get(JmsConstants.DURABLE_PROPERTY);
-                boolean durable = connector.isDurable();
-                if (tempDurable != null)
-                {
-                    durable = Boolean.valueOf(tempDurable).booleanValue();
-                }
-                // Get the durable subscriber name if there is one
-                durableName = (String) event.getEndpoint().getProperties().get(
-                        JmsConstants.DURABLE_NAME_PROPERTY);
-                if (durableName == null && durable && topic)
-                {
-                    durableName = "mule." + connector.getName() + "." + event.getEndpoint().getEndpointURI().getAddress();
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: " + durableName);
-                    }
-                }
+                logger.debug("ReplyTo Selector is: " + selector);
             }
-            return connector.getJmsSupport().createConsumer(session, replyTo, selector,
-                    connector.isNoLocal(), null, topic);
         }
 
-        protected Destination getReplyToDestination(Message message, Session session, MuleEvent event, boolean remoteSync, boolean topic) throws JMSException, EndpointException, InitialisationException
+        //We need to set the durableName and Selector if using topics
+        if (topic)
         {
-            Destination replyTo = null;
-
-            // Some JMS implementations might not support the ReplyTo property.
-            if (isHandleReplyTo(message, event))
+            String tempDurable = (String) event.getEndpoint().getProperties().get(JmsConstants.DURABLE_PROPERTY);
+            boolean durable = connector.isDurable();
+            if (tempDurable != null)
             {
-
-                Object tempReplyTo = event.getMessage().removeProperty(JmsConstants.JMS_REPLY_TO);
-                if (tempReplyTo == null)
+                durable = Boolean.valueOf(tempDurable);
+            }
+            // Get the durable subscriber name if there is one
+            durableName = (String) event.getEndpoint().getProperties().get(
+                    JmsConstants.DURABLE_NAME_PROPERTY);
+            if (durableName == null && durable && topic)
+            {
+                durableName = "mule." + connector.getName() + "." + event.getEndpoint().getEndpointURI().getAddress();
+                if (logger.isDebugEnabled())
                 {
-                    //It may be a Mule URI or global endpoint Ref
-                    tempReplyTo = event.getMessage().removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-                    if (tempReplyTo != null)
-                    {
-                        if (tempReplyTo.toString().startsWith("jms://"))
-                        {
-                            tempReplyTo = tempReplyTo.toString().substring(6);
-                        }
-                        else
-                        {
-                            EndpointBuilder epb = event.getMuleContext().getRegistry().lookupEndpointBuilder(tempReplyTo.toString());
-                            if (epb != null)
-                            {
-                                tempReplyTo = epb.buildOutboundEndpoint().getEndpointURI().getAddress();
-                            }
-                        }
-                    }
+                    logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: " +
+                                 durableName);
                 }
+            }
+        }
+        return connector.getJmsSupport().createConsumer(session, replyTo, selector,
+                                                        connector.isNoLocal(), null, topic);
+    }
+
+    protected Destination getReplyToDestination(Message message, Session session, MuleEvent event, boolean remoteSync, boolean topic) throws JMSException, EndpointException, InitialisationException
+    {
+        Destination replyTo = null;
+
+        // Some JMS implementations might not support the ReplyTo property.
+        if (isHandleReplyTo(message, event))
+        {
+
+            Object tempReplyTo = event.getMessage().removeProperty(JmsConstants.JMS_REPLY_TO);
+            if (tempReplyTo == null)
+            {
+                //It may be a Mule URI or global endpoint Ref
+                tempReplyTo = event.getMessage().removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
                 if (tempReplyTo != null)
                 {
-                    if (tempReplyTo instanceof Destination)
+                    if (tempReplyTo.toString().startsWith("jms://"))
                     {
-                        replyTo = (Destination) tempReplyTo;
+                        tempReplyTo = tempReplyTo.toString().substring(6);
                     }
                     else
                     {
-                        // TODO AP should this drill-down be moved into the resolver as well?
-                        boolean replyToTopic = false;
-                        String reply = tempReplyTo.toString();
-                        int i = reply.indexOf(":");
-                        if (i > -1)
+                        EndpointBuilder epb = event.getMuleContext().getRegistry().lookupEndpointBuilder(tempReplyTo.toString());
+                        if (epb != null)
                         {
-                            // TODO MULE-1409 this check will not work for ActiveMQ 4.x,
-                            // as they have temp-queue://<destination> and temp-topic://<destination> URIs
-                            // Extract to a custom resolver for ActiveMQ4.x
-                            // The code path can be exercised, e.g. by a LoanBrokerESBTestCase
-                            String qtype = reply.substring(0, i);
-                            replyToTopic = JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(qtype);
-                            reply = reply.substring(i + 1);
+                            tempReplyTo = epb.buildOutboundEndpoint().getEndpointURI().getAddress();
                         }
-                        replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
                     }
                 }
-                // Are we going to wait for a return event ?
-                if (remoteSync && replyTo == null && !disableTemporaryDestinations)
+            }
+            if (tempReplyTo != null)
+            {
+                if (tempReplyTo instanceof Destination)
                 {
-                    replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
+                    replyTo = (Destination) tempReplyTo;
+                }
+                else
+                {
+                    // TODO AP should this drill-down be moved into the resolver as well?
+                    boolean replyToTopic = false;
+                    String reply = tempReplyTo.toString();
+                    int i = reply.indexOf(":");
+                    if (i > -1)
+                    {
+                        // TODO MULE-1409 this check will not work for ActiveMQ 4.x,
+                        // as they have temp-queue://<destination> and temp-topic://<destination> URIs
+                        // Extract to a custom resolver for ActiveMQ4.x
+                        // The code path can be exercised, e.g. by a LoanBrokerESBTestCase
+                        String qtype = reply.substring(0, i);
+                        replyToTopic = JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(qtype);
+                        reply = reply.substring(i + 1);
+                    }
+                    replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
                 }
             }
-            return replyTo;
-
+            // Are we going to wait for a return event ?
+            if (remoteSync && replyTo == null && !disableTemporaryDestinations)
+            {
+                replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
+            }
         }
+        return replyTo;
 
-        protected void setQosProperties(Message message, MuleEvent event)
-        {
+    }
 
-        }
+    protected void setQosProperties(Message message, MuleEvent event)
+    {
+
+    }
 
     private class ReplyToListener implements MessageListener
     {
