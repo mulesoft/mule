@@ -368,6 +368,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 jmsCorrelationId = currentMessage.getJMSMessageID();
             }
 
+            // TODO ok, this jmsCorrelationId is never used. Why?
             //selector = "JMSCorrelationID='" + jmsCorrelationId + "'";
             if (logger.isDebugEnabled())
             {
