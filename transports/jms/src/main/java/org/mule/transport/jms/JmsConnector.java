@@ -19,6 +19,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.StartException;
+import org.mule.api.lifecycle.StopException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -194,6 +195,18 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         catch (NotificationException nex)
         {
             throw new InitialisationException(nex, this);
+        }
+
+        if (jmsSupport == null)
+        {
+            if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification))
+            {
+                jmsSupport = new Jms102bSupport(this);
+            }
+            else
+            {
+                jmsSupport = new Jms11Support(this);
+            }
         }
     }
 
@@ -429,21 +442,40 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
     }
 
+	  // TODO This might make retry work a bit better w/ JMS
+//    @Override
+//    protected boolean isAbleToConnect() throws Exception
+//    {
+//        logger.debug("Creating a temporary session to verify that we have a healthy connection...");
+//
+//        Connection connection;
+//        Session session;
+//        try
+//        {
+//            connection = createConnection();
+//            if (connection == null)
+//            {
+//                return false;
+//            }
+//            session = connection.createSession(false, 1);
+//            if (session == null)
+//            {
+//                return false;
+//            }
+//            session.close();
+//            connection.close();
+//            return true;
+//        }
+//        finally
+//        {
+//            session = null;
+//            connection = null;
+//        }
+//    }
+    
     @Override
     protected void doConnect() throws Exception
     {
-        if (jmsSupport == null)
-        {
-            if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification))
-            {
-                jmsSupport = new Jms102bSupport(this);
-            }
-            else
-            {
-                jmsSupport = new Jms11Support(this);
-            }
-        }
-
         connection = createConnection();
         if (started.get())
         {
@@ -564,7 +596,17 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     protected void doStop() throws MuleException
     {
-        // template method
+        if (connection != null)
+        {
+            try
+            {
+                connection.stop();
+            }
+            catch (JMSException e)
+            {
+                throw new StopException(CoreMessages.failedToStop("Jms Connection"), e, this);
+            }
+        }
     }
 
     public ReplyToHandler getReplyToHandler()
