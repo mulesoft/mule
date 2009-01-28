@@ -27,7 +27,6 @@ public class WebsphereTransactedJmsMessageReceiver extends XaTransactedJmsMessag
         super(umoConnector, service, endpoint);
     }
     
-    @Override
     protected void doConnect() throws Exception
     {
         if (connector.isConnected() && connector.isEagerConsumer())
@@ -35,7 +34,8 @@ public class WebsphereTransactedJmsMessageReceiver extends XaTransactedJmsMessag
             createConsumer();
         }
 
-        // TODO Move this check to the new isAbleToConnect() method, below
+        // TODO make it configurable. This connection blip is killing performance with WMQ, session create() and close()
+        // are the heaviest operations there, synchronizing on a global QM for this machine
         // MULE-1150 check whether mule is really connected    
         if (connector.isConnected() && !this.connected.get() && connector.getSessionFromTransaction() == null)
         {
@@ -44,23 +44,6 @@ public class WebsphereTransactedJmsMessageReceiver extends XaTransactedJmsMessag
             s.close();
         }
     }
-    
-//    @Override
-//    protected boolean isAbleToConnect() throws Exception
-//    {
-//        // check connection by creating session
-//        Session s = null;
-//        try
-//        {
-//            s = connector.getConnection().createSession(false, 1);
-//            s.close();
-//        }
-//        finally
-//        {
-//            s = null;
-//        }
-//        return true;
-//    }
 }
 
 
