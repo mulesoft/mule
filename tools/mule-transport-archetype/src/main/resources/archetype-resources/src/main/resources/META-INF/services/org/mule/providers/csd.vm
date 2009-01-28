@@ -4,7 +4,7 @@
 # For a full list of properties that can be set here see -
 # http://mule.mulesource.org/x/FwKV
 
-# The connector class for your transport. This is alwas required
+# The connector class for your transport. This is always required
 connector=org.mule.transport.${ModuleNameLower}.${ModuleName}Connector
 
 #if( $hasCustomMessageAdapter == "y")
