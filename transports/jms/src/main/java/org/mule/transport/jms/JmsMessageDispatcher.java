@@ -470,7 +470,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
     }
 
-    private class ReplyToListener implements MessageListener
+    protected class ReplyToListener implements MessageListener
     {
         private final Latch latch;
         private volatile Message message;
