@@ -50,6 +50,7 @@ import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
@@ -246,7 +247,7 @@ public abstract class AbstractConnector
     protected MuleContext muleContext;
 
     protected final AtomicBoolean initialised = new AtomicBoolean(false);
-    protected final WaitableBoolean connected = new WaitableBoolean(false);
+    protected final AtomicBoolean connected = new AtomicBoolean(false);
     protected final AtomicBoolean started = new AtomicBoolean(false);
     protected final AtomicBoolean disposed = new AtomicBoolean(false);
 
@@ -1384,13 +1385,28 @@ public abstract class AbstractConnector
             return;
         }
 
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Connecting: " + this);
+        }
+            
         retryPolicyTemplate.execute(
             new RetryCallback()
             {
                 public void doWork(RetryContext context) throws Exception
                 {
+                    if (!isAbleToConnect())
+                    {
+                        throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"), null);
+                    }
                     doConnect();
                     setConnected(true);
+                    
+                    logger.info("Connected: " + getWorkDescription());
+                    // TODO Make this work somehow inside the RetryTemplate
+                    //muleContext.fireNotification(new ConnectionNotification(this, getConnectEventId(),
+                    //    ConnectionNotification.CONNECTION_CONNECTED));
+                    
                     if (startOnConnect)
                     {
                         start();
@@ -1406,13 +1422,25 @@ public abstract class AbstractConnector
         );
     }
 
+    /**
+    * Override this method to test whether the connector is able to connect to its resource(s).
+    * This will allow a retry policy to go into effect in the case of failure.
+    *
+    * @return true if the connector is able to connect successfully
+    * @throws Exception if the connector fails to connect
+    */
+    protected boolean isAbleToConnect() throws Exception
+    {
+        return true;
+    }
+
     public void disconnect() throws Exception
     {
         startOnConnect = isStarted();
-
+        
         this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
             ConnectionNotification.CONNECTION_DISCONNECTED));
-
+        // TODO Shouldn't this come at the end of the method, after the receivers have been disconnected?
         connected.set(false);
 
         try
@@ -1424,7 +1452,7 @@ public abstract class AbstractConnector
                     MessageReceiver receiver = (MessageReceiver) iterator.next();
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Disonnecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                        logger.debug("Disconnecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
                     }
                     receiver.disconnect();
                 }
@@ -1449,6 +1477,8 @@ public abstract class AbstractConnector
                     }
                 }
             }
+            
+            // TODO Shouldn't stop() come before disconnect(), not after ?
             if (this.isStarted())
             {
                 this.stop();

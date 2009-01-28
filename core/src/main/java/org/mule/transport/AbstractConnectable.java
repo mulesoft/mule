@@ -10,7 +10,6 @@
 
 package org.mule.transport;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -21,6 +20,7 @@ import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connectable;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.util.ClassUtils;
 import org.mule.util.concurrent.WaitableBoolean;
@@ -159,6 +159,11 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             throw new IllegalStateException("Requester/dispatcher has been disposed; cannot connect to resource");
         }
 
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Connecting: " + this);
+        }
+            
         retryTemplate.execute(
             new RetryCallback()
             {
@@ -166,8 +171,18 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
                 {
                     try
                     {
+                        if (!isAbleToConnect())
+                        {
+                            throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"), null);
+                        }
                         doConnect();
                         connected.set(true);
+                        
+                        logger.info("Connected: " + getWorkDescription());
+                        // TODO Make this work somehow inside the RetryTemplate
+                        //connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
+                        //    ConnectionNotification.CONNECTION_CONNECTED));
+                        
                         if (startOnConnect)
                         {
                             start();
@@ -192,6 +207,18 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         );
     }
 
+    /**
+     * Override this method to test whether the connector is able to connect to its resource(s).
+     * This will allow a retry policy to go into effect in the case of failure.
+     *
+     * @return true if the connector is able to connect successfully
+     * @throws Exception if the connector fails to connect
+     */
+    protected boolean isAbleToConnect() throws Exception
+    {
+        return true;
+    }
+    
     public final synchronized void disconnect() throws Exception
     {
         if (!connected.get())
@@ -208,7 +235,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         connected.set(false);
 
         logger.info("Disconnected: " + this);
-
         connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
             ConnectionNotification.CONNECTION_DISCONNECTED));
     }
@@ -238,12 +264,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         return "endpoint.outbound." + endpoint.getEndpointURI().toString();
     }
 
-    public synchronized void reconnect() throws Exception
-    {
-        disconnect();
-        connect();
-    }
-
     public final void start() throws MuleException
     {
         if(!connected.get())
@@ -264,7 +284,13 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
 
         if (started.compareAndSet(false, true))
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Starting: " + this);
+            }
             doStart();
+            // TODO It seems like a good idea to reset this variable here
+            //startOnConnect = false;
         }
     }
 
@@ -287,6 +313,10 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         {
             try
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Stopping: " + this);
+                }
                 doStop();
             }
             catch (MuleException e)
@@ -308,14 +338,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         // nothing to do by default
     }
 
-    /** 
-     * Override this method to do any processing which needs to happen before connecting. 
-     */
-    protected void doPreConnect(MuleEvent event) throws Exception
-    {
-        // nothing to do by default
-    }
-    
     protected void doConnect() throws Exception
     {
         // nothing to do by default

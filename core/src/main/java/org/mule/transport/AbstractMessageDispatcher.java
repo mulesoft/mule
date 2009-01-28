@@ -158,7 +158,6 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         try
         {
             // Make sure we are connected
-            doPreConnect(event);
             connect();
 
             MuleMessage result = doSend(event);
@@ -259,7 +258,6 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 event = RequestContext.setEvent(event);
 
                 // Make sure we are connected
-                doPreConnect(event);
                 connect();
                 doDispatch(event);
 
