@@ -213,7 +213,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic);
 
-            if (useReplyToDestination && replyTo!=null)
+            if (useReplyToDestination && replyTo != null)
             {
                 consumer = createReplyToConsumer(msg, event, session, replyTo, topic);
 

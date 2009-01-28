@@ -11,48 +11,47 @@
 
     <jms:activemq-connector name="jmsConnector"
                             acknowledgementMode="CLIENT_ACKNOWLEDGE"
-                            specification="1.1"/>
+                            specification="1.1"
+                            disableTemporaryReplyToDestinations="true"/>
 
     <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
     <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector"/>
     <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
 
-    <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
-
     <model name="jmsTest">
 
         <service name="InputPart">
             <inbound>
-                <inbound-endpoint ref="in">
-                    <jms:transaction action="BEGIN_OR_JOIN"/>
-                </inbound-endpoint>
+                <jms:inbound-endpoint ref="in">
+                    <jms:client-ack-transaction action="BEGIN_OR_JOIN"/>
+                </jms:inbound-endpoint>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="middle" transformer-refs="ObjectToJMSMessage">
-                        <jms:transaction action="NONE"/>
-                    </outbound-endpoint>
+                    <jms:outbound-endpoint ref="middle">
+                        <jms:client-ack-transaction action="NONE"/>
+                    </jms:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="JmsClientAcknowledgeTransactionFactory">
             <inbound>
-                <inbound-endpoint ref="middle">
-                    <jms:transaction action="ALWAYS_BEGIN"/>
-                </inbound-endpoint>
+                <jms:inbound-endpoint ref="middle">
+                    <jms:client-ack-transaction action="ALWAYS_BEGIN"/>
+                </jms:inbound-endpoint>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage">
-                        <jms:transaction action="NONE"/>
-                    </outbound-endpoint>
+                    <jms:outbound-endpoint ref="out">
+                        <jms:client-ack-transaction action="NONE"/>
+                    </jms:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
