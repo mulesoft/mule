@@ -466,6 +466,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
     }
 
+    // TODO Ross, this new method must go hand-in-hand with honorQosHeaders flag in doDispatch()
     protected void setQosProperties(Message message, MuleEvent event)
     {
 
