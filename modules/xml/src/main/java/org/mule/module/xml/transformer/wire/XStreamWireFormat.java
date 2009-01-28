@@ -44,7 +44,7 @@ public class XStreamWireFormat extends TransformerPairWireFormat
         out.setConverters(converters);
         // TODO This is currently needed as a workaround for MULE-2881, this needs to
         // be removed is this is not the solution to MULE-2881
-        out.setAcceptUMOMessage(true);
+        out.setAcceptMuleMessage(true);
         setOutboundTransformer(out);
     }
 

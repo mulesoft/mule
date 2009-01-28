@@ -55,7 +55,7 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
     public void testObjectToXml()
     {
         ObjectToXml objectToXml = (ObjectToXml) getAndTestTransformer("objectToXml", ObjectToXml.class);
-        assertTrue(objectToXml.isAcceptUMOMessage());
+        assertTrue(objectToXml.isAcceptMuleMessage());
     }
 
     public void testXmlToDom()
@@ -98,7 +98,7 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
     public void testObjectToXmlOnEndpoint() throws MuleException
     {
         ObjectToXml objectToXml = (ObjectToXml) getAndTestEndpointTransformer("ep3", ObjectToXml.class);
-        assertTrue(objectToXml.isAcceptUMOMessage());
+        assertTrue(objectToXml.isAcceptMuleMessage());
     }
 
     public void testXmlToDomOnEndpoint() throws MuleException

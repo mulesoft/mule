@@ -31,7 +31,7 @@
             ignoreBadInput="true"
             returnClass="java.lang.Object"
             name="objectToXml"
-            acceptUMOMessage="true"/>
+            acceptMuleMessage="true"/>
 
     <mxml:xml-to-dom-transformer
             ignoreBadInput="true"
@@ -79,7 +79,7 @@
     </endpoint>
     
     <endpoint name="ep3" address="vm://3">
-        <mxml:object-to-xml-transformer  acceptUMOMessage="true"/>
+        <mxml:object-to-xml-transformer  acceptMuleMessage="true"/>
     </endpoint>
     
     <endpoint name="ep4" address="vm://4">

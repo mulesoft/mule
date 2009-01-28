@@ -52,7 +52,7 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
     public Transformer getTransformer() throws Exception
     {
         ObjectToXml t = new ObjectToXml();
-        t.setAcceptUMOMessage(true);
+        t.setAcceptMuleMessage(true);
         return t;
     }
 

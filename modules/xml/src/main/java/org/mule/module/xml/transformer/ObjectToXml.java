@@ -32,12 +32,12 @@ public class ObjectToXml extends AbstractXStreamTransformer
         this.setReturnClass(String.class);
     }
 
-    public boolean isAcceptUMOMessage()
+    public boolean isAcceptMuleMessage()
     {
         return this.sourceTypes.contains(MuleMessage.class);
     }
 
-    public void setAcceptUMOMessage(boolean value)
+    public void setAcceptMuleMessage(boolean value)
     {
         if (value)
         {
@@ -58,7 +58,7 @@ public class ObjectToXml extends AbstractXStreamTransformer
          * can be useful for protocols such as tcp where the protocol does not
          * support headers, thus the whole messgae needs to be serialized
          */
-        if (this.isAcceptUMOMessage())
+        if (this.isAcceptMuleMessage())
         {
             src = message;
         }
