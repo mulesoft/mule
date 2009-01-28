@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.FatalException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -40,6 +39,7 @@ import javax.resource.spi.work.WorkException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,7 +50,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 {
-    protected final BlockingDeque consumers;
+    protected BlockingDeque consumers;
 
     protected volatile int receiversCount;
 
@@ -78,11 +78,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         {
             logger.debug("Creating " + receiversCount + " sub-receivers for " + endpoint.getEndpointURI());
         }
-        consumers = new LinkedBlockingDeque(receiversCount);
-        for (int i = 0; i < receiversCount; i++)
-        {
-            consumers.addLast(new SubReceiver());
-        }
     }
 
     protected void doStart() throws MuleException
@@ -105,16 +100,19 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
     protected void doStop() throws MuleException
     {
         logger.debug("doStop()");
-        for (int i = 0; i < receiversCount; i++)
+        if (consumers != null)
         {
-            SubReceiver sub = (SubReceiver) consumers.removeFirst();
-            try
+            for (int i = 0; i < receiversCount; i++)
             {
-                sub.doStop();
-            }
-            finally
-            {
-                consumers.addLast(sub);
+                SubReceiver sub = (SubReceiver) consumers.removeFirst();
+                try
+                {
+                    sub.doStop();
+                }
+                finally
+                {
+                    consumers.addLast(sub);
+                }
             }
         }
     }
@@ -122,41 +120,38 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
     protected void doConnect() throws Exception
     {
         logger.debug("doConnect()");
+
+        consumers = new LinkedBlockingDeque(receiversCount);
         for (int i = 0; i < receiversCount; i++)
         {
-            SubReceiver sub = (SubReceiver) consumers.removeFirst();
-            try
-            {
-                sub.doConnect();
-            }
-            catch (FatalException fex)
-            {
-                sub.doDisconnect();
-                throw fex;
-            }
-            finally
-            {
-                consumers.addLast(sub);
-            }
+            SubReceiver sub = new SubReceiver();
+            sub.doConnect();
+            consumers.addLast(sub);
         }
     }
 
     protected void doDisconnect() throws Exception
     {
         logger.debug("doDisconnect()");
-        for (int i = 0; i < receiversCount; i++)
-        {
-            SubReceiver sub = (SubReceiver) consumers.removeFirst();
-            try
-            {
-                sub.doDisconnect();
-            }
-            finally
-            {
-                consumers.addLast(sub);
-            }
-        }
 
+        if (consumers != null)
+        {
+            SubReceiver sub;
+            for (int i = 0; i < receiversCount; i++)
+            {
+                sub = (SubReceiver) consumers.removeFirst();
+                try
+                {
+                    sub.doDisconnect();
+                }
+                finally
+                {
+                    sub = null;
+                }
+            }
+            consumers.clear();
+            consumers = null;
+        }
     }
 
     protected void doDispose()
@@ -170,22 +165,33 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         private volatile Session session;
         private volatile MessageConsumer consumer;
-        private volatile boolean startOnConnect = false;
 
-        protected void doConnect() throws Exception
+        protected volatile boolean connected;
+        protected volatile boolean started;
+        
+        protected void doConnect() throws MuleException
         {
             subLogger.debug("SUB doConnect()");
-            createConsumer();
-            if (startOnConnect)
+            try
             {
-                doStart();
+                createConsumer();
             }
+            catch (Exception e)
+            {
+                throw new LifecycleException(e, this);
+            }
+            connected = true;
         }
 
-        protected void doDisconnect() throws Exception
+        protected void doDisconnect() throws MuleException
         {
             subLogger.debug("SUB doDisconnect()");
+            if (started)
+            {
+                doStop();
+            }
             closeConsumer();
+            connected = false;
         }
 
         protected void closeConsumer()
@@ -199,21 +205,15 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         protected void doStart() throws MuleException
         {
             subLogger.debug("SUB doStart()");
-
+            if (!connected)
+            {
+                doConnect();
+            }
+            
             try
             { 
-                // If the consumer is null it means that the connection strategy is being
-                // run in a separate thread (doThreading=true), and hasn't managed to connect 
-                // yet. This doStart will then be called from doConnect.
-                if (consumer == null)
-                {
-                    startOnConnect = true;
-                }
-                else
-                {
-                    startOnConnect = false;
-                    consumer.setMessageListener(this);
-                }
+                consumer.setMessageListener(this);
+                started = true;
             }
             catch (JMSException e)
             {
@@ -231,6 +231,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 {
                     consumer.setMessageListener(null);
                 }
+                started = false;
             }
             catch (JMSException e)
             {
