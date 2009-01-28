@@ -13,6 +13,8 @@
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.2"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.2/mule.xsd"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/schemadoc/2.2"
+                schemaLocation="http://www.mulesource.org/schema/mule/schemadoc/2.2/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -30,7 +32,7 @@
             </schemadoc:additional-documentation>
         </xsd:appinfo>
     </xsd:annotation>
-    
+
     <!-- xml filters -->
 
     <xsd:element name="is-xml-filter" type="mule:abstractFilterType" substitutionGroup="mule:abstract-filter">
@@ -98,7 +100,7 @@
     <xsd:complexType name="jaxenFilterType">
         <xsd:annotation>
             <xsd:documentation>
-                The Jaxen filter allows you to route messages based on XPath expressions. 
+                The Jaxen filter allows you to route messages based on XPath expressions.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
@@ -227,7 +229,7 @@
     <xsd:element name="dom-to-xml-transformer" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Converts an XML payload (Document, XML stream, Source, etc.) to a serialized String representation. 
+                Converts an XML payload (Document, XML stream, Source, etc.) to a serialized String representation.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -249,7 +251,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:complexType name="jxpathExtractorType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
@@ -301,7 +303,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:complexType name="objectToXmlType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
@@ -319,7 +321,7 @@
     <xsd:element name="xml-to-dom-transformer" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Transforms an XML message payload to an org.w3c.dom.Document.  
+                Transforms an XML message payload to an org.w3c.dom.Document.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -531,7 +533,7 @@
                             added to the Manager.
                         </xsd:documentation>
                     </xsd:annotation>
-                </xsd:attribute>                
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
