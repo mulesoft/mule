@@ -171,4 +171,3 @@ xmlsec-1.4.0-osgi
 xmlunit-1.1
 xpp3_min-1.1.3.4.O-osgi
 xstream-1.2.2-osgi
-yjp-controller-api-redist-7.0.10-osgi

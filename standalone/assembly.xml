@@ -8,18 +8,18 @@
 
   <fileSets>
     <fileSet>
-      <directory>../src/main/resources</directory>
+      <directory>src/main/resources</directory>
       <outputDirectory></outputDirectory>
     </fileSet>
 
     <!-- Make binary directories executable. -->
     <fileSet>
-      <directory>../src/main/resources/bin</directory>
+      <directory>src/main/resources/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <fileMode>755</fileMode>
     </fileSet>
     <fileSet>
-      <directory>../src/main/resources/bin</directory>
+      <directory>src/main/resources/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <fileMode>644</fileMode>
       <includes>
@@ -27,12 +27,12 @@
       </includes>
     </fileSet>
     <fileSet>
-      <directory>../src/main/resources/lib/boot/exec</directory>
+      <directory>src/main/resources/lib/boot/exec</directory>
       <outputDirectory>lib/boot/exec</outputDirectory>
       <fileMode>755</fileMode>
     </fileSet>
     <fileSet>
-      <directory>../src/main/resources/lib/boot/exec</directory>
+      <directory>src/main/resources/lib/boot/exec</directory>
       <outputDirectory>lib/boot/exec</outputDirectory>
       <fileMode>644</fileMode>
       <includes>
@@ -42,7 +42,7 @@
 
     <!-- Copy the USAGE.txt file to the root directory for visibility -->
     <fileSet>
-      <directory>../src/main/resources/bin</directory>
+      <directory>src/main/resources/bin</directory>
       <outputDirectory></outputDirectory>
       <includes>
           <include>USAGE.txt</include>
@@ -51,7 +51,7 @@
 
     <!-- Copy javadocs (the build must be run with -DperformRelease=true) -->
     <fileSet>
-      <directory>../../../target/site/apidocs</directory>
+      <directory>../../target/site/apidocs</directory>
       <outputDirectory>docs/api</outputDirectory>
     </fileSet>
 
@@ -76,7 +76,7 @@
     the executable scripts.
     -->
     <fileSet>
-        <directory>../../../examples</directory>
+        <directory>../../examples</directory>
         <outputDirectory>examples</outputDirectory>
         <excludes>
             <exclude>pom.xml</exclude>
@@ -99,11 +99,11 @@
     ============================
     -->
     <fileSet>
-        <directory>../../../examples/echo/dist</directory>
+        <directory>../../examples/echo/dist</directory>
         <outputDirectory>examples/echo</outputDirectory>
     </fileSet>
     <fileSet>
-        <directory>../../../examples/echo/dist</directory>
+        <directory>../../examples/echo/dist</directory>
         <outputDirectory>examples/echo</outputDirectory>
         <fileMode>755</fileMode>
         <includes>
@@ -118,11 +118,11 @@
     ==================================
     -->
     <fileSet>
-        <directory>../../../examples/errorhandler/dist</directory>
+        <directory>../../examples/errorhandler/dist</directory>
         <outputDirectory>examples/errorhandler</outputDirectory>
     </fileSet>
     <fileSet>
-        <directory>../../../examples/errorhandler/dist</directory>
+        <directory>../../examples/errorhandler/dist</directory>
         <outputDirectory>examples/errorhandler</outputDirectory>
         <fileMode>755</fileMode>
         <includes>
@@ -137,11 +137,11 @@
     ============================
     -->
     <fileSet>
-        <directory>../../../examples/hello/dist</directory>
+        <directory>../../examples/hello/dist</directory>
         <outputDirectory>examples/hello</outputDirectory>
     </fileSet>
     <fileSet>
-        <directory>../../../examples/hello/dist</directory>
+        <directory>../../examples/hello/dist</directory>
         <outputDirectory>examples/hello</outputDirectory>
         <fileMode>755</fileMode>
         <includes>
@@ -156,11 +156,11 @@
     ===============================
     -->
     <fileSet>
-        <directory>../../../examples/loanbroker/dist</directory>
+        <directory>../../examples/loanbroker/dist</directory>
         <outputDirectory>examples/loanbroker</outputDirectory>
     </fileSet>
     <fileSet>
-        <directory>../../../examples/loanbroker/dist</directory>
+        <directory>../../examples/loanbroker/dist</directory>
         <outputDirectory>examples/loanbroker</outputDirectory>
         <fileMode>755</fileMode>
         <includes>
@@ -170,26 +170,26 @@
     </fileSet>
     <!-- Common classes -->
     <fileSet>
-        <directory>../../../examples/loanbroker/common/dist</directory>
+        <directory>../../examples/loanbroker/common/dist</directory>
         <outputDirectory>examples/loanbroker/common</outputDirectory>
     </fileSet>
     <fileSet>
-        <directory>../../../examples/loanbroker/common-tests/dist</directory>
+        <directory>../../examples/loanbroker/common-tests/dist</directory>
         <outputDirectory>examples/loanbroker/common-tests</outputDirectory>
     </fileSet>
     <!-- Credit Agency EJB -->
     <fileSet>
-        <directory>../../../examples/loanbroker/credit-agency/dist</directory>
+        <directory>../../examples/loanbroker/credit-agency/dist</directory>
         <outputDirectory>examples/loanbroker/credit-agency</outputDirectory>
     </fileSet>
     <!-- LoanBroker ESB -->
     <fileSet>
-        <directory>../../../examples/loanbroker/esb/dist</directory>
+        <directory>../../examples/loanbroker/esb/dist</directory>
         <outputDirectory>examples/loanbroker/esb</outputDirectory>
     </fileSet>
     <!-- OpenEJB needs a direct path to the openejb.conf file (i.e., it can't find it from within a jar) -->
     <fileSet>
-        <directory>../../../examples/loanbroker/esb/src/main/resources</directory>
+        <directory>../../examples/loanbroker/esb/src/main/resources</directory>
         <outputDirectory>lib/user</outputDirectory>
         <includes>
             <include>openejb.conf</include>
@@ -198,12 +198,12 @@
     </fileSet>
     <!-- LoanBroker ESN -->
     <fileSet>
-        <directory>../../../examples/loanbroker/esn/dist</directory>
+        <directory>../../examples/loanbroker/esn/dist</directory>
         <outputDirectory>examples/loanbroker/esn</outputDirectory>
     </fileSet>
     <!-- LoanBroker BPM -->
     <fileSet>
-        <directory>../../../examples/loanbroker/bpm/dist</directory>
+        <directory>../../examples/loanbroker/bpm/dist</directory>
         <outputDirectory>examples/loanbroker/bpm</outputDirectory>
     </fileSet>
 
@@ -213,11 +213,11 @@
     =============================
     -->
     <fileSet>
-        <directory>../../../examples/scripting/dist</directory>
+        <directory>../../examples/scripting/dist</directory>
         <outputDirectory>examples/scripting</outputDirectory>
     </fileSet>
     <fileSet>
-        <directory>../../../examples/scripting/dist</directory>
+        <directory>../../examples/scripting/dist</directory>
         <outputDirectory>examples/scripting</outputDirectory>
         <fileMode>755</fileMode>
         <includes>
@@ -232,11 +232,11 @@
     ===============================
     -->
     <fileSet>
-        <directory>../../../examples/stockquote/dist</directory>
+        <directory>../../examples/stockquote/dist</directory>
         <outputDirectory>examples/stockquote</outputDirectory>
     </fileSet>
     <fileSet>
-        <directory>../../../examples/stockquote/dist</directory>
+        <directory>../../examples/stockquote/dist</directory>
         <outputDirectory>examples/stockquote</outputDirectory>
         <fileMode>755</fileMode>
         <includes>
@@ -251,26 +251,26 @@
     ============================
     -->
     <fileSet>
-        <directory>../../../examples/webapp/dist</directory>
+        <directory>../../examples/webapp/dist</directory>
         <outputDirectory>examples/webapp</outputDirectory>
     </fileSet>
     <!-- Copy configs from other examples -->
     <fileSet>
-        <directory>../../../examples/echo/conf</directory>
+        <directory>../../examples/echo/conf</directory>
         <outputDirectory>examples/webapp/conf</outputDirectory>
         <includes>
             <include>echo-config.xml</include>
         </includes>
     </fileSet>
     <fileSet>
-        <directory>../../../examples/hello/conf</directory>
+        <directory>../../examples/hello/conf</directory>
         <outputDirectory>examples/webapp/conf</outputDirectory>
         <includes>
             <include>hello-http-config.xml</include>
         </includes>
     </fileSet>
     <fileSet>
-        <directory>../../../examples/loanbroker/esn/conf</directory>
+        <directory>../../examples/loanbroker/esn/conf</directory>
         <outputDirectory>examples/webapp/conf</outputDirectory>
         <includes>
             <include>loan-broker-sync-config.xml</include>
@@ -278,7 +278,7 @@
         </includes>
     </fileSet>
     <fileSet>
-        <directory>../../../examples/stockquote/conf</directory>
+        <directory>../../examples/stockquote/conf</directory>
         <outputDirectory>examples/webapp/conf</outputDirectory>
         <includes>
             <include>stockquote-rest-config.xml</include>
@@ -291,7 +291,7 @@
     ============================
     -->
     <fileSet>
-        <directory>../../../examples/bookstore/dist</directory>
+        <directory>../../examples/bookstore/dist</directory>
         <outputDirectory>examples/bookstore</outputDirectory>
     </fileSet>
   </fileSets>
@@ -311,8 +311,8 @@
       <outputDirectory>lib/boot</outputDirectory>
       <includes>
         <include>org.mule.modules:mule-module-boot</include>
-        <include>commons-cli:commons-cli.osgi</include>
-        <include>tanukisoft:wrapper.osgi</include>
+        <include>commons-cli:commons-cli</include>
+        <include>tanukisoft:wrapper</include>
         <include>org.slf4j:slf4j-api</include>
         <include>org.slf4j:jcl104-over-slf4j</include>
         <include>org.slf4j:slf4j-log4j12</include>
@@ -439,8 +439,8 @@
         <exclude>org.mule.tests:mule-tests-functional</exclude>
         
         <!-- lib/boot -->
-        <exclude>commons-cli:commons-cli.osgi</exclude>
-        <exclude>tanukisoft:wrapper.osgi</exclude>
+        <exclude>commons-cli:commons-cli</exclude>
+        <exclude>tanukisoft:wrapper</exclude>
         <exclude>org.slf4j:slf4j-api</exclude>
         <exclude>org.slf4j:jcl104-over-slf4j</exclude>
         <exclude>org.slf4j:slf4j-log4j12</exclude>
@@ -453,7 +453,7 @@
         <exclude>xalan:xalan</exclude>
 
         <!-- Distributed separately in profiler pack -->
-        <exclude>com.yourkit:yjp-controller-api-redist.osgi</exclude>
+        <exclude>com.yourkit:yjp-controller-api-redist</exclude>
       </excludes>
     </dependencySet>
 
