@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -31,15 +32,17 @@ import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.MessageEOFException;
+import javax.jms.MessageFormatException;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
-import javax.jms.MessageFormatException;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>JmsMessageUtils</code> contains helper method for dealing with JMS
@@ -49,6 +52,8 @@ public class JmsMessageUtils
 {
     public static final char REPLACEMENT_CHAR = '_';
 
+    private static final Log logger = LogFactory.getLog(JmsMessageUtils.class);
+
     /**
      * Encode a String so that is is a valid JMS header name
      *
@@ -57,6 +62,9 @@ public class JmsMessageUtils
      */
     public static String encodeHeader(String name)
     {
+        // check against JMS 1.1 spec, sections 3.5.1 (3.8.1.1)
+        boolean nonCompliant = false;
+
         if (StringUtils.isEmpty(name))
         {
             throw new IllegalArgumentException("Header name to encode must not be null or empty");
@@ -83,8 +91,18 @@ public class JmsMessageUtils
                 if (!Character.isJavaIdentifierPart(sb.charAt(j)))
                 {
                     sb.setCharAt(j, REPLACEMENT_CHAR);
+                    nonCompliant = true;
                 }
             }
+
+            if (nonCompliant)
+            {
+                logger.warn(MessageFormat.format(
+                        "Header: {0} is not compliant with JMS specification (sec. 3.5.1, 3.8.1.1). It will cause " +
+                        "problems in your and other applications. Please update your application code to correct this. " +
+                        "Mule renamed it to {1}", name, sb.toString()));
+            }
+
             return sb.toString();
         }
     }
