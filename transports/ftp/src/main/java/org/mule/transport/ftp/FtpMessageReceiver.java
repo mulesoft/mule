@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
+import org.mule.transport.ConnectException;
 import org.mule.transport.file.FileConnector;
 
 import java.io.FilenameFilter;
@@ -70,6 +71,10 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     public void poll() throws Exception
     {
         FTPFile[] files = listFiles();
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Polling: " + files.length + " new file(s)");
+        }
 
         synchronized (scheduledFiles)
         {
@@ -131,8 +136,6 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void processFile(FTPFile file) throws Exception
     {
-        logger.debug("entering processFile()");
-
         FTPClient client = null;
         try
         {
@@ -161,7 +164,6 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         }
         finally
         {
-            logger.debug("leaving processFile()");
             if (client != null)
             {
                 connector.releaseFtp(endpoint.getEndpointURI(), client);
@@ -181,10 +183,27 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     
     protected void doConnect() throws Exception
     {
-        // why?!
-        //connector.releaseFtp(getEndpointURI());
+        // no op
     }
 
+    @Override
+    protected boolean isAbleToConnect() throws Exception
+    {
+        final FTPClient client = connector.createFtpClient(endpoint);
+        try
+        {
+            client.sendNoOp();
+            client.logout();
+            client.disconnect();
+            return true;
+        }
+        finally
+        {
+            connector.releaseFtp(endpoint.getEndpointURI(), client);
+            Thread.sleep(1000);
+        }
+    }
+        
     protected void doDisconnect() throws Exception
     {
         // no op

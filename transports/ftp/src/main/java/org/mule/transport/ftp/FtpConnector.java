@@ -83,7 +83,7 @@ public class FtpConnector extends AbstractConnector
      */
     private boolean validateConnections = true;
 
-    private Map pools = new HashMap();
+    private Map pools;
 
     private String connectionFactoryClass = DEFAULT_FTP_CONNECTION_FACTORY_CLASS;
 
@@ -265,14 +265,14 @@ public class FtpConnector extends AbstractConnector
 
     protected void doStart() throws MuleException
     {
-        // template method
+        pools = new HashMap();
     }
 
     protected void doStop() throws MuleException
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("!!! stopping all pools");
+            logger.debug("Stopping all pools");
         }
         try
         {
@@ -285,6 +285,11 @@ public class FtpConnector extends AbstractConnector
         catch (Exception e)
         {
             throw new ConnectorException(CoreMessages.failedToStop("FTP Connector"), this, e);
+        }
+        finally
+        {
+            pools.clear();
+            pools = null;
         }
     }
 
