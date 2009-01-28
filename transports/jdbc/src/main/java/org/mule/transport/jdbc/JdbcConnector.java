@@ -352,7 +352,14 @@ public class JdbcConnector extends AbstractConnector
 
     protected void doConnect() throws Exception
     {
-        // Simply verify that we are able to connect to the DataSource (needed for retry policies)
+        // template method
+    }
+
+    /** 
+     * Verify that we are able to connect to the DataSource (needed for retry policies) 
+     */
+    protected boolean isAbleToConnect() throws Exception
+    {
         Connection con;
         try
         {
@@ -361,6 +368,7 @@ public class JdbcConnector extends AbstractConnector
             {
                 con.close();
             }
+            return true;
         }
         finally
         {
