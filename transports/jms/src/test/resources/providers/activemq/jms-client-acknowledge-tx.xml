@@ -10,7 +10,8 @@
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
 
     <jms:activemq-connector name="jmsConnector"
-                            acknowledgementMode="CLIENT_ACKNOWLEDGE"/>
+                            acknowledgementMode="CLIENT_ACKNOWLEDGE"
+                            specification="1.1"/>
 
     <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
     <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector"/>
