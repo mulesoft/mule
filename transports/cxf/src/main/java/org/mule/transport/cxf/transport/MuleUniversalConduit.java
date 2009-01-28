@@ -10,6 +10,8 @@
 
 package org.mule.transport.cxf.transport;
 
+import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
@@ -38,11 +40,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
-import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -62,7 +64,7 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
 public class MuleUniversalConduit extends AbstractConduit
 {
 
-    private static final Logger LOGGER = Logger.getLogger(MuleUniversalConduit.class.getName());
+    private static final Logger LOGGER = LogUtils.getL7dLogger(MuleUniversalConduit.class);
 
     private EndpointInfo endpoint;
 

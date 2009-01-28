@@ -15,10 +15,16 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 
 public class UsernameTokenTestCase extends FunctionalTestCase
 {
-    public void testUsernameToken() throws Exception
+    @Override
+    protected void doSetUp() throws Exception
     {
         ClientPasswordCallback.setPassword("password");
         
+        super.doSetUp();
+    }
+
+    public void testUsernameToken() throws Exception
+    {
         GreeterImpl impl = getGreeter();
         
         int i = 0;
