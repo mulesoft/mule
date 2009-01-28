@@ -199,15 +199,28 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
         if (jmsSupport == null)
         {
-            if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification))
-            {
-                jmsSupport = new Jms102bSupport(this);
-            }
-            else
-            {
-                jmsSupport = new Jms11Support(this);
-            }
+            jmsSupport = createJmsSupport();
         }
+    }
+
+    /**
+     * A factory method to create various JmsSupport class versions.
+     * @return JmsSupport instance
+     * @see JmsSupport
+     */
+    protected JmsSupport createJmsSupport()
+    {
+        final JmsSupport result;
+        if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification))
+        {
+            result = new Jms102bSupport(this);
+        }
+        else
+        {
+            result = new Jms11Support(this);
+        }
+
+        return result;
     }
 
     protected ConnectionFactory createConnectionFactory() throws InitialisationException, NamingException
