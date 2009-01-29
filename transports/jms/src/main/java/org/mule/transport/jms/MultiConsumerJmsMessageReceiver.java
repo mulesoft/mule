@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.FatalException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -125,8 +126,19 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         for (int i = 0; i < receiversCount; i++)
         {
             SubReceiver sub = new SubReceiver();
-            sub.doConnect();
-            consumers.addLast(sub);
+            try
+            {
+                sub.doConnect();
+            }
+            catch (FatalException fex)
+            {
+                sub.doDisconnect();
+                throw fex;
+            }
+            finally
+            {
+                consumers.addLast(sub);
+            }
         }
     }
 
