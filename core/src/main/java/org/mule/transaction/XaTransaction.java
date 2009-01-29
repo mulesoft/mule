@@ -112,8 +112,6 @@ public class XaTransaction extends AbstractTransaction
            JTA API-way to do that after the call, so the thread's transaction is subject to manual
            recovery process. Instead TransactionManager or UserTransaction must be used.
             */
-            // TODO AP check this way to get to TM really works in Mule 2
-            TransactionManager txManager = MuleServer.getMuleContext().getTransactionManager();
             delistResources();
             txManager.commit();
         }
@@ -184,8 +182,7 @@ public class XaTransaction extends AbstractTransaction
            JTA API-way to do that after the call, so the thread's transaction is subject to manual
            recovery process. Instead TransactionManager or UserTransaction must be used.
             */
-            TransactionManager txManager = MuleServer.getMuleContext().getTransactionManager();
-//            delistResources();
+            //delistResources();
             txManager.rollback();
         }
         catch (SystemException e)
@@ -279,9 +276,13 @@ public class XaTransaction extends AbstractTransaction
             MuleXaObject xaObject = (MuleXaObject) resource;
             xaObject.enlist();
         }
+        else if (resource instanceof XAResource)
+        {
+            enlistResource((XAResource) resource);
+        }
         else
         {
-            logger.error("Bound resource " + resource + " is not a MuleXaObject ");
+            logger.error("Bound resource " + resource + " is neither a MuleXaObject nor XAResource");
         }
     }
 
