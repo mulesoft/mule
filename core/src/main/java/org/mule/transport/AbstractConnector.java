@@ -68,7 +68,6 @@ import org.mule.util.ObjectNameHelper;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
-import org.mule.util.concurrent.WaitableBoolean;
 
 import java.beans.ExceptionListener;
 import java.io.IOException;
@@ -92,7 +91,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -449,7 +447,7 @@ public abstract class AbstractConnector
 
     public final synchronized void stop() throws MuleException
     {
-        if (this.isStarted() == false)
+        if (!this.isStarted())
         {
             logger.warn("Attempting to stop a connector which is not started");
             return;
@@ -2018,7 +2016,7 @@ public abstract class AbstractConnector
         try
         {
             serviceDescriptor = (TransportServiceDescriptor)
-                RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
+                RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
             if (serviceDescriptor == null)
             {
                 throw new ServiceException(CoreMessages.noServiceTransportDescriptor(getProtocol()));

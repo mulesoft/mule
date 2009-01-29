@@ -22,6 +22,8 @@ import org.mule.util.SpiUtils;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Factory used to create a new service descriptor.
@@ -30,10 +32,16 @@ import org.apache.commons.lang.StringUtils;
 public class ServiceDescriptorFactory 
 {
     // Service types (used for looking up the service descriptors)
+
+    /** @deprecated use {@link #TRANSPORT_SERVICE_TYPE} */
+    @Deprecated
     public static final String PROVIDER_SERVICE_TYPE = "transport";
+    public static final String TRANSPORT_SERVICE_TYPE = "transport";
     public static final String MODEL_SERVICE_TYPE = "model";
     public static final String EXCEPTION_SERVICE_TYPE = "exception";
-    
+
+    protected final Log logger = LogFactory.getLog(getClass());
+
     /**
      * Factory method to create a new service descriptor.
      */
@@ -47,7 +55,7 @@ public class ServiceDescriptorFactory
         String serviceFinderClass = (String) props.remove(MuleProperties.SERVICE_FINDER);
         
         ServiceDescriptor sd = null;
-        if (type.equals(PROVIDER_SERVICE_TYPE)) 
+        if (type.equals(TRANSPORT_SERVICE_TYPE))
         {
             try
             {
@@ -86,7 +94,7 @@ public class ServiceDescriptorFactory
             {
                 // Recursively look up the service descriptor for the real service.
                 return MuleServer.getMuleContext().getRegistry().lookupServiceDescriptor(
-                    ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, realService, overrides);
+                    ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, realService, overrides);
             }
             else
             {

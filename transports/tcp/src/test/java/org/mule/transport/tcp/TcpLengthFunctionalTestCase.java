@@ -21,6 +21,7 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
+    private int timeout = getTimeoutSecs() * 1000 / 20;
 
     public TcpLengthFunctionalTestCase()
     {
@@ -47,7 +48,7 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase
         client.dispatch("asyncClientEndpoint1", TEST_MESSAGE, props);
         // MULE-2754
         Thread.sleep(200);
-        MuleMessage result =  client.request("asyncClientEndpoint1", 3000);
+        MuleMessage result =  client.request("asyncClientEndpoint1", timeout);
         // expect failure - streaming not supported
         assertNull(result);
     }
@@ -59,7 +60,7 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase
         client.dispatch("asyncClientEndpoint2", TEST_MESSAGE, props);
         // MULE-2754
         Thread.sleep(200);
-        MuleMessage result =  client.request("asyncClientEndpoint2", 3000);
+        MuleMessage result =  client.request("asyncClientEndpoint2", timeout);
         // expect failure - TCP simply can't work like this
         assertNull(result);
     }

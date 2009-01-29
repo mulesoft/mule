@@ -29,7 +29,7 @@ public class MailMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     protected void doSetUp() throws Exception
     {
         //wee need to load the transport descriptor in order to tes tthe message Adapter
-        muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, "pop3", null);
+        muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, "pop3", null);
     }
 
     /*

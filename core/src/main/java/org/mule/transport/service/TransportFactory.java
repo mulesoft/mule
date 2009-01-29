@@ -64,7 +64,7 @@ public class TransportFactory
             String scheme = url.getSchemeMetaInfo();
 
             TransportServiceDescriptor sd = (TransportServiceDescriptor)
-                RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
+                RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, scheme, null);
             if (sd == null)
             {
                 throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));

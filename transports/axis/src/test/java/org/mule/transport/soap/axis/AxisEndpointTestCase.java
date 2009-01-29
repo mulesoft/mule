@@ -78,7 +78,7 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         assertEquals(3, endpointUri.getParams().size());
 
         TransportServiceDescriptor sd = (TransportServiceDescriptor)
-                muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, "soap", null);
+                muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, "soap", null);
         if (sd != null)
         {
             //TODO TC: How do we assert this state in the new model?

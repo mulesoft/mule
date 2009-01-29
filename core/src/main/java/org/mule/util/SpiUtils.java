@@ -16,6 +16,7 @@ import org.mule.transport.service.TransportFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -28,14 +29,33 @@ public class SpiUtils
     private static final Log logger = LogFactory.getLog(SpiUtils.class);
 
     public static final String SERVICE_ROOT = "META-INF/services/";
+    /** @deprecated use {@link #TRANSPORT_SERVICE_PATH */
+    @Deprecated
     public static final String PROVIDER_SERVICE_PATH = "org/mule/providers/";
+    public static final String TRANSPORT_SERVICE_PATH = "org/mule/transport/";
     public static final String EXCEPTION_SERVICE_PATH = "org/mule/config/";
 
     public static Properties findServiceDescriptor(String type, String name)
     {
-        if (type.equals(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE))
+        if (type.equals(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE))
         {
-            return findServiceDescriptor(PROVIDER_SERVICE_PATH, name, TransportFactory.class);
+            Properties tsd = findServiceDescriptor(TRANSPORT_SERVICE_PATH, name, TransportFactory.class);
+            if (tsd == null)
+            {
+                // fallback to old-style location
+                tsd = findServiceDescriptor(PROVIDER_SERVICE_PATH, name, TransportFactory.class);
+                if (tsd != null && logger.isWarnEnabled())
+                {
+                    // only warn if anything found, otherwise just propagate null to the caller
+                    logger.warn(MessageFormat.format(
+                            "[{0}] transport service descriptor must be moved under {1}{2}. " +
+                            "Old-style {1}{3} has been deprecated and may not be supported in the future.",
+                            name, SERVICE_ROOT, TRANSPORT_SERVICE_PATH, PROVIDER_SERVICE_PATH 
+                    ));
+                }
+            }
+
+            return tsd;
         }
         else if (type.equals(ServiceDescriptorFactory.EXCEPTION_SERVICE_TYPE))
         {
@@ -87,7 +107,7 @@ public class SpiUtils
             InputStream is = IOUtils.getResourceAsStream(preferredPath, currentClass, false, false);
             
             //if no resource found, then go with default path
-            if(is == null)
+            if (is == null)
             {
                 is = IOUtils.getResourceAsStream(path, currentClass, false, false);
             }
