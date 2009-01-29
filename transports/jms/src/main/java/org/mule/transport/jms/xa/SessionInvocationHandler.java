@@ -77,20 +77,20 @@ public class SessionInvocationHandler implements TargetInvocationHandler
         // processing method from MuleXaObject
         if (XaTransaction.MuleXaObject.DELIST_METHOD_NAME.equals(method.getName()))
         {
-            return Boolean.valueOf(delist());
+            return delist();
         }
         else if (XaTransaction.MuleXaObject.ENLIST_METHOD_NAME.equals(method.getName()))
         {
-            return Boolean.valueOf(enlist());
+            return enlist();
         }
         else if (XaTransaction.MuleXaObject.SET_REUSE_OBJECT_METHOD_NAME.equals(method.getName()))
         {
-            reuseObject = ((Boolean) args[0]).booleanValue();
+            reuseObject = (Boolean) args[0];
             return null;
         }
         else if (XaTransaction.MuleXaObject.IS_REUSE_OBJECT_METHOD_NAME.equals(method.getName()))
         {
-            return Boolean.valueOf(reuseObject);
+            return reuseObject;
         }
         else if (XaTransaction.MuleXaObject.GET_TARGET_OBJECT_METHOD_NAME.equals(method.getName()))
         {
