@@ -39,19 +39,33 @@ public class SpiUtils
     {
         if (type.equals(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE))
         {
-            Properties tsd = findServiceDescriptor(TRANSPORT_SERVICE_PATH, name, TransportFactory.class);
+            // for better EE transports support from earlier versions, try the preferred-xxx lookup first without fallback
+            Properties tsd = findServiceDescriptor(TRANSPORT_SERVICE_PATH, name, TransportFactory.class, false);
+
             if (tsd == null)
             {
-                // fallback to old-style location
-                tsd = findServiceDescriptor(PROVIDER_SERVICE_PATH, name, TransportFactory.class);
-                if (tsd != null && logger.isWarnEnabled())
+                // fallback to old-style 'providers' location, but still without fallback for preferred transports
+                tsd = findServiceDescriptor(PROVIDER_SERVICE_PATH, name, TransportFactory.class, false);
+                if (tsd != null)
                 {
-                    // only warn if anything found, otherwise just propagate null to the caller
-                    logger.warn(MessageFormat.format(
-                            "[{0}] transport service descriptor must be moved under {1}{2}. " +
-                            "Old-style {1}{3} has been deprecated and may not be supported in the future.",
-                            name, SERVICE_ROOT, TRANSPORT_SERVICE_PATH, PROVIDER_SERVICE_PATH 
-                    ));
+                    logTsdDeprecationWarning(name);
+                }
+            }
+
+            if (tsd == null)
+            {
+                // regular flow
+                tsd = findServiceDescriptor(TRANSPORT_SERVICE_PATH, name, TransportFactory.class);
+
+
+                if (tsd == null)
+                {
+                    // fallback to old-style location
+                    tsd = findServiceDescriptor(PROVIDER_SERVICE_PATH, name, TransportFactory.class);
+                    if (tsd != null)
+                    {
+                        logTsdDeprecationWarning(name);
+                    }
                 }
             }
 
@@ -70,6 +84,14 @@ public class SpiUtils
     }
 
     public static Properties findServiceDescriptor(String path, String name, Class currentClass)
+    {
+        return findServiceDescriptor(path, name, currentClass, true);
+    }
+
+    /**
+     * @param fallbackToNonPreferred whether the search should attempt the preferred-xxx.properties lookup
+     */
+    public static Properties findServiceDescriptor(String path, String name, Class currentClass, boolean fallbackToNonPreferred)
     {
         //Preferred name and preferred path - used to construct a URI for alternative or preferred
         //property set.  This enables alternative implementations of a transport to exist side by side
@@ -107,7 +129,7 @@ public class SpiUtils
             InputStream is = IOUtils.getResourceAsStream(preferredPath, currentClass, false, false);
             
             //if no resource found, then go with default path
-            if (is == null)
+            if (is == null && fallbackToNonPreferred)
             {
                 is = IOUtils.getResourceAsStream(path, currentClass, false, false);
             }
@@ -136,4 +158,23 @@ public class SpiUtils
             return null;
         }
     }
+
+    /**
+     * Log a deprecation warning when a Transport Service Descriptor was located in old location
+     * (META-INF/service/org/mule/providers).
+     * @param transport - transport name
+     */
+    protected static void logTsdDeprecationWarning(String transport)
+    {
+        if (logger.isWarnEnabled())
+        {
+            // only warn if anything found, otherwise just propagate null to the caller
+            logger.warn(MessageFormat.format(
+                    "[{0}] transport service descriptor must be moved under {1}{2} " +
+                    "Old-style {1}{3} has been deprecated and may not be supported in the future.",
+                    transport, SERVICE_ROOT, TRANSPORT_SERVICE_PATH, PROVIDER_SERVICE_PATH
+            ));
+        }
+    }
+
 }
