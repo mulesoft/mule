@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+      xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.2"
+      xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.2"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+      xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.2"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
+      xsi:schemaLocation="
+                   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                   http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+                   http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
+                   http://www.mulesource.org/schema/mule/jdbc/2.2 http://www.mulesource.org/schema/mule/jdbc/2.2/mule-jdbc.xsd
+                   http://www.mulesource.org/schema/mule/stdio/2.2 http://www.mulesource.org/schema/mule/stdio/2.2/mule-stdio.xsd
+                   http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+                   http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
+                   http://www.mulesource.org/schema/mule/jbossts/2.2 http://www.mulesource.org/schema/mule/jbossts/2.2/mule-jbossts.xsd">
+
+    <jbossts:transaction-manager/>
+
+    <vm:connector name="vmConnector" queueEvents="true" queueTimeout="10000">
+        <receiver-threading-profile maxThreadsActive="1"/>
+    </vm:connector>
+
+    <model>
+
+        <service name="testBridge">
+            <inbound>
+                <stdio:inbound-endpoint system="IN"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="in"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="VmXaTestService">
+            <inbound>
+                <vm:inbound-endpoint path="in">
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
+                </vm:inbound-endpoint>
+            </inbound>
+            <test:component appendString=" Received" throwException="true" waitTime="3000"/>
+
+            <outbound>
+                <pass-through-router>
+                    <stdio:outbound-endpoint system="OUT">
+                        <xa-transaction action="ALWAYS_JOIN"/>
+                    </stdio:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+
+            <default-service-exception-strategy>
+                <rollback-transaction exception-pattern="*"/>
+            </default-service-exception-strategy>
+            <queue-profile persistent="true"/>
+        </service>
+
+    </model>
+</mule>
