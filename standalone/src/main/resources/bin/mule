@@ -239,7 +239,7 @@ do
         'pa_risc' | 'pa-risc')
             DIST_ARCH="parisc"
             break;;
-        'sun4u' | 'sun4v' | 'sparcv9' | 'sparc')
+        'sun4u' | 'sun4us' | 'sun4v' | 'sparcv9' | 'sparc') 
             DIST_ARCH="sparc"
             break;;
         '9000/800')
