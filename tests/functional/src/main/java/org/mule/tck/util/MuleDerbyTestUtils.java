@@ -137,6 +137,17 @@ public class MuleDerbyTestUtils
      */
     public static void createDataBase(String databaseName, String[] creationSql) throws SQLException
     {
+        createDataBase(databaseName, creationSql, null);
+    }
+    
+    /**
+     * Create a new embedded database
+     * @param databaseName
+     * @param creationSql - SQL used to create and populate initial database tables
+     * @throws SQLException
+     */
+    public static void createDataBase(String databaseName, String[] creationSql, Properties properties) throws SQLException
+    {
         // Do not use the EmbeddedDriver class here directly to avoid compile time references
         // on derby.jar
         try
@@ -148,7 +159,7 @@ public class MuleDerbyTestUtils
              */
             Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS, new Object[0]);            
             Method connectMethod = derbyDriver.getClass().getMethod("connect", new Class[] { String.class, Properties.class });            
-            connectMethod.invoke(derbyDriver, new Object[] { connectionName, null });
+            connectMethod.invoke(derbyDriver, new Object[] { connectionName, properties });
 
             if (creationSql != null)
             {
