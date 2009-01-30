@@ -132,11 +132,13 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             }
             catch (FatalException fex)
             {
+                // Needed for EE-1174
                 sub.doDisconnect();
                 throw fex;
             }
             finally
             {
+                // Needed for EE-1174
                 consumers.addLast(sub);
             }
         }
