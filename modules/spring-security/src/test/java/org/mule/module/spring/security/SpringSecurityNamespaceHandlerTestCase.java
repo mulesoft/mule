@@ -17,14 +17,13 @@ import org.mule.tck.FunctionalTestCase;
 import java.util.Iterator;
 
 import org.springframework.security.AuthenticationManager;
-import org.springframework.security.providers.dao.DaoAuthenticationProvider;
 
-public class NamespaceHandlerTestCase extends FunctionalTestCase
+public class SpringSecurityNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources()
     {
-        return "namespace-config.xml";
+        return "spring-security-namespace-config.xml";
     }
 
     public void testProvider()
