@@ -6,3 +6,4 @@
 # Broken by EE-734, most likely related to the Retry code in org.mule.transport.jms.XaTransactedJmsMessageReceiver
 org.mule.transport.jms.integration.JmsXATransactionComponentTestCase
 
+#SimpleTestCase
