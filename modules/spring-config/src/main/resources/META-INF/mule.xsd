@@ -1977,7 +1977,7 @@
             <xsd:choice maxOccurs="unbounded">
                 <xsd:element ref="abstract-interceptor"/>
                 <xsd:element name="interceptor-stack" type="refInterceptorStackType">
-	                <xsd:annotation>
+                    <xsd:annotation>
                         <xsd:documentation>
                             A reference to a stack of intereceptors defined globally.
                         </xsd:documentation>

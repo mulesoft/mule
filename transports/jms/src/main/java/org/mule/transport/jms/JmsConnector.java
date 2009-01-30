@@ -455,7 +455,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
     }
 
-	  // TODO This might make retry work a bit better w/ JMS
+      // TODO This might make retry work a bit better w/ JMS
 //    @Override
 //    protected boolean validateConnection() throws Exception
 //    {
