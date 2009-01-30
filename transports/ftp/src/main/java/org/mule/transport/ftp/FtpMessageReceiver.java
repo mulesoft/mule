@@ -17,7 +17,6 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
-import org.mule.transport.ConnectException;
 import org.mule.transport.file.FileConnector;
 
 import java.io.FilenameFilter;
@@ -187,7 +186,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     @Override
-    protected boolean isAbleToConnect() throws Exception
+    protected boolean validateConnection() throws Exception
     {
         final FTPClient client = connector.createFtpClient(endpoint);
         try

@@ -358,7 +358,7 @@ public class JdbcConnector extends AbstractConnector
     /** 
      * Verify that we are able to connect to the DataSource (needed for retry policies) 
      */
-    protected boolean isAbleToConnect() throws Exception
+    protected boolean validateConnection() throws Exception
     {
         Connection con;
         try

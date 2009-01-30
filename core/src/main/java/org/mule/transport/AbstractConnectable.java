@@ -28,7 +28,6 @@ import org.mule.util.concurrent.WaitableBoolean;
 import java.beans.ExceptionListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -171,7 +170,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
                 {
                     try
                     {
-                        if (!isAbleToConnect())
+                        if (!validateConnection())
                         {
                             throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"), null);
                         }
@@ -214,7 +213,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
      * @return true if the connector is able to connect successfully
      * @throws Exception if the connector fails to connect
      */
-    protected boolean isAbleToConnect() throws Exception
+    protected boolean validateConnection() throws Exception
     {
         return true;
     }
