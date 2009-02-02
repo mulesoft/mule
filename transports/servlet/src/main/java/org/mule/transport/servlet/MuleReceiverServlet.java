@@ -126,28 +126,46 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, reqUri);
         
         String queryString = request.getQueryString();
-        if (queryString != null) {
+        if (queryString != null) 
+        {
             reqUri += "?"+queryString;
         }
 
         requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, reqUri);
         
         String path;
-        if ("servlet".equals(uri.getScheme())) {
-            path = HttpConnector.normalizeUrl(request.getServletPath());
+        if ("servlet".equals(uri.getScheme())) 
+        {
+            path = HttpConnector.normalizeUrl(request.getContextPath());
+            if ("/".equals(path))
+            {
+                path = HttpConnector.normalizeUrl(request.getServletPath());
+            } 
+            else 
+            {
+                path = path + HttpConnector.normalizeUrl(request.getServletPath());
+            }
+            
             String pathPart2 = uri.getAddress();
 
-            if (!path.endsWith("/")) {
+            if (!path.endsWith("/"))
+            {
                 // "/foo" + "bar"
                 path = path + HttpConnector.normalizeUrl(pathPart2);
-            } else if (pathPart2.startsWith("/")) {
+            }
+            else if (pathPart2.startsWith("/"))
+            {
                 // "/foo/" + "/bar"
                 path = path + pathPart2.substring(1);
-            } else {
+            }
+            else
+            {
                 // "/foo/" + "bar"
                 path = path + pathPart2;
             }
-        } else {
+        } 
+        else 
+        {
             // The Jetty transport has normal paths
             path = HttpConnector.normalizeUrl(uri.getPath());
         }

@@ -20,7 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
 
 public class ServletTestCase extends FunctionalTestCase
 {
@@ -41,12 +42,18 @@ public class ServletTestCase extends FunctionalTestCase
         super.doSetUp();
         
         httpServer = new Server(HTTP_PORT);
+        String path = getContextPath();
+        if (path.equals("")) path = "/";
         
-        ServletHandler handler = new ServletHandler();
-        handler.addServletWithMapping(MuleReceiverServlet.class, "/services/*");
-        httpServer.addHandler(handler);
+        Context c = new Context(httpServer, path, Context.SESSIONS);
+        c.addServlet(new ServletHolder(new MuleReceiverServlet()), "/services/*");
         
         httpServer.start();
+    }
+
+    protected String getContextPath()
+    {
+        return "";
     }
 
     @Override
@@ -75,10 +82,9 @@ public class ServletTestCase extends FunctionalTestCase
         
         MuleClient client = new MuleClient();
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT
-                                        + "/services/mycomponent", request, null);
+                                        + getContextPath() + "/services/mycomponent", request, null);
         String res = result.getPayloadAsString();
 
-        System.out.println(res);
         assertTrue(res.indexOf("Test String") != -1);
     }
 
@@ -88,7 +94,7 @@ public class ServletTestCase extends FunctionalTestCase
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT
-                                        + "/services/mycomponent/echo/text/Test String", "", props);
+                                        + getContextPath() + "/services/mycomponent/echo/text/Test String", "", props);
         String res = result.getPayloadAsString();
         assertTrue(res.indexOf("Test String") != -1);
     }
