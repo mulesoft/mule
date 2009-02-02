@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
+import org.mule.transport.InboundConnectException;
 import org.mule.transport.file.FileConnector;
 
 import java.io.FilenameFilter;
@@ -96,7 +97,14 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         FTPClient client = null;
         try
         {
-            client = connector.createFtpClient(endpoint);
+            try
+            {
+                client = connector.createFtpClient(endpoint);
+            }
+            catch (Exception e)
+            {
+                throw new InboundConnectException(e, this);
+            }
             FTPFile[] files = client.listFiles();
 
             if (!FTPReply.isPositiveCompletion(client.getReplyCode()))
@@ -143,7 +151,14 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 return;
             }
             
-            client = connector.createFtpClient(endpoint);
+            try
+            {
+                client = connector.createFtpClient(endpoint);
+            }
+            catch (Exception e)
+            {
+                throw new InboundConnectException(e, this);
+            }
 
             MuleMessage message;
             InputStream stream = client.retrieveFileStream(file.getName());
@@ -186,7 +201,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     @Override
-    protected boolean validateConnection() throws Exception
+    public boolean validateConnection() throws Exception
     {
         final FTPClient client = connector.createFtpClient(endpoint);
         try

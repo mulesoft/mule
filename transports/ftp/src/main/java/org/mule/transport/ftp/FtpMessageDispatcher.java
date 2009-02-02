@@ -78,8 +78,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect() throws Exception
     {
-        // what was this for?!
-        //connector.releaseFtp(endpoint.getEndpointURI());
+        // template method
     }
 
     protected void doDisconnect() throws Exception
@@ -96,4 +95,21 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
+    public boolean validateConnection() throws Exception
+    {
+        final FTPClient client = connector.createFtpClient(endpoint);
+        try
+        {
+            client.sendNoOp();
+            client.logout();
+            client.disconnect();
+            return true;
+        }
+        finally
+        {
+            connector.releaseFtp(endpoint.getEndpointURI(), client);
+            Thread.sleep(1000);
+        }
+    }
 }

@@ -11,7 +11,6 @@
 package org.mule.transport.ftp;
 
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.transport.ConnectException;
 
 import java.io.IOException;
 
@@ -32,32 +31,25 @@ public class FtpConnectionFactory implements PoolableObjectFactory
     public Object makeObject() throws Exception
     {
         FTPClient client = new FTPClient();
-        try
+        if (uri.getPort() > 0)
         {
-            if (uri.getPort() > 0)
-            {
-                client.connect(uri.getHost(), uri.getPort());
-            }
-            else
-            {
-                client.connect(uri.getHost());
-            }
-            if (!FTPReply.isPositiveCompletion(client.getReplyCode()))
-            {
-                throw new IOException("Ftp connect failed: " + client.getReplyCode());
-            }
-            if (!client.login(uri.getUser(), uri.getPassword()))
-            {
-                throw new IOException("Ftp login failed: " + client.getReplyCode());
-            }
-            if (!client.setFileType(FTP.BINARY_FILE_TYPE))
-            {
-                throw new IOException("Ftp error. Couldn't set BINARY transfer type: " + client.getReplyCode());
-            }
+            client.connect(uri.getHost(), uri.getPort());
         }
-        catch (Exception e)
+        else
         {
-            throw new ConnectException(e, null);
+            client.connect(uri.getHost());
+        }
+        if (!FTPReply.isPositiveCompletion(client.getReplyCode()))
+        {
+            throw new IOException("Ftp connect failed: " + client.getReplyCode());
+        }
+        if (!client.login(uri.getUser(), uri.getPassword()))
+        {
+            throw new IOException("Ftp login failed: " + client.getReplyCode());
+        }
+        if (!client.setFileType(FTP.BINARY_FILE_TYPE))
+        {
+            throw new IOException("Ftp error. Couldn't set BINARY transfer type: " + client.getReplyCode());
         }
         return client;
     }

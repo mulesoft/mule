@@ -16,6 +16,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.ConnectorException;
@@ -25,6 +26,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.model.streaming.CallbackOutputStream;
 import org.mule.transport.AbstractConnector;
+import org.mule.transport.OutboundConnectException;
 import org.mule.transport.file.FilenameParser;
 import org.mule.transport.file.SimpleFilenameParser;
 import org.mule.util.ClassUtils;
@@ -246,6 +248,8 @@ public class FtpConnector extends AbstractConnector
         {
             throw new InitialisationException(e, this);
         }
+
+        pools = new HashMap();
     }
 
     protected void doDispose()
@@ -265,7 +269,7 @@ public class FtpConnector extends AbstractConnector
 
     protected void doStart() throws MuleException
     {
-        pools = new HashMap();
+        // template method
     }
 
     protected void doStop() throws MuleException
@@ -289,7 +293,6 @@ public class FtpConnector extends AbstractConnector
         finally
         {
             pools.clear();
-            pools = null;
         }
     }
 
@@ -517,7 +520,15 @@ public class FtpConnector extends AbstractConnector
             final EndpointURI uri = endpoint.getEndpointURI();
             String filename = getFilename(endpoint, message);
 
-            final FTPClient client = this.createFtpClient(endpoint);
+            final FTPClient client;
+            try
+            {
+                client = this.createFtpClient(endpoint);
+            }
+            catch (Exception e)
+            {
+                throw new OutboundConnectException(e, (OutboundEndpoint) endpoint);
+            }
             try
             {
                 OutputStream out = client.storeFileStream(filename);
