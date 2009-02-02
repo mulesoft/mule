@@ -26,7 +26,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.model.streaming.CallbackOutputStream;
 import org.mule.transport.AbstractConnector;
-import org.mule.transport.OutboundConnectException;
+import org.mule.transport.DispatcherConnectException;
 import org.mule.transport.file.FilenameParser;
 import org.mule.transport.file.SimpleFilenameParser;
 import org.mule.util.ClassUtils;
@@ -527,7 +527,7 @@ public class FtpConnector extends AbstractConnector
             }
             catch (Exception e)
             {
-                throw new OutboundConnectException(e, (OutboundEndpoint) endpoint);
+                throw new DispatcherConnectException(e, (OutboundEndpoint) endpoint);
             }
             try
             {
