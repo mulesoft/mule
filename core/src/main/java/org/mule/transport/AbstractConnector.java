@@ -75,6 +75,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -256,7 +258,6 @@ public abstract class AbstractConnector
      */
     protected boolean startOnConnect = false;
 
-    
     public AbstractConnector()
     {
         setDynamicNotification(false);
@@ -709,6 +710,19 @@ public abstract class AbstractConnector
                     throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNotExceptionListener(this.getName()), exception);
                 }
                 
+                // Store some info. about the receiver/dispatcher which threw the ConnectException so 
+                // that we can make sure that problem has been resolved when we go to reconnect.
+                Map info = new HashMap();
+                if (exception instanceof ReceiverConnectException)
+                {
+                    info.put("failedReceiver", ((ConnectException) exception).getComponent());
+                }
+                else if (exception instanceof DispatcherConnectException)
+                {
+                    info.put("failedDispatcher", ((ConnectException) exception).getComponent());
+                }
+                retryPolicyTemplate.setMetaInfo(info);
+
                 // Reconnect (retry policy will go into effect here if configured)
                 connect();
             }
@@ -1398,6 +1412,38 @@ public abstract class AbstractConnector
                         throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"), null);
                     }
                     doConnect();
+
+                    // Make sure the receiver or dispatcher which triggered the reconnection is now able to 
+                    // connect successfully.  This info. was previously stored by the handleException() method, above.
+                    Map info = context.getMetaInfo();
+                    if (info != null)
+                    {
+                        if (info.get("failedReceiver") != null)
+                        {
+                            String receiverKey = (String) info.get("failedReceiver");
+                            MessageReceiver receiver = (MessageReceiver) receivers.get(receiverKey);
+                            if (!receiver.validateConnection())
+                            {
+                                throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"), receiver);
+                            }
+                        }
+                        else if (info.get("failedDispatcher") != null)
+                        {
+                            OutboundEndpoint endpoint = (OutboundEndpoint) info.get("failedDispatcher");
+                            MessageDispatcher dispatcher = (MessageDispatcher) dispatchers.borrowObject(endpoint);
+                            try
+                            {
+                                if (!dispatcher.validateConnection())
+                                {
+                                    throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"), null);
+                                }
+                            }
+                            finally
+                            {
+                                dispatchers.returnObject(endpoint, dispatcher);
+                            }
+                        }
+                    }
                     setConnected(true);
                     
                     logger.info("Connected: " + getWorkDescription());
@@ -1427,7 +1473,7 @@ public abstract class AbstractConnector
     * @return true if the connector is able to connect successfully
     * @throws Exception if the connector fails to connect
     */
-    protected boolean validateConnection() throws Exception
+    public boolean validateConnection() throws Exception
     {
         return true;
     }
