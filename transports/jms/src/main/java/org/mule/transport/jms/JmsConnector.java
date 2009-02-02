@@ -457,7 +457,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
       // TODO This might make retry work a bit better w/ JMS
 //    @Override
-//    protected boolean validateConnection() throws Exception
+//    public boolean validateConnection() throws Exception
 //    {
 //        logger.debug("Creating a temporary session to verify that we have a healthy connection...");
 //

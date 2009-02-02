@@ -38,6 +38,15 @@ public interface Connectable extends Initialisable, Disposable, Startable, Stopp
     void disconnect() throws Exception;
 
     /**
+     * Test whether the connector is able to connect to its resource(s).
+     * This will allow a retry policy to go into effect in the case of failure.
+     *
+     * @return true if the connector is able to connect successfully
+     * @throws Exception if the connector fails to connect
+     */
+    boolean validateConnection() throws Exception;
+    
+    /**
      * Determines if this object is connected or not
      * 
      * @return
