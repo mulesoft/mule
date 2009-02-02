@@ -22,6 +22,7 @@ import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.retry.notifiers.ConnectNotifier;
 
 import java.io.InterruptedIOException;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +35,9 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
 {
     protected RetryNotifier notifier = new ConnectNotifier();
     
+    /** This data will be made available to the RetryPolicy via the RetryContext. */
+    private Map metaInfo;
+    
     protected transient final Log logger = LogFactory.getLog(getClass());
     
     public RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception
@@ -41,6 +45,10 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
         PolicyStatus status = null;
         RetryPolicy policy = createRetryInstance();
         DefaultRetryContext context = new DefaultRetryContext(callback.getWorkDescription());
+        if (metaInfo != null)
+        {
+            context.setMetaInfo(metaInfo);
+        }
         try
         {
             Exception cause = null;
@@ -108,6 +116,16 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
     public void setNotifier(RetryNotifier retryNotifier)
     {
         this.notifier = retryNotifier;
+    }
+
+    public Map getMetaInfo()
+    {
+        return metaInfo;
+    }
+
+    public void setMetaInfo(Map metaInfo)
+    {
+        this.metaInfo = metaInfo;
     }
 
     // For Spring IoC only

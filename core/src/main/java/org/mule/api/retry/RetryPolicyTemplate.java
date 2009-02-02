@@ -12,6 +12,8 @@ package org.mule.api.retry;
 
 import org.mule.api.context.WorkManager;
 
+import java.util.Map;
+
 
 /**
  * A RetryPolicyTemplate creates a new {@link RetryPolicy} instance each time the retry goes into effect, 
@@ -23,6 +25,10 @@ public interface RetryPolicyTemplate
 {
     RetryPolicy createRetryInstance();
 
+    Map getMetaInfo();
+    
+    void setMetaInfo(Map metaInfo);
+    
     RetryNotifier getNotifier();
 
     void setNotifier(RetryNotifier retryNotifier);
