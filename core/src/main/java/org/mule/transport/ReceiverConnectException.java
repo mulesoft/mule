@@ -10,29 +10,26 @@
 
 package org.mule.transport;
 
-import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.Message;
 
 /** 
  * When this exception is thrown it will trigger a retry (reconnection) policy to go into effect if one is configured.
  */
-public class ConnectException extends LifecycleException
+public class ReceiverConnectException extends ConnectException
 {
-    /** Serial version */
-    private static final long serialVersionUID = -7802483584780922653L;
-
-    public ConnectException(Message message, Object failed)
+    public ReceiverConnectException(Message message, MessageReceiver receiver)
     {
-        super(message, failed);
+        super(message, receiver.getReceiverKey());
     }
 
-    public ConnectException(Message message, Throwable cause, Object failed)
+    public ReceiverConnectException(Message message, Throwable cause, MessageReceiver receiver)
     {
-        super(message, cause, failed);
+        super(message, cause, receiver.getReceiverKey());
     }
 
-    public ConnectException(Throwable cause, Object failed)
+    public ReceiverConnectException(Throwable cause, MessageReceiver receiver)
     {
-        super(cause, failed);
+        super(cause, receiver.getReceiverKey());
     }
 }
