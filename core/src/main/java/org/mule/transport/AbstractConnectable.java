@@ -20,7 +20,6 @@ import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connectable;
 import org.mule.api.transport.Connector;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.util.ClassUtils;
 import org.mule.util.concurrent.WaitableBoolean;
@@ -28,6 +27,7 @@ import org.mule.util.concurrent.WaitableBoolean;
 import java.beans.ExceptionListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -170,10 +170,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
                 {
                     try
                     {
-                        if (!validateConnection())
-                        {
-                            throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"), null);
-                        }
                         doConnect();
                         connected.set(true);
                         
@@ -213,7 +209,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
      * @return true if the connector is able to connect successfully
      * @throws Exception if the connector fails to connect
      */
-    protected boolean validateConnection() throws Exception
+    public boolean validateConnection() throws Exception
     {
         return true;
     }
