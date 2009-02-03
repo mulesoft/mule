@@ -26,6 +26,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.model.streaming.CallbackOutputStream;
 import org.mule.transport.AbstractConnector;
+import org.mule.transport.ConnectException;
 import org.mule.transport.DispatcherConnectException;
 import org.mule.transport.file.FilenameParser;
 import org.mule.transport.file.SimpleFilenameParser;
@@ -559,6 +560,11 @@ public class FtpConnector extends AbstractConnector
                 releaseFtp(uri, client);
                 throw e;
             }
+        }
+        catch (ConnectException ce)
+        {
+            // Don't wrap a ConnectException, otherwise the retry policy will not go into effect.
+            throw ce;
         }
         catch (Exception e)
         {
