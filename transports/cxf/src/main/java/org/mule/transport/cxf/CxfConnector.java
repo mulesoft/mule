@@ -232,6 +232,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         EndpointBuilder protocolEndpointBuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
         protocolEndpointBuilder.setSynchronous(sync);
         protocolEndpointBuilder.setName(ep.getScheme() + ":" + serviceName.getLocalPart());
+        protocolEndpointBuilder.setTransactionConfig(originalEndpoint.getTransactionConfig());
         
         EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(originalEndpoint,
             muleContext);
