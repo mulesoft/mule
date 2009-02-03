@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="this" type="thisType"/>
+  <xs:complexType name="thisType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="is"/>
+      <xs:element type="xs:string" name="basic"/>
+      <xs:element type="xs:string" name="that"/>
+      <xs:element type="xs:string" name="used"/>
+      <xs:element type="xs:string" name="really" maxOccurs="unbounded" minOccurs="0"/>
+      <xs:element type="xs:string" name="simple"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

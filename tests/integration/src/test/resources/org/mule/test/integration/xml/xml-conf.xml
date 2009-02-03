@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+    xmlns:cxf-core="http://cxf.apache.org/core" 
+    xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.2"
+    xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+               http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
+               http://www.mulesource.org/schema/mule/xml/2.2 http://www.mulesource.org/schema/mule/xml/2.2/mule-xml.xsd
+               http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
+               http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+
+    <custom-transformer
+        class="org.mule.module.xml.transformer.XmlToDomDocument" 
+        name="InputStreamToDOM"
+        returnClass="org.w3c.dom.Document" />
+
+    <mule-xml:xslt-transformer 
+        xsl-file="org/mule/test/integration/xml/test.xsl"
+        name="TestXslTransformer" 
+        returnClass="org.w3c.dom.Document"/>
+
+    <mule-xml:xpath-filter name="XPathFilter"
+        pattern="/soap:Envelope/soap:Body/mule:echo/mule:echo"
+        expectedValue="Hello!">
+        <mule-xml:namespace prefix="soap" uri="http://schemas.xmlsoap.org/soap/envelope/" />
+        <mule-xml:namespace prefix="mule" uri="http://simple.component.mule.org/" />
+    </mule-xml:xpath-filter>
+
+    <model name="XmlParse">
+        <service name="xmlReceiver">
+            <inbound>
+                <inbound-endpoint address="http://localhost:63081/xml-parse"
+                    transformer-refs="InputStreamToDOM" synchronous="true">
+                    <filter ref="XPathFilter" />
+                </inbound-endpoint>
+                <inbound-endpoint
+                    address="http://localhost:63081/xml-xslt-parse"
+                    transformer-refs="InputStreamToDOM TestXslTransformer" synchronous="true">
+                    <filter ref="XPathFilter" />
+                </inbound-endpoint>
+                <inbound-endpoint address="http://localhost:63081/validate" synchronous="true" >
+                    <transformer ref="InputStreamToDOM"/>
+                    <mule-xml:schema-validation-filter schemaFile="org/mule/test/integration/xml/schema1.xsd"/>
+                </inbound-endpoint>
+            </inbound>
+
+            <echo-component/>
+        </service>
+    </model>
+
+</mule>
+        
