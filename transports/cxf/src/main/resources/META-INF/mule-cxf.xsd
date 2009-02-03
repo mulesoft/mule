@@ -389,10 +389,22 @@
     </xsd:element>
     
     <xsd:element name="security-manager-callback">
+        <xsd:annotation>
+            <xsd:documentation>
+                A WSS4J Password callback which verifies username/password combinations
+                against the Mule security manager.
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="beans:identifiedType">
-                    <xsd:attribute name="securityManager-ref"/>
+                    <xsd:attribute name="securityManager-ref">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The security manager instance to use for the password callback. (Optional)
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
