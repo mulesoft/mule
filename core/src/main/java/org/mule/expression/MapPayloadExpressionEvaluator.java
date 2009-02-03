@@ -31,35 +31,35 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
     {
         Object payload = message.getPayload();
 
-        if (payload instanceof Map)
+        if (!(payload instanceof Map))
         {
-            if (expression.indexOf(",") > -1)
-            {
-
-                String[] strings = StringUtils.splitAndTrim(expression, ",");
-                Map result = new HashMap(strings.length);
-
-                for (int i = 0; i < strings.length; i++)
-                {
-                    String s = strings[i];
-                    Object val = getValue(s, (Map)payload);
-                    if(val!=null)
-                    {
-                        if(s.endsWith("*"))
-                        {
-                            s = s.substring(s.length()-1);
-                        }
-                        result.put(s, val);                        
-                    }
-                }
-                return result;
-            }
-            else
-            {
-                return getValue(expression, (Map)payload);
-            }
+            return null;
         }
-        return null;
+        
+        if (expression.indexOf(",") > -1)
+        {
+
+            String[] strings = StringUtils.splitAndTrim(expression, ",");
+            Map<String, Object> result = new HashMap<String, Object>(strings.length);
+
+            for (String s : strings)
+            {
+                Object val = getValue(s, (Map) payload);
+                if (val != null)
+                {
+                    if (s.endsWith("*"))
+                    {
+                        s = s.substring(s.length() - 1);
+                    }
+                    result.put(s, val);
+                }
+            }
+            return result;
+        }
+        else
+        {
+            return getValue(expression, (Map)payload);
+        }
     }
 
     protected Object getValue(String key, Map map)
@@ -67,7 +67,7 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
         boolean required;
         if (key.endsWith("*"))
         {
-            key = key.substring(key.length() - 1);
+            key = key.substring(0, key.length() - 1);
             required = false;
         }
         else
