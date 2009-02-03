@@ -27,6 +27,6 @@ public class FilterBasedXmlMessageSplitter extends XmlMessageSplitter
     public void initialise() throws InitialisationException
     {
         logger.warn("Deprecation warning: The FilteringXmlMessageSplitter router has been deprecating in Mule 2.2 in favour of using the <expression-splitter> router.");
-        super.initialise();;
+        super.initialise();
     }
 }
