@@ -130,6 +130,71 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="xpath-filter" type="xpathFilterType" substitutionGroup="mule:abstract-filter" />
+    <xsd:complexType name="xpathFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:patternFilterType">
+                <xsd:sequence>
+                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A namespace declaration, expressed as {{prefix}} and {{uri}} attributes. The prefix can then be used inside the expression.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="expectedValue" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The expected value of the XPath expression evaluation. If the expected value matches the evaluation, the filter returns true.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="schema-validation-filter" type="schemaValidationFilterType" substitutionGroup="mule:abstract-filter" />
+    <xsd:complexType name="schemaValidationFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractFilterType">
+                <xsd:attribute name="schemaFile" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="schemaLanguage" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The expected value of the XPath expression evaluation. If the expected value matches the evaluation, the filter returns true.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="returnResult" type="xsd:boolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether or not the filter should worry about caching a result of the XML. If this is false,
+                            the filter will be more efficient, but it won't allow you to read the XML again. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+  <xsd:element name="schema-validation-transformer" type="schemaValidationTransformerType" substitutionGroup="mule:abstract-transformer"/>
+  <xsd:complexType name="schemaValidationTransformerType">
+    <xsd:complexContent>
+      <xsd:extension base="mule:abstractTransformerType">
+        <xsd:attribute name="schemaFile" type="xsd:string"/>
+        <xsd:attribute name="schemaLanguage" type="xsd:string"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
     <!-- xml outbound routers -->
 
     <xsd:complexType name="messageSplitterType">
@@ -295,6 +360,58 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="xpath-extractor-transformer" type="xpathExtractorType"
+        substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                The XPathExtractor is a simple transformer that evaluates an XPath expression 
+                using the JAXP libraries against the given bean and returns the result. 
+                By default, a String of the result will be returned. To return a Node, NodeSet,
+                Boolean or Number result, the {{resultType}} attribute can be set.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:complexType name="xpathExtractorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransformerType">
+                <xsd:sequence>
+                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A namespace declaration, expressed as {{prefix}} and {{uri}} attributes. The prefix can then be used inside the expression.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="expression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The XPath expression.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="resultType" type="xpathResultType" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The XPath result type (e.g. STRING or NODE). 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:simpleType name="xpathResultType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="NODESET" />
+            <xsd:enumeration value="NODE" />
+            <xsd:enumeration value="STRING" />
+            <xsd:enumeration value="BOOLEAN" />
+            <xsd:enumeration value="NUMBER" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:element name="object-to-xml-transformer" type="objectToXmlType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>

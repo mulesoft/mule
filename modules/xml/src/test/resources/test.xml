@@ -1,0 +1,7 @@
+<test>
+  <some>
+    <nested>value</nested>
+    <in>another</in>
+    <nested>element</nested>
+  </some>
+</test>
