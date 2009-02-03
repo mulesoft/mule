@@ -37,8 +37,10 @@ import javax.jms.Topic;
 
 /**
  * Registers a single JmsMessage listener but uses a thread pool to process incoming
- * messages
+ * messages.
+ * @deprecated use {@link org.mule.transport.jms.MultiConsumerJmsMessageReceiver} (set by default).
  */
+@Deprecated
 public class JmsMessageReceiver extends AbstractMessageReceiver implements MessageListener
 {
 
