@@ -387,4 +387,15 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
+    
+    <xsd:element name="security-manager-callback">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="securityManager-ref"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    
 </xsd:schema>

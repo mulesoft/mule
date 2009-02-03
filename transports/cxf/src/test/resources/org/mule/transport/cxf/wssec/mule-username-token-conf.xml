@@ -26,6 +26,8 @@
                 <ss:user name="anon" password="anon" authorities="ROLE_ANON" />
             </ss:user-service>
         </ss:authentication-provider>
+        
+        <cxf:security-manager-callback id="serverCallback"/>
     </spring:beans>
 
 
@@ -33,10 +35,6 @@
         <quartz:event-generator-job/>
     </quartz:endpoint>
 
-    <spring:bean id="serverCallback" 
-                 class="org.mule.transport.cxf.support.MuleSecurityManagerCallbackHandler">
-       <spring:property name="securityManager" ref="_muleSecurityManager"/>
-    </spring:bean>
     
     <spring:bean id="clientCallback" class="org.mule.transport.cxf.wssec.ClientPasswordCallback"/>
     

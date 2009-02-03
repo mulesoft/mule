@@ -22,11 +22,12 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSecurityException;
 
 public class MuleSecurityManagerCallbackHandler implements CallbackHandler
 {
     private org.mule.api.security.SecurityManager securityManager;
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
     {
         WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
@@ -40,21 +41,17 @@ public class MuleSecurityManagerCallbackHandler implements CallbackHandler
             try
             {
                 securityManager.authenticate(auth);
+                
+                pc.setPassword(pc.getPassword());
             }
             catch (SecurityException e)
             {
-                IOException ie = new IOException("password incorrect for user: " + pc.getIdentifer());
-                ie.initCause(e);
-                throw ie;
+                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, null, null, e);
             }
             catch (SecurityProviderNotFoundException e)
             {
-                IOException ie = new IOException("password incorrect for user: " + pc.getIdentifer());
-                ie.initCause(e);
-                throw ie;
+                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, null, null, e);
             }
-            
-            pc.setPassword(pc.getPassword());
         }
     }
 

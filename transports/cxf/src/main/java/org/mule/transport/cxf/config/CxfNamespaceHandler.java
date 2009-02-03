@@ -11,10 +11,13 @@
 package org.mule.transport.cxf.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.processors.AddAttribute;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.transport.cxf.CxfConnector;
 import org.mule.transport.cxf.CxfConstants;
 import org.mule.transport.cxf.component.WebServiceWrapperComponent;
+import org.mule.transport.cxf.support.MuleSecurityManagerCallbackHandler;
 import org.mule.transport.cxf.support.StaxFeature;
 
 import org.apache.cxf.configuration.spring.SimpleBeanDefinitionParser;
@@ -48,5 +51,10 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("stax", new SimpleBeanDefinitionParser(StaxFeature.class));
         
         registerBeanDefinitionParser("wrapper-component", new ComponentDefinitionParser(WebServiceWrapperComponent.class));
+        
+        OrphanDefinitionParser parser = new OrphanDefinitionParser(MuleSecurityManagerCallbackHandler.class, true);
+        parser.registerPreProcessor(new AddAttribute("securityManager-ref", "_muleSecurityManager"));
+        registerBeanDefinitionParser("security-manager-callback", parser);
+        
     }
 }
