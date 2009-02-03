@@ -182,8 +182,8 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
     /**
      * Load the source from the specified object.
      * 
-     * @param source The source payload.
-     * @return The source.
+     * @param msg Encompassing message
+     * @return The source
      */
     protected Source loadSource(MuleMessage msg) throws Exception
     {
