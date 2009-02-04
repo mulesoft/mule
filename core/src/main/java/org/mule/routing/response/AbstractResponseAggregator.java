@@ -16,7 +16,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.routing.EventCorrelator;
 import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.inbound.AbstractEventAggregator;
 import org.mule.routing.inbound.EventGroup;
 
 /**
@@ -96,9 +95,6 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
     protected abstract EventCorrelatorCallback getCorrelatorCallback();
 
-    /**
-     * @see AbstractEventAggregator#aggregateEvents(EventGroup)
-     */
     protected MuleMessage aggregateEvents(EventGroup events) throws RoutingException
     {
         return null;
