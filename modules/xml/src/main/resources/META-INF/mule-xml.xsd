@@ -642,7 +642,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
                 <xsd:sequence>
-                    <xsd:element name="namespace" type="namespaceType" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="includeConfigNamespaces" type="xsd:boolean" default="false">
                     <xsd:annotation>

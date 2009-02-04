@@ -10,16 +10,23 @@
 
 package org.mule.module.xml.filters;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.filter.Filter;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.xml.util.NamespaceManager;
 import org.mule.util.ClassUtils;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -34,7 +41,8 @@ import org.w3c.dom.Node;
 
 /**
  */
-public class XPathFilter extends AbstractJaxpFilter implements Filter, Initialisable
+public class XPathFilter extends AbstractJaxpFilter 
+    implements Filter, Initialisable, MuleContextAware
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -43,6 +51,10 @@ public class XPathFilter extends AbstractJaxpFilter implements Filter, Initialis
     private String expectedValue;
     private XPath xpath;
     private Map<String, String> prefixToNamespaceMap = null;
+
+    private NamespaceManager namespaceManager;
+
+    private MuleContext muleContext;
 
     public XPathFilter()
     {
@@ -57,6 +69,11 @@ public class XPathFilter extends AbstractJaxpFilter implements Filter, Initialis
     {
         this.pattern = pattern;
         this.expectedValue = expectedValue;
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
     public void initialise() throws InitialisationException
@@ -77,6 +94,27 @@ public class XPathFilter extends AbstractJaxpFilter implements Filter, Initialis
                 this);
         }
 
+        try
+        {
+            namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
+        }
+
+        if (namespaceManager != null)
+        {
+            if (prefixToNamespaceMap == null)
+            {
+                prefixToNamespaceMap = new HashMap(namespaceManager.getNamespaces());
+            }
+            else
+            {
+                prefixToNamespaceMap.putAll(namespaceManager.getNamespaces());
+            }
+        }
+        
         final Map<String, String> prefixToNamespaceMap = this.prefixToNamespaceMap;
         if (prefixToNamespaceMap != null)
         {

@@ -6,6 +6,7 @@
     xmlns:cxf-core="http://cxf.apache.org/core" 
     xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.2"
     xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
+    xmlns:simple="http://simple.component.mule.org/"
     xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
@@ -14,6 +15,7 @@
                http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
+    <mule-xml:namespace-manager includeConfigNamespaces="true"/>
     <custom-transformer
         class="org.mule.module.xml.transformer.XmlToDomDocument" 
         name="InputStreamToDOM"
@@ -25,10 +27,9 @@
         returnClass="org.w3c.dom.Document"/>
 
     <mule-xml:xpath-filter name="XPathFilter"
-        pattern="/soap:Envelope/soap:Body/mule:echo/mule:echo"
+        pattern="/soap:Envelope/soap:Body/simple:echo/simple:echo"
         expectedValue="Hello!">
         <mule-xml:namespace prefix="soap" uri="http://schemas.xmlsoap.org/soap/envelope/" />
-        <mule-xml:namespace prefix="mule" uri="http://simple.component.mule.org/" />
     </mule-xml:xpath-filter>
 
     <model name="XmlParse">

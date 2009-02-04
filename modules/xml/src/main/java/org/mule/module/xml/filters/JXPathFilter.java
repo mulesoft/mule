@@ -14,6 +14,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.CoreMessages;
@@ -36,7 +38,7 @@ import org.dom4j.XPath;
  * <code>JXPathFilter</code> evaluates an XPath expression against a W3C Document,
  * XML string, or Java bean and returns true if the result is as expected.
  */
-public class JXPathFilter implements Filter, MuleContextAware
+public class JXPathFilter implements Filter, MuleContextAware, Initialisable
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -59,6 +61,10 @@ public class JXPathFilter implements Filter, MuleContextAware
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+    }
+
+    public void initialise() throws InitialisationException
+    {
         try
         {
             namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
