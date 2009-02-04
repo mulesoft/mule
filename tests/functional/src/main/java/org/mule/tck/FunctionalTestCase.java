@@ -39,13 +39,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
     
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        return new SpringXmlConfigurationBuilder(getConfigurationResources());
-    }
-
-    //Delegate to an abstract method to ensure that FunctionalTestCases know they need to pass in config resources
-    protected String getConfigurationResources()
-    {
-        return getConfigResources();
+        return new SpringXmlConfigurationBuilder(getConfigResources());
     }
 
     protected abstract String getConfigResources();

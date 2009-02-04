@@ -26,7 +26,7 @@ import javax.servlet.ServletContext;
 public class MockTestCase extends AbstractWebappTestCase
 {
     @Override
-    protected String getConfigurationResources()
+    protected String getConfigResources()
     {
         return "jmx-config.xml," +
                "echo-config.xml," +
@@ -60,6 +60,6 @@ public class MockTestCase extends AbstractWebappTestCase
         context.expectAndReturn("getResourceAsStream", new FullConstraintMatcher(new IsInstanceOf(String.class)), null);
         context.expectAndReturn("getResourceAsStream", new FullConstraintMatcher(new IsInstanceOf(String.class)), null);
         context.expectAndReturn("getResourceAsStream", new FullConstraintMatcher(new IsInstanceOf(String.class)), null);
-        return new WebappMuleXmlConfigurationBuilder((ServletContext) context.proxy(), getConfigurationResources());
+        return new WebappMuleXmlConfigurationBuilder((ServletContext) context.proxy(), getConfigResources());
     }
 }

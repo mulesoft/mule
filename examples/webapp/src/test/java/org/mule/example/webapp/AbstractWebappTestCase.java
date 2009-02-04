@@ -16,9 +16,10 @@ import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.util.StringUtils;
 
-public abstract class AbstractWebappTestCase extends AbstractMuleTestCase
+public abstract class AbstractWebappTestCase extends FunctionalTestCase
 {
     
     public void testSanity() throws Exception
