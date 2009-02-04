@@ -94,24 +94,27 @@ public class XPathFilter extends AbstractJaxpFilter
                 this);
         }
 
-        try
+        if (muleContext != null)
         {
-            namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
-        }
-        catch (RegistrationException e)
-        {
-            throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
-        }
-
-        if (namespaceManager != null)
-        {
-            if (prefixToNamespaceMap == null)
+            try
             {
-                prefixToNamespaceMap = new HashMap(namespaceManager.getNamespaces());
+                namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
             }
-            else
+            catch (RegistrationException e)
             {
-                prefixToNamespaceMap.putAll(namespaceManager.getNamespaces());
+                throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
+            }
+
+            if (namespaceManager != null)
+            {
+                if (prefixToNamespaceMap == null)
+                {
+                    prefixToNamespaceMap = new HashMap(namespaceManager.getNamespaces());
+                }
+                else
+                {
+                    prefixToNamespaceMap.putAll(namespaceManager.getNamespaces());
+                }
             }
         }
         
