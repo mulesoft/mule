@@ -34,7 +34,7 @@ import java.io.OutputStream;
 public interface MessageReceiver extends Connectable
 {
     /**
-     * @return the receivers endpoint
+     * @return the endpoint from which we are receiving events 
      */
     InboundEndpoint getEndpoint();
 
@@ -86,5 +86,4 @@ public interface MessageReceiver extends Connectable
                             Transaction trans,
                             boolean synchronous,
                             OutputStream outputStream) throws MuleException;
-
 }

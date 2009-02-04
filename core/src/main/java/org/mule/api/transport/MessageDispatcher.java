@@ -10,6 +10,7 @@
 
 package org.mule.api.transport;
 
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 
 /**
@@ -53,4 +54,8 @@ public interface MessageDispatcher extends Connectable, MessageDispatching
      */
     Connector getConnector();
 
+    /**
+     * @return the endpoint which we are dispatching events to
+     */
+    OutboundEndpoint getEndpoint();
 }

@@ -80,7 +80,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     {
         try
         {
-            getConnector().handleException(e);
+            handleException(e);
         }
         finally
         {
@@ -90,7 +90,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
 
     public void handleException(Exception exception)
     {
-        connector.handleException(exception);
+        connector.handleException(exception, this);
     }
 
     public boolean validate()

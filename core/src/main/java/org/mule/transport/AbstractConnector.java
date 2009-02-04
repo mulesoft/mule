@@ -676,13 +676,12 @@ public abstract class AbstractConnector
         return disposed.get();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.transport.Connector#handleException(java.lang.Object,
-     *      java.lang.Throwable)
-     */
     public void handleException(Exception exception)
+    {
+        handleException(exception, null);
+    }
+    
+    public void handleException(Exception exception, Connectable failed)
     {
         if (isConnected() &&
             exception instanceof ConnectException &&      
@@ -713,13 +712,17 @@ public abstract class AbstractConnector
                 // Store some info. about the receiver/dispatcher which threw the ConnectException so 
                 // that we can make sure that problem has been resolved when we go to reconnect.
                 Map info = new HashMap();
-                if (exception instanceof ReceiverConnectException)
+                if (failed instanceof MessageReceiver)
                 {
-                    info.put("failedReceiver", ((ConnectException) exception).getComponent());
+                    info.put(RetryContext.FAILED_RECEIVER, ((MessageReceiver) failed).getReceiverKey());
                 }
-                else if (exception instanceof DispatcherConnectException)
+                else if (failed instanceof MessageDispatcher)
                 {
-                    info.put("failedDispatcher", ((ConnectException) exception).getComponent());
+                    info.put(RetryContext.FAILED_DISPATCHER, ((MessageDispatcher) failed).getEndpoint());
+                }
+                else if (failed instanceof MessageRequester)
+                {
+                    info.put(RetryContext.FAILED_REQUESTER, ((MessageRequester) failed).getEndpoint());
                 }
                 retryPolicyTemplate.setMetaInfo(info);
 
@@ -1418,18 +1421,18 @@ public abstract class AbstractConnector
                     Map info = context.getMetaInfo();
                     if (info != null)
                     {
-                        if (info.get("failedReceiver") != null)
+                        if (info.get(RetryContext.FAILED_RECEIVER) != null)
                         {
-                            String receiverKey = (String) info.get("failedReceiver");
+                            String receiverKey = (String) info.get(RetryContext.FAILED_RECEIVER);
                             MessageReceiver receiver = (MessageReceiver) receivers.get(receiverKey);
                             if (!receiver.validateConnection())
                             {
                                 throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"), receiver);
                             }
                         }
-                        else if (info.get("failedDispatcher") != null)
+                        else if (info.get(RetryContext.FAILED_DISPATCHER) != null)
                         {
-                            OutboundEndpoint endpoint = (OutboundEndpoint) info.get("failedDispatcher");
+                            OutboundEndpoint endpoint = (OutboundEndpoint) info.get(RetryContext.FAILED_DISPATCHER);
                             MessageDispatcher dispatcher = (MessageDispatcher) dispatchers.borrowObject(endpoint);
                             try
                             {
@@ -1441,6 +1444,22 @@ public abstract class AbstractConnector
                             finally
                             {
                                 dispatchers.returnObject(endpoint, dispatcher);
+                            }
+                        }
+                        else if (info.get(RetryContext.FAILED_REQUESTER) != null)
+                        {
+                            OutboundEndpoint endpoint = (OutboundEndpoint) info.get(RetryContext.FAILED_REQUESTER);
+                            MessageRequester requester = (MessageRequester) requesters.borrowObject(endpoint);
+                            try
+                            {
+                                if (!requester.validateConnection())
+                                {
+                                    throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"), null);
+                                }
+                            }
+                            finally
+                            {
+                                requesters.returnObject(endpoint, requester);
                             }
                         }
                     }

@@ -322,6 +322,11 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
     }
     
+    public OutboundEndpoint getEndpoint()
+    {
+        return (OutboundEndpoint) super.getEndpoint();
+    }
+    
     protected abstract void doDispatch(MuleEvent event) throws Exception;
 
     protected abstract MuleMessage doSend(MuleEvent event) throws Exception;                                             

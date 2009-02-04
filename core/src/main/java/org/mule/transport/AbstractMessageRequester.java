@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.ReceiveException;
@@ -104,6 +105,11 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
             handleException(e);
             return null;
         }
+    }
+    
+    public OutboundEndpoint getEndpoint()
+    {
+        return (OutboundEndpoint) super.getEndpoint();
     }
     
     /**
