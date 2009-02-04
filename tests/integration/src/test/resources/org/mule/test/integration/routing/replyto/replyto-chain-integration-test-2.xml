@@ -26,7 +26,7 @@
 
         <service name="pojo2">
             <inbound>
-                <inbound-endpoint address="jms://pojo2" synchronous="false" />
+                <inbound-endpoint address="jms://pojo2" synchronous="true" />
             </inbound>
             <echo-component />
             <outbound>

@@ -31,9 +31,7 @@ public class ReplyToChainIntegration2TestCase extends FunctionalTestCase
         String message = "test";
 
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
-        props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
-        MuleMessage result = client.send("vm://pojo1", message, props);
+        MuleMessage result = client.send("vm://pojo1", message, null);
         assertNotNull(result);
         assertEquals("Received: " + message, result.getPayload());
     }

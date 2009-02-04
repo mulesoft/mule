@@ -2,10 +2,6 @@
 # Mule 1.x failures
 ##########################################################################
 
-# Require updated config?
-# MULE-3696
-org.mule.test.integration.routing.replyto.ReplytoChainIntegration2TestCase
-
 # MULE-3697
 org.mule.test.usecases.axis.AxisClientWithComplexTypesTestCase
 
@@ -52,9 +48,6 @@ org.mule.test.integration.models.ConfigureModelTestCase
 # MULE-2741
 org.mule.test.integration.models.OptimisedSedaPipelineTestCase
 org.mule.test.integration.models.SedaPipelineTestCase
-
-# MULE-3709
-org.mule.config.spring.ComponentInterceptorTestCase
 
 # MULE-3000
 org.mule.test.integration.client.MuleClientRemotingTcpTestCase
