@@ -351,8 +351,9 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
     /**
      * If enableMessageHistory = true, returns the number of messages received by this service.
+     * @return -1 if no message history, otherwise the history size
      */
-    public int getReceivedMessages()
+    public int getReceivedMessagesCount()
     {
         if (messageHistory != null)
         {
