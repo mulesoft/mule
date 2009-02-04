@@ -20,9 +20,9 @@ import java.util.Map;
  */
 public interface RetryContext
 {
-    public static String FAILED_RECEIVER = "failedReceiver";
-    public static String FAILED_DISPATCHER = "failedDispatcher";
-    public static String FAILED_REQUESTER = "failedRequester";
+    String FAILED_RECEIVER = "failedReceiver";
+    String FAILED_DISPATCHER = "failedDispatcher";
+    String FAILED_REQUESTER = "failedRequester";
     
     Map getMetaInfo();
 
