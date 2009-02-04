@@ -26,7 +26,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "activemq-config.xml";
+        return "integration/activemq-config.xml";
     }
 
     public void testConfigurationDefaults() throws Exception

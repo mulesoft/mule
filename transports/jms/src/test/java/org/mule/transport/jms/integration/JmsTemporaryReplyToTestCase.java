@@ -13,13 +13,21 @@ package org.mule.transport.jms.integration;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 
-public class JmsTemporaryReplyToTestCase extends FunctionalTestCase
+/**
+ * TODO this test does not use the Test scenarios, I think it would need a new Method sendAndReceive
+ * It might make sense to leave this test as is because it tests that the client also works witrh ReplyTo correctly
+ */
+public abstract class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsTemporaryReplyToTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "jms-temporary-replyTo-test.xml";
+        return "integration/jms-temporary-replyTo.xml";
     }
 
     public void testTemporaryReplyEnabled() throws MuleException

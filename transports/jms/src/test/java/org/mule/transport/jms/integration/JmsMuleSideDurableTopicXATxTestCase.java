@@ -16,14 +16,19 @@ import org.mule.module.client.MuleClient;
  * Testing durable topic
  * with XA transactions
  */
-public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTestCase
 {
 
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
 
+    public JmsMuleSideDurableTopicXATxTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-muleside-durable-topic-xa-tx.xml";
+        return "integration/jms-muleside-durable-topic-xa-tx.xml";
     }
 
     public void testMuleXaTopic() throws Exception
@@ -34,11 +39,11 @@ public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTe
         MuleMessage result = null;
         MuleClient client = new MuleClient();
         client.dispatch("vm://in", DEFAULT_INPUT_MESSAGE, null);
-        result = client.request("vm://out", TIMEOUT);
+        result = client.request("vm://out", getTimeout());
         assertNotNull(result);
-        result = client.request("vm://out", TIMEOUT);
+        result = client.request("vm://out", getTimeout());
         assertNotNull(result);
-        result = client.request("vm://out", SMALL_TIMEOUT);
+        result = client.request("vm://out", getSmallTimeout());
         assertNull(result);
 
         muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).stop();
@@ -49,13 +54,13 @@ public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTe
         muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).start();
         Thread.sleep(1000);
         logger.info(CONNECTOR1_NAME + " is started");
-        result = client.request("vm://out", TIMEOUT);
+        result = client.request("vm://out", getTimeout());
         assertNotNull(result);
         logger.info("Received " + result.getPayload());
-        result = client.request("vm://out", TIMEOUT);
+        result = client.request("vm://out", getTimeout());
         assertNotNull(result);
         logger.info("!Received " + result.getPayload());
-        result = client.request("vm://out", SMALL_TIMEOUT);
+        result = client.request("vm://out", getSmallTimeout());
         assertNull(result);
     }
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd">
+
+    <jms:activemq-connector name="jmsConnector">
+        <spring:property name="retryPolicyFactory" ref="SimpleRetryPolicyFactory"/>
+    </jms:activemq-connector>
+
+    <spring:bean name="SimpleRetryPolicyFactory" class="org.mule.retry.policies.SimpleRetryPolicyFactory">
+        <spring:property name="retryCount" value="5"/>
+        <spring:property name="frequency" value="1000"/>
+    </spring:bean>
+
+</mule>

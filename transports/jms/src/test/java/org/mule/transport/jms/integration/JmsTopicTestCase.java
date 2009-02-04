@@ -12,11 +12,16 @@ package org.mule.transport.jms.integration;
 /**
  * Message is put to topic with two subscribers
  */
-public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsTopicTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-topic.xml";
+        return "integration/jms-topic.xml";
     }
     
     public void testJmsTopic() throws Exception

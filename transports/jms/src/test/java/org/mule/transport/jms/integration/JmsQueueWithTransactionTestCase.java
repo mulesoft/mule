@@ -14,12 +14,16 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
-public class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCase
 {
-    
+    public JmsQueueWithTransactionTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-queue-with-transaction.xml";
+        return "integration/jms-queue-with-transaction.xml";
     }
 
     public void testOutboundJmsTransaction() throws Exception
@@ -27,7 +31,7 @@ public class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCa
         MuleClient client = new MuleClient();
         client.send("vm://in", new DefaultMuleMessage(DEFAULT_INPUT_MESSAGE));
             
-        MuleMessage response = client.request("vm://out", TIMEOUT);
+        MuleMessage response = client.request("vm://out", getTimeout());
         assertNotNull(response);
         assertEquals(DEFAULT_INPUT_MESSAGE, response.getPayloadAsString());
     }

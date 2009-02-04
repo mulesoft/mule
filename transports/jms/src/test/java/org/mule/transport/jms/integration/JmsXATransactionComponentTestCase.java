@@ -14,13 +14,18 @@ import org.mule.module.client.MuleClient;
 
 
 
-public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTestCase
 {
     public static final String CONNECTOR1_NAME = "jmsConnector";
-    
+
+    public JmsXATransactionComponentTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-xa-tx-component.xml";
+        return "integration/jms-xa-tx-component.xml";
     }
 
     public void testOneGlobalTx() throws Exception
@@ -28,11 +33,10 @@ public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTest
         MuleMessage result = null;
         MuleClient client = new MuleClient();
         client.dispatch("vm://in", DEFAULT_INPUT_MESSAGE, null);
-        result = client.request("vm://out", TIMEOUT);
+        result = client.request("vm://out", getTimeout());
         assertNotNull(result);
-        result = client.request("vm://out", SMALL_TIMEOUT);
+        result = client.request("vm://out", getSmallTimeout());
         assertNull(result);
-
         muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).stop();
         assertEquals(muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).isStarted(), false);
         logger.info(CONNECTOR1_NAME + " is stopped");
@@ -41,9 +45,9 @@ public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTest
         muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).start();
         Thread.sleep(1000);
         logger.info(CONNECTOR1_NAME + " is started");
-        result = client.request("vm://out", TIMEOUT);
+        result = client.request("vm://out", getTimeout());
         assertNotNull(result);
-        result = client.request("vm://out", SMALL_TIMEOUT);
+        result = client.request("vm://out", getSmallTimeout());
         assertNull(result);
     }
 }

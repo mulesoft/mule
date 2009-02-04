@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:util="http://www.springframework.org/schema/util"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+      xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+           http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+           http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+           http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
+
+    <vm:connector name="vmConnector" queueEvents="true"/>
+
+    <model>
+        <service name="ConnectionFactoryFromJndi">
+            <inbound>
+                <jms:inbound-endpoint queue="in1" connector-ref="jmsConnector1"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="QueueFromJndi">
+            <inbound>
+                <!-- this queue is looked up from JNDI -->
+                <jms:inbound-endpoint queue="in2" connector-ref="jmsConnector2"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="TopicFromJndi">
+            <inbound>
+                <!-- this topic is looked up from JNDI -->
+                <jms:inbound-endpoint topic="some/long/path/in3" connector-ref="jmsConnector2"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

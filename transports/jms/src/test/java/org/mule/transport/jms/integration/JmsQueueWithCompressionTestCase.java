@@ -14,11 +14,16 @@ import org.mule.tck.testmodels.fruit.Apple;
 /**
  * Message is sent to and received from simple queue using compression in between
  */
-public class JmsQueueWithCompressionTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsQueueWithCompressionTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsQueueWithCompressionTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-queue-with-compression.xml";
+        return "integration/jms-queue-with-compression.xml";
     }
 
     public void testJmsQueue() throws Exception

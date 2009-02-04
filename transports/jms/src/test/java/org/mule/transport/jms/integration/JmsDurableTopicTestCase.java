@@ -12,20 +12,24 @@ package org.mule.transport.jms.integration;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Topic;
-import javax.jms.TopicConnection;
-import javax.jms.TopicConnectionFactory;
-import javax.jms.TopicSession;
+import javax.jms.ConnectionFactory;
+import javax.jms.Connection;
+import javax.jms.Session;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-
-public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
     public static final String TOPIC_QUEUE_NAME = "durable.broadcast";
     private String clientId;
 
+
+    public JmsDurableTopicTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-durable-topic.xml";
+        return "integration/jms-durable-topic.xml";
     }
 
     public void testProviderDurableSubscriber() throws Exception
@@ -48,7 +52,7 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 
     Scenario scenarioNonTx = new NonTransactedScenario()
     {
-        public String getOutputQueue()
+        public String getOutputDestinationName()
         {
             return TOPIC_QUEUE_NAME;
         }
@@ -56,7 +60,7 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 
     Scenario scenarioNotReceive = new ScenarioNotReceive()
     {
-        public String getOutputQueue()
+        public String getOutputDestinationName()
         {
             return TOPIC_QUEUE_NAME;
         }
@@ -64,18 +68,18 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 
     public Message receive(Scenario scenario) throws Exception
     {
-        TopicConnection connection = null;
+        Connection connection = null;
         try
         {
-            TopicConnectionFactory factory = new ActiveMQConnectionFactory(scenario.getBrokerUrl());
-            connection = factory.createTopicConnection();
+            ConnectionFactory factory = getConnectionFactory(true, false);
+            connection = factory.createConnection();
             connection.setClientID(getClientId());
             connection.start();
-            TopicSession session = null;
+            Session session = null;
             try
             {
-                session = connection.createTopicSession(scenario.isTransacted(), scenario.getAcknowledge());
-                Topic destination = session.createTopic(scenario.getOutputQueue());
+                session = connection.createSession(scenario.isTransacted(), scenario.getAcknowledge());
+                Topic destination = session.createTopic(scenario.getOutputDestinationName());
                 MessageConsumer consumer = null;
                 try
                 {

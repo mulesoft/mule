@@ -10,8 +10,16 @@
 
 package org.mule.transport.jms.integration;
 
-public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends AbstractJmsFunctionalTestCase
+import java.util.Map;
+import java.util.Properties;
+
+public abstract class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends AbstractJmsFunctionalTestCase
 {
+
+    public JmsSingleTransactionAlwaysBeginConfigurationTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
 
     public static final String JMS_QUEUE_INPUT_CONF_A = "in1";
     public static final String JMS_QUEUE_OUTPUT_CONF_A = "out1";
@@ -20,19 +28,32 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
     public static final String JMS_QUEUE_INPUT_CONF_C = "in3";
     public static final String JMS_QUEUE_OUTPUT_CONF_C = "out3";
 
+    @Override
+    protected Properties getStartUpProperties()
+    {
+        Properties props = super.getStartUpProperties();
+        //Inject endpoint names into the config
+        props.put(INBOUND_ENDPOINT_KEY + "1", getJmsConfig().getInboundEndpoint() + "1");
+        props.put(INBOUND_ENDPOINT_KEY + "2", getJmsConfig().getInboundEndpoint() + "2");
+        props.put(INBOUND_ENDPOINT_KEY + "3", getJmsConfig().getInboundEndpoint() + "3");
+        props.put(OUTBOUND_ENDPOINT_KEY + "1", getJmsConfig().getOutboundEndpoint()+ "1");
+        props.put(OUTBOUND_ENDPOINT_KEY + "2", getJmsConfig().getOutboundEndpoint()+ "2");
+        props.put(OUTBOUND_ENDPOINT_KEY + "3", getJmsConfig().getOutboundEndpoint()+ "3");
+        return props;
+    }
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-single-tx-ALWAYS_BEGIN-configuration.xml";
+        return "integration/jms-single-tx-ALWAYS_BEGIN.xml";
     }
 
     public void testConfigurationA() throws Exception
     {
-        scenarioCommit.setInputQueue(JMS_QUEUE_INPUT_CONF_A);
-        scenarioRollback.setInputQueue(JMS_QUEUE_INPUT_CONF_A);
-        scenarioNotReceive.setInputQueue(JMS_QUEUE_INPUT_CONF_A);
-        scenarioCommit.setOutputQueue(JMS_QUEUE_OUTPUT_CONF_A);
-        scenarioRollback.setOutputQueue(JMS_QUEUE_OUTPUT_CONF_A);
-        scenarioNotReceive.setOutputQueue(JMS_QUEUE_OUTPUT_CONF_A);
+        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
+        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
+        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
+        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
+        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
+        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
 
         send(scenarioCommit);
         receive(scenarioRollback);
@@ -42,12 +63,12 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
 
     public void testConfigurationB() throws Exception
     {
-        scenarioCommit.setInputQueue(JMS_QUEUE_INPUT_CONF_B);
-        scenarioRollback.setInputQueue(JMS_QUEUE_INPUT_CONF_B);
-        scenarioNotReceive.setInputQueue(JMS_QUEUE_INPUT_CONF_B);
-        scenarioCommit.setOutputQueue(JMS_QUEUE_OUTPUT_CONF_B);
-        scenarioRollback.setOutputQueue(JMS_QUEUE_OUTPUT_CONF_B);
-        scenarioNotReceive.setOutputQueue(JMS_QUEUE_OUTPUT_CONF_B);
+        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
+        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
+        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
+        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
+        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
+        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
 
         send(scenarioCommit);
         receive(scenarioRollback);
@@ -55,22 +76,22 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         receive(scenarioNotReceive);
     }
 
-    /*
+
     public void testConfigurationC() throws Exception
     {
-        scenarioCommit.setInputQueue(JMS_QUEUE_INPUT_CONF_C);
-        scenarioRollback.setInputQueue(JMS_QUEUE_INPUT_CONF_C);
-        scenarioNotReceive.setInputQueue(JMS_QUEUE_INPUT_CONF_C);
-        scenarioCommit.setOutputQueue(JMS_QUEUE_OUTPUT_CONF_C);
-        scenarioRollback.setOutputQueue(JMS_QUEUE_OUTPUT_CONF_C);
-        scenarioNotReceive.setOutputQueue(JMS_QUEUE_OUTPUT_CONF_C);
+        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
+        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
+        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
+        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
+        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
+        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
 
         send(scenarioCommit);
         receive(scenarioRollback);
         receive(scenarioCommit);
         receive(scenarioNotReceive);
     }
-    */
+
 
 }
 

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
+
+    <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
+    <jms:endpoint name="topic" topic="durable.broadcast" connector-ref="jmsConnector"/>
+
+    <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
+
+    <model name="TEST">
+        <service name="InputPart">
+            <inbound>
+                <inbound-endpoint ref="in"/>
+            </inbound>
+            <test:component>
+                <test:return-data>OUTPUT MESSAGE</test:return-data>
+            </test:component>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="topic" transformer-refs="ObjectToJMSMessage"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+    </model>
+
+</mule>

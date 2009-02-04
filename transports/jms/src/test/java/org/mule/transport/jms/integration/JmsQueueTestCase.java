@@ -12,11 +12,16 @@ package org.mule.transport.jms.integration;
 /**
  * Message is sent to and received from simple queue.
  */
-public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsQueueTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-queue.xml";
+        return "integration/jms-queue.xml";
     }
 
     public void testJmsQueue() throws Exception

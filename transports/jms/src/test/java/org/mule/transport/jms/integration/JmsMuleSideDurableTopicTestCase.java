@@ -21,19 +21,22 @@ import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
+import javax.jms.Topic;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.command.ActiveMQTopic;
-
-public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
 
     public static final String TOPIC_QUEUE_NAME = "durable.broadcast";
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
 
+    public JmsMuleSideDurableTopicTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-muleside-durable-topic.xml";
+        return "integration/jms-muleside-durable-topic.xml";
     }
 
     public void testMuleDurableSubscriber() throws Exception
@@ -54,7 +57,7 @@ public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCa
 
     Scenario scenarioNoTx = new NonTransactedScenario()
     {
-        public String getInputQueue()
+        public String getInputDestinationName()
         {
             return TOPIC_QUEUE_NAME;
         }
@@ -68,7 +71,7 @@ public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCa
 
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
-            Message message = consumer.receive(TIMEOUT);
+            Message message = consumer.receive(getTimeout());
             assertNotNull(message);
             assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
             assertEquals(((TextMessage) message).getText(), DEFAULT_OUTPUT_MESSAGE);
@@ -83,14 +86,14 @@ public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCa
         TopicConnection connection = null;
         try
         {
-            TopicConnectionFactory factory = new ActiveMQConnectionFactory(scenario.getBrokerUrl());
+            TopicConnectionFactory factory = (TopicConnectionFactory)getConnectionFactory(true, false);
             connection = factory.createTopicConnection();
             connection.start();
             TopicSession session = null;
             try
             {
                 session = connection.createTopicSession(scenario.isTransacted(), scenario.getAcknowledge());
-                ActiveMQTopic destination = new ActiveMQTopic(scenario.getInputQueue());
+                Topic destination = session.createTopic(scenario.getInputDestinationName());
                 TopicPublisher publisher = null;
                 try
                 {

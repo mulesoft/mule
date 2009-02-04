@@ -21,13 +21,18 @@ import javax.jms.Session;
 /**
  * Tests a transactional exception strategy.
  */
-public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
 {
     public static final String DEADLETTER_QUEUE_NAME = "dead.letter";
-    
+
+    public JmsExceptionStrategyTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-exception-strategy.xml";
+        return "integration/jms-exception-strategy.xml";
     }
 
     public void testTransactedRedeliveryToDLDestination() throws Exception
@@ -54,7 +59,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
     class ScenarioDeadLetter extends ScenarioCommit
     {
         // @Override
-        public String getOutputQueue()
+        public String getOutputDestinationName()
         {
             return DEADLETTER_QUEUE_NAME;
         }
@@ -63,7 +68,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
             // Verify message got sent to dead letter queue.
-            Message message = consumer.receive(TIMEOUT);
+            Message message = consumer.receive(getTimeout());
             assertNotNull(message);
             assertTrue("Message should be ObjectMessage but is " + message.getClass(), message instanceof ObjectMessage);
             Object obj = ((ObjectMessage) message).getObject();
@@ -96,7 +101,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         // @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
-            Message message = consumer.receive(SMALL_TIMEOUT);
+            Message message = consumer.receive(getSmallTimeout());
             assertNull(message);
             return message;
         }

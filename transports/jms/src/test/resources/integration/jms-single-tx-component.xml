@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
+
+    <endpoint name="in" address="${inbound.destination}"/>
+    <endpoint name="middle" address="${middle.destination}"/>
+    <endpoint name="out" address="${outbound.destination}"/>
+    <endpoint name="q1" address="${protocol}://q1"/>
+    <endpoint name="q2" address="${protocol}://q2"/>
+
+    <model name="jmsTest">
+        <service name="Part1">
+            <inbound>
+                <jms:inbound-endpoint ref="in">
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
+                </jms:inbound-endpoint>
+            </inbound>
+            <test:component/>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint ref="middle">
+                        <jms:transaction action="NONE"/>
+                    </jms:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="Part2">
+            <inbound>
+                <jms:inbound-endpoint ref="middle">
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
+                </jms:inbound-endpoint>
+            </inbound>
+            <test:component/>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint ref="q1">
+                        <jms:transaction action="BEGIN_OR_JOIN"/>
+                    </jms:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="Part3">
+            <inbound>
+                <jms:inbound-endpoint ref="q1">
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
+                </jms:inbound-endpoint>
+            </inbound>
+            <test:component/>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint ref="q2">
+                        <jms:transaction action="BEGIN_OR_JOIN"/>
+                    </jms:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="Part4">
+            <inbound>
+                <jms:inbound-endpoint ref="q2">
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
+                </jms:inbound-endpoint>
+            </inbound>
+            <test:component>
+                <test:return-data>OUTPUT MESSAGE</test:return-data>
+            </test:component>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint ref="out">
+                        <jms:transaction action="BEGIN_OR_JOIN"/>
+                    </jms:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+      xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.2"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/jbossts/2.2 http://www.mulesource.org/schema/mule/jbossts/2.2/mule-jbossts.xsd">
+
+    <jbossts:transaction-manager/>
+
+    <endpoint name="in" address="${inbound.destination}"/>
+    <endpoint name="out" address="${outbound.destination}"/>
+
+    <model name="TEST">
+        <service name="Part1">
+            <inbound>
+                <jms:inbound-endpoint ref="in">
+                    <xa-transaction action="BEGIN_OR_JOIN"/>
+                    <properties>
+                        <spring:entry key="reuseConsumer" value="true"/>
+                        <spring:entry key="reuseSession" value="true"/>
+                    </properties>
+                </jms:inbound-endpoint>
+            </inbound>
+            <component>
+                <singleton-object
+                        class="org.mule.transport.jms.integration.JmsXAAlwaysBeginTestCase$TestRollbackComponent"/>
+            </component>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint ref="out">
+                        <xa-transaction action="ALWAYS_BEGIN"/>
+                    </jms:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

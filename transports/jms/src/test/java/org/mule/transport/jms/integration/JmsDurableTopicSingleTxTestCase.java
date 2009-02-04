@@ -13,14 +13,19 @@ package org.mule.transport.jms.integration;
 /**
  * Testing durable topic with external subscriber
  */
-public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
+public abstract class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 {
 
     public static final String TOPIC_QUEUE_NAME = "durable.broadcast";
 
+    public JmsDurableTopicSingleTxTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-durable-topic-single-tx.xml";
+        return "integration/jms-durable-topic-single-tx.xml";
     }
 
     /**
@@ -48,7 +53,7 @@ public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 
     Scenario scenarioCommit = new ScenarioCommit()
     {
-        public String getOutputQueue()
+        public String getOutputDestinationName()
         {
             return TOPIC_QUEUE_NAME;
         }
@@ -56,7 +61,7 @@ public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 
     Scenario scenarioRollback = new ScenarioRollback()
     {
-        public String getOutputQueue()
+        public String getOutputDestinationName()
         {
             return TOPIC_QUEUE_NAME;
         }
@@ -64,7 +69,7 @@ public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 
     Scenario scenarioNotReceive = new ScenarioNotReceive()
     {
-        public String getOutputQueue()
+        public String getOutputDestinationName()
         {
             return TOPIC_QUEUE_NAME;
         }

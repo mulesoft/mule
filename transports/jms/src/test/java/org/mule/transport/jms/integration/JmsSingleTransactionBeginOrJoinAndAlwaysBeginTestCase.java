@@ -9,11 +9,16 @@
  */
 package org.mule.transport.jms.integration;
 
-public class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-single-tx-BEGIN_OR_JOIN_AND_ALWAYS_BEGIN.xml";
+        return "integration/jms-single-tx-BEGIN_OR_JOIN_AND_ALWAYS_BEGIN.xml";
     }
 
     public void testSingleTransactionBeginOrJoinAndAlwaysBegin() throws Exception

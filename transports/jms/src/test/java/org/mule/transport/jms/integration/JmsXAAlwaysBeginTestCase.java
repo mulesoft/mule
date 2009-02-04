@@ -21,8 +21,12 @@ import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsXAAlwaysBeginTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
 
     private static final List committedTx = new CopyOnWriteArrayList();
     private static final List rolledbackTx = new CopyOnWriteArrayList();
@@ -30,7 +34,7 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-xa-tx-ALWAYS_BEGIN.xml";
+        return "integration/jms-xa-tx-ALWAYS_BEGIN.xml";
     }
 
     public void testAlwaysBeginTx() throws Exception

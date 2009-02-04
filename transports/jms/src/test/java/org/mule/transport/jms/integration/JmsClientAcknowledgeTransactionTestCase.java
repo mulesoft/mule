@@ -9,6 +9,12 @@
  */
 package org.mule.transport.jms.integration;
 
+import org.mule.transport.jms.JmsConnector;
+import org.mule.transport.jms.activemq.ActiveMQJmsConnector;
+
+import java.util.Properties;
+import java.util.Map;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
@@ -18,12 +24,18 @@ import javax.jms.Session;
 /**
  * Test jms using JmsClientAcknowledgeTransactionFactory
  */
-public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunctionalTestCase
 {
 
+    public JmsClientAcknowledgeTransactionTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
+    @Override
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-client-acknowledge-tx.xml";
+        return "integration/jms-client-acknowledge-tx.xml";
     }
 
     public void testJmsClientAcknowledgeTransaction() throws Exception
@@ -49,7 +61,7 @@ public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunction
 
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
-            Message message = consumer.receive(TIMEOUT);
+            Message message = consumer.receive(getTimeout());
             assertNotNull(message);
             message.acknowledge();
             return message;

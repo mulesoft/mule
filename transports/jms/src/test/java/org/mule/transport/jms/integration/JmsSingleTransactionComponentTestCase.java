@@ -14,11 +14,16 @@ package org.mule.transport.jms.integration;
  * There is a separate transaction for each service
  * when single transaction(action: BEGIN_OR_JOIN) and jms transport are used
  */
-public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsSingleTransactionComponentTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
-        return "providers/activemq/jms-single-tx-component.xml";
+        return "integration/jms-single-tx-component.xml";
     }
 
     public void testSingleTransactionComponent() throws Exception
