@@ -12,8 +12,6 @@ package org.mule.transport.jms.integration;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase;
-import org.mule.transport.jms.integration.JmsVendorConfiguration;
 
 /**
  * Requires the following connector config:

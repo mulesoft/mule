@@ -17,11 +17,11 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import javax.jms.Topic;
 import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
-import javax.jms.Topic;
 
 public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
@@ -101,10 +101,6 @@ public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctio
                     publisher.setDeliveryMode(DeliveryMode.PERSISTENT);
                     scenario.send(session, publisher);
                 }
-                catch (Exception e)
-                {
-                    throw e;
-                }
                 finally
                 {
                     if (publisher != null)
@@ -113,10 +109,6 @@ public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctio
                     }
                 }
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
             finally
             {
                 if (session != null)
@@ -124,10 +116,6 @@ public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctio
                     session.close();
                 }
             }
-        }
-        catch (Exception e)
-        {
-            throw e;
         }
         finally
         {

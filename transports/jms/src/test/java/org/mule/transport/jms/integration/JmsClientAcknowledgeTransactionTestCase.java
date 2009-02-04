@@ -9,12 +9,6 @@
  */
 package org.mule.transport.jms.integration;
 
-import org.mule.transport.jms.JmsConnector;
-import org.mule.transport.jms.activemq.ActiveMQJmsConnector;
-
-import java.util.Properties;
-import java.util.Map;
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;

@@ -11,12 +11,10 @@
 package org.mule.transport.jms.integration;
 
 import org.mule.RequestContext;
-import org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase;
-import org.mule.transport.jms.integration.JmsVendorConfiguration;
+import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.transport.jms.transformers.JMSMessageToObject;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
-import org.mule.transport.jms.JmsConnector;
 import org.mule.util.FileUtils;
 import org.mule.util.compression.CompressionStrategy;
 import org.mule.util.compression.GZipCompression;

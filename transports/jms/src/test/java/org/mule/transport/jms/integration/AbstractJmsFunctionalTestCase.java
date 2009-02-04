@@ -11,12 +11,10 @@ package org.mule.transport.jms.integration;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.jms.Connection;
@@ -82,14 +80,17 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         String resources = getConfigResources().substring(getConfigResources().lastIndexOf("/") + 1);
-        resources = "integration/" + getJmsConfig().getProviderName() + "/connector-" + resources + "," + getConfigResources();
+        resources = String.format("integration/%s/connector-%s,%s",
+                                  getJmsConfig().getProviderName(),
+                                  resources,
+                                  getConfigResources());
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(resources);
         return builder;
     }
 
     public final JmsVendorConfiguration getJmsConfig()
     {
-        if(jmsConfig==null)
+        if (jmsConfig == null)
         {
             jmsConfig = creatJmsConfig();
         }
@@ -159,7 +160,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected void checkConfig()
     {
-        if(getJmsConfig()==null)
+        if (getJmsConfig() == null)
         {
             throw new IllegalStateException("There must be a Jms Vendor config set on this test");
         }
@@ -227,7 +228,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 try
                 {
                     producer = session.createProducer(destination);
-                    if(scenario.isPersistent())
+                    if (scenario.isPersistent())
                     {
                         producer.setDeliveryMode(DeliveryMode.PERSISTENT);
                     }
