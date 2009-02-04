@@ -2,8 +2,3 @@
 # Test cases listed in this file are not run.
 #
 
-# These broke as a result of adding the isAbleToConnect() test to FtpMessageReceiver (part of EE-1244)
-# For some reason, the socket is taking too long to release and thus we get a java.net.BindException: Address already in use 
-# I'm hoping the upgrade of FtpServer will fix this (EE-1247)
-org.mule.transport.ftp.FtpStreamingTestCase
-org.mule.transport.ftp.issues.MultiStreamMule1696TestCase
