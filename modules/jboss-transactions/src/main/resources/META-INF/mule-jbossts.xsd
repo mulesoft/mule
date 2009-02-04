@@ -35,6 +35,16 @@
 {code}
 
 You can then declare XA transactions on endpoints supporting XA transactions, and all those transactions will be managed by the JBoss transaction manager.
+
+Mule auto-generates the transaction manager XA node ID. To specify the ID yourself, add the following property:
+
+{code:xml}
+&lt;jbossts:transaction-manager&gt;
+   &lt;properties&gt;
+      &lt;spring:entry key="com.arjuna.ats.arjuna.xa.nodeIdentifier" value="SomeUserNodeId"/&gt;
+   &lt;/properties&gt;
+&lt;/jbossts:transaction-manager&gt;
+{code}
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
