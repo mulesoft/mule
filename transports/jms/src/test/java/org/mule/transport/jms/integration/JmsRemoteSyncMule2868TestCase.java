@@ -8,26 +8,30 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jms.issues;
+package org.mule.transport.jms.integration;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-public class JmsRemoteSyncMule2868TestCase extends FunctionalTestCase
+public abstract class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
 {
+    protected JmsRemoteSyncMule2868TestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
 
     protected String getConfigResources()
     {
-        return "jms-remote-sync-mule2868.xml";
+        return "integration/jms-remote-sync-mule2868.xml";
     }
 
     public void testMule2868() throws MuleException
     {
         MuleClient muleClient = new MuleClient();
         MuleMessage response = muleClient.send("vm://in", "test", null);
-        assertEquals("test", response.getPayload());
+        assertEquals("test Received", response.getPayload());
     }
 
 }
