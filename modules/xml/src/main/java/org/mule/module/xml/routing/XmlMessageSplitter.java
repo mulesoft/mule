@@ -12,7 +12,9 @@ package org.mule.module.xml.routing;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.module.xml.util.NamespaceManager;
 import org.mule.routing.outbound.AbstractRoundRobinMessageSplitter;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
@@ -21,6 +23,7 @@ import org.mule.util.StringUtils;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,8 +63,10 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
     public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema";
 
     protected volatile String splitExpression = "";
-    protected volatile Map namespaces = null;
-    protected volatile boolean validateSchema = false;
+    protected volatile Map namespaces;
+    protected NamespaceManager namespaceManager;
+
+    protected volatile boolean validateSchema;
     protected volatile String externalSchemaLocation = "";
 
     public void setSplitExpression(String splitExpression)
@@ -118,6 +123,29 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("splitExpression").getMessage());
         }
+
+        try
+        {
+            namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
+
+            if (namespaceManager != null)
+            {
+                if (namespaces == null)
+                {
+                    namespaces = new HashMap(namespaceManager.getNamespaces());
+                }
+                else
+                {
+                    namespaces.putAll(namespaceManager.getNamespaces());
+                }
+            }
+
+        }
+        catch (RegistrationException e)
+        {
+            throw new InitialisationException(CoreMessages.failedToLoad("NamespaceManager"), e, this);
+        }
+
         super.initialise();
     }
 

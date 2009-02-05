@@ -14,8 +14,10 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.module.xml.routing.XmlMessageSplitter;
+import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -86,6 +88,11 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         asyncXmlSplitter.addEndpoint(endpoint1);
         asyncXmlSplitter.addEndpoint(endpoint2);
         asyncXmlSplitter.addEndpoint(endpoint3);
+
+        syncXmlSplitter.setMuleContext(muleContext);
+        asyncXmlSplitter.setMuleContext(muleContext);
+        syncXmlSplitter.initialise();
+        asyncXmlSplitter.initialise();
     }
 
     public void testStringPayloadXmlMessageSplitter() throws Exception
@@ -231,6 +238,33 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
                     "Failed to initialise the payload: "));
         }
 
+    }
+
+    public void testGlobalNamespaceManagerLookup() throws Exception
+    {
+        // clear any configured namespaces
+        syncXmlSplitter.setNamespaces(null);
+        asyncXmlSplitter.setNamespaces(null);
+
+        // configure a global namespace manager
+        NamespaceManager namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
+        if (namespaceManager == null)
+        {
+            namespaceManager = new NamespaceManager();
+            muleContext.getRegistry().registerObject(MuleProperties.OBJECT_MULE_NAMESPACE_MANAGER, namespaceManager);
+        }
+        Map namespaces = new HashMap();
+        namespaces.put("e", "http://www.example.com");
+        syncXmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
+        asyncXmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
+        namespaceManager.setNamespaces(namespaces);
+
+        // re-init splitters
+        syncXmlSplitter.initialise();
+        asyncXmlSplitter.initialise();
+
+        String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
+        internalTestSuccessfulXmlSplitter(payload);
     }
 
     private class ItemNodeConstraint implements Constraint
