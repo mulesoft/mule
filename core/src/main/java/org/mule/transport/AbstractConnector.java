@@ -336,6 +336,7 @@ public abstract class AbstractConnector
         this.initFromServiceDescriptor();
 
         setMaxDispatchersActive(getDispatcherThreadingProfile().getMaxThreadsActive());
+        setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
         
         this.doInitialise();
 
@@ -868,6 +869,9 @@ public abstract class AbstractConnector
         this.dispatchers.setMaxActive(maxActive);
         // adjust maxIdle in tandem to avoid thrashing
         this.dispatchers.setMaxIdle(maxActive);
+        // this tells the pool to expire some objects eventually if we start
+        // running out. This happens if one is using a lot of dynamic endpoints.
+        this.dispatchers.setMaxTotal(20*maxActive);
     }
 
     private MessageDispatcher getDispatcher(OutboundEndpoint endpoint) throws MuleException
@@ -983,6 +987,9 @@ public abstract class AbstractConnector
         this.requesters.setMaxActive(maxActive);
         // adjust maxIdle in tandem to avoid thrashing
         this.requesters.setMaxIdle(maxActive);
+        // this tells the pool to expire some objects eventually if we start
+        // running out. This happens if one is using a lot of dynamic endpoints.
+        this.requesters.setMaxTotal(20*maxActive);
     }
 
     private MessageRequester getRequester(InboundEndpoint endpoint) throws MuleException
