@@ -646,8 +646,7 @@
                 </xsd:sequence>
                 <xsd:attribute name="includeConfigNamespaces" type="xsd:boolean" default="false">
                     <xsd:annotation>
-                        <xsd:documentation>If true, the namespaces configured on the Xml configuration file will be
-                            added to the Manager.
+                        <xsd:documentation>If true, the top-level namespaces declared in this configuration file will be added to the Manager. Defaults to false.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
