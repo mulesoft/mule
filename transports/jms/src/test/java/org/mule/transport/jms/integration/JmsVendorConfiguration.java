@@ -14,6 +14,7 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.ConfigResource;
 
 import java.text.MessageFormat;
+import java.util.Map;
 
 import javax.jms.ConnectionFactory;
 
@@ -29,7 +30,7 @@ public interface JmsVendorConfiguration
      * @param xa whether to create an XA connection factory
      * @return a new connection factory
      */
-    public abstract ConnectionFactory getConnectionFactory(boolean topic, boolean xa);
+    public abstract ConnectionFactory getConnectionFactory(boolean topic, boolean xa) throws Exception;
 
     public String getInboundEndpoint();
 
@@ -59,4 +60,10 @@ public interface JmsVendorConfiguration
     public String getProtocol();
 
     public String getProviderName();
+
+    /**
+     * These properties will get loaded into the registry.  Good for adding property placeholders
+     * @return
+     */
+    public Map getProperties();
 }

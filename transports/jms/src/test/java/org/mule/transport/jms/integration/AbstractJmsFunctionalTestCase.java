@@ -16,6 +16,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.Properties;
+import java.util.Map;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -73,6 +74,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         props.put(OUTBOUND_ENDPOINT_KEY, getJmsConfig().getOutboundEndpoint());
         props.put(MIDDLE_ENDPOINT_KEY, getJmsConfig().getMiddleEndpoint());
         props.put("protocol", getJmsConfig().getProtocol());
+
+        Map p = getJmsConfig().getProperties();
+        if(p!=null)
+        {
+            props.putAll(p);
+        }
         return props;
     }
 
@@ -109,7 +116,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         return null;
     }
 
-    protected ConnectionFactory getConnectionFactory(boolean topic, boolean xa)
+    protected ConnectionFactory getConnectionFactory(boolean topic, boolean xa) throws Exception
     {
         checkConfig();
         return getJmsConfig().getConnectionFactory(topic, xa);
