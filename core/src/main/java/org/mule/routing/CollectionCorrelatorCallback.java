@@ -15,6 +15,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.routing.inbound.EventGroup;
 
+import java.text.MessageFormat;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,7 +62,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
     /**
      * @return <code>true</code> if the correlation size is not set or exactly the
      *         expected size of the event group.
-     * @see org.mule.routing.inbound.AbstractEventAggregator#shouldAggregateEvents(EventGroup)
+     * @see org.mule.routing.EventCorrelatorCallback#shouldAggregateEvents(org.mule.routing.inbound.EventGroup) 
      */
     public boolean shouldAggregateEvents(EventGroup events)
     {
@@ -68,15 +70,15 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
 
         if (size == -1)
         {
-            logger.warn("Correlation Group Size not set, but AbstractCorrelationAggregator is being used."
-                    + " Message is being forwarded");
+            logger.warn("Correlation Group Size not set, but correlation aggregator is being used."
+                    + " Message is being forwarded as is");
             return true;
         }
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Correlation size is " + size + ". Current event group size is " + events.size()
-                    + " for correlation " + events.getGroupId());
+            logger.debug(MessageFormat.format("Correlation group size is {0}. Current event group size is {1} for group ID: {2}",
+                                              size, events.size(), events.getGroupId()));
         }
 
         return size == events.size();

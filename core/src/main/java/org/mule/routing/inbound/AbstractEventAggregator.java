@@ -27,17 +27,21 @@ import javax.resource.spi.work.WorkException;
 
 public abstract class AbstractEventAggregator extends SelectiveConsumer
 {
+
     protected EventCorrelator eventCorrelator;
 
     private int timeout = 0;
+
+    private boolean failOnTimeout = true;
 
     @Override
     public void initialise() throws InitialisationException
     {
         eventCorrelator = new EventCorrelator(getCorrelatorCallback(), getMessageInfoMapping(), muleContext);
-        if(timeout != 0)
+        if (timeout != 0)
         {
             eventCorrelator.setTimeout(timeout);
+            eventCorrelator.setFailOnTimeout(isFailOnTimeout());
             try
             {
                 eventCorrelator.enableTimeoutMonitor();
@@ -57,14 +61,14 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
         MuleMessage msg = eventCorrelator.process(event);
-        if(msg==null)
+        if (msg == null)
         {
             return null;
         }
-        MuleEvent[] result = new MuleEvent[]{new DefaultMuleEvent(msg, event)};
+        MuleEvent[] result = new MuleEvent[] {new DefaultMuleEvent(msg, event)};
         return result;
     }
-    
+
     public int getTimeout()
     {
         return timeout;
@@ -73,5 +77,15 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     public void setTimeout(int timeout)
     {
         this.timeout = timeout;
+    }
+
+    public boolean isFailOnTimeout()
+    {
+        return failOnTimeout;
+    }
+
+    public void setFailOnTimeout(boolean failOnTimeout)
+    {
+        this.failOnTimeout = failOnTimeout;
     }
 }

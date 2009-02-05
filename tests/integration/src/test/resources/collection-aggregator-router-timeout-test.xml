@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+      xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+               http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+               http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd">
+
+    <model>
+
+        <!--
+            Split the message and set correlation group ids and sizes
+        -->
+        <service name="splitter">
+            <inbound>
+                <vm:inbound-endpoint path="splitter"/>
+            </inbound>
+            <outbound>
+                <!--
+                    round-robin is critical here, otherwise 'lostInTime' endpoint is never hit.
+                -->
+                <list-message-splitter-router disableRoundRobin="false">
+                    <vm:outbound-endpoint path="aggregator"/>
+                    <vm:outbound-endpoint path="lostInTime"/>
+                </list-message-splitter-router>
+            </outbound>
+        </service>
+
+        <!--
+            This service waits long enough for the correlation-aggregator-router to timeout,
+            no message should pass through this service.
+        -->
+        <service name="vortex">
+            <inbound>
+                <vm:inbound-endpoint path="lostInTime"/>
+            </inbound>
+            <test:component waitTime="6000"/>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="aggregator"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <!--
+            This service waits for messages and times out
+        -->
+        <service name="aggregator">
+            <inbound>
+                <vm:inbound-endpoint path="aggregator"/>
+                <collection-aggregator-router timeout="2000" failOnTimeout="false"/>
+            </inbound>
+            <test:component/>
+        </service>
+
+    </model>
+
+</mule>
