@@ -29,13 +29,6 @@
     </build>
 
     <dependencies>
-        <!-- Ensure our OSGi-ified libs are built -->
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>osgi-libs</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-        </dependency>
         
         <dependency>
             <groupId>commons-beanutils</groupId>
