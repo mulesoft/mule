@@ -28,7 +28,7 @@ public class SchemaValidationTestCase extends TestCase
     public void testValidate() throws Exception
     {
         SchemaValidationFilter filter = new SchemaValidationFilter();
-        filter.setSchemaFile("schema1.xsd");
+        filter.setSchemaLocations("schema1.xsd");
         filter.initialise();
         
         assertTrue(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream("/validation1.xml"))));

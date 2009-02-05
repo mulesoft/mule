@@ -46,7 +46,7 @@
                 </inbound-endpoint>
                 <inbound-endpoint address="http://localhost:63081/validate" synchronous="true" >
                     <transformer ref="InputStreamToDOM"/>
-                    <mule-xml:schema-validation-filter schemaFile="org/mule/test/integration/xml/schema1.xsd"/>
+                    <mule-xml:schema-validation-filter schemaLocations="org/mule/test/integration/xml/schema1.xsd, org/mule/test/integration/xml/schema2.xsd"/>
                 </inbound-endpoint>
             </inbound>
 

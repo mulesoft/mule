@@ -159,7 +159,7 @@
     <xsd:complexType name="schemaValidationFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractFilterType">
-                <xsd:attribute name="schemaFile" type="xsd:string">
+                <xsd:attribute name="schemaLocations" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The 

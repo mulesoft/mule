@@ -32,6 +32,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.ls.LSResourceResolver;
@@ -47,7 +48,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
-    private String schemaFile;
+    private String schemaLocations;
     private String schemaLanguage = "http://www.w3.org/2001/XMLSchema";
     private Schema schemaObject;
     private ErrorHandler errorHandler;
@@ -202,27 +203,34 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         
         if (getSchemaObject() == null)
         {
-            String schemaFile = getSchemaFile();
-            if (schemaFile == null)
+            if (schemaLocations == null)
             {
                 throw new InitialisationException(CoreMessages.objectIsNull("schemaFile"), this);
             }
 
-            InputStream schemaStream;
-            try
+            String[] split = StringUtils.split(schemaLocations, ",");
+            Source[] schemas = new Source[split.length];
+            for (int i = 0; i < split.length; i++)
             {
-                schemaStream = loadSchemaStream(schemaFile);
+                String loc = split[i].trim();
+                InputStream schemaStream;
+                try
+                {
+                    schemaStream = loadSchemaStream(loc);
+                }
+                catch (IOException e)
+                {
+                    throw new InitialisationException(e, this);
+                }
+    
+                if (schemaStream == null)
+                {
+                    throw new InitialisationException(CoreMessages.failedToLoad(loc), this);
+                }
+                
+                schemas[i] = new StreamSource(schemaStream);
             }
-            catch (IOException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-
-            if (schemaStream == null)
-            {
-                throw new InitialisationException(CoreMessages.failedToLoad(schemaFile), this);
-            }
-
+            
             SchemaFactory schemaFactory = SchemaFactory.newInstance(getSchemaLanguage());
 
             if (logger.isInfoEnabled())
@@ -243,7 +251,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
             Schema schema;
             try
             {
-                schema = schemaFactory.newSchema(new StreamSource(schemaStream));
+                schema = schemaFactory.newSchema(schemas);
             }
             catch (SAXException e)
             {
@@ -292,14 +300,14 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         return validator;
     }
 
-    public String getSchemaFile()
+    public String getSchemaLocations()
     {
-        return schemaFile;
+        return schemaLocations;
     }
 
-    public void setSchemaFile(String schemaFile)
+    public void setSchemaLocations(String schemaLocations)
     {
-        this.schemaFile = schemaFile;
+        this.schemaLocations = schemaLocations;
     }
 
     public String getSchemaLanguage()
@@ -391,5 +399,4 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
     {
         this.returnResult = returnResult;
     }
-
 }

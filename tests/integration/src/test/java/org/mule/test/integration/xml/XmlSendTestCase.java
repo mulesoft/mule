@@ -66,6 +66,10 @@ public class XmlSendTestCase extends FunctionalTestCase
         xml = getClass().getResourceAsStream("validation2.xml");
         message = client.send("http://localhost:63081/validate", xml, null);
         assertEquals("406", message.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        
+        xml = getClass().getResourceAsStream("validation3.xml");
+        message = client.send("http://localhost:63081/validate", xml, null);
+        assertEquals("200", message.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
     @Override
