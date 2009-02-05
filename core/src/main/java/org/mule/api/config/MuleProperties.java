@@ -107,6 +107,7 @@ public interface MuleProperties
     String OBJECT_DEFAULT_SERVICE_THREADING_PROFILE = "_defaultServiceThreadingProfile";
     String OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE = "_defaultRetryPolicyTemplate";
     String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
+    String OBJECT_MULE_NAMESPACE_MANAGER = "_muleNamespaceManager";
 
     // Not currently used as these need to be instance variables of the MuleContext.
     String OBJECT_WORK_MANAGER = "_muleWorkManager";

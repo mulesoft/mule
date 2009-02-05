@@ -9,6 +9,8 @@
  */
 package org.mule.module.xml.config;
 
+import org.mule.api.config.MuleProperties;
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.module.xml.util.NamespaceManager;
 
@@ -43,7 +45,7 @@ public class NamespaceManagerDefinitionParser extends OrphanDefinitionParser
     @Override
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        Map ns = new HashMap();
+        Map<String, String> ns = new HashMap<String, String>();
 
         for (int i = 0; i < element.getParentNode().getAttributes().getLength(); i++)
         {
@@ -64,6 +66,15 @@ public class NamespaceManagerDefinitionParser extends OrphanDefinitionParser
         }
         builder.addPropertyValue("configNamespaces", ns);
 
-        super.doParse(element, parserContext, builder); 
+        // this id must match the bean name
+        element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, MuleProperties.OBJECT_MULE_NAMESPACE_MANAGER);
+
+        super.doParse(element, parserContext, builder);
+    }
+
+    @Override
+    public String getBeanName(Element element)
+    {
+        return MuleProperties.OBJECT_MULE_NAMESPACE_MANAGER;
     }
 }
