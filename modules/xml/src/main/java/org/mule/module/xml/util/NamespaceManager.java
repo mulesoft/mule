@@ -29,7 +29,7 @@ public class NamespaceManager implements Initialisable
 
     public void initialise() throws InitialisationException
     {
-        if(isIncludeConfigNamespaces())
+        if (isIncludeConfigNamespaces())
         {
             namespaces.putAll(configNamespaces);
         }
