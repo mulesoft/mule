@@ -11,15 +11,10 @@
 package org.mule.module.xml.filters;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.module.xml.filters.SchemaValidationFilter;
-
-import junit.framework.TestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 
-/**
- * @author Ryan Heaton
- */
-public class SchemaValidationTestCase extends TestCase
+public class SchemaValidationTestCase extends AbstractMuleTestCase
 {
 
     /**

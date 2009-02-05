@@ -18,6 +18,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +33,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.ls.LSResourceResolver;
@@ -46,10 +46,11 @@ import org.xml.sax.SAXException;
  */
 public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter, Initialisable
 {
+    public static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
 
     protected transient Log logger = LogFactory.getLog(getClass());
     private String schemaLocations;
-    private String schemaLanguage = "http://www.w3.org/2001/XMLSchema";
+    private String schemaLanguage = DEFAULT_SCHEMA_LANGUAGE;
     private Schema schemaObject;
     private ErrorHandler errorHandler;
     private Map<String, Boolean> validatorFeatures;
@@ -58,11 +59,6 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
     private boolean useStaxSource = false;
     private boolean returnResult = true;
     private XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-    
-    public SchemaValidationFilter()
-    {
-        super();
-    }
 
     /**
      * Accepts the message if schema validation passes.
@@ -205,14 +201,14 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         {
             if (schemaLocations == null)
             {
-                throw new InitialisationException(CoreMessages.objectIsNull("schemaFile"), this);
+                throw new InitialisationException(CoreMessages.objectIsNull("schemaLocations"), this);
             }
 
-            String[] split = StringUtils.split(schemaLocations, ",");
+            String[] split = StringUtils.splitAndTrim(schemaLocations, ",");
             Source[] schemas = new Source[split.length];
             for (int i = 0; i < split.length; i++)
             {
-                String loc = split[i].trim();
+                String loc = split[i];
                 InputStream schemaStream;
                 try
                 {
@@ -267,9 +263,9 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         }
     }
 
-    protected InputStream loadSchemaStream(String schemaFile) throws IOException
+    protected InputStream loadSchemaStream(String schemaLocation) throws IOException
     {
-        return IOUtils.getResourceAsStream(schemaFile, getClass());
+        return IOUtils.getResourceAsStream(schemaLocation, getClass());
     }
 
     /**
