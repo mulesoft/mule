@@ -61,6 +61,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="streaming" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether an InputStream should be sent as the message payload (if true) or a byte array (if false). 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="connectionFactoryClass" type="mule:substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>

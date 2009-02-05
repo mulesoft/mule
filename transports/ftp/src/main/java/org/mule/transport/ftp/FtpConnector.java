@@ -84,6 +84,9 @@ public class FtpConnector extends AbstractConnector
      */
     private boolean validateConnections = true;
 
+    /** Streaming is off by default until MULE-3192 gets fixed */
+    private boolean streaming = false;
+    
     private Map pools;
 
     private String connectionFactoryClass = DEFAULT_FTP_CONNECTION_FACTORY_CLASS;
@@ -632,5 +635,15 @@ public class FtpConnector extends AbstractConnector
     protected boolean validateFile(FTPFile file)
     {
         return true;
+    }
+
+    public boolean isStreaming()
+    {
+        return streaming;
+    }
+
+    public void setStreaming(boolean streaming)
+    {
+        this.streaming = streaming;
     }
 }

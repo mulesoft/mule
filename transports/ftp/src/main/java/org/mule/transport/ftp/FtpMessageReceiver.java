@@ -20,6 +20,7 @@ import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.file.FileConnector;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -161,14 +162,27 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             }
 
             MuleMessage message;
-            InputStream stream = client.retrieveFileStream(file.getName());
-            if (stream == null)
+            // TODO MULE-3192
+            if (connector.isStreaming())
             {
-                throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
-                                                           file.getName(), client.getReplyCode()));
+                InputStream stream = client.retrieveFileStream(file.getName());
+                if (stream == null)
+                {
+                    throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
+                                                               file.getName(), client.getReplyCode()));
+                }
+                message = new DefaultMuleMessage(connector.getMessageAdapter(stream));
             }
-            message = new DefaultMuleMessage(connector.getMessageAdapter(stream));
-            
+            else
+            {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                if (!client.retrieveFile(file.getName(), baos))
+                {
+                    throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
+                                                               file.getName(), client.getReplyCode()));
+                }
+                message = new DefaultMuleMessage(connector.getMessageAdapter(baos.toByteArray()));            
+            }
 
             message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
             message.setProperty(FileConnector.PROPERTY_FILE_SIZE, file.getSize());
