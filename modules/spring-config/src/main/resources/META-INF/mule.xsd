@@ -3171,7 +3171,7 @@
                 <xsd:attribute name="failOnTimeout" type="substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            TODO
+                            When false, incomplete aggregation groups will be forwarded to a component on timeout. When true (default), a CorrelationTimeoutException is thrown and RoutingNotification.CORRELATION_TIMEOUT is fired. The component doesn't receive any messages in this case.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
