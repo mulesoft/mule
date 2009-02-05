@@ -15,8 +15,8 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-import java.util.Properties;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -38,11 +38,12 @@ import javax.transaction.SystemException;
  */
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
+
     public static final String DEFAULT_INPUT_MESSAGE = "INPUT MESSAGE";
     public static final String DEFAULT_OUTPUT_MESSAGE = "OUTPUT MESSAGE";
-    public static final String INBOUND_ENDPOINT_KEY ="inbound.destination";
-    public static final String OUTBOUND_ENDPOINT_KEY ="outbound.destination";
-    public static final String MIDDLE_ENDPOINT_KEY ="middle.destination";
+    public static final String INBOUND_ENDPOINT_KEY = "inbound.destination";
+    public static final String OUTBOUND_ENDPOINT_KEY = "outbound.destination";
+    public static final String MIDDLE_ENDPOINT_KEY = "middle.destination";
 
     private MuleClient client;
     private JmsVendorConfiguration jmsConfig;
@@ -52,7 +53,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     protected Scenario scenarioRollback;
     protected Scenario scenarioNotReceive;
     protected Scenario scenarioReceive;
-
 
 
     public AbstractJmsFunctionalTestCase(JmsVendorConfiguration config)
@@ -76,7 +76,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         props.put("protocol", getJmsConfig().getProtocol());
 
         Map p = getJmsConfig().getProperties();
-        if(p!=null)
+        if (p != null)
         {
             props.putAll(p);
         }
@@ -133,6 +133,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         checkConfig();
         return getJmsConfig().getOutboundEndpoint();
     }
+
     protected String getInboundQueueName()
     {
         checkConfig();
@@ -144,8 +145,10 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         checkConfig();
         return getJmsConfig().getOutboundDestinationName();
     }
+
     /**
      * Timeout used when checking that a message is NOT present
+     *
      * @return
      */
     protected long getSmallTimeout()
@@ -157,6 +160,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * The timeout used when waiting for a message to arrive
+     *
      * @return
      */
     protected long getTimeout()
@@ -268,6 +272,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * By default this will create a Queue, override to create a topic
+     *
      * @param session
      * @param scenario
      * @return
@@ -280,6 +285,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * By default this will create a Queue, override to create a topic
+     *
      * @param session
      * @param scenario
      * @return
@@ -290,7 +296,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         return session.createQueue(scenario.getOutputDestinationName());
     }
 
-    /**/
+     /**/
     public Message receive(Scenario scenario) throws Exception
     {
         Connection connection = null;
@@ -341,6 +347,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected interface Scenario
     {
+
         boolean isPersistent();
 
         void setPersistent(boolean persistent);
@@ -364,6 +371,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected abstract class AbstractScenario implements Scenario
     {
+
         private String inputQueue = getInboundQueueName();
         private String outputQueue = getOutboundQueueName();
         private boolean persistent = false;
@@ -424,6 +432,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected class NonTransactedScenario extends AbstractScenario
     {
+
         public boolean isTransacted()
         {
             return false;
@@ -437,6 +446,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected class ScenarioCommit extends AbstractScenario
     {
+
         public boolean isTransacted()
         {
             return true;
@@ -450,6 +460,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected class ScenarioRollback extends AbstractScenario
     {
+
         public boolean isTransacted()
         {
             return true;
@@ -463,6 +474,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected class ScenarioNotReceive extends NonTransactedScenario
     {
+
         @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
@@ -475,6 +487,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected class ScenarioReceive extends NonTransactedScenario
     {
+
         @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
