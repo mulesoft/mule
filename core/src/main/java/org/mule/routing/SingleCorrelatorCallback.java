@@ -31,9 +31,9 @@ public class SingleCorrelatorCallback implements EventCorrelatorCallback
      * The <code>SingleResponseRouter</code> will return true if the event group
      * size is 1. If the group size is greater than 1, a warning will be logged.
      *
-     * @param events
+     * @param events event group to consider
      * @return true if the event group size is 1 or greater
-     * @see {@link org.mule.routing.response.AbstractResponseAggregator#shouldAggregateEvents(EventGroup)}
+     * @see {@link EventCorrelatorCallback#shouldAggregateEvents(EventGroup)}
      */
     public boolean shouldAggregateEvents(EventGroup events)
     {
