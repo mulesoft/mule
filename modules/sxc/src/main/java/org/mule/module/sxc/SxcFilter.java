@@ -10,12 +10,16 @@
 
 package org.mule.module.sxc;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
 import com.envoisolutions.sxc.xpath.XPathBuilder;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class SxcFilter implements Filter
 {
@@ -64,6 +68,20 @@ public class SxcFilter implements Filter
     public void addEventHandler(SxcFilteringOutboundRouter router, XPathBuilder builder)
     {    
         builder.listen(pattern, new FilterEventHandler(router, this));
+    }
+    
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final SxcFilter other = (SxcFilter) obj;
+        return equal(pattern, other.pattern);
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), pattern});
     }
 }
 

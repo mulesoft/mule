@@ -10,6 +10,9 @@
 
 package org.mule.routing.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.ObjectFilter;
@@ -119,5 +122,18 @@ public class RegExFilter implements Filter, ObjectFilter
     {
         setPattern(expression);
     }
+    
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
+        final RegExFilter other = (RegExFilter) obj;
+        return equal(pattern, other.pattern);
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), pattern});
+    }
 }

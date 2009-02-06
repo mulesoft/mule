@@ -10,6 +10,9 @@
 
 package org.mule.module.xml.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -318,5 +321,21 @@ public class JaxenFilter implements Filter, MuleContextAware
     public void setFactory(AbstractFactory factory)
     {
         this.factory = factory;
+    }
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final JaxenFilter other = (JaxenFilter) obj;
+        return equal(expectedValue, other.expectedValue)
+            && equal(contextProperties, other.contextProperties)
+            && equal(namespaces, other.namespaces)
+            && equal(pattern, other.pattern);
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), expectedValue, contextProperties, namespaces, pattern});
     }
 }

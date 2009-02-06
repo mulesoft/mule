@@ -10,12 +10,15 @@
 
 package org.mule.module.ognl.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+import ognl.Ognl;
+import ognl.OgnlException;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.routing.filter.Filter;
 
-import ognl.Ognl;
-import ognl.OgnlException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -92,4 +95,17 @@ public class OGNLFilter implements Filter
         return false;
     }
 
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final OGNLFilter other = (OGNLFilter) obj;
+        return equal(expression, other.expression);
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), expression});
+    }
 }

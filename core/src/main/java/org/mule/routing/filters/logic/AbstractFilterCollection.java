@@ -10,6 +10,7 @@
 package org.mule.routing.filters.logic;
 
 import org.mule.api.routing.filter.Filter;
+import org.mule.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,4 +97,19 @@ public abstract class AbstractFilterCollection implements Filter
     {
         this.filters = filters;
     }
+    
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final AbstractFilterCollection other = (AbstractFilterCollection) obj;
+        return ClassUtils.equal(filters, other.filters);
+    }
+
+    public int hashCode()
+    {
+        return ClassUtils.hash(new Object[]{this.getClass(), filters});
+    }
+
 }

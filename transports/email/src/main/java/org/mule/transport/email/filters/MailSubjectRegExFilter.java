@@ -11,6 +11,7 @@
 package org.mule.transport.email.filters;
 
 import org.mule.routing.filters.RegExFilter;
+import org.mule.util.ClassUtils;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -44,5 +45,19 @@ public class MailSubjectRegExFilter extends AbstractMailFilter
     public String getExpression()
     {
         return filter.getPattern();
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final MailSubjectRegExFilter other = (MailSubjectRegExFilter) obj;
+        return ClassUtils.equal(filter, other.filter);
+    }
+
+    public int hashCode()
+    {
+        return ClassUtils.hash(new Object[]{this.getClass(), filter});
     }
 }

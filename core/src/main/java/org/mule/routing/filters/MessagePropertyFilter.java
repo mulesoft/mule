@@ -10,6 +10,9 @@
 
 package org.mule.routing.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
@@ -139,5 +142,21 @@ public class MessagePropertyFilter implements Filter
     public void setCaseSensitive(boolean caseSensitive)
     {
         this.caseSensitive = caseSensitive;
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final MessagePropertyFilter other = (MessagePropertyFilter) obj;
+        return equal(propertyName, other.propertyName)
+            && equal(propertyValue, other.propertyValue)
+            && caseSensitive == other.caseSensitive;
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), propertyName, propertyValue, caseSensitive});
     }
 }

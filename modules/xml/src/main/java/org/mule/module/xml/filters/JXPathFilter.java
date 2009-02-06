@@ -10,6 +10,9 @@
 
 package org.mule.module.xml.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -353,5 +356,23 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
     public void setLenient(boolean lenient)
     {
         this.lenient = lenient;
+    }
+    
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final JXPathFilter other = (JXPathFilter) obj;
+        return equal(expectedValue, other.expectedValue)
+            && equal(contextProperties, other.contextProperties)
+            && equal(namespaces, other.namespaces)
+            && equal(pattern, other.pattern)
+            && lenient == other.lenient;
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), expectedValue, contextProperties, namespaces, pattern, lenient});
     }
 }

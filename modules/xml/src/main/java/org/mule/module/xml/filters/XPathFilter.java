@@ -10,6 +10,9 @@
 
 package org.mule.module.xml.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -356,5 +359,21 @@ public class XPathFilter extends AbstractJaxpFilter
     public void setNamespaces(Map<String, String> prefixToNamespaceMap)
     {
         this.prefixToNamespaceMap = prefixToNamespaceMap;
+    }
+    
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final XPathFilter other = (XPathFilter) obj;
+        return equal(expectedValue, other.expectedValue)
+            && equal(prefixToNamespaceMap, other.prefixToNamespaceMap)
+            && equal(pattern, other.pattern);
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), expectedValue, prefixToNamespaceMap, pattern});
     }
 }

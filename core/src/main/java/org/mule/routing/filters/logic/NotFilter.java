@@ -10,6 +10,9 @@
 
 package org.mule.routing.filters.logic;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
@@ -46,4 +49,17 @@ public class NotFilter implements Filter
         return (filter != null ? !filter.accept(message) : false);
     }
 
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final NotFilter other = (NotFilter) obj;
+        return equal(filter, other.filter);
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), filter});
+    }
 }

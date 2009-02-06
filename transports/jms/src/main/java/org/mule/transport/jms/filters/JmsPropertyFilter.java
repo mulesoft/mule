@@ -10,6 +10,9 @@
 
 package org.mule.transport.jms.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.util.ClassUtils;
@@ -203,4 +206,20 @@ public class JmsPropertyFilter implements Filter
         this.pattern = Pattern.compile(pattern);
     }
 
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final JmsPropertyFilter other = (JmsPropertyFilter) obj;
+        return equal(expression, other.expression)
+            && equal(propertyClass, other.propertyClass)
+            && equal(propertyName, other.propertyName)
+            && equal(pattern, other.pattern);
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), expression, propertyClass, propertyName, pattern});
+    }
 }

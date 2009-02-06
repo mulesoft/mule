@@ -14,6 +14,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.CoreMessages;
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 
 import java.text.MessageFormat;
 
@@ -220,5 +222,25 @@ public class ExpressionFilter implements Filter, MuleContextAware
     public void setNullReturnsTrue(boolean nullReturnsTrue)
     {
         this.nullReturnsTrue = nullReturnsTrue;
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final ExpressionFilter other = (ExpressionFilter) obj;
+        return equal(customEvaluator, other.customEvaluator)
+            && equal(delegateFilter, other.delegateFilter)
+            && equal(evaluator, other.evaluator)
+            && equal(expression, other.expression)
+            && equal(fullExpression, other.fullExpression)
+            && nullReturnsTrue == other.nullReturnsTrue;
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), customEvaluator, delegateFilter,
+            evaluator, expression, fullExpression, nullReturnsTrue});
     }
 }

@@ -56,7 +56,7 @@ public class EndpointPollingJob implements Job
             throw new JobExecutionException(QuartzMessages.connectorNotInJobDataMap().getMessage());
         }
 
-        AbstractConnector connector = (AbstractConnector) RegistryContext.getRegistry().lookupConnector(connectorName);
+        QuartzConnector connector = (QuartzConnector) RegistryContext.getRegistry().lookupConnector(connectorName);
         if (connector == null)
         {
             throw new JobExecutionException(QuartzMessages.noConnectorFound(connectorName).getMessage());
@@ -80,7 +80,7 @@ public class EndpointPollingJob implements Job
 
         try
         {
-            MuleClient client = new MuleClient();
+            MuleClient client = connector.getClient();
             logger.debug("Attempting to receive event on: " + jobConfig.getEndpointRef());
             MuleMessage result = client.request(jobConfig.getEndpointRef(), jobConfig.getTimeout());
             if (result != null)

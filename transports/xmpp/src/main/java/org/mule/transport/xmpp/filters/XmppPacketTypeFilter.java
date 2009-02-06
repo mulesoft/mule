@@ -10,6 +10,9 @@
 
 package org.mule.transport.xmpp.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.jivesoftware.smack.filter.PacketFilter;
 
 /**
@@ -42,5 +45,19 @@ public class XmppPacketTypeFilter extends AbstractXmppFilter
     protected PacketFilter createFilter()
     {
         return new org.jivesoftware.smack.filter.PacketTypeFilter(expectedType);
+    }
+    
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final XmppPacketTypeFilter other = (XmppPacketTypeFilter) obj;
+        return equal(expectedType, other.expectedType);
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), expectedType});
     }
 }

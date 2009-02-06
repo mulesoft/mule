@@ -10,6 +10,9 @@
 
 package org.mule.transport.jms.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
@@ -39,4 +42,17 @@ public class JmsSelectorFilter implements Filter
         this.expression = expression;
     }
 
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final JmsSelectorFilter other = (JmsSelectorFilter) obj;
+        return equal(expression, other.expression);
+    }
+
+    public int hashCode()
+    {
+        return hash(new Object[]{this.getClass(), expression});
+    }
 }
