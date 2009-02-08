@@ -503,6 +503,8 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         {
             if (connection != null)
             {
+                // Ignore exceptions while closing the connection
+                connection.setExceptionListener(null); 
                 connection.close();
             }
         }
