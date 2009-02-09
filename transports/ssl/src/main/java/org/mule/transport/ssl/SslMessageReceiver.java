@@ -100,6 +100,7 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
             ((SSLSocket) socket).addHandshakeCompletedListener(SslMessageReceiver.this);
         }
 
+        @Override
         protected void preRouteMuleMessage(DefaultMuleMessage message) throws Exception
         {
             super.preRouteMuleMessage(message);
@@ -107,6 +108,7 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
             preRoute(message);
         }
 
+        @Override
         protected void shutdownSocket() throws IOException
         {
             // SSL Sockets don't support shutdownSocket
