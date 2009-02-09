@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.retry.RetryContext;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transport.AbstractMessageDispatcher;
 
@@ -120,6 +121,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         DataInputStream underlyingIs = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         TcpInputStream tis = new TcpInputStream(underlyingIs)
         {
+            @Override
             public void close() throws IOException
             {
                 try
@@ -158,6 +160,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected synchronized void doDispose()
     {
         try
@@ -170,19 +173,50 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
-        // Test the connection
-        if (connector.isValidateConnections())
-        {
-            Socket socket = connector.getSocket(endpoint);
-            connector.releaseSocket(socket, endpoint);
-        }
+        // nothing, there is an optional validation in validateConnection()
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         //nothing to do
     }
-    
+
+    @Override
+    public RetryContext validateConnection(RetryContext retryContext)
+    {
+        Socket socket = null;
+        try
+        {
+            socket = connector.getSocket(endpoint);
+
+            retryContext.setOk();
+        }
+        catch (Exception ex)
+        {
+            retryContext.setFailed(ex);
+        }
+        finally
+        {
+            if (socket != null)
+            {
+                try
+                {
+                    connector.releaseSocket(socket, endpoint);
+                }
+                catch (Exception e)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Failed to release a socket " + socket, e);
+                    }
+                }
+            }
+        }
+        
+        return retryContext;
+    }
 }

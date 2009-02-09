@@ -256,6 +256,10 @@ public abstract class AbstractConnector
      * until connection is successful.
      */
     protected boolean startOnConnect = false;
+    /**
+     * Whether to test a connection on each take.
+     */
+    private boolean validateConnections = true;
 
     public AbstractConnector()
     {
@@ -1416,7 +1420,7 @@ public abstract class AbstractConnector
             {
                 public void doWork(RetryContext context) throws Exception
                 {
-                    if (!validateConnection(context).isOk())
+                    if (validateConnections && !validateConnection(context).isOk())
                     {
                         throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"),
                                                    context.getLastFailure(), null);
@@ -1430,7 +1434,7 @@ public abstract class AbstractConnector
                     {
                         String receiverKey = (String) info.get(RetryContext.FAILED_RECEIVER);
                         MessageReceiver receiver = (MessageReceiver) receivers.get(receiverKey);
-                        if (!receiver.validateConnection(context).isOk())
+                        if (validateConnections && !receiver.validateConnection(context).isOk())
                         {
                             throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect receiver to resource"),
                                                        context.getLastFailure(), receiver);
@@ -1442,7 +1446,7 @@ public abstract class AbstractConnector
                         MessageDispatcher dispatcher = (MessageDispatcher) dispatchers.borrowObject(endpoint);
                         try
                         {
-                            if (!dispatcher.validateConnection(context).isOk())
+                            if (validateConnections && !dispatcher.validateConnection(context).isOk())
                             {
                                 throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect dispatcher to resource"),
                                                            context.getLastFailure(), null);
@@ -1459,7 +1463,7 @@ public abstract class AbstractConnector
                         MessageRequester requester = (MessageRequester) requesters.borrowObject(endpoint);
                         try
                         {
-                            if (!requester.validateConnection(context).isOk())
+                            if (validateConnections && !requester.validateConnection(context).isOk())
                             {
                                 throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect requester to resource"),
                                                            context.getLastFailure(), null);
@@ -1493,12 +1497,13 @@ public abstract class AbstractConnector
     }
 
     /**
-    * Override this method to test whether the connector is able to connect to its resource(s).
-    * This will allow a retry policy to go into effect in the case of failure.
-    *
-    * @return true if the connector is able to connect successfully
-    * @throws Exception if the connector fails to connect  @param retryContext
-    */
+     * Override this method to test whether the connector is able to connect to its resource(s).
+     * This will allow a retry policy to go into effect in the case of failure.
+     *
+     * @return retry context with a success flag or failure details
+     * @see RetryContext#isOk()
+     * @see RetryContext#getLastFailure()
+     */
     public RetryContext validateConnection(RetryContext retryContext)
     {
         retryContext.setOk();
@@ -2287,5 +2292,27 @@ public abstract class AbstractConnector
     public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
     {
         this.retryPolicyTemplate = retryPolicyTemplate;
+    }
+
+    /**
+     * Whether to test a connection on each take from pool.
+     */
+    public boolean isValidateConnections()
+    {
+        return validateConnections;
+    }
+
+    /**
+     * Whether to test a connection on each take. A result is higher availability at the expense of a
+     * potential slight performance hit (when a test connection is made) or be very lightweight in other cases
+     * (like sending a hearbeat ping to the server). <p/> Disable to obtain
+     * slight performance gain or if you are absolutely sure of the server
+     * availability.
+     * <p/>It is up to the transport implementatin to support such validation, thus it should be considered a hint only.
+     * <p/>The default value is <code>true</code>
+     */
+    public void setValidateConnections(final boolean validateConnections)
+    {
+        this.validateConnections = validateConnections;
     }
 }
