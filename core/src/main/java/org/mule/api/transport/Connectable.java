@@ -14,6 +14,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.retry.RetryContext;
 
 /**
  * Interface for objects that should connect to a resource.
@@ -38,15 +39,6 @@ public interface Connectable extends Initialisable, Disposable, Startable, Stopp
     void disconnect() throws Exception;
 
     /**
-     * Test whether the connector is able to connect to its resource(s).
-     * This will allow a retry policy to go into effect in the case of failure.
-     *
-     * @return true if the connector is able to connect successfully
-     * @throws Exception if the connector fails to connect
-     */
-    boolean validateConnection() throws Exception;
-    
-    /**
      * Determines if this object is connected or not
      * 
      * @return
@@ -59,4 +51,19 @@ public interface Connectable extends Initialisable, Disposable, Startable, Stopp
      * @return
      */
     String getConnectionDescription();
+
+    /**
+     * Test whether the connector is able to connect to its resource(s).
+     * This will allow a retry policy to go into effect in the case of failure. Implementations must
+     * call either:
+     * <ul>
+     *  <li>{@link org.mule.api.retry.RetryContext#setOk()} when no problems found (or no validation required).
+     *  <li>{@link org.mule.api.retry.RetryContext#setFailed(Throwable)} with a root cause for a connection failure.
+     * </ul>
+     * Callers should then check for {@link org.mule.api.retry.RetryContext#isOk()}. The failure, if any, will be
+     * provided via the {@link org.mule.api.retry.RetryContext#getLastFailure()}.
+     * @return same retry context with status info set and any failures populated
+     * @throws Exception if the connector fails to connect  @param retryContext
+     */
+    RetryContext validateConnection(RetryContext retryContext);
 }

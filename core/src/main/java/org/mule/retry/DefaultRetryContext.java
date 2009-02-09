@@ -13,17 +13,27 @@ package org.mule.retry;
 import org.mule.api.MuleMessage;
 import org.mule.api.retry.RetryContext;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The RetryContext is used to store any data which carries over from 
+ * The RetryContext is used to store any data which carries over from
  * attempt to attempt such as response messages.
  */
 public class DefaultRetryContext implements RetryContext
 {
+
     private MuleMessage[] returnMessages;
-    private Map metaInfo;
+    private Map metaInfo = new HashMap();
     private String description;
+    private Throwable lastFailure;
+    private boolean failed = false;
+
+    public DefaultRetryContext()
+    {
+        // needed for some EE policies
+    }
 
     public DefaultRetryContext(String description)
     {
@@ -32,11 +42,15 @@ public class DefaultRetryContext implements RetryContext
 
     public Map getMetaInfo()
     {
-        return metaInfo;
+        return Collections.unmodifiableMap(metaInfo);
     }
 
     public void setMetaInfo(Map metaInfo)
     {
+        if (metaInfo == null)
+        {
+            throw new IllegalArgumentException("Can't accept null meta-info map");
+        }
         this.metaInfo = metaInfo;
     }
 
@@ -57,13 +71,13 @@ public class DefaultRetryContext implements RetryContext
 
     public void addReturnMessage(MuleMessage result)
     {
-        if(returnMessages ==null)
+        if (returnMessages == null)
         {
-            returnMessages = new MuleMessage[]{result};
+            returnMessages = new MuleMessage[] {result};
         }
         else
         {
-            MuleMessage[] newReturnMessages = new MuleMessage[returnMessages.length+1];
+            MuleMessage[] newReturnMessages = new MuleMessage[returnMessages.length + 1];
             System.arraycopy(newReturnMessages, 0, returnMessages, 0, 1);
             returnMessages = newReturnMessages;
         }
@@ -72,5 +86,28 @@ public class DefaultRetryContext implements RetryContext
     public String getDescription()
     {
         return description;
+    }
+
+    public Throwable getLastFailure()
+    {
+        return this.lastFailure;
+    }
+
+    public void setOk()
+    {
+        this.failed = false;
+        this.lastFailure = null;
+    }
+
+    public boolean isOk()
+    {
+        // note that it might be possible to fail without throwable, so not relying on lastFailure field
+        return !this.failed;
+    }
+
+    public void setFailed(Throwable lastFailure)
+    {
+        this.failed = true;
+        this.lastFailure = lastFailure;
     }
 }

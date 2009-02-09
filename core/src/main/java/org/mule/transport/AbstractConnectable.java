@@ -27,7 +27,6 @@ import org.mule.util.concurrent.WaitableBoolean;
 import java.beans.ExceptionListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -202,16 +201,10 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         );
     }
 
-    /**
-     * Override this method to test whether the connector is able to connect to its resource(s).
-     * This will allow a retry policy to go into effect in the case of failure.
-     *
-     * @return true if the connector is able to connect successfully
-     * @throws Exception if the connector fails to connect
-     */
-    public boolean validateConnection() throws Exception
+    public RetryContext validateConnection(RetryContext retryContext)
     {
-        return true;
+        retryContext.setOk();
+        return retryContext;
     }
     
     public final synchronized void disconnect() throws Exception

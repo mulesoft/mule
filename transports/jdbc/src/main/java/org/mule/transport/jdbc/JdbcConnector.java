@@ -16,6 +16,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.retry.RetryContext;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -356,9 +357,10 @@ public class JdbcConnector extends AbstractConnector
     }
 
     /** 
-     * Verify that we are able to connect to the DataSource (needed for retry policies) 
+     * Verify that we are able to connect to the DataSource (needed for retry policies)
+     * @param retryContext
      */
-    public boolean validateConnection() throws Exception
+    public RetryContext validateConnection(RetryContext retryContext)
     {
         Connection con;
         try
@@ -368,12 +370,18 @@ public class JdbcConnector extends AbstractConnector
             {
                 con.close();
             }
-            return true;
+            retryContext.setOk();
+        }
+        catch (Exception ex)
+        {
+            retryContext.setFailed(ex);
         }
         finally
         {
             con = null;
         }
+
+        return retryContext;
     }
 
     protected void doDisconnect() throws Exception

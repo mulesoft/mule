@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.retry.RetryContext;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -215,21 +216,41 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     @Override
-    public boolean validateConnection() throws Exception
+    public RetryContext validateConnection(RetryContext retryContext)
     {
-        final FTPClient client = connector.createFtpClient(endpoint);
+        FTPClient client = null;
         try
         {
+            client = connector.createFtpClient(endpoint);
             client.sendNoOp();
             client.logout();
             client.disconnect();
-            return true;
+
+            retryContext.setOk();
+        }
+        catch (Exception ex)
+        {
+            retryContext.setFailed(ex);
         }
         finally
         {
-            connector.releaseFtp(endpoint.getEndpointURI(), client);
-            Thread.sleep(1000);
+            try
+            {
+                if (client != null)
+                {
+                    connector.releaseFtp(endpoint.getEndpointURI(), client);
+                }
+            }
+            catch (Exception e)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Failed to release ftp client " + client, e);
+                }
+            }
         }
+
+        return retryContext;
     }
         
     protected void doDisconnect() throws Exception

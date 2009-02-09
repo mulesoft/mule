@@ -93,6 +93,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
             }
             else
             {
+                context.setFailed(cause);
                 throw new RetryPolicyExhaustedException(cause, callback.getWorkDescription());
             }
         }
