@@ -18,8 +18,7 @@ import org.mule.util.StringMessageUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,8 +37,8 @@ public class GenericLifecycleManager implements LifecycleManager
     protected String currentPhase = notInLifecyclePhase.getName();
     protected String executingPhase = null;
     protected ListOrderedSet lifecycles = new ListOrderedSet();
-    protected Map index = new HashMap(6);
-    protected Set completedPhases = new HashSet(6);
+    protected Map<String, Integer> index = new HashMap<String, Integer>(6);
+    protected Set completedPhases = new LinkedHashSet(6);
 
     public Set getLifecycles()
     {
@@ -48,17 +47,17 @@ public class GenericLifecycleManager implements LifecycleManager
 
     public void setLifecycles(Set lifecycles)
     {
-        for (Iterator iterator = lifecycles.iterator(); iterator.hasNext();)
+        for (Object lifecycle : lifecycles)
         {
-            LifecyclePhase phase = (LifecyclePhase) iterator.next();
+            LifecyclePhase phase = (LifecyclePhase) lifecycle;
             registerLifecycle(phase);
         }
     }
 
-    public void registerLifecycle(LifecyclePhase lci)
+    public void registerLifecycle(LifecyclePhase phase)
     {
-        index.put(lci.getName(), new Integer(lifecycles.size()));
-        lifecycles.add(lci);
+        index.put(phase.getName(), lifecycles.size());
+        lifecycles.add(phase);
     }
 
     /**
@@ -104,9 +103,7 @@ public class GenericLifecycleManager implements LifecycleManager
     }
 
     /**
-     * Returns the name of the currently executing phase or null if there is not current phase
-     *
-     * @return
+     * Returns the name of the currently executing phase or null if there is not current phase.
      */
     public String getExecutingPhase()
     {
@@ -144,12 +141,12 @@ public class GenericLifecycleManager implements LifecycleManager
         LifecyclePhase lcp;
         String phase;
         Integer phaseIndex;
-        for (Iterator iterator = completedPhases.iterator(); iterator.hasNext();)
+        for (Object completedPhase : completedPhases)
         {
-            phase = (String) iterator.next();
-            phaseIndex = (Integer) index.get(phase);
-            lcp = (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
-            
+            phase = (String) completedPhase;
+            phaseIndex = index.get(phase);
+            lcp = (LifecyclePhase) lifecycles.get(phaseIndex);
+
             if (logger.isDebugEnabled())
             {
                 logger.debug("phase: " + lcp);
@@ -159,8 +156,8 @@ public class GenericLifecycleManager implements LifecycleManager
         //If we're currently in a phase, fire that too
         if (getExecutingPhase() != null)
         {
-            phaseIndex = (Integer) index.get(getExecutingPhase());
-            lcp = (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
+            phaseIndex = index.get(getExecutingPhase());
+            lcp = (LifecyclePhase) lifecycles.get(phaseIndex);
             
             if (logger.isDebugEnabled())
             {
@@ -187,21 +184,21 @@ public class GenericLifecycleManager implements LifecycleManager
             throw new IllegalStateException("Currently executing lifecycle phase: " + executingPhase);
         }
 
-        Integer phaseIndex = (Integer) index.get(name);
+        Integer phaseIndex = index.get(name);
         if (phaseIndex == null)
         {
             throw new IllegalStateException("Phase does not exist: " + name);
         }
         if (NotInLifecyclePhase.PHASE_NAME.equals(currentPhase))
         {
-            if (phaseIndex.intValue() > 0)
+            if (phaseIndex > 0)
             {
                 throw new IllegalStateException("The first lifecycle phase has to be called before the '" + name + "' phase");
             }
         }
         else
         {
-            LifecyclePhase phase = (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
+            LifecyclePhase phase = (LifecyclePhase) lifecycles.get(phaseIndex);
             if (!phase.isPhaseSupported(currentPhase))
             {
                 throw new IllegalStateException("Lifecycle phase: " + currentPhase + " does not support current phase: "
@@ -212,11 +209,11 @@ public class GenericLifecycleManager implements LifecycleManager
 
     protected LifecyclePhase lookupPhase(String phase) throws IllegalArgumentException
     {
-        Integer phaseIndex = (Integer) index.get(phase);
+        Integer phaseIndex = index.get(phase);
         if (phaseIndex == null)
         {
             throw new IllegalArgumentException("No lifecycle phase registered with name: " + phase);
         }
-        return (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
+        return (LifecyclePhase) lifecycles.get(phaseIndex);
     }
 }
