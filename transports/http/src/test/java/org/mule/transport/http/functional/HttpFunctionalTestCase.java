@@ -16,7 +16,6 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.testmodels.mule.TestSedaService;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
@@ -35,8 +34,7 @@ public class HttpFunctionalTestCase extends FunctionalTestCase
 
     public void testSend() throws Exception
     {        
-        final TestSedaService testSedaService = (TestSedaService) muleContext.getRegistry().lookupService("testComponent");
-        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(testSedaService);
+        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent("testComponent");
         assertNotNull(testComponent);
 
         if (checkPathProperties) 
@@ -56,7 +54,7 @@ public class HttpFunctionalTestCase extends FunctionalTestCase
         }
         
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
