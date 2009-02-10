@@ -67,6 +67,10 @@ org.mule.test.integration.service.ServiceInFlightMessagesTestCase
 # The following tests will fail if run off-line
 ##########################################################################
 #org.mule.config.spring.RootSchemaValidationTestCase
+
+##########################################################################
+# The following tests will fail if 0.0.0.0 is not configured properly
+##########################################################################
 #org.mule.test.integration.management.ManagementSimpleStartupTestCase
 #org.mule.test.integration.management.ManagementStartupTestCase
 
