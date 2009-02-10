@@ -269,7 +269,6 @@ public abstract class AbstractService implements Service
 
     public void start() throws MuleException
     {
-        // TODO If Service is uninitialised when start is called should we initialise
         // or throw an exception?
         if (!initialised.get())
         {
@@ -419,7 +418,6 @@ public abstract class AbstractService implements Service
         }
         catch (MuleException e)
         {
-            // TODO MULE-863: If this is an error, do something!
             logger.error("Failed to stop service: " + name, e);
         }
         doDispose();
