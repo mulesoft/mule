@@ -17,6 +17,8 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.DispatchException;
 import org.mule.transport.cxf.i18n.CxfMessages;
+import org.mule.transport.cxf.support.CopyAttachmentInInterceptor;
+import org.mule.transport.cxf.support.CopyAttachmentOutInterceptor;
 import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
 import org.mule.transport.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
@@ -117,9 +119,11 @@ public class ClientWrapper
 
         if (proxy)
         {
-            client.getOutInterceptors().add(new OutputPayloadInterceptor());
-            ((MuleUniversalConduit)client.getConduit()).setCloseInput(false);
+            client.getInInterceptors().add(new CopyAttachmentInInterceptor());
             client.getInInterceptors().add(new StreamClosingInterceptor());
+            client.getOutInterceptors().add(new OutputPayloadInterceptor());
+            client.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
+            ((MuleUniversalConduit)client.getConduit()).setCloseInput(false);
         }
         
         List<AbstractFeature> features = (List<AbstractFeature>) endpoint.getProperty(CxfConstants.OUT_FAULT_INTERCEPTORS);

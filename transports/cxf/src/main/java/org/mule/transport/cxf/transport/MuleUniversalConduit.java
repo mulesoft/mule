@@ -184,8 +184,8 @@ public class MuleUniversalConduit extends AbstractConduit
             }
         };
 
-        // We can create a generic StreamMessageAdapter here as the underlying
-        // transport will create one specific to the transport
+//        MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT_PROPERTY);
+//        DefaultMessageAdapter req = new DefaultMessageAdapter(handler, event.getMessage());
         DefaultMessageAdapter req = new DefaultMessageAdapter(handler);
         message.getExchange().put(CxfConstants.MULE_MESSAGE, req);
     }

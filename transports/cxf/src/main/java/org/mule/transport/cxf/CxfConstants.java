@@ -39,4 +39,5 @@ public interface CxfConstants
     String APPLY_TRANSFORMERS_TO_PROTOCOL = "applyTransformersToProtocol";
     String APPLY_SECURITY_TO_PROTOCOL = "applySecurityToProtocol";
     String PROTOCOL_CONNECTOR = "protocolConnector";
+    String ATTACHMENTS = "cxf.attachments";
 }

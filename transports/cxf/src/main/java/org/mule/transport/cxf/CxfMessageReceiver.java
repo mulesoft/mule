@@ -24,6 +24,8 @@ import org.mule.api.service.ServiceAware;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.cxf.i18n.CxfMessages;
+import org.mule.transport.cxf.support.CopyAttachmentInInterceptor;
+import org.mule.transport.cxf.support.CopyAttachmentOutInterceptor;
 import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.transport.cxf.support.OutputPayloadInterceptor;
@@ -49,6 +51,7 @@ import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
@@ -183,6 +186,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                     sfb.setProperties(properties);
                 }
                 properties.put("mtom-enabled", mtomEnabled);
+                properties.put(AttachmentOutInterceptor.WRITE_ATTACHMENTS, true);
             }
             
             sfb.setInInterceptors((List<Interceptor>) endpointProps.get("inInterceptors"));
@@ -212,6 +216,8 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             if (proxy)
             {
                 sfb.getOutInterceptors().add(new OutputPayloadInterceptor());
+                sfb.getInInterceptors().add(new CopyAttachmentInInterceptor());
+                sfb.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
             }
             
             sfb.setServiceClass(svcCls);
