@@ -4387,14 +4387,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="validateConnections" type="substitutableBoolean" default="true">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Causes Mule to validate connections before use. Note that this is only a configuration hint,
-                            transport implementations may or may not make an extra effort to validate the connection. Default is true.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

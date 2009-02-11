@@ -60,6 +60,7 @@ public class TcpConnector extends AbstractConnector
     private int receiveBufferSize = DEFAULT_BUFFER_SIZE;
     private int receiveBacklog = DEFAULT_BACKLOG;
     private boolean sendTcpNoDelay;
+    private boolean validateConnections = true;
     private Boolean reuseAddress = Boolean.TRUE; // this could be null for Java default
     private int socketSoLinger = DEFAULT_SO_LINGER;
     private TcpProtocol tcpProtocol;
@@ -448,6 +449,25 @@ public class TcpConnector extends AbstractConnector
         {
             return value;
         }
+    }
+
+    /**
+     * Should the connection be checked before sending data?
+     *
+     * @return If true, the message adapter opens and closes the socket on intialisation.
+     */
+    public boolean isValidateConnections()
+    {
+        return validateConnections;
+    }
+
+    /**
+     * @param validateConnections If true, the message adapter opens and closes the socket on intialisation.
+     * @see #isValidateConnections()
+     */
+    public void setValidateConnections(boolean validateConnections)
+    {
+        this.validateConnections = validateConnections;
     }
 
     /**

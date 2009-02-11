@@ -35,6 +35,7 @@ import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -78,10 +79,15 @@ public class FtpConnector extends AbstractConnector
 
     private boolean binary = true;
 
+    /**
+     * Whether to test FTP connection on each take from pool.
+     */
+    private boolean validateConnections = true;
+
     /** Streaming is off by default until MULE-3192 gets fixed */
     private boolean streaming = false;
     
-    private Map<String, ObjectPool> pools;
+    private Map pools;
 
     private String connectionFactoryClass = DEFAULT_FTP_CONNECTION_FACTORY_CLASS;
 
@@ -115,7 +121,7 @@ public class FtpConnector extends AbstractConnector
             polling = DEFAULT_POLLING_FREQUENCY;
         }
         logger.debug("set polling frequency to " + polling);
-        args.add(polling);
+        args.add(new Long(polling));
         
         return args;
     }
@@ -206,7 +212,7 @@ public class FtpConnector extends AbstractConnector
             logger.debug("=== get pool for " + uri);
         }
         String key = uri.getUser() + ":" + uri.getPassword() + "@" + uri.getHost() + ":" + uri.getPort();
-        ObjectPool pool = pools.get(key);
+        ObjectPool pool = (ObjectPool) pools.get(key);
         if (pool == null)
         {
             try
@@ -215,7 +221,7 @@ public class FtpConnector extends AbstractConnector
                         (FtpConnectionFactory) ClassUtils.instanciateClass(getConnectionFactoryClass(),
                                                                             new Object[] {uri}, getClass());
                 pool = new GenericObjectPool(connectionFactory);
-                ((GenericObjectPool) pool).setTestOnBorrow(isValidateConnections());
+                ((GenericObjectPool) pool).setTestOnBorrow(this.validateConnections);
                 pools.put(key, pool);
             }
             catch (Exception ex)
@@ -245,7 +251,7 @@ public class FtpConnector extends AbstractConnector
             throw new InitialisationException(e, this);
         }
 
-        pools = new HashMap<String, ObjectPool>();
+        pools = new HashMap();
     }
 
     protected void doDispose()
@@ -276,8 +282,9 @@ public class FtpConnector extends AbstractConnector
         }
         try
         {
-            for (ObjectPool pool : pools.values())
+            for (Iterator it = pools.values().iterator(); it.hasNext();)
             {
+                ObjectPool pool = (ObjectPool)it.next();
                 pool.close();
             }
         }
@@ -396,6 +403,26 @@ public class FtpConnector extends AbstractConnector
                 client.enterLocalActiveMode();
             }
         }
+    }
+
+    /**
+     * Whether to test FTP connection on each take from pool.
+     */
+    public boolean isValidateConnections()
+    {
+        return validateConnections;
+    }
+
+    /**
+     * Whether to test FTP connection on each take from pool. This takes care of a
+     * failed (or restarted) FTP server at the expense of an additional NOOP command
+     * packet being sent, but increases overall availability. <p/> Disable to gain
+     * slight performance gain or if you are absolutely sure of the FTP server
+     * availability. <p/> The default value is <code>true</code>
+     */
+    public void setValidateConnections(final boolean validateConnections)
+    {
+        this.validateConnections = validateConnections;
     }
 
     /**

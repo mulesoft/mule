@@ -54,6 +54,13 @@
                 <xsd:attributeGroup ref="inboundAttributes"/>
                 <xsd:attributeGroup ref="outboundAttributes"/>
                 <xsd:attributeGroup ref="commonAttributes"/>
+                <xsd:attribute name="validateConnections" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Causes Mule to validate connections before use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="streaming" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
