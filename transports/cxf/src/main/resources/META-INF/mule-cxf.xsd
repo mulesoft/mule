@@ -21,13 +21,7 @@
 
     <xsd:annotation>
         <xsd:documentation>
-            Apache CXF is an open source services framework. CXF helps you build and develop services
-            using frontend programming APIs, like JAX-WS. These services can speak a variety of protocols such as SOAP,
-            XML/HTTP, RESTful HTTP, or CORBA and work over a variety of transports such as HTTP, JMS or JBI.
-            \\
-            The Mule CXF Transport is an evolution of Mule's XFire Transport which provides support for the use of web
-            service integration via Apache CXF. The Mule CXF connector also provides support for WS-Security,
-            WS-Addressing and WS-Reliable-Messaging.
+            Apache CXF is an open source services framework. CXF helps you build and develop services using frontend programming APIs, like JAX-WS. These services can speak a variety of protocols such as SOAP, XML/HTTP, RESTful HTTP, or CORBA and work over a variety of transports such as HTTP, JMS or JBI. The Mule CXF Transport is an evolution of Mule's XFire transport, which provided support for the use of web service integration via Apache CXF. The Mule CXF connector also provides support for WS-Security, WS-Addressing, and WS-Reliable-Messaging.
         </xsd:documentation>
         
         <xsd:appinfo>
@@ -50,9 +44,7 @@
                 <xsd:attribute name="defaultFrontend" type="xsd:string" default="jaxws">
                    <xsd:annotation>
                         <xsd:documentation>
-                            The CXF frontend that is used to build an internal service representation
-                            from your Java classes. The default is "jaxws". The "simple" frontend is
-                            also supported.  
+                            The CXF frontend that is used to build an internal service representation from your Java classes. The default is "jaxws". The "simple" frontend is also supported.  
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -66,9 +58,7 @@
                 <xsd:attribute name="initializeStaticBusInstance" type="mule:substitutableBoolean" default="true">
                     <xsd:annotation>
                          <xsd:documentation>
-                             Initialize the static CXF Bus with a Bus configured to use Mule for
-                             all transports. This will affect any CXF generated clients
-                             that you run standalone. Defaults to true.
+                             Initialize the static CXF Bus with a Bus configured to use Mule for all transports. This will affect any CXF generated clients that you run standalone. Defaults to true.
                          </xsd:documentation>
                      </xsd:annotation>
                 </xsd:attribute>
@@ -117,8 +107,7 @@
         <xsd:attribute name="proxy" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether or not this outbound endpoint is acting as a web service proxy. If so,
-                    it will expect raw xml as the input parameter and return an XML stream as the output.
+                    Whether or not this outbound endpoint is acting as a web service proxy. If so, it will expect raw xml as the input parameter and return an XML stream as the output.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -132,28 +121,24 @@
         <xsd:attribute name="wsdlLocation" type="xsd:string" >
             <xsd:annotation>
                 <xsd:documentation>
-                    The location of the WSDL for your service. If this is a
-                    server side endpoint it will served to your users.
+                    The location of the WSDL for your service. If this is a server side endpoint it will served to your users.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="protocolConnector" type="xsd:string" >
-            <xsd:annotation>
-                <xsd:documentation>
-                    The name of the connector that you wish to use to send/receive
-                    messages on with CXF. (As of 2.1)
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+    	<xsd:attribute name="protocolConnector" type="xsd:string" >
+    		<xsd:annotation>
+    			<xsd:documentation>
+                            The name of the connector that you wish to use to send/receive messages on with CXF. (As of 2.1)
+    			</xsd:documentation>
+    		</xsd:annotation>
+    	</xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="inboundEndpointAttributes">
         <xsd:attribute name="frontend">
             <xsd:annotation>
                 <xsd:documentation>
-                    The CXF frontend that is used to build an internal service representation
-                    from your Java classes. The default is "jaxws". The "simple" frontend is
-                    also supported.  
+                    The CXF frontend that is used to build an internal service representation from your Java classes. The default is "jaxws". The "simple" frontend is also supported.  
                 </xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
@@ -166,8 +151,7 @@
         <xsd:attribute name="bindingUri" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The binding that should be used for this service. It defaults
-                    to the soap binding by default.
+                    The binding that should be used for this service. It defaults to the SOAP binding by default.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -181,9 +165,7 @@
         <xsd:attribute name="serviceClass" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The class CXF should use to construct it's service model. This is
-                    optional and by default it will use the implementation class of
-                    your component.
+                    The class CXF should use to construct its service model. This is optional, and by default it will use the implementation class of your component.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -197,21 +179,21 @@
         <xsd:attribute name="applyFiltersToProtocol" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether or not to apply the filters to the protocol endpoint.
+                    Whether to apply the filters to the protocol endpoint.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="applyTransformersToProtocol" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether or not to apply the transformers to the protocol endpoint.
+                    Whether to apply the transformers to the protocol endpoint.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="applySecurityToProtocol" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether or not to apply the security filter to the protocol endpoint.
+                    Whether to apply the security filter to the protocol endpoint.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -222,18 +204,14 @@
             <xsd:element name="databinding" type="databindingType" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The databinding implementation that should be used.
-                        By default, this is JAXB for the JAX-WS frontend and Aegis
-                        for the simple frontend. This should be specified in the form
-                        of a spring bean.
+                        The databinding implementation that should be used. By default, this is JAXB for the JAX-WS frontend and Aegis for the simple frontend. This should be specified in the form of a Spring bean.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element ref="features" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        Any CXF features you wish to apply to the client/server.
-                        See the CXF documentation for more information on features.
+                        Any CXF features you want to apply to the client/server. See the CXF documentation for more information on features.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -272,24 +250,21 @@
         <xsd:attribute name="wsdlPort" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The WSDL port you wish to use to communicate to the service.
+                    The WSDL port you want to use to communicate with the service.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="clientClass" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The name of the client class that CXF generated using CXF's wsdl2java
-                    tool. You must use wsdl2java if you do not have both the client and the
-                    server in the same JVM. Otherwise, this can be optional if the endpoint
-                    address is the same in both cases.
+                    The name of the client class that CXF generated using CXF's wsdl2java tool. You must use wsdl2java if you do not have both the client and the server in the same JVM. Otherwise, this can be optional if the endpoint address is the same in both cases.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="operation" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The operation you wish to invoke on the outbound endpoint.
+                    The operation you want to invoke on the outbound endpoint.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -336,8 +311,7 @@
     <xsd:element name="wrapper-component" type="wrapperComponentType" substitutionGroup="mule:abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                The WebServiceWrapperComponent class allows you to send 
-                the result of a web service call to another endpoint. 
+                The WebServiceWrapperComponent class allows you to send the result of a web service call to another endpoint. 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -348,7 +322,7 @@
                 <xsd:attribute name="address" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            TODO
+                            The URL of the web service.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -362,14 +336,14 @@
                 <xsd:attribute name="wsdlPort" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The WSDL port you wish to use to communicate to the service.
+                            The WSDL port you want to use to communicate to the service.
                          </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="operation" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The operation you wish to invoke on the outbound endpoint.
+                            The operation you want to invoke on the outbound endpoint.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
