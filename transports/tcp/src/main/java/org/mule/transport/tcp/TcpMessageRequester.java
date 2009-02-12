@@ -13,6 +13,7 @@ package org.mule.transport.tcp;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.retry.RetryContext;
 import org.mule.transport.AbstractMessageRequester;
 
 import java.net.Socket;
@@ -86,12 +87,7 @@ public class TcpMessageRequester extends AbstractMessageRequester
 
     protected void doConnect() throws Exception
     {
-        // Test the connection
-        if (connector.isValidateConnections())
-        {
-            Socket socket = connector.getSocket(endpoint);
-            connector.releaseSocket(socket, endpoint);
-        }
+        // nothing, there is an optional validation in validateConnection()
     }
 
     protected void doDisconnect() throws Exception
@@ -99,4 +95,38 @@ public class TcpMessageRequester extends AbstractMessageRequester
         //nothing to do
     }
 
+    @Override
+    public RetryContext validateConnection(RetryContext retryContext)
+    {
+        Socket socket = null;
+        try
+        {
+            socket = connector.getSocket(endpoint);
+
+            retryContext.setOk();
+        }
+        catch (Exception ex)
+        {
+            retryContext.setFailed(ex);
+        }
+        finally
+        {
+            if (socket != null)
+            {
+                try
+                {
+                    connector.releaseSocket(socket, endpoint);
+                }
+                catch (Exception e)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Failed to release a socket " + socket, e);
+                    }
+                }
+            }
+        }
+
+        return retryContext;
+    }
 }

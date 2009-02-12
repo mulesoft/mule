@@ -46,8 +46,8 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     // there's nothing like homegrown pseudo-2PC.. :/
     // shared state management like this should go into the connector and use
     // something like commons-tx
-    protected final Set scheduledFiles = Collections.synchronizedSet(new HashSet());
-    protected final Set currentFiles = Collections.synchronizedSet(new HashSet());
+    protected final Set<String> scheduledFiles = Collections.synchronizedSet(new HashSet<String>());
+    protected final Set<String> currentFiles = Collections.synchronizedSet(new HashSet<String>());
 
     public FtpMessageReceiver(Connector connector,
                               Service service,
@@ -80,9 +80,8 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
         synchronized (scheduledFiles)
         {
-            for (int i = 0; i < files.length; i++)
+            for (final FTPFile file : files)
             {
-                final FTPFile file = files[i];
                 final String fileName = file.getName();
 
                 if (!scheduledFiles.contains(fileName) && !currentFiles.contains(fileName))
@@ -119,20 +118,20 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 return files;
             }
 
-            List v = new ArrayList();
+            List<FTPFile> v = new ArrayList<FTPFile>();
 
-            for (int i = 0; i < files.length; i++)
+            for (FTPFile file : files)
             {
-                if (files[i].isFile())
+                if (file.isFile())
                 {
-                    if (filenameFilter == null || filenameFilter.accept(null, files[i].getName()))
+                    if (filenameFilter == null || filenameFilter.accept(null, file.getName()))
                     {
-                        v.add(files[i]);
+                        v.add(file);
                     }
                 }
             }
 
-            return (FTPFile[]) v.toArray(new FTPFile[v.size()]);
+            return v.toArray(new FTPFile[v.size()]);
         }
         finally
         {

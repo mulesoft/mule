@@ -65,6 +65,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         super(connector, service, endpoint);
     }
 
+    @Override
     protected void doConnect() throws ConnectException
     {
         disposing.set(false);
@@ -90,6 +91,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         }
     }
 
+    @Override
     protected void doDisconnect() throws ConnectException
     {
         // this will cause the server thread to quit
@@ -112,11 +114,13 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         }
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // nothing to do
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // nothing to do
@@ -182,6 +186,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         // template method
     }
 
+    @Override
     protected void doDispose()
     {
         try
@@ -266,6 +271,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             releaseSocket();
         }
 
+        @Override
         public void release()
         {
             waitForStreams();
@@ -390,6 +396,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             return null;
         }
         
+        @Override
         protected boolean hasMoreMessages(Object message)
         {
             return !socket.isClosed() && !dataInWorkFinished 
@@ -411,6 +418,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             }
         }
 
+        @Override
         protected void preRouteMuleMessage(final DefaultMuleMessage message) throws Exception
         {
             super.preRouteMuleMessage(message);

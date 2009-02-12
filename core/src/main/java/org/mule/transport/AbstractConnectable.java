@@ -20,6 +20,7 @@ import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connectable;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.util.ClassUtils;
 import org.mule.util.concurrent.WaitableBoolean;
@@ -169,14 +170,19 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
                 {
                     try
                     {
+                        if (connector.isValidateConnections() && !validateConnection(context).isOk())
+                        {
+                            throw new ConnectException(MessageFactory.createStaticMessage("Failed to connect resource"),
+                                                       context.getLastFailure(), this);
+                        }
                         doConnect();
                         connected.set(true);
-                        
+
                         logger.info("Connected: " + getWorkDescription());
                         // TODO Make this work somehow inside the RetryTemplate
                         //connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
                         //    ConnectionNotification.CONNECTION_CONNECTED));
-                        
+
                         if (startOnConnect)
                         {
                             start();

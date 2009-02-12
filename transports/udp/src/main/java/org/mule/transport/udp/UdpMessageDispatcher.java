@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.retry.RetryContext;
 import org.mule.transport.AbstractMessageDispatcher;
 
 import java.io.IOException;
@@ -37,11 +38,46 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (UdpConnector)endpoint.getConnector();
     }
 
+    @Override
+    public RetryContext validateConnection(RetryContext retryContext)
+    {
+        DatagramSocket socket = null;
+        try
+        {
+            socket = connector.getSocket(endpoint);
+
+            retryContext.setOk();
+        }
+        catch (Exception ex)
+        {
+            retryContext.setFailed(ex);
+        }
+        finally
+        {
+            if (socket != null)
+            {
+                try
+                {
+                    connector.releaseSocket(socket, endpoint);
+                }
+                catch (Exception e)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Failed to release a socket " + socket, e);
+                    }
+                }
+            }
+        }
+
+        return retryContext;
+
+    }
+
     protected void doConnect() throws Exception
     {
-        // Test the connection
-        DatagramSocket socket = connector.getSocket(endpoint);
-        connector.releaseSocket(socket, endpoint);
+        // nothing, there is an optional validation in validateConnection()
+        
     }
 
     protected void doDisconnect() throws Exception

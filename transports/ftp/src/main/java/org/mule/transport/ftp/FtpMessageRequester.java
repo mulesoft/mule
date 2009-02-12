@@ -44,8 +44,6 @@ public class FtpMessageRequester extends AbstractMessageRequester
 
     protected void doConnect() throws Exception
     {
-        // what was this for?!
-        //connector.releaseFtp(endpoint.getEndpointURI());
     }
 
     protected void doDisconnect() throws Exception
