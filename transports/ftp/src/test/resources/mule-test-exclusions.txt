@@ -2,3 +2,6 @@
 # Test cases listed in this file are not run.
 #
 
+# MULE-4138 Upgrade Apache FTP server library
+org.mule.transport.ftp.FtpStreamingTestCase
+org.mule.transport.ftp.issues.MultiStreamMule1696TestCase
