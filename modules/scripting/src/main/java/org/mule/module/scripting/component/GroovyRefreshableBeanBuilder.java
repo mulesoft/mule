@@ -24,8 +24,8 @@ public class GroovyRefreshableBeanBuilder implements Callable
     private volatile Object refreshableBean;
     private String methodName;
     private static final String ON_CALL = "onCall";
-    private static final Class[] UMOEVENTCONTEXT = new Class[]{MuleEventContext.class};
-    
+    private static final Class[] MULE_EVENT_CONTEXT = new Class[]{MuleEventContext.class};
+
     public GroovyRefreshableBeanBuilder()
     {
         super();
@@ -36,7 +36,7 @@ public class GroovyRefreshableBeanBuilder implements Callable
         if (refreshableBean instanceof GroovyObject)
         {
             GroovyObject script = (GroovyObject)refreshableBean;
-            MetaMethod onCall = script.getMetaClass().pickMethod("onCall", UMOEVENTCONTEXT);
+            MetaMethod onCall = script.getMetaClass().pickMethod("onCall", MULE_EVENT_CONTEXT);
 
             if (onCall != null)
             {
