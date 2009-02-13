@@ -9,11 +9,13 @@
  */
 package org.mule.transport.jms.integration;
 
+import org.junit.Test;
+
 
 /**
  * Testing durable topic with external subscriber
  */
-public abstract class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
+public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 {
 
     public static final String TOPIC_QUEUE_NAME = "durable.broadcast";
@@ -31,6 +33,7 @@ public abstract class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTes
     /**
      * @throws Exception
      */
+    @Test
     public void testProviderDurableSubscriber() throws Exception
     {
         setClientId("Client1");

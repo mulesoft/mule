@@ -18,10 +18,12 @@ import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
+import org.junit.Test;
+
 /**
  * Tests a transactional exception strategy.
  */
-public abstract class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
+public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
 {
     public static final String DEADLETTER_QUEUE_NAME = "dead.letter";
 
@@ -35,6 +37,7 @@ public abstract class JmsExceptionStrategyTestCase extends AbstractJmsFunctional
         return "integration/jms-exception-strategy.xml";
     }
 
+    @Test
     public void testTransactedRedeliveryToDLDestination() throws Exception
     {
         send(scenarioDeadLetter);
@@ -43,7 +46,8 @@ public abstract class JmsExceptionStrategyTestCase extends AbstractJmsFunctional
         // Verify message got sent to dead letter queue instead.
         receive(scenarioDeadLetter);
     }
-
+    
+    @Test
     public void testTransactedRedeliveryToDLDestinationRollback() throws Exception
     {
         send(scenarioDeadLetter);

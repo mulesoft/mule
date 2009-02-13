@@ -16,7 +16,9 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Connection;
 import javax.jms.Session;
 
-public abstract class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
+import org.junit.Test;
+
+public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
     public static final String TOPIC_QUEUE_NAME = "durable.broadcast";
     private String clientId;
@@ -31,7 +33,8 @@ public abstract class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestC
     {
         return "integration/jms-durable-topic.xml";
     }
-
+    
+    @Test
     public void testProviderDurableSubscriber() throws Exception
     {
         setClientId("Client1");

@@ -14,7 +14,9 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
-public abstract class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCase
+import org.junit.Test;
+
+public class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsQueueWithTransactionTestCase(JmsVendorConfiguration config)
     {
@@ -26,6 +28,7 @@ public abstract class JmsQueueWithTransactionTestCase extends AbstractJmsFunctio
         return "integration/jms-queue-with-transaction.xml";
     }
 
+    @Test
     public void testOutboundJmsTransaction() throws Exception
     {
         MuleClient client = new MuleClient();

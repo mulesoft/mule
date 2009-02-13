@@ -15,23 +15,27 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
+import org.junit.Test;
+
 /**
  * Test jms using JmsClientAcknowledgeTransactionFactory
  */
-public abstract class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunctionalTestCase
+public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunctionalTestCase
 {
-
+         
     public JmsClientAcknowledgeTransactionTestCase(JmsVendorConfiguration config)
-    {
+    {   
         super(config);
+        System.out.println("using jms provider : " + config.getProviderName());
     }
-
+    
     @Override
     protected String getConfigResources()
     {
         return "integration/jms-client-acknowledge-tx.xml";
     }
-
+    
+    @Test
     public void testJmsClientAcknowledgeTransaction() throws Exception
     {
         send(scenarioAcknowledge);

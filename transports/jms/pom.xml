@@ -25,6 +25,9 @@
                         <include>**/*TestCase.java</include>
                         <include>**/*Test.java</include>
                     </includes>
+                    <excludes>
+                        <exclude>**/JmsXATransactionComponentTestCase.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -80,6 +83,12 @@
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+        	<groupId>junit</groupId>
+        	<artifactId>junit</artifactId>
+        	<version>4.5</version>
+        	<scope>test</scope>
         </dependency>
     </dependencies>
 </project>

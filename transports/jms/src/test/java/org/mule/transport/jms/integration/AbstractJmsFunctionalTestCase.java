@@ -14,7 +14,10 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.jms.integration.activemq.ActiveMQJmsConfiguration;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 
@@ -33,9 +36,17 @@ import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
 /**
- * The main idea
+ * The main idea, now runs as a parameterized JUnit 4 test
  */
+@RunWith(Parameterized.class)
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
 
@@ -45,16 +56,47 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     public static final String OUTBOUND_ENDPOINT_KEY = "outbound.destination";
     public static final String MIDDLE_ENDPOINT_KEY = "middle.destination";
 
-    private MuleClient client;
-    private JmsVendorConfiguration jmsConfig;
+    private MuleClient client = null;
+    protected JmsVendorConfiguration jmsConfig = null;
 
     protected Scenario scenarioNoTx;
     protected Scenario scenarioCommit;
     protected Scenario scenarioRollback;
     protected Scenario scenarioNotReceive;
     protected Scenario scenarioReceive;
+    
+    /**
+     * Set the list of jms providers to test.  The goal is to externalize this, i.e. read the 
+     * list from an xml file, use maven profiles to control it, etc.
+     * @return
+     */
+    @Parameters
+    public static Collection jmsProviderConfigs() {
+     return Arrays.asList(new JmsVendorConfiguration[][] {{new ActiveMQJmsConfiguration()}});
+    }
 
-
+    /**
+     * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we need to 
+     * explicitly call the setUp and tearDown methods
+     * @throws Exception
+     */
+    @Before
+    public void before() throws Exception
+    {
+        super.setUp();
+    }
+    
+    /**
+     * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we need to 
+     * explicitly call the setUp and tearDown methods
+     * @throws Exception
+     */
+    @After
+    public void after() throws Exception
+    {
+        super.tearDown();
+    }
+    
     public AbstractJmsFunctionalTestCase(JmsVendorConfiguration config)
     {
         setJmsConfig(config);
@@ -70,6 +112,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     {
         Properties props = new Properties();
         //Inject endpoint names into the config
+        Assert.assertNotNull(getJmsConfig());
+        Assert.assertNotNull(getJmsConfig().getInboundEndpoint());        
+        Assert.assertNotNull(getJmsConfig().getOutboundEndpoint());
+        Assert.assertNotNull(getJmsConfig().getOutboundEndpoint());
+        Assert.assertNotNull(getJmsConfig().getMiddleEndpoint());
+        
         props.put(INBOUND_ENDPOINT_KEY, getJmsConfig().getInboundEndpoint());
         props.put(OUTBOUND_ENDPOINT_KEY, getJmsConfig().getOutboundEndpoint());
         props.put(MIDDLE_ENDPOINT_KEY, getJmsConfig().getMiddleEndpoint());
@@ -299,6 +347,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      /**/
     public Message receive(Scenario scenario) throws Exception
     {
+        assertNotNull("scenario is null!",scenario);
         Connection connection = null;
         try
         {
@@ -314,6 +363,8 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 try
                 {
                     consumer = session.createConsumer(destination);
+                    assertNotNull("consumer is null!",consumer);
+                    assertNotNull("session is null!",session);
                     return scenario.receive(session, consumer);
                 }
                 finally

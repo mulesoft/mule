@@ -9,10 +9,12 @@
  */
 package org.mule.transport.jms.integration;
 
+import org.junit.Test;
+
 /**
  * Message is sent to and received from simple queue.
  */
-public abstract class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
+public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsQueueTestCase(JmsVendorConfiguration config)
     {
@@ -24,6 +26,7 @@ public abstract class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
         return "integration/jms-queue.xml";
     }
 
+    @Test
     public void testJmsQueue() throws Exception
     {
         dispatchMessage();
@@ -31,6 +34,7 @@ public abstract class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
         receive(scenarioNotReceive);
     }
 
+    @Test
     public void testMultipleSend() throws Exception
     {
         dispatchMessage();

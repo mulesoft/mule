@@ -23,7 +23,9 @@ import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
 
-public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
+import org.junit.Test;
+
+public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
 
     public static final String TOPIC_QUEUE_NAME = "durable.broadcast";
@@ -39,6 +41,7 @@ public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctio
         return "integration/jms-muleside-durable-topic.xml";
     }
 
+    @Test
     public void testMuleDurableSubscriber() throws Exception
     {
         send(scenarioNoTx);

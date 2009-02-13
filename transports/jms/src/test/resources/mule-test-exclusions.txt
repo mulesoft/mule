@@ -3,5 +3,5 @@
 #
 
 # MULE-3682
-org.mule.transport.jms.integration.activemq.ActiveMQXATransactionComponentTestCase
+# see pom.xml as we are using JUnit 4 for integration tests and this doesn't work with them (yet)
 
