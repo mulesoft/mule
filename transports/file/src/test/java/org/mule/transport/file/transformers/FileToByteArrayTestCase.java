@@ -81,6 +81,7 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
 
         FileInputStream fis = new FileInputStream(_testFile);
         assertTrue(Arrays.equals(_resultData, (byte[]) getTransformer().transform(fis)));
+        fis.close();
     }
 
     public void testTransformByteArray() throws TransformerException, Exception
@@ -89,6 +90,7 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
         byte[] bytes = new byte[new Long(_testFile.length()).intValue()];
         fis.read(bytes);
         assertTrue(Arrays.equals(_resultData, (byte[]) getTransformer().transform(bytes)));
+        fis.close();
     }
 
     public void testTransformString() throws TransformerException, Exception
