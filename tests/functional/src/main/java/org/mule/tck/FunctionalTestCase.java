@@ -16,6 +16,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -80,6 +81,18 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
             fail("Componnent is not a JavaComponent and therefore has no component object instance");
             return null;
         }
+    }
+
+    /**
+     * A convenience method to get a type-safe reference to the FunctionTestComponent
+     * @param serviceName service name as declared in the config
+     * @return test component
+     * @since 2.2
+     * @see org.mule.tck.functional.FunctionalTestComponent
+     */
+    protected FunctionalTestComponent getFunctionalTestComponent(String serviceName) throws Exception
+    {
+        return (FunctionalTestComponent) getComponent(serviceName);
     }
 
     protected String loadResourceAsString(String name) throws IOException
