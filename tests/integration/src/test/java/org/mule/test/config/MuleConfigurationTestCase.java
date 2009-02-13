@@ -195,7 +195,8 @@ public class MuleConfigurationTestCase extends TestCase
         assertEquals("direct", config.getSystemModelType());
         assertEquals(30000, config.getDefaultResponseTimeout());
         assertEquals(60000, config.getDefaultTransactionTimeout());
-        assertEquals("/some/directory", config.getWorkingDirectory());
+        // on windows this ends up with a c:/ in it
+        assertTrue(config.getWorkingDirectory().indexOf("/some/directory") != -1);
         assertTrue(config.isClientMode());
         assertFalse(ThreadSafeAccess.AccessControl.isFailOnMessageScribbling());
         assertEquals("MY_SERVER", config.getId());
