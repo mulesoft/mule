@@ -10,11 +10,10 @@
 
 package org.mule.transport.jms.integration;
 
+import java.util.Map;
 import java.util.Properties;
 
-import org.junit.Test;
-
-public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends AbstractJmsFunctionalTestCase
 {
 
     public JmsSingleTransactionAlwaysBeginConfigurationTestCase(JmsVendorConfiguration config)
@@ -47,7 +46,6 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         return "integration/jms-single-tx-ALWAYS_BEGIN.xml";
     }
 
-    @Test
     public void testConfigurationA() throws Exception
     {
         scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
@@ -63,7 +61,6 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         receive(scenarioNotReceive);
     }
 
-    @Test
     public void testConfigurationB() throws Exception
     {
         scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
@@ -79,7 +76,7 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         receive(scenarioNotReceive);
     }
 
-    @Test
+
     public void testConfigurationC() throws Exception
     {
         scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
@@ -94,6 +91,8 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         receive(scenarioCommit);
         receive(scenarioNotReceive);
     }
+
+
 }
 
 

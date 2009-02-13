@@ -9,12 +9,10 @@
  */
 package org.mule.transport.jms.integration;
 
-import org.junit.Test;
-
 /**
  * Message is put to topic with two subscribers
  */
-public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsTopicTestCase(JmsVendorConfiguration config)
     {
@@ -25,8 +23,7 @@ public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
     {
         return "integration/jms-topic.xml";
     }
-
-    @Test
+    
     public void testJmsTopic() throws Exception
     {
         // One message is sent.
@@ -36,7 +33,6 @@ public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
         receiveMessage();
     }
 
-    @Test
     public void testMultipleSend() throws Exception
     {
         // One message is sent.

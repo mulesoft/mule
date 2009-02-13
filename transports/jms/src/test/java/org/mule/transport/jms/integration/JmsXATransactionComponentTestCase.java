@@ -12,9 +12,9 @@ package org.mule.transport.jms.integration;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
-import org.junit.Test;
 
-public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTestCase
+
+public abstract class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTestCase
 {
     public static final String CONNECTOR1_NAME = "jmsConnector";
 
@@ -28,7 +28,6 @@ public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTest
         return "integration/jms-xa-tx-component.xml";
     }
 
-    @Test
     public void testOneGlobalTx() throws Exception
     {
         MuleMessage result;

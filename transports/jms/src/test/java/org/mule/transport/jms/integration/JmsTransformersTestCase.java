@@ -35,13 +35,12 @@ import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.junit.Test;
 
 /**
  * <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations.
  */
 
-public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 {
     private Session session = null;
 
@@ -76,7 +75,6 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         }
     }
 
-    @Test
     public void testTransformObjectMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
@@ -94,7 +92,6 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         assertTrue("Transformed object should be an object message", result2 instanceof ObjectMessage);
     }
 
-    @Test
     public void testTransformTextMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
@@ -113,7 +110,6 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         assertTrue("Transformed object should be a TextMessage", result2 instanceof TextMessage);
     }
 
-    @Test
     public void testTransformMapMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
@@ -135,7 +131,6 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         assertTrue("Transformed object should be a Map", result instanceof Map);
     }
 
-    @Test
     public void testTransformByteMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
@@ -155,7 +150,6 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         assertEquals("Source and result should be equal", text, res);
     }
 
-    @Test
     public void testTransformStreamMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
@@ -196,7 +190,6 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
     // This was fixed in 4.x.
     // For more information why this was VERY BAD read:
     // http://en.wikipedia.org/wiki/Zip_of_death
-    @Test
     public void testCompressedBytesMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));

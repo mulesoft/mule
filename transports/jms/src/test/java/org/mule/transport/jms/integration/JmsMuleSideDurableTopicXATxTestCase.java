@@ -12,13 +12,11 @@ package org.mule.transport.jms.integration;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
-import org.junit.Test;
-
 /**
  * Testing durable topic
  * with XA transactions
  */
-public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTestCase
 {
 
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
@@ -33,7 +31,6 @@ public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTe
         return "integration/jms-muleside-durable-topic-xa-tx.xml";
     }
 
-    @Test
     public void testMuleXaTopic() throws Exception
     {
         // There is a need to guarantee that XaMessageTopicReceiver connected to topic

@@ -13,13 +13,11 @@ package org.mule.transport.jms.integration;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
 
-import org.junit.Test;
-
-public class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
 {
-
-    public JmsRemoteSyncMule2868TestCase(JmsVendorConfiguration config)
+    protected JmsRemoteSyncMule2868TestCase(JmsVendorConfiguration config)
     {
         super(config);
     }
@@ -29,7 +27,6 @@ public class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
         return "integration/jms-remote-sync-mule2868.xml";
     }
 
-    @Test
     public void testMule2868() throws MuleException
     {
         MuleClient muleClient = new MuleClient();

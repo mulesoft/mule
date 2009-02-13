@@ -13,8 +13,6 @@ package org.mule.transport.jms.integration;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
-import org.junit.Test;
-
 /**
  * Requires the following connector config:
  *
@@ -43,7 +41,7 @@ import org.junit.Test;
  *       </util:properties>
  *   </spring:beans>
  */
-public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 {
 
     public JmsConnectorJndiTestCase(JmsVendorConfiguration config)
@@ -56,8 +54,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     {
         return "integration/jms-jndi-config.xml";
     }
-    
-    @Test
+
     public void testConnectionFactoryFromJndi() throws Exception
     {
         MuleClient client = new MuleClient();
@@ -69,8 +66,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
         assertNotNull(result);
         assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
     } 
-
-    @Test
+ 
     public void testQueueFromJndi() throws Exception
     {
         MuleClient client = new MuleClient();
@@ -82,7 +78,6 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
         assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
     }
     
-    @Test
     public void testTopicFromJndi() throws Exception
     {
         MuleClient client = new MuleClient();
@@ -92,5 +87,6 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
         assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
-    }    
+    }
+    
 }

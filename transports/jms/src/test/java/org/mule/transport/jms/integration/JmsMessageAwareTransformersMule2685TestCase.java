@@ -27,10 +27,9 @@ import javax.jms.TextMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Test;
 
 /** <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations. */
-public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunctionalTestCase
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
@@ -67,7 +66,6 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
         }
     }
 
-    @Test
     public void testMessageAwareTransformerChainedWithObjectToJMSMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
