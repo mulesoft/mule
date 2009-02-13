@@ -35,9 +35,13 @@ public class CounterCallback implements EventCallback
         incCallbackCount();
     }
 
-    protected void incCallbackCount()
+    /**
+     * Increment callback count.
+     * @return current count after increment
+     */
+    protected int incCallbackCount()
     {
-        callbackCount.incrementAndGet();
+        return callbackCount.incrementAndGet();
     }
 
     public int getCallbackCount()
