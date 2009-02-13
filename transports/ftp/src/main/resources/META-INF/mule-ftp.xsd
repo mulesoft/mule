@@ -57,7 +57,7 @@
                 <xsd:attribute name="streaming" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether an InputStream should be sent as the message payload (if true) or a byte array (if false). 
+                            Whether an InputStream should be sent as the message payload (if true) or a byte array (if false). Default is false.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -131,14 +131,14 @@
         <xsd:attribute name="binary" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    Select/disable binary file transfer type.
+                    Select/disable binary file transfer type. Default is true.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="passive" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    Select/disable passive protocol (more likely to work through firewalls).
+                    Select/disable passive protocol (more likely to work through firewalls). Default is true.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
