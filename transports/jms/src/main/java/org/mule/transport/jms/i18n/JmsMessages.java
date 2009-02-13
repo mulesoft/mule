@@ -54,9 +54,9 @@ public class JmsMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 8, ObjectUtils.toString(object, "null"));
     }
 
-    public static Message tooManyRedeliveries(String id, String times)
+    public static Message tooManyRedeliveries(String messageId, String times, int maxRedelivery, String connectorName)
     {
-        return factory.createMessage(BUNDLE_PATH, 11, id, times);
+        return factory.createMessage(BUNDLE_PATH, 11, messageId, times, maxRedelivery, connectorName);
     }
 
     public static Message invalidResourceType(Class expectedClass, Object object)

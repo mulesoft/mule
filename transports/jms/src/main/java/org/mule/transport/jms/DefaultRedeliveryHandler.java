@@ -13,6 +13,7 @@ package org.mule.transport.jms;
 import org.mule.api.MessagingException;
 import org.mule.transport.jms.i18n.JmsMessages;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
 
@@ -79,12 +80,14 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Message with id: " + id + " has been redelivered " + (i + 1)
-                             + " times, which exceeds the maxRedelivery setting on the connector");
+                logger.debug(MessageFormat.format(
+                        "Message with id: {0} has been redelivered {1} times, which exceeds the maxRedelivery setting " +
+                        "of {2} on the connector {3}", id, connector.getMaxRedelivery(), connector.getName()));
             }
-            JmsMessageAdapter adapter = (JmsMessageAdapter)connector.getMessageAdapter(message);
+            JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
             throw new MessageRedeliveredException(
-                JmsMessages.tooManyRedeliveries(id, String.valueOf(i + 1)), adapter);
+                    JmsMessages.tooManyRedeliveries(id, String.valueOf(i + 1), connector.getMaxRedelivery(),
+                                                    connector.getName()), adapter);
 
         }
         else

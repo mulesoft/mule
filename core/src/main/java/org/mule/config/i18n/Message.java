@@ -24,7 +24,7 @@ public class Message implements Serializable
     private Object[] args;
     private Message nextMessage;
 
-    protected Message(String message, int code, Object[] args)
+    protected Message(String message, int code, Object... args)
     {
         super();
         this.message = message;

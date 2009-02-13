@@ -19,10 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-public abstract class MessageFactory extends Object
+public abstract class MessageFactory
 {
-    private static final CoreMessages factory = new CoreMessages();
-    
     /**
      * This error code is used for {@link Message} instances that are not read from a
      * resource bundles but are created only with a string.
@@ -52,7 +50,7 @@ public abstract class MessageFactory extends Object
      * @param bundlePath complete path to the resource bundle for lookup
      * @param code numeric code of the message
      * @param arg
-     * @see getBundlePath()
+     * @see #getBundlePath(String)
      */
     protected Message createMessage(String bundlePath, int code, Object arg)
     {
@@ -67,7 +65,7 @@ public abstract class MessageFactory extends Object
      * @param code numeric code of the message
      * @param arg1
      * @param arg2
-     * @see getBundlePath()
+     * @see #getBundlePath(String)
      */
     protected Message createMessage(String bundlePath, int code, Object arg1, Object arg2)
     {
@@ -83,7 +81,7 @@ public abstract class MessageFactory extends Object
      * @param arg1
      * @param arg2
      * @param arg3
-     * @see getBundlePath()
+     * @see #getBundlePath(String)
      */
     protected Message createMessage(String bundlePath, int code, Object arg1, Object arg2, 
         Object arg3)
@@ -101,14 +99,14 @@ public abstract class MessageFactory extends Object
      * @param bundlePath complete path to the resource bundle for lookup
      * @param code numeric code of the message
      * @param arguments
-     * @see getBundlePath()
+     * @see #getBundlePath(String)
      */
-    protected Message createMessage(String bundlePath, int code, Object[] arguments)
+    protected Message createMessage(String bundlePath, int code, Object... arguments)
     {
         String messageString = getString(bundlePath, code, arguments);
         return new Message(messageString, code, arguments);
     }
-    
+
     /**
      * Factory method to create a new {@link Message} instance that is filled with the formatted
      * message with id <code>code</code> from the resource bundle <code>bundlePath</code>.
