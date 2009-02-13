@@ -23,9 +23,6 @@ import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * <code>DefaultRedeliveryHandler</code> TODO
- */
 public class DefaultRedeliveryHandler implements RedeliveryHandler
 {
     /**
@@ -33,10 +30,11 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
      */
     protected static final Log logger = LogFactory.getLog(DefaultRedeliveryHandler.class);
 
-    private Map messages = null;
+    private Map<String, Integer> messages = null;
 
     protected JmsConnector connector;
 
+    @SuppressWarnings("unchecked")
     public DefaultRedeliveryHandler()
     {
         messages = Collections.synchronizedMap(new LRUMap(256));
@@ -59,7 +57,6 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
      * <code>MessageRedeliveredException</code> to indicate that the message should
      * be handled by the connector Exception Handler.
      * 
-     * @param message
      */
     public void handleRedelivery(Message message) throws JMSException, MessagingException
     {
@@ -69,34 +66,33 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
         }
 
         String id = message.getJMSMessageID();
-        Integer i = (Integer)messages.remove(id);
+        Integer i = messages.remove(id);
         if (i == null)
         {
             if (logger.isDebugEnabled())
             {
                 logger.debug("Message with id: " + id + " has been redelivered for the first time");
             }
-            messages.put(id, new Integer(1));
-            return;
+            messages.put(id, 1);
         }
-        else if (i.intValue() == connector.getMaxRedelivery())
+        else if (i == connector.getMaxRedelivery())
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Message with id: " + id + " has been redelivered " + (i.intValue() + 1)
+                logger.debug("Message with id: " + id + " has been redelivered " + (i + 1)
                              + " times, which exceeds the maxRedelivery setting on the connector");
             }
             JmsMessageAdapter adapter = (JmsMessageAdapter)connector.getMessageAdapter(message);
             throw new MessageRedeliveredException(
-                JmsMessages.tooManyRedeliveries(id, String.valueOf(i.intValue() + 1)), adapter);
+                JmsMessages.tooManyRedeliveries(id, String.valueOf(i + 1)), adapter);
 
         }
         else
         {
-            messages.put(id, new Integer(i.intValue() + 1));
+            messages.put(id, i + 1);
             if (logger.isDebugEnabled())
             {
-                logger.debug("Message with id: " + id + " has been redelivered " + i.intValue() + " times");
+                logger.debug("Message with id: " + id + " has been redelivered " + i + " times");
             }
         }
     }
