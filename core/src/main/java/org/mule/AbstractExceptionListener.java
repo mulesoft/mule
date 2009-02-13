@@ -45,7 +45,6 @@ import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -135,7 +134,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         if (t != null)
         {
             RoutingException re = (RoutingException) t;
-            handleRoutingException(re.getUmoMessage(), re.getEndpoint(), e);
+            handleRoutingException(re.getMuleMessage(), re.getEndpoint(), e);
             return;
         }
 
@@ -143,7 +142,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         if (t != null)
         {
             MessagingException me = (MessagingException) t;
-            handleMessagingException(me.getUmoMessage(), e);
+            handleMessagingException(me.getMuleMessage(), e);
             return;
         }
 
@@ -424,7 +423,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     /**
      * Fires a server notification to all registered
-     * {@link org.mule.api.context.notification.listener.ExceptionNotificationListener}
+     * {@link org.mule.api.context.notification.ExceptionNotificationListener}
      * eventManager.
      *
      * @param notification the notification to fire.
@@ -504,7 +503,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * reference to the object that failed which can be used for more informative
      * logging.
      *
-     * @param service the object that failed during a lifecycle call
+     * @param component the object that failed during a lifecycle call
      * @param e       the top level exception thrown. This may or may not be the
      *                <code>LifecycleException</code> but a lifecycle exception will be
      *                present in the exception stack.

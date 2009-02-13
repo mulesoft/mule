@@ -110,7 +110,7 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
             catch (RoutingException e)
             {
                 // we'll want to send the whole message to the Exception handler
-                e = new RoutingException(e.getI18nMessage(), e.getUmoMessage(), e.getEndpoint(), e.getCause());
+                e = new RoutingException(e.getI18nMessage(), e.getMuleMessage(), e.getEndpoint(), e.getCause());
                 // e.addInfo("chunking", "true");
                 // buffer = new byte[data.length - len];
                 // System.arraycopy(data, len, buffer, 0, buffer.length);

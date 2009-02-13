@@ -35,19 +35,19 @@ public class MessagingException extends MuleException
     /**
      * The MuleMessage being processed when the error occurred
      */
-    protected final transient MuleMessage umoMessage;
+    protected final transient MuleMessage muleMessage;
 
-    public MessagingException(Message message, MuleMessage umoMessage)
+    public MessagingException(Message message, MuleMessage muleMessage)
     {
         super();
-        this.umoMessage = umoMessage;
+        this.muleMessage = muleMessage;
         setMessage(generateMessage(message));
     }
 
-    public MessagingException(Message message, MuleMessage umoMessage, Throwable cause)
+    public MessagingException(Message message, MuleMessage muleMessage, Throwable cause)
     {
         super(cause);
-        this.umoMessage = umoMessage;
+        this.muleMessage = muleMessage;
         setMessage(generateMessage(message));
     }
 
@@ -56,11 +56,11 @@ public class MessagingException extends MuleException
         super();
         if (payload == null)
         {
-            this.umoMessage = RequestContext.getEventContext().getMessage();
+            this.muleMessage = RequestContext.getEventContext().getMessage();
         }
         else
         {
-            this.umoMessage = new DefaultMuleMessage(payload, (Map) null);
+            this.muleMessage = new DefaultMuleMessage(payload, (Map) null);
         }
         setMessage(generateMessage(message));
     }
@@ -70,11 +70,11 @@ public class MessagingException extends MuleException
         super(cause);
         if (payload == null)
         {
-            this.umoMessage = RequestContext.getEventContext().getMessage();
+            this.muleMessage = RequestContext.getEventContext().getMessage();
         }
         else
         {
-            this.umoMessage = new DefaultMuleMessage(payload, (Map) null);
+            this.muleMessage = new DefaultMuleMessage(payload, (Map) null);
         }
         setMessage(generateMessage(message));
     }
@@ -88,9 +88,9 @@ public class MessagingException extends MuleException
             buf.append(message.getMessage()).append(". ");
         }
 
-        if (umoMessage != null)
+        if (muleMessage != null)
         {
-            Object payload = umoMessage.getPayload();
+            Object payload = muleMessage.getPayload();
             if (payload == null)
             {
                 payload = NullPayload.getInstance();
@@ -108,9 +108,9 @@ public class MessagingException extends MuleException
         return buf.toString();
     }
 
-    public MuleMessage getUmoMessage()
+    public MuleMessage getMuleMessage()
     {
-        return umoMessage;
+        return muleMessage;
     }
 
 }
