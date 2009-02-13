@@ -11,7 +11,6 @@
 package org.mule.transport.file.transformers;
 
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
@@ -24,11 +23,10 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class FileToByteArrayTestCase extends AbstractTransformerTestCase
 {
+    private static final String TEST_STRING = "The dog is on the table, where's the dog?";
 
-    FileToByteArray _fts;
-    File _testFile = null;
-    byte[] _resultData;
-    final String _testString = "The dog is on the table, where's the dog?";
+    private File testFile;
+    private byte[] resultData;
 
     /*
      * (non-Javadoc)
@@ -37,11 +35,17 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        _resultData = _testString.getBytes(muleContext.getConfiguration().getDefaultEncoding());
-        _testFile = FileUtils.newFile(SystemUtils.JAVA_IO_TMPDIR, "FileToStringTestData");
-        FileWriter fw = new FileWriter(_testFile);
-        fw.write(_testString);
-        fw.close();
+        resultData = TEST_STRING.getBytes(muleContext.getConfiguration().getDefaultEncoding());
+        testFile = FileUtils.newFile(SystemUtils.JAVA_IO_TMPDIR, "FileToStringTestData");
+        FileWriter fw = new FileWriter(testFile);
+        try
+        {
+            fw.write(TEST_STRING);
+        }
+        finally
+        {
+            fw.close();
+        }
     }
 
     /*
@@ -50,7 +54,7 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
      */
     protected void doTearDown() throws Exception
     {
-        assertTrue(_testFile.delete());
+        assertTrue(testFile.delete());
         super.doTearDown();
     }
 
@@ -61,7 +65,7 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
 
     public Object getResultData()
     {
-        return _resultData;
+        return resultData;
     }
 
     @Override
@@ -73,29 +77,44 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
     @Override
     public Object getTestData()
     {
-        return _testFile;
+        return testFile;
     }
 
-    public void testTransformInputStream() throws TransformerException, Exception
+    public void testTransformInputStream() throws Exception
     {
-
-        FileInputStream fis = new FileInputStream(_testFile);
-        assertTrue(Arrays.equals(_resultData, (byte[]) getTransformer().transform(fis)));
-        fis.close();
+        FileInputStream fis = new FileInputStream(testFile);
+        try
+        {
+            assertTrue(Arrays.equals(resultData, (byte[]) getTransformer().transform(fis)));
+        }
+        finally
+        {
+            fis.close();
+        }
     }
 
-    public void testTransformByteArray() throws TransformerException, Exception
+    public void testTransformByteArray() throws Exception
     {
-        FileInputStream fis = new FileInputStream(_testFile);
-        byte[] bytes = new byte[new Long(_testFile.length()).intValue()];
-        fis.read(bytes);
-        assertTrue(Arrays.equals(_resultData, (byte[]) getTransformer().transform(bytes)));
-        fis.close();
+        FileInputStream fis = new FileInputStream(testFile);
+        byte[] bytes = new byte[(int) testFile.length()];
+        try
+        {
+            int count;
+            while ((count = fis.read(bytes)) != -1)
+            {
+                // read fully
+            }
+            assertTrue(Arrays.equals(resultData, (byte[]) getTransformer().transform(bytes)));
+        }
+        finally
+        {
+            fis.close();
+        }
     }
 
-    public void testTransformString() throws TransformerException, Exception
+    public void testTransformString() throws Exception
     {
-        assertTrue(Arrays.equals(_resultData, (byte[]) getTransformer().transform(_testString)));
+        assertTrue(Arrays.equals(resultData, (byte[]) getTransformer().transform(TEST_STRING)));
     }
 
 }
