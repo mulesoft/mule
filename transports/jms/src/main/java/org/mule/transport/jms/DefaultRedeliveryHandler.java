@@ -72,7 +72,7 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Message doesn't have a JMSMessageID set, Mule can't handle redelivery for it.");
+                logger.debug("Message doesn't have a JMSMessageID set, Mule can't handle redelivery for it. " + message);
             }
             return;
         }
