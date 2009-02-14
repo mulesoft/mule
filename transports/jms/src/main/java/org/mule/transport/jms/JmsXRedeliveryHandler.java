@@ -11,6 +11,8 @@
 package org.mule.transport.jms;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleRuntimeException;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.jms.i18n.JmsMessages;
 
 import java.text.MessageFormat;
@@ -60,22 +62,35 @@ public class JmsXRedeliveryHandler implements RedeliveryHandler
         }
 
         String messageId = message.getJMSMessageID();
-        Integer deliveryCount = message.getIntProperty(JmsConstants.JMS_X_DELIVERY_COUNT);
-        if (deliveryCount == null)
+        int deliveryCount = -1;
+        try
+        {
+            deliveryCount = message.getIntProperty(JmsConstants.JMS_X_DELIVERY_COUNT);
+        }
+        catch (JMSException e)
+        {
+            throw new MuleRuntimeException(MessageFactory.createStaticMessage(String.format(
+                    "Invalid use of %s. Message is flagged with JMSRedelivered, but JMSXDeliveryCount is not set",
+                    getClass().getName())));
+        }
+
+        int redeliveryCount = deliveryCount - 1;
+
+        if (redeliveryCount == 1)
         {
             if (logger.isDebugEnabled())
             {
                 logger.debug("Message with id: " + messageId + " has been redelivered for the first time");
             }
         }
-        else if (deliveryCount > connector.getMaxRedelivery())
+        else if (redeliveryCount > connector.getMaxRedelivery())
         {
             logger.debug(MessageFormat.format(
                     "Message with id: {0} has been redelivered {1} times, which exceeds the maxRedelivery setting " +
-                    "of {2} on the connector {3}", messageId, deliveryCount, connector.getMaxRedelivery(), connector.getName()));
+                    "of {2} on the connector {3}", messageId, redeliveryCount, connector.getMaxRedelivery(), connector.getName()));
             JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
             throw new MessageRedeliveredException(
-                JmsMessages.tooManyRedeliveries(messageId, String.valueOf(deliveryCount),
+                JmsMessages.tooManyRedeliveries(messageId, String.valueOf(redeliveryCount),
                                                 connector.getMaxRedelivery(), connector.getName()), adapter);
 
         }
@@ -84,7 +99,7 @@ public class JmsXRedeliveryHandler implements RedeliveryHandler
             if (logger.isDebugEnabled())
             {
                 // re-delivery count is actually less by 1 than an actual delivery count
-                logger.debug("Message with id: " + messageId + " has been redelivered " + (deliveryCount - 1) + " times");
+                logger.debug("Message with id: " + messageId + " has been redelivered " + redeliveryCount + " times");
             }
         }
     }
