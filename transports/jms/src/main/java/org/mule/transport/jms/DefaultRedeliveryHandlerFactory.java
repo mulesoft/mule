@@ -19,7 +19,7 @@ public class DefaultRedeliveryHandlerFactory implements RedeliveryHandlerFactory
 
     public RedeliveryHandler create()
     {
-        RedeliveryHandler result = null;
+        RedeliveryHandler result;
 
         // initialize, accounting for concurrency
         if (handler.get() == null)
