@@ -67,7 +67,7 @@ public class JmsXRedeliveryHandler implements RedeliveryHandler
         {
             deliveryCount = message.getIntProperty(JmsConstants.JMS_X_DELIVERY_COUNT);
         }
-        catch (JMSException e)
+        catch (NumberFormatException nex)
         {
             throw new MuleRuntimeException(MessageFactory.createStaticMessage(String.format(
                     "Invalid use of %s. Message is flagged with JMSRedelivered, but JMSXDeliveryCount is not set",
