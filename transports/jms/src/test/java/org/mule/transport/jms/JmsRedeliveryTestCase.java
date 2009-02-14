@@ -26,6 +26,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public class JmsRedeliveryTestCase extends FunctionalTestCase
 {
     private final int timeout = getTimeoutSecs() * 1000 / 4;
+    private static final String DESTINATION = "jms://in";
 
     protected String getConfigResources()
     {
@@ -34,6 +35,14 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
 
     public void testRedelivery() throws Exception
     {
+        MuleClient client = new MuleClient();
+        // required if broker is not restarted with the test - it tries to deliver those messages to the client
+        // drain the queue
+        while (client.request(DESTINATION, 1000) != null)
+        {
+            logger.warn("Destination " + DESTINATION + " isn't empty, draining it");
+        }
+
         FunctionalTestComponent ftc = getFunctionalTestComponent("Bouncer");
 
         // whether a MessageRedeliverdException has been fired
@@ -64,8 +73,7 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
         };
         ftc.setEventCallback(callback);
 
-        MuleClient client = new MuleClient();
-        client.dispatch("jms://in", "test", null);
+        client.dispatch(DESTINATION, "test", null);
 
         mrexFired.await(timeout, TimeUnit.MILLISECONDS);
         assertEquals("MessageRedeliveredException never fired.", 0, mrexFired.getCount());
