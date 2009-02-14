@@ -71,7 +71,7 @@ public abstract class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTest
     {
         MuleClient client = new MuleClient();
 
-        client.dispatch("jms://in2?connector=jmsConnector2", DEFAULT_INPUT_MESSAGE, null);
+        client.dispatch("jms://jndi-queue-in?connector=jmsConnector2", DEFAULT_INPUT_MESSAGE, null);
         
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
@@ -82,7 +82,7 @@ public abstract class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTest
     {
         MuleClient client = new MuleClient();
         
-        client.dispatch("jms://topic:some/long/path/in3?connector=jmsConnector2", DEFAULT_INPUT_MESSAGE, null);
+        client.dispatch("jms://topic:jndi-topic-in?connector=jmsConnector2", DEFAULT_INPUT_MESSAGE, null);
         
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);

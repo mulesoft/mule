@@ -10,7 +10,7 @@
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
 
     <endpoint name="in" address="${inbound.destination}" />
-    <jms:endpoint name="topic" topic="durable.broadcast"/>
+    <endpoint name="in.topic" address="${broadcast.topic.destination}"/>
 
     <model name="TEST">
         <service name="InputPart">
@@ -24,7 +24,7 @@
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="topic">
+                    <outbound-endpoint ref="in.topic">
                         <jms:transaction action="NONE"/>
                     </outbound-endpoint>
                 </pass-through-router>

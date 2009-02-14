@@ -9,36 +9,36 @@
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
 
-    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
-
-    <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
+    <endpoint name="broadcast" address="${broadcast.topic.destination}" connector-ref="jmsConnectorC1"/>
+    <endpoint name="broadcast2" address="${broadcast.topic.destination}" connector-ref="jmsConnectorC2"/>
+    <endpoint name="out" address="${outbound.destination}" connector-ref="jmsConnector"/>
 
     <model name="TEST">
 
         <service name="Part1">
             <inbound>
-                <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC1"/>
+                <inbound-endpoint ref="broadcast"/>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage"/>
+                    <outbound-endpoint ref="out"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="Part3">
             <inbound>
-                <jms:inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC2"/>
+                <inbound-endpoint ref="broadcast2"/>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage"/>
+                    <outbound-endpoint ref="out"/>
                 </pass-through-router>
             </outbound>
         </service>

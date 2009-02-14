@@ -16,8 +16,6 @@ package org.mule.transport.jms.integration;
 public abstract class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 {
 
-    public static final String TOPIC_QUEUE_NAME = "durable.broadcast";
-
     public JmsDurableTopicSingleTxTestCase(JmsVendorConfiguration config)
     {
         super(config);
@@ -55,7 +53,7 @@ public abstract class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTes
     {
         public String getOutputDestinationName()
         {
-            return TOPIC_QUEUE_NAME;
+            return getJmsConfig().getBroadcastDestinationName();
         }
     };
 
@@ -63,7 +61,7 @@ public abstract class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTes
     {
         public String getOutputDestinationName()
         {
-            return TOPIC_QUEUE_NAME;
+            return getJmsConfig().getBroadcastDestinationName();
         }
     };
 
@@ -71,7 +69,7 @@ public abstract class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTes
     {
         public String getOutputDestinationName()
         {
-            return TOPIC_QUEUE_NAME;
+            return getJmsConfig().getBroadcastDestinationName();
         }
     };
 }

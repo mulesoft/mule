@@ -13,7 +13,8 @@ import org.mule.transport.jms.integration.JmsVendorConfiguration;
 
 import java.util.Map;
 
-import javax.jms.ConnectionFactory;
+import javax.jms.Connection;
+import javax.jms.JMSException;
 
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -29,16 +30,16 @@ public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
 {
     public static final String DEFAULT_BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
 
-    public ConnectionFactory getConnectionFactory(boolean topic, boolean xa)
+    public Connection getConnection(boolean topic, boolean xa) throws Exception
     {
         if (xa)
         {
-            return new ActiveMQXAConnectionFactory(DEFAULT_BROKER_URL);
+            return new ActiveMQXAConnectionFactory(DEFAULT_BROKER_URL).createConnection();
 
         }
         else
         {
-            return new ActiveMQConnectionFactory(DEFAULT_BROKER_URL);
+            return new ActiveMQConnectionFactory(DEFAULT_BROKER_URL).createConnection();
         }
     }
 
@@ -57,6 +58,11 @@ public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
         return getProtocol() + "://" + getMiddleDestinationName();
     }
 
+    public String getTopicBroadcastEndpoint()
+    {
+        return getProtocol() + "://topic:" + getBroadcastDestinationName();
+    }
+
     public String getInboundDestinationName()
     {
         return "in";
@@ -70,6 +76,11 @@ public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
     public String getMiddleDestinationName()
     {
         return "middle";
+    }
+
+    public String getBroadcastDestinationName()
+    {
+        return "broadcast";
     }
 
     /**

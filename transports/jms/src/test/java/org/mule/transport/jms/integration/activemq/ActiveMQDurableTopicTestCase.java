@@ -17,9 +17,6 @@ import javax.jms.ConnectionFactory;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
-/**
- * TODO
- */
 public class ActiveMQDurableTopicTestCase extends JmsDurableTopicTestCase
 {
     public ActiveMQDurableTopicTestCase()

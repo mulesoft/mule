@@ -11,9 +11,6 @@ package org.mule.transport.jms.integration.activemq;
 
 import org.mule.transport.jms.integration.JmsQueueWithCompressionTestCase;
 
-/**
- * TODO
- */
 public class ActiveMQQueueWithCompressionTestCase extends JmsQueueWithCompressionTestCase
 {
     public ActiveMQQueueWithCompressionTestCase()

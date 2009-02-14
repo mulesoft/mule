@@ -11,9 +11,6 @@ package org.mule.transport.jms.integration.activemq;
 
 import org.mule.transport.jms.integration.JmsMuleSideDurableTopicXATxTestCase;
 
-/**
- * TODO
- */
 public class ActiveMQMuleSideDurableTopicXATxTestCase extends JmsMuleSideDurableTopicXATxTestCase
 {
     public ActiveMQMuleSideDurableTopicXATxTestCase()

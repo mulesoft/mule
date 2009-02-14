@@ -16,8 +16,10 @@
                     see http://activemq.apache.org/jndi-support.html for configuring queues/topics
                     through JNDI properties
                 -->
-            <spring:prop key="queue.in2">in-queue2</spring:prop>
-            <spring:prop key="topic.some/long/path/in3">in-topic3</spring:prop>
+            <!--<spring:prop key="queue.in2">in-queue2</spring:prop>-->
+            <!--<spring:prop key="topic.with/long/path">in-topic3</spring:prop>-->
+            <spring:prop key="queue.jndi-queue-in">in</spring:prop>
+            <spring:prop key="topic.jndi-topic-in">in</spring:prop>
         </util:properties>
     </spring:beans>
 

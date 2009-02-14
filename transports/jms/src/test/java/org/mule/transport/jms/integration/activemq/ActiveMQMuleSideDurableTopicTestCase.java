@@ -14,9 +14,6 @@ import org.mule.transport.jms.integration.JmsVendorConfiguration;
 import org.mule.transport.jms.activemq.ActiveMQJmsConnector;
 import org.mule.api.transport.Connector;
 
-/**
- * TODO
- */
 public class ActiveMQMuleSideDurableTopicTestCase extends JmsMuleSideDurableTopicTestCase
 {
     public ActiveMQMuleSideDurableTopicTestCase()

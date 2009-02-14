@@ -18,7 +18,6 @@ import javax.jms.Session;
 
 public abstract class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
-    public static final String TOPIC_QUEUE_NAME = "durable.broadcast";
     private String clientId;
 
 
@@ -54,7 +53,7 @@ public abstract class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestC
     {
         public String getOutputDestinationName()
         {
-            return TOPIC_QUEUE_NAME;
+            return getJmsConfig().getBroadcastDestinationName();
         }
     };
 
@@ -62,7 +61,7 @@ public abstract class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestC
     {
         public String getOutputDestinationName()
         {
-            return TOPIC_QUEUE_NAME;
+            return getJmsConfig().getBroadcastDestinationName();
         }
     };
 
@@ -71,8 +70,7 @@ public abstract class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestC
         Connection connection = null;
         try
         {
-            ConnectionFactory factory = getConnectionFactory(true, false);
-            connection = factory.createConnection();
+            connection = getConnection(true, false);
             connection.setClientID(getClientId());
             connection.start();
             Session session = null;

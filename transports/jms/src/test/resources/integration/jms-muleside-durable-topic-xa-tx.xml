@@ -20,6 +20,10 @@
     <vm:endpoint name="in" path="in" connector-ref="vm"/>
     <vm:endpoint name="out" path="out" connector-ref="vm"/>
 
+    <endpoint name="broadcast" address="${broadcast.topic.destination}" connector-ref="jmsConnectorTestDriver"/>
+    <endpoint name="broadcast1" address="${broadcast.topic.destination}" connector-ref="jmsConnectorC1"/>
+    <endpoint name="broadcast2" address="${broadcast.topic.destination}" connector-ref="jmsConnectorC2"/>
+
     <model name="TEST">
         <service name="InputPart">
             <inbound>
@@ -30,9 +34,9 @@
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorTestDriver">
+                    <outbound-endpoint ref="broadcast">
                         <xa-transaction action="BEGIN_OR_JOIN"/> 
-                    </jms:outbound-endpoint>
+                    </outbound-endpoint>
                     <!--
                         There's no inbound TX, so make sure XA is happy by starting it via router
                         on the outbound. Such problems are now nicely detected and reported via an error.
@@ -44,9 +48,9 @@
 
         <service name="Part1">
             <inbound>
-                <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC1">
+                <inbound-endpoint ref="broadcast1">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
-                </jms:inbound-endpoint>
+                </inbound-endpoint>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
@@ -62,9 +66,9 @@
 
         <service name="Part3">
             <inbound>
-                <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC2">
+                <inbound-endpoint ref="broadcast2">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
-                </jms:inbound-endpoint>
+                </inbound-endpoint>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>

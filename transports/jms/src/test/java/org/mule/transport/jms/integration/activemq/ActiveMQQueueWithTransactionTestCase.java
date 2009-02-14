@@ -11,9 +11,6 @@ package org.mule.transport.jms.integration.activemq;
 
 import org.mule.transport.jms.integration.JmsQueueWithTransactionTestCase;
 
-/**
- * TODO
- */
 public class ActiveMQQueueWithTransactionTestCase extends JmsQueueWithTransactionTestCase
 {
     public ActiveMQQueueWithTransactionTestCase()

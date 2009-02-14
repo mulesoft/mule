@@ -17,6 +17,7 @@ import java.text.MessageFormat;
 import java.util.Map;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.Connection;
 
 /**
  * Abstracts all the Jms Vendor specific configuration.
@@ -30,7 +31,7 @@ public interface JmsVendorConfiguration
      * @param xa whether to create an XA connection factory
      * @return a new connection factory
      */
-    public abstract ConnectionFactory getConnectionFactory(boolean topic, boolean xa) throws Exception;
+    public abstract Connection getConnection(boolean topic, boolean xa) throws Exception;
 
     public String getInboundEndpoint();
 
@@ -38,12 +39,15 @@ public interface JmsVendorConfiguration
 
     public String getMiddleEndpoint();
 
+    public String getTopicBroadcastEndpoint();
+
     public String getInboundDestinationName();
 
     public String getOutboundDestinationName();
 
     public String getMiddleDestinationName();
 
+    public String getBroadcastDestinationName();
 
     /**
      * Timeout used when checking that a message is NOT present

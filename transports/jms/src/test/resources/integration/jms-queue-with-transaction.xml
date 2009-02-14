@@ -13,9 +13,9 @@
 
     <vm:connector name="VMQueue" queueEvents="true"/>
 
-    <jms:endpoint name="feederQueue" queue="feeder.queue">
-        <jms:transaction action="ALWAYS_BEGIN" timeout="3000"/>
-    </jms:endpoint>
+    <endpoint name="in" address="${inbound.destination}">
+
+    </endpoint>
     
     <!-- see MULE-3342 for what this test is supposed to check -->
     <model name="model">
@@ -25,14 +25,16 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint ref="feederQueue" />
+                    <outbound-endpoint ref="in" >
+                        <jms:transaction action="ALWAYS_BEGIN" timeout="3000"/>
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="jms-to-vm">
             <inbound>
-                <jms:inbound-endpoint queue="feeder.queue"/>
+                <inbound-endpoint ref="in"/>
             </inbound>
             <outbound>
                 <pass-through-router>

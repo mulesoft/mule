@@ -9,6 +9,11 @@
        http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
 
+    <endpoint name="in" address="${inbound.destination}"/>
+    <endpoint name="middle" address="${middle.destination}"/>
+    <endpoint name="middle2" address="${middle2.destination}"/>
+    <endpoint name="out" address="${outbound.destination}"/>
+
     <gzip-compress-transformer name="Compress"/>
     <gzip-uncompress-transformer name="Uncompress"/>
     <jms:jmsmessage-to-object-transformer name="JmsToObject"/>
@@ -17,38 +22,38 @@
     <model name="test">
         <service name="InputPart">
             <inbound>
-                <jms:inbound-endpoint queue="in" />
+                <inbound-endpoint ref="in" />
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="q1" transformer-refs="Compress ObjectToJms"/>
+                    <outbound-endpoint ref="middle" transformer-refs="Compress ObjectToJms"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="MiddlePart">
             <inbound>
-                <jms:inbound-endpoint queue="q1" transformer-refs="JmsToObject Uncompress"/>
+                <jms:inbound-endpoint queue="middle" transformer-refs="JmsToObject Uncompress"/>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="q2" transformer-refs="Compress ObjectToJms"/>
+                    <jms:outbound-endpoint queue="middle2" transformer-refs="Compress ObjectToJms"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="OutputPart">
             <inbound>
-                <jms:inbound-endpoint queue="q2" transformer-refs="JmsToObject Uncompress"/>
+                <inbound-endpoint ref="middle2" transformer-refs="JmsToObject Uncompress"/>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="out"/>
+                    <outbound-endpoint ref="out"/>
                 </pass-through-router>
             </outbound>
         </service>

@@ -11,6 +11,7 @@
 
     <endpoint name="in" address="${inbound.destination}"/>
     <endpoint name="middle" address="${middle.destination}"/>
+    <endpoint name="middle2" address="${middle2.destination}"/>
     <endpoint name="out" address="${outbound.destination}"/>
 
     <model name="jmsTest">

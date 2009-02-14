@@ -44,6 +44,9 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     public static final String INBOUND_ENDPOINT_KEY = "inbound.destination";
     public static final String OUTBOUND_ENDPOINT_KEY = "outbound.destination";
     public static final String MIDDLE_ENDPOINT_KEY = "middle.destination";
+    public static final String MIDDLE2_ENDPOINT_KEY ="middle2.destination";
+
+    public static final String BROADCAST_TOPIC_ENDPOINT_KEY ="broadcast.topic.destination";
 
     private MuleClient client;
     private JmsVendorConfiguration jmsConfig;
@@ -73,6 +76,9 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         props.put(INBOUND_ENDPOINT_KEY, getJmsConfig().getInboundEndpoint());
         props.put(OUTBOUND_ENDPOINT_KEY, getJmsConfig().getOutboundEndpoint());
         props.put(MIDDLE_ENDPOINT_KEY, getJmsConfig().getMiddleEndpoint());
+        props.put(MIDDLE2_ENDPOINT_KEY, getJmsConfig().getMiddleEndpoint() + "2");
+
+        props.put(BROADCAST_TOPIC_ENDPOINT_KEY, getJmsConfig().getTopicBroadcastEndpoint());
         props.put("protocol", getJmsConfig().getProtocol());
 
         Map p = getJmsConfig().getProperties();
@@ -116,10 +122,10 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         return null;
     }
 
-    protected ConnectionFactory getConnectionFactory(boolean topic, boolean xa) throws Exception
+    protected Connection getConnection(boolean topic, boolean xa) throws Exception
     {
         checkConfig();
-        return getJmsConfig().getConnectionFactory(topic, xa);
+        return getJmsConfig().getConnection(topic, xa);
     }
 
     protected String getInboundEndpoint()
@@ -228,7 +234,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         Connection connection = null;
         try
         {
-            connection = getConnectionFactory(false, false).createConnection();
+            connection = getConnection(false, false);
             connection.start();
             Session session = null;
             try
@@ -302,8 +308,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         Connection connection = null;
         try
         {
-            ConnectionFactory factory = getConnectionFactory(false, false);
-            connection = factory.createConnection();
+            connection = getConnection(false, false);
             connection.start();
             Session session = null;
             try

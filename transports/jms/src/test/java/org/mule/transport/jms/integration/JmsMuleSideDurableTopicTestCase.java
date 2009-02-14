@@ -26,7 +26,6 @@ import javax.jms.TopicSession;
 public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
 
-    public static final String TOPIC_QUEUE_NAME = "durable.broadcast";
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
 
     public JmsMuleSideDurableTopicTestCase(JmsVendorConfiguration config)
@@ -59,7 +58,7 @@ public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctio
     {
         public String getInputDestinationName()
         {
-            return TOPIC_QUEUE_NAME;
+            return getJmsConfig().getBroadcastDestinationName();
         }
 
         public void send(Session session, MessageProducer producer) throws JMSException
@@ -86,8 +85,7 @@ public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctio
         TopicConnection connection = null;
         try
         {
-            TopicConnectionFactory factory = (TopicConnectionFactory)getConnectionFactory(true, false);
-            connection = factory.createTopicConnection();
+            connection = (TopicConnection)getConnection(true, false);
             connection.start();
             TopicSession session = null;
             try
