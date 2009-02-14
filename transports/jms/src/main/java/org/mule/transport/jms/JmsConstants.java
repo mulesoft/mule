@@ -33,6 +33,9 @@ public class JmsConstants
     public static final String JMS_TIMESTAMP = "JMSTimestamp";
     public static final String JMS_TYPE = "JMSType";
 
+    // extended properties
+    public static final String JMS_X_DELIVERY_COUNT = "JMSXDeliveryCount";
+
     // QoS properties
     public static final String TIME_TO_LIVE_PROPERTY = "timeToLive";
     public static final String PERSISTENT_DELIVERY_PROPERTY = "persistentDelivery";
