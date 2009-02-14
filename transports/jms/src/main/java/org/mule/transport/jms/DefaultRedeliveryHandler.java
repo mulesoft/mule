@@ -67,6 +67,16 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
         }
 
         String id = message.getJMSMessageID();
+
+        if (id == null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Message doesn't have a JMSMessageID set, Mule can't handle redelivery for it.");
+            }
+            return;
+        }
+
         Integer redeliveryCount = messages.remove(id);
         if (redeliveryCount != null)
         {
