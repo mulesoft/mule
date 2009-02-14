@@ -69,7 +69,6 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
 
         mrexFired.await(timeout, TimeUnit.MILLISECONDS);
         assertEquals("MessageRedeliveredException never fired.", 0, mrexFired.getCount());
-        assertEquals(3, callback.getCallbackCount());
     }
 
 }
