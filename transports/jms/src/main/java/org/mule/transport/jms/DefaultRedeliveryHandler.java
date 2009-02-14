@@ -67,8 +67,13 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
         }
 
         String id = message.getJMSMessageID();
-        Integer i = messages.remove(id);
-        if (i == null)
+        Integer redeliveryCount = messages.remove(id);
+        if (redeliveryCount != null)
+        {
+            redeliveryCount += 1; // inc the count
+        }
+
+        if (redeliveryCount == null)
         {
             if (logger.isDebugEnabled())
             {
@@ -76,26 +81,26 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
             }
             messages.put(id, 1);
         }
-        else if (i == connector.getMaxRedelivery())
+        else if (redeliveryCount > connector.getMaxRedelivery())
         {
             if (logger.isDebugEnabled())
             {
                 logger.debug(MessageFormat.format(
                         "Message with id: {0} has been redelivered {1} times, which exceeds the maxRedelivery setting " +
-                        "of {2} on the connector {3}", id, connector.getMaxRedelivery(), connector.getName()));
+                        "of {2} on the connector {3}", id, redeliveryCount, connector.getMaxRedelivery(), connector.getName()));
             }
             JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
             throw new MessageRedeliveredException(
-                    JmsMessages.tooManyRedeliveries(id, String.valueOf(i + 1), connector.getMaxRedelivery(),
+                    JmsMessages.tooManyRedeliveries(id, "" + redeliveryCount, connector.getMaxRedelivery(),
                                                     connector.getName()), adapter);
 
         }
         else
         {
-            messages.put(id, i + 1);
+            messages.put(id, redeliveryCount);
             if (logger.isDebugEnabled())
             {
-                logger.debug("Message with id: " + id + " has been redelivered " + i + " times");
+                logger.debug("Message with id: " + id + " has been redelivered " + redeliveryCount + " times");
             }
         }
     }
