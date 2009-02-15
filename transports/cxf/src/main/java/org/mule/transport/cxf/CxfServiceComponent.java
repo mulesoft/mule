@@ -295,6 +295,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
                 }
             }
             
+            muleResMsg.setProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, "true");
             return muleResMsg;
         }
         catch (MuleException e)

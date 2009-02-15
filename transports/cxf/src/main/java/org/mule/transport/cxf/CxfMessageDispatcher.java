@@ -11,6 +11,7 @@
 package org.mule.transport.cxf;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -34,6 +35,7 @@ import java.util.regex.Pattern;
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Holder;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
@@ -139,7 +141,9 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_EVENT_PROPERTY, event); 
-        
+
+        Holder<MuleMessage> holder = new Holder<MuleMessage>();
+        props.put("holder", holder); 
         // Set custom soap action if set on the event or endpoint
         String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null)
@@ -154,8 +158,8 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         Object response = method.invoke(wrapper.getClientProxy(), getArgs(event));
         
         // TODO: handle holders
-        
-        return buildResponseMessage(event, new Object[] { response });
+        MuleMessage muleRes = holder.value;
+        return buildResponseMessage(muleRes, new Object[] { response });
     }
 
     protected MuleMessage doSendWithClient(MuleEvent event) throws Exception
@@ -164,6 +168,10 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_EVENT_PROPERTY, event); 
+        
+        // Holds the response from the transport
+        Holder<MuleMessage> holder = new Holder<MuleMessage>();
+        props.put("holder", holder); 
         
         // Set custom soap action if set on the event or endpoint
         String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
@@ -193,22 +201,24 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         
         Object[] response = wrapper.getClient().invoke(bop, getArgs(event), ctx);
 
-        return buildResponseMessage(event, response);
+        MuleMessage muleRes = holder.value;
+        System.out.println(muleRes);
+        return buildResponseMessage(muleRes, response);
     }
 
-    protected MuleMessage buildResponseMessage(MuleEvent event, Object[] response) 
+    protected MuleMessage buildResponseMessage(MuleMessage transportResponse, Object[] response) 
     {
         MuleMessage result = null;
         if (response != null && response.length <= 1)
         {
             if (response.length == 1)
             {
-                result = new DefaultMuleMessage(response[0], event.getMessage());
+                result = new DefaultMuleMessage(response[0], transportResponse);
             }
         }
         else
         {
-            result = new DefaultMuleMessage(response, event.getMessage());
+            result = new DefaultMuleMessage(response, transportResponse);
         }
 
         return result;

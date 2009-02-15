@@ -405,7 +405,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                     }
                 }
             }
-            else if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null)
+            else if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null
+                        && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName))
             {
                 headerValue = msg.getStringProperty(headerName, null);
                 if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
@@ -425,19 +426,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             httpMethod.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, "multipart/related");
         }
 
-        //attach the outbound prorperties to the message
-        Object value;
-        for (Iterator iterator = msg.getPropertyNames(PropertyScope.OUTBOUND).iterator(); iterator.hasNext();)
-        {
-            headerName = (String) iterator.next();
-
-                value = msg.getProperty(headerName, PropertyScope.OUTBOUND);
-                if(value!=null)
-                {
-                    httpMethod.addRequestHeader(headerName, value.toString());
-                }
-            
-        }
     }
 
     protected String paramToString(Object param)

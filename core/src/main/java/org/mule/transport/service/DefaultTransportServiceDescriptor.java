@@ -196,7 +196,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     {
 
         MessageReceiver mr = createMessageReceiver(connector, service, endpoint, null);
-        mr.initialise();
+//        mr.initialise();
         return mr;
     }
 
@@ -249,7 +249,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             try
             {
                 MessageReceiver mr = (MessageReceiver) ClassUtils.instanciateClass(receiverClass, newArgs, classLoader);
-                mr.initialise();
+//                mr.initialise();
                 return mr;
             }
             catch (Exception e)

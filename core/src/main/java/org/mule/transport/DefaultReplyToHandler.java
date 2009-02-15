@@ -55,7 +55,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("sending reply to: " + returnMessage.getReplyTo());
+            logger.debug("sending reply to: " + replyTo);
         }
 
         String replyToEndpoint = replyTo.toString();
@@ -66,7 +66,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         // make sure remove the replyTo property as not cause a a forever
         // replyto loop
         returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-
+        
         // Create the replyTo event asynchronous
         MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, endpoint, event.getSession(), false);
 

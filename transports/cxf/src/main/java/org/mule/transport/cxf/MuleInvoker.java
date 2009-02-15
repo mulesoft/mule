@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.ServiceException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
@@ -76,8 +77,8 @@ public class MuleInvoker implements Invoker
             
             if (bop != null)
             {
-                muleReq.setProperty("cxf.operation", bop.getOperationInfo().getName());
-                muleReq.setProperty("cxf.service", svc.getName());
+                muleReq.setProperty(CxfConstants.INBOUND_OPERATION, bop.getOperationInfo().getName(), PropertyScope.INVOCATION);
+                muleReq.setProperty(CxfConstants.INBOUND_SERVICE, svc.getName(), PropertyScope.INVOCATION);
             }
             
             String replyTo = (String) exchange.getInMessage().get(MuleProperties.MULE_REPLY_TO_PROPERTY);

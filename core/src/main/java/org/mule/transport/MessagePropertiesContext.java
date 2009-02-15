@@ -9,14 +9,17 @@
  */
 package org.mule.transport;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.transport.PropertyScope;
 import org.mule.util.MapUtils;
 import org.mule.util.ObjectUtils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -39,11 +42,24 @@ import java.util.TreeSet;
  */
 public class MessagePropertiesContext implements Serializable
 {
+    /**
+     * The order that properties should be read in.
+     */
+    private final static List<PropertyScope> SCOPE_ORDER = new ArrayList<PropertyScope>();
+    
+    static
+    {
+        SCOPE_ORDER.add(PropertyScope.OUTBOUND);
+        SCOPE_ORDER.add(PropertyScope.INVOCATION);
+        SCOPE_ORDER.add(PropertyScope.INBOUND);
+        SCOPE_ORDER.add(PropertyScope.SESSION);
+    }
+    
     protected Map scopedMap;
     protected Set keySet;
 
     protected PropertyScope defaultScope = PropertyScope.OUTBOUND;
-
+    
     public MessagePropertiesContext()
     {
         keySet = new TreeSet();
@@ -123,9 +139,9 @@ public class MessagePropertiesContext implements Serializable
     public Object getProperty(String key)
     {
         Object value = null;
-        for (Iterator iterator = scopedMap.values().iterator(); iterator.hasNext();)
+        for (PropertyScope scope : SCOPE_ORDER)
         {
-            Map props = (Map) iterator.next();
+            Map props = (Map) scopedMap.get(scope);
             value = props.get(key);
             if (value != null)
             {
@@ -171,19 +187,17 @@ public class MessagePropertiesContext implements Serializable
      */
     public Object removeProperty(String key)
     {
-        Object value = getScopedProperties(PropertyScope.INVOCATION).remove(key);
-        if (value == null)
-        {
-            value = getScopedProperties(PropertyScope.OUTBOUND).remove(key);
-        }
-        if (value == null)
-        {
-            value = getScopedProperties(PropertyScope.SESSION).remove(key);
-        }
-        if (value != null)
-        {
-            keySet.remove(key);
-        }
+        Object value = getScopedProperties(PropertyScope.OUTBOUND).remove(key);
+        Object inv = getScopedProperties(PropertyScope.INVOCATION).remove(key);
+        Object inbound = getScopedProperties(PropertyScope.INBOUND).remove(key);
+        Object session = getScopedProperties(PropertyScope.SESSION).remove(key);
+    
+        keySet.remove(key);
+      
+        if (value == null) value = inv;
+        if (value == null) value = inbound;
+        if (value == null) value = session;
+        
         return value;
     }
 
@@ -302,7 +316,7 @@ public class MessagePropertiesContext implements Serializable
     public String toString()
     {
         StringBuffer buf = new StringBuffer(128);
-        buf.append("Properites{");
+        buf.append("Properties{");
         for (Iterator iterator = scopedMap.entrySet().iterator(); iterator.hasNext();)
         {
             Map.Entry entry = (Map.Entry) iterator.next();

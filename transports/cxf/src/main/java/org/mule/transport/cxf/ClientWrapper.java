@@ -187,7 +187,7 @@ public class ClientWrapper
         BindingOperationInfo bop = ep.getBinding().getBindingInfo().getOperation(q);
         if (bop == null)
         {
-            throw new Exception("No such operation: " + defaultMethod);
+            throw new Exception("No such operation: " + opName);
         }
 
         if (bop.isUnwrappedCapable())
@@ -384,12 +384,14 @@ public class ClientWrapper
 
     protected String getMethodOrOperationName(MuleEvent event) throws DispatchException
     {
-        // @TODO: Which of these *really* matter?
-        String method = (String) event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+        // People can specify a CXF operation, which may in fact be different
+        // than the method name. If that's not found, we'll default back to the 
+        // mule method property. 
+        String method = (String) event.getMessage().getProperty(CxfConstants.OPERATION);
 
         if (method == null)
         {
-            method = (String) event.getMessage().getProperty(CxfConstants.OPERATION);
+            method = (String) event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
         }
 
         if (method == null)

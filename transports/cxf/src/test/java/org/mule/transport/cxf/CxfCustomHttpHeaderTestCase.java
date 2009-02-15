@@ -46,7 +46,7 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements E
 
         HashMap<String, String> props = new HashMap<String, String>();
         props.put(MuleProperties.MULE_USER_PROPERTY, "alan");
-        props.put(MuleProperties.MULE_METHOD_PROPERTY, "sayHello");
+        props.put(MuleProperties.MULE_METHOD_PROPERTY, "onReceive");
         props.put(myProperty, myProperty);
 
         MuleClient client = new MuleClient();

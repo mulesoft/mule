@@ -21,6 +21,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -44,6 +45,8 @@ import java.text.MessageFormat;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
+
+import org.apache.commons.lang.BooleanUtils;
 
 /**
  * A Seda service runs inside a Seda Model and is responsible for managing a Seda
@@ -248,7 +251,12 @@ public class SedaService extends AbstractService implements Work, WorkListener
             result = invokeComponent(event);
             result = sendToOutboundRouter(event, result);
             result = processAsyncReplyRouter(result);
-            processReplyTo(event, result, replyToHandler, replyTo);
+            
+            // Allow components to stop processing of the ReplyTo property (e.g. CXF)
+            if (result != null && !BooleanUtils.toBoolean((String)result.getProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY)))
+            {
+                processReplyTo(event, result, replyToHandler, replyTo);
+            }
         }
         catch (Exception e)
         {

@@ -136,14 +136,22 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected void processCookies(MuleEvent event)
     {
         MuleMessage msg = event.getMessage();
-        Object cookieObject = msg.removeProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+        
+        processCookies(msg.removeProperty(HttpConnector.HTTP_COOKIES_PROPERTY), 
+                       (String)msg.removeProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY));
+        
+        processCookies(endpoint.getProperty(HttpConnector.HTTP_COOKIES_PROPERTY), 
+                       (String)endpoint.getProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY));
+    }
+
+    private void processCookies(Object cookieObject, String policy)
+    {
         if (cookieObject instanceof Cookie[])
         {
             // cookies came in via a regular HTTP request
             Cookie[] cookies = (Cookie[]) cookieObject;
             if (cookies != null && cookies.length > 0)
             {
-                String policy = (String) msg.removeProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY);
                 client.getParams().setCookiePolicy(CookieHelper.getCookiePolicy(policy));
                 client.getState().addCookies(cookies);
             }
@@ -246,7 +254,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         Object body = null;
         boolean releaseConn = false;
         try
-        {
+        {   
             httpMethod = execute(event, httpMethod);
 
             DefaultExceptionPayload ep = null;
@@ -256,7 +264,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                     new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " "
                                   + httpMethod.getStatusText())));
             }
-            
             
             InputStream is = httpMethod.getResponseBodyAsStream();
             if (is == null)

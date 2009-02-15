@@ -198,26 +198,28 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     protected void fillProperties(MuleEvent previousEvent)
     {
-        if (previousEvent != null)
-        {
-            MuleMessage msg = previousEvent.getMessage();
-            synchronized (msg)
-            {
-                for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
-                {
-                    String prop = (String) iterator.next();
-                    Object value = msg.getProperty(prop);
-                    // don't overwrite property on the message
-                    if (!ignoreProperty(prop))
-                    {
-                        message.setProperty(prop, value);
-                    }
-                }
-            }
-        }
+//        if (previousEvent != null)
+//        {
+//            MuleMessage msg = previousEvent.getMessage();
+//            synchronized (msg)
+//            {
+//                for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+//                {
+//                    String prop = (String) iterator.next();
+//                    Object value = msg.getProperty(prop);
+//                    // don't overwrite property on the message
+//                    if (!ignoreProperty(prop))
+//                    {
+//                        message.setProperty(prop, value);
+//                    }
+//                }
+//            }
+//        }
 
         if (endpoint != null && endpoint.getProperties() != null)
         {
+//            PropertyScope scope = endpoint instanceof OutboundEndpoint ? PropertyScope.OUTBOUND : PropertyScope.INVOCATION;
+            
             for (Iterator iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
             {
                 String prop = (String) iterator.next();

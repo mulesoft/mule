@@ -142,6 +142,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
         buf.append('{');
         buf.append("id=").append(getUniqueId());
         buf.append(", payload=").append(getPayload().getClass().getName());
+        buf.append(", properties=").append(properties);
         buf.append(", correlationId=").append(getCorrelationId());
         buf.append(", correlationGroup=").append(getCorrelationGroupSize());
         buf.append(", correlationSeq=").append(getCorrelationSequence());
@@ -494,9 +495,8 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     public String getEncoding()
     {
         assertAccess(READ);
-        // TODO Temporary fix for MULE-4117
-        //String encoding =  getStringProperty(MuleProperties.MULE_ENCODING_PROPERTY, null);
-        String encoding =  (String) getProperty(MuleProperties.MULE_ENCODING_PROPERTY, PropertyScope.OUTBOUND);
+        
+        String encoding =  getStringProperty(MuleProperties.MULE_ENCODING_PROPERTY, null);
         if (encoding != null)
         {
             return encoding;

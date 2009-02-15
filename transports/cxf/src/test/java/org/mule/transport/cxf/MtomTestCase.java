@@ -23,8 +23,6 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
 
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.TestMtomService;
@@ -44,7 +42,7 @@ public class MtomTestCase extends FunctionalTestCase
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
             "http://localhost:63081/services/mtom");
         ((SOAPBinding) bp.getBinding()).setMTOMEnabled(true);
-        Client client = ClientProxy.getClient(port);
+//        Client client = ClientProxy.getClient(port);
 //        new LoggingFeature().initialize(client, null);
         
         File file = new File("src/test/resources/mtom-conf.xml");

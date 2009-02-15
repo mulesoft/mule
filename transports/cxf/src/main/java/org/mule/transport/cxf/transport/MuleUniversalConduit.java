@@ -11,6 +11,7 @@
 package org.mule.transport.cxf.transport;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -22,9 +23,11 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.OutputHandler;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.cxf.CxfConnector;
 import org.mule.transport.cxf.CxfConstants;
@@ -38,7 +41,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.util.Iterator;
 import java.util.logging.Logger;
+
+import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -184,9 +190,18 @@ public class MuleUniversalConduit extends AbstractConduit
             }
         };
 
-//        MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT_PROPERTY);
-//        DefaultMessageAdapter req = new DefaultMessageAdapter(handler, event.getMessage());
-        DefaultMessageAdapter req = new DefaultMessageAdapter(handler);
+        MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT_PROPERTY);
+        
+        DefaultMessageAdapter req;
+        if (event == null) 
+        {
+            req = new DefaultMessageAdapter(handler);
+        }
+        else 
+        {
+            req = new DefaultMessageAdapter(handler, event.getMessage());
+        }
+        
         message.getExchange().put(CxfConstants.MULE_MESSAGE, req);
     }
     
@@ -199,8 +214,9 @@ public class MuleUniversalConduit extends AbstractConduit
             OutboundEndpoint ep = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
 
             MessageAdapter req = (MessageAdapter) m.getExchange().get(CxfConstants.MULE_MESSAGE);
+            req.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, uri, PropertyScope.INVOCATION);
             
-            MuleMessage result = sendStream(req, ep);
+            MuleMessage result = sendStream(req, ep, m.getExchange());
 
             // If we have a result, send it back to CXF
             if (result != null && !isOneway(m.getExchange()))
@@ -208,6 +224,7 @@ public class MuleUniversalConduit extends AbstractConduit
                 Message inMessage = new MessageImpl();
                 String contentType = result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
 
+                inMessage.put(CxfConstants.MULE_MESSAGE, result);
                 inMessage.put(Message.ENCODING, result.getEncoding());
                 inMessage.put(Message.CONTENT_TYPE, contentType);
                 inMessage.setContent(InputStream.class, result.getPayload(InputStream.class));
@@ -267,7 +284,9 @@ public class MuleUniversalConduit extends AbstractConduit
     {
     }
     
-    protected MuleMessage sendStream(MessageAdapter sa, OutboundEndpoint ep) throws MuleException
+    protected MuleMessage sendStream(MessageAdapter sa, 
+                                     OutboundEndpoint ep,
+                                     Exchange exchange) throws MuleException
     {
         MuleEventContext eventContext = RequestContext.getEventContext();
         MuleSession session = null;
@@ -281,12 +300,39 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             session = new DefaultMuleSession(message, connector.getSessionHandler(), connector.getMuleContext());
         }
-
+        
+        // Filter out CXF client properties like wsdlLocation, inInterceptors, etc
+        MuleEvent prev = RequestContext.getEvent();
+        // If you're invoking from a CXF generated client, the event can be null
+        if (prev != null) 
+        {
+            for (Iterator itr = prev.getEndpoint().getProperties().keySet().iterator(); itr.hasNext();)
+            {
+                String key = (String) itr.next();
+                
+                message.removeProperty(key);
+            }
+        }
+        
+        message.removeProperty(CxfConstants.OPERATION);
+        message.removeProperty(CxfConstants.INBOUND_OPERATION);
+        message.removeProperty(CxfConstants.INBOUND_SERVICE);
+        
         MuleEvent event = new DefaultMuleEvent(message, ep, session, true);
         event.setTimeout(MuleEvent.TIMEOUT_NOT_SET_VALUE);
         RequestContext.setEvent(event);
 
-        return ep.send(event);
+        MuleMessage msg = ep.send(event);
+        
+        // We need to grab this back in the CxfMessageDispatcher again.
+        Holder<MuleMessage> holder = (Holder<MuleMessage>) exchange.get("holder");
+        // it's null if there is no dispatcher and the Client is being used directly over Mule
+        if (holder != null)
+        {
+            holder.value = msg;
+        }
+        
+        return msg;
     }
 
     public void close()

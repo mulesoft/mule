@@ -23,8 +23,10 @@ import org.mule.transport.tcp.TcpConnector;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
@@ -95,6 +97,23 @@ public class HttpConnector extends TcpConnector
     public static final String DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY = "body";
     public static final String HTTP_POST_BODY_PARAM_PROPERTY = HTTP_PREFIX + "post.body.param";
 
+    public static final Set<String> HTTP_INBOUND_PROPERTIES;
+    
+    static 
+    {
+        Set<String> props = new HashSet<String>();
+        props.add(HTTP_CONTEXT_PATH_PROPERTY);
+        props.add(HTTP_GET_BODY_PARAM_PROPERTY);
+        props.add(HTTP_METHOD_PROPERTY);
+        props.add(HTTP_PARAMS_PROPERTY);
+        props.add(HTTP_POST_BODY_PARAM_PROPERTY);
+        props.add(HTTP_REQUEST_PROPERTY);
+        props.add(HTTP_REQUEST_PATH_PROPERTY);
+        props.add(HTTP_STATUS_PROPERTY);
+        props.add(HTTP_VERSION_PROPERTY);
+        HTTP_INBOUND_PROPERTIES = props;
+    };
+    
     public static final String HTTP_COOKIE_SPEC_PROPERTY = "cookieSpec";
     public static final String HTTP_COOKIES_PROPERTY = "cookies";
     public static final String HTTP_ENABLE_COOKIES_PROPERTY = "enableCookies";

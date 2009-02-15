@@ -37,6 +37,12 @@ public interface MuleProperties
     String MULE_ORIGINATING_ENDPOINT_PROPERTY = PROPERTY_PREFIX + "ORIGINATING_ENDPOINT";
     String MULE_ERROR_CODE_PROPERTY = PROPERTY_PREFIX + "ERROR_CODE";
     String MULE_REPLY_TO_PROPERTY = PROPERTY_PREFIX + "REPLYTO";
+    /**
+     * Prevents processing of the ReplyTo property by the Service. This is useful
+     * if you're component routed the message somewhere else which processed the
+     * ReplyTo.
+     */
+    String MULE_REPLY_TO_STOP_PROPERTY = PROPERTY_PREFIX + "REPLYTO_STOP";
     String MULE_USER_PROPERTY = PROPERTY_PREFIX + "USER";
     String MULE_ENCODING_PROPERTY = PROPERTY_PREFIX + "ENCODING";
     String MULE_REPLY_TO_REQUESTOR_PROPERTY = PROPERTY_PREFIX + "REPLYTO_REQUESTOR";
