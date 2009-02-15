@@ -32,6 +32,8 @@
         <module>soap</module>
         <module>ssl</module>
         <module>stdio</module>
+        <module>tcp</module>
+        <module>udp</module>
         <module>vm</module>
         <module>xmpp</module>
     </modules>
