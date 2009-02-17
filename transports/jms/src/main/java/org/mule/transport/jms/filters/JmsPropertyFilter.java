@@ -10,12 +10,11 @@
 
 package org.mule.transport.jms.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.util.ClassUtils;
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 import org.mule.util.StringUtils;
 
 import java.util.regex.Pattern;
@@ -135,9 +134,9 @@ public class JmsPropertyFilter implements Filter
         }
         else
         {
-                logger.warn("Expected a payload of javax.jms.Message but instead received " +
+            logger.warn("Expected a payload of javax.jms.Message but instead received " +
                         ClassUtils.getSimpleName(message.getPayload().getClass()));
-            }
+        }
 
             return false;
         }
