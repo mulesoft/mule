@@ -25,10 +25,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transport.DefaultMessageAdapter;
+import org.mule.transport.NullPayload;
 import org.mule.transport.cxf.CxfConnector;
 import org.mule.transport.cxf.CxfConstants;
 import org.mule.transport.cxf.support.DelegatingOutputStream;
@@ -39,6 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PushbackInputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.util.Iterator;
@@ -219,7 +222,8 @@ public class MuleUniversalConduit extends AbstractConduit
             MuleMessage result = sendStream(req, ep, m.getExchange());
 
             // If we have a result, send it back to CXF
-            if (result != null && !isOneway(m.getExchange()))
+            InputStream is = getResponseBody(m, result);
+            if (is != null)
             {
                 Message inMessage = new MessageImpl();
                 String contentType = result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
@@ -227,7 +231,7 @@ public class MuleUniversalConduit extends AbstractConduit
                 inMessage.put(CxfConstants.MULE_MESSAGE, result);
                 inMessage.put(Message.ENCODING, result.getEncoding());
                 inMessage.put(Message.CONTENT_TYPE, contentType);
-                inMessage.setContent(InputStream.class, result.getPayload(InputStream.class));
+                inMessage.setContent(InputStream.class, is);
                 inMessage.setExchange(m.getExchange());
                 getMessageObserver().onMessage(inMessage);
             }
@@ -243,6 +247,31 @@ public class MuleUniversalConduit extends AbstractConduit
             ex.initCause(e);
             throw ex;
         }
+    }
+
+    protected InputStream getResponseBody(Message m, MuleMessage result) throws TransformerException, IOException
+    {
+        boolean response = result != null 
+            && !NullPayload.getInstance().equals(result.getPayload())
+            && !isOneway(m.getExchange()); 
+        
+        if (response)
+        {
+            // Sometimes there may not actually be a body, in which case
+            // we want to act appropriately. E.g. one way invocations over a proxy
+            InputStream is = (InputStream) result.getPayload(InputStream.class);
+            PushbackInputStream pb = new PushbackInputStream(is);
+            result.setPayload(pb);
+            
+            int b = pb.read();
+            if (b != -1) 
+            {
+                pb.unread(b);
+                return pb;
+            }
+        }
+        
+        return null;
     }
 
     protected boolean isOneway(Exchange exchange)

@@ -85,6 +85,25 @@ public class ProxyTestCase extends FunctionalTestCase
         assertTrue(resString.indexOf("<transformed xmlns=\"http://foo\">") != -1);
     }
     
+    public void testOneWay() throws Exception 
+    {
+        String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" + 
+            "<soap:Body>" +
+            "<send xmlns=\"http://testmodels.cxf.transport.mule.org\"><text>hello</text></send>" + 
+            "</soap:Body>" + 
+            "</soap:Envelope>";
+
+        Map<String, Object> httpHeaders = new HashMap<String, Object>();
+        
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, httpHeaders);
+        props.put("SOAPAction", "http://acme.com/oneway");
+              
+        MuleClient client = new MuleClient();
+        MuleMessage result = client.send("http://localhost:63081/services/routeBasedOnSoapAction", msg, props);
+        assertEquals("", result.getPayloadAsString());
+    }
+    
     protected String getConfigResources()
     {
         return "proxy-conf.xml";

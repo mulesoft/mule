@@ -11,7 +11,6 @@
 package org.mule.transport.cxf;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -202,7 +201,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         Object[] response = wrapper.getClient().invoke(bop, getArgs(event), ctx);
 
         MuleMessage muleRes = holder.value;
-        System.out.println(muleRes);
+        
         return buildResponseMessage(muleRes, response);
     }
 

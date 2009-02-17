@@ -124,7 +124,20 @@
                     </cxf:outbound-endpoint>
                     <message-property-filter pattern="SOAPAction=http://acme.com/transform"/>
                 </filtering-router>
+                <filtering-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/oneway" 
+                        proxy="true"
+                        synchronous="true"/>
+                    <message-property-filter pattern="SOAPAction=http://acme.com/oneway"/>
+                </filtering-router>
             </outbound>
+        </service>
+        
+        <service name="asyncService">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/oneway"/>
+            </inbound>
+             <component class="org.mule.transport.cxf.testmodels.AsyncService"/>
         </service>
     </model>
 
