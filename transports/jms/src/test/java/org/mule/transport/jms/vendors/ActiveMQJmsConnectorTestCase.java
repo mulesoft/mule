@@ -11,9 +11,9 @@
 package org.mule.transport.jms.vendors;
 
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.jms.AutoDiscoveryRedeliveryHandlerFactory;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
+import org.mule.transport.jms.JmsXRedeliveryHandler;
 import org.mule.transport.jms.activemq.ActiveMQJmsConnector;
 import org.mule.transport.jms.test.TestRedeliveryHandler;
 
@@ -59,7 +59,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertNull(c.getPassword());
 
         assertNotNull(c.getRedeliveryHandlerFactory());
-        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof AutoDiscoveryRedeliveryHandlerFactory);
+        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof JmsXRedeliveryHandler);
         
         assertFalse(c.isDurable());
         assertFalse(c.isNoLocal());
