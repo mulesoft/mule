@@ -10,10 +10,10 @@
 
 package org.mule.transport.jms.test;
 
-import org.mule.transport.jms.DefaultRedeliveryHandler;
+import org.mule.transport.jms.CountingRedeliveryHandler;
 
 
-public class TestRedeliveryHandler extends DefaultRedeliveryHandler
+public class TestRedeliveryHandler extends CountingRedeliveryHandler
 {
     // nop
 }

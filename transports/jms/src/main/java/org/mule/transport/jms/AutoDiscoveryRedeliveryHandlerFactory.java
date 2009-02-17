@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
  * This factory will consult JMS connection metadata for supported optional properties and use
  * those, if available, otherwise falling back to the manual counting of redeliveries.
  *
- * @see org.mule.transport.jms.DefaultRedeliveryHandlerFactory
+ * @see CountingRedeliveryHandlerFactory
  * @see org.mule.transport.jms.JmsXRedeliveryHandlerFactory
  * @see javax.jms.ConnectionMetaData
  */
@@ -97,12 +97,12 @@ public class AutoDiscoveryRedeliveryHandlerFactory implements RedeliveryHandlerF
                 }
             }
 
-            newInstance = (supportsDeliveryCount) ? new JmsXRedeliveryHandler() : new DefaultRedeliveryHandler();
+            newInstance = (supportsDeliveryCount) ? new JmsXRedeliveryHandler() : new CountingRedeliveryHandler();
         }
         catch (JMSException e)
         {
             // fallback to defaults
-            newInstance = new DefaultRedeliveryHandler();
+            newInstance = new CountingRedeliveryHandler();
         }
 
         if (logger.isDebugEnabled())

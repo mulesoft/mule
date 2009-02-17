@@ -28,19 +28,19 @@ import org.apache.commons.logging.LogFactory;
  * This redelivery handler will keep counting the redelivery attempts for each message redelivered. Used for
  * providers not implementing the {@code JMSXDeliveryCount} property support.
  */
-public class DefaultRedeliveryHandler implements RedeliveryHandler
+public class CountingRedeliveryHandler implements RedeliveryHandler
 {
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(DefaultRedeliveryHandler.class);
+    protected static final Log logger = LogFactory.getLog(CountingRedeliveryHandler.class);
 
     private Map<String, Integer> messages = null;
 
     protected JmsConnector connector;
 
     @SuppressWarnings("unchecked")
-    public DefaultRedeliveryHandler()
+    public CountingRedeliveryHandler()
     {
         messages = Collections.synchronizedMap(new LRUMap(256));
     }

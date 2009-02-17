@@ -12,7 +12,10 @@ package org.mule.transport.jms;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class DefaultRedeliveryHandlerFactory implements RedeliveryHandlerFactory
+/**
+ * @see CountingRedeliveryHandler
+ */
+public class CountingRedeliveryHandlerFactory implements RedeliveryHandlerFactory
 {
 
     protected AtomicReference<RedeliveryHandler> handler = new AtomicReference<RedeliveryHandler>(null);
@@ -24,7 +27,7 @@ public class DefaultRedeliveryHandlerFactory implements RedeliveryHandlerFactory
         // initialize, accounting for concurrency
         if (handler.get() == null)
         {
-            final DefaultRedeliveryHandler newInstance = new DefaultRedeliveryHandler();
+            final CountingRedeliveryHandler newInstance = new CountingRedeliveryHandler();
             boolean ok = handler.compareAndSet(null, newInstance);
             if (!ok)
             {
