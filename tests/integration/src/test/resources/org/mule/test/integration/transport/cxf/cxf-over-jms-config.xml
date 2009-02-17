@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+       xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
+       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector"/>
+
+    <cxf:endpoint name="clientEndpoint" address="jms://TestComponent2?method=echo"/>
+    
+    <model name="Test-Case">
+        <service name="JmsService">
+            <inbound>
+                <jms:inbound-endpoint address="jms://TestComponent"/>
+            </inbound>
+            <outbound>
+                <chaining-router>
+                    <outbound-endpoint address="vm://test" synchronous="true"/>
+                    <jms:outbound-endpoint address="jms://testout"/>
+                </chaining-router>
+            </outbound>
+        </service>
+        
+        <service name="TestComponent">
+            <inbound>
+                <cxf:inbound-endpoint address="vm://test" frontend="simple" synchronous="true"/>
+            </inbound>
+            <echo-component/>
+        </service>
+        
+        <service name="TestComponent2">
+            <inbound>
+                <cxf:inbound-endpoint address="jms://TestComponent2" frontend="simple"/>
+            </inbound>
+            <echo-component/>
+            <outbound>
+                <chaining-router>
+                    <jms:outbound-endpoint address="jms://testout"/>
+                </chaining-router>
+            </outbound>
+        </service>
+    </model>
+    
+</mule>
