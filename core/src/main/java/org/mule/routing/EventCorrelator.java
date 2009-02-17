@@ -75,6 +75,9 @@ public class EventCorrelator
      */
     protected final ConcurrentMap responseMessages = new ConcurrentHashMap();
 
+    protected final Object groupsLock = new Object();
+
+    // @GuardedBy groupsLock
     protected final BoundedFifoBuffer processedGroups = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
 
     private int timeout = -1; // undefined
@@ -368,16 +371,22 @@ public class EventCorrelator
 
     protected void addProcessedGroup(Object id)
     {
-        if (processedGroups.isFull())
+        synchronized (groupsLock)
         {
-            processedGroups.remove();
+            if (processedGroups.isFull())
+            {
+                processedGroups.remove();
+            }
+            processedGroups.add(id);
         }
-        processedGroups.add(id);
     }
 
     protected boolean isGroupAlreadyProcessed(Object id)
     {
-        return processedGroups.contains(id);
+        synchronized (groupsLock)
+        {
+            return processedGroups.contains(id);
+        }
     }
 
     /**
