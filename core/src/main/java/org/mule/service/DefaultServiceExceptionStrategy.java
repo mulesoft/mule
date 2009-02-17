@@ -58,13 +58,13 @@ public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
     protected void routeException(MuleMessage message, ImmutableEndpoint failedEndpoint, Throwable t)
     {
         super.routeException(message, failedEndpoint, t);
-        List endpoints = getEndpoints(t);
+        List<ImmutableEndpoint> endpoints = getEndpoints(t);
         if (CollectionUtils.isNotEmpty(endpoints) && getServiceStatistics() != null)
         {
             ServiceStatistics statistics = getServiceStatistics();
-            for (int i = 0; i < endpoints.size(); i++)
+            for (ImmutableEndpoint endpoint : endpoints)
             {
-                statistics.getOutboundRouterStat().incrementRoutedMessage((ImmutableEndpoint) endpoints.get(i));
+                statistics.getOutboundRouterStat().incrementRoutedMessage(endpoint);
             }
         }
     }
@@ -87,7 +87,7 @@ public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
         }
         else
         {
-            return ((AbstractService)event.getService()).getStatistics();
+            return event.getService().getStatistics();
         }
     }
 }
