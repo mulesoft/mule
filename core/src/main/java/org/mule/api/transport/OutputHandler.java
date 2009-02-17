@@ -19,8 +19,6 @@ import java.io.OutputStream;
  * The OutputHandler is a strategy class that is set on the StreamMessageAdapter to
  * defer the writing of the message payload until there is a stream available to
  * write it to.
- * 
- * @see org.mule.transport.streaming.StreamMessageAdapter
  */
 public interface OutputHandler
 {
@@ -31,7 +29,7 @@ public interface OutputHandler
      * 
      * @param event the current event
      * @param out the output stream to write to
-     * @throws IOException
+     * @throws IOException in case of error
      */
     void write(MuleEvent event, OutputStream out) throws IOException;
 
