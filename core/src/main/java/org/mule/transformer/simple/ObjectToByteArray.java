@@ -10,10 +10,13 @@
 
 package org.mule.transformer.simple;
 
+import org.mule.RequestContext;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.OutputHandler;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -28,6 +31,7 @@ public class ObjectToByteArray extends SerializableToByteArray
     {
         this.registerSourceType(InputStream.class);
         this.registerSourceType(String.class);
+        this.registerSourceType(OutputHandler.class);
         setReturnClass(byte[].class);
     }
 
@@ -53,6 +57,21 @@ public class ObjectToByteArray extends SerializableToByteArray
                     is.close();
                 }
                 return byteOut.toByteArray();
+            }
+            else if (src instanceof OutputHandler)
+            {
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                
+                try
+                {
+                    ((OutputHandler) src).write(RequestContext.getEvent(), bytes);
+                    
+                    return bytes.toByteArray();
+                }
+                catch (IOException e)
+                {
+                    throw new TransformerException(this, e);
+                }
             }
         }
         catch (Exception e)
