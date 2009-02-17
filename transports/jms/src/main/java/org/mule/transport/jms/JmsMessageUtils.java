@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.transport.OutputHandler;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
@@ -175,6 +176,24 @@ public class JmsMessageUtils
             ObjectMessage oMsg = session.createObjectMessage();
             oMsg.setObject((Serializable) object);
             return oMsg;
+        }
+        else if (object instanceof OutputHandler)
+        {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            try
+            {
+                ((OutputHandler) object).write(null, output);
+            }
+            catch (IOException e)
+            {
+                JMSException j = new JMSException("Could not serialize OutputHandler.");
+                j.initCause(e);
+                throw j;
+            }
+            
+            BytesMessage bMsg = session.createBytesMessage();
+            bMsg.writeBytes((byte[]) output.toByteArray());
+            return bMsg;
         }
         else
         {
