@@ -18,14 +18,13 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.XaTransactionFactory;
-import org.mule.transport.jms.DefaultRedeliveryHandler;
-import org.mule.transport.jms.DefaultRedeliveryHandlerFactory;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsConstants;
 import org.mule.transport.jms.filters.JmsPropertyFilter;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
 import org.mule.transport.jms.test.TestConnectionFactory;
 import org.mule.transport.jms.test.TestRedeliveryHandler;
+import org.mule.transport.jms.test.TestRedeliveryHandlerFactory;
 
 import javax.jms.Session;
 
@@ -57,8 +56,8 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertNull(c.getPassword());
 
         assertNotNull(c.getRedeliveryHandlerFactory());
-        assertTrue(c.getRedeliveryHandlerFactory() instanceof DefaultRedeliveryHandlerFactory);
-        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof DefaultRedeliveryHandler);
+        assertTrue(c.getRedeliveryHandlerFactory() instanceof TestRedeliveryHandlerFactory);
+        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof TestRedeliveryHandler);
         
         assertNull(c.getClientId());
         assertFalse(c.isDurable());

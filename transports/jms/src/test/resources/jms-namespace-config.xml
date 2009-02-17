@@ -19,7 +19,9 @@
     <spring:bean name="redeliveryHandlerFactory" class="org.mule.transport.jms.test.TestRedeliveryHandlerFactory"/>
     
     <!-- Default config -->
-    <jms:connector name="jmsConnectorDefaults" connectionFactory-ref="connectionFactory"/>
+    <jms:connector name="jmsConnectorDefaults"
+                   connectionFactory-ref="connectionFactory"
+                   redeliveryHandlerFactory-ref="redeliveryHandlerFactory"/>
 
     <jms:connector name="jmsConnector1"
                    acknowledgementMode="DUPS_OK_ACKNOWLEDGE"

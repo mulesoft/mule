@@ -24,6 +24,10 @@ import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * This redelivery handler will keep counting the redelivery attempts for each message redelivered. Used for
+ * providers not implementing the {@code JMSXDeliveryCount} property support.
+ */
 public class DefaultRedeliveryHandler implements RedeliveryHandler
 {
     /**

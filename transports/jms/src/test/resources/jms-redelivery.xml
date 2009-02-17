@@ -11,15 +11,9 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
 
-    <!--
-        This will not be needed once it's made the default redelivery handler factory.
-    -->
-    <spring:bean name="redeliveryHandlerFactory" class="org.mule.transport.jms.JmsXRedeliveryHandlerFactory"/>
-
     <jms:activemq-connector name="jmsConnector"
                             maxRedelivery="3"
-                            disableTemporaryReplyToDestinations="true"
-                            redeliveryHandlerFactory-ref="redeliveryHandlerFactory"/>
+                            disableTemporaryReplyToDestinations="true"/>
 
     <model name="test">
 

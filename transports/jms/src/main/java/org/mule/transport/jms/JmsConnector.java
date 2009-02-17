@@ -185,7 +185,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         if (redeliveryHandlerFactory == null)
         {
-            redeliveryHandlerFactory = new DefaultRedeliveryHandlerFactory();
+            redeliveryHandlerFactory = new AutoDiscoveryRedeliveryHandlerFactory(this);
         }
 
         try
