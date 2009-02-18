@@ -15,9 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-/**
- * Reference to a global transaction factort
- */
 public class CxfOverJMSTestCase extends FunctionalTestCase
 {
 
