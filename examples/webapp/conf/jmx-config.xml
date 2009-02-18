@@ -10,6 +10,6 @@
 
     <management:jmx-server/>
 
-    <management:jmx-mx4j-adaptor jmxAdaptorUrl="http://localhost:9999"/>
+    <management:jmx-mx4j-adaptor jmxAdaptorUrl="http://0.0.0.0:9999"/>
 
  </mule>

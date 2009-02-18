@@ -35,7 +35,7 @@
     <td width="100%"><a href="stockquote.jsp" target="main"><font face="Arial Black" color="#FFFFFF">Stock Quote</font></a></td>
   </tr>
   <tr>
-    <td width="100%"><a href="http://localhost:9999" target="main"><font color="#FFFFFF" face="Arial Black">JMX Console</font></a>
+    <td width="100%"><a href="http://<%=request.getServerName()%>:9999" target="main"><font color="#FFFFFF" face="Arial Black">JMX Console</font></a>
     </td>
   </tr>
   <tr>
