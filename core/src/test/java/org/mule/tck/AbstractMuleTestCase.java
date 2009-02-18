@@ -334,7 +334,6 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         if (failOnTimeout)
         {
             logger.fatal(msg);
-            fail(msg);
             Runtime.getRuntime().halt(1);
         }
         else
