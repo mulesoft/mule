@@ -11,7 +11,6 @@
     <property environment="env"/>
 
     <property name="dir.java" value="src"/>
-    <property name="dir.resources" value="${dir.java}/main/resources"/>
     <property name="dir.conf" value="conf"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
@@ -58,7 +57,6 @@
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">
             <fileset dir="${dir.conf}"/>
-            <fileset dir="${dir.resources}"/>
         </copy>
     </target>
 
