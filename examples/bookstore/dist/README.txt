@@ -15,11 +15,11 @@ http://mule.mulesource.org/display/MULE2INTRO/Bookstore+Example
 +---------------------+
 | Running the example |
 +---------------------+
-You can build the example with Maven by simply running "mvn" from this directory
 
-The WAR files will be generated in the following locations, which can then be 
-deployed to any standard JEE web server:
+bookstore-web$  mvn tomcat:run
+admin-web$      mvn tomcat:run
 
-  admin-web/target/bookstore-admin.war
-  bookstore-web/target/bookstore.war
+Applications will then be available at:
 
+bookstore-web: http://localhost:8888
+admin-web:     http://localhost:8889
