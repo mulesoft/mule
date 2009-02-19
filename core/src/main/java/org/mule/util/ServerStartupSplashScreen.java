@@ -55,8 +55,8 @@ public class ServerStartupSplashScreen extends SplashScreen
         // JDK, Encoding, OS, and Host
         header.add("JDK: " + System.getProperty("java.version") + " (" 
             + System.getProperty("java.vm.info") + ")");
-        header.add("Encoding: OS: " + System.getProperty("file.encoding") 
-                + ", Mule: " + context.getConfiguration().getDefaultEncoding());
+        header.add("OS encoding: " + System.getProperty("file.encoding")
+                + ", Mule encoding: " + context.getConfiguration().getDefaultEncoding());
         String patch = System.getProperty("sun.os.patch.level", null);
         header.add("OS: " + System.getProperty("os.name")
                 + (patch != null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : "") + " ("
