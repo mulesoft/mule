@@ -7,8 +7,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.jms.integration;
 
+package org.mule.transport.jms.integration;
 
 import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
@@ -19,11 +19,12 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
 import javax.jms.TopicConnection;
-import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
 
-public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
+import org.junit.Test;
+
+public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
 
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
@@ -38,6 +39,7 @@ public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctio
         return "integration/jms-muleside-durable-topic.xml";
     }
 
+    @Test
     public void testMuleDurableSubscriber() throws Exception
     {
         send(scenarioNoTx);
@@ -63,7 +65,7 @@ public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctio
 
         public void send(Session session, MessageProducer producer) throws JMSException
         {
-            //publish and send is the same for ActiveMQ
+            // publish and send is the same for ActiveMQ
             producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
 
         }
@@ -79,13 +81,12 @@ public abstract class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctio
 
     };
 
-
     public void send(Scenario scenario) throws Exception
     {
         TopicConnection connection = null;
         try
         {
-            connection = (TopicConnection)getConnection(true, false);
+            connection = (TopicConnection) getConnection(true, false);
             connection.start();
             TopicSession session = null;
             try

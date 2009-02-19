@@ -7,16 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transport.jms.integration;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
+import org.junit.Test;
+
 /**
- * Testing durable topic
- * with XA transactions
+ * Testing durable topic with XA transactions
  */
-public abstract class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTestCase
+public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTestCase
 {
 
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
@@ -31,11 +33,13 @@ public abstract class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFun
         return "integration/jms-muleside-durable-topic-xa-tx.xml";
     }
 
+    @Test
     public void testMuleXaTopic() throws Exception
     {
-        // There is a need to guarantee that XaMessageTopicReceiver connected to topic
+        // There is a need to guarantee that XaMessageTopicReceiver connected to
+        // topic
         Thread.sleep(3000);
-        
+
         MuleMessage result;
         MuleClient client = new MuleClient();
         client.dispatch("vm://in", DEFAULT_INPUT_MESSAGE, null);

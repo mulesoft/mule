@@ -3,5 +3,5 @@
 #
 
 # MULE-3682
-org.mule.transport.jms.integration.activemq.ActiveMQXATransactionComponentTestCase
+org.mule.transport.jms.integration.JmsXATransactionComponentTestCase
 

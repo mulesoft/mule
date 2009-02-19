@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transport.jms.integration;
 
 import org.mule.api.MuleMessage;
@@ -14,12 +15,15 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.MuleParameterized;
+import org.mule.transport.jms.integration.activemq.ActiveMQJmsConfiguration;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -33,9 +37,15 @@ import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+
 /**
- * The main idea
+ * The main idea, now runs as a parameterized JUnit 4 test
  */
+@RunWith(MuleParameterized.class)
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
 
@@ -44,12 +54,11 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     public static final String INBOUND_ENDPOINT_KEY = "inbound.destination";
     public static final String OUTBOUND_ENDPOINT_KEY = "outbound.destination";
     public static final String MIDDLE_ENDPOINT_KEY = "middle.destination";
-    public static final String MIDDLE2_ENDPOINT_KEY ="middle2.destination";
+    public static final String MIDDLE2_ENDPOINT_KEY = "middle2.destination";
 
-    public static final String BROADCAST_TOPIC_ENDPOINT_KEY ="broadcast.topic.destination";
-
-    private MuleClient client;
-    private JmsVendorConfiguration jmsConfig;
+    private MuleClient client = null;
+    protected JmsVendorConfiguration jmsConfig = null;
+    public static final String BROADCAST_TOPIC_ENDPOINT_KEY = "broadcast.topic.destination";
 
     protected Scenario scenarioNoTx;
     protected Scenario scenarioCommit;
@@ -57,6 +66,41 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     protected Scenario scenarioNotReceive;
     protected Scenario scenarioReceive;
 
+    /**
+     * Set the list of jms providers to test. The goal is to externalize this, i.e.
+     * read the list from an xml file, use maven profiles to control it, etc.
+     * 
+     * @return
+     */
+    @Parameters
+    public static Collection jmsProviderConfigs()
+    {
+        return Arrays.asList(new JmsVendorConfiguration[][]{{new ActiveMQJmsConfiguration()}});
+    }
+
+    /**
+     * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we
+     * need to explicitly call the setUp and tearDown methods
+     * 
+     * @throws Exception
+     */
+    @Before
+    public void before() throws Exception
+    {
+        super.setUp();
+    }
+
+    /**
+     * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we
+     * need to explicitly call the setUp and tearDown methods
+     * 
+     * @throws Exception
+     */
+    @After
+    public void after() throws Exception
+    {
+        super.tearDown();
+    }
 
     public AbstractJmsFunctionalTestCase(JmsVendorConfiguration config)
     {
@@ -72,7 +116,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     protected Properties getStartUpProperties()
     {
         Properties props = new Properties();
-        //Inject endpoint names into the config
+        // Inject endpoint names into the config
         props.put(INBOUND_ENDPOINT_KEY, getJmsConfig().getInboundEndpoint());
         props.put(OUTBOUND_ENDPOINT_KEY, getJmsConfig().getOutboundEndpoint());
         props.put(MIDDLE_ENDPOINT_KEY, getJmsConfig().getMiddleEndpoint());
@@ -93,10 +137,8 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         String resources = getConfigResources().substring(getConfigResources().lastIndexOf("/") + 1);
-        resources = String.format("integration/%s/connector-%s,%s",
-                                  getJmsConfig().getProviderName(),
-                                  resources,
-                                  getConfigResources());
+        resources = String.format("integration/%s/connector-%s,%s", getJmsConfig().getProviderName(),
+            resources, getConfigResources());
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(resources);
         return builder;
     }
@@ -115,10 +157,9 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         this.jmsConfig = jmsConfig;
     }
 
-
     protected JmsVendorConfiguration creatJmsConfig()
     {
-        //Overriding classes must override this or inject this object
+        // Overriding classes must override this or inject this object
         return null;
     }
 
@@ -154,7 +195,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * Timeout used when checking that a message is NOT present
-     *
+     * 
      * @return
      */
     protected long getSmallTimeout()
@@ -166,7 +207,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * The timeout used when waiting for a message to arrive
-     *
+     * 
      * @return
      */
     protected long getTimeout()
@@ -278,7 +319,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * By default this will create a Queue, override to create a topic
-     *
+     * 
      * @param session
      * @param scenario
      * @return
@@ -291,7 +332,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * By default this will create a Queue, override to create a topic
-     *
+     * 
      * @param session
      * @param scenario
      * @return
@@ -302,9 +343,10 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         return session.createQueue(scenario.getOutputDestinationName());
     }
 
-     /**/
+    /**/
     public Message receive(Scenario scenario) throws Exception
     {
+        assertNotNull("scenario is null!", scenario);
         Connection connection = null;
         try
         {
@@ -346,9 +388,9 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
     // Test Scenarios
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
 
     protected interface Scenario
     {
@@ -367,9 +409,13 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
         int getAcknowledge();
 
-        void send(Session session, MessageProducer producer) throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException, RollbackException;
+        void send(Session session, MessageProducer producer)
+            throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException,
+            RollbackException;
 
-        Message receive(Session session, MessageConsumer consumer) throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException, RollbackException;
+        Message receive(Session session, MessageConsumer consumer)
+            throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException,
+            RollbackException;
 
         boolean isTransacted();
     }
@@ -488,7 +534,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             return message;
         }
     }
-
 
     protected class ScenarioReceive extends NonTransactedScenario
     {

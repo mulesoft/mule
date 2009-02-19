@@ -35,12 +35,13 @@ import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.junit.Test;
 
 /**
  * <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations.
  */
 
-public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
+public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 {
     private Session session = null;
 
@@ -57,11 +58,11 @@ public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestC
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        
+
         JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector1");
         ConnectionFactory cf = connector.getConnectionFactory();
-        
-        session = cf.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);                
+
+        session = cf.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
 
     // @Override
@@ -75,6 +76,7 @@ public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestC
         }
     }
 
+    @Test
     public void testTransformObjectMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
@@ -92,6 +94,7 @@ public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestC
         assertTrue("Transformed object should be an object message", result2 instanceof ObjectMessage);
     }
 
+    @Test
     public void testTransformTextMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
@@ -110,6 +113,7 @@ public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestC
         assertTrue("Transformed object should be a TextMessage", result2 instanceof TextMessage);
     }
 
+    @Test
     public void testTransformMapMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
@@ -124,13 +128,14 @@ public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestC
         Object result2 = trans.transform(p);
         assertTrue("Transformed object should be a MapMessage", result2 instanceof MapMessage);
 
-        MapMessage mMsg = (MapMessage)result2;
+        MapMessage mMsg = (MapMessage) result2;
         AbstractJmsTransformer trans2 = new JMSMessageToObject();
         trans2.setReturnClass(Map.class);
         Object result = trans2.transform(mMsg);
         assertTrue("Transformed object should be a Map", result instanceof Map);
     }
 
+    @Test
     public void testTransformByteMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
@@ -143,13 +148,14 @@ public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestC
 
         AbstractJmsTransformer trans2 = new JMSMessageToObject();
         trans2.setReturnClass(byte[].class);
-        BytesMessage bMsg = (BytesMessage)result2;
+        BytesMessage bMsg = (BytesMessage) result2;
         Object result = trans2.transform(bMsg);
         assertTrue("Transformed object should be a byte[]", result instanceof byte[]);
-        String res = new String((byte[])result);
+        String res = new String((byte[]) result);
         assertEquals("Source and result should be equal", text, res);
     }
 
+    @Test
     public void testTransformStreamMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
@@ -180,8 +186,7 @@ public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestC
         assertEquals(new Double(d), newD);
         assertEquals(text, newText);
     }
-    
-    
+
     // The following test was disabled for ActiveMQ 3.x because ActiveMQ 3.2.4
     // unconditionally uncompresses BytesMessages for reading, even if it is not
     // supposed to do so (the layer doing the message reading seems to have no access
@@ -190,6 +195,7 @@ public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestC
     // This was fixed in 4.x.
     // For more information why this was VERY BAD read:
     // http://en.wikipedia.org/wiki/Zip_of_death
+    @Test
     public void testCompressedBytesMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
@@ -215,9 +221,9 @@ public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestC
         assertTrue("Transformed object should be a Bytes message", result2 instanceof BytesMessage);
 
         // check whether the BytesMessage contains the compressed bytes
-        BytesMessage intermediate = (BytesMessage)result2;
+        BytesMessage intermediate = (BytesMessage) result2;
         intermediate.reset();
-        byte[] intermediateBytes = new byte[(int)(intermediate.getBodyLength())];
+        byte[] intermediateBytes = new byte[(int) (intermediate.getBodyLength())];
         int intermediateSize = intermediate.readBytes(intermediateBytes);
         assertTrue("Intermediate bytes must be compressed", compressor.isCompressed(intermediateBytes));
         assertTrue("Intermediate bytes must be equal to compressed source", Arrays.equals(compressedBytes,
@@ -233,8 +239,8 @@ public abstract class JmsTransformersTestCase extends AbstractJmsFunctionalTestC
         bMsg.writeBytes(compressedBytes);
         Object result = trans2.transform(bMsg);
         assertTrue("Transformed object should be a byte[]", result instanceof byte[]);
-        assertTrue("Result should be compressed", compressor.isCompressed((byte[])result));
-        assertTrue("Source and result should be equal", Arrays.equals(compressedBytes, (byte[])result));
+        assertTrue("Result should be compressed", compressor.isCompressed((byte[]) result));
+        assertTrue("Source and result should be equal", Arrays.equals(compressedBytes, (byte[]) result));
     }
 
     /*

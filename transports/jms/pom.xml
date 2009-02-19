@@ -1,85 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.mule.transports</groupId>
-        <artifactId>mule-transports</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
-    </parent>
-    <artifactId>mule-transport-jms</artifactId>
-    <packaging>bundle</packaging>
-    <name>JMS Transport</name>
-    <description>A Mule transport for Jms Connectivity.</description>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mule.transports</groupId>
+		<artifactId>mule-transports</artifactId>
+		<version>2.5.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>mule-transport-jms</artifactId>
+	<packaging>bundle</packaging>
+	<name>JMS Transport</name>
+	<description>A Mule transport for Jms Connectivity.</description>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <forkMode>pertest</forkMode>
-                    <includes>
-                        <!-- 
-                            This module has some classes which begin with 'Test' and that are
-                            no JUnit tests. Exclude those.
-                         -->
-                        <include>**/*TestCase.java</include>
-                        <include>**/*Test.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<forkMode>pertest</forkMode>
+					<includes>
+						<!--
+							This module has some classes which begin with 'Test' and that are
+							no JUnit tests. Exclude those.
+						-->
+						<include>**/*TestCase.java</include>
+						<include>**/*Test.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jms_1.1_spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
-        </dependency>
-        
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jms_1.1_spec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
+		</dependency>
 
-        <!-- Unit tests only -->
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-tcp</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-jbossts</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>mockobjects</groupId>
-            <artifactId>mockobjects-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+
+		<!-- Unit tests only -->
+		<dependency>
+			<groupId>org.mule.transports</groupId>
+			<artifactId>mule-transport-tcp</artifactId>
+			<version>${version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.transports</groupId>
+			<artifactId>mule-transport-vm</artifactId>
+			<version>${version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-jbossts</artifactId>
+			<version>${version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>mockobjects</groupId>
+			<artifactId>mockobjects-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<!--
+				added version here instead of root pom in order to avoid potential
+				issues of using an JUnit4 in the rest of the project. Currently it
+				is only needed to compile the MuleParameterized class
+			-->
+			<version>4.5</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

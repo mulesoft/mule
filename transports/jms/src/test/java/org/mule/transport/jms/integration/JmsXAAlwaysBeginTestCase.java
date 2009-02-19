@@ -7,8 +7,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.jms.integration;
 
+package org.mule.transport.jms.integration;
 
 import java.util.List;
 
@@ -20,8 +20,9 @@ import javax.transaction.xa.Xid;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
-public abstract class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
+public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsXAAlwaysBeginTestCase(JmsVendorConfiguration config)
     {
@@ -37,6 +38,7 @@ public abstract class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTest
         return "integration/jms-xa-tx-ALWAYS_BEGIN.xml";
     }
 
+    @Test
     public void testAlwaysBeginTx() throws Exception
     {
         send(scenarioNoTx);
@@ -46,7 +48,6 @@ public abstract class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTest
         assertEquals(committedTx.size(), 0);
         assertEquals(rolledbackTx.size(), 2);
     }
-
 
     public static class TestRollbackComponent
     {
