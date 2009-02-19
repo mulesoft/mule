@@ -63,14 +63,21 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         {
             consumableClasses.add(ClassUtils.loadClass("javax.xml.stream.XMLStreamReader",
                 DefaultMuleMessage.class));
-            consumableClasses.add(ClassUtils.loadClass("javax.xml.transform.stream.StreamSource",
-                DefaultMuleMessage.class));
-            consumableClasses.add(OutputHandler.class);
         }
         catch (ClassNotFoundException e)
         {
-            throw new RuntimeException(e);
         }
+        
+        try
+        {
+            consumableClasses.add(ClassUtils.loadClass("javax.xml.transform.stream.StreamSource",
+                DefaultMuleMessage.class));
+        }
+        catch (ClassNotFoundException e)
+        {
+        }
+        
+        consumableClasses.add(OutputHandler.class);
     }
 
     public DefaultMuleMessage(Object message)
