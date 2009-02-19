@@ -99,7 +99,7 @@
                </component>
                <outbound>
                     <pass-through-router>
-                        <outbound-endpoint ref="stats" />
+                        <outbound-endpoint ref="stats" transformer-refs="setHtmlContentType"/>
                     </pass-through-router>
                </outbound>
           </service>
