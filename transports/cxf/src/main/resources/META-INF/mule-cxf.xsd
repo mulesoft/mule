@@ -132,6 +132,13 @@
     			</xsd:documentation>
     		</xsd:annotation>
     	</xsd:attribute>
+        <xsd:attribute name="applyTransformersToProtocol" type="mule:substitutableBoolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Whether to apply the transformers to the protocol endpoint. Defaults to true for Mule 2.2+ and false for 2.1 and previous versions.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="inboundEndpointAttributes">
@@ -180,13 +187,6 @@
             <xsd:annotation>
                 <xsd:documentation>
                     Whether to apply the filters to the protocol endpoint.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="applyTransformersToProtocol" type="mule:substitutableBoolean">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Whether to apply the transformers to the protocol endpoint.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

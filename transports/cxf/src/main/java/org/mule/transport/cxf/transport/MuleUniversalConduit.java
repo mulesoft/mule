@@ -50,6 +50,7 @@ import java.util.logging.Logger;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -89,6 +90,8 @@ public class MuleUniversalConduit extends AbstractConduit
 
     private boolean closeInput;
 
+    private boolean applyTransformersToProtocol;
+    
     /**
      * @param ei The Endpoint being invoked by this destination.
      * @param t The EPR associated with this Conduit - i.e. the reply destination.
@@ -214,23 +217,29 @@ public class MuleUniversalConduit extends AbstractConduit
         LOGGER.info("Sending message to " + uri);
         try
         {
-            OutboundEndpoint ep = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+            OutboundEndpoint protocolEndpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
 
             MessageAdapter req = (MessageAdapter) m.getExchange().get(CxfConstants.MULE_MESSAGE);
             req.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, uri, PropertyScope.INVOCATION);
             
-            MuleMessage result = sendStream(req, ep, m.getExchange());
+            MuleMessage result = sendStream(req, protocolEndpoint, m.getExchange());
 
+            if (result == null)
+            {
+                m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
+                return;
+            }
+            
             // If we have a result, send it back to CXF
             InputStream is = getResponseBody(m, result);
             if (is != null)
             {
                 Message inMessage = new MessageImpl();
-                String contentType = result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
 
-                inMessage.put(CxfConstants.MULE_MESSAGE, result);
-                inMessage.put(Message.ENCODING, result.getEncoding());
+                String contentType = result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
                 inMessage.put(Message.CONTENT_TYPE, contentType);
+                inMessage.put(Message.ENCODING, result.getEncoding());
+                inMessage.put(CxfConstants.MULE_MESSAGE, result);
                 inMessage.setContent(InputStream.class, is);
                 inMessage.setExchange(m.getExchange());
                 getMessageObserver().onMessage(inMessage);
@@ -351,6 +360,16 @@ public class MuleUniversalConduit extends AbstractConduit
         event.setTimeout(MuleEvent.TIMEOUT_NOT_SET_VALUE);
         RequestContext.setEvent(event);
 
+        // This is a little "trick" to apply transformers from the CXF endpoint
+        // to the raw message instead of the pojos
+        if (applyTransformersToProtocol)
+        {
+            message.applyTransformers(((OutboundEndpoint) prev.getEndpoint()).getTransformers());
+        }
+        
+        // The underlying endpoint transformers
+        event.transformMessage();
+        
         MuleMessage msg = ep.send(event);
         
         // We need to grab this back in the CxfMessageDispatcher again.
@@ -455,6 +474,11 @@ public class MuleUniversalConduit extends AbstractConduit
     public void setCloseInput(boolean closeInput)
     {
         this.closeInput = closeInput;
+    }
+
+    public void setApplyTransformersToProtocol(boolean applyTransformersToProtocol)
+    {
+        this.applyTransformersToProtocol = applyTransformersToProtocol;
     }
 
     protected CxfConnector getConnector()

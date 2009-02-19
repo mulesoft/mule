@@ -1,0 +1,46 @@
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+    xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+    xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.2"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+        http://www.mulesource.org/schema/mule/xml/2.2 http://www.mulesource.org/schema/mule/xml/2.2/mule-xml.xsd">
+    
+    <vm:connector name="vm.connector" queueEvents="true"/>
+    
+    <cxf:endpoint 
+        name="payloadTransformerClient" 
+        address="vm://in"
+        proxy="true"
+        applyTransformersToProtocol="false"
+        synchronous="false">
+        <transformers>
+            <mule-xml:xslt-transformer xsl-file="proxy.xsl" />
+        </transformers>
+    </cxf:endpoint>
+    
+    <cxf:endpoint 
+        name="protocolTransformerClient" 
+        address="vm://in"
+        proxy="true"
+        applyTransformersToProtocol="true"
+        synchronous="false">
+        <transformers>
+            <mule-xml:xslt-transformer xsl-file="proxy.xsl" />
+        </transformers>
+    </cxf:endpoint>
+
+    <model name="TestCxfModel">
+        <service name="echoService">
+            <inbound>
+                <inbound-endpoint address="cxf:vm://service" synchronous="true"/>
+            </inbound>
+            <component class="org.mule.component.simple.EchoComponent" />
+        </service>
+    </model>
+</mule>

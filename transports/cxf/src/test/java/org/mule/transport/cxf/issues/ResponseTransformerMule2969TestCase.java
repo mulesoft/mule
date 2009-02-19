@@ -17,7 +17,7 @@ import org.mule.tck.functional.StringAppendTestTransformer;
 
 public class ResponseTransformerMule2969TestCase extends FunctionalTestCase
 {
-
+    
     protected String getConfigResources()
     {
         return "response-transformer-mule2969.xml";

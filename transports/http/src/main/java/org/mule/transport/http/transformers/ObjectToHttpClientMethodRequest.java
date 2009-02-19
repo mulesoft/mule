@@ -389,9 +389,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
 
             if (headerName.equalsIgnoreCase(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY))
             {
-                logger.warn("Deprecation warning:  There is not need to set custom headers using: " + HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY
-                + " you can now add the properties directly to the outbound endpoint or use the OUTBOUND property scope on the message.");
-
+                if (logger.isInfoEnabled())
+                {
+                    logger.warn("Deprecation warning:  There is not need to set custom headers using: " + HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY
+                        + " you can now add the properties directly to the outbound endpoint or use the OUTBOUND property scope on the message.");
+                }
+                
                 Map customHeaders = (Map) msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
                 if (customHeaders != null)
                 {   

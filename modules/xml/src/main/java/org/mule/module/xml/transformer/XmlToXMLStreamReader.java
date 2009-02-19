@@ -10,6 +10,7 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
@@ -23,8 +24,10 @@ import javax.xml.transform.Source;
 
 import org.w3c.dom.Document;
 
-public class XmlToXMLStreamReader extends AbstractXmlTransformer
+public class XmlToXMLStreamReader extends AbstractXmlTransformer implements DiscoverableTransformer
 {
+
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
     private boolean reversible;
     
     public XmlToXMLStreamReader()
@@ -76,6 +79,13 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer
         this.reversible = reversible;
     }
 
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
+    }
 }
-
-

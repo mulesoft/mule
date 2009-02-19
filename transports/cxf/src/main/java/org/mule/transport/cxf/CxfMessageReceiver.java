@@ -96,9 +96,9 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             List<AbstractFeature> features = (List<AbstractFeature>) endpointProps.get(CxfConstants.FEATURES);
             String proxyStr = (String) endpointProps.get(CxfConstants.PROXY);
 
-            applyFiltersToProtocol = BooleanUtils.toBoolean((String) endpointProps.get(CxfConstants.APPLY_FILTERS_TO_PROTOCOL));
-            applySecurityToProtocol = BooleanUtils.toBoolean((String) endpointProps.get(CxfConstants.APPLY_SECURITY_TO_PROTOCOL));
-            applyTransformersToProtocol = BooleanUtils.toBoolean((String) endpointProps.get(CxfConstants.APPLY_TRANSFORMERS_TO_PROTOCOL));
+            applyFiltersToProtocol = isTrue((String) endpointProps.get(CxfConstants.APPLY_FILTERS_TO_PROTOCOL), true);
+            applySecurityToProtocol = isTrue((String) endpointProps.get(CxfConstants.APPLY_SECURITY_TO_PROTOCOL), true);
+            applyTransformersToProtocol = isTrue((String) endpointProps.get(CxfConstants.APPLY_TRANSFORMERS_TO_PROTOCOL), true);
             
             Class<?> svcCls = null;
             Class<?> targetCls;
@@ -280,6 +280,13 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         {
             throw new InitialisationException(e, this);
         }
+    }
+
+    private boolean isTrue(String string, boolean defaultValue)
+    {
+        if (string == null) return defaultValue;
+        
+        return BooleanUtils.toBoolean(string);
     }
 
     /**

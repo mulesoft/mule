@@ -13,7 +13,9 @@
         
         <service name="CXFService">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:4444/services/CXFService" synchronous="true"
+                <cxf:inbound-endpoint address="http://localhost:4444/services/CXFService" 
+                    synchronous="true"
+                    applyTransformersToProtocol="false"
                     responseTransformer-refs="StringAppendTestTransformer" frontend="simple" >
                 </cxf:inbound-endpoint>
             </inbound>

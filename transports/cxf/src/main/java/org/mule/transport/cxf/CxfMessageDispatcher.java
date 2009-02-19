@@ -88,7 +88,22 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
 
     protected Object[] getArgs(MuleEvent event) throws TransformerException
     {
-        Object payload = event.transformMessage();
+        Object payload;
+        
+        if (wrapper.isApplyTransformersToProtocol())
+        {
+            payload = event.getMessage().getPayload();
+        }
+        else 
+        {
+            payload = event.transformMessage();
+        }
+        
+        if (wrapper.isProxy())
+        {
+            return new Object[] { event.getMessage() };
+        }
+        
         Object[] args;
 
         if (payload instanceof Object[])
@@ -124,14 +139,18 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         ((ClientImpl)wrapper.getClient()).setSynchronousTimeout(event.getTimeout());
+        
+        MuleMessage res;
         if (!wrapper.isClientProxyAvailable())
         {
-            return doSendWithClient(event);
+            res = doSendWithClient(event);
         }
         else
         {
-            return doSendWithProxy(event);
+            res = doSendWithProxy(event);
         }
+        
+        return res;
     }
 
     protected MuleMessage doSendWithProxy(MuleEvent event) throws Exception
@@ -201,12 +220,18 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         Object[] response = wrapper.getClient().invoke(bop, getArgs(event), ctx);
 
         MuleMessage muleRes = holder.value;
-        
         return buildResponseMessage(muleRes, response);
     }
 
     protected MuleMessage buildResponseMessage(MuleMessage transportResponse, Object[] response) 
     {
+        // One way dispatches over an async transport result in this
+        if (transportResponse == null) 
+        {
+            return null;
+        }
+        
+        // Otherwise we may have a response!
         MuleMessage result = null;
         if (response != null && response.length <= 1)
         {

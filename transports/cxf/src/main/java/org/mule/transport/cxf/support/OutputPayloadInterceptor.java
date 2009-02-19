@@ -10,7 +10,10 @@
 
 package org.mule.transport.cxf.support;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.DelayedResult;
+import org.mule.transport.NullPayload;
 
 import java.util.List;
 
@@ -51,29 +54,54 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
 
         objs.clear();
 
-        for (final Object o : originalParts)
+        for (Object o : originalParts)
         {
-            if (o instanceof DelayedResult)
+            if (o instanceof MuleMessage) 
             {
-                objs.add(getDelayedResultCallback((DelayedResult)o));
-            }
-            else if (o instanceof XMLStreamReader)
-            {
-                objs.add(new XMLStreamWriterCallback()
+                try
                 {
-                    public void write(XMLStreamWriter writer) throws Fault, XMLStreamException
+                    MuleMessage muleMsg = (MuleMessage) o;
+                    final Object payload = muleMsg.getPayload();
+                    
+                    if (payload instanceof DelayedResult)
                     {
-                        XMLStreamReader xsr = (XMLStreamReader)o;
-                        StaxUtils.copy(xsr, writer);      
-                        writer.flush();
-                        xsr.close();
+                        o = getDelayedResultCallback((DelayedResult)payload);
                     }
-                });
-            } 
+                    else if (payload instanceof XMLStreamReader)
+                    {
+                        o = new XMLStreamWriterCallback()
+                        {
+                            public void write(XMLStreamWriter writer) throws Fault, XMLStreamException
+                            {
+                                XMLStreamReader xsr = (XMLStreamReader)payload;
+                                StaxUtils.copy(xsr, writer);      
+                                writer.flush();
+                                xsr.close();
+                            }
+                        };
+                    } 
+                    else if (payload instanceof NullPayload)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        o = muleMsg.getPayload(XMLStreamReader.class);
+                    }
+    
+                    objs.add(o);
+                }
+                catch (TransformerException e)
+                {
+                    throw new Fault(e);
+                } 
+            }
             else
             {
+                // it's probably a null object
                 objs.add(o);
             }
+            
         }
     }
 

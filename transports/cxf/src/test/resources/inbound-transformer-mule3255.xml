@@ -15,8 +15,10 @@
         
         <service name="CXFService">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:4444/services/CXFService" frontend="simple" bindingUri=""
-                                      transformer-refs="StringAppendTestTransformer" />
+                <cxf:inbound-endpoint address="http://localhost:4444/services/CXFService" 
+                    applyTransformersToProtocol="false"
+                    frontend="simple" 
+                    transformer-refs="StringAppendTestTransformer" />
             </inbound>
             <echo-component/>
         </service>

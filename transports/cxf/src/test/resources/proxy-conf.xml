@@ -37,6 +37,25 @@
             </outbound>
         </service>
         
+        <service name="proxyWithTransform">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/transform-proxy" proxy="true">
+                    <!-- we're just ensuring that cxf proxies can handle non XMLStreamReader types here -->
+                    <transformers>
+                        <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document"/>
+                    </transformers>
+                    <response-transformers>
+                        <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document"/>
+                    </response-transformers>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/greeter" proxy="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
         <service name="greeter">
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:63081/services/greeter"/>

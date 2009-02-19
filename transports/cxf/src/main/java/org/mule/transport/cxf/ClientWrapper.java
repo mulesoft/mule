@@ -82,6 +82,7 @@ public class ClientWrapper
     protected Method defaultMethod;
 
     protected boolean proxy;
+    private boolean applyTransformersToProtocol;
     
     public Client getClient()
     {
@@ -124,6 +125,10 @@ public class ClientWrapper
             client.getOutInterceptors().add(new OutputPayloadInterceptor());
             client.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
             ((MuleUniversalConduit)client.getConduit()).setCloseInput(false);
+            
+            String value = (String) endpoint.getProperty(CxfConstants.APPLY_TRANSFORMERS_TO_PROTOCOL);
+            applyTransformersToProtocol = value == null || BooleanUtils.toBoolean((String)value); 
+            ((MuleUniversalConduit)client.getConduit()).setApplyTransformersToProtocol(applyTransformersToProtocol);
         }
         
         List<AbstractFeature> features = (List<AbstractFeature>) endpoint.getProperty(CxfConstants.OUT_FAULT_INTERCEPTORS);
@@ -215,7 +220,8 @@ public class ClientWrapper
         cpf.setDataBinding(new StaxDataBinding());
         cpf.getFeatures().add(new StaxDataBindingFeature());
         cpf.setAddress(endpoint.getEndpointURI().getAddress());
-
+        cpf.setBus(bus);
+        
         if (wsdlLocation != null) 
         {
             cpf.setWsdlLocation(wsdlLocation);
@@ -477,4 +483,15 @@ public class ClientWrapper
         }
         return method;
     }
+
+    public boolean isProxy()
+    {
+        return proxy;
+    }
+
+    public boolean isApplyTransformersToProtocol()
+    {
+        return applyTransformersToProtocol;
+    }
+    
 }

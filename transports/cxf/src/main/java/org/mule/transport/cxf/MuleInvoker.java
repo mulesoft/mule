@@ -134,6 +134,11 @@ public class MuleInvoker implements Invoker
             {
                 return new MessageContentsList((Object)null);
             }
+            else if (receiver.isProxy())
+            {
+                message.getPayload();
+                return new Object[] { message };
+            }
             else
             {
                 return new Object[]{message.getPayload()};

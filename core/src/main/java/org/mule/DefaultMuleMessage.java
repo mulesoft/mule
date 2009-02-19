@@ -18,6 +18,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MutableMessageAdapter;
+import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageAdapter;
@@ -62,9 +63,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         {
             consumableClasses.add(ClassUtils.loadClass("javax.xml.stream.XMLStreamReader",
                 DefaultMuleMessage.class));
+            consumableClasses.add(ClassUtils.loadClass("javax.xml.transform.stream.StreamSource",
+                DefaultMuleMessage.class));
+            consumableClasses.add(OutputHandler.class);
         }
         catch (ClassNotFoundException e)
         {
+            throw new RuntimeException(e);
         }
     }
 
