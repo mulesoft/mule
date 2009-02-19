@@ -17,7 +17,7 @@ When a result is returned there <br/> will be in ascii text form so you'll need 
 Http PUT will send an event asynchronously to the Mule server
 <p/>
 Please enter something:
-<form method="POST" name="submitPut" action="/mule-examples/rest/restPUTTest">
+<form method="POST" name="submitPut" action="<%=request.getContextPath()%>/rest/restPUTTest">
     <table>
         <tr><td>
             <input type="text" name="payload"/><input type="hidden" name="PUT"/></td><td><input type="submit" value=" PUT " />
@@ -27,7 +27,7 @@ Please enter something:
 <p></p>
 <h2>Http GET</h2>
 Get get something back
-<form method="GET" name="submitGet" action="/mule-examples/rest">
+<form method="GET" name="submitGet" action="<%=request.getContextPath()%>/rest">
     <table>
         <tr><td>
             <input type="hidden" name="endpoint" value="restFileEndpoint"/>

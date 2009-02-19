@@ -21,11 +21,11 @@
     <td width="100%"><a href="helloworld.jsp" target="main"><font color="#FFFFFF" face="Arial Black">Hello World</font></a></td>
   </tr>
   <tr>
-    <td width="100%"><a href="resthelloworld.html" target="main"><font face="Arial Black" color="#FFFFFF">REST Hello World</font></a>
+    <td width="100%"><a href="resthelloworld.jsp" target="main"><font face="Arial Black" color="#FFFFFF">REST Hello World</font></a>
     </td>
   </tr>
   <tr>
-    <td width="100%"><a href="restputget.html" target="main"><font face="Arial Black" color="#FFFFFF">REST Put/Get</font></a>
+    <td width="100%"><a href="restputget.jsp" target="main"><font face="Arial Black" color="#FFFFFF">REST Put/Get</font></a>
     </td>
   </tr>
   <tr>

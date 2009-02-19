@@ -14,7 +14,7 @@ processed.  This example uses the Servlet Connector in the <a target="_blank" hr
 <p/>
 
 Please enter your name:
-<form method="POST" name="submitName" action="/mule-examples/rest?endpoint=greeter">
+<form method="POST" name="submitName" action="<%=request.getContextPath()%>/rest?endpoint=greeter">
     <table>
         <tr><td>
             <input type="text" name="payload"/></td><td><input type="submit" value="POST" />
