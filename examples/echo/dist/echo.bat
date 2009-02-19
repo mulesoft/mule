@@ -13,7 +13,7 @@ SET MULE_LIB=.\conf
 ECHO The Echo example is available in three variations:
 ECHO   1. Echo from the Command Line
 ECHO   2. Echo using the Axis Transport
-ECHO      (surf to http://localhost:65081/services/EchoUMO?method=echo&param=hello)
+ECHO      (surf to http://localhost:65081/services/EchoUMO?method=echo^&param=hello)
 ECHO   3. Echo using the Cxf Transport
 ECHO      (surf to http://localhost:65082/services/EchoUMO/echo/text/hello)
 SET /P Choice=Select the one you wish to execute and press Enter... 
