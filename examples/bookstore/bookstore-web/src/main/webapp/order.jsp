@@ -1,10 +1,7 @@
 <%@ page import="org.mule.example.bookstore.Book,
                   org.mule.example.bookstore.CatalogService,
                   org.mule.example.bookstore.OrderService,
-                  java.util.ArrayList,
-                  java.util.Collection,
-                 java.util.Iterator,
-                 org.apache.cxf.jaxws.JaxWsProxyFactoryBean"%>
+                  org.apache.cxf.jaxws.JaxWsProxyFactoryBean"%>
 <%@ page language="java" %>
 
 <head>
@@ -92,6 +89,6 @@
  %>
 
 <br/>
-<a href="/bookstore">Return to Home Page</a>
+<a href="/<%=request.getContextPath()%>">Return to Home Page</a>
 </body>
 </html>

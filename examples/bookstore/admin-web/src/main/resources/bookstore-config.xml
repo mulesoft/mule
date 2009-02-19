@@ -28,7 +28,7 @@
           <service name="CatalogService">
                <inbound>
                     <!-- Public interface -->
-                    <inbound-endpoint address="cxf:http://localhost:8777/services/catalog" />
+                    <inbound-endpoint address="cxf:http://0.0.0.0:8777/services/catalog" />
 
                     <!-- Administration interface -->
                     <inbound-endpoint address="servlet://catalog">                                      
@@ -52,7 +52,7 @@
           <service name="OrderService">
                <inbound>
                     <!-- Public interface -->
-                    <inbound-endpoint address="cxf:http://localhost:8777/services/order" />
+                    <inbound-endpoint address="cxf:http://0.0.0.0:8777/services/order" />
                </inbound>
                <component>
                     <singleton-object class="org.mule.example.bookstore.OrderServiceImpl" />

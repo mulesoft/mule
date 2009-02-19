@@ -23,7 +23,7 @@ import javax.jws.WebService;
 public interface CatalogService
 {
     /** The catalog will be accesible as a web service at this URL */
-    static final String URL = "http://localhost:8777/services/catalog";
+    static final String URL = "http://0.0.0.0:8777/services/catalog";
 
     /** Return a collection of all books in the catalog */
     @WebResult(name="books") 

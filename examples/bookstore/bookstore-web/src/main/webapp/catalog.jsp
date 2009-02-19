@@ -75,7 +75,7 @@
                     <td><%=book.getTitle()%></td>
                     <td><%=book.getAuthor()%></td>
                     <td>$<%=book.getPrice()%></td>
-                    <td><a href="order.jsp?id=<%=book.getId()%>">Order this book</a></td>
+                    <td><a href="<%=request.getContextPath()%>/order.jsp?id=<%=book.getId()%>">Order this book</a></td>
                    </tr>
         <%
             }

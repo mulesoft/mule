@@ -30,7 +30,7 @@ public class HtmlTemplate
         output += body;            
         output += "</body>";
 
-        output += "<br/><a href=\"/bookstore-admin\">Return to Home Page</a>";
+        output += "<br/><a href=\"/\">Return to Home Page</a>";
         output += "</html>";
         
         return output;

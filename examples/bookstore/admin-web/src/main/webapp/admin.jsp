@@ -15,7 +15,7 @@
 <hr/>
 
 <h2>Add a new book</h2>
-<form method="POST" name="addBook" action="/bookstore-admin/services/catalog">
+<form method="POST" name="addBook" action="<%=request.getContextPath()%>/services/catalog">
     <table>
         <tr>
             <td>Title: </td>
@@ -34,7 +34,7 @@
 </form>
 
 <h2>Get latest statistics from Data Warehouse</h2>
-<form method="GET" name="getStats" action="/bookstore-admin/services/stats">
+<form method="GET" name="getStats" action="<%=request.getContextPath()%>/services/stats">
     <input type="submit" name="submit" value="Get stats" />
 </form>
 

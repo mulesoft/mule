@@ -21,7 +21,7 @@ import javax.jws.WebService;
 public interface OrderService
 {
     /** The order service will be accesible as a web service at this URL */
-    static final String URL = "http://localhost:8777/services/order";
+    static final String URL = "http://0.0.0.0:8777/services/order";
 
     /** Place a book order */
     @WebResult(name="order") 
