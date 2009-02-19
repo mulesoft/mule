@@ -67,14 +67,16 @@ public class DataWarehouse
     
     protected String printHtmlStats()
     {
-        String output = "<h2>Data Warehouse Statistics</h2>";
-        output += "<table>";
-        output += "<tr><th>Books sold</th> <td>" + booksOrdered + "</td></tr>";
-        output += "<tr><th>Total revenue</th> <td>$" + totalRevenue + "</td></tr>";
-        output += "<tr><th>Average price</th> <td>$" + averagePrice + "</td></tr>";
-        output += "<tr><th>Best seller</th> <td>" + bestSeller + "</td></tr>";
-        output += "</table>";
-        return output;
+        StringBuilder sb = new StringBuilder();
+        sb.append("<h2>Data Warehouse Statistics</h2>");
+        sb.append("<table>");
+        sb.append("  <tr><th>Books sold</th> <td>").append(booksOrdered).append("</td></tr>");
+        sb.append(String.format("  <tr><th>Total revenue</th> <td>$%.2f</td></tr>", totalRevenue));
+        sb.append(String.format("  <tr><th>Average price</th> <td>$%.2f</td></tr>", averagePrice));
+        sb.append("<tr><th>Best seller</th> <td>").append(bestSeller).append("</td></tr>");
+        sb.append("</table>");
+
+        return sb.toString();
     }
 }
 
