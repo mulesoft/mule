@@ -13,7 +13,6 @@ package org.mule.example.bookstore;
 import org.mule.example.bookstore.web.HtmlTemplate;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -55,11 +54,8 @@ public class DataWarehouse
     {
         String title = "";
         int quantity = 0;
-        Iterator it = sales.entrySet().iterator();
-        Entry <String, Integer> entry;
-        while (it.hasNext())
+        for (Entry<String, Integer> entry : sales.entrySet())
         {
-            entry = (Entry <String, Integer>) it.next();
             if (entry.getValue() > quantity)
             {
                 title = entry.getKey();
