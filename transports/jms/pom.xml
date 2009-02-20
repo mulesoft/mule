@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.transports</groupId>
@@ -18,10 +20,10 @@
                 <configuration>
                     <forkMode>pertest</forkMode>
                     <includes>
-                        <!-- 
+                        <!--
                             This module has some classes which begin with 'Test' and that are
                             no JUnit tests. Exclude those.
-                         -->
+                        -->
                         <include>**/*TestCase.java</include>
                         <include>**/*Test.java</include>
                     </includes>
@@ -50,7 +52,7 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
         </dependency>
-        
+
 
         <!-- Unit tests only -->
         <dependency>
@@ -79,6 +81,17 @@
         <dependency>
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <!--
+                added version here instead of root pom in order to avoid potential
+                issues of using an JUnit4 in the rest of the project. Currently it
+                is only needed to compile the MuleParameterized class
+            -->
+            <version>4.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

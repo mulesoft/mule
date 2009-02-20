@@ -7,14 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transport.jms.integration;
 
 import org.mule.tck.testmodels.fruit.Apple;
 
+import org.junit.Test;
+
 /**
  * Message is sent to and received from simple queue using compression in between
  */
-public abstract class JmsQueueWithCompressionTestCase extends AbstractJmsFunctionalTestCase
+public class JmsQueueWithCompressionTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsQueueWithCompressionTestCase(JmsVendorConfiguration config)
     {
@@ -26,14 +29,16 @@ public abstract class JmsQueueWithCompressionTestCase extends AbstractJmsFunctio
         return "integration/jms-queue-with-compression.xml";
     }
 
+    @Test
     public void testJmsQueue() throws Exception
     {
-        //Lets test it doesn't blow up with serialized objects
+        // Lets test it doesn't blow up with serialized objects
         dispatchMessage(new Apple());
         receiveMessage();
         receive(scenarioNotReceive);
     }
 
+    @Test
     public void testMultipleSend() throws Exception
     {
         dispatchMessage();

@@ -17,9 +17,8 @@ import org.mule.transport.jms.integration.JmsMuleSideDurableTopicTestCase;
 import org.mule.transport.jms.integration.JmsMuleSideDurableTopicXATxTestCase;
 import org.mule.transport.jms.integration.JmsVendorConfiguration;
 
-import junit.framework.TestSuite;
 import junit.framework.TestResult;
-import junit.textui.TestRunner;
+import junit.framework.TestSuite;
 
 /**
  * This isn't used right now, but shows that we can introduce a test suite for a Jms provider using this single file and

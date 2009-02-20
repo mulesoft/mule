@@ -7,19 +7,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transport.jms.integration;
 
+import javax.jms.Connection;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
-import javax.jms.Topic;
-import javax.jms.ConnectionFactory;
-import javax.jms.Connection;
 import javax.jms.Session;
+import javax.jms.Topic;
 
-public abstract class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
+import org.junit.Test;
+
+public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
     private String clientId;
-
 
     public JmsDurableTopicTestCase(JmsVendorConfiguration config)
     {
@@ -31,6 +32,7 @@ public abstract class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestC
         return "integration/jms-durable-topic.xml";
     }
 
+    @Test
     public void testProviderDurableSubscriber() throws Exception
     {
         setClientId("Client1");

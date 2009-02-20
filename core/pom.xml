@@ -29,7 +29,7 @@
     </build>
 
     <dependencies>
-        
+
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
@@ -43,12 +43,18 @@
             <classifier>asl</classifier>
         </dependency>
 
-        <!--  OTHERS.  group/artifact id only, version and exclusions are specified via dependency management -->
+        <!--
+            OTHERS. group/artifact id only, version and exclusions are specified
+            via dependency management
+        -->
         <dependency>
             <groupId>backport-util-concurrent</groupId>
             <artifactId>backport-util-concurrent</artifactId>
         </dependency>
-        <!-- TODO MULE-1947 Remove this since command-line parsing is limited to mule-module-boot -->
+        <!--
+            TODO MULE-1947 Remove this since command-line parsing is limited to
+            mule-module-boot
+        -->
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
@@ -84,9 +90,8 @@
         </dependency>
 
         <!--
-            Bind log4j statically, but preserve
-            the clogging API compatibility.
-            -->
+            Bind log4j statically, but preserve the clogging API compatibility.
+        -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl104-over-slf4j</artifactId>
@@ -112,6 +117,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <!--
+                added version here instead of root pom in order to avoid potential
+                issues of using an JUnit4 in the rest of the project. Currently it
+                is only needed to compile the MuleParameterized class
+            -->
+            <version>4.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

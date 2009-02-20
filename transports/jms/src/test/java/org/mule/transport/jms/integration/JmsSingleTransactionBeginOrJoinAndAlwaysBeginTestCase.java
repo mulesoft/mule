@@ -7,9 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transport.jms.integration;
 
-public abstract class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
+import org.junit.Test;
+
+public class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase(JmsVendorConfiguration config)
     {
@@ -21,6 +24,7 @@ public abstract class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase exte
         return "integration/jms-single-tx-BEGIN_OR_JOIN_AND_ALWAYS_BEGIN.xml";
     }
 
+    @Test
     public void testSingleTransactionBeginOrJoinAndAlwaysBegin() throws Exception
     {
         send(scenarioCommit);
