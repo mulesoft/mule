@@ -7,16 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration;
 
-import org.junit.Test;
 
 /**
- * There is a separate transaction for each service when single transaction(action:
- * BEGIN_OR_JOIN) and jms transport are used
+ * There is a separate transaction for each service
+ * when single transaction(action: BEGIN_OR_JOIN) and jms transport are used
  */
-public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsSingleTransactionComponentTestCase(JmsVendorConfiguration config)
     {
@@ -28,7 +26,6 @@ public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctional
         return "integration/jms-single-tx-component.xml";
     }
 
-    @Test
     public void testSingleTransactionComponent() throws Exception
     {
         send(scenarioCommit);

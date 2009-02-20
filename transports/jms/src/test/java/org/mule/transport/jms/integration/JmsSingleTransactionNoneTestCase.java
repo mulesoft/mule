@@ -10,12 +10,10 @@
 
 package org.mule.transport.jms.integration;
 
-import org.junit.Test;
-
 /**
  * Send and recieve JmsMessage without any tx
  */
-public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsSingleTransactionNoneTestCase(JmsVendorConfiguration config)
     {
@@ -27,7 +25,6 @@ public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestC
         return "integration/jms-single-tx-NONE.xml";
     }
 
-    @Test
     public void testNoneTx() throws Exception
     {
         send(scenarioNoTx);

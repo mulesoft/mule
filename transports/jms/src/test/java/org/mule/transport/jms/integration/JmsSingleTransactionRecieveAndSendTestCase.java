@@ -13,9 +13,7 @@ package org.mule.transport.jms.integration;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
-import org.junit.Test;
-
-public class JmsSingleTransactionRecieveAndSendTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsSingleTransactionRecieveAndSendTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsSingleTransactionRecieveAndSendTestCase(JmsVendorConfiguration config)
     {
@@ -27,7 +25,6 @@ public class JmsSingleTransactionRecieveAndSendTestCase extends AbstractJmsFunct
         return "integration/jms-single-tx-receive-send-in-one-tx.xml";
     }
 
-    @Test
     public void testSingleTransactionBeginOrJoinAndAlwaysBegin() throws Exception
     {
         send(scenarioCommit);

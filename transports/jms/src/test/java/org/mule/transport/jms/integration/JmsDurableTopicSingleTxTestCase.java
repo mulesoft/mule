@@ -7,15 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration;
 
-import org.junit.Test;
 
 /**
  * Testing durable topic with external subscriber
  */
-public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
+public abstract class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 {
 
     public JmsDurableTopicSingleTxTestCase(JmsVendorConfiguration config)
@@ -31,7 +29,6 @@ public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
     /**
      * @throws Exception
      */
-    @Test
     public void testProviderDurableSubscriber() throws Exception
     {
         setClientId("Client1");

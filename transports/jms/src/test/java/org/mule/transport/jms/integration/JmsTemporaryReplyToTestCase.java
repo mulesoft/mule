@@ -14,14 +14,11 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
-import org.junit.Test;
-
 /**
- * TODO this test does not use the Test scenarios, I think it would need a new Method
- * sendAndReceive It might make sense to leave this test as is because it tests that
- * the client also works witrh ReplyTo correctly
+ * TODO this test does not use the Test scenarios, I think it would need a new Method sendAndReceive
+ * It might make sense to leave this test as is because it tests that the client also works witrh ReplyTo correctly
  */
-public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsTemporaryReplyToTestCase(JmsVendorConfiguration config)
     {
@@ -33,7 +30,6 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
         return "integration/jms-temporary-replyTo.xml";
     }
 
-    @Test
     public void testTemporaryReplyEnabled() throws MuleException
     {
         MuleClient muleClient = new MuleClient();
@@ -41,32 +37,30 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
         assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
     }
 
-    @Test
     public void testTemporaryReplyDisabled() throws MuleException
     {
         MuleClient muleClient = new MuleClient();
         MuleMessage response = muleClient.send("vm://in2", TEST_MESSAGE, null);
-        // We get the original message back, not the result from the remote component
+        //We get the original message back, not the result from the remote component
         assertEquals(TEST_MESSAGE, response.getPayload());
     }
 
-    @Test
     public void testDisableTempraryReplyOnTheConeector() throws MuleException
     {
         MuleClient muleClient = new MuleClient();
         MuleMessage response = muleClient.send("vm://in3", TEST_MESSAGE, null);
-        // We get the original message back, not the result from the remote component
+        //We get the original message back, not the result from the remote component
         assertEquals(TEST_MESSAGE, response.getPayload());
 
     }
 
-    @Test
     public void testExplicitReplyToAsyncSet() throws MuleException
     {
         MuleClient muleClient = new MuleClient();
         MuleMessage response = muleClient.send("vm://in4", TEST_MESSAGE, null);
-        // We get the original message back, not the result from the remote component
+        //We get the original message back, not the result from the remote component
         assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
 
     }
+
 }

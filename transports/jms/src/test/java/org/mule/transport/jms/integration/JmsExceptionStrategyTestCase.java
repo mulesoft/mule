@@ -7,7 +7,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration;
 
 import org.mule.api.config.MuleProperties;
@@ -19,12 +18,10 @@ import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
-import org.junit.Test;
-
 /**
  * Tests a transactional exception strategy.
  */
-public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
 {
     public static final String DEADLETTER_QUEUE_NAME = "dead.letter";
 
@@ -38,7 +35,6 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         return "integration/jms-exception-strategy.xml";
     }
 
-    @Test
     public void testTransactedRedeliveryToDLDestination() throws Exception
     {
         send(scenarioDeadLetter);
@@ -48,7 +44,6 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         receive(scenarioDeadLetter);
     }
 
-    @Test
     public void testTransactedRedeliveryToDLDestinationRollback() throws Exception
     {
         send(scenarioDeadLetter);
@@ -59,9 +54,8 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         // Verify there is no more message to receive.
         receive(scenarioDeadLetterNotReceive);
     }
-
+    
     Scenario scenarioDeadLetter = new ScenarioDeadLetter();
-
     class ScenarioDeadLetter extends ScenarioCommit
     {
         // @Override
@@ -76,12 +70,10 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
             // Verify message got sent to dead letter queue.
             Message message = consumer.receive(getTimeout());
             assertNotNull(message);
-            assertTrue("Message should be ObjectMessage but is " + message.getClass(),
-                message instanceof ObjectMessage);
+            assertTrue("Message should be ObjectMessage but is " + message.getClass(), message instanceof ObjectMessage);
             Object obj = ((ObjectMessage) message).getObject();
             assertTrue(obj instanceof ExceptionMessage);
-            // The payload should be the original message, not the reply message
-            // since the FTC threw an exception.
+            // The payload should be the original message, not the reply message since the FTC threw an exception.
             assertEquals(DEFAULT_INPUT_MESSAGE, ((ExceptionMessage) obj).getPayload());
 
             String dest = message.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
@@ -92,9 +84,8 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
             return message;
         }
     }
-
+    
     Scenario scenarioDeadLetterRollback = new ScenarioDeadLetterRollback();
-
     class ScenarioDeadLetterRollback extends ScenarioDeadLetter
     {
         // @Override
@@ -105,7 +96,6 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
     }
 
     Scenario scenarioDeadLetterNotReceive = new ScenarioDeadLetterNotReceive();
-
     class ScenarioDeadLetterNotReceive extends ScenarioDeadLetter
     {
         // @Override

@@ -7,15 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration;
-
-import org.junit.Test;
 
 /**
  * Message is sent to and received from simple queue.
  */
-public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsQueueTestCase(JmsVendorConfiguration config)
     {
@@ -27,7 +24,6 @@ public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
         return "integration/jms-queue.xml";
     }
 
-    @Test
     public void testJmsQueue() throws Exception
     {
         dispatchMessage();
@@ -35,7 +31,6 @@ public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
         receive(scenarioNotReceive);
     }
 
-    @Test
     public void testMultipleSend() throws Exception
     {
         dispatchMessage();

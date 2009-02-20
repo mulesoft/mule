@@ -10,11 +10,10 @@
 
 package org.mule.transport.jms.integration;
 
+import java.util.Map;
 import java.util.Properties;
 
-import org.junit.Test;
-
-public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends AbstractJmsFunctionalTestCase
 {
 
     public JmsSingleTransactionAlwaysBeginConfigurationTestCase(JmsVendorConfiguration config)
@@ -33,22 +32,20 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
     protected Properties getStartUpProperties()
     {
         Properties props = super.getStartUpProperties();
-        // Inject endpoint names into the config
+        //Inject endpoint names into the config
         props.put(INBOUND_ENDPOINT_KEY + "1", getJmsConfig().getInboundEndpoint() + "1");
         props.put(INBOUND_ENDPOINT_KEY + "2", getJmsConfig().getInboundEndpoint() + "2");
         props.put(INBOUND_ENDPOINT_KEY + "3", getJmsConfig().getInboundEndpoint() + "3");
-        props.put(OUTBOUND_ENDPOINT_KEY + "1", getJmsConfig().getOutboundEndpoint() + "1");
-        props.put(OUTBOUND_ENDPOINT_KEY + "2", getJmsConfig().getOutboundEndpoint() + "2");
-        props.put(OUTBOUND_ENDPOINT_KEY + "3", getJmsConfig().getOutboundEndpoint() + "3");
+        props.put(OUTBOUND_ENDPOINT_KEY + "1", getJmsConfig().getOutboundEndpoint()+ "1");
+        props.put(OUTBOUND_ENDPOINT_KEY + "2", getJmsConfig().getOutboundEndpoint()+ "2");
+        props.put(OUTBOUND_ENDPOINT_KEY + "3", getJmsConfig().getOutboundEndpoint()+ "3");
         return props;
     }
-
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-ALWAYS_BEGIN.xml";
     }
 
-    @Test
     public void testConfigurationA() throws Exception
     {
         scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
@@ -64,7 +61,6 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         receive(scenarioNotReceive);
     }
 
-    @Test
     public void testConfigurationB() throws Exception
     {
         scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
@@ -80,7 +76,7 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         receive(scenarioNotReceive);
     }
 
-    @Test
+
     public void testConfigurationC() throws Exception
     {
         scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
@@ -95,4 +91,8 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         receive(scenarioCommit);
         receive(scenarioNotReceive);
     }
+
+
 }
+
+

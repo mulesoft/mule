@@ -7,7 +7,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration;
 
 import javax.jms.JMSException;
@@ -16,18 +15,15 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-import org.junit.Test;
-
 /**
  * Test jms using JmsClientAcknowledgeTransactionFactory
  */
-public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunctionalTestCase
+public abstract class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunctionalTestCase
 {
 
     public JmsClientAcknowledgeTransactionTestCase(JmsVendorConfiguration config)
     {
         super(config);
-        System.out.println("using jms provider : " + config.getProviderName());
     }
 
     @Override
@@ -36,7 +32,6 @@ public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunction
         return "integration/jms-client-acknowledge-tx.xml";
     }
 
-    @Test
     public void testJmsClientAcknowledgeTransaction() throws Exception
     {
         send(scenarioAcknowledge);

@@ -7,16 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.transport.jms.integration;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
-import org.junit.Test;
 
-public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTestCase
-    implements junit.framework.Test
+
+public abstract class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTestCase
 {
     public static final String CONNECTOR1_NAME = "jmsConnector";
 
@@ -30,7 +28,6 @@ public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTest
         return "integration/jms-xa-tx-component.xml";
     }
 
-    @Test
     public void testOneGlobalTx() throws Exception
     {
         MuleMessage result;
