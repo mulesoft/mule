@@ -93,7 +93,8 @@
 
     <xsd:element name="jaxen-filter" type="jaxenFilterType" substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
-            <xsd:documentation>The Jaxen filter allows you to route messages based on XPath expressions. The Jaxen filter is generally faster than the JXPath filter and should be considered the first choice when using an XPath filter.
+            <xsd:documentation>
+The Jaxen filter allows you to route messages based on XPath expressions. The Jaxen filter is generally faster than the JXPath filter and should be considered the first choice when using an XPath filter.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -131,7 +132,13 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="xpath-filter" type="xpathFilterType" substitutionGroup="mule:abstract-filter" />
+    <xsd:element name="xpath-filter" type="xpathFilterType" substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+		The XPath filter uses the JAXP libraries to filter XPath expressions. Available as of Mule 2.2.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="xpathFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:patternFilterType">
@@ -147,7 +154,7 @@
                 <xsd:attribute name="expectedValue" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The expected value of the XPath expression evaluation. If the expected value matches the evaluation, the filter returns true.
+                            The expected value of the XPath expression evaluation. If the expected value matches the evaluation, the filter returns true. 
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -155,29 +162,35 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="schema-validation-filter" type="schemaValidationFilterType" substitutionGroup="mule:abstract-filter" />
+    <xsd:element name="schema-validation-filter" type="schemaValidationFilterType" substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+            The schema validation filter uses the JAXP libraries to validate your message against a schema. Available as of Mule 2.2.
+            </xsd:documentation>
+         </xsd:annotation>
+    </xsd:element>
+
     <xsd:complexType name="schemaValidationFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractFilterType">
                 <xsd:attribute name="schemaLocations" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The 
+                            The path to the schema file. You can specify multiple schema locations for validation.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="schemaLanguage" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The expected value of the XPath expression evaluation. If the expected value matches the evaluation, the filter returns true.
+                            The schema language to use. The default is "http://www.w3.org/2001/XMLSchema".
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="returnResult" type="xsd:boolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether or not the filter should worry about caching a result of the XML. If this is false,
-                            the filter will be more efficient, but it won't allow you to read the XML again. 
+                            Whether the filter should cache the result of the XML. If this is false, the filter will be more efficient, but it won't allow you to read the XML again. 
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -217,7 +230,7 @@
                 </xsd:attribute>
                 <xsd:attribute name="externalSchemaLocation" type="xsd:string">
                     <xsd:annotation>
-                        <xsd:documentation>The location of a schema location that should be used to validate the current message. This is not required if the message contains the location of the schema.
+                        <xsd:documentation>The location of a schema that should be used to validate the current message. This is not required if the message contains the location of the schema.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
