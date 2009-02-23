@@ -18,8 +18,8 @@
     </description>
 
     <http:connector name="http.connector">
-        <receiver-threading-profile maxThreadsActive="100"/>
-        <dispatcher-threading-profile maxThreadsActive="100"/>
+        <receiver-threading-profile maxThreadsActive="200"/>
+        <dispatcher-threading-profile maxThreadsActive="200"/>
     </http:connector>
     
     <!-- 
