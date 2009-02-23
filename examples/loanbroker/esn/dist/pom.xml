@@ -14,12 +14,12 @@
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-common</artifactId>
-            <version>${muleVersion}</version>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-common-tests</artifactId>
-            <version>${muleVersion}</version>
+            <version>1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
