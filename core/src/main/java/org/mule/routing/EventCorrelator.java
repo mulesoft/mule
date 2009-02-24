@@ -280,6 +280,7 @@ public class EventCorrelator
             }
 
             // ensure that only one thread at a time evaluates this EventGroup
+            // TODO this sync is useless (local var), need to lock on a field, possibly use lock striping
             synchronized (group)
             {
                 // make sure no other thread removed the group in the meantime
