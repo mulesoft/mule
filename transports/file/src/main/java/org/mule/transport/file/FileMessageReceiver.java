@@ -129,19 +129,19 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             File[] files = this.listFiles();
             if (logger.isDebugEnabled())
             {
-                logger.debug("Files: " + files);
+                logger.debug("Files: " + Arrays.toString(files));
             }
             Comparator comparator = getComparator();
             if (comparator != null)
             {
                 Arrays.sort(files, comparator);
             }
-            for (int i = 0; i < files.length; i++)
+            for (File file : files)
             {
                 // don't process directories
-                if (files[i].isFile())
+                if (file.isFile())
                 {
-                    this.processFile(files[i]);
+                    this.processFile(file);
                 }
             }
         }
@@ -212,7 +212,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             destinationFile = FileUtils.newFile(moveDir, destinationFileName);
         }
 
-        MessageAdapter msgAdapter = null;
+        MessageAdapter msgAdapter;
         try
         {
             if (fc.isStreaming())
@@ -397,7 +397,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     {
         try
         {
-            File[] todoFiles = null;
+            File[] todoFiles;
             if (fileFilter != null)
             {
                 todoFiles = readDirectory.listFiles(fileFilter);
@@ -441,7 +441,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             if (reverseProperty != null)
             {
-                reverse = Boolean.valueOf((String) reverseProperty).booleanValue();
+                reverse = Boolean.valueOf((String) reverseProperty);
             }
             Class clazz = Class.forName(o.toString());
             o = clazz.newInstance();
