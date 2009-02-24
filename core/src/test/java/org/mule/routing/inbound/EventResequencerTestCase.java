@@ -34,7 +34,7 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
         Service testService = getTestService("test", Apple.class);
         assertNotNull(testService);
 
-        SimpleEventResequencer router = new SimpleEventResequencer(3);
+        TestEventResequencer router = new TestEventResequencer(3);
         router.setMuleContext(muleContext);
         router.initialise();
 
@@ -66,7 +66,7 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
 
         // set a resequencing comparator. We need to reset the router since it will not process the same event group
         //twice
-        router = new SimpleEventResequencer(3);
+        router = new TestEventResequencer(3);
         router.setMuleContext(muleContext);
         router.setEventComparator(new EventPayloadComparator());
         router.initialise();
@@ -83,18 +83,18 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
         assertEquals("test event C", results[2].getMessageAsString());
     }
 
-    public static class SimpleEventResequencer extends CorrelationEventResequencer
+    public static class TestEventResequencer extends CorrelationEventResequencer
     {
         private int eventCount = 0;
         private int eventthreshold = 1;
 
-        public SimpleEventResequencer(int eventthreshold)
+        public TestEventResequencer(int eventthreshold)
         {
             super();
             this.eventthreshold = eventthreshold;
             this.setEventComparator(new CorrelationSequenceComparator());
         }
-        
+
         @Override
         protected EventCorrelatorCallback getCorrelatorCallback()
         {

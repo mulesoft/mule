@@ -37,7 +37,7 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
         MuleSession session = getTestSession(testService, muleContext);
 
         InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
-        SimpleEventAggregator router = new SimpleEventAggregator(3);
+        TestEventAggregator router = new TestEventAggregator(3);
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
         router.setMuleContext(muleContext);
@@ -67,12 +67,12 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
         assertEquals("test event A test event B test event C ", results[0].getMessageAsString());
     }
 
-    public static class SimpleEventAggregator extends AbstractEventAggregator
+    public static class TestEventAggregator extends AbstractEventAggregator
     {
         protected final int eventThreshold;
         protected int eventCount = 0;
 
-        public SimpleEventAggregator(int eventThreshold)
+        public TestEventAggregator(int eventThreshold)
         {
             this.eventThreshold = eventThreshold;
         }
