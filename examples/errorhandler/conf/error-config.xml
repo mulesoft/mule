@@ -121,6 +121,7 @@
                     <file:outbound-endpoint path="test-data/exceptions"
                                             outputPattern="Exception-[UUID].xml"
                                             transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML"/>
+                    <payload-type-filter expectedType="org.mule.api.DefaultMuleException"/>
                 </filtering-router>
                 
                 <filtering-router transformer-refs="ErrorMessageToException">
