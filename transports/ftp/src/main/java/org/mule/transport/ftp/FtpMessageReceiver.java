@@ -201,11 +201,6 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void postProcess(FTPClient client, FTPFile file, MuleMessage message) throws Exception
     {
-        if (!client.completePendingCommand())
-        {
-            throw new IOException(MessageFormat.format("Failed to complete a pending command. Retrieveing file {0}. Ftp error: {1}",
-                                                       file.getName(), client.getReplyCode()));
-        }
         if (!client.deleteFile(file.getName()))
         {
             throw new IOException(MessageFormat.format("Failed to delete file {0}. Ftp error: {1}",
@@ -214,6 +209,12 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         if (logger.isDebugEnabled())
         {
             logger.debug("Deleted processed file " + file.getName());
+        }
+        
+        if (!client.completePendingCommand())
+        {
+            throw new IOException(MessageFormat.format("Failed to complete a pending command. Retrieveing file {0}. Ftp error: {1}",
+                                                       file.getName(), client.getReplyCode()));
         }
     }
     
