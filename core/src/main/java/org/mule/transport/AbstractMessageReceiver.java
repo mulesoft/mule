@@ -40,6 +40,9 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 
 import java.io.OutputStream;
+import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all Message
@@ -225,8 +228,8 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
             try
             {
                 logger.trace("Message Payload: \n"
-                        + StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()),
-                        200, false));
+                        + StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false));
+                logger.trace("Message detail: \n" + message);
             }
             catch (Exception e)
             {
