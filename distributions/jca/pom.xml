@@ -157,7 +157,7 @@
         <dependency>
             <groupId>com.yourkit</groupId>
             <artifactId>yjp-controller-api-redist</artifactId>
-            <version>${yourKitVersion}</version>
+            <version>${yourKitVersion}-osgi</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

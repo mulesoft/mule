@@ -162,7 +162,7 @@
         <xmlSecurityVersion>1.4.0</xmlSecurityVersion>
         <wss4jVersion>1.5.4</wss4jVersion>
         <xstreamVersion>1.2.2</xstreamVersion>
-        <yourKitVersion>7.0.10</yourKitVersion>
+        <yourKitVersion>8.0.1</yourKitVersion>
         <xaPoolVersion>1.4</xaPoolVersion>
     </properties>
 
