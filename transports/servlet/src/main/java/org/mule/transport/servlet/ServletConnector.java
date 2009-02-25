@@ -99,6 +99,6 @@ public class ServletConnector extends AbstractConnector
     protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         EndpointURI uri = endpoint.getEndpointURI();
-        return uri.getAddress() + uri.getPath();
+        return uri.getAddress();
     }
 }
