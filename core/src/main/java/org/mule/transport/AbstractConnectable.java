@@ -170,11 +170,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
                 {
                     try
                     {
-                        if (connector.isValidateConnections() && !validateConnection(context).isOk())
-                        {
-                            throw new ConnectException(MessageFactory.createStaticMessage("Failed to connect resource"),
-                                                       context.getLastFailure(), this);
-                        }
                         doConnect();
                         connected.set(true);
 
