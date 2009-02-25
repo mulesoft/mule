@@ -17,11 +17,17 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleParameterized;
 import org.mule.transport.jms.integration.activemq.ActiveMQJmsConfiguration;
+import org.mule.util.IOUtils;
+import org.mule.util.ClassUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
+import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.net.URL;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -73,9 +79,25 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * @return
      */
     @Parameters
-    public static Collection jmsProviderConfigs()
+    public static Collection jmsProviderConfigs() throws Exception
     {
-        return Arrays.asList(new JmsVendorConfiguration[][]{{new ActiveMQJmsConfiguration()}});
+        JmsVendorConfiguration[][] configs = null;
+        URL url = ClassUtils.getResource("jms-vendor-configs.txt", AbstractJmsFunctionalTestCase.class);
+        if(url !=null)
+        {
+            List classes = IOUtils.readLines(url.openStream());
+            configs = new JmsVendorConfiguration[1][classes.size()];
+            int i=0;
+            for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
+            {
+                String cls = (String) iterator.next();
+                configs[0][i] = (JmsVendorConfiguration)ClassUtils.instanciateClass(cls, ClassUtils.NO_ARGS);
+
+            }
+        }
+        return Arrays.asList(configs);
+        //return Arrays.asList(new JmsVendorConfiguration[][]{{new ActiveMQJmsConfiguration()}});
+
     }
 
     /**
