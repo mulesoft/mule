@@ -2,13 +2,11 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
-      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
       xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
       xsi:schemaLocation="
        http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
-       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
-
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd">
+    
     <endpoint name="in" address="${inbound.destination}" />
     <endpoint name="topic" address="${broadcast.topic.destination}"/>
 
