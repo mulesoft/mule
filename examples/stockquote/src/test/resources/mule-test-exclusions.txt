@@ -4,5 +4,6 @@
 
 # Requires tools.jar on the classpath for dynamic client compilation
 org.mule.example.stockquote.WsdlStockQuoteFunctionalTestCase
+# EE-332
 org.mule.example.stockquote.SoapStockQuoteFunctionalTestCase
 org.mule.example.stockquote.RestStockQuoteFunctionalTestCase
