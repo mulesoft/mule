@@ -35,14 +35,14 @@
                     <xsd:element name="return-data" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Defines the data to return from the service once invoked. This can be located in a file (loaded using the {{file}} attribute or the return data can be embeddded directly in the XML file.
+                                Defines the data to return from the service once it has been invoked. The return data can be located in a file, which you specify using the {{file}} attribute (specify a resource on the classpath or on disk), or the return data can be embeddded directly in the XML.
                             </xsd:documentation>
                         </xsd:annotation>
                         <xsd:complexType mixed="true">
                             <xsd:attribute name="file" type="xsd:string">
                                 <xsd:annotation>
                                     <xsd:documentation>
-                                        The location of a file to load as test data. The file can point to a resource on the classpath or on disk.
+                                        The location of a file to load. The file can point to a resource on the classpath or on disk.
                                     </xsd:documentation>
                                 </xsd:annotation>
                             </xsd:attribute>
@@ -52,7 +52,7 @@
                     <xsd:element name="callback" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>
-                                A user-defined callback that is invoked when the test component is invoked. This can be useful for capturing information such as message counts.
+                                A user-defined callback that is invoked when the test component is invoked. This can be useful for capturing information such as message counts. Use the {{class}} attribute to specify the callback class name, which must be an object that implements {{org.mule.tck.functional.EventCallback}}.
                             </xsd:documentation>
                         </xsd:annotation>
                         <xsd:complexType>
