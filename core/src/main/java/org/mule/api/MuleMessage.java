@@ -72,7 +72,7 @@ public interface MuleMessage extends MessageAdapter
 
     /**
      * Will attempt to obtain the payload of this message with the desired Class type. This will
-     * try and resolve a trnsformr that can do this transformation. If a transformer cannot be found
+     * try and resolve a transformer that can do this transformation. If a transformer cannot be found
      * an exception is thrown.  Any transfromers added to the reqgistry will be checked for compatability
      * @param outputType the desired return type
      * @return The converted payload of this message. Note that this method will not alter the payload of this
