@@ -17,7 +17,7 @@
         </xsd:documentation>
 
         <xsd:appinfo>
-            <schemadoc:short-name>Scripting</schemadoc:short-name>
+            <schemadoc:short-name>scripting</schemadoc:short-name>
             <schemadoc:page-title>Scripting Module</schemadoc:page-title>
             
             <schemadoc:additional-documentation where="after-common-elements">
