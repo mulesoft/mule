@@ -14,19 +14,21 @@ import com.yourkit.api.ProfilingModes;
 
 public interface YourKitProfilerServiceMBean
 {
-    public static final long ALLOCATION_RECORDING_ALL = ProfilingModes.ALLOCATION_RECORDING_ALL;
-    public static final long ALLOCATION_RECORDING_ADAPTIVE = ProfilingModes.ALLOCATION_RECORDING_ADAPTIVE;
-    public static final long CPU_SAMPLING = ProfilingModes.CPU_SAMPLING;
-    public static final long CPU_TRACING = ProfilingModes.CPU_TRACING;
-    public static final long MONITOR_PROFILING = ProfilingModes.MONITOR_PROFILING;
-    public static final long CPU_J2EE = ProfilingModes.CPU_J2EE;
-    public static final long SNAPSHOT_WITHOUT_HEAP = ProfilingModes.SNAPSHOT_WITHOUT_HEAP;
-    public static final long SNAPSHOT_WITH_HEAP = ProfilingModes.SNAPSHOT_WITH_HEAP;
-    public static final long SNAPSHOT_HPROF = ProfilingModes.SNAPSHOT_HPROF;
+    // YourKit 8.x API merged all & adaptive into a single constant (2L), but we are keeping them different
+    // for our interface backwards compatibility with MuleHQ
+    long ALLOCATION_RECORDING_ALL = ProfilingModes.ALLOCATION_RECORDING;
+    long ALLOCATION_RECORDING_ADAPTIVE = 66L;
+    long CPU_SAMPLING = ProfilingModes.CPU_SAMPLING;
+    long CPU_TRACING = ProfilingModes.CPU_TRACING;
+    long MONITOR_PROFILING = ProfilingModes.MONITOR_PROFILING;
+    long CPU_J2EE = ProfilingModes.CPU_J2EE;
+    long SNAPSHOT_WITHOUT_HEAP = ProfilingModes.SNAPSHOT_WITHOUT_HEAP;
+    long SNAPSHOT_WITH_HEAP = ProfilingModes.SNAPSHOT_WITH_HEAP;
+    long SNAPSHOT_HPROF = ProfilingModes.SNAPSHOT_HPROF;
     /**
      * this mark is added to getStatus to indicate that captureEverySec was stated
      */
-    public static final long SNAPSHOT_CAPTURING = 256;
+    long SNAPSHOT_CAPTURING = 256;
 
     /**
      * @return name of host where controlled profiled application is running. The method never returns null.

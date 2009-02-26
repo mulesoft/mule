@@ -15,7 +15,6 @@ import org.mule.module.management.i18n.ManagementMessages;
 import com.yourkit.api.Controller;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -71,7 +70,19 @@ public class YourKitProfilerService implements YourKitProfilerServiceMBean
      */
     public void startAllocationRecording(long mode) throws Exception
     {
-        controller.startAllocationRecording(mode);
+        if (ALLOCATION_RECORDING_ADAPTIVE != mode && ALLOCATION_RECORDING_ALL != mode)
+        {
+            throw new IllegalArgumentException("Invalid allocation recording mode requested: " + mode);
+        }
+        if (mode == ALLOCATION_RECORDING_ALL)
+        {
+            controller.startAllocationRecording(true, 1, false, 0);
+        }
+        else
+        {
+            // adaptive, record every 10th object OR above 1MB in size
+            controller.startAllocationRecording(true, 10, true, 1048576);
+        }
     }
 
     /**
