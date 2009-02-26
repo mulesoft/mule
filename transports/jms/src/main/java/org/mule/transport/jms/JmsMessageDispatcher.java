@@ -82,6 +82,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         // template method
     }
 
+    protected boolean isDisableTemporaryDestinations()
+    {
+        return disableTemporaryDestinations;
+    }
+
     private MuleMessage dispatchMessage(MuleEvent event) throws Exception
     {
         Session session = null;
@@ -416,9 +421,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 tempReplyTo = event.getMessage().removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
                 if (tempReplyTo != null)
                 {
-                    if (tempReplyTo.toString().startsWith("jms://"))
+                    int i = tempReplyTo.toString().indexOf("://");
+                    if(i > -1)
                     {
-                        tempReplyTo = tempReplyTo.toString().substring(6);
+                        tempReplyTo = tempReplyTo.toString().substring(i+3);
                     }
                     else
                     {
