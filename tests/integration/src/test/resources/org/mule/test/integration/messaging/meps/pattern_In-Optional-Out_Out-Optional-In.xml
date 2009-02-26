@@ -19,7 +19,7 @@
     <description>
         Receives a message from another party. The service processes the message and then it gets routed via the
         outbound router. The outbound router will wait for a result from the call and will return the result to the
-        originating party if one is received. This pattern is analogous to using Remote Sync on a Mule endpoint. If no
+        originating party if one is received. If no
         result is returned from the outbound call, null is returned.
     </description>
 
@@ -50,8 +50,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint ref="ExternalEndpoint"/>
-                    <!-- Mule will automatically listen n this destination when Remote sync is set. If this is not se
-                     a temprary destination is set up -->
+                    <!-- Mule will automatically listen on this destination when synchronous is true. If this is not set, a temprary destination is set up -->
                     <!--<reply-to address="jms://reply"/>-->
                 </pass-through-router>
             </outbound>
