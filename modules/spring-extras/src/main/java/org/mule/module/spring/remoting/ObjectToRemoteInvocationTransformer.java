@@ -19,6 +19,10 @@ import java.io.ObjectInputStream;
 
 import org.springframework.remoting.support.RemoteInvocation;
 
+/**
+ * Transforms a byte[] into an ObjectInputStream and then into a Spring RemoteInvocation instance.
+ */
+
 public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
 {
 

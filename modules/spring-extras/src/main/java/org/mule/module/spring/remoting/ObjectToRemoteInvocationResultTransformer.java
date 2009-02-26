@@ -18,6 +18,10 @@ import java.io.ObjectOutputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
+/**
+ * Converts an Object to a Spring RemoteInvocationResult and then into a byte[].
+ */
+
 public class ObjectToRemoteInvocationResultTransformer extends AbstractTransformer
 {
 
