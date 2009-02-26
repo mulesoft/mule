@@ -309,7 +309,7 @@
     <xsd:element name="abstract-filenameParser" abstract="true" type="filenameParserType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for flename parser elements.
+                A placeholder for flename parser elements. The filename parser is set on the connector used when writing files to a directory. The parser will convert the {{outputPattern}} attribute to a string using the parser and the current message. The default implmentation used is {{&lt;legacy-filename-parser&gt;}}, but you can specify {{&lt;expression-filename-parser&gt;}} or {{&lt;custom-filename-parser&gt;}}. 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
