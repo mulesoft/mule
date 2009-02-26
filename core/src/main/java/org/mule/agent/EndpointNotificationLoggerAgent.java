@@ -82,6 +82,12 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
 
     protected void logEvent(ServerNotification e)
     {
+        if (muleContext.isDisposing() || muleContext.isDisposed())
+        {
+            logger.warn("MuleContext is disposing/disposed, no notification will be processed");
+            return;
+        }
+        
         if (logEndpoint != null && !ignoredNotifications.contains(new Integer(e.getAction())))
         {
             if ((e.getAction() == ConnectionNotification.CONNECTION_FAILED || e.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED)

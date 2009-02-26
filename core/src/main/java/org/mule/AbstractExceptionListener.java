@@ -332,12 +332,15 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     protected void closeStream(MuleMessage message)
     {
-        if (muleContext != null
-            && message != null
+        if (muleContext == null || muleContext.isDisposing() || muleContext.isDisposed())
+        {
+            return;
+        }
+        if (message != null
             && muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE) != null)
         {
             ((StreamCloserService) muleContext.getRegistry().lookupObject(
-                MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).closeStream(message.getPayload());
+                    MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).closeStream(message.getPayload());
         }
     }
 
