@@ -84,7 +84,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
     {
         if (muleContext.isDisposing() || muleContext.isDisposed())
         {
-            logger.warn("MuleContext is disposing/disposed, no notification will be processed");
+            logger.warn("MuleContext is disposing/disposed, no notification will be processed: "+ e);
             return;
         }
         
