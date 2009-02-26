@@ -26,6 +26,13 @@
     </modules>
 
     <build>
+        <!-- TODO We could make tomcat:run the top-level goal so that typing "mvn" would run both webapps.
+        However, there's no way to fork the two modules yet, so the first one blocks the second one, see:
+        https://jira.codehaus.org/browse/MTOMCAT-20
+
+        <defaultGoal>tomcat:run</defaultGoal>
+        -->
+        
         <defaultGoal>install</defaultGoal>
 
         <plugins>
