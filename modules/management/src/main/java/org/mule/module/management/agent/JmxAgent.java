@@ -269,6 +269,7 @@ public class JmxAgent extends AbstractAgent
             MBeanServerFactory.releaseMBeanServer(mBeanServer);
         }
         mBeanServer = null;
+        serverCreated.compareAndSet(true, false);
         initialized.set(false);
     }
 
