@@ -27,47 +27,22 @@
             <artifactId>mule-example-loanbroker-credit-agency</artifactId>
             <version>${version}</version>
         </dependency>
+
         <dependency>
             <groupId>openejb</groupId>
             <artifactId>openejb-core</artifactId>
-            <version>1.0</version>
             <scope>provided</scope>
-            <exclusions>
-                <!-- exclude older concurrency backport -->
-                <exclusion>
-                    <groupId>backport-util-concurrent</groupId>
-                    <artifactId>backport-util-concurrent</artifactId>
-                </exclusion>
-                <!-- Tries to pull an unpublished castor version -->
-                <exclusion>
-                    <groupId>castor</groupId>
-                    <artifactId>castor</artifactId>
-                </exclusion>
-                <!-- we like slf4j -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <!-- no old xerces please -->
-                <!-- apparently scope=provided and dependencyManagement don't get along? -->
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>1.0</version>
         </dependency>
+        <!-- TODO MULE-4215
         <dependency>
-            <!-- But still need castor at runtime -->
-            <groupId>castor</groupId>
-            <artifactId>castor</artifactId>
-            <version>1.0</version>
+            <groupId>org.apache.openejb</groupId>
+            <artifactId>openejb-core</artifactId>
             <scope>provided</scope>
+            <version>3.1</version>
         </dependency>
-
+        -->
+        
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-core</artifactId>
