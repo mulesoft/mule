@@ -37,12 +37,12 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
         this.setReturnClass(byte[].class);
     }
 
-    public boolean isAcceptUMOMessage()
+    public boolean isAcceptMuleMessage()
     {
         return this.isSourceTypeSupported(MuleMessage.class, true);
     }
 
-    public void setAcceptUMOMessage(boolean value)
+    public void setAcceptMuleMessage(boolean value)
     {
         if (value)
         {
@@ -52,6 +52,24 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
         {
             this.unregisterSourceType(MuleMessage.class);
         }
+    }
+
+    /**
+     * @deprecated use {@link #isAcceptMuleMessage}
+     */
+    @Deprecated
+    public boolean isAcceptUMOMessage()
+    {
+        return isAcceptMuleMessage();
+    }
+
+    /**
+     * @deprecated use {@link #isAcceptMuleMessage}
+     */
+    @Deprecated
+    public void setAcceptUMOMessage(boolean value)
+    {
+        setAcceptMuleMessage(value);
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException
