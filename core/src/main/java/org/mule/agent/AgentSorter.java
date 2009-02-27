@@ -25,15 +25,15 @@ import org.apache.commons.collections.Predicate;
  * Sort {@link Agent} instances so that dependencies of each agent are started before the 
  * actual {@link Agent} is started itself.
  */
-public class AgentSorter extends Object
+public class AgentSorter
 {
-    
-    public static List sortAgents(Collection/*<Agent>*/ agents)
+    @SuppressWarnings("unchecked")
+    public static List sortAgents(Collection<Agent> agents)
     {
-        List sortedAgents = new ArrayList();
+        List<Agent> sortedAgents = new ArrayList<Agent>();
         
         // step 1: add all agents with no dependencies
-        Collection agentsWithoutDependencies = CollectionUtils.select(agents, new Predicate()
+        Collection<Agent> agentsWithoutDependencies = CollectionUtils.select(agents, new Predicate()
         {
             public boolean evaluate(Object object)
             {
@@ -43,7 +43,7 @@ public class AgentSorter extends Object
         sortedAgents.addAll(agentsWithoutDependencies);
         
         // step 2: process the remaining agents
-        List remainingAgents = new ArrayList(agents);
+        List<Agent> remainingAgents = new ArrayList<Agent>(agents);
         remainingAgents.removeAll(agentsWithoutDependencies);
         while (!remainingAgents.isEmpty())
         {
@@ -98,7 +98,7 @@ public class AgentSorter extends Object
         return CollectionUtils.exists(collection, new ClassEqualityPredicate(clazz));
     }
     
-    private static class ClassEqualityPredicate extends Object implements Predicate
+    private static class ClassEqualityPredicate implements Predicate
     {
         private Class requiredClass;
 
