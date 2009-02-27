@@ -46,7 +46,7 @@ public class PoolingProfile
     public static final int WHEN_EXHAUSTED_GROW = 2;
 
     /**
-     * Controls the maximum number of Mule UMOs that can be borrowed from a service
+     * Controls the maximum number of Mule components that can be borrowed from a service
      * pool at one time. When non-positive, there is no limit to the number of
      * components that may be active at one time. When maxActive is exceeded, the
      * pool is said to be exhausted. You can specify this value on the descriptor
@@ -55,8 +55,8 @@ public class PoolingProfile
     public static final int DEFAULT_MAX_POOL_ACTIVE = 5;
 
     /**
-     * Controls the maximum number of Mule UMOs that can sit idle in the pool at any
-     * time. When non-positive, there is no limit to the number of Mule UMOs that may
+     * Controls the maximum number of Mule components that can sit idle in the pool at any
+     * time. When non-positive, there is no limit to the number of Mule components that may
      * be idle at one time. You can specify this value on the descriptor declaration.
      * If none is set this value will be used. If this value is not set then a system
      * default of '5' will be used.
@@ -71,7 +71,7 @@ public class PoolingProfile
     public static final long DEFAULT_MAX_POOL_WAIT = 4000;
 
     /**
-     * Specifies the behaviour of the Mule UMO pool when the pool is exhausted:
+     * Specifies the behaviour of the Mule component pool when the pool is exhausted:
      * <ul>
      * <li>WHEN_EXHAUSTED_FAIL : will throw a NoSuchElementException</li>
      * <li>WHEN_EXHAUSTED_WAIT : will block (invoke Object.wait(long) until a new or
@@ -107,14 +107,9 @@ public class PoolingProfile
             // if the values were an actual enum in ObjectPool we could iterate
             // properly.. :/
 
-            Integer value = new Integer(WHEN_EXHAUSTED_WAIT);
-            this.put("WHEN_EXHAUSTED_WAIT", value);
-
-            value = new Integer(WHEN_EXHAUSTED_FAIL);
-            this.put("WHEN_EXHAUSTED_FAIL", value);
-
-            value = new Integer(WHEN_EXHAUSTED_GROW);
-            this.put("WHEN_EXHAUSTED_GROW", value);
+            this.put("WHEN_EXHAUSTED_WAIT", WHEN_EXHAUSTED_WAIT);
+            this.put("WHEN_EXHAUSTED_FAIL", WHEN_EXHAUSTED_FAIL);
+            this.put("WHEN_EXHAUSTED_GROW", WHEN_EXHAUSTED_GROW);
         }
     };
 
@@ -125,14 +120,9 @@ public class PoolingProfile
 
         // static initializer
         {
-            Integer value = new Integer(INITIALISE_NONE);
-            this.put("INITIALISE_NONE", value);
-
-            value = new Integer(INITIALISE_ONE);
-            this.put("INITIALISE_ONE", value);
-
-            value = new Integer(INITIALISE_ALL);
-            this.put("INITIALISE_ALL", value);
+            this.put("INITIALISE_NONE", INITIALISE_NONE);
+            this.put("INITIALISE_ONE", INITIALISE_ONE);
+            this.put("INITIALISE_ALL", INITIALISE_ALL);
         }
     };
 
@@ -145,8 +135,6 @@ public class PoolingProfile
     private int exhaustedAction = DEFAULT_POOL_EXHAUSTED_ACTION;
 
     private int initialisationPolicy = DEFAULT_POOL_INITIALISATION_POLICY;
-
-//    private UMOPoolFactory poolFactory = new CommonsPoolFactory();
 
     public PoolingProfile()
     {
@@ -180,7 +168,7 @@ public class PoolingProfile
     }
 
     /**
-     * @return max number of Mule UMOs that can be idle in a service
+     * @return max number of Mule components that can be idle in a service
      */
     public int getMaxIdle()
     {
@@ -188,7 +176,7 @@ public class PoolingProfile
     }
 
     /**
-     * @return max number of Mule UMOs that can be active in a service
+     * @return max number of Mule components that can be active in a service
      */
     public int getMaxActive()
     {
@@ -196,8 +184,8 @@ public class PoolingProfile
     }
 
     /**
-     * @return time in miilisconds to wait for a Mule UMO to be available in a
-     *         service when the pool of Mule UMOs is exhausted and the
+     * @return time in miilisconds to wait for a Mule component to be available in a
+     *         service when the pool of Mule components is exhausted and the
      *         PoolExhaustedAction is set to WHEN_EXHAUSTED_BLOCK
      */
     public long getMaxWait()
@@ -206,7 +194,7 @@ public class PoolingProfile
     }
 
     /**
-     * @return the action when the Mule UMO pool is exhaused for a service
+     * @return the action when the Mule component pool is exhaused for a service
      */
     public int getExhaustedAction()
     {
