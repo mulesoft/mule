@@ -27,7 +27,7 @@ import java.util.Comparator;
  * parts so that another router such as the <i>CorrelationEventResequencer</i> can
  * receive the parts and reorder or merge them.
  */
-public abstract class CorrelationEventResequencer extends AbstractEventAggregator
+public class CorrelationEventResequencer extends AbstractEventAggregator
 {
     protected Comparator eventComparator;
 
