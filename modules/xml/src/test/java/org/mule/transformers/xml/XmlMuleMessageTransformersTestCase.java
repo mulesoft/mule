@@ -1,5 +1,5 @@
 /*
- * $Id:XmlUMOMessageTransformersTestCase.java 5937 2007-04-09 22:35:04Z rossmason $
+ * $Id:XmlMuleMessageTransformersTestCase.java 5937 2007-04-09 22:35:04Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -25,11 +25,11 @@ import java.util.Map;
 
 import org.custommonkey.xmlunit.XMLAssert;
 
-public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTestCase
+public class XmlMuleMessageTransformersTestCase extends AbstractXmlTransformerTestCase
 {
     private MuleMessage testObject = null;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         Map props = new HashMap();
@@ -43,7 +43,7 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
             .getTestSession(muleContext), true));
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         RequestContext.clear();
@@ -138,10 +138,10 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
 
     /**
      * Different JVMs serialize fields to XML in a different order, in which case we
-     * need to check for the actual contents. We reconstruct the UMOMessages from the
+     * need to check for the actual contents. We reconstruct the Mule Messages from the
      * generated XML and compare them as objects.
      */
-    // @Override
+    @Override
     public boolean compareResults(Object expected, Object result)
     {
         if (!super.compareResults(expected, result))
