@@ -64,7 +64,7 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
     }
 
     /**
-     * @deprecated use {@link #isAcceptMuleMessage}
+     * @deprecated use {@link #setAcceptMuleMessage(boolean)}
      */
     @Deprecated
     public void setAcceptUMOMessage(boolean value)
