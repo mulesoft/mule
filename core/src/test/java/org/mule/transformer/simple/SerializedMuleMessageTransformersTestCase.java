@@ -1,5 +1,5 @@
 /*
- * $Id:SerializedUMOMessageTransformersTestCase.java 5937 2007-04-09 22:35:04Z rossmason $
+ * $Id:SerializedMuleMessageTransformersTestCase.java 5937 2007-04-09 22:35:04Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
-public class SerializedUMOMessageTransformersTestCase extends AbstractTransformerTestCase
+public class SerializedMuleMessageTransformersTestCase extends AbstractTransformerTestCase
 {
     private MuleMessage testObject = null;
 
@@ -45,14 +45,13 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
                 MuleTestUtils.getTestSession(muleContext), true));
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         RequestContext.clear();
     }
 
-    // @Override
-
+    @Override
     public void testTransform() throws Exception
     {
         // this depends on the ordering of properties in the map.
