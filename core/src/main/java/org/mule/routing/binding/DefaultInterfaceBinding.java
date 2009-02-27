@@ -69,12 +69,6 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
         this.methodName = methodName;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.routing.InterfaceBinding#createProxy(java.lang.Object,
-     *      UMODescriptor descriptor java.lang.Class)
-     */
     public Object createProxy(Object target)
     {
         try

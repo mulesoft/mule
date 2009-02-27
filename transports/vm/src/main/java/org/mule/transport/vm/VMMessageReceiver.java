@@ -183,7 +183,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
     protected void processMessage(Object msg) throws Exception
     {
-        // getMessages() returns UMOEvents
         MuleMessage message = (MuleMessage) msg;
 
         // Rewrite the message to treat it as a new message

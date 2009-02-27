@@ -122,7 +122,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
             }
             catch (Exception e)
             {
-                throw new DefaultMuleException(CoreMessages.failedToStart("UMO Service: "
+                throw new DefaultMuleException(CoreMessages.failedToStart("Service: "
                                                                           + component.getService().getName()), e);
             }
         }
@@ -148,7 +148,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
             }
             catch (Exception e)
             {
-                throw new DefaultMuleException(CoreMessages.failedToStop("UMO Service: "
+                throw new DefaultMuleException(CoreMessages.failedToStop("Service: "
                                                                          + component.getService().getName()), e);
             }
         }

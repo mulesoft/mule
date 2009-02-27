@@ -21,13 +21,13 @@ public class RestServiceException extends MessagingException
      */
     private static final long serialVersionUID = -1026055907767407433L;
 
-    public RestServiceException(Message message, MuleMessage umoMessage)
+    public RestServiceException(Message message, MuleMessage muleMessage)
     {
-        super(message, umoMessage);
+        super(message, muleMessage);
     }
 
-    public RestServiceException(Message message, MuleMessage umoMessage, Throwable cause)
+    public RestServiceException(Message message, MuleMessage muleMessage, Throwable cause)
     {
-        super(message, umoMessage, cause);
+        super(message, muleMessage, cause);
     }
 }

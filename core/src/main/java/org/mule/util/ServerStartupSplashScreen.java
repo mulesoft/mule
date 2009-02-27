@@ -90,11 +90,11 @@ public class ServerStartupSplashScreen extends SplashScreen
         else
         {
             footer.add(CoreMessages.agentsRunning().getMessage());
-            Agent umoAgent;
+            Agent agent;
             for (Iterator iterator = agents.iterator(); iterator.hasNext();)
             {
-                umoAgent = (Agent) iterator.next();
-                footer.add("  " + umoAgent.getDescription());
+                agent = (Agent) iterator.next();
+                footer.add("  " + agent.getDescription());
             }
         }
     }    

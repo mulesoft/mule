@@ -40,8 +40,8 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
         assertEquals(results.size(), getNumberOfMessages());
         for (Iterator iterator = results.iterator(); iterator.hasNext();)
         {
-            MuleMessage umoMessage = (MuleMessage)iterator.next();
-            assertEquals("request received by service 3", umoMessage.getPayloadAsString());
+            MuleMessage message = (MuleMessage)iterator.next();
+            assertEquals("request received by service 3", message.getPayloadAsString());
         }
     }
 
@@ -64,8 +64,8 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
         assertEquals(results.size(), getNumberOfMessages());
         for (Iterator iterator = results.iterator(); iterator.hasNext();)
         {
-            MuleMessage umoMessage = (MuleMessage)iterator.next();
-            assertEquals("request received by service 3", umoMessage.getPayloadAsString());
+            MuleMessage message = (MuleMessage)iterator.next();
+            assertEquals("request received by service 3", message.getPayloadAsString());
         }
     }
 

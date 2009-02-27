@@ -89,15 +89,15 @@ public class AxisServiceProxy
 
                 if (wsException != null)
                 {
-                    MuleException umoException = ExceptionHelper.getRootMuleException(wsException.getException());
+                    MuleException exception = ExceptionHelper.getRootMuleException(wsException.getException());
                     // if the exception has a cause, then throw only the cause
-                    if (umoException.getCause() != null)
+                    if (exception.getCause() != null)
                     {
-                        throw umoException.getCause();
+                        throw exception.getCause();
                     }
                     else
                     {
-                        throw umoException;
+                        throw exception;
                     }
                 }
 

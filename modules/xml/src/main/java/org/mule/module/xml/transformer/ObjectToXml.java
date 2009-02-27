@@ -18,7 +18,7 @@ import org.mule.api.transformer.TransformerException;
  * some clever tricks so objects that get marshalled to XML do not need to implement
  * any interfaces including Serializable and you don't even need to specify a default
  * constructor. If <code>MuleMessage</code> is configured as a source type on this
- * transformer by calling <code>setAcceptUMOMessage(true)</code> then the MuleMessage
+ * transformer by calling <code>setAcceptMuleMessage(true)</code> then the MuleMessage
  * will be serialised. This is useful for transports such as TCP where the message
  * headers would normally be lost.
  */

@@ -19,13 +19,13 @@ import org.mule.config.i18n.Message;
  */
 public abstract class SecurityException extends MessagingException
 {
-    protected SecurityException(Message message, MuleMessage umoMessage)
+    protected SecurityException(Message message, MuleMessage muleMessage)
     {
-        super(message, umoMessage);
+        super(message, muleMessage);
     }
 
-    protected SecurityException(Message message, MuleMessage umoMessage, Throwable cause)
+    protected SecurityException(Message message, MuleMessage muleMessage, Throwable cause)
     {
-        super(message, umoMessage, cause);
+        super(message, muleMessage, cause);
     }
 }

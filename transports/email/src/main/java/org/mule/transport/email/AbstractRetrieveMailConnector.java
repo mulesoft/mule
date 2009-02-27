@@ -79,15 +79,12 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
         backupFolder = string;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transport.UMOConnector#registerListener(javax.jms.MessageListener,
-     *      java.lang.String)
+    /**
+     * @see org.mule.api.transport.Connector#registerListener(org.mule.api.service.Service, org.mule.api.endpoint.InboundEndpoint) 
      */
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
-        Object[] args = {new Long(checkFrequency), Boolean.valueOf(isBackupEnabled()), backupFolder};
+        Object[] args = {checkFrequency, isBackupEnabled(), backupFolder};
         return serviceDescriptor.createMessageReceiver(this, service, endpoint, args);
     }
 

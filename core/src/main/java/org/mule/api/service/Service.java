@@ -81,7 +81,7 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
     boolean isPaused();
     
     /**
-     * The exception strategy to use to handle exceptions in the Mule UMO.
+     * The exception strategy to use to handle exceptions in the Mule component.
      *
      * @return the exception strategy to use. If none has been set a default will be
      *         used.
@@ -136,7 +136,7 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
     Model getModel();
 
     /**
-     * The exception strategy to use to handle exceptions in the Mule UMO.
+     * The exception strategy to use to handle exceptions in the Mule component.
      * 
      * @param listener the exception strategy to use. If none has been set or
      *            argument is null a default

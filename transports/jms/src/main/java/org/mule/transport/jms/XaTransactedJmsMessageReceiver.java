@@ -76,16 +76,16 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         }
     }
 
-    public XaTransactedJmsMessageReceiver(Connector umoConnector, Service service, InboundEndpoint endpoint)
+    public XaTransactedJmsMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
         throws CreateException
     {
-        super(umoConnector, service, endpoint);
+        super(connector, service, endpoint);
         // TODO AP: find appropriate value for polling frequency with the scheduler;
         // see setFrequency/setTimeUnit & VMMessageReceiver for more
         this.setTimeUnit(DEFAULT_JMS_POLL_TIMEUNIT);
         this.setFrequency(MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency", DEFAULT_JMS_POLL_FREQUENCY));
 
-        this.connector = (JmsConnector) umoConnector;
+        this.connector = (JmsConnector) connector;
         this.timeout = endpoint.getTransactionConfig().getTimeout();
 
         // If reconnection is configured, default reuse strategy to false
@@ -104,7 +104,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             this.reuseSession);
 
         // Do extra validation, XA Topic & reuse are incompatible. See MULE-2622
-        boolean topic = connector.getTopicResolver().isTopic(getEndpoint());
+        boolean topic = this.connector.getTopicResolver().isTopic(getEndpoint());
         if (topic && (reuseConsumer || reuseSession))
         {
             logger.warn("Destination " + getEndpoint().getEndpointURI() + " is a topic and XA transaction was " +

@@ -32,21 +32,21 @@ public class DispatchException extends RoutingException
         super(message, endpoint);
     }
 
-    public DispatchException(MuleMessage umoMessage, ImmutableEndpoint endpoint, Throwable cause)
+    public DispatchException(MuleMessage message, ImmutableEndpoint endpoint, Throwable cause)
     {
-        super(umoMessage, endpoint, cause);
+        super(message, endpoint, cause);
     }
 
-    public DispatchException(Message message, MuleMessage umoMessage, ImmutableEndpoint endpoint)
+    public DispatchException(Message message, MuleMessage muleMessage, ImmutableEndpoint endpoint)
     {
-        super(message, umoMessage, endpoint);
+        super(message, muleMessage, endpoint);
     }
 
     public DispatchException(Message message,
-                             MuleMessage umoMessage,
+                             MuleMessage muleMessage,
                              ImmutableEndpoint endpoint,
                              Throwable cause)
     {
-        super(message, umoMessage, endpoint, cause);
+        super(message, muleMessage, endpoint, cause);
     }
 }

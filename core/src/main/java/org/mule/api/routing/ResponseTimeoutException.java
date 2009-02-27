@@ -27,16 +27,16 @@ public class ResponseTimeoutException extends RoutingException
      */
     private static final long serialVersionUID = 6882278747922113239L;
 
-    public ResponseTimeoutException(Message message, MuleMessage umoMessage, ImmutableEndpoint endpoint)
+    public ResponseTimeoutException(Message message, MuleMessage muleMessage, ImmutableEndpoint endpoint)
     {
-        super(message, umoMessage, endpoint);
+        super(message, muleMessage, endpoint);
     }
 
     public ResponseTimeoutException(Message message,
-                                    MuleMessage umoMessage,
+                                    MuleMessage muleMessage,
                                     ImmutableEndpoint endpoint,
                                     Throwable cause)
     {
-        super(message, umoMessage, endpoint, cause);
+        super(message, muleMessage, endpoint, cause);
     }
 }

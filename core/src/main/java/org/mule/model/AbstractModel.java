@@ -30,14 +30,13 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>MuleModel</code> is the default implementation of the Model. The model
  * encapsulates and manages the runtime behaviour of a Mule Server instance. It is
- * responsible for maintaining the UMOs instances and their configuration.
+ * responsible for maintaining the service instances and their configuration.
  */
 public abstract class AbstractModel implements Model
 {
@@ -54,21 +53,11 @@ public abstract class AbstractModel implements Model
     protected transient Log logger = LogFactory.getLog(getClass());
     protected MuleContext muleContext;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.UMOModel#getName()
-     */
     public String getName()
     {
         return name;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.UMOModel#setName(java.lang.String)
-     */
     public void setName(String name)
     {
         this.name = name;

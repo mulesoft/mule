@@ -25,13 +25,13 @@ public class EncryptionNotSupportedException extends SecurityException
      */
     private static final long serialVersionUID = -1661059380853528623L;
 
-    public EncryptionNotSupportedException(Message message, MuleMessage umoMessage)
+    public EncryptionNotSupportedException(Message message, MuleMessage muleMessage)
     {
-        super(message, umoMessage);
+        super(message, muleMessage);
     }
 
-    public EncryptionNotSupportedException(Message message, MuleMessage umoMessage, Throwable cause)
+    public EncryptionNotSupportedException(Message message, MuleMessage muleMessage, Throwable cause)
     {
-        super(message, umoMessage, cause);
+        super(message, muleMessage, cause);
     }
 }

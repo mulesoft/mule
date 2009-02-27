@@ -15,7 +15,7 @@ import org.mule.api.MuleException;
 import java.util.Date;
 
 /**
- * <code>MuleServiceMBean</code> is a JMX service interface for the UMOManager
+ * <code>MuleServiceMBean</code> is a JMX service interface for the MuleContext.
  * 
  */
 public interface MuleServiceMBean

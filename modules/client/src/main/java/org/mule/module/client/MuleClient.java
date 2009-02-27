@@ -61,7 +61,6 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -101,7 +100,7 @@ public class MuleClient implements Disposable
     protected static final Log logger = LogFactory.getLog(MuleClient.class);
 
     /**
-     * the local UMOManager instance
+     * The local MuleContext instance.
      */
     private MuleContext muleContext;
 
@@ -888,7 +887,7 @@ public class MuleClient implements Disposable
     /**
      * The overriding method may want to return a custom {@link MuleContext} here
      * 
-     * @return the UMOManager to use
+     * @return the MuleContext to use
      */
     public MuleContext getMuleContext()
     {

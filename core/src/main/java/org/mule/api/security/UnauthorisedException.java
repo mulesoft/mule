@@ -37,22 +37,22 @@ public class UnauthorisedException extends SecurityException
         super(message, RequestContext.getEventContext().getMessage(), cause);
     }
 
-    public UnauthorisedException(Message message, MuleMessage umoMessage)
+    public UnauthorisedException(Message message, MuleMessage muleMessage)
     {
-        super(message, umoMessage);
+        super(message, muleMessage);
     }
 
-    public UnauthorisedException(Message message, MuleMessage umoMessage, Throwable cause)
+    public UnauthorisedException(Message message, MuleMessage muleMessage, Throwable cause)
     {
-        super(message, umoMessage, cause);
+        super(message, muleMessage, cause);
     }
 
-    public UnauthorisedException(MuleMessage umoMessage,
+    public UnauthorisedException(MuleMessage message,
                                  SecurityContext context,
                                  ImmutableEndpoint endpoint,
                                  EndpointSecurityFilter filter)
     {
-        super(constructMessage(context, endpoint, filter), umoMessage);
+        super(constructMessage(context, endpoint, filter), message);
     }
 
     private static Message constructMessage(SecurityContext context,
@@ -60,7 +60,7 @@ public class UnauthorisedException extends SecurityException
                                             EndpointSecurityFilter filter)
     {
 
-        Message m = null;
+        Message m;
         if (context == null)
         {
             m = CoreMessages.authSetButNoContext(filter.getClass().getName());

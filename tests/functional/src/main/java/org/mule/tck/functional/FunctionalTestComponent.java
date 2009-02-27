@@ -254,13 +254,12 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      * An MuleEvent callback isn't strictly required but it is usfal for performing assertions
      * on the current message being received.
      * Note that the FunctionalTestComponent should be made a singleton
-     * {@link org.mule.api.UMODescriptor#setSingleton} when using MuleEvent callbacks
+     * when using MuleEvent callbacks
      * <p/>
      * Another option is to register a {@link org.mule.tck.functional.FunctionalTestNotificationListener} with Mule and this
      * will deleiver a {@link org.mule.tck.functional.FunctionalTestNotification} for every message received by this service
      *
      * @return the callback to call when a message is received
-     * @see org.mule.api.UMODescriptor
      * @see FunctionalTestNotification
      * @see FunctionalTestNotificationListener
      */
@@ -274,13 +273,12 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      * An MuleEvent callback isn't strictly required but it is usfal for performing assertions
      * on the current message being received.
      * Note that the FunctionalTestComponent should be made a singleton
-     * {@link org.mule.api.UMODescriptor#setSingleton} when using MuleEvent callbacks
+     * when using MuleEvent callbacks
      * <p/>
      * Another option is to register a {@link org.mule.tck.functional.FunctionalTestNotificationListener} with Mule and this
      * will deleiver a {@link org.mule.tck.functional.FunctionalTestNotification} for every message received by this service
      *
      * @param eventCallback the callback to call when a message is received
-     * @see org.mule.api.UMODescriptor
      * @see FunctionalTestNotification
      * @see FunctionalTestNotificationListener
      */

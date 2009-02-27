@@ -110,8 +110,8 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                 int i = in.read();
                 //Roll back our read
                 in.unread(i);
-                MuleMessage umoMessage = new DefaultMuleMessage(connector.getMessageAdapter(in));
-                routeMessage(umoMessage, endpoint.isSynchronous());
+                MuleMessage message = new DefaultMuleMessage(connector.getMessageAdapter(in));
+                routeMessage(message, endpoint.isSynchronous());
             }
             else
             {
@@ -146,8 +146,8 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                     finalMessageString = fullBuffer.toString();
                 }
 
-                MuleMessage umoMessage = new DefaultMuleMessage(connector.getMessageAdapter(finalMessageString));
-                routeMessage(umoMessage, endpoint.isSynchronous());
+                MuleMessage message = new DefaultMuleMessage(connector.getMessageAdapter(finalMessageString));
+                routeMessage(message, endpoint.isSynchronous());
             }
 
             doConnect();

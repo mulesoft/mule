@@ -16,8 +16,6 @@ import org.mule.api.context.notification.ServerNotification;
  * <code>ManagementNotification</code> is fired when monitored resources such as
  * internal queues reach capacity
  * 
- * @see org.mule.MuleManager
- * @see org.mule.api.context.UMOManager
  */
 public class ManagementNotification extends ServerNotification
 {

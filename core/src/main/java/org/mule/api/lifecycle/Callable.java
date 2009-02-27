@@ -13,8 +13,8 @@ package org.mule.api.lifecycle;
 import org.mule.api.MuleEventContext;
 
 /**
- * <code>Callable</code> is used to provide UMOs with an interface that supports
- * event calls. UMO components do not have to implement this interface, though the
+ * <code>Callable</code> is used to provide a Service with an interface that supports
+ * event calls. Components do not have to implement this interface, though the
  * <code>onCall</code> method provides an example lifecycle method that is executed
  * when an event is received for the implementing service.
  */
@@ -32,7 +32,7 @@ public interface Callable extends EventListener
      *         the returned object as the payload. This new event will then get
      *         published via the configured outbound router if-
      *         <ol>
-     *         <li>One has been configured for the UMO.</li>
+     *         <li>One has been configured for the component.</li>
      *         <li>the <code>setStopFurtherProcessing(true)</code> wasn't called
      *         on the event context event.</li>
      *         </ol>

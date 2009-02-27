@@ -32,9 +32,9 @@ public class ServiceException extends MessagingException
     /**
      * @param message the exception message
      */
-    public ServiceException(Message message, MuleMessage umoMessage, Service service)
+    public ServiceException(Message message, MuleMessage muleMessage, Service service)
     {
-        super(generateMessage(message, service), umoMessage);
+        super(generateMessage(message, service), muleMessage);
         this.service = service;
     }
 
@@ -42,15 +42,15 @@ public class ServiceException extends MessagingException
      * @param message the exception message
      * @param cause the exception that cause this exception to be thrown
      */
-    public ServiceException(Message message, MuleMessage umoMessage, Service service, Throwable cause)
+    public ServiceException(Message message, MuleMessage muleMessage, Service service, Throwable cause)
     {
-        super(generateMessage(message, service), umoMessage, cause);
+        super(generateMessage(message, service), muleMessage, cause);
         this.service = service;
     }
 
-    public ServiceException(MuleMessage umoMessage, Service service, Throwable cause)
+    public ServiceException(MuleMessage message, Service service, Throwable cause)
     {
-        super(generateMessage(null, service), umoMessage, cause);
+        super(generateMessage(null, service), message, cause);
         this.service = service;
     }
 

@@ -211,18 +211,18 @@ public abstract class MuleException extends Exception
             return false;
         }
 
-        final MuleException umoException = (MuleException) o;
+        final MuleException exception = (MuleException) o;
 
-        if (errorCode != umoException.errorCode)
+        if (errorCode != exception.errorCode)
         {
             return false;
         }
         if (i18nMessage != null
-                        ? !i18nMessage.equals(umoException.i18nMessage) : umoException.i18nMessage != null)
+                        ? !i18nMessage.equals(exception.i18nMessage) : exception.i18nMessage != null)
         {
             return false;
         }
-        if (message != null ? !message.equals(umoException.message) : umoException.message != null)
+        if (message != null ? !message.equals(exception.message) : exception.message != null)
         {
             return false;
         }

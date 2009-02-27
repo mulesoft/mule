@@ -15,9 +15,9 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.Authentication;
+import org.mule.api.security.SecurityContext;
 import org.mule.api.security.SecurityException;
 import org.mule.api.security.SecurityProviderNotFoundException;
-import org.mule.api.security.SecurityContext;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.api.security.UnsupportedAuthenticationSchemeException;
@@ -131,11 +131,11 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
 
             Authentication authResult;
 
-            Authentication umoAuthentication = new AcegiAuthenticationAdapter(authRequest);
+            Authentication authentication = new AcegiAuthenticationAdapter(authRequest);
 
             try
             {
-                authResult = getSecurityManager().authenticate(umoAuthentication);
+                authResult = getSecurityManager().authenticate(authentication);
             }
             catch (AuthenticationException e)
             {

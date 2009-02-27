@@ -37,24 +37,24 @@ public class RoutingException extends MessagingException
         this.endpoint = endpoint;
     }
 
-    public RoutingException(MuleMessage umoMessage, ImmutableEndpoint endpoint, Throwable cause)
+    public RoutingException(MuleMessage message, ImmutableEndpoint endpoint, Throwable cause)
     {
-        super(generateMessage(null, endpoint), umoMessage, cause);
+        super(generateMessage(null, endpoint), message, cause);
         this.endpoint = endpoint;
     }
 
-    public RoutingException(Message message, MuleMessage umoMessage, ImmutableEndpoint endpoint)
+    public RoutingException(Message message, MuleMessage muleMessage, ImmutableEndpoint endpoint)
     {
-        super(generateMessage(message, endpoint), umoMessage);
+        super(generateMessage(message, endpoint), muleMessage);
         this.endpoint = endpoint;
     }
 
     public RoutingException(Message message,
-                            MuleMessage umoMessage,
+                            MuleMessage muleMessage,
                             ImmutableEndpoint endpoint,
                             Throwable cause)
     {
-        super(generateMessage(message, endpoint), umoMessage, cause);
+        super(generateMessage(message, endpoint), muleMessage, cause);
         this.endpoint = endpoint;
     }
 

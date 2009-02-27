@@ -133,11 +133,10 @@ public class TransformerUtils
     }
 
     /**
-     * Builds a list of UMOTransformers.
+     * Builds a list of Transformers.
      *
      * @param names - a list of transformers separated by commans
      * @return a list (possibly empty) of transformers or
-     * {@link TransformerUtils#UNDEFINED} if the names list is null
      * @throws org.mule.api.DefaultMuleException
      */
     public static List getTransformers(String names) throws DefaultMuleException

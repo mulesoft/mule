@@ -31,21 +31,21 @@ public class CouldNotRouteOutboundMessageException extends RoutingException
         super(message, endpoint);
     }
 
-    public CouldNotRouteOutboundMessageException(MuleMessage umoMessage, ImmutableEndpoint endpoint, Throwable cause)
+    public CouldNotRouteOutboundMessageException(MuleMessage muleMessage, ImmutableEndpoint endpoint, Throwable cause)
     {
-        super(umoMessage, endpoint, cause);
+        super(muleMessage, endpoint, cause);
     }
 
-    public CouldNotRouteOutboundMessageException(Message message, MuleMessage umoMessage, ImmutableEndpoint endpoint)
+    public CouldNotRouteOutboundMessageException(Message message, MuleMessage muleMessage, ImmutableEndpoint endpoint)
     {
-        super(message, umoMessage, endpoint);
+        super(message, muleMessage, endpoint);
     }
 
     public CouldNotRouteOutboundMessageException(Message message,
-                                                 MuleMessage umoMessage,
+                                                 MuleMessage muleMessage,
                                                  ImmutableEndpoint endpoint,
                                                  Throwable cause)
     {
-        super(message, umoMessage, endpoint, cause);
+        super(message, muleMessage, endpoint, cause);
     }
 }

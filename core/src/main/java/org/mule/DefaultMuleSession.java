@@ -42,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>DefaultMuleSession</code> manages the interaction and distribution of events for
- * Mule UMOs.
+ * Mule Services.
  */
 
 public final class DefaultMuleSession implements MuleSession

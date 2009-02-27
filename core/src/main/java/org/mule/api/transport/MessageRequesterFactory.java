@@ -40,7 +40,7 @@ public interface MessageRequesterFactory
      * endpoint. The returned instance should be immediately useable.
      *
      * @param endpoint the endoint for which this requester should be created
-     * @return a properly created <code>UMOMessagerequester</code> for this
+     * @return a properly created <code>MessageRequester</code> for this
      *         transport
      * @throws org.mule.api.MuleException if the requester cannot be created
      */

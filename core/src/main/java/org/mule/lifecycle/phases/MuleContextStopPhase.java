@@ -26,11 +26,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * The Stop phase for the Management context LifecycleManager. Calling {@link org.mule.api.UMOManagementContext#stop()}
+ * The Stop phase for the Management context LifecycleManager. Calling {@link MuleContext#stop()}
  * with initiate this phase via the {@link org.mule.api.lifecycle.LifecycleManager}.
  * This phase controls the order in which objects should be stopped.
  *
- * @see org.mule.api.UMOManagementContext
+ * @see org.mule.api.MuleContext
  * @see org.mule.api.lifecycle.LifecycleManager
  * @see org.mule.api.lifecycle.Stoppable
  */

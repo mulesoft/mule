@@ -31,21 +31,21 @@ public class RoutePathNotFoundException extends RoutingException
         super(message, endpoint);
     }
 
-    public RoutePathNotFoundException(MuleMessage umoMessage, ImmutableEndpoint endpoint, Throwable cause)
+    public RoutePathNotFoundException(MuleMessage message, ImmutableEndpoint endpoint, Throwable cause)
     {
-        super(umoMessage, endpoint, cause);
+        super(message, endpoint, cause);
     }
 
-    public RoutePathNotFoundException(Message message, MuleMessage umoMessage, ImmutableEndpoint endpoint)
+    public RoutePathNotFoundException(Message message, MuleMessage muleMessage, ImmutableEndpoint endpoint)
     {
-        super(message, umoMessage, endpoint);
+        super(message, muleMessage, endpoint);
     }
 
     public RoutePathNotFoundException(Message message,
-                                      MuleMessage umoMessage,
+                                      MuleMessage muleMessage,
                                       ImmutableEndpoint endpoint,
                                       Throwable cause)
     {
-        super(message, umoMessage, endpoint, cause);
+        super(message, muleMessage, endpoint, cause);
     }
 }

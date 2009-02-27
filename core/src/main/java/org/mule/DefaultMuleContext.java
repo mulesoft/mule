@@ -400,7 +400,7 @@ public class DefaultMuleContext implements MuleContext
 
     /**
      * Obtains a workManager instance that can be used to schedule work in a
-     * thread pool. This will be used primarially by UMOAgents wanting to
+     * thread pool. This will be used primarially by Agents wanting to
      * schedule work. This work Manager must <b>never</b> be used by provider
      * implementations as they have their own workManager accible on the
      * connector.

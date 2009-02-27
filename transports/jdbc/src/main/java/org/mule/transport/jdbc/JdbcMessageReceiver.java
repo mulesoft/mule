@@ -114,7 +114,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         {
             con = this.connector.getConnection();
             MessageAdapter msgAdapter = this.connector.getMessageAdapter(message);
-            MuleMessage umoMessage = new DefaultMuleMessage(msgAdapter);
+            MuleMessage muleMessage = new DefaultMuleMessage(msgAdapter);
             if (this.ackStmt != null)
             {
                 if (aggregateResult)
@@ -142,7 +142,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                 }
                 else
                 {
-                    Object[] paramValues = connector.getParams(endpoint, this.ackParams, umoMessage, this.endpoint.getEndpointURI().getAddress());
+                    Object[] paramValues = connector.getParams(endpoint, this.ackParams, muleMessage, this.endpoint.getEndpointURI().getAddress());
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(paramValues));
@@ -154,7 +154,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                     }
                 }
             }
-            routeMessage(umoMessage, tx, tx != null || endpoint.isSynchronous());
+            routeMessage(muleMessage, tx, tx != null || endpoint.isSynchronous());
 
         }
         catch (Exception ex)

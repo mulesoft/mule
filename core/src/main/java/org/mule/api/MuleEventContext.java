@@ -140,7 +140,7 @@ public interface MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
+     * synchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the message payload to send
@@ -152,7 +152,7 @@ public interface MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
+     * synchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -165,7 +165,7 @@ public interface MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
+     * synchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -180,7 +180,7 @@ public interface MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
+     * synchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -291,7 +291,7 @@ public interface MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the endpoint
+     * asynchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -304,7 +304,7 @@ public interface MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the endpoint
+     * asynchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event.
      * 
      * @param message the event message payload to send
@@ -318,7 +318,7 @@ public interface MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the endpoint
+     * asynchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -368,12 +368,12 @@ public interface MuleEventContext
      * configuration. The user can override this behaviour by obtaining a reference
      * to the MuleEvent context, either by implementing
      * <code>org.mule.api.lifecycle.Callable</code> or calling
-     * <code>UMOManager.getEventContext</code> to obtain the MuleEventContext for
+     * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for
      * the current thread. The user can programmatically control how events are
      * dispached.
      * 
      * @return Returns true is the user has set stopFurtherProcessing.
-     * @see org.mule.api.context.UMOManager
+     * @see org.mule.api.MuleContext
      * @see MuleEventContext
      * @see org.mule.api.lifecycle.Callable
      */

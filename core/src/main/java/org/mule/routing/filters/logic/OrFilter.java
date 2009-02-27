@@ -39,8 +39,8 @@ public class OrFilter extends AbstractFilterCollection
     {
         for (Iterator iterator = getFilters().iterator(); iterator.hasNext();)
         {
-            Filter umoFilter = (Filter) iterator.next();
-            if(umoFilter.accept(message))
+            Filter filter = (Filter) iterator.next();
+            if(filter.accept(message))
             {
                 return true;
             }

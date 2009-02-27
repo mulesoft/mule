@@ -108,7 +108,7 @@ public class AxisServiceComponent implements Initialisable, Callable
      *         the returned object as the payload. This new context will then get
      *         published to the configured outbound endpoint if-
      *         <ol>
-     *         <li>One has been configured for the UMO.</li>
+     *         <li>One has been configured for the component.</li>
      *         <li>the <code>setStopFurtherProcessing(true)</code> wasn't called
      *         on the previous context.</li>
      *         </ol>

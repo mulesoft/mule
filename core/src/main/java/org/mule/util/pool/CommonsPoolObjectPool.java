@@ -52,7 +52,7 @@ public class CommonsPoolObjectPool implements ObjectPool
     protected PoolingProfile poolingProfile;
 
     /**
-     * Creates a new pool and an Object factory with the UMODescriptor
+     * Creates a new pool and an Object factory with the ServiceDescriptor
      * 
      * @param descriptor the descriptor to use when constructing MuleProxy objects in
      *            the pool

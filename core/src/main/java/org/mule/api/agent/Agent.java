@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * <code>Agent</code> is a server plugin that can be initialised, started and
- * destroyed along with the UMOManager itself. Agents can initialise or bind to
+ * destroyed along with the MuleContext itself. Agents can initialise or bind to
  * external services such as a Jmx server.
  */
 public interface Agent extends Lifecycle, NamedObject

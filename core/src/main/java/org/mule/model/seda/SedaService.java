@@ -95,9 +95,9 @@ public class SedaService extends AbstractService implements Work, WorkListener
     }
     
     /**
-     * Initialise the service. The service will first create a Mule UMO from the
-     * UMODescriptor and then initialise a pool based on the attributes in the
-     * UMODescriptor.
+     * Initialise the service. The service will first create a Mule component from the
+     * Service and then initialise a pool based on the attributes in the
+     * Service.
      * 
      * @throws org.mule.api.lifecycle.InitialisationException if the service fails
      *             to initialise

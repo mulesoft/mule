@@ -40,9 +40,6 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 
 import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all Message
@@ -79,7 +76,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
      * @param service the service to associate with the receiver. When data is
      *                  received the service <code>dispatchEvent</code> or
      *                  <code>sendEvent</code> is used to dispatch the data to the
-     *                  relivant UMO.
+     *                  relevant Service.
      * @param endpoint  the provider contains the endpointUri on which the receiver
      *                  will listen on. The endpointUri can be anything and is specific to
      *                  the receiver implementation i.e. an email address, a directory, a

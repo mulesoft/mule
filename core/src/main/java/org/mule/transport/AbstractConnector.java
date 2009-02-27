@@ -280,21 +280,11 @@ public abstract class AbstractConnector
         requesters.setTestOnReturn(true);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.transport.UMOConnector#getName()
-     */
     public String getName()
     {
         return name;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.transport.UMOConnector#setName(java.lang.String)
-     */
     public void setName(String newName)
     {
         if (newName == null)

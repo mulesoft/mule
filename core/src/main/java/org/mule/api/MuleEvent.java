@@ -22,8 +22,8 @@ import java.io.OutputStream;
  * environment. All data sent or received within the mule environment will be passed
  * between components as an MuleEvent. <p/> <p/> The MuleEvent holds a MuleMessage
  * payload and provides helper methods for obtaining the data in a format that the
- * receiving Mule UMO understands. The event can also maintain any number of
- * properties that can be set and retrieved by Mule UMO components.
+ * receiving Mule component understands. The event can also maintain any number of
+ * properties that can be set and retrieved by Mule components.
  * 
  * @see MuleMessage
  */
@@ -167,12 +167,12 @@ public interface MuleEvent
      * configuration. The user can override this behaviour by obtaining a reference
      * to the MuleEvent context, either by implementing
      * <code>org.mule.api.lifecycle.Callable</code> or calling
-     * <code>UMOManager.getEventContext</code> to obtain the MuleEventContext for
+     * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for
      * the current thread. The user can programmatically control how events are
      * dispached.
      * 
      * @return Returns true is the user has set stopFurtherProcessing.
-     * @see org.mule.api.context.UMOManager
+     * @see org.mule.api.MuleContext
      * @see MuleEventContext
      * @see org.mule.api.lifecycle.Callable
      */
@@ -184,7 +184,7 @@ public interface MuleEvent
      * configuration. The user can override this behaviour by obtaining a reference
      * to the MuleEvent context, either by implementing
      * <code>org.mule.api.lifecycle.Callable</code> or calling
-     * <code>UMOManager.getEventContext</code> to obtain the MuleEventContext for
+     * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for
      * the current thread. The user can programmatically control how events are
      * dispached.
      * 

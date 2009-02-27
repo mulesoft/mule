@@ -19,7 +19,7 @@ import org.acegisecurity.context.SecurityContextImpl;
 
 /**
  * <code>AcegiSecurityContextFactory</code> creates an AcegiSecurityContext for an
- * UMOAuthentication object
+ * {@link Authentication} object
  */
 public class AcegiSecurityContextFactory implements SecurityContextFactory
 {

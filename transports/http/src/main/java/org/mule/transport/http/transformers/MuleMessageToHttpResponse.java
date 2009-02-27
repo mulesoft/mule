@@ -35,8 +35,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 
 /**
- * <code>UMOMessageToHttpResponse</code> converts a UMOMEssage into an Http
- * response.
+ * Converts a UMOMEssage into an Http response.
  */
 
 public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer

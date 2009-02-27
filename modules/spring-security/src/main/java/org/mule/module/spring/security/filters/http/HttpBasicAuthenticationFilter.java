@@ -131,11 +131,11 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
 
             Authentication authResult;
 
-            Authentication umoAuthentication = new SpringAuthenticationAdapter(authRequest);
+            Authentication authentication = new SpringAuthenticationAdapter(authRequest);
 
             try
             {
-                authResult = getSecurityManager().authenticate(umoAuthentication);
+                authResult = getSecurityManager().authenticate(authentication);
             }
             catch (AuthenticationException e)
             {

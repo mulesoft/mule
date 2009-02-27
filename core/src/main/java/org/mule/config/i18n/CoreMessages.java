@@ -895,13 +895,6 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 230, name);
     }
 
-    // public static Message modelNameDoesNotMatchModel(UMOImmutableDescriptor descriptor, String modelName)
-    // {
-    // return factory.createMessage(BUNDLE_PATH, 231, descriptor.getName(), descriptor.getModelName(), modelName);
-    // }
-
-    // These endpoint errors should go away once we make setting endpoints on routers typesafe
-
     public static Message inboundRouterMustUseInboundEndpoints(InboundRouterCollection router,
                                                                ImmutableEndpoint endpoint)
     {

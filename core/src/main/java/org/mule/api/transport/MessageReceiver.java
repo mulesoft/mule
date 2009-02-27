@@ -53,7 +53,7 @@ public interface MessageReceiver extends Connectable
      * @param service the service to associate with the receiver. When data is
      *            received the service <code>dispatchEvent</code> or
      *            <code>sendEvent</code> is used to dispatch the data to the
-     *            relivant UMO.
+     *            relevant component.
      */
     //void setService(Service service);
 

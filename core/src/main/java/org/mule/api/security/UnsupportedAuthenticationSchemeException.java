@@ -25,13 +25,13 @@ public class UnsupportedAuthenticationSchemeException extends SecurityException
      */
     private static final long serialVersionUID = 3281021140543598680L;
 
-    public UnsupportedAuthenticationSchemeException(Message message, MuleMessage umoMessage)
+    public UnsupportedAuthenticationSchemeException(Message message, MuleMessage muleMessage)
     {
-        super(message, umoMessage);
+        super(message, muleMessage);
     }
 
-    public UnsupportedAuthenticationSchemeException(Message message, MuleMessage umoMessage, Throwable cause)
+    public UnsupportedAuthenticationSchemeException(Message message, MuleMessage muleMessage, Throwable cause)
     {
-        super(message, umoMessage, cause);
+        super(message, muleMessage, cause);
     }
 }

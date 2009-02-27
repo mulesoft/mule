@@ -46,15 +46,15 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
 
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
         {
-            OutboundRouter umoOutboundRouter = (OutboundRouter) iterator.next();
-            if (umoOutboundRouter.isMatch(message))
+            OutboundRouter outboundRouter = (OutboundRouter) iterator.next();
+            if (outboundRouter.isMatch(message))
             {
                 matchfound = true;
                 // Manage outbound only transactions here
-                final OutboundRouter router = umoOutboundRouter;
+                final OutboundRouter router = outboundRouter;
 
                 
-                TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig(),
+                TransactionTemplate tt = new TransactionTemplate(outboundRouter.getTransactionConfig(),
                     session.getService().getExceptionListener(), muleContext);
                 
                 TransactionCallback cb = new TransactionCallback()

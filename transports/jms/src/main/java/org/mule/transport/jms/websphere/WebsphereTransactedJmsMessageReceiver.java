@@ -21,10 +21,10 @@ import javax.jms.Session;
 
 public class WebsphereTransactedJmsMessageReceiver extends XaTransactedJmsMessageReceiver
 {
-    public WebsphereTransactedJmsMessageReceiver(Connector umoConnector, Service service, 
+    public WebsphereTransactedJmsMessageReceiver(Connector connector, Service service, 
         InboundEndpoint endpoint) throws InitialisationException, CreateException
     {
-        super(umoConnector, service, endpoint);
+        super(connector, service, endpoint);
     }
     
     protected void doConnect() throws Exception

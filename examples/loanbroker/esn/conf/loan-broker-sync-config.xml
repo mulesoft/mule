@@ -18,7 +18,7 @@
      <vm:connector name="syncVm"/>
 
     <!--
-       The Mule model initialises and manages your UMO components
+       The Mule model initialises and manages your Mule components
      -->
     <model name="loan-broker">
 

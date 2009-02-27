@@ -19,7 +19,7 @@ import org.springframework.security.context.SecurityContextImpl;
 
 /**
  * <code>AcegiSecurityContextFactory</code> creates an AcegiSecurityContext for an
- * UMOAuthentication object
+ * Authentication object
  */
 public class SpringSecurityContextFactory implements SecurityContextFactory
 {

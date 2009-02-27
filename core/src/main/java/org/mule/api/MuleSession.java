@@ -50,7 +50,7 @@ public interface MuleSession extends Serializable
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
+     * synchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param event the event to process
@@ -62,7 +62,7 @@ public interface MuleSession extends Serializable
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
+     * synchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -75,7 +75,7 @@ public interface MuleSession extends Serializable
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
+     * synchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -100,7 +100,7 @@ public interface MuleSession extends Serializable
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the endpoint
+     * asynchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param event the event message payload to send first on the service
@@ -112,7 +112,7 @@ public interface MuleSession extends Serializable
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the endpoint
+     * asynchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -124,7 +124,7 @@ public interface MuleSession extends Serializable
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the endpoint
+     * asynchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send

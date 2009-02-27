@@ -276,15 +276,15 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         // This will go when we start dropping support for 1.4 and start using 1.5
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            ImmutableEndpoint umoEndpoint = (ImmutableEndpoint) iterator.next();
-            if (!(umoEndpoint instanceof OutboundEndpoint))
+            ImmutableEndpoint endpoint = (ImmutableEndpoint) iterator.next();
+            if (!(endpoint instanceof OutboundEndpoint))
             {
                 throw new InvalidEndpointTypeException(CoreMessages.outboundRouterMustUseOutboudEndpoints(
-                        this, umoEndpoint));
+                        this, endpoint));
             }
             else
             {
-                addEndpoint((OutboundEndpoint) umoEndpoint);
+                addEndpoint((OutboundEndpoint) endpoint);
             }
         }
     }

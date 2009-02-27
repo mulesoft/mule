@@ -387,10 +387,10 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      */
     protected void logException(Throwable t)
     {
-        MuleException umoe = ExceptionHelper.getRootMuleException(t);
-        if (umoe != null)
+        MuleException muleException = ExceptionHelper.getRootMuleException(t);
+        if (muleException != null)
         {
-            logger.error(umoe.getDetailedMessage());
+            logger.error(muleException.getDetailedMessage());
         }
         else
         {

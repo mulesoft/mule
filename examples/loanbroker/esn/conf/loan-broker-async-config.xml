@@ -24,7 +24,7 @@
     <vm:endpoint name="CustomerResponses" path="customer.responses" connector-ref="asyncVm"/>
 
     <!--
-       The Mule model initialises and manages your UMO components
+       The Mule model initialises and manages your Mule components
     -->
     <model name="loan-broker">
 

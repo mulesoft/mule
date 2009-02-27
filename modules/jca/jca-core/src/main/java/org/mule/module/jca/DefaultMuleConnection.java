@@ -93,7 +93,7 @@ public class DefaultMuleConnection implements MuleConnection
      * @param messageProperties any properties to be associated with the payload. In
      *            the case of Jms you could set the JMSReplyTo property in these
      *            properties.
-     * @return a umomessage response.
+     * @return a response.
      * @throws org.mule.api.MuleException
      */
     public MuleMessage send(String url, Object payload, Map messageProperties) throws MuleException

@@ -12,14 +12,14 @@ package org.mule.module.jaas.filters;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.security.Authentication;
+import org.mule.api.security.Credentials;
 import org.mule.api.security.CredentialsNotSetException;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.api.security.EncryptionStrategyNotFoundException;
+import org.mule.api.security.SecurityContext;
 import org.mule.api.security.SecurityException;
 import org.mule.api.security.SecurityProviderNotFoundException;
-import org.mule.api.security.Authentication;
-import org.mule.api.security.Credentials;
-import org.mule.api.security.SecurityContext;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
@@ -49,10 +49,10 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
 
         Credentials user = new MuleCredentials(userHeader, getSecurityManager());
         Authentication authResult;
-        Authentication umoAuthentication = new JaasAuthentication(user);
+        Authentication authentication = new JaasAuthentication(user);
         try
         {
-            authResult = getSecurityManager().authenticate(umoAuthentication);
+            authResult = getSecurityManager().authenticate(authentication);
         }
         catch (SecurityException se)
         {

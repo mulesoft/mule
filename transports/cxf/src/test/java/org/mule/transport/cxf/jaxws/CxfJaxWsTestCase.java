@@ -42,8 +42,8 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
         HttpClient client =  new HttpClient();
         // The format in which CXF processes the request in Http GET is:
         // http://host/service/OPERATION/PARAM_NAME/PARAM_VALUE
-        // In this case: http://localhost:63081/EchoUMO/echo/text/hello
-        // (service: EchoUmo corresponds to the name in the mule config file: TC-HTTP-CALL.xml)
+        // In this case: http://localhost:63081/Echo/echo/text/hello
+        // (service: Echo corresponds to the name in the mule config file: TC-HTTP-CALL.xml)
         HttpMethod httpMethod = new GetMethod("http://localhost:63081/services/Echo/echo/text/hello");
         // Http Status Code 200 means OK, the request has succeeded. (500 would indicate an error)
         assertEquals(200, client.executeMethod(httpMethod));

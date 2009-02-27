@@ -20,18 +20,19 @@ import org.mule.api.registry.Registry;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.lifecycle.DefaultLifecyclePhase;
+import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * The Start phase for the Management context LifecycleManager. Calling
- * {@link org.mule.api.UMOManagementContext#start()} with initiate this phase via the
+ * The Start phase for the MuleContext. Calling
+ * {@link MuleContext#start()} will initiate this phase via the
  * {@link org.mule.api.lifecycle.LifecycleManager}. This phase controls the order in
  * which objects should be started.
  * 
- * @see org.mule.api.UMOManagementContext
+ * @see org.mule.api.MuleContext
  * @see org.mule.api.lifecycle.LifecycleManager
  * @see org.mule.api.lifecycle.Startable
  */
@@ -46,7 +47,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
     {
         super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
 
-        Set startOrderedObjects = new LinkedHashSet();
+        Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<LifecycleObject>();
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Model.class));

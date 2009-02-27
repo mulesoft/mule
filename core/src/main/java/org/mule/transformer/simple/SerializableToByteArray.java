@@ -22,7 +22,7 @@ import org.apache.commons.lang.SerializationUtils;
 /**
  * <code>SerializableToByteArray</code> converts a serializable object or a String
  * to a byte array. If <code>MuleMessage</code> is configured as a source type on this
- * transformer by calling <code>setAcceptUMOMessage(true)</code> then the MuleMessage
+ * transformer by calling <code>setAcceptMuleMessage(true)</code> then the MuleMessage
  * will be serialised. This is useful for transports such as TCP where the message
  * headers would normally be lost.
  */

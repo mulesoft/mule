@@ -78,10 +78,10 @@ public interface ImmutableEndpoint extends Serializable
 
     /**
      * Transformers are responsible for transforming data when it is received or
-     * sent by the UMO (depending on whether this endpoint is a receiver or not). A
+     * sent by the component (depending on whether this endpoint is a receiver or not). A
      * tranformation for an inbound event can be forced by the user by calling the
      * inbound event.getTransformedMessage(). A tranformation for an outbound event
-     * is called or when the UMO dispatchEvent() or sendEvent() methods are called.
+     * is called or when the Service dispatchEvent() or sendEvent() methods are called.
      * If an endpoint has no transformers an empty list is returned.
      *
      * @return the transformers to use when receiving or sending data

@@ -202,7 +202,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
+     * synchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -219,7 +219,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
+     * synchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the message payload to send
@@ -236,7 +236,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the
+     * synchronously to the next available Mule component in the pool or via the
      * endpointUri configured for the event
      * 
      * @param message the event message payload to send
@@ -277,10 +277,10 @@ public class DefaultMuleEventContext implements MuleEventContext
         {
             public Object call() throws Exception
             {
-                MuleMessage umoMessage = new DefaultMuleMessage(message, event.getMessage());
-                umoMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
-                umoMessage.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
-                return sendEvent(umoMessage);
+                MuleMessage muleMessage = new DefaultMuleMessage(message, event.getMessage());
+                muleMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
+                muleMessage.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
+                return sendEvent(muleMessage);
             }
         };
 
@@ -403,7 +403,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
+     * synchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -448,7 +448,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the
+     * asynchronously to the next available Mule component in the pool or via the
      * endpointUri configured for the event
      * 
      * @param message the event message payload to send
@@ -466,7 +466,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the endpoint
+     * asynchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -483,7 +483,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the endpoint
+     * asynchronously to the next available Mule component in the pool or via the endpoint
      * configured for the event
      * 
      * @param message the event message payload to send
@@ -572,7 +572,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * configuration. The user can override this behaviour by obtaining a reference
      * to the MuleEvent context, either by implementing
      * <code>org.mule.api.lifecycle.Callable</code> or calling
-     * <code>UMOManager.getEventContext</code> to obtain the MuleEventContext for
+     * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for
      * the current thread. The user can programmatically control how events are
      * dispached.
      * 

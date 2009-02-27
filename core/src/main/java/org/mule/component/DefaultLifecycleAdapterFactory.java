@@ -30,12 +30,6 @@ import org.mule.api.model.EntryPointResolverSet;
 public class DefaultLifecycleAdapterFactory implements LifecycleAdapterFactory
 {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.lifecycle.LifecycleAdapterFactory#create(java.lang.Object,
-     *      org.mule.api.UMODescriptor)
-     */
     public LifecycleAdapter create(Object pojoService, JavaComponent component, EntryPointResolverSet resolver, MuleContext muleContext)
         throws MuleException
     {

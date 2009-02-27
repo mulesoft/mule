@@ -31,38 +31,38 @@ public class ServiceRoutingException extends RoutingException
     private transient Service service;
 
     public ServiceRoutingException(Message message,
-                                     MuleMessage umoMessage,
+                                     MuleMessage muleMessage,
                                      ImmutableEndpoint endpoint,
                                      Service service)
     {
-        super(generateMessage(message, endpoint, service), umoMessage, endpoint);
+        super(generateMessage(message, endpoint, service), muleMessage, endpoint);
         this.service = service;
     }
 
     public ServiceRoutingException(Message message,
-                                     MuleMessage umoMessage,
+                                     MuleMessage muleMessage,
                                      ImmutableEndpoint endpoint,
                                      Service service,
                                      Throwable cause)
     {
-        super(generateMessage(message, endpoint, service), umoMessage, endpoint, cause);
+        super(generateMessage(message, endpoint, service), muleMessage, endpoint, cause);
         this.service = service;
     }
 
-    public ServiceRoutingException(MuleMessage umoMessage,
+    public ServiceRoutingException(MuleMessage message,
                                      ImmutableEndpoint endpoint,
                                      Service service)
     {
-        super(generateMessage(null, endpoint, service), umoMessage, endpoint);
+        super(generateMessage(null, endpoint, service), message, endpoint);
         this.service = service;
     }
 
-    public ServiceRoutingException(MuleMessage umoMessage,
+    public ServiceRoutingException(MuleMessage message,
                                      ImmutableEndpoint endpoint,
                                      Service service,
                                      Throwable cause)
     {
-        super(generateMessage(null, endpoint, service), umoMessage, endpoint, cause);
+        super(generateMessage(null, endpoint, service), message, endpoint, cause);
         this.service = service;
 
     }

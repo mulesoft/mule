@@ -57,7 +57,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A base implementation for all UMOComponents in Mule
+ * A base implementation for all Services in Mule
  */
 public abstract class AbstractService implements Service
 {
@@ -148,10 +148,11 @@ public abstract class AbstractService implements Service
     }
 
     /**
-     * Initialise the service. The service will first create a Mule UMO from the
-     * UMODescriptor and then initialise a pool based on the attributes in the
-     * UMODescriptor.
+     * Initialise the service. The service will first create a component from the
+     * ServiceDescriptor and then initialise a pool based on the attributes in the
+     * ServiceDescriptor .
      *
+     * @seee org.mule.api.registry.ServiceDescriptor
      * @throws org.mule.api.lifecycle.InitialisationException
      *          if the service fails
      *          to initialise

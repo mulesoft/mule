@@ -24,10 +24,10 @@ import java.util.Map;
 public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCase
 {
     
-    public void assertExceptionPayload(MuleMessage umoMessage, String exceptionMessage)
+    public void assertExceptionPayload(MuleMessage message, String exceptionMessage)
     {
-        assertNotNull(umoMessage.getExceptionPayload());
-        ExceptionPayload exceptionPayload = umoMessage.getExceptionPayload();
+        assertNotNull(message.getExceptionPayload());
+        ExceptionPayload exceptionPayload = message.getExceptionPayload();
         assertNotNull(exceptionPayload);
         assertEquals(exceptionMessage, exceptionPayload.getMessage());
     }

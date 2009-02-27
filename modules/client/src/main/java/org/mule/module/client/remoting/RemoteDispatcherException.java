@@ -13,8 +13,7 @@ import org.mule.api.MuleException;
 import org.mule.config.i18n.Message;
 
 /**
- * Exceptions thrown by the Client RemteDispatcher.  Note that this exception is not used to wrap othor {@link UMOException}
- * instances.
+ * Exceptions thrown by the Client RemoteDispatcher.
  */
 public class RemoteDispatcherException extends MuleException
 {

@@ -28,13 +28,13 @@ public class CorrelationTimeoutException  extends MessagingException
         super(message, payload, cause);
     }
 
-    public CorrelationTimeoutException(Message message, MuleMessage umoMessage)
+    public CorrelationTimeoutException(Message message, MuleMessage muleMessage)
     {
-        super(message, umoMessage);
+        super(message, muleMessage);
     }
 
-    public CorrelationTimeoutException(Message message, MuleMessage umoMessage, Throwable cause)
+    public CorrelationTimeoutException(Message message, MuleMessage muleMessage, Throwable cause)
     {
-        super(message, umoMessage, cause);
+        super(message, muleMessage, cause);
     }
 }

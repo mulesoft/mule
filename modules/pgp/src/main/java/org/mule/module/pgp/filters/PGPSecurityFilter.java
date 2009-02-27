@@ -28,14 +28,13 @@ import org.mule.security.AbstractEndpointSecurityFilter;
 import java.io.ByteArrayInputStream;
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import cryptix.message.LiteralMessage;
 import cryptix.message.Message;
 import cryptix.message.MessageFactory;
 import cryptix.message.SignedMessage;
 import cryptix.pki.KeyBundle;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 {
@@ -78,11 +77,11 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         }
 
         final Authentication authResult;
-        Authentication umoAuthentication;
+        Authentication authentication;
 
         try
         {
-            umoAuthentication = new PGPAuthentication(userId, decodeMsgRaw(creds));
+            authentication = new PGPAuthentication(userId, decodeMsgRaw(creds));
         }
         catch (Exception e1)
         {
@@ -92,7 +91,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
         try
         {
-            authResult = getSecurityManager().authenticate(umoAuthentication);
+            authResult = getSecurityManager().authenticate(authentication);
         }
         catch (Exception e)
         {

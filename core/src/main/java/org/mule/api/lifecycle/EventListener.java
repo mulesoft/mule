@@ -12,7 +12,7 @@ package org.mule.api.lifecycle;
 
 /**
  * <code>EventListener</code> is a marker interface that is implemented by
- * objects wishing to receive UMO events in managed environments, succh as an EJB
+ * objects wishing to receive Mule events in managed environments, such as an EJB
  * container. There are not methods on this interface as typically Mule will work out
  * the method to invoke on the listener. Developers can implement
  * <code>org.mule.api.lifecycle.Callable</code> to implement a specific Mule

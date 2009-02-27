@@ -49,9 +49,9 @@ import org.apache.commons.logging.LogFactory;
  * <code>DefaultMuleEvent</code> represents any data event occuring in the Mule
  * environment. All data sent or received within the Mule environment will be passed
  * between components as an MuleEvent. <p/> The MuleEvent holds some data and provides
- * helper methods for obtaining the data in a format that the receiving Mule UMO
+ * helper methods for obtaining the data in a format that the receiving Mule component
  * understands. The event can also maintain any number of properties that can be set
- * and retrieved by Mule UMO components.
+ * and retrieved by Mule components.
  */
 
 public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSafeAccess
@@ -510,9 +510,9 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     /**
      * Setting this parameter will stop the Mule framework from processing this event
      * in the standard way. This allow for client code to override default behaviour.
-     * The common reasons for doing this are - 1. The UMO has more than one send
+     * The common reasons for doing this are - 1. The service has more than one send
      * endpoint configured; the service must dispatch to other prviders
-     * programatically by using the service on the current event 2. The UMO doesn't
+     * programatically by using the service on the current event 2. The service doesn't
      * send the current event out through a endpoint. i.e. the processing of the
      * event stops in the uMO.
      *

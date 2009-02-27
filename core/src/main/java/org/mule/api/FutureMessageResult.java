@@ -90,7 +90,7 @@ public class FutureMessageResult extends FutureTask
     /**
      * Set a post-invocation transformer.
      * 
-     * @param t UMOTransformers to be applied to the result of this invocation. May be
+     * @param t Transformers to be applied to the result of this invocation. May be
      *            null.
      */
     public void setTransformers(List t)

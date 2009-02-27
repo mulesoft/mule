@@ -348,16 +348,12 @@ public class CxfServiceComponent implements Callable, Lifecycle
     }
 
     /**
-     * Gets the stream representation of the current message. If the message is set
-     * for streaming the input stream on the UMOStreamMEssageAdapter will be used,
-     * otherwise a byteArrayInputStream will be used to hold the byte[]
-     * representation of the current message.
+     * Gets the stream representation of the current message.
      * 
      * @param context the event context
      * @return The inputstream for the current message
      * @throws MuleException
      */
-
     protected InputStream getMessageStream(MuleEventContext context) throws MuleException
     {
         InputStream is;

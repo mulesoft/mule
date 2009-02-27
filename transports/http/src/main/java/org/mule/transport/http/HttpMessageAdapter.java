@@ -117,11 +117,6 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
-    /*
-    * (non-Javadoc)
-    *
-    * @see org.mule.transport.UMOMessageAdapter#getProperty(java.lang.Object)
-    */
     public Object getProperty(String key)
     {
         if (HttpConstants.HEADER_KEEP_ALIVE.equals(key) || HttpConstants.HEADER_CONNECTION.equals(key))

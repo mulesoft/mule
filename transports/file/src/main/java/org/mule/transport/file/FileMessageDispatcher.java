@@ -45,11 +45,6 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.UMOConnectorSession#dispatch(org.mule.api.MuleEvent)
-     */
     protected void doDispatch(MuleEvent event) throws Exception
     {
         Object data = event.transformMessage();
@@ -138,11 +133,6 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.UMOConnectorSession#send(org.mule.api.MuleEvent)
-     */
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);

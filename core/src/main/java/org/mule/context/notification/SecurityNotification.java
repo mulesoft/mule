@@ -18,8 +18,7 @@ import org.mule.api.context.notification.ServerNotification;
  * type of event. Subscribing to these notifications developers can maintain an
  * access log, block clients, etc.
  * 
- * @see org.mule.MuleManager
- * @see org.mule.api.context.UMOManager
+ * @see org.mule.api.MuleContext
  */
 public class SecurityNotification extends ServerNotification
 {

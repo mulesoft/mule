@@ -24,12 +24,6 @@ public class TestDefaultLifecycleAdapterFactory implements LifecycleAdapterFacto
         super();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.lifecycle.LifecycleAdapterFactory#create(java.lang.Object,
-     *      org.mule.api.UMODescriptor, org.mule.api.model.EntryPointResolver)
-     */
     public LifecycleAdapter create(Object pojoService, JavaComponent service, EntryPointResolverSet resolver, MuleContext muleContext)
         throws MuleException
     {

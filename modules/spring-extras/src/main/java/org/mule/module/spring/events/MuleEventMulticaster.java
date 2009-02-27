@@ -636,7 +636,7 @@ public class MuleEventMulticaster
     {
         if (!muleContext.isInitialised())
         {
-            // Next see if there are any UMOConnectors to register
+            // Next see if there are any Connectors to register
             Map connectors = applicationContext.getBeansOfType(Connector.class, true, true);
             if (connectors.size() > 0)
             {
@@ -660,7 +660,7 @@ public class MuleEventMulticaster
     {
         if (!muleContext.isInitialised())
         {
-            // Next see if there are any UMOConnectors to register
+            // Next see if there are any Connectors to register
             Map transformers = applicationContext.getBeansOfType(Transformer.class, true, true);
             if (transformers.size() > 0)
             {

@@ -10,8 +10,8 @@
 
 package org.mule;
 
-import org.mule.api.MuleException;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.RoutingException;
@@ -34,19 +34,12 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
         assertEquals(e.getClass().getName() + ": " + msg, e.toString());
     }
 
-    public final void testRoutingExceptionNullUMOMessageNullUMOImmutableEndpoint() throws MuleException
-    {
-        RoutingException rex = new RoutingException(null, null);
-        assertNotNull(rex);
-    }
-
-    public final void testRoutingExceptionNullUMOMessageValidUMOImmutableEndpoint() throws MuleException
+    public final void testRoutingExceptionNullMessageValidEndpoint() throws MuleException
     {
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint("test://outbound");
         assertNotNull(endpoint);
 
         RoutingException rex = new RoutingException(null, endpoint);
-        assertNotNull(rex);
         assertSame(endpoint, rex.getEndpoint());
     }
 

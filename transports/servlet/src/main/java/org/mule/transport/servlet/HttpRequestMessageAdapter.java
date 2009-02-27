@@ -134,11 +134,6 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         request = template.request;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.providers.UMOMessageAdapter#getMessage()
-     */
     public Object getPayload()
     {
         try
@@ -160,11 +155,6 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         return !request.getContentType().startsWith("text");
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.providers.UMOMessageAdapter#setMessage(java.lang.Object)
-     */
     private void setPayload(HttpServletRequest message) throws MessagingException
     {
         request = message;

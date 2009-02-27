@@ -319,15 +319,15 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
 
         for (Iterator iterator = axisComponent.getInboundRouter().getEndpoints().iterator(); iterator.hasNext();)
         {
-            ImmutableEndpoint umoEndpoint = (ImmutableEndpoint) iterator.next();
-            if (endpointKey.startsWith(umoEndpoint.getEndpointURI().getAddress()))
+            ImmutableEndpoint endpoint = (ImmutableEndpoint) iterator.next();
+            if (endpointKey.startsWith(endpoint.getEndpointURI().getAddress()))
             {
                 logger.info("Unregistering Axis endpoint: " + endpointKey + " for service: "
                         + ((AxisMessageReceiver) receiver).getSoapService().getName());
             }
             try
             {
-                umoEndpoint.getConnector()
+                endpoint.getConnector()
                         .unregisterListener(receiver.getService(), receiver.getEndpoint());
             }
             catch (Exception e)

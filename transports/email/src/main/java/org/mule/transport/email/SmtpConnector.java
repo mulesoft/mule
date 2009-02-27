@@ -76,12 +76,6 @@ public class SmtpConnector extends AbstractMailConnector
         return "smtp";
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transport.UMOConnector#registerListener(javax.jms.MessageListener,
-     *      java.lang.String)
-     */
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         throw new UnsupportedOperationException("Listeners cannot be registered on a SMTP endpoint");

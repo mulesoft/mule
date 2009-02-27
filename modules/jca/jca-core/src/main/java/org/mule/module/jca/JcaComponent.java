@@ -69,7 +69,7 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
         }
         catch (Exception e)
         {
-            logger.error(CoreMessages.failedToInvoke("UMO Service: " + service.getName()));
+            logger.error(CoreMessages.failedToInvoke("Service: " + service.getName()));
         }
         return null;
     }

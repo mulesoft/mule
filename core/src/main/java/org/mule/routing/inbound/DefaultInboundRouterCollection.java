@@ -30,9 +30,9 @@ import org.mule.util.StringUtils;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>DefaultInboundRouterCollection</code> is a collection of routers that will be
@@ -81,17 +81,17 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
         ConcurrentMap eventsToRoute = new ConcurrentHashMap(2);
         boolean noRoute = true;
         boolean match = false;
-        InboundRouter umoInboundRouter;
+        InboundRouter inboundRouter;
         MuleEvent lastEvent= null;
 
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
         {
-            umoInboundRouter = (InboundRouter) iterator.next();
+            inboundRouter = (InboundRouter) iterator.next();
 
-            if (umoInboundRouter.isMatch(event))
+            if (inboundRouter.isMatch(event))
             {
                 match = true;
-                MuleEvent[] events = umoInboundRouter.process(event);
+                MuleEvent[] events = inboundRouter.process(event);
                 if(events!=null)
                 {
                     for (int i = 0; i < events.length; i++)

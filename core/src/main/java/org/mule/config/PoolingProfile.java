@@ -231,14 +231,4 @@ public class PoolingProfile
         this.exhaustedAction = exhaustedAction;
     }
 
-//    public UMOPoolFactory getPoolFactory()
-//    {
-//        return poolFactory;
-//    }
-//
-//    public void setPoolFactory(UMOPoolFactory poolFactory)
-//    {
-//        this.poolFactory = poolFactory;
-//    }
-
 }

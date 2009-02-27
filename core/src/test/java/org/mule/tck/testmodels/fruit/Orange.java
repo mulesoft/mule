@@ -78,7 +78,7 @@ public class Orange implements Callable, OrangeInterface
 
     public Object onCall(MuleEventContext context) throws MuleException
     {
-        logger.debug("Orange received an event in UMOCallable.onEvent! MuleEvent says: "
+        logger.debug("Orange received an event in Callable.onEvent! MuleEvent says: "
                      + context.getMessageAsString());
         bite();
         return null;

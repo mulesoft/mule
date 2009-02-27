@@ -40,7 +40,7 @@
     <xm:xslt-transformer name="Xslt" xsl-file="xsl/soap-stock.xsl"/>
 
     <!--
-        The Mule model initialises and manages your UMO components
+        The Mule model initialises and manages your Mule components
     -->
     <model name="Sample-SOAP">
         <!--

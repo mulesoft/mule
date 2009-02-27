@@ -44,7 +44,7 @@ the different components are made from the loan broker component (a la hub and s
     </endpoint-identifiers>
 
      <!--
-       The Mule model initialises and manages your UMO components
+       The Mule model initialises and manages your Mule components
    -->
     <model name="loan-broker">
         <!-- by declaring the Axis service component we can overload its default

@@ -27,21 +27,21 @@ public class FailedToQueueEventException extends ServiceException
      */
     private static final long serialVersionUID = -8368283988424746098L;
 
-    public FailedToQueueEventException(Message message, MuleMessage umoMessage, Service service)
+    public FailedToQueueEventException(Message message, MuleMessage muleMessage, Service service)
     {
-        super(message, umoMessage, service);
+        super(message, muleMessage, service);
     }
 
     public FailedToQueueEventException(Message message,
-                                       MuleMessage umoMessage,
+                                       MuleMessage muleMessage,
                                        Service service,
                                        Throwable cause)
     {
-        super(message, umoMessage, service, cause);
+        super(message, muleMessage, service, cause);
     }
 
-    public FailedToQueueEventException(MuleMessage umoMessage, Service service, Throwable cause)
+    public FailedToQueueEventException(MuleMessage muleMessage, Service service, Throwable cause)
     {
-        super(umoMessage, service, cause);
+        super(muleMessage, service, cause);
     }
 }

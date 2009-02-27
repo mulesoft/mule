@@ -19,7 +19,7 @@ import java.beans.ExceptionListener;
 
 /**
  * The <code>Model</code> encapsulates and manages the runtime behaviour of a
- * Mule Server instance. It is responsible for maintaining the UMOs instances and
+ * Mule Server instance. It is responsible for maintaining the Service instances and
  * their configuration.
  */
 public interface Model extends Lifecycle, MuleContextAware, NamedObject
@@ -51,7 +51,7 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject
 
     /**
      * The lifecycle adapter is used by the model to translate Mule lifecycle event
-     * to events that UMO components registered with the model understand. The
+     * to events that components registered with the model understand. The
      * <code>LifecycleAdapterFactory</code> is used by the model to instanciate
      * LifecycleAdapters.
      *

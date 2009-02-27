@@ -26,18 +26,18 @@ public class MessageBuilderException extends MessagingException
      */
     private static final long serialVersionUID = 1144140732378649625L;
 
-    public MessageBuilderException(Message message, MuleMessage umoMessage)
+    public MessageBuilderException(Message message, MuleMessage muleMessage)
     {
-        super(message, umoMessage);
+        super(message, muleMessage);
     }
 
-    public MessageBuilderException(Message message, MuleMessage umoMessage, Throwable cause)
+    public MessageBuilderException(Message message, MuleMessage muleMessage, Throwable cause)
     {
-        super(message, umoMessage, cause);
+        super(message, muleMessage, cause);
     }
 
-    public MessageBuilderException(MuleMessage umoMessage, Throwable cause)
+    public MessageBuilderException(MuleMessage message, Throwable cause)
     {
-        super(CoreMessages.failedToBuildMessage(), umoMessage, cause);
+        super(CoreMessages.failedToBuildMessage(), message, cause);
     }
 }

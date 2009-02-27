@@ -75,11 +75,6 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.UMOConnectorSession#dispatch(org.mule.api.MuleEvent)
-     */
     protected void doDispatch(MuleEvent event) throws Exception
     {
         Object[] arguments = getArgs(event);
@@ -90,11 +85,6 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
         invokedMethod.invoke(remoteObject, arguments);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.UMOConnectorSession#send(org.mule.api.MuleEvent)
-     */
     public MuleMessage doSend(MuleEvent event) throws Exception
     {
         if (invokedMethod == null)

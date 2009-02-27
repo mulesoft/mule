@@ -152,19 +152,19 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
         }
     }
 
-    protected void setJmsProperties(MuleMessage umoMessage, Message msg) throws JMSException
+    protected void setJmsProperties(MuleMessage message, Message msg) throws JMSException
     {
-        for (Iterator iterator = umoMessage.getPropertyNames().iterator(); iterator.hasNext();)
+        for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
         {
             String key = iterator.next().toString();
 
             if (!JmsConstants.JMS_PROPERTY_NAMES.contains(key))
             {
-                Object value = umoMessage.getProperty(key);
+                Object value = message.getProperty(key);
 
                 if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(key))
                 {
-                    msg.setJMSCorrelationID(umoMessage.getCorrelationId());
+                    msg.setJMSCorrelationID(message.getCorrelationId());
                 }
 
                 // We dont want to set the ReplyTo property again as it will be set

@@ -31,21 +31,21 @@ public class CouldNotRouteInboundEventException extends RoutingException
         super(message, endpoint);
     }
 
-    public CouldNotRouteInboundEventException(MuleMessage umoMessage, ImmutableEndpoint endpoint, Throwable cause)
+    public CouldNotRouteInboundEventException(MuleMessage muleMessage, ImmutableEndpoint endpoint, Throwable cause)
     {
-        super(umoMessage, endpoint, cause);
+        super(muleMessage, endpoint, cause);
     }
 
-    public CouldNotRouteInboundEventException(Message message, MuleMessage umoMessage, ImmutableEndpoint endpoint)
+    public CouldNotRouteInboundEventException(Message message, MuleMessage muleMessage, ImmutableEndpoint endpoint)
     {
-        super(message, umoMessage, endpoint);
+        super(message, muleMessage, endpoint);
     }
 
     public CouldNotRouteInboundEventException(Message message,
-                                              MuleMessage umoMessage,
+                                              MuleMessage muleMessage,
                                               ImmutableEndpoint endpoint,
                                               Throwable cause)
     {
-        super(message, umoMessage, endpoint, cause);
+        super(message, muleMessage, endpoint, cause);
     }
 }

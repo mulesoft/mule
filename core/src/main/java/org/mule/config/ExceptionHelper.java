@@ -373,12 +373,12 @@ public final class ExceptionHelper
     public static MuleException getRootMuleException(Throwable t)
     {
         Throwable cause = t;
-        MuleException umoException = null;
+        MuleException exception = null;
         while (cause != null)
         {
             if (cause instanceof MuleException)
             {
-                umoException = (MuleException)cause;
+                exception = (MuleException)cause;
             }
             cause = getExceptionReader(cause).getCause(cause);
             // address some misbehaving exceptions, avoid endless loop
@@ -387,7 +387,7 @@ public final class ExceptionHelper
                 break;
             }
         }
-        return umoException;
+        return exception;
     }
 
     public static List getExceptionsAsList(Throwable t)
