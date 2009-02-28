@@ -70,10 +70,9 @@ public abstract class AbstractReceiverWorker implements Work
      */
     protected void doRun()
     {
-        // TODO Remove this call to MuleServer.getMuleContext().  The muleContext should be passed
-        // in and stored as a local variable (MuleContextAware).  It is used down the line for
+        //  MuleContext is used down the line for
         // getTransactionManager() (XaTransactionFactory) and getQueueManager() (VMTransaction)
-        MuleContext muleContext = MuleServer.getMuleContext();
+        MuleContext muleContext = receiver.getConnector().getMuleContext();
         TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
                                                          endpoint.getConnector().getExceptionListener(),
                                                          muleContext);
