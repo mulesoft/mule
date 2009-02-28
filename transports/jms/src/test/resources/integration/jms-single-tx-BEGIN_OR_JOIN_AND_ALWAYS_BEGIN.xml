@@ -2,51 +2,36 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
-      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
       xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
       xsi:schemaLocation="
        http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
-       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
-       ">
-
-    <jms:endpoint name="in" queue="in" connector-ref="jmsConnector1"/>
-    <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector1"/>
-    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector2"/>
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd">
 
     <model name="jmsTest">
 
         <service name="InputPart">
             <inbound>
-                <inbound-endpoint ref="in">
-                    <jms:transaction action="ALWAYS_BEGIN"/>
-                </inbound-endpoint>
+                <inbound-endpoint ref="in"/>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="middle">
-                        <jms:transaction action="NONE"/>
-                    </outbound-endpoint>
+                    <outbound-endpoint ref="middle"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="OutputPart">
             <inbound>
-                <inbound-endpoint ref="middle">
-                    <jms:transaction action="BEGIN_OR_JOIN"/>
-                </inbound-endpoint>
+                <inbound-endpoint ref="middle2"/>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="out">
-                        <jms:transaction action="BEGIN_OR_JOIN"/>
-                    </outbound-endpoint>
-                    <jms:transaction action="ALWAYS_BEGIN"/>
+                    <outbound-endpoint ref="out"/>
+                    <!--<jms:transaction action="ALWAYS_BEGIN"/>-->
                 </pass-through-router>
             </outbound>
         </service>

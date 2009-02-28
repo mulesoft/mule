@@ -9,41 +9,46 @@
        http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
 
+    <endpoint name="in" address="${inbound.destination}"/>
+    <endpoint name="ep1" address="${middle.destination}"/>
+    <endpoint name="ep2" address="${middle2.destination}"/>
+    <endpoint name="out" address="${outbound.destination}"/>
+
     <model name="test">
         <service name="InputPart">
             <inbound>
-                <jms:inbound-endpoint queue="in"/>
+                <inbound-endpoint ref="in"/>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="q1"/>
+                    <outbound-endpoint ref="ep1"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="MiddlePart">
             <inbound>
-                <jms:inbound-endpoint queue="q1"/>
+                <inbound-endpoint ref="ep1"/>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="q2"/>
+                    <outbound-endpoint ref="ep2"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="OutputPart">
             <inbound>
-                <jms:inbound-endpoint queue="q2"/>
+                <inbound-endpoint ref="ep2"/>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="out"/>
+                    <outbound-endpoint ref="out"/>
                 </pass-through-router>
             </outbound>
         </service>

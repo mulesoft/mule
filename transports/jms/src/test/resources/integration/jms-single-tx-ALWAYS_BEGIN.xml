@@ -2,74 +2,50 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
-      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
       xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
       xsi:schemaLocation="
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
-       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
-
-    <endpoint name="in1" address="${inbound.destination1}" connector-ref="jmsConnector1"/>
-    <endpoint name="out1" address="${outbound.destination1}" connector-ref="jmsConnector2"/>
-
-    <endpoint name="in2" address="${inbound.destination2}" connector-ref="jmsConnector1"/>
-    <endpoint name="out2" address="${outbound.destination2}" connector-ref="jmsConnector2"/>
-
-    <endpoint name="in3" address="${inbound.destination3}" connector-ref="jmsConnector1"/>
-    <endpoint name="out3" address="${outbound.destination3}" connector-ref="jmsConnector2"/>
+       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd">
 
     <model name="TEST">
         <service name="ConfigurationA">
             <inbound>
-                <inbound-endpoint ref="in1">
-                    <jms:transaction action="BEGIN_OR_JOIN"/>
-                </inbound-endpoint>                
+                <inbound-endpoint ref="in1"/>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="out1">
-                        <jms:transaction action="BEGIN_OR_JOIN"/>
-                    </outbound-endpoint>
-                    <jms:transaction action="ALWAYS_BEGIN"/>
+                    <outbound-endpoint ref="out1"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="ConfigurationB">
             <inbound>
-                <inbound-endpoint ref="in2">
-                    <jms:transaction action="BEGIN_OR_JOIN"/>
-                </inbound-endpoint>                
+                <inbound-endpoint ref="in2"/>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="out2">
-                        <jms:transaction action="ALWAYS_BEGIN"/>
-                    </outbound-endpoint>
+                    <outbound-endpoint ref="out2"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="ConfigurationC">
             <inbound>
-                <inbound-endpoint ref="in3">
-                    <jms:transaction action="BEGIN_OR_JOIN"/>
-                </inbound-endpoint>                
+                <inbound-endpoint ref="in3"/>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="out3">
-                        <jms:transaction action="ALWAYS_BEGIN"/>
-                    </outbound-endpoint>
+                    <outbound-endpoint ref="out3"/>
                 </pass-through-router>
             </outbound>
         </service>

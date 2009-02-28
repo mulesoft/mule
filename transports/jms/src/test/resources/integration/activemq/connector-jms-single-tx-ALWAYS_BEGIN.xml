@@ -9,5 +9,28 @@
     <jms:activemq-connector name="jmsConnector1"/>
     <jms:activemq-connector name="jmsConnector2"/>
 
+    <endpoint name="in1" address="${inbound.destination1}" connector-ref="jmsConnector1">
+        <jms:transaction action="BEGIN_OR_JOIN"/>
+    </endpoint>
+    <endpoint name="out1" address="${outbound.destination1}" connector-ref="jmsConnector2">
+        <jms:transaction action="ALWAYS_BEGIN"/>
+    </endpoint>
+
+    <endpoint name="in2" address="${inbound.destination2}" connector-ref="jmsConnector1">
+        <jms:transaction action="ALWAYS_BEGIN"/>
+    </endpoint>
+
+    <endpoint name="out2" address="${outbound.destination2}" connector-ref="jmsConnector2">
+        <jms:transaction action="ALWAYS_BEGIN"/>
+    </endpoint>
+
+    <endpoint name="in3" address="${inbound.destination3}" connector-ref="jmsConnector1">
+        <jms:transaction action="BEGIN_OR_JOIN"/>
+    </endpoint>
+
+    <endpoint name="out3" address="${outbound.destination3}" connector-ref="jmsConnector2">
+        <jms:transaction action="ALWAYS_BEGIN"/>
+    </endpoint>
+
 
 </mule>
