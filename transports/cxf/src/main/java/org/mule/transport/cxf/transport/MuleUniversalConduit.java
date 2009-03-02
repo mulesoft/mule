@@ -365,10 +365,10 @@ public class MuleUniversalConduit extends AbstractConduit
         if (applyTransformersToProtocol)
         {
             message.applyTransformers(((OutboundEndpoint) prev.getEndpoint()).getTransformers());
+            
+            // The underlying endpoint transformers
+            event.transformMessage();
         }
-        
-        // The underlying endpoint transformers
-        event.transformMessage();
         
         MuleMessage msg = ep.send(event);
         
