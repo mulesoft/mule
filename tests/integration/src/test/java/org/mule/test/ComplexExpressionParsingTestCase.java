@@ -29,7 +29,6 @@ public class ComplexExpressionParsingTestCase extends AbstractMuleTestCase
     public void testComplexExpressionJdbcParsing() throws Exception
     {
         muleContext.getExpressionManager().registerEvaluator(new GroovyExpressionEvaluator());
-        MuleMessage msg = new DefaultMuleMessage(Arrays.asList(0, "test"));
 
         List parsedParams = new ArrayList();
         JdbcConnector c = new JdbcConnector();
