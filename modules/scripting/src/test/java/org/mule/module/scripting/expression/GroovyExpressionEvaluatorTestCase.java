@@ -30,12 +30,12 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
         Object value = e.evaluate("payload.apple.washed", msg);
         assertNotNull(value);
         assertTrue(value instanceof Boolean);
-        assertTrue(((Boolean) value).booleanValue());
+        assertTrue((Boolean) value);
 
         value = e.evaluate("message.payload.banana.bitten", msg);
         assertNotNull(value);
         assertTrue(value instanceof Boolean);
-        assertTrue(((Boolean) value).booleanValue());
+        assertTrue((Boolean) value);
 
         value = e.evaluate("bar", msg);
         assertNull(value);
