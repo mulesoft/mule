@@ -28,10 +28,10 @@ import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -78,7 +78,10 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
 
         String componentName = event.getSession().getService().getName();
 
-        ConcurrentMap eventsToRoute = new ConcurrentHashMap(2);
+        /*
+            Event Map must be ordered: MULE-4229
+         */
+        Map<String, MuleEvent> eventsToRoute = new LinkedHashMap<String, MuleEvent>(2);
         boolean noRoute = true;
         boolean match = false;
         InboundRouter inboundRouter;
@@ -94,11 +97,10 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
                 MuleEvent[] events = inboundRouter.process(event);
                 if(events!=null)
                 {
-                    for (int i = 0; i < events.length; i++)
+                    for (MuleEvent event1 : events)
                     {
-                        lastEvent = events[i];
-                        //Only add the event if it's a new event
-                        eventsToRoute.putIfAbsent(lastEvent.getId(), lastEvent);
+                        lastEvent = event1;
+                        eventsToRoute.put(lastEvent.getId(), lastEvent);
                     }
                 }
 
@@ -165,6 +167,12 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
                 try
                 {
                     MuleMessage messageResult = null;
+                    /*
+                        DON'T CHANGE THIS ITERATOR TYPE.
+                        Looks like Iterator and Iterable for LinkedHashMap have different order.
+                        This is critical to preserve the order for dispatching after e.g. resequencer.
+                        MULE-4229
+                     */
                     for (Iterator iterator = eventsToRoute.values().iterator(); iterator.hasNext();)
                     {
                         MuleEvent eventToRoute = (MuleEvent) iterator.next();
