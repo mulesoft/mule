@@ -216,7 +216,7 @@
                 <xsd:sequence minOccurs="1" maxOccurs="1">
                     <xsd:element name="job-endpoint" type="endpointRefType">
                         <xsd:annotation>
-                            <xsd:documentation>The endpoint used to dispatch the scheduled event.</xsd:documentation>
+                            <xsd:documentation>The endpoint used to dispatch the scheduled event. The preferred approach is to create a global endpoint and reference it using the {{ref}} attribute. However, you can also use the {{address}} attribute to define a URI endpoint. You can use the {{timeout}} attribute to specify an arbitrary time-out value associated with the endpoint that can be used by jobs that block waiting to receive events.</xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
@@ -303,33 +303,7 @@
         <xsd:attribute name="cronExpression" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The cron expression to schedule events at specified dates/times. This attribute or repeatInterval is required. A cron expression is a string comprised by 6 or 7 fields separated by white space. Fields can contain any of the allowed values, along with various combinations of the allowed special characters for that field. The fields are as follows:
-                    {html}
-                    <table>
-                        <th>Field Name </th><th>Mandatory</th><th>Allowed Values</th><th>Allowed Special Chars</th>
-                        <tr><td>Seconds</td><td>YES</td><td>0-59</td><td>, - * /</td></tr>
-                        <tr><td>Minutes</td><td>YES</td><td>0-59</td><td>, - * /</td></tr>
-                        <tr><td>Hours</td><td>YES</td><td>0-23</td><td>, - * /</td></tr>
-                        <tr><td>Day of Month</td><td>YES</td><td>1-31</td><td>, - * ? / L W C</td></tr>
-                        <tr><td>Month</td><td>YES</td><td>1-12 or JAN-DEC</td><td>, - * /</td></tr>
-                        <tr><td>Day of Week</td><td>YES</td><td>1-7 or SUN-SAT</td><td>, - * ? / L C #</td></tr>
-                        <tr><td>Year</td><td>NO</td><td>empty, 1970-2099</td><td>, - * /</td></tr>
-                    </table>
-
-                    Cron expressions can be as simple as this: <b>* * * * ? *</b><br></br>
-                    or more complex, like this: <b>0 0/5 14,18,3-39,52 ? JAN,MAR,SEP MON-FRI 2002-2010</b>
-
-                    <h4>Some examples:</h4>
-                    <ul>
-                    <li>0 0 12 * * ?         Fire at 12pm (noon) every day</li>
-                    <li>0 15 10 ? * *     Fire at 10:15am every day</li>
-                    <li>0 15 10 * * ?     Fire at 10:15am every day</li>
-                    <li>0 15 10 * * ? *     Fire at 10:15am every day</li>
-                    <li>0 15 10 * * ? 2005 Fire at 10:15am every day during the year 2005</li>
-                    <li>0 * 14 * * ?         Fire every minute starting at 2pm and ending at 2:59pm, every day</li>
-                    <li>0 0/5 14 * * ?     Fire every 5 minutes starting at 2pm and ending at 2:55pm, every day</li>
-                    </ul>
-                    {html}
+                    The cron expression to schedule events at specified dates/times. This attribute or repeatInterval is required. 
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
