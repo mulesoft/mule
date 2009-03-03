@@ -83,7 +83,7 @@ public class ServiceDescriptorFactory
             ServiceFinder finder;
             try
             {
-                finder = (ServiceFinder) ClassUtils.instanciateClass(serviceFinderClass, ClassUtils.NO_ARGS);
+                finder = (ServiceFinder) ClassUtils.instanciateClass(serviceFinderClass);
             }
             catch (Exception e)
             {

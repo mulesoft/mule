@@ -32,8 +32,8 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
     // we do not want to match these methods when looking for a service method to
     // invoke
-    protected final Set ignoreMethods = new HashSet(Arrays.asList(new String[]{"equals",
-            "getInvocationHandler"}));
+    protected final Set<String> ignoreMethods = new HashSet<String>(Arrays.asList("equals",
+                                                                                  "getInvocationHandler"));
 
     public void testIsConcrete() throws Exception
     {
@@ -73,12 +73,11 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
     public void testInstanciateClass() throws Exception
     {
-        Object object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.Orange", new Object[]{});
+        Object object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.Orange");
         assertNotNull(object);
         assertTrue(object instanceof Orange);
 
-        object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Object[]{
-                new Apple(), new Banana()});
+        object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Apple(), new Banana());
         assertNotNull(object);
         assertTrue(object instanceof FruitBowl);
 
@@ -89,7 +88,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
         try
         {
-            ClassUtils.instanciateClass("java.lang.Bing", new Object[]{});
+            ClassUtils.instanciateClass("java.lang.Bing");
             fail("Class does not exist, ClassNotFoundException should have been thrown");
         }
         catch (ClassNotFoundException e)

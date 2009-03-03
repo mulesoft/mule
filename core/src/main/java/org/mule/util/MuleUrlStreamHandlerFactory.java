@@ -104,7 +104,7 @@ public class MuleUrlStreamHandlerFactory extends Object implements URLStreamHand
             String className = packagePrefix + "." + protocol + ".Handler";
             try
             {
-                handler = (URLStreamHandler) ClassUtils.instanciateClass(className, null);
+                handler = (URLStreamHandler) ClassUtils.instanciateClass(className);
             }
             catch (Exception ex)
             {

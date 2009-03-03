@@ -14,7 +14,6 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
-import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -127,8 +126,8 @@ public class VmXATransactionTestCase extends FunctionalTestCase
             {
                 return (XAResource) resource;
             }
-            Method method = resource.getClass().getMethod("getXAResource", null);
-            return (XAResource) method.invoke(resource, ClassUtils.NO_ARGS);
+            Method method = resource.getClass().getMethod("getXAResource");
+            return (XAResource) method.invoke(resource);
         }
 
 

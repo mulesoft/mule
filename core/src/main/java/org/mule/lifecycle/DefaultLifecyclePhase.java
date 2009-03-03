@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 
 import java.lang.reflect.Method;
@@ -271,7 +270,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase
         }
         try
         {
-            lifecycleMethod.invoke(o, ClassUtils.NO_ARGS);
+            lifecycleMethod.invoke(o);
         }
         catch (Exception e)
         {

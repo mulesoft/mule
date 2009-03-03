@@ -207,7 +207,7 @@ public class ConfigScannerAgent extends AbstractAgent
             Class cfgBuilderClass = ClassUtils.loadClass(
                 "org.mule.config.spring.SpringXmlConfigurationBuilder", MuleServer.class);
             ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
-                cfgBuilderClass, new Object[]{configFile});
+                cfgBuilderClass, configFile);
 
             if (!cfgBuilder.isConfigured())
             {

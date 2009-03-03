@@ -75,12 +75,11 @@ public class ExceptionBean
                 Class aClass = ClassUtils.loadClass(exceptionClass, getClass());
                 if (cause == null)
                 {
-                    t = (Throwable)ClassUtils.instanciateClass(aClass, new Object[]{getDetailMessage()});
+                    t = (Throwable)ClassUtils.instanciateClass(aClass, getDetailMessage());
                 }
                 else
                 {
-                    t = (Throwable)ClassUtils.instanciateClass(aClass, new Object[]{getDetailMessage(),
-                        cause.toException()});
+                    t = (Throwable)ClassUtils.instanciateClass(aClass, getDetailMessage(), cause.toException());
                 }
                 if (getStackTrace() != null)
                 {

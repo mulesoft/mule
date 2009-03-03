@@ -106,7 +106,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory
                 MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
         }
 
-        Object object = ClassUtils.instanciateClass(objectClass, ClassUtils.NO_ARGS);
+        Object object = ClassUtils.instanciateClass(objectClass);
 
         if (properties != null)
         {

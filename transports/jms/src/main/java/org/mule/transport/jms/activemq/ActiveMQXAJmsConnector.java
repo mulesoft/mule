@@ -22,7 +22,7 @@ public class ActiveMQXAJmsConnector extends ActiveMQJmsConnector
         try
         {
             ConnectionFactory connectionFactory = (ConnectionFactory)
-                    ClassUtils.instanciateClass(ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS, new Object[]{getBrokerURL()});
+                    ClassUtils.instanciateClass(ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS, getBrokerURL());
             applyVendorSpecificConnectionFactoryProperties(connectionFactory);
             return connectionFactory;
         }

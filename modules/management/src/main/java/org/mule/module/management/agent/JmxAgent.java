@@ -223,8 +223,7 @@ public class JmxAgent extends AbstractAgent
                 // refactor
                 if (!credentials.isEmpty())
                 {
-                    JMXAuthenticator jmxAuthenticator = (JMXAuthenticator)ClassUtils.instanciateClass(
-                        DEFAULT_JMX_AUTHENTICATOR, ClassUtils.NO_ARGS);
+                    JMXAuthenticator jmxAuthenticator = (JMXAuthenticator)ClassUtils.instanciateClass(DEFAULT_JMX_AUTHENTICATOR);
                     // TODO support for custom authenticators
                     ((SimplePasswordJmxAuthenticator)jmxAuthenticator).setCredentials(credentials);
                     connectorServerProperties.put(JMXConnectorServer.AUTHENTICATOR, jmxAuthenticator);

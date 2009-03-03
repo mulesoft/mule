@@ -87,7 +87,7 @@ public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFac
 
         try
         {
-            return (Provider) ClassUtils.instanciateClass(info.getProviderClass(), null);
+            return (Provider) ClassUtils.instanciateClass(info.getProviderClass());
         }
         catch (Exception ex)
         {

@@ -151,7 +151,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 }
             }
             String transClass = (x == -1 ? transString : transString.substring(0, x));
-            Transformer trans = (Transformer) ClassUtils.instanciateClass(transClass, ClassUtils.NO_ARGS);
+            Transformer trans = (Transformer) ClassUtils.instanciateClass(transClass);
             if (!(trans instanceof DiscoverableTransformer))
             {
                 throw new TransformerException(CoreMessages.transformerNotImplementDiscoverable(trans));
@@ -186,7 +186,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
         {
             Map.Entry entry = (Map.Entry) iterator.next();
-            Object object = ClassUtils.instanciateClass(entry.getValue().toString(), ClassUtils.NO_ARGS);
+            Object object = ClassUtils.instanciateClass(entry.getValue().toString());
             String key = entry.getKey().toString();
             Class meta = Object.class;
             if(object instanceof ObjectProcessor)
@@ -205,7 +205,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         while (objectString != null)
         {
 
-            Object o = ClassUtils.instanciateClass(objectString, ClassUtils.NO_ARGS);
+            Object o = ClassUtils.instanciateClass(objectString);
             Class meta = Object.class;
             if(o instanceof ObjectProcessor)
             {

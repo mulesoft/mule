@@ -109,7 +109,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
 
                 ConfigResource[] constructorArg = new ConfigResource[configs.size()];
                 System.arraycopy(configs.toArray(), 0, constructorArg, 0, configs.size());
-                ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils.instanciateClass(className, new Object[]{constructorArg});
+                ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils.instanciateClass(className, constructorArg);
                 cb.configure(muleContext);
             }
         }

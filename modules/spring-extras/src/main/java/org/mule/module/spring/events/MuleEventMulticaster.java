@@ -736,8 +736,7 @@ public class MuleEventMulticaster
             {
                 setSubscriptionFilter(WildcardFilter.class);
             }
-            ObjectFilter filter = (ObjectFilter) ClassUtils.instanciateClass(getSubscriptionFilter(),
-                new Object[]{pattern});
+            ObjectFilter filter = (ObjectFilter) ClassUtils.instanciateClass(getSubscriptionFilter(), pattern);
             return filter;
         }
         catch (Exception e)

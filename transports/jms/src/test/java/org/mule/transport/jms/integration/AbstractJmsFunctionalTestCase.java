@@ -16,18 +16,16 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleParameterized;
-import org.mule.transport.jms.integration.activemq.ActiveMQJmsConfiguration;
-import org.mule.util.IOUtils;
 import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.net.URL;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -91,7 +89,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
             {
                 String cls = (String) iterator.next();
-                configs[0][i] = (JmsVendorConfiguration)ClassUtils.instanciateClass(cls, ClassUtils.NO_ARGS);
+                configs[0][i] = (JmsVendorConfiguration)ClassUtils.instanciateClass(cls);
 
             }
         }

@@ -328,7 +328,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         }
     }
 
-    public static Object instanciateClass(Class clazz, Object[] constructorArgs)
+    public static Object instanciateClass(Class clazz, Object... constructorArgs)
             throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
             IllegalAccessException, InvocationTargetException
     {
@@ -365,9 +365,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         if (ctor == null)
         {
             StringBuffer argsString = new StringBuffer(100);
-            for (int i = 0; i < args.length; i++)
+            for (Class arg : args)
             {
-                argsString.append(args[i].getName()).append(", ");
+                argsString.append(arg.getName()).append(", ");
             }
             throw new NoSuchMethodException("could not find constructor with matching arg params: "
                     + argsString);
@@ -376,7 +376,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return ctor.newInstance(constructorArgs);
     }
 
-    public static Object instanciateClass(String name, Object[] constructorArgs)
+    public static Object instanciateClass(String name, Object... constructorArgs)
             throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
             InstantiationException, IllegalAccessException, InvocationTargetException
     {

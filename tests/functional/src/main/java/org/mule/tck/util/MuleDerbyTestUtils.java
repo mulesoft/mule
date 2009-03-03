@@ -65,7 +65,7 @@ public class MuleDerbyTestUtils
         {
             // force loading the driver so it's available even if no prior connection to the
             // database was made
-            ClassUtils.instanciateClass(DERBY_DRIVER_CLASS, new Object[0]);
+            ClassUtils.instanciateClass(DERBY_DRIVER_CLASS);
 
             DriverManager.getConnection("jdbc:derby:;shutdown=true");
         }
@@ -99,13 +99,12 @@ public class MuleDerbyTestUtils
     /** Start a previously created (and stopped) database */
     public static void startDataBase(String databaseName) throws Exception
     {
-        Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS, new Object[0]);        
+        Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS);
 
-        Method connectMethod = derbyDriver.getClass().getMethod("connect", 
-            new Class[] { String.class, Properties.class });
-        
+        Method connectMethod = derbyDriver.getClass().getMethod("connect", String.class, Properties.class);
+
         String connectionName = "jdbc:derby:" + databaseName;
-        connectMethod.invoke(derbyDriver, new Object[] { connectionName, null });
+        connectMethod.invoke(derbyDriver, connectionName, null);
     }
 
     /**
@@ -157,9 +156,9 @@ public class MuleDerbyTestUtils
              * EmbeddedDriver derbyDriver = new EmbeddedDriver();
              * derbyDriver.connect(connectionName, null);
              */
-            Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS, new Object[0]);            
-            Method connectMethod = derbyDriver.getClass().getMethod("connect", new Class[] { String.class, Properties.class });            
-            connectMethod.invoke(derbyDriver, new Object[] { connectionName, properties });
+            Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS);
+            Method connectMethod = derbyDriver.getClass().getMethod("connect", String.class, Properties.class);
+            connectMethod.invoke(derbyDriver, connectionName, properties);
 
             if (creationSql != null)
             {
@@ -167,18 +166,18 @@ public class MuleDerbyTestUtils
                  * EmbeddedDataSource embeddedDS = new EmbeddedDataSource();
                  * embeddedDS.setDatabaseName(databaseName);
                  */
-                DataSource embeddedDS = (DataSource) ClassUtils.instanciateClass(DERBY_DATASOURCE_CLASS, new Object[0]);
-                Method m = embeddedDS.getClass().getMethod("setDatabaseName", new Class[] { String.class });
-                m.invoke(embeddedDS, new Object[] { databaseName });
+                DataSource embeddedDS = (DataSource) ClassUtils.instanciateClass(DERBY_DATASOURCE_CLASS);
+                Method m = embeddedDS.getClass().getMethod("setDatabaseName", String.class);
+                m.invoke(embeddedDS, databaseName);
 
                 Connection con = null;
                 try
                 {
                     con = embeddedDS.getConnection();
                     Statement st = con.createStatement();
-                    for (int i = 0; i < creationSql.length; ++i)
+                    for (String aCreationSql : creationSql)
                     {
-                        st.execute(creationSql[i]);
+                        st.execute(aCreationSql);
                     }
                     con.commit();
                 }

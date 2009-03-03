@@ -59,7 +59,7 @@ public final class LifecycleTransitionResult
         }
         try
         {
-            method.invoke(target, ClassUtils.NO_ARGS);
+            method.invoke(target);
         }
         catch (IllegalAccessException e)
         {

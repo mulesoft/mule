@@ -64,7 +64,7 @@ public class WeblogicJmsTopicResolver extends DefaultJmsTopicResolver
             {
                 Method topicMethod = ClassUtils.getPublicMethod(destination.getClass(), "isTopic", PARAMETER_TYPES_NONE);
 
-                topic = ((Boolean) topicMethod.invoke(destination, ClassUtils.NO_ARGS)).booleanValue();
+                topic = (Boolean) topicMethod.invoke(destination);
             }
             catch (Exception e)
             {

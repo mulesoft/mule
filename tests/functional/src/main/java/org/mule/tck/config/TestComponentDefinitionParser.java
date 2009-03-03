@@ -112,7 +112,7 @@ public class TestComponentDefinitionParser extends ComponentDefinitionParser
                 String c = ele.getAttribute("class");
                 try
                 {
-                    EventCallback cb = (EventCallback)ClassUtils.instanciateClass(c, ClassUtils.NO_ARGS);
+                    EventCallback cb = (EventCallback)ClassUtils.instanciateClass(c);
                     props.put("eventCallback", cb);
 
                 }

@@ -90,7 +90,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             try
             {
                 configBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(info.getConfigurationBuilder(),
-                    new Object[]{info.getConfigurations()});
+                                                                                   info.getConfigurations());
             }
             catch (Exception e)
             {

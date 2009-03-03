@@ -51,7 +51,7 @@ public class CustomJobFromMessageConfig extends AbstractJobConfig
                     new Class[]{Job.class, JobConfig.class}, result.getClass()).getMessage());
         }
 
-        return (Job) ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS);
+        return (Job) ClassUtils.instanciateClass(clazz);
     }
 
     public JobConfig getJobConfig(MuleMessage message) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException
