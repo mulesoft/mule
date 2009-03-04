@@ -1618,7 +1618,7 @@
                     <encoding>ISO-8859-1</encoding>
                     <source>1.5</source>
                     <!-- aggregate all when built from the top-level directory -->
-                    <!-- <aggregate>true</aggregate> -->
+                    <aggregate>true</aggregate>
                     <!-- Link to the external online JavaDoc -->
                     <links>
                         <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
