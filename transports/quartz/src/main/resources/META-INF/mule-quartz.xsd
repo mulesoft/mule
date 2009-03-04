@@ -75,7 +75,7 @@
                  substitutionGroup="mule:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                An outbound Quartz endpoint allows existing events to be stored and fired at a later time/date. If you are using a persistent event store, the payload of the event must implement {{java.io.Serializable}}. You configure an {{org.quartz.Job}} implementation on the endpoint to tell it what action to take. Mule has some default jobs, but you can also write your own.
+                An outbound Quartz endpoint allows existing events to be stored and fired at a later time/date. If you are using a persistent event store, the payload of the event must implement java.io.Serializable. You configure an org.quartz.Job implementation on the endpoint to tell it what action to take. Mule has some default jobs, but you can also write your own.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -163,7 +163,7 @@
                     <xsd:element name="payload" type="mule:dataReferenceType" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The payload of the newly created event. The payload can be a reference to a file, fixed string, or object configured as a Spring bean. If this value is not set, an event will be generated with an {{org.mule.transport.NullPayload}} instance.
+                                The payload of the newly created event. The payload can be a reference to a file, fixed string, or object configured as a Spring bean. If this value is not set, an event will be generated with an org.mule.transport.NullPayload instance.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -216,7 +216,7 @@
                 <xsd:sequence minOccurs="1" maxOccurs="1">
                     <xsd:element name="job-endpoint" type="endpointRefType">
                         <xsd:annotation>
-                            <xsd:documentation>The endpoint used to dispatch the scheduled event. The preferred approach is to create a global endpoint and reference it using the {{ref}} attribute. However, you can also use the {{address}} attribute to define a URI endpoint. You can use the {{timeout}} attribute to specify an arbitrary time-out value associated with the endpoint that can be used by jobs that block waiting to receive events.</xsd:documentation>
+                            <xsd:documentation>The endpoint used to dispatch the scheduled event. The preferred approach is to create a global endpoint and reference it using the ref attribute. However, you can also use the address attribute to define a URI endpoint. You can use the timeout attribute to specify an arbitrary time-out value associated with the endpoint that can be used by jobs that block waiting to receive events.</xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
@@ -333,7 +333,7 @@
     <xsd:complexType name="endpointRefType">
         <xsd:annotation>
             <xsd:documentation>
-                Defines an endpoint reference. The preferred approach is to create a global endpoint and reference that. However, you can also use the {{address}} attribute to define a URI endpoint.
+                Defines an endpoint reference. The preferred approach is to create a global endpoint and reference that. However, you can also use the address attribute to define a URI endpoint.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="ref" type="xsd:NMTOKEN">

@@ -113,7 +113,7 @@
         <xsd:attribute name="path" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The queue path, such as {{dispatchInQueue}} to create the address {{vm://dispatchInQueue}}.
+                    The queue path, such as dispatchInQueue to create the address vm://dispatchInQueue.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -122,7 +122,7 @@
     <xsd:element name="transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction">
         <xsd:annotation>
             <xsd:documentation>
-                The {{&lt;transaction&gt;}} element configures a transaction. Transactions allow a series of operations to be grouped together so that they can be rolled back if a failure occurs. For more information, see [Transaction Management].
+                The transaction element configures a transaction. Transactions allow a series of operations to be grouped together so that they can be rolled back if a failure occurs. For more information, see [Transaction Management].
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

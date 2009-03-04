@@ -23,7 +23,7 @@
             <schemadoc:additional-documentation where="before-specific-elements">
                 h2. Filename Parsers
 
-                The {{filenameParser}} is set on the connector used when writing files to a directory. The parser will convert the {{outputPattern}} attribute to a string using the parser and the current message.
+                The filenameParser is set on the connector used when writing files to a directory. The parser will convert the outputPattern attribute to a string using the parser and the current message.
             </schemadoc:additional-documentation>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="false"
                                           requestEvents="true"
@@ -69,7 +69,7 @@
                         <xsd:documentation>
                             If set to true (the default), it will cause the file to be deleted once it is read. If streaming is turned on, this occurs when the InputStream for the file is closed. Otherwise the file will be read into memory and deleted immediately.
                             
-                            To access the {{java.io.File}} object set this property to false and specify a NoActionTransformer transformer for the connector. Mule will not delete the file, so it is up to the component to delete it when it is done. If the moveToDirectory is set, the file is first moved, then the File object of the moved file is passed to the component. It is recommended that a moveToDirectory is specified when turning autoDelete off.
+                            To access the java.io.File object set this property to false and specify a NoActionTransformer transformer for the connector. Mule will not delete the file, so it is up to the component to delete it when it is done. If the moveToDirectory is set, the file is first moved, then the File object of the moved file is passed to the component. It is recommended that a moveToDirectory is specified when turning autoDelete off.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -102,14 +102,14 @@
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Reads the contents of a {{java.io.File}} into a byte array (byte[]).</xsd:documentation>
+                Reads the contents of a java.io.File into a byte array (byte[]).</xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="file-to-string-transformer" type="mule:abstractTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Reads the contents of a {{java.io.File}} into a {{java.lang.String}}.</xsd:documentation>
+                Reads the contents of a java.io.File into a java.lang.String.</xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
@@ -126,7 +126,7 @@
                  substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                This filter can be used to restrict the files being processed by applying Java regular expressions to the filename, such as {{pattern="myCustomerFile(.*)"}}.
+                This filter can be used to restrict the files being processed by applying Java regular expressions to the filename, such as pattern="myCustomerFile(.*)".
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -166,7 +166,7 @@
     <xsd:complexType name="filenameParserType">
         <xsd:annotation>
             <xsd:documentation>
-                The {{filenameParser}} is used when writing files to a directory. The parser will convert the {{outputPattern}} attribute to a string using the parser and the current message. The default implmentation used is {{SimpleFilenameParser}}.
+                The filenameParser is used when writing files to a directory. The parser will convert the outputPattern attribute to a string using the parser and the current message. The default implmentation used is SimpleFilenameParser.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:complexType>
@@ -203,7 +203,7 @@
         <xsd:attribute name="comparator" type="mule:substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
-                    Sorts incoming files using the specified comparator, such as {{comparator="org.mule.transport.file.comparator.OlderFirstComparator"}}. The class must implement the {{java.util.Comparator}} interface.
+                    Sorts incoming files using the specified comparator, such as comparator="org.mule.transport.file.comparator.OlderFirstComparator". The class must implement the java.util.Comparator interface.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -287,7 +287,7 @@
                  substitutionGroup="abstract-filenameParser">
         <xsd:annotation>
             <xsd:documentation>
-                Allows the user to specify a custom filename parser. The implementation must implement {{org.mule.transport.file.FilenameParser}}.
+                Allows the user to specify a custom filename parser. The implementation must implement org.mule.transport.file.FilenameParser.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -298,7 +298,7 @@
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The implementation class name that implements {{org.mule.transport.file.FilenameParser}}.
+                            The implementation class name that implements org.mule.transport.file.FilenameParser.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -309,7 +309,7 @@
     <xsd:element name="abstract-filenameParser" abstract="true" type="filenameParserType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for flename parser elements. The filename parser is set on the connector used when writing files to a directory. The parser will convert the {{outputPattern}} attribute to a string using the parser and the current message. The default implmentation used is {{&lt;legacy-filename-parser&gt;}}, but you can specify {{&lt;expression-filename-parser&gt;}} or {{&lt;custom-filename-parser&gt;}}. 
+                A placeholder for flename parser elements. The filename parser is set on the connector used when writing files to a directory. The parser will convert the outputPattern attribute to a string using the parser and the current message. The default implmentation used is &lt;legacy-filename-parser&gt;, but you can specify &lt;expression-filename-parser&gt; or &lt;custom-filename-parser&gt;. 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

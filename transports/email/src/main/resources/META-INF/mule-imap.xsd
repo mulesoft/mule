@@ -17,7 +17,7 @@
                 schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.2/mule-schemadoc.xsd"/>
         
     <xsd:annotation>
-        <xsd:documentation>The IMAP transport can be used for receiving messages from IMAP inboxes using the {{javax.mail}} API. The [IMAPS Transport] is similar but uses secure connections over SSL/TLS.</xsd:documentation>
+        <xsd:documentation>The IMAP transport can be used for receiving messages from IMAP inboxes using the javax.mail API. The [IMAPS Transport] is similar but uses secure connections over SSL/TLS.</xsd:documentation>
         <xsd:appinfo>
             <schemadoc:short-name>IMAP</schemadoc:short-name>
             <schemadoc:page-title>IMAP Transport</schemadoc:page-title>

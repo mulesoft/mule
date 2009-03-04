@@ -66,14 +66,14 @@
                 <xsd:attribute name="queryRunner-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                                                    Reference to the QueryRunner object, which is the object that actually runs the Query. This object is typically created using Spring. Default is {{org.apache.commons.dbutils.QueryRunner.}}
+                                                    Reference to the QueryRunner object, which is the object that actually runs the Query. This object is typically created using Spring. Default is org.apache.commons.dbutils.QueryRunner.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="resultSetHandler-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                                                    Reference to the ResultSetHandler object, which is the object that determines which java.sql.ResultSet gets handled. This object is typically created using Spring. Default is {{org.apache.commons.dbutils.handlers.MapListHandler}}, which steps through the ResultSet and stores records as Map objects on a List.
+                                                    Reference to the ResultSetHandler object, which is the object that determines which java.sql.ResultSet gets handled. This object is typically created using Spring. Default is org.apache.commons.dbutils.handlers.MapListHandler, which steps through the ResultSet and stores records as Map objects on a List.
                                                 </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

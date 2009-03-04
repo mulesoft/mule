@@ -46,7 +46,7 @@
                     <xsd:element ref="file:abstract-filenameParser">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The {{filenameParser}} is used when writing files to an FTP server. The parser will convert the {{outputPattern}} attribute to a string using the parser and the current message. To add a parser to your configuration, you import the *file* namespace into your XML configuration. For more information about filenameParsers, see the [File Transport].
+                                The filenameParser is used when writing files to an FTP server. The parser will convert the outputPattern attribute to a string using the parser and the current message. To add a parser to your configuration, you import the "file" namespace into your XML configuration. For more information about filenameParsers, see the [File Transport].
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>

@@ -35,7 +35,7 @@
     <xsd:element name="connector" type="httpsConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                This connector provides Secure HTTP connectivity on top of what is already provided with the Mule [Http Transport].
+                This connector provides Secure HTTP connectivity on top of what is already provided with the Mule [HTTP Transport].
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -43,7 +43,7 @@
      <xsd:element name="polling-connector" type="httpsPollingConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                Allows Mule to poll an external HTTP server and generate events from the result. This is useful for pull-only web services. This connector provides a secure version of the {{PollingHttpConnector}}.
+                Allows Mule to poll an external HTTP server and generate events from the result. This is useful for pull-only web services. This connector provides a secure version of the PollingHttpConnector.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

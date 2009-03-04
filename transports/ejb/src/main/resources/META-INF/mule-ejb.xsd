@@ -44,7 +44,7 @@
         &lt;outbound-endpoint address="ejb://localhost:1099/SomeService?method=remoteMethod"/&gt;
         {code}
 
-        If the method can take one or more input arguments, you configure their types as a comma-separated list using the {{methodArgumentTypes}} attribute. Multiple arguments are passed in as an array of objects as the payload of the Mule event.
+        If the method can take one or more input arguments, you configure their types as a comma-separated list using the methodArgumentTypes attribute. Multiple arguments are passed in as an array of objects as the payload of the Mule event.
 
         h2. Transformers
 

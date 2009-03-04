@@ -135,7 +135,7 @@
     <xsd:element name="streaming-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that data written to a socket is transmitted in a single packet, so if you want to transmit entire Mule messages reliably, you must specify an additional protocol. However, this is not an issue with streaming, so the {{&lt;streaming-protocol&gt;}} element is an alias for the "direct" (null) protocol.
+                TCP does not guarantee that data written to a socket is transmitted in a single packet, so if you want to transmit entire Mule messages reliably, you must specify an additional protocol. However, this is not an issue with streaming, so the streaming-protocol element is an alias for the "direct" (null) protocol.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -143,7 +143,7 @@
     <xsd:element name="xml-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that data written to a socket is transmitted in a single packet, so if you want to transmit entire Mule messages reliably, you must specify an additional protocol. The {{&lt;xml-protocol&gt;}} element configures the XML protocol, which uses XML syntax to isolate messages from the stream of bytes received, so it will only work with well-formed XML.
+                TCP does not guarantee that data written to a socket is transmitted in a single packet, so if you want to transmit entire Mule messages reliably, you must specify an additional protocol. The xml-protocol element configures the XML protocol, which uses XML syntax to isolate messages from the stream of bytes received, so it will only work with well-formed XML.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -151,7 +151,7 @@
     <xsd:element name="xml-eof-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                Similar to {{&lt;xml-protocol&gt;}}, the {{&lt;xml-eof-protocol&gt;}} element configures the XML protocol, but it will also use socket closure to terminate a message (even if the XML is not well-formed).
+                Similar to xml-protocol, the xml-eof-protocol element configures the XML protocol, but it will also use socket closure to terminate a message (even if the XML is not well-formed).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -159,7 +159,7 @@
     <xsd:element name="eof-protocol" type="byteOrMessageProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that data written to a socket is transmitted in a single packet, so if you want to transmit entire Mule messages reliably, you must specify an additional protocol. The {{&lt;eof-protocol&gt;}} element configures a protocol that simply accumulates all data until the socket closes and places it in a single message.
+                TCP does not guarantee that data written to a socket is transmitted in a single packet, so if you want to transmit entire Mule messages reliably, you must specify an additional protocol. The eof-protocol element configures a protocol that simply accumulates all data until the socket closes and places it in a single message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -167,7 +167,7 @@
     <xsd:element name="direct-protocol" type="byteOrMessageProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                TCP does not guarantee that data written to a socket is transmitted in a single packet. Using the {{&lt;direct-protocol&gt;}} element to configure the "null" protocol does not change the normal TCP behavior, so message fragmentation may occur. For example, a single sent message may be received in several pieces, each as a separate received message. Typically, it is not a good choice for messaging within Mule, but it may be necessary to interface with external TCP-based protocols.
+                TCP does not guarantee that data written to a socket is transmitted in a single packet. Using the direct-protocol element to configure the "null" protocol does not change the normal TCP behavior, so message fragmentation may occur. For example, a single sent message may be received in several pieces, each as a separate received message. Typically, it is not a good choice for messaging within Mule, but it may be necessary to interface with external TCP-based protocols.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -189,7 +189,7 @@
     <xsd:element name="safe-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                Similar to {{&lt;length-protocol&gt;}}, {{&lt;safe-protocol&gt;}} also includes a prefix. Verification of the prefix allows mis-matched protocols to be detected and avoids interpreting "random" data as a message length (which may give out-of-memory errors). This is the default protocol in Mule 2.x.
+                Similar to length-protocol, safe-protocol also includes a prefix. Verification of the prefix allows mis-matched protocols to be detected and avoids interpreting "random" data as a message length (which may give out-of-memory errors). This is the default protocol in Mule 2.x.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -197,7 +197,7 @@
     <xsd:element name="length-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                The {{&lt;length-protocol&gt;}} element configures the length protocol, which precedes each message with the number of bytes sent so that an entire message can be constructed on the received.
+                The length-protocol element configures the length protocol, which precedes each message with the number of bytes sent so that an entire message can be constructed on the received.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -219,7 +219,7 @@
     <xsd:element name="custom-protocol" type="customProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
-                The {{&lt;custom-protocol&gt;}} element allows you to configure your own protocol implementation.
+                The custom-protocol element allows you to configure your own protocol implementation.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -240,7 +240,7 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                The {{&lt;inbound-endpoint&gt;}} element configures the endpoint on which the messages are received.
+                The inbound-endpoint element configures the endpoint on which the messages are received.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -255,7 +255,7 @@
     <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                The {{&lt;outbound-endpoint&gt;}} element configures the endpoint where the messages are sent.
+                The outbound-endpoint element configures the endpoint where the messages are sent.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -270,7 +270,7 @@
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                The {{&lt;endpoint&gt;}} element configures a global TCP endpoint definition.
+                The endpoint element configures a global TCP endpoint definition.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
