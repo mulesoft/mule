@@ -11,6 +11,8 @@ package org.mule.transport.jms.activemq;
 
 import org.mule.util.ClassUtils;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.jms.ConnectionFactory;
 
 public class ActiveMQXAJmsConnector extends ActiveMQJmsConnector
@@ -26,10 +28,15 @@ public class ActiveMQXAJmsConnector extends ActiveMQJmsConnector
             applyVendorSpecificConnectionFactoryProperties(connectionFactory);
             return connectionFactory;
         }
+        catch (InvocationTargetException itex)
+        {
+            Throwable target = itex.getCause();
+            handleException(target instanceof Exception ? (Exception) target : new Exception(target));
+        }
         catch (Exception e)
         {
-            logger.warn(e);
-            return null;
+            handleException(e);
         }
+        return null;
     }
 }

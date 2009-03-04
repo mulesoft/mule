@@ -15,6 +15,7 @@ import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.xa.TargetInvocationHandler;
 import org.mule.util.ClassUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -49,11 +50,16 @@ public class ActiveMQJmsConnector extends JmsConnector
             applyVendorSpecificConnectionFactoryProperties(connectionFactory);
             return connectionFactory;
         }
+        catch (InvocationTargetException itex)
+        {
+            Throwable target = itex.getCause();
+            handleException(target instanceof Exception ? (Exception) target : new Exception(target));
+        }
         catch (Exception e)
         {
             handleException(e);
-            return null;
         }
+        return null;
     }
 
     protected void applyVendorSpecificConnectionFactoryProperties(ConnectionFactory connectionFactory)
