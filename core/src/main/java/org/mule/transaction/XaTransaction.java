@@ -54,7 +54,7 @@ public class XaTransaction extends AbstractTransaction
         if (txManager == null)
         {
             throw new IllegalStateException(
-                    CoreMessages.objectNotRegistered("Transaction Manager", "Transaction Manager").getMessage());
+                    CoreMessages.objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager").getMessage());
         }
 
         try
@@ -351,7 +351,7 @@ public class XaTransaction extends AbstractTransaction
         if (txManager == null)
         {
             throw new IllegalStateException(
-                    CoreMessages.objectNotRegistered("TransactionManager", "Transaction Manager").getMessage());
+                    CoreMessages.objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager").getMessage());
         }
         try
         {
@@ -374,7 +374,7 @@ public class XaTransaction extends AbstractTransaction
         if (txManager == null)
         {
             throw new IllegalStateException(
-                    CoreMessages.objectNotRegistered("TransactionManager", "Transaction Manager").getMessage());
+                    CoreMessages.objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager").getMessage());
         }
         try
         {
