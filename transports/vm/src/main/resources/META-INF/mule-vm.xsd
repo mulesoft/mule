@@ -122,7 +122,7 @@
     <xsd:element name="transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction">
         <xsd:annotation>
             <xsd:documentation>
-                The transaction configuration.
+                The {{&lt;transaction&gt;}} element configures a transaction. Transactions allow a series of operations to be grouped together so that they can be rolled back if a failure occurs. For more information, see [Transaction Management].
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
