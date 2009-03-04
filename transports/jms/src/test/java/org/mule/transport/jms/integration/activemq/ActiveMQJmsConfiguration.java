@@ -20,10 +20,6 @@ import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 /**
- * TODO
- */
-
-/**
  * Abstracts all the Jms Vendor specific configuration.  This is the implementation for ActiveMQ.
  */
 public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
