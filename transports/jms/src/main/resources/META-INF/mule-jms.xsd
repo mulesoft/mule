@@ -31,7 +31,7 @@
     <xsd:element name="connector" type="genericConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                A generic connector for sending and receiving messages over JMS queues.
+                The {{&lt;connector&gt;}} element configures a generic connector for sending and receiving messages over JMS queues.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -55,7 +55,7 @@
     <xsd:element name="custom-connector" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                A custom connector for sending and receiving messages over JMS queues.
+                The {{&lt;custom-connector&gt;}} element configures a custom connector for sending and receiving messages over JMS queues.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -197,7 +197,7 @@
         <xsd:attribute name="jndiProviderProperties-ref" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    Feference to a Map that contains additional provider properties.
+                    Reference to a Map that contains additional provider properties.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -254,14 +254,14 @@
     <xsd:element name="activemq-connector" type="activeMqConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                ActiveMQ version of the JMS connector.
+                The {{&lt;activemq-connector&gt;}} element configures an ActiveMQ version of the JMS connector.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="activemq-xa-connector" type="activeMqConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                ActiveMQ version of the JMS connector with XA transaction support.
+                The {{&lt;activemq-xa-connector&gt;}} element configures an ActiveMQ version of the JMS connector with XA transaction support.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -282,14 +282,14 @@
     <xsd:element name="weblogic-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                WebLogic version of the JMS connector.
+                The {{&lt;weblogic-connector&gt;}} element configures a WebLogic version of the JMS connector.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="websphere-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                WebSphere version of the JMS connector.
+                The {{&lt;websphere-connector&gt;}} element configures a WebSphere version of the JMS connector.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -297,14 +297,14 @@
     <xsd:element name="transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction">
         <xsd:annotation>
             <xsd:documentation>
-                Transactions allow a series of operations to be grouped together so that they can be rolled back if a failure occurs. Set the action (such as ALWAYS_BEGIN or JOIN_IF_POSSIBLE) and the timeout setting for the transaction.
+                The {{&lt;transaction&gt;}} element configures a transaction. Transactions allow a series of operations to be grouped together so that they can be rolled back if a failure occurs. Set the action (such as ALWAYS_BEGIN or JOIN_IF_POSSIBLE) and the timeout setting for the transaction.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="client-ack-transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction">
         <xsd:annotation>
             <xsd:documentation>
-                Identical to a transaction but for message acknowledgements. There is no notion of rollback with client acknowledgement, but this transaction can be useful for controlling how messages are consumed from a destination.
+                The {{&lt;client-ack-transaction&gt;}} element configures a client acknowledgment transaction, which is identical to a transaction but with message acknowledgements. There is no notion of rollback with client acknowledgement, but this transaction can be useful for controlling how messages are consumed from a destination.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -312,14 +312,14 @@
     <xsd:element name="jmsmessage-to-object-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Converts a JMS message into an object by extracting the message payload.
+                The {{&lt;jmsmessage-to-object-transformer&gt;}} element configures a transformer that converts a JMS message into an object by extracting the message payload.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="object-to-jmsmessage-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Converts an object into one of five types of JMS messages, depending on the object passed in: java.lang.String -> javax.jms.TextMessage, byte[] -> javax.jms.BytesMessage, java.util.Map -> javax.jms.MapMessage, java.io.InputStream -> javax.jms.StreamMessage, and java.lang.Object -> javax.jms.ObjectMessage.
+                The {{&lt;object-to-jmsmessage-transformer&gt;}} element configures a transformer that converts an object into one of five types of JMS messages, depending on the object passed in: java.lang.String -> javax.jms.TextMessage, byte[] -> javax.jms.BytesMessage, java.util.Map -> javax.jms.MapMessage, java.io.InputStream -> javax.jms.StreamMessage, and java.lang.Object -> javax.jms.ObjectMessage.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -327,7 +327,7 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                An endpoint on which JMS messages are received.
+                The {{&lt;inbound-endpoint&gt;}} element configures an endpoint on which JMS messages are received.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -344,7 +344,7 @@
     <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                An endpoint to which JMS messages are sent.
+                The {{&lt;inbound-endpoint&gt;}} element configures an endpoint to which JMS messages are sent.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -361,7 +361,7 @@
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                A global JMS endpoint definition.
+                The {{&lt;endpoint&gt;}} element configures a global JMS endpoint definition.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -437,7 +437,7 @@
     <xsd:element name="property-filter" substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                Allows you to filter messages based on a JMS property.
+                The {{&lt;property-filter&gt;}} element configures a filter that allows you to filter messages based on a JMS property.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
