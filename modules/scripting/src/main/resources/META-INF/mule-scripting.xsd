@@ -17,7 +17,7 @@
         </xsd:documentation>
 
         <xsd:appinfo>
-            <schemadoc:short-name>scripting</schemadoc:short-name>
+            <schemadoc:short-name>Scripting</schemadoc:short-name>
             <schemadoc:page-title>Scripting Module</schemadoc:page-title>
             
             <schemadoc:additional-documentation where="after-common-elements">
@@ -85,20 +85,22 @@
                 <xsd:sequence>
                     <xsd:element name="script" type="scriptType" minOccurs="0">
                         <xsd:annotation>
-                            <xsd:documentation>A script to be executed by a JSR-223 compliant script engine such as Groovy, JavaScript(Rhino), Python, Ruby or Beanshell (etc).</xsd:documentation>
+                            <xsd:documentation>
+                                A script to be executed by a JSR-223 compliant script engine such as Groovy, JavaScript(Rhino), Python, Ruby, or Beanshell.
+                            </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                     <xsd:element name="java-interface-binding" type="mule:pojoBindingType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
-                                A binding associates a Mule endpoint with an injected Java interface (this is like using Spring to inject a bean, but instead of calling a method on the bean a message is sent to an endpoint). Script bindings will only work with Java-based scripting languages. Right now there is no validation on when languages support java bindinngs since there are so many scripting languages.
+                                A binding associates a Mule endpoint with an injected Java interface (this is like using Spring to inject a bean, but instead of calling a method on the bean a message is sent to an endpoint). Script bindings will only work with Java-based scripting languages. Right now there is no validation on when languages support Java bindinngs because there are so many scripting languages.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="script-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
-                        <xsd:documentation>A reference to a script object bean, that is, a &lt;script:script ...&gt; definition.
+                        <xsd:documentation>A reference to a script object bean, that is, a {{&lt;script:script ...&gt;}} definition.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -109,7 +111,7 @@
     <xsd:element name="script" type="scriptType" substitutionGroup="mule:abstract-extension">
         <xsd:annotation>
             <xsd:documentation>
-                Represents a script that can be used as a component for a service or a transformer. The script text can be pulled in from a script file or be embedded inside this element. A script to be executed by any JSR-223 compliant script engine such as Groovy, JavaScript(Rhino), Python, Ruby or Beanshell (etc).
+                Represents a script that can be used as a component for a service or a transformer. The script text can be pulled in from a script file or can be embedded inside this element. A script can be executed by any JSR-223 compliant script engine such as Groovy, JavaScript(Rhino), Python, Ruby, or Beanshell.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -152,7 +154,7 @@
                     </tr>
                     <tr>
                         <td>result</td>
-                        <td>a placeholder object where the result of the script can be written to.
+                        <td>a placeholder object where the result of the script can be written.
                             Usually it's better to just return a value from the script unless the script
                             method doesn't have a return value.
                         </td>
@@ -197,7 +199,7 @@
     <xsd:element name="transformer" type="scriptTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Runs a script to perform transformation on the current message. To use Groovy as an example, the following transformer configuration will converts a comma-separated string of values to a _java.util.List_.
+                Runs a script to perform transformation on the current message. 
             </xsd:documentation>
             <xsd:appinfo>
                 <schemadoc:snippet id="transformer-config"
@@ -213,7 +215,7 @@
                     <xsd:element name="script" type="scriptType">
                         <xsd:annotation>
                             <xsd:documentation>
-                                A script to be executed by a JSR-223 compliant script engine such as Groovy, JavaScript(Rhino), Python, Ruby or Beanshell (etc).
+                                A script to be executed by a JSR-223 compliant script engine such as Groovy, JavaScript(Rhino), Python, Ruby, or Beanshell.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -240,7 +242,7 @@
                 </xsd:attribute>
                 <xsd:attribute name="refreshableBean-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
-                        <xsd:documentation>The referecne to a {{groovy.lang.Groovy}} object to use for this component.
+                        <xsd:documentation>The reference to a {{groovy.lang.Groovy}} object to use for this component.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -257,7 +259,7 @@
     <xsd:element name="lang" type="langType" substitutionGroup="mule:abstract-extension">
         <xsd:annotation>
             <xsd:documentation>
-                This element allows the http://www.springframework.org/schema/lang namespace to be embedded. Within this element developers can include the spring _lang_ namespace.
+                This element allows the http://www.springframework.org/schema/lang namespace to be embedded. Within this element developers can include the Spring {{lang}} namespace.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
