@@ -59,27 +59,6 @@
     </wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
-  <wsdl:binding name="WebServiceLocalBinding" type="tns:WebServicePortType">
-    <wsdlsoap:binding style="document" transport="urn:cxf:transport:local"/>
-    <wsdl:operation name="log">
-      <wsdlsoap:operation soapAction=""/>
-      <wsdl:input name="logRequest">
-        <wsdlsoap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="logResponse">
-        <wsdlsoap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="echo">
-      <wsdlsoap:operation soapAction=""/>
-      <wsdl:input name="echoRequest">
-        <wsdlsoap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="echoResponse">
-        <wsdlsoap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
   <wsdl:binding name="WebServiceHttpBinding" type="tns:WebServicePortType">
     <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
     <wsdl:operation name="log">
@@ -102,9 +81,7 @@
     </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="WebService">
-    <wsdl:port name="WebServiceLocalPort" binding="tns:WebServiceLocalBinding">
-      <wsdlsoap:address location="http://localhost:6070/webServiceProxy"/>
-    </wsdl:port>
+
     <wsdl:port name="WebServiceMulePort" binding="tns:WebServiceHttpBinding">
       <wsdlsoap:address location="http://localhost:6070/webServiceProxy"/>
     </wsdl:port>

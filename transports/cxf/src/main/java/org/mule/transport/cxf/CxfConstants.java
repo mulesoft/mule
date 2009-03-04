@@ -41,4 +41,5 @@ public class CxfConstants
     public static final String ATTACHMENTS = "cxf_attachments";
     public static final String INBOUND_SERVICE= "cxf_service";
     public static final String INBOUND_OPERATION= "cxf_operation";
+    public static final String ENABLE_MULE_SOAP_HEADERS = "enableMuleSoapHeaders";
 }

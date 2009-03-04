@@ -139,6 +139,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="enableMuleSoapHeaders" type="mule:substitutableBoolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Whether or not this endpoint should write Mule SOAP headers which pass along the correlation and ReplyTo information. (As of 2.2.1)
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="inboundEndpointAttributes">
@@ -166,6 +173,13 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The WSDL endpoint name of your service.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="namespace" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The service namespace. (As of 2.2.1)
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

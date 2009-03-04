@@ -70,6 +70,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     private boolean applySecurityToProtocol;
     private boolean applyTransformersToProtocol;
     private boolean applyFiltersToProtocol;
+    private boolean enableHeaders;
     
     public CxfMessageReceiver(Connector connector, Service service, InboundEndpoint Endpoint)
         throws CreateException
@@ -95,10 +96,11 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             List<DataBinding> databinding = (List<DataBinding>) endpointProps.get(CxfConstants.DATA_BINDING);
             List<AbstractFeature> features = (List<AbstractFeature>) endpointProps.get(CxfConstants.FEATURES);
             String proxyStr = (String) endpointProps.get(CxfConstants.PROXY);
-
+            
             applyFiltersToProtocol = isTrue((String) endpointProps.get(CxfConstants.APPLY_FILTERS_TO_PROTOCOL), true);
             applySecurityToProtocol = isTrue((String) endpointProps.get(CxfConstants.APPLY_SECURITY_TO_PROTOCOL), true);
             applyTransformersToProtocol = isTrue((String) endpointProps.get(CxfConstants.APPLY_TRANSFORMERS_TO_PROTOCOL), true);
+            enableHeaders = isTrue((String) endpointProps.get(CxfConstants.ENABLE_MULE_SOAP_HEADERS), true);
             
             Class<?> svcCls = null;
             Class<?> targetCls;
@@ -205,13 +207,17 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             {
                 sfb.setOutInterceptors(new ArrayList<Interceptor>());
             }
-            sfb.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
             
             if (sfb.getOutFaultInterceptors() == null)
             {
                 sfb.setOutFaultInterceptors(new ArrayList<Interceptor>());
             }
-            sfb.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
+            
+            if (enableHeaders)
+            {
+                sfb.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
+                sfb.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
+            }
             
             if (proxy)
             {

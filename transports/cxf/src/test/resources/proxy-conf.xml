@@ -101,6 +101,24 @@
             </outbound>
         </service>
         
+        <service name="serverClientProxyWithWsdl">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/proxyWithWsdl" 
+                  namespace="http://www.muleumo.org"
+                  serviceName="WebService"
+                  proxy="true" 
+                  wsdlLocation="localWsdl.wsdl"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
+                        proxy="true"
+                        synchronous="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        
         <service name="serverClientProxyWithTransform">
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:63081/services/proxyWithTransform" proxy="true"/>
