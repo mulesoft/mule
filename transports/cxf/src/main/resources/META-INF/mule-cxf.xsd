@@ -132,17 +132,17 @@
     			</xsd:documentation>
     		</xsd:annotation>
     	</xsd:attribute>
-        <xsd:attribute name="applyTransformersToProtocol" type="mule:substitutableBoolean">
+        <xsd:attribute name="applyTransformersToProtocol" type="mule:substitutableBoolean" default="true">
             <xsd:annotation>
                 <xsd:documentation>
                     Whether to apply the transformers to the protocol endpoint. Defaults to true for Mule 2.2+ and false for 2.1 and previous versions.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="enableMuleSoapHeaders" type="mule:substitutableBoolean">
+        <xsd:attribute name="enableMuleSoapHeaders" type="mule:substitutableBoolean" default="true">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether or not this endpoint should write Mule SOAP headers which pass along the correlation and ReplyTo information. (As of 2.2.1)
+                    Whether or not this endpoint should write Mule SOAP headers which pass along the correlation and ReplyTo information. This is true by default, but the Mule SOAP headers are only triggered in situations where there is an existing correlation ID and the ReplyTo header is set. (As of 2.2.1)
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -197,17 +197,17 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="applyFiltersToProtocol" type="mule:substitutableBoolean">
+        <xsd:attribute name="applyFiltersToProtocol" type="mule:substitutableBoolean" default="true">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether to apply the filters to the protocol endpoint.
+                    Whether to apply the filters to the protocol endpoint. Defaults to true for Mule 2.2+ and false for 2.1 and previous versions.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="applySecurityToProtocol" type="mule:substitutableBoolean">
+        <xsd:attribute name="applySecurityToProtocol" type="mule:substitutableBoolean" default="true">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether to apply the security filter to the protocol endpoint.
+                    Whether to apply the security filter to the protocol endpoint. Defaults to true for Mule 2.2+ and false for 2.1 and previous versions.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

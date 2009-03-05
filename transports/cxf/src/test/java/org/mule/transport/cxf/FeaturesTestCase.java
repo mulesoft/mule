@@ -32,7 +32,7 @@ public class FeaturesTestCase extends FunctionalTestCase
         assertNotNull(endpoint);
         Map properties = endpoint.getProperties();
         assertNotNull(properties);
-        assertEquals(1, properties.size());
+        assertEquals(5, properties.size());
         assertNotNull(properties.get("features"));
         assertTrue(properties.get("features") instanceof List);
         List features = (List) properties.get("features");
