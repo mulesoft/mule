@@ -29,7 +29,7 @@
                     <outbound-endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"/>
                 </filtering-router>
             </outbound>
-            <threading-profile maxBufferSize="6" maxThreadsActive="12"  poolExhaustedAction="DISCARD"/>
+            <threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
 <!--            <pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/>-->
             <queue-profile maxOutstandingMessages="102" persistent="true"/>
         </service>
