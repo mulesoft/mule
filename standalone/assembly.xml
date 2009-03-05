@@ -362,6 +362,7 @@
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring-config</include>
         <include>org.mule.modules:mule-module-spring-extras</include>
+        <include>org.mule.modules:mule-module-spring-security</include>
         <include>org.mule.modules:mule-module-sxc</include>
         <include>org.mule.modules:mule-module-xml</include>
       </includes>
@@ -418,6 +419,7 @@
         <exclude>org.mule.modules:mule-module-scripting</exclude>
         <exclude>org.mule.modules:mule-module-spring-config</exclude>
         <exclude>org.mule.modules:mule-module-spring-extras</exclude>
+        <exclude>org.mule.modules:mule-module-spring-security</exclude>
         <exclude>org.mule.modules:mule-module-sxc</exclude>
         <exclude>org.mule.modules:mule-module-xml</exclude>
         <exclude>org.mule.examples:mule-examples-all</exclude>
