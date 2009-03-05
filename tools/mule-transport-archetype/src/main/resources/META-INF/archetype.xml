@@ -111,7 +111,7 @@ Which Mule transports do you want to include in this project? If you intend exte
                     <description>
 Which Mule modules do you want to include in this project? The client is added for testing:
 
-(options: bulders, client, jaas, jbossts, management, ognl, pgp, scripting,
+(options: builders, client, jaas, jbossts, management, ognl, pgp, scripting,
           spring-extras, sxc, xml):
 
                     </description>
