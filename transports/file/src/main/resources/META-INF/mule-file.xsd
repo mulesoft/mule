@@ -102,14 +102,14 @@
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Reads the contents of a java.io.File into a byte array (byte[]).</xsd:documentation>
+                The file-to-byte-array-transformer element configures a transformer that reads the contents of a java.io.File into a byte array (byte[]).</xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="file-to-string-transformer" type="mule:abstractTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Reads the contents of a java.io.File into a java.lang.String.</xsd:documentation>
+                The file-to-string-transformer element configures a transformer that reads the contents of a java.io.File into a java.lang.String.</xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
@@ -117,7 +117,7 @@
                  substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                This filter can be used to restrict the files being processed by applying wildcard expressions to the filename. For example, you can read only .xml and .txt files by entering the following: {noformat}&lt;file:filename-wildcard-filter pattern="*.txt,*.xml"/&gt;{noformat}
+                The filename-wildcard-filter element configures a filter that can be used to restrict the files being processed by applying wildcard expressions to the filename. For example, you can read only .xml and .txt files by entering the following: &lt;file:filename-wildcard-filter pattern="*.txt,*.xml"/&gt;
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -126,7 +126,7 @@
                  substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                This filter can be used to restrict the files being processed by applying Java regular expressions to the filename, such as pattern="myCustomerFile(.*)".
+                The filename-regex-filter element configures a filter that can be used to restrict the files being processed by applying Java regular expressions to the filename, such as pattern="myCustomerFile(.*)".
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -240,12 +240,11 @@
                  substitutionGroup="abstract-filenameParser">
         <xsd:annotation>
             <xsd:documentation>
-                The default filename parser used by the File connector. It understands the following patterns:
-
-                * #\[DATE\] - the current date in the format dd-MM-yy_HH-mm-ss.SS
-                * #\[DATE:dd-MM-yy\] - the current date using the specified format
+                The legacy-filename-parser element configures the default filename parser used by the File connector. It understands the following patterns:
+                * #\[DATE\] - The current date in the format dd-MM-yy_HH-mm-ss.SS
+                * #\[DATE:dd-MM-yy\] - The current date using the specified format
                 * #\[SYSTIME\] - The current system time milliseconds
-                * #\[UUID\] - A generated Universally unique id
+                * #\[UUID\] - A generated universally unique ID
                 * #\[ORIGINALNAME\] - The original file name if the file being written was read from another location
                 * #\[COUNT\] - An incremental counter.
             </xsd:documentation>
@@ -261,18 +260,7 @@
                  substitutionGroup="abstract-filenameParser">
         <xsd:annotation>
             <xsd:documentation>
-                ExpressionFilenameParser can use any expression language supported by Mule to construct a file name for the current message. Expressions can be xpath, xquery, ognl, mvel, header, function, and more. For example, an xpath expression can be defined to pull a message ID out of an XML message and use that as the file name:
-                {noformat}#[xpath:/message/header/@id]{noformat}
-                This parser superseeds the legacy-filename-parser from previous releases of Mule. The following demonstrates how to achieve the same results when using the expression-filename-parser over the legacy-filename-parser.
-
-                * #\[DATE\] : #\[function:dateStamp\]
-                * #\[DATE:dd-MM-yy\] : #\[function:dateStamp:dd-MM-yy\]
-                * #\[SYSTIME\] : #\[function:systime\]
-                * #\[UUID\] : #\[function:uuid\]
-                * #\[ORIGINALNAME\] : #\[header:originalFilename\]
-                * #\[COUNT\] : #\[function:counter\] - note that this is a global counter. If you want a local counter per file connector then you should use the legacy-filename-parser.
-                * #\[&lt;Message Property Name&gt;\] : #\[header:&lt;Message Property Name&gt;\]
-
+                The expression-filename-parser element configures the ExpressionFilenameParser, which can use any expression language supported by Mule to construct a file name for the current message. Expressions can be xpath, xquery, ognl, mvel, header, function, and more. 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -287,7 +275,7 @@
                  substitutionGroup="abstract-filenameParser">
         <xsd:annotation>
             <xsd:documentation>
-                Allows the user to specify a custom filename parser. The implementation must implement org.mule.transport.file.FilenameParser.
+                The custom-filename-parser element allows the user to specify a custom filename parser. The implementation must implement org.mule.transport.file.FilenameParser.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -309,7 +297,7 @@
     <xsd:element name="abstract-filenameParser" abstract="true" type="filenameParserType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for flename parser elements. The filename parser is set on the connector used when writing files to a directory. The parser will convert the outputPattern attribute to a string using the parser and the current message. The default implmentation used is &lt;legacy-filename-parser&gt;, but you can specify &lt;expression-filename-parser&gt; or &lt;custom-filename-parser&gt;. 
+                The abstract-filenameParser element is a placeholder for filename parser elements. The filename parser is set on the connector used when writing files to a directory. The parser will convert the outputPattern attribute to a string using the parser and the current message. The default implmentation used is legacy-filename-parser, but you can specify expression-filename-parser or custom-filename-parser. 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
