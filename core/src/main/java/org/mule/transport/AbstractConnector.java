@@ -700,7 +700,7 @@ public abstract class AbstractConnector
                 }
                 else
                 {
-                    throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNotExceptionListener(this.getName()), exception);
+                    throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), exception);
                 }
                 
                 // Store some info. about the receiver/dispatcher which threw the ConnectException so 
@@ -727,7 +727,7 @@ public abstract class AbstractConnector
             {
                 if (exceptionListener == null)
                 {
-                    throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNotExceptionListener(this.getName()), e);
+                    throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), e);
                 }
                 else
                 {
@@ -743,7 +743,7 @@ public abstract class AbstractConnector
             }
             else
             {
-                throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNotExceptionListener(this.getName()), exception);
+                throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), exception);
             }
         }
     }

@@ -584,7 +584,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 145, string);
     }
 
-    public static Message exceptionOnConnectorNotExceptionListener(String name)
+    public static Message exceptionOnConnectorNoExceptionListener(String name)
     {
         return factory.createMessage(BUNDLE_PATH, 146, name);
     }
