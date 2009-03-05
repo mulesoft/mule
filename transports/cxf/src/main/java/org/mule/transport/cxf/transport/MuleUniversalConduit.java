@@ -16,19 +16,23 @@ import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
-import org.mule.RegistryContext;
+import org.mule.MuleServer;
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.NullPayload;
 import org.mule.transport.cxf.CxfConnector;
@@ -44,7 +48,9 @@ import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.ws.Holder;
@@ -91,6 +97,10 @@ public class MuleUniversalConduit extends AbstractConduit
     private boolean closeInput;
 
     private boolean applyTransformersToProtocol;
+    
+    private ImmutableEndpoint muleEndpoint;
+
+    private Map<String,OutboundEndpoint> protocolEndpoints = new HashMap<String, OutboundEndpoint>();
     
     /**
      * @param ei The Endpoint being invoked by this destination.
@@ -217,7 +227,7 @@ public class MuleUniversalConduit extends AbstractConduit
         LOGGER.info("Sending message to " + uri);
         try
         {
-            OutboundEndpoint protocolEndpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+            OutboundEndpoint protocolEndpoint = getProtocolEndpoint(uri);
 
             MessageAdapter req = (MessageAdapter) m.getExchange().get(CxfConstants.MULE_MESSAGE);
             req.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, uri, PropertyScope.INVOCATION);
@@ -256,6 +266,42 @@ public class MuleUniversalConduit extends AbstractConduit
             ex.initCause(e);
             throw ex;
         }
+    }
+
+    protected OutboundEndpoint getProtocolEndpoint(String uri) throws MuleException
+    {
+        OutboundEndpoint ep = protocolEndpoints.get(uri);
+        if (ep == null)
+        {
+            ep = initializeProtocolEndpoint(uri);
+        }
+        return ep;
+    }
+
+    protected synchronized OutboundEndpoint initializeProtocolEndpoint(String uri) throws MuleException
+    {
+        OutboundEndpoint ep = protocolEndpoints.get(uri);
+        if (ep != null) return ep;
+        
+        MuleContext muleContext = MuleServer.getMuleContext();
+        MuleRegistry registry = muleContext.getRegistry();
+
+        // Someone is using a JAX-WS client directly and not going through MuleClient
+        if (muleEndpoint == null)
+        {
+            return registry.lookupEndpointFactory().getOutboundEndpoint(uri);
+        }
+        
+        // MuleClient/Dispatcher case
+        EndpointURIEndpointBuilder builder = new EndpointURIEndpointBuilder(uri, muleContext);
+        String connectorName = (String)muleEndpoint.getProperty("protocolConnector");
+        if (connectorName != null) 
+        {
+            builder.setConnector(registry.lookupConnector(connectorName));
+        }
+        ep = registry.lookupEndpointFactory().getOutboundEndpoint(builder);
+        protocolEndpoints.put(uri, ep);
+        return ep;
     }
 
     protected InputStream getResponseBody(Message m, MuleMessage result) throws TransformerException, IOException
@@ -495,4 +541,11 @@ public class MuleUniversalConduit extends AbstractConduit
     {
         return transport;
     }
+    
+    public void setMuleEndpoint(ImmutableEndpoint muleEndpoint)
+    {
+        this.muleEndpoint = muleEndpoint;
+        
+    }
+    
 }

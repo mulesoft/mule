@@ -3,30 +3,35 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-       http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd">
+       http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
+       http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd">
 
+    <http:connector name="Http1"/>
+    <http:connector name="Http2"/>
+    
     <cxf:connector name="CxfConnector1" defaultFrontend="simple"/>
     <cxf:connector name="CxfConnector2" defaultFrontend="simple"/>
 
-    <endpoint name="cxf1" address="cxf:http://localhost:61081/services/TestComponent1?method=receive" connector-ref="CxfConnector1"/>
-    <endpoint name="cxf2" address="cxf:http://localhost:61082/services/TestComponent2?method=receive" connector-ref="CxfConnector2"/>
+    <cxf:endpoint name="cxf1" address="http://localhost:61081/services/TestComponent1?method=receive" connector-ref="CxfConnector1" protocolConnector="Http1"/>
+    <cxf:endpoint name="cxf2" address="http://localhost:61082/services/TestComponent2?method=receive" connector-ref="CxfConnector2" protocolConnector="Http1"/>
 
     <model name="TestXfireConnectors">
         
         <!-- Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised -->
         <service name="TestComponent1">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:61081/services/TestComponent1" connector-ref="CxfConnector1"/>
+                <cxf:inbound-endpoint address="http://localhost:61081/services/TestComponent1" connector-ref="CxfConnector1" protocolConnector="Http1"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
 
         <service name="TestComponent2">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:61082/services/TestComponent2" connector-ref="CxfConnector2"/>
+                <cxf:inbound-endpoint address="http://localhost:61082/services/TestComponent2" connector-ref="CxfConnector2" protocolConnector="Http1"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>

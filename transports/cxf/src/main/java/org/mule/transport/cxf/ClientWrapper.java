@@ -119,18 +119,21 @@ public class ClientWrapper
         addInterceptors(client.getOutInterceptors(), (List<Interceptor>) endpoint.getProperty(CxfConstants.OUT_INTERCEPTORS));
         addInterceptors(client.getOutFaultInterceptors(), (List<Interceptor>) endpoint.getProperty(CxfConstants.OUT_FAULT_INTERCEPTORS));
 
+        MuleUniversalConduit conduit = (MuleUniversalConduit)client.getConduit();
+        conduit.setMuleEndpoint(endpoint);
+        
         if (proxy)
         {
             client.getInInterceptors().add(new CopyAttachmentInInterceptor());
             client.getInInterceptors().add(new StreamClosingInterceptor());
             client.getOutInterceptors().add(new OutputPayloadInterceptor());
             client.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
-            ((MuleUniversalConduit)client.getConduit()).setCloseInput(false);
+            conduit.setCloseInput(false);
         }
         
         String value = (String) endpoint.getProperty(CxfConstants.APPLY_TRANSFORMERS_TO_PROTOCOL);
         applyTransformersToProtocol = isTrue(value, true); 
-        ((MuleUniversalConduit)client.getConduit()).setApplyTransformersToProtocol(applyTransformersToProtocol);
+        conduit.setApplyTransformersToProtocol(applyTransformersToProtocol);
         
         enableHeaders = isTrue((String) endpoint.getProperty(CxfConstants.ENABLE_MULE_SOAP_HEADERS), true); 
         
@@ -506,5 +509,5 @@ public class ClientWrapper
     {
         return applyTransformersToProtocol;
     }
-    
+
 }
