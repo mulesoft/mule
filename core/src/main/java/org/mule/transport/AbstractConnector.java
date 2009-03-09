@@ -73,6 +73,7 @@ import java.beans.ExceptionListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -677,6 +678,14 @@ public abstract class AbstractConnector
     
     public void handleException(Exception exception, Connectable failed)
     {
+        // unwrap any exception caused by using reflection apis, but only the top layer
+        if (exception instanceof InvocationTargetException)
+        {
+            Throwable target = exception.getCause();
+            // just because API accepts Exception, not Throwable :\
+            exception = target instanceof Exception ? (Exception) target : new Exception(target);
+        }
+        
         if (isConnected() &&
             exception instanceof ConnectException &&      
             !(retryPolicyTemplate instanceof NoRetryPolicyTemplate))
