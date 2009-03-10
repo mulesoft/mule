@@ -21,6 +21,7 @@ import org.mule.util.UUID;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -41,6 +42,8 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
 
     private HttpServletRequest request;
 
+    private Object payload;
+
     public HttpRequestMessageAdapter(Object message) throws MessagingException
     {
         if (message instanceof HttpServletRequest)
@@ -48,6 +51,8 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
             setPayload((HttpServletRequest) message);
             setContentEncoding((HttpServletRequest) message);
 
+            Map headers = new HashMap();
+            
             final Map parameterMap = request.getParameterMap();
             if (parameterMap != null && parameterMap.size() > 0)
             {
@@ -60,11 +65,11 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
                     {
                         if (value.getClass().isArray() && ((Object[]) value).length == 1)
                         {
-                            setProperty(key, ((Object[]) value)[0]);
+                            headers.put(key, ((Object[]) value)[0]);
                         }
                         else
                         {
-                            setProperty(key, value);
+                            headers.put(key, value);
                         }
                     }
                 }
@@ -73,7 +78,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
             for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();)
             {
                 key = (String) e.nextElement();
-                properties.setProperty(key, request.getAttribute(key));
+                headers.put(key, request.getAttribute(key));
             }
             String realKey;
             for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();)
@@ -98,7 +103,14 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
                     }
                 }
                 
-                setProperty(realKey, value);
+                headers.put(realKey, value);
+            }
+            
+            addInboundProperties(headers);
+            
+            if ("GET".equalsIgnoreCase(request.getMethod())) 
+            {
+                payload = getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
             }
         }
         else
@@ -136,13 +148,9 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
 
     public Object getPayload()
     {
-        try
+        try 
         {
-            if ("GET".equalsIgnoreCase(request.getMethod())) 
-            {
-                return getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
-            }
-            return request.getInputStream();
+            return payload == null ? payload = request.getInputStream() : payload;
         }
         catch (IOException e)
         {

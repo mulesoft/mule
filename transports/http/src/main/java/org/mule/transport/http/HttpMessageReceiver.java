@@ -31,6 +31,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.ConnectException;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.i18n.HttpMessages;
@@ -262,7 +263,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 path = path.substring(0, i);
             }
 
-            message.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path);
+            message.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path, PropertyScope.INBOUND);
             
             if (logger.isDebugEnabled())
             {
@@ -270,7 +271,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
 
             message.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, 
-                HttpConnector.normalizeUrl(endpoint.getEndpointURI().getPath()));
+                HttpConnector.normalizeUrl(endpoint.getEndpointURI().getPath()), PropertyScope.INBOUND);
             
             // determine if the request path on this request denotes a different receiver
             MessageReceiver receiver = getTargetReceiver(message, endpoint);
