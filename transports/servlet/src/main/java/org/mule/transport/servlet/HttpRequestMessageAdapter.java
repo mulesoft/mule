@@ -42,8 +42,6 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
 
     private HttpServletRequest request;
 
-    private Object payload;
-
     public HttpRequestMessageAdapter(Object message) throws MessagingException
     {
         if (message instanceof HttpServletRequest)
@@ -107,11 +105,6 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
             }
             
             addInboundProperties(headers);
-            
-            if ("GET".equalsIgnoreCase(request.getMethod())) 
-            {
-                payload = getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
-            }
         }
         else
         {
@@ -150,7 +143,14 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
     {
         try 
         {
-            return payload == null ? payload = request.getInputStream() : payload;
+            if ("GET".equalsIgnoreCase(request.getMethod())) 
+            {
+                return getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+            }
+            else 
+            {
+                return request.getInputStream();
+            }
         }
         catch (IOException e)
         {
