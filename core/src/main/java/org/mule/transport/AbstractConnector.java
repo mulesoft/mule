@@ -1175,7 +1175,6 @@ public abstract class AbstractConnector
             if (receiver != null)
             {
                 destroyReceiver(receiver, endpoint);
-                receiver.dispose();
             }
         }
     }
