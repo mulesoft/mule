@@ -145,7 +145,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         {
             if ("GET".equalsIgnoreCase(request.getMethod())) 
             {
-                return getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+                return request.getRequestURI().toString();
             }
             else 
             {
