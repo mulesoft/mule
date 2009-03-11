@@ -45,6 +45,7 @@ import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.response.DefaultResponseRouterCollection;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
+import org.mule.util.ClassUtils;
 import org.mule.util.concurrent.WaitableBoolean;
 
 import java.beans.ExceptionListener;
@@ -53,7 +54,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -533,14 +533,9 @@ public abstract class AbstractService implements Service
         return name;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     public String toString()
     {
-        return getName();
+        return String.format("%s{%s}", ClassUtils.getSimpleName(this.getClass()), getName());
     }
 
     public boolean isStopped()
