@@ -111,18 +111,6 @@
             </outbound>
         </service>
 
-        <service name="JmsRemoteSyncOutboundEndpointResponseTransformer">
-            <inbound>
-                <inbound-endpoint address="vm://jmsRemoteSyncOutboundEndpointResponseTransformer" synchronous="true" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <!-- remoteSync shouldn't need to be set on outbound endpoint is it is set on inbound endpoint -->
-                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" synchronous="true" />
-                </pass-through-router>
-            </outbound>
-        </service>
-
         <service name="ChainedRouterOutboundEndpointResponseTransformer">
             <inbound>
                 <inbound-endpoint address="vm://chainedRouterOutboundEndpointResponseTransformer" synchronous="true" />
