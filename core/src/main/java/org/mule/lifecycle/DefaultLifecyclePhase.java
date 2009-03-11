@@ -70,7 +70,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Attempting to apply lifecycle phase: " + getName());
+            logger.debug("Applying lifecycle phase: " + getName());
         }
 
         // overlapping interfaces can cause duplicates
