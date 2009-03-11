@@ -24,6 +24,7 @@ import org.mule.context.notification.ModelNotification;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.service.DefaultServiceExceptionStrategy;
+import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
 import java.util.Collection;
@@ -214,4 +215,9 @@ public abstract class AbstractModel implements Model
         }
     }
 
+    @Override
+    public String toString()
+    {
+        return String.format("%s{%s}", ClassUtils.getSimpleName(this.getClass()), getName());
+    }
 }
