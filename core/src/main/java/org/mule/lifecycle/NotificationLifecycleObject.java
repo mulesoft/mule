@@ -108,7 +108,7 @@ public class NotificationLifecycleObject extends LifecycleObject
     {
         try
         {
-            return (ServerNotification)ctor.newInstance(new Object[]{context, action});
+            return (ServerNotification)ctor.newInstance(context, action);
         }
         catch (Exception e)
         {
