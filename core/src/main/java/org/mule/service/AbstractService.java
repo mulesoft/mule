@@ -53,6 +53,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -905,6 +906,13 @@ public abstract class AbstractService implements Service
                 {
                     result = outboundReturnMessage;
                 }
+                else if (getComponent() instanceof PassThroughComponent)
+                {
+                    // If there was no component, then we really want to return the response from
+                    // the outbound router as the actual payload - even if it's null.
+                    return new DefaultMuleMessage(NullPayload.getInstance(), result);
+                }
+                
                 if (stats.isEnabled())
                 {
                     stats.incSentEventSync();

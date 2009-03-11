@@ -59,7 +59,6 @@
         <service name="greeter">
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:63081/services/greeter"/>
-                <forwarding-router/>
             </inbound>
             <component>
                 <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
@@ -76,16 +75,16 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="test" />
+                    <vm:outbound-endpoint path="test" synchronous="true"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="echoService">
             <inbound>
-                <inbound-endpoint address="vm://test" />
+                <inbound-endpoint address="vm://test" synchronous="true"/>
             </inbound>
-            <bridge-component/>
+            <echo-component/>
         </service>
         
         <service name="serverClientProxy">

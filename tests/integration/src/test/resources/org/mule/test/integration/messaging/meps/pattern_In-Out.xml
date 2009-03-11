@@ -21,7 +21,7 @@
         service returns null a message with a NullPayload payload is returned.
     </description>
 
-    <http:endpoint name="inboundEndpoint" host="localhost" port="8081" synchronous="true"/>
+    <http:endpoint name="inboundEndpoint" host="localhost" port="63081" synchronous="true"/>
     
     <model>
         <service name="In-Out-Service">

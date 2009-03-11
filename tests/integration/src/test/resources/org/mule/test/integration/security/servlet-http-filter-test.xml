@@ -30,7 +30,7 @@
     <model name="http secured test model">
         <service name="SecureUMO">
             <inbound>
-                <inbound-endpoint address="servlet://test">
+                <inbound-endpoint address="servlet://test" synchronous="true">
                     <mule-ss:http-security-filter realm="mule-realm"/>
                 </inbound-endpoint>
             </inbound>

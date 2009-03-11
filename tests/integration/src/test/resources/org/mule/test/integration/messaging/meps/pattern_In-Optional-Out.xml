@@ -21,7 +21,7 @@
         service returns null and there was no error while processing the request, nothing is returned to the callee.
     </description>
 
-    <http:endpoint name="inboundEndpoint" host="localhost" port="8081" synchronous="true"/>
+    <http:endpoint name="inboundEndpoint" host="localhost" port="63081" synchronous="true"/>
 
     <model>
         <service name="In-Optional-Out-Service">

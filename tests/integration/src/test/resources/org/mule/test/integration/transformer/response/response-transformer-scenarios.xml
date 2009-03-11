@@ -95,7 +95,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://echo" />
+                    <outbound-endpoint address="jms://echo" synchronous="true" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -106,7 +106,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" />
+                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" synchronous="true" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -154,14 +154,14 @@
 
         <service name="VmEchoService">
             <inbound>
-                <inbound-endpoint address="vm://echo" />
+                <inbound-endpoint address="vm://echo" synchronous="true"/>
             </inbound>
             <echo-component />
         </service>
 
         <service name="JmsEchoService">
             <inbound>
-                <inbound-endpoint address="jms://echo" />
+                <inbound-endpoint address="jms://echo" synchronous="true"/>
             </inbound>
             <echo-component />
         </service>

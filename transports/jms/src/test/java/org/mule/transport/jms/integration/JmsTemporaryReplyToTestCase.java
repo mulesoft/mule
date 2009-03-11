@@ -13,6 +13,7 @@ package org.mule.transport.jms.integration;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.transport.NullPayload;
 
 import org.junit.Test;
 
@@ -46,8 +47,8 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
     {
         MuleClient muleClient = new MuleClient();
         MuleMessage response = muleClient.send("vm://in2", TEST_MESSAGE, null);
-        // We get the original message back, not the result from the remote component
-        assertEquals(TEST_MESSAGE, response.getPayload());
+
+        assertEquals(NullPayload.getInstance(), response.getPayload());
     }
 
     @Test
@@ -55,9 +56,8 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
     {
         MuleClient muleClient = new MuleClient();
         MuleMessage response = muleClient.send("vm://in3", TEST_MESSAGE, null);
-        // We get the original message back, not the result from the remote component
-        assertEquals(TEST_MESSAGE, response.getPayload());
-
+        
+        assertEquals(NullPayload.getInstance(), response.getPayload());
     }
 
     @Test
@@ -67,6 +67,5 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
         MuleMessage response = muleClient.send("vm://in4", TEST_MESSAGE, null);
         // We get the original message back, not the result from the remote component
         assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
-
     }
 }
