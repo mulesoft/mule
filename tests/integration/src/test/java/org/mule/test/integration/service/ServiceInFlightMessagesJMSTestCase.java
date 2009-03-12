@@ -29,7 +29,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesTestCase
 {
 
-    private static final int LATCH_WAIT_TIME_MILLIS = 3000;
+    private final int timeout = getTimeoutSecs() * 1000 / 20;
 
     protected String getConfigResources()
     {
@@ -51,7 +51,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
 
         muleContext.stop();
 
-        assertTrue(listener.countdownLatch.await(LATCH_WAIT_TIME_MILLIS, TimeUnit.MILLISECONDS));
+        assertTrue(listener.countdownLatch.await(timeout, TimeUnit.MILLISECONDS));
 
         assertNoLostMessages(NUM_MESSAGES, service, listener);
         // Seda queue is empty because queue is not persistent and therefore is
@@ -102,7 +102,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         muleContext.start();
         reregisterTestJMSConsumer(listener);
 
-        assertTrue(listener.countdownLatch.await(LATCH_WAIT_TIME_MILLIS, TimeUnit.MILLISECONDS));
+        assertTrue(listener.countdownLatch.await(timeout, TimeUnit.MILLISECONDS));
         assertNoLostMessages(NUM_MESSAGES, service, listener);
         assertSedaQueueEmpty(service);
         // TODO Enable the following assertion once MULE-4072 is fixed
@@ -167,7 +167,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         muleContext.start();
         reregisterTestJMSConsumer(listener);
 
-        assertTrue(listener.countdownLatch.await(LATCH_WAIT_TIME_MILLIS, TimeUnit.MILLISECONDS));
+        assertTrue(listener.countdownLatch.await(timeout, TimeUnit.MILLISECONDS));
         assertNoLostMessages(NUM_MESSAGES, service, listener);
         assertSedaQueueEmpty(service);
     }
