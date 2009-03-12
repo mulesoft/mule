@@ -13,8 +13,12 @@ package org.mule.transport.jms;
 import org.mule.api.MessagingException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
-import org.mule.transport.jms.JmsConstants;
-import org.mule.transport.jms.JmsMessageAdapter;
+
+import com.mockobjects.dynamic.Mock;
+
+import javax.jms.TextMessage;
+
+import org.apache.commons.collections.IteratorUtils;
 
 public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {  
@@ -35,7 +39,28 @@ public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
      */
     public Object getValidMessage() throws Exception
     {
-        return JmsConnectorTestCase.getMessage();
+        Mock message = new Mock(TextMessage.class);
+
+        message.expectAndReturn("getText", "Test JMS Message");
+        message.expectAndReturn("getText", "Test JMS Message");
+
+        message.expectAndReturn("getJMSCorrelationID", null);
+        message.expectAndReturn("getJMSMessageID", "1234567890");
+        message.expectAndReturn("getJMSDeliveryMode", new Integer(1));
+        message.expectAndReturn("getJMSDestination", null);
+        message.expectAndReturn("getJMSPriority", new Integer(4));
+        message.expectAndReturn("getJMSRedelivered", Boolean.FALSE);
+        message.expectAndReturn("getJMSReplyTo", null);
+        message.expectAndReturn("getJMSExpiration", new Long(0));
+        message.expectAndReturn("getJMSTimestamp", new Long(0));
+        message.expectAndReturn("getJMSType", null);
+
+        message.expect("toString");
+
+        message.expectAndReturn("getPropertyNames",
+                                IteratorUtils.asEnumeration(IteratorUtils.emptyIterator()));
+
+        return message.proxy();
     }
 
     public void testIllegalSpecification() throws Exception
