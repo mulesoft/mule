@@ -13,8 +13,8 @@ package org.mule.test.integration.service;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsSupport;
-import org.mule.transport.jms.activemq.ActiveMQJmsConnector;
 import org.mule.util.queue.QueueSession;
 import org.mule.util.xa.ResourceManagerSystemException;
 
@@ -189,7 +189,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
     {
         InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "jms://out");
-        ActiveMQJmsConnector jmsConnector = (ActiveMQJmsConnector) muleContext.getRegistry().lookupConnector(
+        JmsConnector jmsConnector = (JmsConnector) muleContext.getRegistry().lookupConnector(
             "jmsConnector");
         JmsSupport jmsSupport = jmsConnector.getJmsSupport();
         MessageConsumer consumer = jmsSupport.createConsumer(jmsConnector.getSession(endpoint),
