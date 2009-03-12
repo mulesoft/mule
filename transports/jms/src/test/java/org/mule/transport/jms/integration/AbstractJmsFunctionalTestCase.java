@@ -167,7 +167,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     {
         if (jmsConfig == null)
         {
-            jmsConfig = creatJmsConfig();
+            jmsConfig = createJmsConfig();
         }
         return jmsConfig;
     }
@@ -177,7 +177,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         this.jmsConfig = jmsConfig;
     }
 
-    protected JmsVendorConfiguration creatJmsConfig()
+    protected JmsVendorConfiguration createJmsConfig()
     {
         // Overriding classes must override this or inject this object
         return null;
