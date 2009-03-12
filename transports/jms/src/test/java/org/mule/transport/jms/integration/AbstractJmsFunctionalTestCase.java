@@ -42,6 +42,8 @@ import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -56,43 +58,57 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     public static final String DEFAULT_INPUT_MESSAGE = "INPUT MESSAGE";
     public static final String DEFAULT_OUTPUT_MESSAGE = "OUTPUT MESSAGE";
+
     public static final String INBOUND_ENDPOINT_KEY = "inbound.destination";
     public static final String OUTBOUND_ENDPOINT_KEY = "outbound.destination";
+
     public static final String MIDDLE_ENDPOINT_KEY = "middle.destination";
     public static final String MIDDLE2_ENDPOINT_KEY = "middle2.destination";
 
-    private MuleClient client = null;
-    protected JmsVendorConfiguration jmsConfig = null;
     public static final String BROADCAST_TOPIC_ENDPOINT_KEY = "broadcast.topic.destination";
 
+    protected static final Log logger = LogFactory.getLog("MULE_TESTS");
+
+    protected JmsVendorConfiguration jmsConfig = null;
     protected Scenario scenarioNoTx;
+
     protected Scenario scenarioCommit;
     protected Scenario scenarioRollback;
     protected Scenario scenarioNotReceive;
     protected Scenario scenarioReceive;
 
+    private MuleClient client = null;
+
     /**
      * Set the list of jms providers to test. The goal is to externalize this, i.e.
      * read the list from an xml file, use maven profiles to control it, etc.
      * 
-     * @return
      */
     @Parameters
     public static Collection jmsProviderConfigs() throws Exception
     {
-        JmsVendorConfiguration[][] configs = null;
+        JmsVendorConfiguration[][] configs;
         URL url = ClassUtils.getResource("jms-vendor-configs.txt", AbstractJmsFunctionalTestCase.class);
-        if (url != null)
-        {
-            List classes = IOUtils.readLines(url.openStream());
-            configs = new JmsVendorConfiguration[1][classes.size()];
-            int i = 0;
-            for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
-            {
-                String cls = (String) iterator.next();
-                configs[0][i] = (JmsVendorConfiguration) ClassUtils.instanciateClass(cls);
 
-            }
+        if (url == null)
+        {
+            throw new IllegalArgumentException("Please specify the org.mule.transport.jms.integration.JmsVendorConfiguration " +
+                                               "implementation to use in jms-vendor-configs.txt on classpaath.");
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Parameterized test using: " + url);
+        }
+
+        List classes = IOUtils.readLines(url.openStream());
+        configs = new JmsVendorConfiguration[1][classes.size()];
+        int i = 0;
+        for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
+        {
+            String cls = (String) iterator.next();
+            configs[0][i] = (JmsVendorConfiguration) ClassUtils.instanciateClass(cls);
+
         }
         return Arrays.asList(configs);
 
@@ -102,7 +118,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we
      * need to explicitly call the setUp and tearDown methods
      * 
-     * @throws Exception
      */
     @Before
     public void before() throws Exception
@@ -114,7 +129,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we
      * need to explicitly call the setUp and tearDown methods
      * 
-     * @throws Exception
      */
     @After
     public void after() throws Exception
@@ -223,7 +237,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     /**
      * Timeout used when checking that a message is NOT present
      * 
-     * @return
      */
     protected long getSmallTimeout()
     {
@@ -235,7 +248,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     /**
      * The timeout used when waiting for a message to arrive
      * 
-     * @return
      */
     protected long getTimeout()
     {
