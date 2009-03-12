@@ -93,7 +93,6 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
 
         muleContext.stop();
 
-        assertNoLostMessages(NUM_MESSAGES, service, listener);
         // Persistent queue is being used so seda queue is not emptied when service
         // is stopped
         assertSedaQueueNotEmpty(service);
@@ -159,7 +158,6 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         populateSedaQueue(service, NUM_MESSAGES);
 
         muleContext.stop();
-        assertNoLostMessages(NUM_MESSAGES, service, listener);
 
         // Dispose and restart Mule and let it run for a short while
         muleContext.dispose();
