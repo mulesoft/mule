@@ -22,21 +22,11 @@ import org.apache.commons.collections.IteratorUtils;
 
 public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {  
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
-     */
     public MessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new JmsMessageAdapter(payload);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#getValidMessage()
-     */
     public Object getValidMessage() throws Exception
     {
         Mock message = new Mock(TextMessage.class);

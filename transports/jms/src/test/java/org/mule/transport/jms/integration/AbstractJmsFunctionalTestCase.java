@@ -18,6 +18,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleParameterized;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -81,20 +82,19 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     {
         JmsVendorConfiguration[][] configs = null;
         URL url = ClassUtils.getResource("jms-vendor-configs.txt", AbstractJmsFunctionalTestCase.class);
-        if(url !=null)
+        if (url != null)
         {
             List classes = IOUtils.readLines(url.openStream());
             configs = new JmsVendorConfiguration[1][classes.size()];
-            int i=0;
+            int i = 0;
             for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
             {
                 String cls = (String) iterator.next();
-                configs[0][i] = (JmsVendorConfiguration)ClassUtils.instanciateClass(cls);
+                configs[0][i] = (JmsVendorConfiguration) ClassUtils.instanciateClass(cls);
 
             }
         }
         return Arrays.asList(configs);
-        //return Arrays.asList(new JmsVendorConfiguration[][]{{new ActiveMQJmsConfiguration()}});
 
     }
 
@@ -156,9 +156,16 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        String resources = getConfigResources().substring(getConfigResources().lastIndexOf("/") + 1);
+        final String configResource = getConfigResources();
+        // multiple configs arent' supported by this mechanism, validate and fail if needed
+        if (StringUtils.splitAndTrim(configResource, ",; ").length > 1)
+        {
+            throw new IllegalArgumentException("Parameterized tests don't support multiple " +
+                                               "config files as input: " + configResource);
+        }
+        String resources = configResource.substring(configResource.lastIndexOf("/") + 1);
         resources = String.format("integration/%s/connector-%s,%s", getJmsConfig().getProviderName(),
-            resources, getConfigResources());
+                                  resources, configResource);
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(resources);
         return builder;
     }
