@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+       xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector" persistentDelivery="true"/>
+
+    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector" synchronous="false"/>
+
+    <model name="TestModel">
+
+        <service name="TestService">
+            <test:component waitTime="30"/>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint ref="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="PausedTestService" initialState="paused">
+            <test:component waitTime="30"/>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint ref="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="TestPersistentQueueService">
+            <test:component waitTime="30"/>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint ref="out"/>
+                </pass-through-router>
+            </outbound>
+            <queue-profile persistent="true"/>
+        </service>
+        
+        <service name="PausedTestPersistentQueueService" initialState="paused">
+            <test:component waitTime="30"/>
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint ref="out"/>
+                </pass-through-router>
+            </outbound>
+            <queue-profile persistent="true"/>
+        </service>
+        
+    </model>
+
+</mule>

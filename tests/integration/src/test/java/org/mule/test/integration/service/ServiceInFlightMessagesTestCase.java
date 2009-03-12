@@ -22,7 +22,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 {
 
     private static final int WAIT_TIME_MILLIS = 500;
-    private static final int NUM_MESSAGES = 500;
+    protected static final int NUM_MESSAGES = 500;
 
     protected String getConfigResources()
     {
@@ -176,7 +176,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertSedaQueueEmpty(service);
     }
 
-    private void populateSedaQueue(Service service, int numMessages) throws MuleException, Exception
+    protected void populateSedaQueue(Service service, int numMessages) throws MuleException, Exception
     {
         for (int i = 0; i < numMessages; i++)
         {
@@ -199,31 +199,32 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
                                   + queueSession.getQueue(service.getName() + ".service").size());
     }
 
-    private synchronized void assertSedaQueueEmpty(Service service) throws ResourceManagerSystemException
+    protected synchronized void assertSedaQueueEmpty(Service service) throws ResourceManagerSystemException
     {
         QueueSession queueSession = getTestQueueSession();
         assertEquals(0, queueSession.getQueue(service.getName() + ".service").size());
     }
 
-    private synchronized void assertSedaQueueNotEmpty(Service service) throws ResourceManagerSystemException
+    protected synchronized void assertSedaQueueNotEmpty(Service service)
+        throws ResourceManagerSystemException
     {
         QueueSession queueSession = getTestQueueSession();
         assertTrue(queueSession.getQueue(service.getName() + ".service").size() > 0);
     }
 
-    private synchronized void assertOutboundVMQueueEmpty() throws ResourceManagerSystemException
+    protected synchronized void assertOutboundVMQueueEmpty() throws ResourceManagerSystemException
     {
         QueueSession queueSession = getTestQueueSession();
         assertEquals(0, queueSession.getQueue("out").size());
     }
 
-    private synchronized void assertOutboundVMQueueNotEmpty() throws ResourceManagerSystemException
+    protected synchronized void assertOutboundVMQueueNotEmpty() throws ResourceManagerSystemException
     {
         QueueSession queueSession = getTestQueueSession();
         assertTrue(queueSession.getQueue("out").size() > 0);
     }
 
-    private QueueSession getTestQueueSession() throws ResourceManagerSystemException
+    protected QueueSession getTestQueueSession() throws ResourceManagerSystemException
     {
         TransactionalQueueManager tqm = new TransactionalQueueManager();
         FilePersistenceStrategy fps = new FilePersistenceStrategy();
