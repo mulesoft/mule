@@ -60,9 +60,6 @@ org.mule.test.integration.client.MuleClientWSDLExternalTestCase
 # EE-979
 org.mule.security.MultiuserSecurityTestCase
 
-# MULE-4072
-org.mule.test.integration.service.ServiceInFlightMessagesTestCase
-
 ##########################################################################
 # The following tests will fail if run off-line
 ##########################################################################

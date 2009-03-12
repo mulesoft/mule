@@ -160,6 +160,12 @@ public class SedaService extends AbstractService implements Work, WorkListener
 
     protected void doStop() throws MuleException
     {
+        // Resume if paused. (This is required to unblock the "ticker" thread)
+        if (isPaused())
+        {
+            paused.set(false);
+        }
+
         if (queue != null && queue.size() > 0)
         {
             try
@@ -337,7 +343,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
                 // before stopping
                 if (stopping.get())
                 {
-                    if (queueProfile.isPersistent() || (queueSession == null || getQueueSize() <= 0))
+                    if (queueProfile.isPersistent() || queueSession == null || getQueueSize() <= 0)
                     {
                         stopping.set(false);
                         break;
