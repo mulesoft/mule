@@ -134,5 +134,12 @@ public interface OutboundRouter extends Router
      * @return the Endpoint or null if the endpointUri is not registered
      */
     OutboundEndpoint getEndpoint(String name);
+    
+    /**
+     * Determines is this router requires a new message copy.
+     * 
+     * @return
+     */
+    boolean isRequiresNewMessage();
 
 }

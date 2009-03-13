@@ -1171,4 +1171,9 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 301, tx);
     }
+    
+    public static Message cannotCopyStreamPayload(String streamType)
+    {
+        return factory.createMessage(BUNDLE_PATH, 302, streamType);
+    }
 }

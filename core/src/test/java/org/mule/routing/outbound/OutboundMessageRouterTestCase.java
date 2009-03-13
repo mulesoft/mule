@@ -95,8 +95,9 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         session.expectAndReturn("getService", getTestService());
         session.expectAndReturn("getService", getTestService());
 
-        session.expect("dispatchEvent", C.eq(message, endpoint1));
-        session.expect("dispatchEvent", C.eq(message, endpoint2));
+        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint1)));
+        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint2)));
+
         messageRouter.setMatchAll(true);
         messageRouter.route(message, (MuleSession)session.proxy());
         session.verify();

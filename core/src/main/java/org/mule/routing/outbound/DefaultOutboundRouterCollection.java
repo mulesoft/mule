@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -17,6 +18,7 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.TransactionCallback;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 import org.mule.transaction.TransactionTemplate;
@@ -42,12 +44,34 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
             throws MessagingException
     {
         MuleMessage result;
+        boolean first = true;
         boolean matchfound = false;
 
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
         {
             OutboundRouter outboundRouter = (OutboundRouter) iterator.next();
-            if (outboundRouter.isMatch(message))
+
+            final MuleMessage outboundRouterMessage;
+            // Create copy of message for router 2..n if matchAll="true" or if
+            // routers require copy because it may mutate payload before match is
+            // chosen
+            if (!first && (isMatchAll() || outboundRouter.isRequiresNewMessage()))
+            {
+                if (((DefaultMuleMessage) message).isConsumable())
+                {
+                    throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getPayload()
+                        .getClass()
+                        .getName()), message);
+                }
+                outboundRouterMessage = new DefaultMuleMessage(message.getPayload(), message);
+            }
+            else
+            {
+                outboundRouterMessage = message;
+            }
+            first = false;
+
+            if (outboundRouter.isMatch(outboundRouterMessage))
             {
                 matchfound = true;
                 // Manage outbound only transactions here
@@ -61,7 +85,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                 {
                     public Object doInTransaction() throws Exception
                     {
-                        return router.route(message, session);
+                        return router.route(outboundRouterMessage, session);
                     }
                 };
                 try
@@ -70,7 +94,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                 }
                 catch (Exception e)
                 {
-                    throw new RoutingException(message, null, e);
+                    throw new RoutingException(outboundRouterMessage, null, e);
                 }
 
                 if (!isMatchAll())

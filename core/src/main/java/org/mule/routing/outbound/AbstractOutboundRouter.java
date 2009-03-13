@@ -396,4 +396,10 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     {
         this.resultsHandler = resultsHandler;
     }
+    
+    public boolean isRequiresNewMessage()
+    {
+        return false;
+    }
+    
 }
