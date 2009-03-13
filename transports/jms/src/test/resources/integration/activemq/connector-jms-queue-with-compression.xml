@@ -8,4 +8,7 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
+    <jms:jmsmessage-to-object-transformer name="JmsToObject"/>
+    <jms:object-to-jmsmessage-transformer name="ObjectToJms"/>
+    
 </mule>

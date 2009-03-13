@@ -16,8 +16,6 @@
 
     <gzip-compress-transformer name="Compress"/>
     <gzip-uncompress-transformer name="Uncompress"/>
-    <jms:jmsmessage-to-object-transformer name="JmsToObject"/>
-    <jms:object-to-jmsmessage-transformer name="ObjectToJms"/>
 
     <model name="test">
         <service name="InputPart">
@@ -34,12 +32,12 @@
 
         <service name="MiddlePart">
             <inbound>
-                <jms:inbound-endpoint queue="middle" transformer-refs="JmsToObject Uncompress"/>
+                <inbound-endpoint ref="middle" transformer-refs="JmsToObject Uncompress"/>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="middle2" transformer-refs="Compress ObjectToJms"/>
+                    <outbound-endpoint ref="middle2" transformer-refs="Compress ObjectToJms"/>
                 </pass-through-router>
             </outbound>
         </service>
