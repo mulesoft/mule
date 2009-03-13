@@ -10,7 +10,7 @@ It consists of two webapps consuming Mule services, one with Mule running
 inside it.
 
 For more information, refer to 
-http://mule.mulesource.org/display/MULE2INTRO/Bookstore+Example
+http://www.mulesource.org/display/MULE2INTRO/Bookstore+Webapp+Example
 
 +---------------------+
 | Running the example |
