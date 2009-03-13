@@ -15,8 +15,8 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.MuleParameterized;
 import org.mule.util.ClassUtils;
+import org.mule.util.CollectionUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
@@ -46,13 +46,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
 
-/**
- * The main idea, now runs as a parameterized JUnit 4 test
- */
-@RunWith(MuleParameterized.class)
+// TODO EE-1398 Document this class
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
 
@@ -82,18 +77,17 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     /**
      * Set the list of jms providers to test. The goal is to externalize this, i.e.
      * read the list from an xml file, use maven profiles to control it, etc.
-     * 
      */
-    @Parameters
-    public static Collection jmsProviderConfigs() throws Exception
+    public static Collection jmsProviderConfigs() 
     {
         JmsVendorConfiguration[][] configs;
         URL url = ClassUtils.getResource("jms-vendor-configs.txt", AbstractJmsFunctionalTestCase.class);
 
         if (url == null)
         {
-            throw new IllegalArgumentException("Please specify the org.mule.transport.jms.integration.JmsVendorConfiguration " +
-                                               "implementation to use in jms-vendor-configs.txt on classpaath.");
+            fail("Please specify the org.mule.transport.jms.integration.JmsVendorConfiguration " +
+                  "implementation to use in jms-vendor-configs.txt on classpaath.");
+            return CollectionUtils.EMPTY_COLLECTION;
         }
 
         if (logger.isDebugEnabled())
@@ -101,17 +95,24 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             logger.debug("Parameterized test using: " + url);
         }
 
-        List classes = IOUtils.readLines(url.openStream());
-        configs = new JmsVendorConfiguration[1][classes.size()];
-        int i = 0;
-        for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
+        try
         {
-            String cls = (String) iterator.next();
-            configs[0][i] = (JmsVendorConfiguration) ClassUtils.instanciateClass(cls);
-
+	        List classes = IOUtils.readLines(url.openStream());
+	        configs = new JmsVendorConfiguration[1][classes.size()];
+	        int i = 0;
+	        for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
+	        {
+	            String cls = (String) iterator.next();
+	            configs[0][i] = (JmsVendorConfiguration) ClassUtils.instanciateClass(cls);	
+	        }
+	        return Arrays.asList(configs);
         }
-        return Arrays.asList(configs);
-
+        catch (Exception e)
+        {
+            fail("Please specify the org.mule.transport.jms.integration.JmsVendorConfiguration " +
+                 "implementation to use in jms-vendor-configs.txt on classpath: " + e.getMessage());
+            return CollectionUtils.EMPTY_COLLECTION;
+        }
     }
 
     /**
@@ -136,6 +137,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         super.tearDown();
     }
 
+    public AbstractJmsFunctionalTestCase() 
+    {
+    	// TODO jmsProviderConfigs() can return more than one provider, but our test class can only handle one at a time
+		this((JmsVendorConfiguration) ((JmsVendorConfiguration[]) jmsProviderConfigs().iterator().next())[0]);
+    }
+    
     public AbstractJmsFunctionalTestCase(JmsVendorConfiguration config)
     {
         setJmsConfig(config);
@@ -301,7 +308,10 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     protected void doTearDown() throws Exception
     {
         super.doTearDown();
-        client.dispose();
+        if (client != null)
+        {
+        	client.dispose();
+        }
     }
 
     protected MuleClient getClient()

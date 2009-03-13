@@ -18,11 +18,6 @@ import org.junit.Test;
  */
 public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsSingleTransactionComponentTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-component.xml";

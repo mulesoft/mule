@@ -17,12 +17,6 @@ import org.junit.Test;
  */
 public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 {
-
-    public JmsDurableTopicSingleTxTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-durable-topic-single-tx.xml";

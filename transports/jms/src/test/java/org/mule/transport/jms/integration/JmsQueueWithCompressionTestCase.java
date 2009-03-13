@@ -19,11 +19,6 @@ import org.junit.Test;
  */
 public class JmsQueueWithCompressionTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsQueueWithCompressionTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-queue-with-compression.xml";

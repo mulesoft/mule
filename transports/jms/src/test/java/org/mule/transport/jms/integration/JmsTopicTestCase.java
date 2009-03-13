@@ -17,11 +17,6 @@ import org.junit.Test;
  */
 public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsTopicTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-topic.xml";

@@ -14,11 +14,6 @@ import org.junit.Test;
 
 public class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-BEGIN_OR_JOIN_AND_ALWAYS_BEGIN.xml";

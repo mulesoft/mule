@@ -16,12 +16,6 @@ import org.junit.Test;
 
 public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends AbstractJmsFunctionalTestCase
 {
-
-    public JmsSingleTransactionAlwaysBeginConfigurationTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     public static final String JMS_QUEUE_INPUT_CONF_A = "in1";
     public static final String JMS_QUEUE_OUTPUT_CONF_A = "out1";
     public static final String JMS_QUEUE_INPUT_CONF_B = "in2";

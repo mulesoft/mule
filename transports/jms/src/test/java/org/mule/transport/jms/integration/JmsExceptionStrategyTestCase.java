@@ -28,11 +28,6 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
 {
     public static final String DEADLETTER_QUEUE_NAME = "dead.letter";
 
-    public JmsExceptionStrategyTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-exception-strategy.xml";

@@ -22,11 +22,6 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
     private String clientId;
 
-    public JmsDurableTopicTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-durable-topic.xml";

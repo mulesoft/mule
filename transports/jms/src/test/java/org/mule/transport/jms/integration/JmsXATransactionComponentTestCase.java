@@ -20,11 +20,6 @@ public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTest
 {
     public static final String CONNECTOR1_NAME = "jmsConnector";
 
-    public JmsXATransactionComponentTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-xa-tx-component.xml";

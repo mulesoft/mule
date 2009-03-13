@@ -17,11 +17,6 @@ import org.junit.Test;
  */
 public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsQueueTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-queue.xml";

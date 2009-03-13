@@ -23,13 +23,6 @@ import org.junit.Test;
  */
 public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunctionalTestCase
 {
-
-    public JmsClientAcknowledgeTransactionTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-        System.out.println("using jms provider : " + config.getProviderName());
-    }
-
     @Override
     protected String getConfigResources()
     {

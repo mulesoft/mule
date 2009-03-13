@@ -18,11 +18,6 @@ import org.junit.Test;
 
 public class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsQueueWithTransactionTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-queue-with-transaction.xml";

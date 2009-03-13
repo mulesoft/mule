@@ -17,11 +17,6 @@ import org.junit.Test;
 
 public class JmsSingleTransactionRecieveAndSendTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsSingleTransactionRecieveAndSendTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-receive-send-in-one-tx.xml";

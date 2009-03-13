@@ -24,11 +24,6 @@ import org.junit.Test;
 
 public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsXAAlwaysBeginTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     private static final List committedTx = new CopyOnWriteArrayList();
     private static final List rolledbackTx = new CopyOnWriteArrayList();
     protected static final Log logger = LogFactory.getLog(JmsXAAlwaysBeginTestCase.class);

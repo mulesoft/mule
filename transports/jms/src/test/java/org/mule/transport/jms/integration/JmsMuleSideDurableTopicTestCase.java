@@ -26,13 +26,7 @@ import org.junit.Test;
 
 public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
-
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
-
-    public JmsMuleSideDurableTopicTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
 
     protected String getConfigResources()
     {

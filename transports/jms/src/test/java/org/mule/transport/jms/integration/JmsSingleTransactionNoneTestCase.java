@@ -17,11 +17,6 @@ import org.junit.Test;
  */
 public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsSingleTransactionNoneTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-NONE.xml";
