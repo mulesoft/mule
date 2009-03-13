@@ -76,13 +76,13 @@ public class ProjectArchetypeMojo extends AbstractMojo
     private String muleVersion;
 
     /**
-     * @parameter expression="${groupId}" alias="newGroupId" default-value="default"
+     * @parameter expression="${groupId}" alias="newGroupId" default-value="com.mycompany.mule"
      * @require
      */
     private String groupId;
 
     /**
-     * @parameter expression="${artifactId}" alias="newArtifactId" default-value="default"
+     * @parameter expression="${artifactId}" alias="newArtifactId" default-value="my-mule-project"
      * @require
      */
     private String artifactId;
@@ -140,7 +140,6 @@ public class ProjectArchetypeMojo extends AbstractMojo
 
         map.put("version", version);
         map.put("muleVersion", muleVersion);
-
 
         try
         {

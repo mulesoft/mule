@@ -76,13 +76,13 @@ public class ExampleArchetypeMojo extends AbstractMojo
     private String muleVersion;
 
     /**
-     * @parameter expression="${groupId}" alias="newGroupId" default-value="default"
+     * @parameter expression="${groupId}" alias="newGroupId" default-value="com.mycompany.mule"
      * @require
      */
     private String groupId;
 
     /**
-     * @parameter expression="${artifactId}" alias="newArtifactId" default-value="default"
+     * @parameter expression="${artifactId}" alias="newArtifactId" default-value="my-mule-example"
      * @require
      */
     private String artifactId;

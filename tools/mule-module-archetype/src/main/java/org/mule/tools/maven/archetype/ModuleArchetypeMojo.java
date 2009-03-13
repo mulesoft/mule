@@ -37,7 +37,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * a set of user parameters to create a working Maven project. This is a modified newVersion for bobber to support additional functionality.
  * @requiresProject false
  */
-public class ProjectArchetypeMojo extends AbstractMojo
+public class ModuleArchetypeMojo extends AbstractMojo
 {
     /**
      * @parameter expression="${component.org.apache.maven.archetype.Archetype}"
@@ -76,13 +76,13 @@ public class ProjectArchetypeMojo extends AbstractMojo
     private String muleVersion;
 
     /**
-     * @parameter expression="${groupId}" alias="newGroupId" default-value="default"
+     * @parameter expression="${groupId}" alias="newGroupId" default-value="com.mycompany.mule"
      * @require
      */
     private String groupId;
 
     /**
-     * @parameter expression="${artifactId}" alias="newArtifactId" default-value="default"
+     * @parameter expression="${artifactId}" alias="newArtifactId" default-value="my-mule-module"
      * @require
      */
     private String artifactId;
