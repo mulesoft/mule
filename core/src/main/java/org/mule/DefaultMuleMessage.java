@@ -36,6 +36,7 @@ import java.util.Set;
 import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -694,6 +695,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         }
     }
 
+    /**
+     * Determines if the payload of this message is consumable i.e. it can't be read
+     * more than once. This is here temporarily without adding to MuleMessage
+     * interface until MULE-4256 is implemented.
+     * 
+     * @return
+     */
     public boolean isConsumable()
     {
         return isConsumedFromAdditional(this.getPayload().getClass());
