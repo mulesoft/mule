@@ -7,8 +7,8 @@ public class ScanLicenseHeaders
      * These files are known to have invalid license headers and are the usual exception to the rule
      */
     static List exceptions = [ "BobberArchetype.java", "BobberArchetypeMojo.java", 
-        "ExampleArchetypeMojo.java", "ProjectArchetypeMojo.java", "TransportArchetypeMojo.java", 
-        "XMLStreamReaderToContentHandler.java", "BndMojo.java" ];
+        "ExampleArchetypeMojo.java", "ProjectArchetypeMojo.java", "ModuleArchetypeMojo.java",
+        "TransportArchetypeMojo.java", "XMLStreamReaderToContentHandler.java", "BndMojo.java" ];
 
     static void main(args)
     {
