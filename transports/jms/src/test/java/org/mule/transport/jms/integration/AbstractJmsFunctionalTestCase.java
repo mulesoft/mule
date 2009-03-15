@@ -15,6 +15,7 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.MuleParameterized;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.IOUtils;
@@ -46,8 +47,52 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 
-// TODO EE-1398 Document this class
+/**
+ * This is the base class for all integration tests that are part of the JMs integration test suite.  this is
+ * a suite that can be run on multiple JMS providers since all configuration for the provider is abstracted into
+ * a single class which implements {@link org.mule.transport.jms.integration.JmsVendorConfiguration}.  The implementation
+ * of this class is loaded by looking for the classname in a properties file called 'jms-vendor-configs.txt'in the root
+ * classpath.
+ * <p/>
+ * This test case provides a number of support methods for testing Jms providers with Mule.  This implementation is based
+ * around the conepts of scenarios.  Scenarios define an action or set of actions and are represented as implementations
+ * of {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.Scenario}.  Scenarios can be combined to create
+ * a test.  The default scenarios are usually sufficient to create a test.  These are:
+ * {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.ScenarioReceive}
+ * {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.ScenarioNotReceive}
+ * {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.ScenarioCommit}
+ * {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.ScenarioRollback}
+ * {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.NonTransactedScenario}
+ * <p/>
+ * This object will also add properties to the registry that can be accessed withn Xml config files using placeholders.
+ * The following properties are made available -
+ * <ul>
+ * <li>${inbound.destination} - the URI of the inbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+ * <li>${outbound.destination} - the URI of the outbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration implementation)</li>
+ * <li>${middle.destination} - the URI of the middle destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+ * <li>${middle2.destination} - the URI of a second middle destination 'middle2'.</li>
+ * <li>${middle3.destination} - the URI of a third middle destination 'middle3'.</li>
+ * <li>${broadcast.destination} - the URI of the broadcast topic (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+ * <li>${protocol} - the protocol of the current messaging connector (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+ * </ul>
+ * <p/>
+ * For each integration test there are 2 configuration files. One is provided by the JMS integration suite and defines the
+ * event flow for the test. The other is a vendor-specific config file that defines the connectors and possibly endpoints and
+ * transformers for the Jms connector being tested. These configurations are known as 'connector' files, the share the same
+ * file name as the generic configuration file prepended with 'connector-'.  The location of these files must be-
+ * <code>
+ * integration/<provider_name>/connector-<event_flow_config_name>
+ * </code>
+ * <p/>
+ * The 'provider_name' is obtained from the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation.
+ * <p/>
+ * In order to know what objects to define in the 'connector-' files you must copy the connector flies from the activeMQ (default)
+ * test suite and configure the objects to match the configuration in the ActiveMQ tests.  Note that the object names must
+ * be the same consistently for things to work.
+ */
+@RunWith(MuleParameterized.class)
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
 
@@ -59,7 +104,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     public static final String MIDDLE_ENDPOINT_KEY = "middle.destination";
     public static final String MIDDLE2_ENDPOINT_KEY = "middle2.destination";
-
+    public static final String MIDDLE3_ENDPOINT_KEY = "middle3.destination";
     public static final String BROADCAST_TOPIC_ENDPOINT_KEY = "broadcast.topic.destination";
 
     protected static final Log logger = LogFactory.getLog("MULE_TESTS");
@@ -75,10 +120,20 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     private MuleClient client = null;
 
     /**
-     * Set the list of jms providers to test. The goal is to externalize this, i.e.
-     * read the list from an xml file, use maven profiles to control it, etc.
+     * Finds the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} instances to test with by looking
+     * in a file called "jms-vendor-configs.txt" which contains one or more fuly qualified classnames of
+     * {@link org.mule.transport.jms.integration.JmsVendorConfiguration} instances to load.
+     *
+     * @return a collection of {@link org.mule.transport.jms.integration.JmsVendorConfiguration} instance to test
+     * against.
+     *
+     * @throws Exception if the 'jms-vendor-configs.txt' cannot be loaded or the classes defined within that file
+     * are not on the classpath
+     *
+     * TODO this method can return more than one provider, but our test class can only handle one at a time
+     * IMPORTANT: Only set one class in 'jms-vendor-configs.txt'
      */
-    public static Collection jmsProviderConfigs() 
+    public static Collection jmsProviderConfigs()
     {
         JmsVendorConfiguration[][] configs;
         URL url = ClassUtils.getResource("jms-vendor-configs.txt", AbstractJmsFunctionalTestCase.class);
@@ -103,7 +158,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 	        for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
 	        {
 	            String cls = (String) iterator.next();
-	            configs[0][i] = (JmsVendorConfiguration) ClassUtils.instanciateClass(cls);	
+	            configs[0][i] = (JmsVendorConfiguration) ClassUtils.instanciateClass(cls, ClassUtils.NO_ARGS);
 	        }
 	        return Arrays.asList(configs);
         }
@@ -118,7 +173,8 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     /**
      * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we
      * need to explicitly call the setUp and tearDown methods
-     * 
+     *
+     * @throws Exception if, well, anything goes wrong
      */
     @Before
     public void before() throws Exception
@@ -129,7 +185,8 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     /**
      * Since we are using JUnit 4, but the Mule Test Framework assumes JUnit 3, we
      * need to explicitly call the setUp and tearDown methods
-     * 
+     *
+     * @throws Exception if, well, anything goes wrong
      */
     @After
     public void after() throws Exception
@@ -137,12 +194,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         super.tearDown();
     }
 
-    public AbstractJmsFunctionalTestCase() 
+    public AbstractJmsFunctionalTestCase()
     {
     	// TODO jmsProviderConfigs() can return more than one provider, but our test class can only handle one at a time
 		this((JmsVendorConfiguration) ((JmsVendorConfiguration[]) jmsProviderConfigs().iterator().next())[0]);
     }
-    
+
     public AbstractJmsFunctionalTestCase(JmsVendorConfiguration config)
     {
         setJmsConfig(config);
@@ -153,6 +210,21 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         scenarioReceive = new ScenarioReceive();
     }
 
+    /**
+     * Adds the following properties to the registry so that the Xml configuration files can reference them.
+     * <p/>
+     * <ul>
+     * <li>${inbound.destination} - the URI of the inbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+     * <li>${outbound.destination} - the URI of the outbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration implementation)</li>
+     * <li>${middle.destination} - the URI of the middle destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+     * <li>${middle2.destination} - the URI of a second middle destination 'middle2'.</li>
+     * <li>${middle3.destination} - the URI of a third middle destination 'middle3'.</li>
+     * <li>${broadcast.destination} - the URI of the broadcast topic (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+     * <li>${protocol} - the protocol of the current messaging connector (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+     * </ul>
+     *
+     * @return
+     */
     @Override
     protected Properties getStartUpProperties()
     {
@@ -162,6 +234,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         props.put(OUTBOUND_ENDPOINT_KEY, getJmsConfig().getOutboundEndpoint());
         props.put(MIDDLE_ENDPOINT_KEY, getJmsConfig().getMiddleEndpoint());
         props.put(MIDDLE2_ENDPOINT_KEY, getJmsConfig().getMiddleEndpoint() + "2");
+        props.put(MIDDLE3_ENDPOINT_KEY, getJmsConfig().getMiddleEndpoint() + "3");
 
         props.put(BROADCAST_TOPIC_ENDPOINT_KEY, getJmsConfig().getTopicBroadcastEndpoint());
         props.put("protocol", getJmsConfig().getProtocol());
@@ -174,6 +247,14 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         return props;
     }
 
+    /**
+     * This creates a {@link org.mule.config.spring.SpringXmlConfigurationBuilder} as expected but also figures out
+     * which 'connector' configuration file to load with the event flow configuration (obtained from the overriding \
+     * class which implements {@link #getConfigResources()}).
+     *
+     * @return The config builder used to create the Mule instance for this test
+     * @throws Exception
+     */
     @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
@@ -186,11 +267,17 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }
         String resources = configResource.substring(configResource.lastIndexOf("/") + 1);
         resources = String.format("integration/%s/connector-%s,%s", getJmsConfig().getProviderName(),
-                                  resources, configResource);
+                resources, getConfigResources());
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(resources);
         return builder;
     }
 
+    /**
+     * Returns the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implemetation to be used
+     * with this test
+     *
+     * @return settings for this test
+     */
     public final JmsVendorConfiguration getJmsConfig()
     {
         if (jmsConfig == null)
@@ -200,52 +287,109 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         return jmsConfig;
     }
 
+    /**
+     * Sets the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implemetation to be used
+     * with this test
+     *
+     * @param jmsConfig the settings for this test
+     */
     public final void setJmsConfig(JmsVendorConfiguration jmsConfig)
     {
         this.jmsConfig = jmsConfig;
     }
 
+    /**
+     * Overriding classes must override this or inject this object. It is responsible for creating the
+     * {@link org.mule.transport.jms.integration.JmsVendorConfiguration} instance to be used by this test.
+     *
+     * @return the settings for this test
+     */
     protected JmsVendorConfiguration createJmsConfig()
     {
         // Overriding classes must override this or inject this object
         return null;
     }
 
-    protected Connection getConnection(boolean topic, boolean xa) throws Exception
+    /**
+     * Create a connection factory for the Jms profider being tested.  This calls
+     * through to {@link org.mule.transport.jms.integration.JmsVendorConfiguration#getConnection(boolean, boolean)}
+     *
+     * @param topic whether to use a topic or queue connection factory, for 1.1
+     *              implementations this proerty can be ignored
+     * @param xa    whether to create an XA connection factory
+     * @return a new JMS connection
+     */
+    protected final Connection getConnection(boolean topic, boolean xa) throws Exception
     {
         checkConfig();
         return getJmsConfig().getConnection(topic, xa);
     }
 
-    protected String getInboundEndpoint()
+    /**
+     * Returns the {@link #getInboundDestinationName()} in the form of an endpoint URI i.e.
+     * jms://in.
+     * <p/>
+     * This calls through to {@link JmsVendorConfiguration#getInboundEndpoint()}
+     *
+     * @return the Inbound JMS endpoint
+     */
+    protected final String getInboundEndpoint()
     {
         checkConfig();
         return getJmsConfig().getInboundEndpoint();
     }
 
-    protected String getOutboundEndpoint()
+    /**
+     * Returns the {@link #getOutboundDestinationName()} in the form of an endpoint URI i.e.
+     * jms://out.
+     * <p/>
+     * This calls through to {@link org.mule.transport.jms.integration.JmsVendorConfiguration#getOutboundEndpoint()}
+     *
+     * @return the Outbound JMS endpoint
+     */
+    protected final String getOutboundEndpoint()
     {
         checkConfig();
         return getJmsConfig().getOutboundEndpoint();
     }
 
-    protected String getInboundQueueName()
+    /**
+     * The test inbound queue name.  For consistency this should always be 'in'. Note that you need to make
+     * sure that this queue is available in the the JMS provider being tested.
+     * <p/>
+     * This calls through to {@link org.mule.transport.jms.integration.JmsVendorConfiguration#getInboundDestinationName()}
+     *
+     * @return The test inbound destination name
+     */
+    protected final String getInboundQueueName()
     {
         checkConfig();
         return getJmsConfig().getInboundDestinationName();
     }
 
-    protected String getOutboundQueueName()
+    /**
+     * The test outbound queue name.  For consistency this should always be 'out'. Note that you need to make
+     * sure that this queue is available in the the JMS provider being tested.
+     * <p/>
+     * This calls through to {@link org.mule.transport.jms.integration.JmsVendorConfiguration#getOutboundDestinationName()}
+     *
+     * @return The test outbound destination name
+     */
+    protected final String getOutboundQueueName()
     {
         checkConfig();
         return getJmsConfig().getOutboundDestinationName();
     }
 
     /**
-     * Timeout used when checking that a message is NOT present
-     * 
+     * Timeout in milliseconds used when checking that a message is NOT present. This is usually 1000-2000ms.
+     * It is customizable so that slow connections i.e. over a wAN can be accounted for.
+     * <p/>
+     * This calls through to {@link JmsVendorConfiguration#getSmallTimeout()}
+     *
+     * @return timeout in milliseconds used when checking that a message is NOT present
      */
-    protected long getSmallTimeout()
+    protected final long getSmallTimeout()
     {
         checkConfig();
         return getJmsConfig().getSmallTimeout();
@@ -253,15 +397,23 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     /**
-     * The timeout used when waiting for a message to arrive
-     * 
+     * The timeout in milliseconds used when waiting for a message to arrive. This is usually 3000-5000ms.
+     * However, it is customizable so that slow connections i.e. over a wAN can be accounted for.
+     * <p/>
+     * This calls through to {@link JmsVendorConfiguration#getTimeout()}
+     *
+     * @return The timeout used when waiting for a message to arrive
      */
-    protected long getTimeout()
+    protected final long getTimeout()
     {
         checkConfig();
         return getJmsConfig().getTimeout();
     }
 
+    /**
+     * Ensures that the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} instance is not null
+     * if it is an {@link IllegalStateException} will be thrown
+     */
     protected void checkConfig()
     {
         if (getJmsConfig() == null)
@@ -368,7 +520,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * By default this will create a Queue, override to create a topic
-     * 
+     *
      * @param session
      * @param scenario
      * @return
@@ -381,7 +533,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * By default this will create a Queue, override to create a topic
-     * 
+     *
      * @param session
      * @param scenario
      * @return
@@ -392,7 +544,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         return session.createQueue(scenario.getOutputDestinationName());
     }
 
-    /**/
+     /**/
     public Message receive(Scenario scenario) throws Exception
     {
         assertNotNull("scenario is null!", scenario);
@@ -459,12 +611,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         int getAcknowledge();
 
         void send(Session session, MessageProducer producer)
-            throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException,
-            RollbackException;
+                throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException,
+                RollbackException;
 
         Message receive(Session session, MessageConsumer consumer)
-            throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException,
-            RollbackException;
+                throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException,
+                RollbackException;
 
         boolean isTransacted();
     }
