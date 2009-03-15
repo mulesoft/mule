@@ -92,7 +92,6 @@ import org.junit.runner.RunWith;
  * test suite and configure the objects to match the configuration in the ActiveMQ tests.  Note that the object names must
  * be the same consistently for things to work.
  */
-@RunWith(MuleParameterized.class)
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
 
