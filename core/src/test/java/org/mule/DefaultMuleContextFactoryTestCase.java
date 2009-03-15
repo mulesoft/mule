@@ -264,8 +264,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
             muleContext.getRegistry().registerObject(TEST_STRING_KEY, TEST_STRING_VALUE);
             muleContext.getRegistry().registerObject(TEST_OBJECT_NAME, new Banana());
         }
-
-        protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception {}
     }
 
     static class TestConfigurationBuilder2 extends AbstractConfigurationBuilder
@@ -277,8 +275,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
             testModel.setName(TEST_MODEL_NAME);
             muleContext.getRegistry().registerModel(testModel);
         }
-
-        protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception {}
     }
 
     static class TestMuleContextBuilder extends DefaultMuleContextBuilder

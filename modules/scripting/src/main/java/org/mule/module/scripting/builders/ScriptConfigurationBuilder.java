@@ -77,11 +77,6 @@ public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBui
         }
     }
 
-    protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception 
-    {
-        // nothing to do
-    }
-    
     protected void populateBindings(Bindings bindings)
     {
         bindings.put("muleContext", muleContext);

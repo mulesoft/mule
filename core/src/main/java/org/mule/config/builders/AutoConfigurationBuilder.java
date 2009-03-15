@@ -58,11 +58,6 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         autoConfigure(muleContext, configResources);
     }
 
-    protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception
-    {
-        // nothing to do
-    }
-    
     /**
      * @param muleContext
      * @return

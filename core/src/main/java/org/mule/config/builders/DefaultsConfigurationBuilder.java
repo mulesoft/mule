@@ -83,9 +83,4 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         systemModel.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
         registry.registerModel(systemModel);
     }
-    
-    protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception
-    {
-        // nothing to do
-    }    
 }

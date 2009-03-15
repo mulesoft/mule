@@ -41,9 +41,4 @@ public class SimpleConfigurationBuilder extends AbstractConfigurationBuilder
             muleContext.getRegistry().registerObjects(objects);
         }
     }
-
-    protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception
-    {
-        // nothing to do
-    }    
 }

@@ -30,7 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 /**
  * <code>MuleXmlBuilderContextListener</code> is a bootstrap listener used to
- * construct a MuleManager instance. This listener delegates to the
+ * construct a {@link org.mule.api.MuleContext} instance. This listener delegates to the
  * <i>MuleXmlConfigurationBuilder</i>.
  * <p>
  * The location of the configuration file can be specified in a init parameter called

@@ -66,8 +66,4 @@ public class SpringConfigurationBuilder extends AbstractConfigurationBuilder
         registry.initialise();
     }
 
-    protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception
-    {
-        // do nothing
-    }
 }
