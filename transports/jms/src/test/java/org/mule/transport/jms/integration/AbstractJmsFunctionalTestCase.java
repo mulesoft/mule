@@ -48,14 +48,14 @@ import org.junit.After;
 import org.junit.Before;
 
 /**
- * This is the base class for all integration tests that are part of the JMs integration test suite.  this is
+ * This is the base class for all integration tests that are part of the JMS integration test suite.  this is
  * a suite that can be run on multiple JMS providers since all configuration for the provider is abstracted into
  * a single class which implements {@link org.mule.transport.jms.integration.JmsVendorConfiguration}.  The implementation
  * of this class is loaded by looking for the classname in a properties file called 'jms-vendor-configs.txt'in the root
  * classpath.
  * <p/>
  * This test case provides a number of support methods for testing Jms providers with Mule.  This implementation is based
- * around the conepts of scenarios.  Scenarios define an action or set of actions and are represented as implementations
+ * around the concept of scenarios.  Scenarios define an action or set of actions and are represented as implementations
  * of {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.Scenario}.  Scenarios can be combined to create
  * a test.  The default scenarios are usually sufficient to create a test.  These are:
  * {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.ScenarioReceive}
@@ -78,17 +78,17 @@ import org.junit.Before;
  * <p/>
  * For each integration test there are 2 configuration files. One is provided by the JMS integration suite and defines the
  * event flow for the test. The other is a vendor-specific config file that defines the connectors and possibly endpoints and
- * transformers for the Jms connector being tested. These configurations are known as 'connector' files, the share the same
- * file name as the generic configuration file prepended with 'connector-'.  The location of these files must be-
+ * transformers for the Jms connector being tested. These configurations are known as 'connector' files, they share the same
+ * file name as the generic configuration file prepended with 'connector-'.  The location of these files must be
+ * <p/>
  * <code>
- * integration/<provider_name>/connector-<event_flow_config_name>
- * </code>
+ * integration/&lt;provider_name>/connector-&lt;event_flow_config_name></code>
  * <p/>
  * The 'provider_name' is obtained from the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation.
  * <p/>
- * In order to know what objects to define in the 'connector-' files you must copy the connector flies from the activeMQ (default)
+ * In order to know what objects to define in the 'connector-' files you must copy the connector files from the ActiveMQ (default)
  * test suite and configure the objects to match the configuration in the ActiveMQ tests.  Note that the object names must
- * be the same consistently for things to work.
+ * be consistently the same for things to work.
  */
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
