@@ -142,9 +142,9 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             return CollectionUtils.EMPTY_COLLECTION;
         }
 
-        if (logger.isDebugEnabled())
+        if (logger.isInfoEnabled())
         {
-            logger.debug("Parameterized test using: " + url);
+            logger.info("Parameterized test using: " + url);
         }
 
         try
@@ -194,7 +194,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     public AbstractJmsFunctionalTestCase()
     {
         // TODO jmsProviderConfigs() can return more than one provider, but our test class can only handle one at a time
-        this((JmsVendorConfiguration) ((JmsVendorConfiguration[]) jmsProviderConfigs().iterator().next())[0]);
+        this(((JmsVendorConfiguration[]) jmsProviderConfigs().iterator().next())[0]);
     }
 
     public AbstractJmsFunctionalTestCase(JmsVendorConfiguration config)
