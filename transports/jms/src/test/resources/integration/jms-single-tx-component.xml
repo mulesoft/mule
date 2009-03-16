@@ -12,8 +12,9 @@
     <endpoint name="in" address="${inbound.destination}"/>
     <endpoint name="middle" address="${middle.destination}"/>
     <endpoint name="out" address="${outbound.destination}"/>
-    <endpoint name="q1" address="${protocol}://q1"/>
-    <endpoint name="q2" address="${protocol}://q2"/>
+    <!-- TODO properly configure these -->
+    <endpoint name="q1" address="${protocol}://middle2"/>
+    <endpoint name="q2" address="${protocol}://middle3"/>
 
     <model name="jmsTest">
         <service name="Part1">

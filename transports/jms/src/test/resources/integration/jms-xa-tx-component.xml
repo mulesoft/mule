@@ -28,7 +28,7 @@
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="q1">
+                    <jms:outbound-endpoint queue="middle">
                         <jms:transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                     <xa-transaction action="BEGIN_OR_JOIN"/>
@@ -38,14 +38,14 @@
 
         <service name="Part1">
             <inbound>
-                <jms:inbound-endpoint queue="q1">
+                <jms:inbound-endpoint queue="middle">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="q2">
+                    <jms:outbound-endpoint queue="middle2">
                         <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </pass-through-router>
@@ -54,14 +54,14 @@
 
         <service name="Part2">
             <inbound>
-                <jms:inbound-endpoint queue="q2">
+                <jms:inbound-endpoint queue="middle2">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="q3">
+                    <jms:outbound-endpoint queue="middle3">
                         <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </pass-through-router>
@@ -70,7 +70,7 @@
 
         <service name="Part3">
             <inbound>
-                <jms:inbound-endpoint queue="q3">
+                <jms:inbound-endpoint queue="middle3">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
