@@ -125,13 +125,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-    	<xsd:attribute name="protocolConnector" type="xsd:string" >
-    		<xsd:annotation>
-    			<xsd:documentation>
+        <xsd:attribute name="protocolConnector" type="xsd:string" >
+            <xsd:annotation>
+                <xsd:documentation>
                             The name of the connector that you wish to use to send/receive messages on with CXF. (As of 2.1)
-    			</xsd:documentation>
-    		</xsd:annotation>
-    	</xsd:attribute>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="applyTransformersToProtocol" type="mule:substitutableBoolean" default="true">
             <xsd:annotation>
                 <xsd:documentation>

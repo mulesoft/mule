@@ -135,7 +135,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
     <xsd:element name="xpath-filter" type="xpathFilterType" substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-		The XPath filter uses the JAXP libraries to filter XPath expressions. Available as of Mule 2.2.
+        The XPath filter uses the JAXP libraries to filter XPath expressions. Available as of Mule 2.2.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

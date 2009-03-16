@@ -15,7 +15,6 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.MuleParameterized;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.IOUtils;
@@ -47,7 +46,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 
 /**
  * This is the base class for all integration tests that are part of the JMs integration test suite.  this is
@@ -151,15 +149,15 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
         try
         {
-	        List classes = IOUtils.readLines(url.openStream());
-	        configs = new JmsVendorConfiguration[1][classes.size()];
-	        int i = 0;
-	        for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
-	        {
-	            String cls = (String) iterator.next();
-	            configs[0][i] = (JmsVendorConfiguration) ClassUtils.instanciateClass(cls, ClassUtils.NO_ARGS);
-	        }
-	        return Arrays.asList(configs);
+            List classes = IOUtils.readLines(url.openStream());
+            configs = new JmsVendorConfiguration[1][classes.size()];
+            int i = 0;
+            for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
+            {
+                String cls = (String) iterator.next();
+                configs[0][i] = (JmsVendorConfiguration) ClassUtils.instanciateClass(cls, ClassUtils.NO_ARGS);
+            }
+            return Arrays.asList(configs);
         }
         catch (Exception e)
         {
@@ -195,8 +193,8 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     public AbstractJmsFunctionalTestCase()
     {
-    	// TODO jmsProviderConfigs() can return more than one provider, but our test class can only handle one at a time
-		this((JmsVendorConfiguration) ((JmsVendorConfiguration[]) jmsProviderConfigs().iterator().next())[0]);
+        // TODO jmsProviderConfigs() can return more than one provider, but our test class can only handle one at a time
+        this((JmsVendorConfiguration) ((JmsVendorConfiguration[]) jmsProviderConfigs().iterator().next())[0]);
     }
 
     public AbstractJmsFunctionalTestCase(JmsVendorConfiguration config)
@@ -461,7 +459,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         super.doTearDown();
         if (client != null)
         {
-        	client.dispose();
+            client.dispose();
         }
     }
 
