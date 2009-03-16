@@ -17,7 +17,7 @@
     <model>
         <service name="ConnectionFactoryFromJndi">
             <inbound>
-                <jms:inbound-endpoint queue="in1" connector-ref="jmsConnector1"/>
+                <inbound-endpoint ref="ep_in1" />
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -29,7 +29,7 @@
         <service name="QueueFromJndi">
             <inbound>
                 <!-- this queue is looked up from JNDI -->
-                <jms:inbound-endpoint queue="jndi-queue-in" connector-ref="jmsConnector2"/>
+                <inbound-endpoint ref="ep_jndi-queue-in" />
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -41,7 +41,7 @@
         <service name="TopicFromJndi">
             <inbound>
                 <!-- this topic is looked up from JNDI -->
-                <jms:inbound-endpoint topic="jndi-topic-in" connector-ref="jmsConnector2"/>
+                <inbound-endpoint ref="ep_jndi-topic-in" />
             </inbound>
             <outbound>
                 <pass-through-router>

@@ -36,5 +36,8 @@
                             forceJndiDestinations="true"
                             connectionFactoryJndiName="ConnectionFactory"/>
 
+    <jms:endpoint name="ep_in1" queue="in1" connector-ref="jmsConnector1"/>
+    <jms:endpoint name="ep_jndi-queue-in" queue="jndi-queue-in" connector-ref="jmsConnector2"/>
+    <jms:endpoint name="ep_jndi-topic-in" topic="jndi-topic-in" connector-ref="jmsConnector2"/>
 
 </mule>
