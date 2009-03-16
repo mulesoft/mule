@@ -11,13 +11,13 @@ package org.mule.transport.jms.integration.activemq;
 
 import org.mule.transport.jms.integration.JmsVendorConfiguration;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.jms.Connection;
-import javax.jms.JMSException;
 
-import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQXAConnectionFactory;
 
 /**
  * Abstracts all the Jms Vendor specific configuration.  This is the implementation for ActiveMQ.
@@ -111,6 +111,6 @@ public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
 
     public Map getProperties()
     {
-        return null;
+        return new HashMap();
     }
 }
