@@ -16,11 +16,9 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.transformer.AbstractMessageAwareTransformer;
-import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 
-import javax.jms.ConnectionFactory;
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
@@ -45,10 +43,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
     {
         super.doSetUp();
 
-        JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector1");
-        ConnectionFactory cf = connector.getConnectionFactory();
-
-        session = cf.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
+        session = getConnection(false, false).createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
 
     // @Override
