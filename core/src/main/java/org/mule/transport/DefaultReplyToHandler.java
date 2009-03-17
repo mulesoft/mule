@@ -18,11 +18,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.service.AbstractService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,10 +41,10 @@ public class DefaultReplyToHandler implements ReplyToHandler
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(DefaultReplyToHandler.class);
+    protected transient final Log logger = LogFactory.getLog(getClass());
 
     private volatile List transformers;
-    private final Map endpointCache = new HashMap();
+    private final Map<String, ImmutableEndpoint> endpointCache = new HashMap<String, ImmutableEndpoint>();
 
     public DefaultReplyToHandler(List transformers)
     {
@@ -78,7 +78,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
             {
                 logger.info("reply to sent: " + endpoint);
             }
-            ((AbstractService) event.getService()).getStatistics().incSentReplyToEvent();
+            event.getService().getStatistics().incSentReplyToEvent();
         }
         catch (Exception e)
         {
