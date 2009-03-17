@@ -113,7 +113,7 @@
                                 log.info('(full build with a -DperformRelease=true must have run before)'.center(80))
                                 log.info '*' * 80
 
-                                def muleRoot = "$project.build.directory/../../"
+                                def muleRoot = "$project.build.directory/../../../"
 
                                 log.info("Mule project root: ${new File(muleRoot).canonicalPath}")
 
