@@ -137,7 +137,7 @@ public class ClientWrapper
         
         enableHeaders = isTrue((String) endpoint.getProperty(CxfConstants.ENABLE_MULE_SOAP_HEADERS), true); 
         
-        List<AbstractFeature> features = (List<AbstractFeature>) endpoint.getProperty(CxfConstants.OUT_FAULT_INTERCEPTORS);
+        List<AbstractFeature> features = (List<AbstractFeature>) endpoint.getProperty(CxfConstants.FEATURES);
         
         if (features != null)
         {
