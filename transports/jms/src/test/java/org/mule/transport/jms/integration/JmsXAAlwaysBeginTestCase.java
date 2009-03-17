@@ -20,6 +20,7 @@ import javax.transaction.xa.Xid;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
@@ -44,6 +45,7 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
         assertEquals(rolledbackTx.size(), 2);
     }
 
+    @Ignore
     public static class TestRollbackComponent
     {
 
@@ -58,6 +60,7 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
         }
     }
 
+    @Ignore
     public static class TestResource implements XAResource
     {
 

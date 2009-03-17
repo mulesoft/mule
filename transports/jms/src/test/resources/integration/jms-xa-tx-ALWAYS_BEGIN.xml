@@ -23,10 +23,6 @@
             <inbound>
                 <jms:inbound-endpoint ref="in">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
-                    <properties>
-                        <spring:entry key="reuseConsumer" value="true"/>
-                        <spring:entry key="reuseSession" value="true"/>
-                    </properties>
                 </jms:inbound-endpoint>
             </inbound>
             <component>
