@@ -15,7 +15,6 @@ import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMessageAdapter;
-import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.UUID;
 
@@ -145,7 +144,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         {
             if ("GET".equalsIgnoreCase(request.getMethod())) 
             {
-                return request.getRequestURI().toString();
+                return request.getRequestURI().toString() + "?" + request.getQueryString();
             }
             else 
             {
