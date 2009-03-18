@@ -431,13 +431,17 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected MuleMessage receiveMessage() throws Exception
     {
+        return receiveMessage(DEFAULT_OUTPUT_MESSAGE);
+    }
+
+    protected MuleMessage receiveMessage(Object expected) throws Exception
+    {
         MuleMessage result = client.request(getOutboundEndpoint(), getTimeout());
         assertNotNull(result);
         assertNotNull(result.getPayload());
         assertNull(result.getExceptionPayload());
-        assertEquals(DEFAULT_OUTPUT_MESSAGE, result.getPayload());
+        assertEquals(expected, result.getPayload());
         return result;
-
     }
 
     public void runAsynchronousDispatching() throws Exception
