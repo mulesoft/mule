@@ -10,7 +10,6 @@
 package org.mule.config.bootstrap;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -23,6 +22,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.util.StreamCloser;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
+import org.mule.util.ExceptionUtils;
 import org.mule.util.PropertiesUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -31,6 +31,9 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This object will load objects defined in a file called <code>registry-bootstrap.properties</code> into the local registry.
@@ -77,6 +80,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     public String TRANSFORMER_PREFIX = "transformer.";
     public String OBJECT_PREFIX = "object.";
 
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
     protected MuleContext context;
 
@@ -106,7 +110,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    protected void process(Properties props) throws NoSuchMethodException, IllegalAccessException, MuleException, InvocationTargetException, ClassNotFoundException, InstantiationException
+    protected void process(Properties props) throws Exception
     {
         registerTransformers(props, context.getRegistry());
         registerUnnamedObjects(props, context.getRegistry());
@@ -115,12 +119,13 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     }
 
-    private void registerTransformers(Properties props, MuleRegistry registry) throws MuleException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
+    private void registerTransformers(Properties props, MuleRegistry registry) throws Exception
     {
         int i = 1;
         String transString = props.getProperty(TRANSFORMER_PREFIX + i);
         String name = null;
         String returnClassString = null;
+        boolean optional = false;
 
         while (transString != null)
         {
@@ -128,45 +133,94 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             int x = transString.indexOf(",");
             if (x > -1)
             {
-                Properties p = PropertiesUtils.getPropertiesFromString(transString.substring(i + 1), ',');
+                Properties p = PropertiesUtils.getPropertiesFromString(transString.substring(x + 1), ',');
                 name = p.getProperty("name", null);
                 returnClassString = p.getProperty("returnClass", null);
+                optional = p.containsKey("optional");
             }
 
-            if (returnClassString != null)
+            final String transClass = (x == -1 ? transString : transString.substring(0, x));
+            try
             {
-                if (returnClassString.equals("byte[]"))
+
+                if (returnClassString != null)
                 {
-                    returnClass = byte[].class;
+                    if (returnClassString.equals("byte[]"))
+                    {
+                        returnClass = byte[].class;
+                    }
+                    else
+                    {
+                        returnClass = ClassUtils.loadClass(returnClassString, getClass());
+                    }
+                }
+                Transformer trans = (Transformer) ClassUtils.instanciateClass(transClass);
+                if (!(trans instanceof DiscoverableTransformer))
+                {
+                    throw new TransformerException(CoreMessages.transformerNotImplementDiscoverable(trans));
+                }
+                if (returnClass != null)
+                {
+                    trans.setReturnClass(returnClass);
+                }
+                if (name != null)
+                {
+                    trans.setName(name);
                 }
                 else
                 {
-                    returnClass = ClassUtils.loadClass(returnClassString, getClass());
+                    //This will generate a default name for the transformer
+                    name = trans.getName();
+                    //We then prefix the name to ensure there is less chance of conflict if the user registers
+                    // the transformer with the same name
+                    trans.setName("_" + name);
+                }
+                registry.registerTransformer(trans);
+            }
+            catch (InvocationTargetException itex)
+            {
+                Throwable cause = ExceptionUtils.getCause(itex);
+                if (cause instanceof NoClassDefFoundError && optional)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Ignoring optional transformer: " + transClass);
+                    }
+                }
+                else
+                {
+                    throw new Exception(cause);
                 }
             }
-            String transClass = (x == -1 ? transString : transString.substring(0, x));
-            Transformer trans = (Transformer) ClassUtils.instanciateClass(transClass);
-            if (!(trans instanceof DiscoverableTransformer))
+            catch (NoClassDefFoundError ncdfe)
             {
-                throw new TransformerException(CoreMessages.transformerNotImplementDiscoverable(trans));
+                if (optional)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Ignoring optional transformer: " + transClass);
+                    }
+                }
+                else
+                {
+                    throw ncdfe;
+                }
             }
-            if (returnClass != null)
+            catch (ClassNotFoundException cnfe)
             {
-                trans.setReturnClass(returnClass);
+                if (optional)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Ignoring optional transformer: " + transClass);
+                    }
+                }
+                else
+                {
+                    throw cnfe;
+                }
             }
-            if (name != null)
-            {
-                trans.setName(name);
-            }
-            else
-            {
-                //This will generate a default name for the transformer
-                name = trans.getName();
-                //We then prefix the name to ensure there is less chance of conflict if the user registers
-                // the transformer with the same name
-                trans.setName("_" + name);
-            }
-            registry.registerTransformer(trans);
+
             props.remove(TRANSFORMER_PREFIX + i++);
             name = null;
             returnClass = null;
@@ -174,42 +228,150 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void registerObjects(Properties props, Registry registry) throws MuleException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
+    private void registerObjects(Properties props, Registry registry) throws Exception
     {
         // Note that calling the other register methods first will have removed any processed entries
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
         {
             Map.Entry entry = (Map.Entry) iterator.next();
-            Object object = ClassUtils.instanciateClass(entry.getValue().toString());
-            String key = entry.getKey().toString();
-            Class meta = Object.class;
-            if (object instanceof ObjectProcessor)
+            final String className = entry.getValue().toString();
+            boolean optional = false;
+
+            try
             {
-                meta = ObjectProcessor.class;
+                int x = className.indexOf(",");
+                if (x > -1)
+                {
+                    Properties p = PropertiesUtils.getPropertiesFromString(className.substring(x + 1), ',');
+                    optional = p.containsKey("optional");
+                }
+                Object object = ClassUtils.instanciateClass(className);
+                String key = entry.getKey().toString();
+                Class meta = Object.class;
+                if (object instanceof ObjectProcessor)
+                {
+                    meta = ObjectProcessor.class;
+                }
+                registry.registerObject(key, object, meta);
             }
-            registry.registerObject(key, object, meta);
+            catch (InvocationTargetException itex)
+            {
+                Throwable cause = ExceptionUtils.getCause(itex);
+                if (cause instanceof NoClassDefFoundError && optional)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Ignoring optional object: " + className);
+                    }
+                }
+                else
+                {
+                    throw new Exception(cause);
+                }
+            }
+            catch (NoClassDefFoundError ncdfe)
+            {
+                if (optional)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Ignoring optional object: " + className);
+                    }
+                }
+                else
+                {
+                    throw ncdfe;
+                }
+            }
+            catch (ClassNotFoundException cnfe)
+            {
+                if (optional)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Ignoring optional object: " + className);
+                    }
+                }
+                else
+                {
+                    throw cnfe;
+                }
+            }
         }
         props.clear();
     }
 
-    private void registerUnnamedObjects(Properties props, Registry registry) throws MuleException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
+    private void registerUnnamedObjects(Properties props, Registry registry) throws Exception
     {
         int i = 1;
         String objectString = props.getProperty(OBJECT_PREFIX + i);
         while (objectString != null)
         {
+            boolean optional = false;
+            try
+            {
+                int x = objectString.indexOf(",");
+                if (x > -1)
+                {
+                    Properties p = PropertiesUtils.getPropertiesFromString(objectString.substring(x + 1), ',');
+                    optional = p.containsKey("optional");
+                }
+                Object o = ClassUtils.instanciateClass(objectString);
+                Class meta = Object.class;
+                if (o instanceof ObjectProcessor)
+                {
+                    meta = ObjectProcessor.class;
+                }
+                else if (o instanceof StreamCloser)
+                {
+                    meta = StreamCloser.class;
+                }
+                registry.registerObject(OBJECT_PREFIX + i + "#" + o.hashCode(), o, meta);
+            }
+            catch (InvocationTargetException itex)
+            {
+                Throwable cause = ExceptionUtils.getCause(itex);
+                if (cause instanceof NoClassDefFoundError && optional)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Ignoring optional unnamed object: " + objectString);
+                    }
+                }
+                else
+                {
+                    throw new Exception(cause);
+                }
+            }
+            catch (NoClassDefFoundError ncdfe)
+            {
+                if (optional)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Ignoring optional unnamed object: " + objectString);
+                    }
+                }
+                else
+                {
+                    throw ncdfe;
+                }
+            }
+            catch (ClassNotFoundException cnfe)
+            {
+                if (optional)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Ignoring optional unnamed object: " + objectString);
+                    }
+                }
+                else
+                {
+                    throw cnfe;
+                }
+            }
 
-            Object o = ClassUtils.instanciateClass(objectString);
-            Class meta = Object.class;
-            if(o instanceof ObjectProcessor)
-            {
-                meta = ObjectProcessor.class;
-            }
-            else if(o instanceof StreamCloser)
-            {
-                meta = StreamCloser.class;
-            }
-            registry.registerObject(OBJECT_PREFIX + i + "#" + o.hashCode(), o, meta);
             props.remove(OBJECT_PREFIX + i++);
             objectString = props.getProperty(OBJECT_PREFIX + i);
         }
