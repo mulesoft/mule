@@ -168,6 +168,8 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             }
             registry.registerTransformer(trans);
             props.remove(TRANSFORMER_PREFIX + i++);
+            name = null;
+            returnClass = null;
             transString = props.getProperty(TRANSFORMER_PREFIX + i);
         }
     }
