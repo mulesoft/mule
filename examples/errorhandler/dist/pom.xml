@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
-            <version>${version}</version>
+            <version>${muleVersion}</version>
         </dependency>
 
 
