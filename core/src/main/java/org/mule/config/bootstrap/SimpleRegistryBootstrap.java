@@ -37,36 +37,30 @@ import java.util.Properties;
  * This allows modules and transports to make certain objects available by default.  The most common use case is for a
  * module or transport to load stateless transformers into the registry.
  * For this file to be located it must be present in the modules META-INF directory under
- * <code>META-INF/services/org/mule/config/</code>
+ * <pre>META-INF/services/org/mule/config/</pre>
  * <p/>
  * The format of this file is a simple key / value pair. i.e.
- * <code>
+ * <pre>
  * myobject=org.foo.MyObject
- * </code>
- * <p/>
+ * </pre>
  * Will register an instance of MyObject with a key of 'myobject'. If you don't care about the object name and want to
  * ensure that the ojbect gets a unique name you can use -
- * <code>
+ * <pre>
  * object.1=org.foo.MyObject
  * object.2=org.bar.MyObject
- * </code>
- * <p/>
+ * </pre>
  * or
- * <code>
+ * <pre>
  * myFoo=org.foo.MyObject
  * myBar=org.bar.MyObject
- * </code>
- * <p/>
- * <p/>
+ * </pre>
  * Loading transformers has a slightly different notation since you can define the 'returnClass' and 'name'of
  * the transformer as parameters i.e.
- * <p/>
- * <code>
+ * <pre>
  * transformer.1=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
  * transformer.2=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String, name=JMSMessageToString
  * transformer.3=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
- * </code>
- * <p/>
+ * </pre>
  * Note that the key used for transformers must be 'transformer.x' where 'x' is a sequential number.  The transformer name will be
  * automatically generated as JMSMessageToXXX where XXX is the return class name i.e. JMSMessageToString unless a 'name'
  * parameter is specified. If no 'returnClass' is specified the defualt in the transformer will be used.
@@ -174,22 +168,20 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             }
             registry.registerTransformer(trans);
             props.remove(TRANSFORMER_PREFIX + i++);
-            name = null;
-            returnClass = null;
             transString = props.getProperty(TRANSFORMER_PREFIX + i);
         }
     }
 
     private void registerObjects(Properties props, Registry registry) throws MuleException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
     {
-        //Note that caling the other register methods first will have removed any processed entries
+        // Note that calling the other register methods first will have removed any processed entries
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
         {
             Map.Entry entry = (Map.Entry) iterator.next();
             Object object = ClassUtils.instanciateClass(entry.getValue().toString());
             String key = entry.getKey().toString();
             Class meta = Object.class;
-            if(object instanceof ObjectProcessor)
+            if (object instanceof ObjectProcessor)
             {
                 meta = ObjectProcessor.class;
             }
