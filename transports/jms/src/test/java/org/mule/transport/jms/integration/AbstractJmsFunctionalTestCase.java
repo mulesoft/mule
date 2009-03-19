@@ -10,7 +10,6 @@
 
 package org.mule.transport.jms.integration;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -596,18 +595,43 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * other tests may still exist from other tests' runs.
      * <p/>
      * Well-behaving tests should drain both inbound and outbound destinations, as well as any intermediary ones.
-     * Typically this method is called from {@link #doSetUp} and {@link #doTearDown}, with proper super calls.
-     * @param endpoint fully specified endpoint with protocol, e.g. wmq://QM_tests/in
-     * @param connector connector to be used for the above endpoint
-     * @see #doSetUp()
-     * @see #doTearDown()
+     * Typically this method is called from {@link #suitePreSetUp()} and {@link #suitePostTearDown()}, with proper super calls.
+     * @param destination destination name without any protocol specifics
+     * @see #suitePreSetUp()
+     * @see #suitePostTearDown()
      */
-    protected void drain(final String endpoint, final String connector) throws MuleException
+    protected void drain(final String destination) throws Exception
     {
-        while (getClient().request(endpoint + "?connector=" + connector, 500) != null)
+        Connection c = null;
+        Session s = null;
+        try
         {
-            logger.warn("Destination " + getInboundQueueName() + " isn't empty, draining it");
+            c = getConnection(false, false);
+            assertNotNull(c);
+            c.start();
+
+            s = c.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            Destination d = s.createQueue(destination);
+            MessageConsumer consumer = s.createConsumer(d);
+
+            while (consumer.receiveNoWait() != null)
+            {
+                logger.warn("Destination " + destination + " isn't empty, draining it");
+            }
         }
+        finally
+        {
+            if (c != null)
+            {
+                c.stop();
+                if (s != null)
+                {
+                    s.close();
+                }
+                c.close();
+            }
+        }
+
     }
 
     // /////////////////////////////////////////////////////////////////////////////////////////////////

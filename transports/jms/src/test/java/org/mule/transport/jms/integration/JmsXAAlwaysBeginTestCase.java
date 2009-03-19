@@ -38,17 +38,11 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
     }
 
     @Override
-    protected void doSetUp() throws Exception
+    protected void suitePreSetUp() throws Exception
     {
         super.doSetUp();
-        drain(getInboundEndpoint(), CONNECTOR_NAME);
-    }
-
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        super.doTearDown();
-        drain(getOutboundEndpoint(), CONNECTOR_NAME);
+        drain(getInboundQueueName());
+        drain(getOutboundQueueName());
     }
 
     @Test
