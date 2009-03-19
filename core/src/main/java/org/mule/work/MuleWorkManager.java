@@ -109,20 +109,19 @@ public class MuleWorkManager implements WorkManager
     {
         if (workExecutorService != null)
         {
-            // Disable new tasks from being submitted
-            workExecutorService.shutdown();
             try
             {
+                // Cancel currently executing tasks
+                List outstanding = workExecutorService.shutdownNow();
+
                 // Wait a while for existing tasks to terminate
                 if (!workExecutorService.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS))
                 {
-                    // Cancel currently executing tasks
-                    List outstanding = workExecutorService.shutdownNow();
                     if (logger.isWarnEnabled())
                     {
                         logger.warn(MessageFormat.format(
-                            "Pool {0} did not terminate in time; {1} work items were cancelled.", name,
-                            outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())));
+                                "Pool {0} did not terminate in time; {1} work items were cancelled.",
+                                name, outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())));
                     }
                 }
             }
