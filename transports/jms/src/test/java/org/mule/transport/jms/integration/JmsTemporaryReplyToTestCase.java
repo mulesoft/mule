@@ -47,7 +47,7 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
     }
 
     @Test
-    public void testDisableTempraryReplyOnTheConeector() throws MuleException
+    public void testDisableTemporaryReplyOnTheConnector() throws MuleException
     {
         MuleClient muleClient = new MuleClient();
         MuleMessage response = muleClient.send("vm://in3", TEST_MESSAGE, null);
