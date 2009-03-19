@@ -41,8 +41,8 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
     protected void suitePreSetUp() throws Exception
     {
         super.doSetUp();
-        drain(getInboundQueueName());
-        drain(getOutboundQueueName());
+        purge(getInboundQueueName());
+        purge(getOutboundQueueName());
     }
 
     @Test

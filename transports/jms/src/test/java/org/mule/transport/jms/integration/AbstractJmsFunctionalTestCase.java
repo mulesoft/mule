@@ -591,7 +591,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     /**
-     * Drain destinations for clean test setup. Especially applicable to WMQ tests, as messages from
+     * Purge destinations for clean test setup. Especially applicable to WMQ tests, as messages from
      * other tests may still exist from other tests' runs.
      * <p/>
      * Well-behaving tests should drain both inbound and outbound destinations, as well as any intermediary ones.
@@ -600,7 +600,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * @see #suitePreSetUp()
      * @see #suitePostTearDown()
      */
-    protected void drain(final String destination) throws Exception
+    protected void purge(final String destination) throws Exception
     {
         Connection c = null;
         Session s = null;

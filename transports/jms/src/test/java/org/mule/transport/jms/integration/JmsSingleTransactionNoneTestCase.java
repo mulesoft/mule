@@ -29,9 +29,9 @@ public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestC
     {
         super.suitePreSetUp();
         
-        drain(getInboundQueueName());
-        drain(getJmsConfig().getMiddleDestinationName());
-        drain(getOutboundQueueName());
+        purge(getInboundQueueName());
+        purge(getJmsConfig().getMiddleDestinationName());
+        purge(getOutboundQueueName());
     }
 
     @Test

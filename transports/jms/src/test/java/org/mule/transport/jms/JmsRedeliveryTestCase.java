@@ -37,7 +37,7 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         // required if broker is not restarted with the test - it tries to deliver those messages to the client
-        // drain the queue
+        // purge the queue
         while (client.request(DESTINATION, 1000) != null)
         {
             logger.warn("Destination " + DESTINATION + " isn't empty, draining it");
