@@ -29,6 +29,15 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
         return "integration/jms-temporary-replyTo.xml";
     }
 
+    @Override
+    protected void suitePreSetUp() throws Exception
+    {
+        super.suitePreSetUp();
+
+        purge(getInboundQueueName());
+        purge(getOutboundQueueName());
+    }
+
     @Test
     public void testTemporaryReplyEnabled() throws MuleException
     {
