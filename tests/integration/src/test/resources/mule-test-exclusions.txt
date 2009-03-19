@@ -71,3 +71,6 @@ org.mule.security.MultiuserSecurityTestCase
 #org.mule.test.integration.management.ManagementSimpleStartupTestCase
 #org.mule.test.integration.management.ManagementStartupTestCase
 
+# MULE-4251, MULE-4268
+org.mule.test.integration.service.ServiceInFlightMessagesJMSTestCase
+
