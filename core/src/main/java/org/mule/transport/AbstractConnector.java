@@ -93,6 +93,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -1452,7 +1453,7 @@ public abstract class AbstractConnector
                     }
                     else if (info.get(RetryContext.FAILED_REQUESTER) != null)
                     {
-                        OutboundEndpoint endpoint = (OutboundEndpoint) info.get(RetryContext.FAILED_REQUESTER);
+                        InboundEndpoint endpoint = (InboundEndpoint) info.get(RetryContext.FAILED_REQUESTER);
                         MessageRequester requester = (MessageRequester) requesters.borrowObject(endpoint);
                         try
                         {
