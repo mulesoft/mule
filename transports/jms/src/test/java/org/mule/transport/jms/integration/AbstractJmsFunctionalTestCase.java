@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms.integration;
 
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -323,7 +324,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     /**
-     * Returns the {@link #getInboundDestinationName()} in the form of an endpoint URI i.e.
+     * Returns the {@link #getInboundQueueName()} in the form of an endpoint URI i.e.
      * jms://in.
      * <p/>
      * This calls through to {@link JmsVendorConfiguration#getInboundEndpoint()}
@@ -337,7 +338,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     /**
-     * Returns the {@link #getOutboundDestinationName()} in the form of an endpoint URI i.e.
+     * Returns the {@link #getOutboundQueueName()} in the form of an endpoint URI i.e.
      * jms://out.
      * <p/>
      * This calls through to {@link org.mule.transport.jms.integration.JmsVendorConfiguration#getOutboundEndpoint()}
@@ -587,6 +588,25 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             {
                 connection.close();
             }
+        }
+    }
+
+    /**
+     * Drain destinations for clean test setup. Especially applicable to WMQ tests, as messages from
+     * other tests may still exist from other tests' runs.
+     * <p/>
+     * Well-behaving tests should drain both inbound and outbound destinations, as well as any intermediary ones.
+     * Typically this method is called from {@link #doSetUp} and {@link #doTearDown}, with proper super calls.
+     * @param endpoint fully specified endpoint with protocol, e.g. wmq://QM_tests/in
+     * @param connector connector to be used for the above endpoint
+     * @see #doSetUp()
+     * @see #doTearDown()
+     */
+    protected void drain(final String endpoint, final String connector) throws MuleException
+    {
+        while (getClient().request(endpoint + "?connector=" + connector, 500) != null)
+        {
+            logger.warn("Destination " + getInboundQueueName() + " isn't empty, draining it");
         }
     }
 

@@ -17,9 +17,25 @@ import org.junit.Test;
  */
 public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestCase
 {
+    private static final String CONNECTOR_NAME = "jmsConnector";
+
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-NONE.xml";
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        drain(getInboundEndpoint(), CONNECTOR_NAME);
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        super.doTearDown();
+        drain(getOutboundEndpoint(), CONNECTOR_NAME);
     }
 
     @Test
