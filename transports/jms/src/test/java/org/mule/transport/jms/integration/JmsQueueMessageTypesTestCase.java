@@ -12,7 +12,8 @@ package org.mule.transport.jms.integration;
 
 import org.mule.tck.testmodels.fruit.Apple;
 
-import java.util.ArrayList;
+import java.awt.Color;
+import java.io.Serializable;
 
 import org.junit.Test;
 
@@ -45,16 +46,18 @@ public class JmsQueueMessageTypesTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testObjectMessage() throws Exception
     {
-        dispatchMessage(new ArrayList());
-        receiveMessage(new ArrayList());
+        Serializable obj = new Color(0);        
+        dispatchMessage(obj);
+        receiveMessage(obj);
         receive(scenarioNotReceive);
     }
 
     @Test
     public void testCustomObjectMessage() throws Exception
     {
-        dispatchMessage(new Apple());
-        receiveMessage(new Apple());
+        Serializable obj = new Apple();
+        dispatchMessage(obj);
+        receiveMessage(obj);
         receive(scenarioNotReceive);
     }
 
