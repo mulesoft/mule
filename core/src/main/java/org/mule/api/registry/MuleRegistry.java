@@ -86,7 +86,7 @@ public interface MuleRegistry extends Registry
     /** @deprecated Use lookupConnector() instead */
     Collection getConnectors();
 
-    /** @deprecated Use lookupEndpoint() instead */
+    /** @deprecated Use {@link org.mule.api.endpoint.EndpointFactory} for creation/lookup of individual endpoints instead */
     Collection getEndpoints();
 
     /** @deprecated Use lookupAgent() instead */
