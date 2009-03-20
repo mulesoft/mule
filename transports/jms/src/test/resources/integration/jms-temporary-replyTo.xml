@@ -60,7 +60,7 @@
                     <reply-to address="${inbound.destination}"/>
                 </pass-through-router>
             </outbound>
-            <async-reply>
+            <async-reply timeout="5000" failOnTimeout="true">
                 <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"/>
                 <single-async-reply-router/>
             </async-reply>
