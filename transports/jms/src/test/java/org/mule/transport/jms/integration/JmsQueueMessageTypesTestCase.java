@@ -44,7 +44,16 @@ public class JmsQueueMessageTypesTestCase extends AbstractJmsFunctionalTestCase
     }
 
     @Test
-    public void testObjectMessage() throws Exception
+    public void testBinaryMessage() throws Exception
+    {
+        byte[] bytes = new byte[] {'\u0000', '\u007F', '\u0033', '\u007F', '\u0055'};
+        dispatchMessage(bytes);
+        receiveMessage(bytes);
+        receive(scenarioNotReceive);
+    }
+
+    @Test
+    public void testJdkObjectMessage() throws Exception
     {
         Serializable obj = new Color(0);        
         dispatchMessage(obj);

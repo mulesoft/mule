@@ -444,6 +444,21 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         return result;
     }
 
+    protected MuleMessage receiveMessage(byte[] expected) throws Exception
+    {
+        MuleMessage result = client.request(getOutboundEndpoint(), getTimeout());
+        assertNotNull(result);
+        assertNotNull(result.getPayload());
+        assertNull(result.getExceptionPayload());
+        byte[] bytes = result.getPayloadAsBytes();
+        assertEquals("Wrong number of bytes", expected.length, bytes.length);
+        for (int i=0; i < expected.length; ++i)
+        {
+            assertEquals("Byte #" + i + " does not match", expected[i], bytes[i]);
+        }
+        return result;
+    }
+
     public void runAsynchronousDispatching() throws Exception
     {
         dispatchMessage();
