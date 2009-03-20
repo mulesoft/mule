@@ -5,11 +5,9 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
       xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
-      xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.2"
       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
       xsi:schemaLocation="
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
-       http://www.mulesource.org/schema/mule/scripting/2.2 http://www.mulesource.org/schema/mule/scripting/2.2/mule-scripting.xsd
        http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
        http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
@@ -33,20 +31,18 @@
     <model>
         <service name="In-Out_Out-Only-Async-Service">
             <inbound>
-                <inbound-endpoint ref="inboundEndpoint"/>
+                <inbound-endpoint ref="inboundEndpoint">
+                    <message-properties-transformer>
+                        <add-message-property key="foo" value="bar"/>
+                    </message-properties-transformer>
+                </inbound-endpoint>
             </inbound>
-            <script:component>
-                <script:script engine="groovy">
-                    message.setProperty("foo", "bar")
-                    return message
-                </script:script>
-            </script:component>
 
             <outbound>
-                <filtering-router>
+                <pass-through-router>
                     <outbound-endpoint ref="externalEndpoint"/>
                     <reply-to ref="replyEndpoint"/>
-                </filtering-router>
+                </pass-through-router>
             </outbound>
 
             <async-reply failOnTimeout="true" timeout="4000">
