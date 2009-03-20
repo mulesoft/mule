@@ -153,6 +153,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             Destination dest = connector.getJmsSupport().createDestination(session, endpoint);
             producer = connector.getJmsSupport().createProducer(session, dest, topic);
 
+            preTransformMessage(event.getMessage());
+
             Object message = event.transformMessage();
             if (!(message instanceof Message))
             {
@@ -196,6 +198,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     ? BooleanUtils.toBoolean(persistentDeliveryString)
                     : connector.isPersistentDelivery();
 
+            // If we are honouring the icurrent QoS message headers we need to use the ones set on the current message
             if (connector.isHonorQosHeaders())
             {
                 int priorityProp = eventMsg.getIntProperty(JmsConstants.JMS_PRIORITY, Connector.INT_VALUE_NOT_SET);
@@ -314,6 +317,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    protected void preTransformMessage(MuleMessage message) throws Exception
+    {
+        // nothing to do
+    }
+    
     protected void handleMultiTx(Session session) throws Exception
     {
         logger.debug("Multi-transaction support is not available in Mule Community Edition.");
