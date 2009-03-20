@@ -24,18 +24,18 @@
 
             <test:component/>
 
-            <async-reply timeout="5000">
-                <collection-async-reply-router/>
-                <jms:inbound-endpoint queue="reply.queue"/>
-            </async-reply>
-
             <outbound>
                 <multicasting-router>
-                    <reply-to address="jms://reply.queue"/>
                     <jms:outbound-endpoint queue="service1" synchronous="false"/>
                     <jms:outbound-endpoint queue="service2" synchronous="false"/>
+                    <reply-to address="jms://reply.queue"/>
                 </multicasting-router>
             </outbound>
+
+            <async-reply timeout="5000">
+                <jms:inbound-endpoint queue="reply.queue"/>
+                <collection-async-reply-router/>
+            </async-reply>
         </service>
     </model>
 </mule>
