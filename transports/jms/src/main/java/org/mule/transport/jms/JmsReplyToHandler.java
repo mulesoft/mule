@@ -114,8 +114,12 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             String priorityString = (String)eventMsg.removeProperty(JmsConstants.PRIORITY_PROPERTY);
             String persistentDeliveryString = (String)eventMsg.removeProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
 
-            String correlationIDString = (String)eventMsg.getProperty(JmsConstants.JMS_MESSAGE_ID);
-            replyToMessage.setJMSCorrelationID(correlationIDString);
+            String correlationIDString = replyToMessage.getJMSCorrelationID();
+            if (StringUtils.isBlank(correlationIDString))
+            {
+                correlationIDString = (String) eventMsg.getProperty(JmsConstants.JMS_MESSAGE_ID);
+                replyToMessage.setJMSCorrelationID(correlationIDString);
+            }
 
             if (ttlString == null && priorityString == null && persistentDeliveryString == null)
             {
