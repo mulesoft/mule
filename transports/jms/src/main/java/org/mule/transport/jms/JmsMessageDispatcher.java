@@ -318,6 +318,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    /**
+     * This method is called before the current message is transformed.  It can be used to do any message body or
+     * header processing before the transformer is called.
+     *
+     * @param message the current MuleMessage Being processed
+     * @throws Exception
+     */
     protected void preTransformMessage(MuleMessage message) throws Exception
     {
         // nothing to do
