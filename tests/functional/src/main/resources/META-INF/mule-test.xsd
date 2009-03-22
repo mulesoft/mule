@@ -73,6 +73,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="logMessageDetails" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to output all message details to the log.  This includes all headers and the full payload.  The information will be loogged at INFO level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="doInboundTransform" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>

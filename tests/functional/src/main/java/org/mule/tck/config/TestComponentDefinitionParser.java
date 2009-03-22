@@ -53,6 +53,7 @@ public class TestComponentDefinitionParser extends ComponentDefinitionParser
         addIgnored("exceptionToThrow");
         addIgnored("waitTime");
         addIgnored("doInboundTransform");
+        addIgnored("logMessageDetails");
     }
 
     public TestComponentDefinitionParser(Class componentInstanceClass)

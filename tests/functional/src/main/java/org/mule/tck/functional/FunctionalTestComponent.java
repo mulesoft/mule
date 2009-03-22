@@ -59,6 +59,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     private String appendString;
     private Class exceptionToThrow;
     private long waitTime = 0;
+    private boolean logMessageDetails = false;
     private MuleContext muleContext;
 
     /**
@@ -192,6 +193,12 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
                 + StringMessageUtils.truncate(data.toString(), 100, true), '*', 80);
 
         logger.info(msg);
+
+        if(isLogMessageDetails())
+        {
+            logger.info("Full Message payload: \n" + context.getMessage().getPayload());
+            logger.info(StringMessageUtils.headersToString(context.getMessage()));
+        }
 
         if (eventCallback != null)
         {
@@ -444,5 +451,15 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     public void setDoInboundTransform(boolean doInboundTransform)
     {
         this.doInboundTransform = doInboundTransform;
+    }
+
+    public boolean isLogMessageDetails()
+    {
+        return logMessageDetails;
+    }
+
+    public void setLogMessageDetails(boolean logMessageDetails)
+    {
+        this.logMessageDetails = logMessageDetails;
     }
 }
