@@ -194,11 +194,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     ? BooleanUtils.toBoolean(persistentDeliveryString)
                     : connector.isPersistentDelivery();
 
-            // If we are honouring the icurrent QoS message headers we need to use the ones set on the current message
+            // If we are honouring the current QoS message headers we need to use the ones set on the current message
             if (connector.isHonorQosHeaders())
             {
-                Object priorityProp = eventMsg.getProperty(JmsConstants.JMS_PRIORITY, PropertyScope.OUTBOUND);
-                Object deliveryModeProp = eventMsg.getProperty(JmsConstants.JMS_DELIVERY_MODE, PropertyScope.OUTBOUND);
+                Object priorityProp = eventMsg.getProperty(JmsConstants.JMS_PRIORITY);
+                Object deliveryModeProp = eventMsg.getProperty(JmsConstants.JMS_DELIVERY_MODE);
 
                 if (priorityProp != null)
                 {
