@@ -35,7 +35,7 @@ public class ExpressionMessageInfoMapping implements MessageInfoMapping, MuleCon
 
     public String getCorrelationId(MuleMessage message)
     {
-        String id = (String) muleContext.getExpressionManager().evaluate(getCorrelationIdExpression(), message, true);
+        String id = (String) muleContext.getExpressionManager().evaluate(getCorrelationIdExpression(), message, false);
         if (id == null)
         {
             id = getMessageId(message);
