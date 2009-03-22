@@ -12,6 +12,8 @@ package org.mule.util;
 
 import org.mule.MuleServer;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 
 import java.io.UnsupportedEncodingException;
@@ -21,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Useful methods for formatting message strings for logging or exceptions.
@@ -229,4 +232,33 @@ public final class StringMessageUtils
         }
     }
 
+    public static String headersToString(MuleMessage m)
+    {
+        if(m==null)
+        {
+            return null;
+        }
+        StringBuffer buf = new StringBuffer();
+        buf.append("\nMessage properties:\n");
+
+        for (int i = 0; i < PropertyScope.ALL_SCOPES.length; i++)
+        {
+            PropertyScope scope = PropertyScope.ALL_SCOPES[i];
+            try
+            {
+                Set names = m.getPropertyNames(scope);
+                buf.append("  ").append(scope.getScope().toUpperCase()).append(" scoped properties:\n");
+
+                for (Object name : names)
+                {
+                    buf.append("    ").append(name).append("=").append(m.getProperty(name.toString(), scope)).append("\n");
+                }
+            }
+            catch (IllegalArgumentException e)
+            {
+                continue;
+            }
+        }
+        return buf.toString();
+    }
 }
