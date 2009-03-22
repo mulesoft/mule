@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+    xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
+    xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd">
+
+    <vm:connector name="vmConnector" queueEvents="true" />
+
+    <endpoint name="replyTo" address="${inbound.destination}" connector-ref="jmsConnector1"/>
+
+    <model name="Model">
+
+        <service name="JMSService">
+            <inbound>
+                <vm:inbound-endpoint path="in4" synchronous="true"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2">
+                        <property key="priority" value="1"/>
+                    </outbound-endpoint>
+                    <reply-to ref="replyTo"/>
+                    <!-- This isn't very intuitive. What we are saying here is correlate on the 'customCorrelation' header.  Access the
+                         correlationId as usual, since it will be null it will use the messgeIdExpression -->
+
+                    <!-- A better approach here would be to add a property to the router called "correlationId", that is used to set the
+                     correlationId on outgoing messages -->
+                    <expression-message-info-mapping  messageIdExpression="#[header:customCorrelation]" correlationIdExpression="#[mule:message.correlationId]"/>
+                </pass-through-router>
+            </outbound>
+            <async-reply>
+                <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"/>
+                <single-async-reply-router>
+                    <!-- Now when we receive the messages back we need need to know what to correlate with. Maybe we should add
+                    a "correlatesUsing" property that will be used to extract the create ID from the currnet message -->
+                    
+                    <expression-message-info-mapping messageIdExpression="#[header:customCorrelation]" correlationIdExpression="#[mule:message.correlationId]"/>
+                </single-async-reply-router>
+            </async-reply>
+        </service>
+
+        <service name="TestService1">
+            <inbound>
+                <inbound-endpoint address="${outbound.destination}" synchronous="true" connector-ref="jmsConnector1"/>
+            </inbound>
+            <test:component appendString=" #[mule:context.serviceName]"/>
+        </service>
+
+    </model>
+</mule>
