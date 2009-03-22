@@ -14,6 +14,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.MessageTypeNotSupportedException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMessageAdapter;
 
 import java.util.Enumeration;
@@ -212,8 +213,8 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
             Destination value = this.jmsMessage.getJMSReplyTo();
             if (value != null)
             {
-                props.put(JmsConstants.JMS_REPLY_TO, value);
-                props.put(MuleProperties.MULE_REPLY_TO_PROPERTY, value);
+                //Special handling of replyTo since it needs to go into the invocation scope
+                setReplyTo(value);
             }
         }
         catch (JMSException e)
@@ -302,7 +303,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
     {
         if (replyTo instanceof Destination)
         {
-            setProperty(JmsConstants.JMS_REPLY_TO, replyTo);
+            setProperty(JmsConstants.JMS_REPLY_TO, replyTo, PropertyScope.INVOCATION);
         }
         super.setReplyTo(replyTo);
     }
