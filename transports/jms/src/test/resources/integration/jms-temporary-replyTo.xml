@@ -57,7 +57,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"/>
-                    <reply-to address="${inbound.destination}"/>
+                    <reply-to address="${inbound.destination}?connector=jmsConnector1"/>
                 </pass-through-router>
             </outbound>
             <async-reply timeout="5000" failOnTimeout="true">

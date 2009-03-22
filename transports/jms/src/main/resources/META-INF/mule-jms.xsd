@@ -114,6 +114,12 @@
             <xsd:annotation>
                 <xsd:documentation>
                     If set to true, the JMS provider logs the message to stable storage as it is sent so that it can be recovered if delivery is unsuccessful.
+
+                    A client marks a message as persistent if it feels that the application will have problems if the message is lost in transit. A client marks a message as non-persistent if an occasional lost message is tolerable. Clients use delivery mode to tell a JMS provider how to balance message transport reliability/throughput.
+
+                    Delivery mode only covers the transport of the message to its destination. Retention of a message at the destination until its receipt is acknowledged is not guaranteed by a PERSISTENT delivery mode. Clients should assume that message retention policies are set administratively. Message retention policy governs the reliability of message delivery from destination to message consumer. For example, if a client's message storage space is exhausted, some messages as defined by a site specific message retention policy may be dropped.
+
+                    A message is guaranteed to be delivered once-and-only-once by a JMS Provider if the delivery mode of the messge is persistent and if the destination has a sufficient message retention policy.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
