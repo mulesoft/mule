@@ -71,7 +71,7 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
         EndpointBuilder builder = new EndpointURIEndpointBuilder("ejb://localhost/TestService?method=reverseString",
             muleContext);
         Properties props = new Properties();
-        props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
+        props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, String.class.getName());
         builder.setProperties(props);
         
         OutboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
