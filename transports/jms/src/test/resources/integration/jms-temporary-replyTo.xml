@@ -12,6 +12,8 @@
 
     <vm:connector name="vmConnector" queueEvents="true" />
 
+    <endpoint name="replyTo" address="${inbound.destination}" connector-ref="jmsConnector2"/>
+    
     <model name="Model">
 
         <service name="JMSService1">
@@ -57,10 +59,10 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"/>
-                    <reply-to address="${inbound.destination}?connector=jmsConnector1"/>
+                    <reply-to ref="replyTo"/>
                 </pass-through-router>
             </outbound>
-            <async-reply timeout="5000" failOnTimeout="true">
+            <async-reply timeout="5001" failOnTimeout="true">
                 <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"/>
                 <single-async-reply-router/>
             </async-reply>

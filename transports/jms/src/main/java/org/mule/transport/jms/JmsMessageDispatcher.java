@@ -166,9 +166,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             Message msg = (Message) message;
 
-            //Allow overrides to alter the message if necessary
-            processMessage(msg, event);
-
             MuleMessage eventMsg = event.getMessage();
 
             replyTo = getReplyToDestination(msg, session, event, useReplyToDestination, topic);
@@ -178,6 +175,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             {
                 msg.setJMSReplyTo(replyTo);
             }
+
+            //Allow overrides to alter the message if necessary
+            processMessage(msg, event);
 
             // QoS support
             String ttlString = (String) eventMsg.removeProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
@@ -213,7 +213,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             if (logger.isDebugEnabled())
             {
                 logger.debug("Sending message of type " + ClassUtils.getSimpleName(msg.getClass()));
-                logger.info("Sending JMS Message type " + msg.getJMSType() +
+                logger.debug("Sending JMS Message type " + msg.getJMSType() +
                        "\n  JMSMessageID=" + msg.getJMSMessageID() +
                        "\n  JMSCorrelationID=" + msg.getJMSCorrelationID() +
                        "\n  JMSDeliveryMode=" + (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT) +
