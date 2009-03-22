@@ -22,6 +22,7 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageAdapter;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transaction.TransactionCollection;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageDispatcher;
@@ -168,11 +169,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             //Allow overrides to alter the message if necessary
             processMessage(msg, event);
 
-            if (event.getMessage().getCorrelationId() != null)
-            {
-                msg.setJMSCorrelationID(event.getMessage().getCorrelationId());
-            }
-
             MuleMessage eventMsg = event.getMessage();
 
             replyTo = getReplyToDestination(msg, session, event, useReplyToDestination, topic);
@@ -201,24 +197,29 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             // If we are honouring the icurrent QoS message headers we need to use the ones set on the current message
             if (connector.isHonorQosHeaders())
             {
-                int priorityProp = eventMsg.getIntProperty(JmsConstants.JMS_PRIORITY, Connector.INT_VALUE_NOT_SET);
-                int deliveryModeProp = eventMsg.getIntProperty(JmsConstants.JMS_DELIVERY_MODE, Connector.INT_VALUE_NOT_SET);
+                Object priorityProp = eventMsg.getProperty(JmsConstants.JMS_PRIORITY, PropertyScope.OUTBOUND);
+                Object deliveryModeProp = eventMsg.getProperty(JmsConstants.JMS_DELIVERY_MODE, PropertyScope.OUTBOUND);
 
-                if (priorityProp != Connector.INT_VALUE_NOT_SET)
+                if (priorityProp != null)
                 {
-                    priority = priorityProp;
+                    priority = NumberUtils.toInt(priorityProp);
                 }
-                if (deliveryModeProp != Connector.INT_VALUE_NOT_SET)
+                if (deliveryModeProp != null)
                 {
-                    persistent = deliveryModeProp == DeliveryMode.PERSISTENT;
+                    persistent = NumberUtils.toInt(deliveryModeProp) == DeliveryMode.PERSISTENT;
                 }
             }
 
             if (logger.isDebugEnabled())
             {
                 logger.debug("Sending message of type " + ClassUtils.getSimpleName(msg.getClass()));
+                logger.info("Sending JMS Message type " + msg.getJMSType() +
+                       "\n  JMSMessageID=" + msg.getJMSMessageID() +
+                       "\n  JMSCorrelationID=" + msg.getJMSCorrelationID() +
+                       "\n  JMSDeliveryMode=" + (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT) +
+                       "\n  JMSPriority=" + priority +
+                       "\n  JMSReplyTo=" + msg.getJMSReplyTo());
             }
-
             connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic);
 
             if (useReplyToDestination && replyTo != null)
