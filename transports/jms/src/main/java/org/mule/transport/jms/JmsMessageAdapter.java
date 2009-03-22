@@ -17,6 +17,8 @@ import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMessageAdapter;
 
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -100,10 +102,20 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
     }
 
     /**
-     * @param message new value for the message
+     * Decomposes the received message into a payload, properties (headers) and possibly attachements too.
+     * Important note: when adding properties you must assign them to the inbound scope.  this can be done in
+     * two ways-
+     * <ol>
+     * <li>use the method {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)} using the
+     * {@link org.mule.api.transport.PropertyScope.INBOUND}</li>
+     * <li>use the {@link #addInboundProperties(java.util.Map)} method to add all inbound properties at once.
+     * </ol>
+     * 
+     * @param message the message received by the Mule endpoint in it's raw form.
      */
     private void setMessage(Object message) throws MessagingException
     {
+        Map props = new HashMap();
         if (message instanceof Message)
         {
             this.jmsMessage = (Message) message;
@@ -118,7 +130,9 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
             String value = this.jmsMessage.getJMSCorrelationID();
             if (value != null)
             {
-                setProperty(JmsConstants.JMS_CORRELATION_ID, value);
+                props.put(JmsConstants.JMS_CORRELATION_ID, value);
+                //Map to the internal Mule property
+                props.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, value);
             }
         }
         catch (JMSException e)
@@ -129,7 +143,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         try
         {
             int value = this.jmsMessage.getJMSDeliveryMode();
-            setProperty(JmsConstants.JMS_DELIVERY_MODE, new Integer(value));
+            props.put(JmsConstants.JMS_DELIVERY_MODE, new Integer(value));
         }
         catch (JMSException e)
         {
@@ -141,7 +155,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
             Destination value = this.jmsMessage.getJMSDestination();
             if (value != null)
             {
-                setProperty(JmsConstants.JMS_DESTINATION, value);
+                props.put(JmsConstants.JMS_DESTINATION, value);
             }
         }
         catch (JMSException e)
@@ -152,7 +166,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         try
         {
             long value = this.jmsMessage.getJMSExpiration();
-            setProperty(JmsConstants.JMS_EXPIRATION, new Long(value));
+            props.put(JmsConstants.JMS_EXPIRATION, new Long(value));
         }
         catch (JMSException e)
         {
@@ -164,7 +178,8 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
             String value = this.jmsMessage.getJMSMessageID();
             if (value != null)
             {
-                setProperty(JmsConstants.JMS_MESSAGE_ID, value);
+                props.put(JmsConstants.JMS_MESSAGE_ID, value);
+                props.put(MuleProperties.MULE_MESSAGE_ID_PROPERTY, value);
             }
         }
         catch (JMSException e)
@@ -175,7 +190,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         try
         {
             int value = this.jmsMessage.getJMSPriority();
-            setProperty(JmsConstants.JMS_PRIORITY, new Integer(value));
+            props.put(JmsConstants.JMS_PRIORITY, new Integer(value));
         }
         catch (JMSException e)
         {
@@ -185,7 +200,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         try
         {
             boolean value = this.jmsMessage.getJMSRedelivered();
-            setProperty(JmsConstants.JMS_REDELIVERED, Boolean.valueOf(value));
+            props.put(JmsConstants.JMS_REDELIVERED, Boolean.valueOf(value));
         }
         catch (JMSException e)
         {
@@ -197,7 +212,8 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
             Destination value = this.jmsMessage.getJMSReplyTo();
             if (value != null)
             {
-                setProperty(JmsConstants.JMS_REPLY_TO, value);
+                props.put(JmsConstants.JMS_REPLY_TO, value);
+                props.put(MuleProperties.MULE_REPLY_TO_PROPERTY, value);
             }
         }
         catch (JMSException e)
@@ -208,7 +224,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         try
         {
             long value = this.jmsMessage.getJMSTimestamp();
-            setProperty(JmsConstants.JMS_TIMESTAMP, new Long(value));
+            props.put(JmsConstants.JMS_TIMESTAMP, new Long(value));
         }
         catch (JMSException e)
         {
@@ -220,7 +236,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
             String value = this.jmsMessage.getJMSType();
             if (value != null)
             {
-                setProperty(JmsConstants.JMS_TYPE, value);
+                props.put(JmsConstants.JMS_TYPE, value);
             }
         }
         catch (JMSException e)
@@ -239,7 +255,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
                     Object value = this.jmsMessage.getObjectProperty(key);
                     if (value != null)
                     {
-                        setProperty(key, value);
+                        props.put(key, value);
                     }
                 }
                 catch (JMSException e1)
@@ -252,12 +268,9 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         {
             // ignored
         }
+        addInboundProperties(props);
     }
 
-    public String getUniqueId()
-    {
-        return (String) getProperty(JmsConstants.JMS_MESSAGE_ID);
-    }
 
     /**
      * Sets a correlationId for this message. The correlation Id can be used by
@@ -272,25 +285,10 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      */
     public void setCorrelationId(String id)
     {
+        super.setCorrelationId(id);
         setProperty(JmsConstants.JMS_CORRELATION_ID, id);
     }
 
-    /**
-     * Sets a correlationId for this message. The correlation Id can be used by
-     * components in the system to manage message relations. <p/> The correlationId
-     * is associated with the message using the underlying transport protocol. As
-     * such not all messages will support the notion of a correlationId i.e. tcp or
-     * file. In this situation the correlation Id is set as a property of the message
-     * where it's up to developer to keep the association with the message. For
-     * example if the message is serialised to xml the correlationId will be
-     * available in the message.
-     *
-     * @return the correlationId for this message or null if one hasn't been set
-     */
-    public String getCorrelationId()
-    {
-        return (String) getProperty(JmsConstants.JMS_CORRELATION_ID);
-    }
 
     /**
      * Sets a replyTo address for this message. This is useful in an asynchronous
@@ -306,28 +304,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         {
             setProperty(JmsConstants.JMS_REPLY_TO, replyTo);
         }
-        else
-        {
-            super.setReplyTo(replyTo);
-        }
-    }
-
-    /**
-     * Sets a replyTo address for this message. This is useful in an asynchronous
-     * environment where the caller doesn't wait for a response and the response
-     * needs to be routed somewhere for further processing. The value of this field
-     * can be any valid endpointUri url.
-     *
-     * @return the endpointUri url to reply to or null if one has not been set
-     */
-    public Object getReplyTo()
-    {
-        Object replyTo = getProperty(JmsConstants.JMS_REPLY_TO);
-        if (replyTo == null)
-        {
-            replyTo = getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-        }
-        return replyTo;
+        super.setReplyTo(replyTo);
     }
 
     public ThreadSafeAccess newThreadCopy()
