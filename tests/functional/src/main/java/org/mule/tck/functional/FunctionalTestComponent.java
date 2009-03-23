@@ -23,6 +23,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.SystemUtils;
 
 import java.util.List;
 
@@ -188,16 +189,24 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
             messageHistory.add(data);
         }
 
-        String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
-                + context.getService().getName() + ". Content is: "
-                + StringMessageUtils.truncate(data.toString(), 100, true), '*', 80);
-
-        logger.info(msg);
-
-        if(isLogMessageDetails())
+        if (logger.isInfoEnabled())
         {
-            logger.info("Full Message payload: \n" + context.getMessage().getPayload());
-            logger.info(StringMessageUtils.headersToString(context.getMessage()));
+            String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
+                    + context.getService().getName() + ". Content is: "
+                    + StringMessageUtils.truncate(data.toString(), 100, true), '*', 80);
+
+            logger.info(msg);
+        }
+
+        final MuleMessage message = context.getMessage();
+        if (isLogMessageDetails() && logger.isInfoEnabled())
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append("Full Message payload: ").append(SystemUtils.LINE_SEPARATOR);
+            sb.append(message.getPayload()).append(SystemUtils.LINE_SEPARATOR);
+            sb.append(StringMessageUtils.headersToString(message));
+            logger.info(sb.toString());
         }
 
         if (eventCallback != null)
@@ -210,7 +219,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         {
             if (returnData instanceof String && muleContext.getExpressionManager().isValidExpression(returnData.toString()))
             {
-                replyMessage = muleContext.getExpressionManager().parse(returnData.toString(), context.getMessage());
+                replyMessage = muleContext.getExpressionManager().parse(returnData.toString(), message);
             }
             else
             {
@@ -221,7 +230,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         {
             if (appendString != null)
             {
-                replyMessage = append(data.toString(), context.getMessage());
+                replyMessage = append(data.toString(), message);
             }
             else
             {

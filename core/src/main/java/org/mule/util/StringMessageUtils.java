@@ -11,8 +11,8 @@
 package org.mule.util;
 
 import org.mule.MuleServer;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 
@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Useful methods for formatting message strings for logging or exceptions.
@@ -234,29 +235,29 @@ public final class StringMessageUtils
 
     public static String headersToString(MuleMessage m)
     {
-        if(m==null)
+        if (m == null)
         {
             return null;
         }
-        StringBuffer buf = new StringBuffer();
-        buf.append("\nMessage properties:\n");
+        StringBuilder buf = new StringBuilder();
+        buf.append(SystemUtils.LINE_SEPARATOR).append("Message properties:").append(SystemUtils.LINE_SEPARATOR);
 
         for (int i = 0; i < PropertyScope.ALL_SCOPES.length; i++)
         {
             PropertyScope scope = PropertyScope.ALL_SCOPES[i];
             try
             {
-                Set names = m.getPropertyNames(scope);
-                buf.append("  ").append(scope.getScope().toUpperCase()).append(" scoped properties:\n");
+                Set names = new TreeSet(m.getPropertyNames(scope));
+                buf.append("  ").append(scope.getScope().toUpperCase()).append(" scoped properties:").append(SystemUtils.LINE_SEPARATOR);
 
                 for (Object name : names)
                 {
-                    buf.append("    ").append(name).append("=").append(m.getProperty(name.toString(), scope)).append("\n");
+                    buf.append("    ").append(name).append("=").append(m.getProperty(name.toString(), scope)).append(SystemUtils.LINE_SEPARATOR);
                 }
             }
             catch (IllegalArgumentException e)
             {
-                continue;
+                // ignored
             }
         }
         return buf.toString();
