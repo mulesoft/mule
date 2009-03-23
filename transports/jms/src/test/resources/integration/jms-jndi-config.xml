@@ -15,21 +15,10 @@
     <vm:connector name="vmConnector" queueEvents="true"/>
 
     <model>
-        <service name="ConnectionFactoryFromJndi">
-            <inbound>
-                <inbound-endpoint ref="ep_in1" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-
         <service name="QueueFromJndi">
             <inbound>
                 <!-- this queue is looked up from JNDI -->
-                <inbound-endpoint ref="ep_jndi-queue-in" />
+                <inbound-endpoint ref="ep_jndi-queue" />
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -41,7 +30,18 @@
         <service name="TopicFromJndi">
             <inbound>
                 <!-- this topic is looked up from JNDI -->
-                <inbound-endpoint ref="ep_jndi-topic-in" />
+                <inbound-endpoint ref="ep_jndi-topic" />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="NonJndiQueue">
+            <inbound>
+                <inbound-endpoint ref="ep_non-jndi-queue" />
             </inbound>
             <outbound>
                 <pass-through-router>

@@ -165,19 +165,32 @@ public class Jms102bSupport extends Jms11Support
     {
         if (connector.isJndiDestinations())
         {
-            Destination dest = this.getJndiDestination(name);
-            if (dest != null)
+            try
             {
-                if (logger.isDebugEnabled())
+                Destination dest = getJndiDestination(name);
+                if (dest != null)
                 {
-                    logger.debug(MessageFormat.format("Destination {0} located in JNDI, will use it now", name));
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(MessageFormat.format("Destination {0} located in JNDI, will use it now", name));
+                    }
+                    return dest;
                 }
-
-                return dest;
+                else
+                {
+                    throw new JMSException("JNDI destination not found with name: " + name);
+                }
             }
-            else if (connector.isForceJndiDestinations())
+            catch (JMSException e)
             {
-                throw new JMSException("JNDI destination not found with name: " + name);
+                if (connector.isForceJndiDestinations())
+                {
+                    throw e;
+                }
+                else 
+                {
+                    logger.warn("Unable to look up JNDI destination " + name + ": " + e.getMessage());
+                }
             }
         }
 

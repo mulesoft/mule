@@ -23,12 +23,22 @@
         </util:properties>
     </spring:beans>
 
+    <!-- Use JNDI ConnectionFactory but not JNDI Destinations -->
     <jms:connector name="jmsConnector1"
                    jndiInitialFactory="org.apache.activemq.jndi.ActiveMQInitialContextFactory"
                    jndiProviderUrl="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"
                    connectionFactoryJndiName="ConnectionFactory"/>
 
+    <!-- Use JNDI ConnectionFactory and optional JNDI Destinations -->
     <jms:activemq-connector name="jmsConnector2"
+                            jndiInitialFactory="org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                            jndiProviderUrl="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"
+                            jndiProviderProperties-ref="providerProperties"
+                            jndiDestinations="true"
+                            connectionFactoryJndiName="ConnectionFactory"/>
+
+    <!-- Use JNDI ConnectionFactory and force JNDI Destinations -->
+    <jms:activemq-connector name="jmsConnector3"
                             jndiInitialFactory="org.apache.activemq.jndi.ActiveMQInitialContextFactory"
                             jndiProviderUrl="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"
                             jndiProviderProperties-ref="providerProperties"
@@ -36,8 +46,9 @@
                             forceJndiDestinations="true"
                             connectionFactoryJndiName="ConnectionFactory"/>
 
-    <jms:endpoint name="ep_in1" queue="in1" connector-ref="jmsConnector1"/>
-    <jms:endpoint name="ep_jndi-queue-in" queue="jndi-queue-in" connector-ref="jmsConnector2"/>
-    <jms:endpoint name="ep_jndi-topic-in" topic="jndi-topic-in" connector-ref="jmsConnector2"/>
-
+    <jms:endpoint name="ep_non-jndi-queue" queue="in1" connector-ref="jmsConnector1"/>
+    <jms:endpoint name="ep_non-jndi-queue-optional-jndi" queue="in1" connector-ref="jmsConnector2"/>
+    <jms:endpoint name="ep_non-jndi-queue-force-jndi" queue="in1" connector-ref="jmsConnector3"/>
+    <jms:endpoint name="ep_jndi-queue" queue="jndi-queue-in" connector-ref="jmsConnector2"/>
+    <jms:endpoint name="ep_jndi-topic" topic="jndi-topic-in" connector-ref="jmsConnector2"/>
 </mule>
