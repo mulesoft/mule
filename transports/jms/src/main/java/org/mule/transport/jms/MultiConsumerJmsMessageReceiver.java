@@ -82,6 +82,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         consumers = new LinkedBlockingDeque(receiversCount);
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         logger.debug("doStart()");
@@ -93,6 +94,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         logger.debug("doStop()");
@@ -102,11 +104,12 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext();)
             {
                 sub = it.next();
-                sub.doStop();
+                sub.doStop(true);
             }
         }
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         logger.debug("doConnect()");
@@ -120,6 +123,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         }
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         logger.debug("doDisconnect()");
@@ -140,6 +144,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         consumers.clear();
     }
 
+    @Override
     protected void doDispose()
     {
         logger.debug("doDispose()");
@@ -174,7 +179,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             subLogger.debug("SUB doDisconnect()");
             if (started)
             {
-                doStop();
+                doStop(true);
             }
             closeConsumer();
             connected = false;
@@ -207,24 +212,36 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             }
         }
 
-        protected void doStop() throws MuleException
+        /**
+         * Stop the subreceiver.
+         * @param force - if true, any exceptions will be logged but the subreceiver will be considered stopped regardless
+         * @throws MuleException only if force = false
+         */
+        protected void doStop(boolean force) throws MuleException
         {
             subLogger.debug("SUB doStop()");
 
-            try
+            if (consumer != null)
             {
-                if (consumer != null)
+                try
                 {
                     consumer.setMessageListener(null);
+                    started = false;
                 }
-                started = false;
-            }
-            catch (JMSException e)
-            {
-                throw new LifecycleException(e, this);
+                catch (JMSException e)
+                {
+                    if (force)
+                    {
+                        logger.warn("Unable to cleanly stop subreceiver: " + e.getMessage());
+                        started = false;
+                    }
+                    else
+                    {
+                        throw new LifecycleException(e, this);
+                    }
+                }
             }
         }
-
 
         /**
          * Create a consumer for the jms destination.
