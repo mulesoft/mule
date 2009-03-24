@@ -261,6 +261,21 @@
                                 <descriptor>assembly.xml</descriptor>
                             </descriptors>
                             <appendAssemblyId>true</appendAssemblyId>
+                            <archive>
+                                <manifestEntries>
+                                    <!-- TODO: Once we upgrade to newer version of plugin we can specify
+                                         MANIFEST entries here.  MULE-4209.
+                                    <More-Info>For more information go to ${productUrl}</More-Info>
+                                    <Support>Get commercial support: ${pom.organization.url}/support</Support>
+                                    <Description>Mule ESB and Integration Platform</Description>
+                                    <License>CPAL v1.0 http://www.mulesource.com/CPAL/</License>
+                                    <Vendor-Url>${pom.organization.url}</Vendor-Url>
+                                    <Product-Url>${productUrl}</Product-Url>
+                                    <Build-Date>${timestamp}</Build-Date>
+                                    <Dev-List-Email>dev@mule.codehaus.org</Dev-List-Email>
+                                    -->
+                                </manifestEntries>
+                            </archive>
                         </configuration>
                     </execution>
                 </executions>
