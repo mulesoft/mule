@@ -29,7 +29,7 @@
             <outbound>
                 <pass-through-router>
                     <jms:outbound-endpoint queue="middle">
-                        <jms:transaction action="BEGIN_OR_JOIN"/>
+                        <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                     <xa-transaction action="BEGIN_OR_JOIN"/>
                 </pass-through-router>
