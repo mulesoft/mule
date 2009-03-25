@@ -13,12 +13,14 @@ package org.mule.transport.jms;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
+import org.mule.transaction.TransactionCoordination;
 
 import java.util.Iterator;
 import java.util.List;
@@ -157,7 +159,21 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         finally
         {
             connector.closeQuietly(replyToProducer);
-            connector.closeQuietly(session);
+
+            final Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+            if (transaction == null)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Closing non-TX replyTo session: " + session);
+                }
+                connector.closeQuietly(session);
+            }
+            else if (logger.isDebugEnabled())
+            {
+                logger.debug("Not closing TX replyTo session: " + session);
+            }
+
         }
     }
 
