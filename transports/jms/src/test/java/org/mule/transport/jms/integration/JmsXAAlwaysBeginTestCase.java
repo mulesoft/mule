@@ -40,7 +40,15 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
     @Override
     protected void suitePreSetUp() throws Exception
     {
-        super.doSetUp();
+        super.suitePreSetUp();
+        purge(getInboundQueueName());
+        purge(getOutboundQueueName());
+    }
+
+    @Override
+    protected void suitePostTearDown() throws Exception
+    {
+        super.suitePostTearDown();
         purge(getInboundQueueName());
         purge(getOutboundQueueName());
     }
