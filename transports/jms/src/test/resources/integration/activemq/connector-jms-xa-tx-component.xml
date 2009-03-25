@@ -6,6 +6,6 @@
        http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
        http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd">
 
-    <jms:activemq-xa-connector name="jmsConnector" specification="1.1" numberOfConcurrentTransactedReceivers="1"/>
+    <jms:activemq-xa-connector name="jmsConnector" specification="1.1" numberOfConsumers="1"/>
     
 </mule>
