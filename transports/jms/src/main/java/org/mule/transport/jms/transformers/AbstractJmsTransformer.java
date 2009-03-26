@@ -158,7 +158,43 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
         {
             String key = iterator.next().toString();
 
-            if (!JmsConstants.JMS_PROPERTY_NAMES.contains(key))
+            if (JmsConstants.JMS_PROPERTY_NAMES.contains(key))
+            {
+                Object value = message.getProperty(key);
+                if (value instanceof String)
+                {
+                    msg.setStringProperty(key, (String) value);
+                }
+                else if (value instanceof Boolean)
+                {
+                    msg.setBooleanProperty(key, (Boolean) value);
+                }
+                else if (value instanceof Short)
+                {
+                    msg.setShortProperty(key, (Short) value);
+                }
+                else if (value instanceof Integer)
+                {
+                    msg.setIntProperty(key, (Integer) value);
+                }
+                else if (value instanceof Float)
+                {
+                    msg.setFloatProperty(key, (Float) value);
+                }
+                else if (value instanceof Double)
+                {
+                    msg.setDoubleProperty(key, (Double) value);
+                }
+                else if (value instanceof Byte)
+                {
+                    msg.setByteProperty(key, (Byte) value);
+                }
+                //else if (value instanceof Object)
+                //{
+                //    msg.setObjectProperty(key, value);
+                //}
+            }
+            else
             {
                 Object value = message.getProperty(key);
 
