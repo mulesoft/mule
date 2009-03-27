@@ -5,7 +5,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package ${groupId}.${ModuleNameLower}.config;
+package org.mule.module.${ModuleNameLower}.config;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

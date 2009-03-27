@@ -88,14 +88,14 @@ spring-extras, sxc, xml):
         </template>
 
         <template>
-            <file>src/main/java/org/mule/modules/Messages.vm</file>
+            <file>src/main/java/org/mule/module/Messages.vm</file>
             <output>
                 src/main/java/${package}/${ModuleNameLower}/i18n/${ModuleName}Messages.java
             </output>
             <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
-            <file>src/main/java/org/mule/modules/package.vm</file>
+            <file>src/main/java/org/mule/module/package.vm</file>
             <output>
                 src/main/java/${package}/${ModuleNameLower}/package.html
             </output>
@@ -128,7 +128,7 @@ spring-extras, sxc, xml):
             <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
         <template>
-            <file>src/main/java/org/mule/modules/config/NamespaceHandler.vm</file>
+            <file>src/main/java/org/mule/module/config/NamespaceHandler.vm</file>
             <output>
                 src/main/java/${package}/${ModuleNameLower}/config/${ModuleName}NamespaceHandler.java
             </output>
@@ -137,7 +137,7 @@ spring-extras, sxc, xml):
 
         <!-- Test Cases -->
         <template>
-            <file>src/test/java/org/mule/modules/FunctionalTestCase.vm</file>
+            <file>src/test/java/org/mule/module/FunctionalTestCase.vm</file>
             <output>
                 src/test/java/${package}/${ModuleNameLower}/${ModuleName}TestCase.java
             </output>
@@ -151,7 +151,7 @@ spring-extras, sxc, xml):
             <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
-            <file>src/test/java/org/mule/modules/NamespaceHandlerTestCase.vm</file>
+            <file>src/test/java/org/mule/module/NamespaceHandlerTestCase.vm</file>
             <output>
                 src/test/java/${package}/${ModuleNameLower}/${ModuleName}NamespaceHandlerTestCase.java
             </output>
