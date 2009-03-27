@@ -256,11 +256,11 @@
                             <goal>attached</goal>
                         </goals>
                         <configuration>
-                            <!-- <finalName>mule-${version}.jar</finalName> -->
+                            <finalName>mule-embedded-${version}</finalName>
                             <descriptors>
                                 <descriptor>assembly.xml</descriptor>
                             </descriptors>
-                            <appendAssemblyId>true</appendAssemblyId>
+                            <appendAssemblyId>false</appendAssemblyId>
                             <archive>
                                 <manifestEntries>
                                     <!-- TODO: Once we upgrade to newer version of plugin we can specify
