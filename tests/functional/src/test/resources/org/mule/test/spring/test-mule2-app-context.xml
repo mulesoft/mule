@@ -16,11 +16,11 @@
                         returnClass="java.lang.String"/>
 
     <!--<spring:bean id="creditProfileLookup" class="org.mule.routing.MuleEndpointProxy">-->
-    <!--<endpoint address="xfire:http://localhost:8081/service/CreditAgency?method=getCreditProfile"/>-->
+    <!--<endpoint address="cxf:http://localhost:8081/service/CreditAgency?method=getCreditProfile"/>-->
     <!--</spring:bean>-->
 
     <!--<spring:bean id="lendersLookup" class="org.mule.routing.MuleEndpointProxy">-->
-    <!--<endpoint address="xfire:http://localhost:8082/service/LendersService?method=getAvailableLenders"-->
+    <!--<endpoint address="cxf:http://localhost:8082/service/LendersService?method=getAvailableLenders"-->
     <!--responseTransformers="ArrayToLenderList"/>-->
     <!--</spring:bean>-->
 

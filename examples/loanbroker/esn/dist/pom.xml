@@ -63,11 +63,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <forkMode>pertest</forkMode>
-                    <excludes>
-                        <!-- these still fail quite often with an unexpected NullPayload :( -->
-                        <exclude>org/mule/examples/loanbroker/esn/AxisLoanBrokerSynchronousFunctionalTestCase.java</exclude>
-                        <exclude>org/mule/examples/loanbroker/esn/XFireLoanBrokerSynchronousFunctionalTestCase.java</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
 

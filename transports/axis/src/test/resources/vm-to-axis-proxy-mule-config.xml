@@ -16,7 +16,7 @@
             <bridge-component/>
             <outbound>
                 <pass-through-router>
-                    <axis:outbound-endpoint address="http://localhost:62080/mule-tests-external-xfire/services/TestService?method=getTest"
+                    <axis:outbound-endpoint address="http://localhost:62080/mule-tests-external-cxf/services/TestService?method=getTest"
                         soapAction="#[methodNamespace]#[method]">
                         <axis:soap-method method="qname{getTest:http://mule.mulesource.org/Tests/TestService/}">
                             <axis:soap-parameter parameter="in0" type="string" mode="IN"/>

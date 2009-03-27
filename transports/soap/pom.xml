@@ -9,7 +9,7 @@
     <artifactId>mule-transport-soap</artifactId>
     <packaging>bundle</packaging>
     <name>SOAP Transport</name>
-    <description>A Mule transport for SOAP connectivity. The transport will use Axis, Glue or XFire
+    <description>A Mule transport for SOAP connectivity. The transport will use Axis or CXF
         depending on which is on the classpath.</description>
 
     <build>

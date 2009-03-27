@@ -26,7 +26,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
 
         try
         {
-            client.send("cxf:http://localhost:63181/services/CxfDefault?method=testXFireException", "TEST",
+            client.send("cxf:http://localhost:63181/services/CxfDefault?method=testCxfException", "TEST",
                 null);
         }
         catch (DispatchException e)
@@ -47,7 +47,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
         try
         {
             client.send(
-                "cxf:http://localhost:63181/services/CxfWithExceptionStrategy?method=testXFireException",
+                "cxf:http://localhost:63181/services/CxfWithExceptionStrategy?method=testCxfException",
                 "TEST", null);
         }
         catch (DispatchException ex)
@@ -70,7 +70,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
         try
         {
             client.send(
-                "cxf:http://localhost:63181/services/CxfWithExceptionStrategy?method=testNonXFireException",
+                "cxf:http://localhost:63181/services/CxfWithExceptionStrategy?method=testNonCxfException",
                 "TEST", null);
         }
         catch (DispatchException e)

@@ -52,7 +52,7 @@
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="echoServiceLocalBinding" type="tns:echoServicePortType">
-    <wsdlsoap:binding style="document" transport="urn:xfire:transport:local"/>
+    <wsdlsoap:binding style="document" transport="urn:cxf:transport:local"/>
     <wsdl:operation name="log">
       <wsdlsoap:operation soapAction=""/>
       <wsdl:input name="logRequest">

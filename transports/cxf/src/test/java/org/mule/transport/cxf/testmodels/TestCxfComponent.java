@@ -10,17 +10,17 @@
 
 package org.mule.transport.cxf.testmodels;
 
-public class TestXFireComponent
+public class TestCxfComponent
 {
-    public String testXFireException(String data) throws CxfEnabledFaultMessage
+    public String testCxfException(String data) throws CxfEnabledFaultMessage
     {
         CustomFault fault = new CustomFault();
         fault.setDescription("Custom Exception Message");
-        throw new CxfEnabledFaultMessage("XFire Exception Message", fault);
+        throw new CxfEnabledFaultMessage("Cxf Exception Message", fault);
     }
 
-    public String testNonXFireException(String data)
+    public String testNonCxfException(String data)
     {
-        throw new UnsupportedOperationException("Non-XFire Enabled Exception");
+        throw new UnsupportedOperationException("Non-Cxf Enabled Exception");
     }
 }

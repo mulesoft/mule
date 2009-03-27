@@ -49,9 +49,9 @@ import org.apache.commons.logging.LogFactory;
  * of the WSDL for the service. If this property is not set, the address of the WSDL
  * will be assumed to be the value of uriWebservice followed by "?WSDL". It is
  * important to note that both urls' of the webservice to be proxied and the WSDL
- * address must contain no xfire or axis endpoints, just plain http endpoints. Even
+ * address must contain no cxf or axis endpoints, just plain http endpoints. Even
  * the inbound endpoint of the WSProxyService must be residing on an http protocol
- * (with no xfire or axis).
+ * (with no cxf or axis).
  */
 public class WSProxyService implements Callable, ServiceAware, Initialisable
 {

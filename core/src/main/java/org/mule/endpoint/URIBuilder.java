@@ -35,7 +35,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
  * - queryMap values override uri values
  * - the order of parameters in the uri remains the same (even if values change)
  * - queryMap parameters are appended after uri parameters
- * (I don't think ordering should matter, but XFire seems to require it) 
  *
  * TODO - check that we have sufficient control via XML (what about empty strings?)
  *

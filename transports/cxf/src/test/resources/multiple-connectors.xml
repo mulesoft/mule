@@ -19,7 +19,7 @@
     <cxf:endpoint name="cxf1" address="http://localhost:61081/services/TestComponent1?method=receive" connector-ref="CxfConnector1" protocolConnector="Http1"/>
     <cxf:endpoint name="cxf2" address="http://localhost:61082/services/TestComponent2?method=receive" connector-ref="CxfConnector2" protocolConnector="Http1"/>
 
-    <model name="TestXfireConnectors">
+    <model name="TestCxfConnectors">
         
         <!-- Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised -->
         <service name="TestComponent1">

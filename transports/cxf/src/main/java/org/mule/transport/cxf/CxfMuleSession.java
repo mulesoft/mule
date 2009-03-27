@@ -15,7 +15,7 @@ import org.mule.api.MuleSession;
 import org.apache.cxf.transport.Session;
 
 /**
- * Mules session wrapper for XFire
+ * Mules session wrapper for Cxf
  */
 public class CxfMuleSession implements Session
 {

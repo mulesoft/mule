@@ -37,8 +37,8 @@ public class CxfEnabledFaultMessage extends FaultInfoException
 
     public static QName getFaultName()
     {
-        return new QName("http://org.mule.transport.cxf.xfire.testmodels/XFireTestService/",
-            "XFireEnabledFaultMessage");
+        return new QName("http://org.mule.transport.cxf.testmodels/CxfTestService/",
+            "CxfEnabledFaultMessage");
     }
 
 }

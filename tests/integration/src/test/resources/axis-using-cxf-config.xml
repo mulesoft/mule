@@ -34,7 +34,7 @@
             </outbound>
         </service>
 
-        <!-- Accessing an Axis hosted web-service using XFire dynamic client -->
+        <!-- Accessing an Axis hosted web-service using Cxf dynamic client -->
         <service name="BridgeToAxisService">
             <inbound>
                 <inbound-endpoint address="vm://axis.in"/>

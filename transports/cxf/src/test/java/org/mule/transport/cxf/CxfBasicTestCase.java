@@ -28,7 +28,7 @@ public class CxfBasicTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        echoWsdl = IOUtils.getResourceAsString("xfire-echo-service.wsdl", getClass());
+        echoWsdl = IOUtils.getResourceAsString("cxf-echo-service.wsdl", getClass());
         XMLUnit.setIgnoreWhitespace(true);
         try
         {

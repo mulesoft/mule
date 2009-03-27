@@ -42,10 +42,10 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     // TODO FAILING MULE- 2969
 
-    // public void testXfireSyncResponseTransformer() throws Exception
+    // public void testCxfSyncResponseTransformer() throws Exception
     // {
     // MuleClient client = new MuleClient();
-    // MuleMessage message = client.send("xfire:http://localhost:4444/services/XFireSync?method=echo",
+    // MuleMessage message = client.send("cxf:http://localhost:4444/services/CxfSync?method=echo",
     // "request",
     // null);
     // assertNotNull(message);

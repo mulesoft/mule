@@ -16,9 +16,9 @@
             inboundEndpoint="cxf:servlet://mycomponent">
         </mule-descriptor>
 
-        <mule-descriptor name="xfireService" implementation="org.mule.tck.testmodels.services.TestServiceComponent">
+        <mule-descriptor name="CxfService" implementation="org.mule.tck.testmodels.services.TestServiceComponent">
             <inbound-router>
-                <endpoint address="cxf:http://localhost:18082/xfireService"/>
+                <endpoint address="cxf:http://localhost:18082/cxfService"/>
             </inbound-router>
         </mule-descriptor>
     </model>

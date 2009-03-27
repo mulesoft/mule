@@ -1702,9 +1702,9 @@ public abstract class AbstractConnector
      * this allows you to register protocols that are not prefixed with the connector
      * protocol. This is useful where you use a Service Finder to discover which
      * Transport implementation to use. For example the 'wsdl' transport is a generic
-     * 'finder' transport that will use Axis, Xfire or Glue to create the WSDL
-     * client. These transport protocols would be wsdl-axis, wsdl-xfire and
-     * wsdl-glue, but they can all support 'wsdl' protocol too.
+     * 'finder' transport that will use Axis or CXF to create the WSDL
+     * client. These transport protocols would be wsdl-axis and wsdl-cxf, 
+     * but they can all support 'wsdl' protocol too.
      *
      * @param protocol the supported protocol to register
      */

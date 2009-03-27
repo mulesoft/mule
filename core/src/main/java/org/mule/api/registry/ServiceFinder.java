@@ -20,7 +20,7 @@ import java.util.Properties;
  * is looked up directly, however a generic service name might be used where the real 
  * service implementation will depend on other modules/resources being available.
  * For example, in the case of a SOAP connector the finder could check the classpath for 
- * Axis or XFire and return the correct descriptor.
+ * Axis or CXF and return the correct descriptor.
  */
 public interface ServiceFinder
 {

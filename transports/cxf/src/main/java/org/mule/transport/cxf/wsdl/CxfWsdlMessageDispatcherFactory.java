@@ -16,7 +16,7 @@ import org.mule.api.transport.MessageDispatcher;
 import org.mule.transport.AbstractMessageDispatcherFactory;
 
 /**
- * Creates an XFire WSDL Message Dispatcher
+ * Creates an Cxf WSDL Message Dispatcher
  */
 public class CxfWsdlMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {

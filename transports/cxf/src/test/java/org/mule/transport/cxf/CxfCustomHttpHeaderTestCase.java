@@ -59,7 +59,7 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements E
         // make sure all notifications have trickled in
         Thread.sleep(3000);
 
-        // make sure we received a notification on xfire
+        // make sure we received a notification on cxf
         assertNotNull(notificationMsg);
 
         // MULE_USER should be allowed in

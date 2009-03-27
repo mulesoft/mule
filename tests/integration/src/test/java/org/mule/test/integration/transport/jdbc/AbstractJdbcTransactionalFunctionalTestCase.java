@@ -135,7 +135,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
 
         // these tests no longer work - they need replacing with config driven tests
         // furthemore, nothing is read from service properties any more
-        // (except for axis and xfire related hacks)
+        // (except for axis and cxf related hacks)
         // so i am removing the code below since it's a pointless call to a deprecated method
 //        HashMap props = new HashMap();
 //        props.put("eventCallback", callback);

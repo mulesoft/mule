@@ -4,7 +4,7 @@
 
 # This class matches surefire's include pattern by accident.
 # Don't execute it as it's not a unit test.
-org.mule.transport.cxf.testmodels.TestXFireComponent
+org.mule.transport.cxf.testmodels.TestCxfComponent
 
 # tests with external dependencies
 # MULE-3693
