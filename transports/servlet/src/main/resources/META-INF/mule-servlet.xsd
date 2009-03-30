@@ -76,8 +76,7 @@
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-            Returns a simple Map of the parameters sent with the HTTP Request.
-            If the same parameter is given more than once, only the first value for it will be in the Map.
+            The &lt;http-request-to-parameter-map&gt; transformer returns a simple Map of the parameters sent with the HTTP Request. If the same parameter is given more than once, only the first value for it will be in the Map.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -86,7 +85,7 @@
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-            Converts an HttpServletRequest into an InputStream.
+            The &lt;http-request-to-input-stream&gt; transformer converts an HttpServletRequest into an InputStream.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -95,7 +94,7 @@
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-            Converts an HttpServletRequest into an array of bytes by extracting the payload of the request.
+            The &lt;http-request-to-byte-array&gt; transformer converts an HttpServletRequest into an array of bytes by extracting the payload of the request.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
