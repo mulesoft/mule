@@ -10,13 +10,11 @@
 
 package org.mule.transport.jms.integration;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.jms.JmsConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.IOUtils;
@@ -94,7 +92,6 @@ import org.junit.Before;
  */
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
-    public static final String CONNECTOR = "jmsConnector";
 
     public static final String DEFAULT_INPUT_MESSAGE = "INPUT MESSAGE";
     public static final String DEFAULT_OUTPUT_MESSAGE = "OUTPUT MESSAGE";
@@ -436,30 +433,13 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected void dispatchMessage() throws Exception
     {
-        dispatchMessage(DEFAULT_INPUT_MESSAGE);
+        client.dispatch(getInboundEndpoint(), DEFAULT_INPUT_MESSAGE, null);
     }
 
     protected void dispatchMessage(Object payload) throws Exception
     {
-        dispatchMessage(payload, null);
+        client.dispatch(getInboundEndpoint(), payload, null);
     }
-
-    protected MuleMessage dispatchMessage(Object payload, Map messageProperties) throws Exception
-    {
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
-        client.dispatch(getInboundEndpoint(), message);
-        return message;
-    }
-    
-    protected javax.jms.Message dispatchJmsMessage(Map messageProperties) throws Exception
-    {
-        JmsConnector connector = getConnector();
-        Session jmsSession = connector.getSession(false, false);
-        Message message = jmsSession.createTextMessage(DEFAULT_INPUT_MESSAGE);
-        
-        dispatchMessage(message, messageProperties);
-        return message;
-    }    
 
     protected MuleMessage receiveMessage() throws Exception
     {
@@ -691,11 +671,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         this.multipleProviders = multipleProviders;
     }
 
-    protected JmsConnector getConnector()
-    {
-        return (JmsConnector) muleContext.getRegistry().lookupConnector(CONNECTOR);
-    }
-    
     // /////////////////////////////////////////////////////////////////////////////////////////////////
     // Test Scenarios
     // /////////////////////////////////////////////////////////////////////////////////////////////////
