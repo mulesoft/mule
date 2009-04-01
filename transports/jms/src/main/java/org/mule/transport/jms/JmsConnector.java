@@ -42,6 +42,7 @@ import java.util.Map;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
@@ -62,7 +63,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
  * and queues, durable subscribers, acknowledgement modes and local transactions.
  */
 
-public class JmsConnector extends AbstractConnector implements ConnectionNotificationListener, javax.jms.ExceptionListener
+public class JmsConnector extends AbstractConnector implements ConnectionNotificationListener, ExceptionListener
 {
 
     public static final String JMS = "jms";
