@@ -236,6 +236,14 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="embeddedMode" type="xsd:boolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Some application servers, like WebSphere AS, don't allow certain methods to be called on JMS objects,
+                    effectively limiting available features. Embedded mode tells Mule to avoid those whenever possible. Default is false.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
 

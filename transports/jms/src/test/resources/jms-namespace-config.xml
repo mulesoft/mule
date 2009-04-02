@@ -37,7 +37,8 @@
                    connectionFactory-ref="connectionFactory"
                    redeliveryHandlerFactory-ref="redeliveryHandlerFactory"
                    username="myuser"
-                   password="mypass"/>
+                   password="mypass"
+                   embeddedMode="true"/>
 
     <jms:custom-connector name="jmsConnector2" class="org.mule.transport.jms.JmsConnector"
                           specification="1.1">
