@@ -148,6 +148,11 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /** determines whether a temporary JMSReplyTo destination will be used when using synchronous outbound JMS endpoints */
     private boolean disableTemporaryReplyToDestinations = false;
 
+    /**
+     * In-container embedded mode disables some features for strict Java EE compliance.
+     */
+    private boolean embeddedMode;
+
     ////////////////////////////////////////////////////////////////////////
     // Methods
     ////////////////////////////////////////////////////////////////////////
@@ -416,7 +421,10 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             {
                 connection.setClientID(getClientId());
             }
-            connection.setExceptionListener(this);
+            if (!embeddedMode)
+            {
+                connection.setExceptionListener(this);
+            }
         }
 
 
@@ -505,7 +513,10 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             if (connection != null)
             {
                 // Ignore exceptions while closing the connection
-                connection.setExceptionListener(null); 
+                if (!embeddedMode)
+                {
+                    connection.setExceptionListener(null);
+                }
                 connection.close();
             }
         }
@@ -1208,5 +1219,15 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     public int getNumberOfConsumers()
     {
         return this.numberOfConcurrentTransactedReceivers;
+    }
+
+    public boolean isEmbeddedMode()
+    {
+        return embeddedMode;
+    }
+
+    public void setEmbeddedMode(boolean embeddedMode)
+    {
+        this.embeddedMode = embeddedMode;
     }
 }
