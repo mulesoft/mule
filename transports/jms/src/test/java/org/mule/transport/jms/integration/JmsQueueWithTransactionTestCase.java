@@ -16,8 +16,15 @@ import org.mule.module.client.MuleClient;
 
 import org.junit.Test;
 
+/** see MULE-3342 for what this test is supposed to check */
 public class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsQueueWithTransactionTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+        setTransacted(true);
+    }
+
     protected String getConfigResources()
     {
         return "integration/jms-queue-with-transaction.xml";

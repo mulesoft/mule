@@ -10,6 +10,8 @@
 
 package org.mule.transport.jms.integration;
 
+import javax.jms.Message;
+
 import org.junit.Test;
 
 /**
@@ -17,56 +19,38 @@ import org.junit.Test;
  */
 public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 {
+    public JmsDurableTopicSingleTxTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+        setTransacted(true);
+    }
+
     protected String getConfigResources()
     {
         return "integration/jms-durable-topic-single-tx.xml";
     }
 
-    /**
-     * @throws Exception
-     */
     @Test
     public void testProviderDurableSubscriber() throws Exception
     {
         setClientId("Client1");
-        receive(scenarioNotReceive);
+        assertNull(receiveNoWait());
         setClientId("Client2");
-        receive(scenarioNotReceive);
+        assertNull(receiveNoWait());
 
         setClientId("Sender");
-        send(scenarioCommit);
+        sendAndCommit(DEFAULT_INPUT_MESSAGE);
 
         setClientId("Client1");
-        receive(scenarioCommit);
-        receive(scenarioNotReceive);
+        Message output = receiveAndCommit();
+        assertPayloadEquals(DEFAULT_INPUT_MESSAGE, output);
+        assertNull(receiveNoWait());
+        
         setClientId("Client2");
-        receive(scenarioRollback);
-        receive(scenarioCommit);
-        receive(scenarioNotReceive);
-
+        receiveAndRollback();
+        assertPayloadEquals(DEFAULT_INPUT_MESSAGE, output);
+        output = receiveAndCommit();
+        assertPayloadEquals(DEFAULT_INPUT_MESSAGE, output);
+        assertNull(receiveNoWait());
     }
-
-    Scenario scenarioCommit = new ScenarioCommit()
-    {
-        public String getOutputDestinationName()
-        {
-            return getJmsConfig().getBroadcastDestinationName();
-        }
-    };
-
-    Scenario scenarioRollback = new ScenarioRollback()
-    {
-        public String getOutputDestinationName()
-        {
-            return getJmsConfig().getBroadcastDestinationName();
-        }
-    };
-
-    Scenario scenarioNotReceive = new ScenarioNotReceive()
-    {
-        public String getOutputDestinationName()
-        {
-            return getJmsConfig().getBroadcastDestinationName();
-        }
-    };
 }

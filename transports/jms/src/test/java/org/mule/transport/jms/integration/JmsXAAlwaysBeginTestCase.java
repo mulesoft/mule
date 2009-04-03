@@ -18,6 +18,7 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Ignore;
@@ -25,41 +26,29 @@ import org.junit.Test;
 
 public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 {
-
     private static final String CONNECTOR_NAME = "jmsConnector";
 
     private static final List committedTx = new CopyOnWriteArrayList();
     private static final List rolledbackTx = new CopyOnWriteArrayList();
     protected static final Log logger = LogFactory.getLog(JmsXAAlwaysBeginTestCase.class);
 
+    public JmsXAAlwaysBeginTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
         return "integration/jms-xa-tx-ALWAYS_BEGIN.xml";
     }
 
-    @Override
-    protected void suitePreSetUp() throws Exception
-    {
-        super.suitePreSetUp();
-        purge(getInboundQueueName());
-        purge(getOutboundQueueName());
-    }
-
-    @Override
-    protected void suitePostTearDown() throws Exception
-    {
-        super.suitePostTearDown();
-        purge(getInboundQueueName());
-        purge(getOutboundQueueName());
-    }
-
     @Test
     public void testAlwaysBeginTx() throws Exception
     {
-        send(scenarioNoTx);
-        receive(scenarioNoTx);
-        receive(scenarioNoTx);
-        receive(scenarioNotReceive);
+        send();
+        receive();
+        receive();
+        assertNull(receiveNoWait());
         assertEquals(committedTx.size(), 0);
         assertEquals(rolledbackTx.size(), 2);
     }

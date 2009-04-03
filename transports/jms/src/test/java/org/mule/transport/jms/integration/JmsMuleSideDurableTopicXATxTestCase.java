@@ -22,6 +22,11 @@ public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTe
 {
     public static final String CONNECTOR1_NAME = "jmsConnectorC1";
 
+    public JmsMuleSideDurableTopicXATxTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
         return "integration/jms-muleside-durable-topic-xa-tx.xml";

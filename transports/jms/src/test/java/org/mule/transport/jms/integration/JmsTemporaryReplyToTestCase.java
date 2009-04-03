@@ -24,18 +24,14 @@ import org.junit.Test;
  */
 public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsTemporaryReplyToTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
         return "integration/jms-temporary-replyTo.xml";
-    }
-
-    @Override
-    protected void suitePreSetUp() throws Exception
-    {
-        super.suitePreSetUp();
-
-        purge(getInboundQueueName());
-        purge(getOutboundQueueName());
     }
 
     @Test

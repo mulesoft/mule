@@ -10,10 +10,18 @@
 
 package org.mule.transport.jms.integration;
 
+import javax.jms.Message;
+
 import org.junit.Test;
 
 public class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+        setTransacted(true);
+    }
+
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-BEGIN_OR_JOIN_AND_ALWAYS_BEGIN.xml";
@@ -22,9 +30,11 @@ public class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends Abstr
     @Test
     public void testSingleTransactionBeginOrJoinAndAlwaysBegin() throws Exception
     {
-        send(scenarioCommit);
-        receive(scenarioRollback);
-        receive(scenarioCommit);
-        receive(scenarioNotReceive);
+        sendAndCommit(DEFAULT_INPUT_MESSAGE);
+        Message output = receiveAndRollback();
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, output);
+        output = receiveAndCommit();
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, output);
+        receiveAndAssertNone();
     }
 }

@@ -34,6 +34,11 @@ import org.junit.Test;
  */
 public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsConnectorJndiTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     @Override
     protected String getConfigResources()
     {

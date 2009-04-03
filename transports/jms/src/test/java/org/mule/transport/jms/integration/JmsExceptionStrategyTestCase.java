@@ -15,7 +15,6 @@ import org.mule.message.ExceptionMessage;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
@@ -26,7 +25,11 @@ import org.junit.Test;
  */
 public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
 {
-    public static final String DEADLETTER_QUEUE_NAME = "dead.letter";
+    public JmsExceptionStrategyTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+        setTransacted(true);
+    }
 
     protected String getConfigResources()
     {
@@ -36,79 +39,49 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testTransactedRedeliveryToDLDestination() throws Exception
     {
-        send(scenarioDeadLetter);
-        // Verify outbound message did _not_ get delivered.
-        receive(scenarioNotReceive);
-        // Verify message got sent to dead letter queue instead.
-        receive(scenarioDeadLetter);
+        sendAndCommit(DEFAULT_INPUT_MESSAGE);
+        // Verify message did _not_ get delivered to the outbound destination.
+        receiveAndAssertNone();
+
+        // Verify that an ExceptionMessage got sent to dead letter queue instead.
+        Message output = receive(getJmsConfig().getDeadLetterDestinationName(), getTimeout(), null);
+        assertTrue("Message should be ObjectMessage but is " + output.getClass(), output instanceof ObjectMessage);
+        Object payload = ((ObjectMessage) output).getObject();
+        assertTrue(payload instanceof ExceptionMessage);
+        // The payload should be the original message, not the reply message
+        // since the FTC threw an exception.
+        assertEquals(DEFAULT_INPUT_MESSAGE, ((ExceptionMessage) payload).getPayload());
+
+        String dest = (String) output.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
+        assertNotNull(dest);
+        assertEquals(getJmsConfig().getDeadLetterEndpoint(), dest);
     }
 
     @Test
     public void testTransactedRedeliveryToDLDestinationRollback() throws Exception
     {
-        send(scenarioDeadLetter);
+        sendAndCommit(DEFAULT_INPUT_MESSAGE);
+        
         // Receive message but roll back transaction.
-        receive(scenarioDeadLetterRollback);
+        receive(getJmsConfig().getDeadLetterDestinationName(), getTimeout(), new MessagePostProcessor() 
+            {
+                public void postProcess(Session session, Message message) throws JMSException
+                {
+                    session.rollback();
+                }
+            });
+
         // Receive message again and commit transaction.
-        receive(scenarioDeadLetter);
+        receive(getJmsConfig().getDeadLetterDestinationName(), getTimeout(), new MessagePostProcessor() 
+        {
+            public void postProcess(Session session, Message message) throws JMSException
+            {
+                session.commit();
+            }
+        });
+
         // Verify there is no more message to receive.
-        receive(scenarioDeadLetterNotReceive);
-    }
-
-    Scenario scenarioDeadLetter = new ScenarioDeadLetter();
-
-    class ScenarioDeadLetter extends ScenarioCommit
-    {
-        // @Override
-        public String getOutputDestinationName()
-        {
-            return DEADLETTER_QUEUE_NAME;
-        }
-
-        // @Override
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            // Verify message got sent to dead letter queue.
-            Message message = consumer.receive(getTimeout());
-            assertNotNull(message);
-            assertTrue("Message should be ObjectMessage but is " + message.getClass(),
-                message instanceof ObjectMessage);
-            Object obj = ((ObjectMessage) message).getObject();
-            assertTrue(obj instanceof ExceptionMessage);
-            // The payload should be the original message, not the reply message
-            // since the FTC threw an exception.
-            assertEquals(DEFAULT_INPUT_MESSAGE, ((ExceptionMessage) obj).getPayload());
-
-            String dest = message.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
-            assertNotNull(dest);
-            assertEquals("jms://" + DEADLETTER_QUEUE_NAME, dest);
-
-            applyTransaction(session);
-            return message;
-        }
-    }
-
-    Scenario scenarioDeadLetterRollback = new ScenarioDeadLetterRollback();
-
-    class ScenarioDeadLetterRollback extends ScenarioDeadLetter
-    {
-        // @Override
-        protected void applyTransaction(Session session) throws JMSException
-        {
-            session.rollback();
-        }
-    }
-
-    Scenario scenarioDeadLetterNotReceive = new ScenarioDeadLetterNotReceive();
-
-    class ScenarioDeadLetterNotReceive extends ScenarioDeadLetter
-    {
-        // @Override
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(getSmallTimeout());
-            assertNull(message);
-            return message;
-        }
+        Message output = receive(getJmsConfig().getDeadLetterDestinationName(), getSmallTimeout(), null);
+        assertNull(output);
     }
 }

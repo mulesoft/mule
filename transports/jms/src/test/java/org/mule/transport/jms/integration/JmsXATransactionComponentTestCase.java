@@ -16,9 +16,13 @@ import org.mule.module.client.MuleClient;
 import org.junit.Test;
 
 public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTestCase
-    implements junit.framework.Test
 {
     public static final String CONNECTOR1_NAME = "jmsConnector";
+
+    public JmsXATransactionComponentTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
 
     protected String getConfigResources()
     {

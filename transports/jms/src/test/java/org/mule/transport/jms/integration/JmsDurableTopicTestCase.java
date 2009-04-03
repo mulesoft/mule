@@ -10,17 +10,17 @@
 
 package org.mule.transport.jms.integration;
 
-import javax.jms.Connection;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.Session;
-import javax.jms.Topic;
 
 import org.junit.Test;
 
 public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
-    private String clientId;
+    public JmsDurableTopicTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+        setUseTopics(true);
+    }
 
     protected String getConfigResources()
     {
@@ -31,88 +31,20 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
     public void testProviderDurableSubscriber() throws Exception
     {
         setClientId("Client1");
-        receive(scenarioNotReceive);
+        assertNull(receiveNoWait());
         setClientId("Client2");
-        receive(scenarioNotReceive);
+        assertNull(receiveNoWait());
 
         setClientId("Sender");
-        send(scenarioNonTx);
+        send();
 
         setClientId("Client1");
-        receive(scenarioNonTx);
-        receive(scenarioNotReceive);
+        Message output = receive();
+        assertPayloadEquals(DEFAULT_INPUT_MESSAGE, output);
+        assertNull(receiveNoWait());
         setClientId("Client2");
-        receive(scenarioNonTx);
-        receive(scenarioNotReceive);
-    }
-
-    Scenario scenarioNonTx = new NonTransactedScenario()
-    {
-        public String getOutputDestinationName()
-        {
-            return getJmsConfig().getBroadcastDestinationName();
-        }
-    };
-
-    Scenario scenarioNotReceive = new ScenarioNotReceive()
-    {
-        public String getOutputDestinationName()
-        {
-            return getJmsConfig().getBroadcastDestinationName();
-        }
-    };
-
-    public Message receive(Scenario scenario) throws Exception
-    {
-        Connection connection = null;
-        try
-        {
-            connection = getConnection(true, false);
-            connection.setClientID(getClientId());
-            connection.start();
-            Session session = null;
-            try
-            {
-                session = connection.createSession(scenario.isTransacted(), scenario.getAcknowledge());
-                Topic destination = session.createTopic(scenario.getOutputDestinationName());
-                MessageConsumer consumer = null;
-                try
-                {
-                    consumer = session.createDurableSubscriber(destination, getClientId());
-                    return scenario.receive(session, consumer);
-                }
-                finally
-                {
-                    if (consumer != null)
-                    {
-                        consumer.close();
-                    }
-                }
-            }
-            finally
-            {
-                if (session != null)
-                {
-                    session.close();
-                }
-            }
-        }
-        finally
-        {
-            if (connection != null)
-            {
-                connection.close();
-            }
-        }
-    }
-
-    public String getClientId()
-    {
-        return clientId;
-    }
-
-    public void setClientId(String clientId)
-    {
-        this.clientId = clientId;
+        output = receive();
+        assertPayloadEquals(DEFAULT_INPUT_MESSAGE, output);
+        assertNull(receiveNoWait());
     }
 }

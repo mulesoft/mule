@@ -12,6 +12,10 @@ package org.mule.transport.jms.integration;
 
 import java.util.Properties;
 
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
+
 import org.junit.Test;
 
 public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends AbstractJmsFunctionalTestCase
@@ -37,56 +41,63 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         return props;
     }
 
+    public JmsSingleTransactionAlwaysBeginConfigurationTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+        setTransacted(true);
+    }
+
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-ALWAYS_BEGIN.xml";
     }
 
+    MessagePostProcessor commit = new MessagePostProcessor() 
+    {
+        public void postProcess(Session session, Message message) throws JMSException
+        {
+            session.commit();
+        }
+    };
+    
+    MessagePostProcessor rollback = new MessagePostProcessor() 
+    {
+        public void postProcess(Session session, Message message) throws JMSException
+        {
+            session.rollback();
+        }
+    };
+    
     @Test
     public void testConfigurationA() throws Exception
     {
-        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
-        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
-        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
-        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
-        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
-        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
-
-        send(scenarioCommit);
-        receive(scenarioRollback);
-        receive(scenarioCommit);
-        receive(scenarioNotReceive);
+        send(JMS_QUEUE_INPUT_CONF_A, DEFAULT_INPUT_MESSAGE, commit);
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, 
+            receive(JMS_QUEUE_OUTPUT_CONF_A, getTimeout(), rollback));
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, 
+                            receive(JMS_QUEUE_OUTPUT_CONF_A, getTimeout(), commit));
+        assertNull(receive(JMS_QUEUE_OUTPUT_CONF_A, getTimeout(), null));
     }
 
     @Test
     public void testConfigurationB() throws Exception
     {
-        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
-        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
-        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
-        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
-        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
-        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
-
-        send(scenarioCommit);
-        receive(scenarioRollback);
-        receive(scenarioCommit);
-        receive(scenarioNotReceive);
+        send(JMS_QUEUE_INPUT_CONF_B, DEFAULT_INPUT_MESSAGE, commit);
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, 
+            receive(JMS_QUEUE_OUTPUT_CONF_B, getTimeout(), rollback));
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, 
+            receive(JMS_QUEUE_OUTPUT_CONF_B, getTimeout(), commit));
+        assertNull(receive(JMS_QUEUE_OUTPUT_CONF_B, getTimeout(), null));
     }
 
     @Test
     public void testConfigurationC() throws Exception
     {
-        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
-        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
-        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
-        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
-        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
-        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
-
-        send(scenarioCommit);
-        receive(scenarioRollback);
-        receive(scenarioCommit);
-        receive(scenarioNotReceive);
+        send(JMS_QUEUE_INPUT_CONF_C, DEFAULT_INPUT_MESSAGE, commit);
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, 
+            receive(JMS_QUEUE_OUTPUT_CONF_C, getTimeout(), rollback));
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, 
+            receive(JMS_QUEUE_OUTPUT_CONF_C, getTimeout(), commit));
+        assertNull(receive(JMS_QUEUE_OUTPUT_CONF_C, getTimeout(), null));
     }
 }

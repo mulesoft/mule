@@ -43,6 +43,11 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 {
     private Session session = null;
 
+    public JmsTransformersTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
         return "integration/jms-transformers.xml";

@@ -34,6 +34,11 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
 
     private Session session = null;
 
+    public JmsMessageAwareTransformersMule2685TestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+    }
+
     protected String getConfigResources()
     {
         return "integration/jms-transformers.xml";

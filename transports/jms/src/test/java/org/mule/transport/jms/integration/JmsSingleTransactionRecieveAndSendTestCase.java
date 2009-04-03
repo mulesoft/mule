@@ -11,12 +11,17 @@
 package org.mule.transport.jms.integration;
 
 import javax.jms.Message;
-import javax.jms.TextMessage;
 
 import org.junit.Test;
 
 public class JmsSingleTransactionRecieveAndSendTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsSingleTransactionRecieveAndSendTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+        setTransacted(true);
+    }
+
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-receive-send-in-one-tx.xml";
@@ -25,11 +30,11 @@ public class JmsSingleTransactionRecieveAndSendTestCase extends AbstractJmsFunct
     @Test
     public void testSingleTransactionBeginOrJoinAndAlwaysBegin() throws Exception
     {
-        send(scenarioCommit);
-        Message message = receive(scenarioReceive);
-        assertNotNull(message);
-        assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
-        assertEquals(((TextMessage) message).getText(), AbstractJmsFunctionalTestCase.DEFAULT_OUTPUT_MESSAGE);
+        sendAndCommit(DEFAULT_INPUT_MESSAGE);
+        Message output = receiveAndRollback();
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, output);
+        output = receiveAndCommit();
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, output);
+        receiveAndAssertNone();
     }
-
 }

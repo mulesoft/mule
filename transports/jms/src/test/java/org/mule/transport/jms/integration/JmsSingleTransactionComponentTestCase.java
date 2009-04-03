@@ -10,6 +10,8 @@
 
 package org.mule.transport.jms.integration;
 
+import javax.jms.Message;
+
 import org.junit.Test;
 
 /**
@@ -18,6 +20,12 @@ import org.junit.Test;
  */
 public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctionalTestCase
 {
+    public JmsSingleTransactionComponentTestCase(JmsVendorConfiguration config)
+    {
+        super(config);
+        setTransacted(true);
+    }
+    
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-component.xml";
@@ -26,12 +34,17 @@ public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctional
     @Test
     public void testSingleTransactionComponent() throws Exception
     {
-        send(scenarioCommit);
+        sendAndCommit(DEFAULT_INPUT_MESSAGE);
+        
         // Receive message but roll back transaction.
-        receive(scenarioRollback);
+        Message output = receiveAndRollback();
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, output);
+
         // Receive message again and commit transaction.
-        receive(scenarioCommit);
-        // Verify there is no more message to receive.
-        receive(scenarioNotReceive);
+        output = receiveAndCommit();
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, output);
+
+        // No more messages
+        assertNull(receiveNoWait());
     }
 }
