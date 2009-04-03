@@ -32,11 +32,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     public static final String MULE_DEFAULTS_CONFIG = "default-mule-config.xml";
 
     /** Prepend "default-mule-config.xml" to the list of config resources. */
-    private boolean useDefaultConfigResource = true;
+    protected boolean useDefaultConfigResource = true;
 
-    private Registry registry;
+    protected Registry registry;
     
-    private ApplicationContext parentContext;
+    protected ApplicationContext parentContext;
     
     public SpringXmlConfigurationBuilder(String[] configResources) throws ConfigurationException
     {
