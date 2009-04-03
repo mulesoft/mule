@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
@@ -59,6 +60,11 @@ public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
         return getProtocol() + "://topic:" + getBroadcastDestinationName();
     }
 
+    public String getDeadLetterEndpoint()
+    {
+        return getProtocol() + "://" + getDeadLetterDestinationName();
+    }
+
     public String getInboundDestinationName()
     {
         return "in";
@@ -77,6 +83,11 @@ public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
     public String getBroadcastDestinationName()
     {
         return "broadcast";
+    }
+
+    public String getDeadLetterDestinationName()
+    {
+        return "dlq";
     }
 
     /**
@@ -112,5 +123,10 @@ public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
     public Map getProperties()
     {
         return new HashMap();
+    }
+
+    public ConnectionFactory getTestConnectionFactory()
+    {
+        return new ActiveMQTestReconnectionConnectionFactoryWrapper();       
     }
 }

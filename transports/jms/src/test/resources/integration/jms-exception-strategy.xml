@@ -26,7 +26,7 @@
             </outbound>
             <default-service-exception-strategy>
                 <commit-transaction exception-pattern="*"/>
-                <jms:outbound-endpoint queue="dead.letter">
+                <jms:outbound-endpoint queue="dlq">
                     <jms:transaction action="ALWAYS_JOIN"/>
                 </jms:outbound-endpoint>
             </default-service-exception-strategy>

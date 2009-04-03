@@ -13,6 +13,7 @@ package org.mule.transport.jms.integration;
 import java.util.Map;
 
 import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 
 /**
  * Abstracts all the Jms Vendor specific configuration for the Jms integration test suite.
@@ -84,6 +85,14 @@ public interface JmsVendorConfiguration
     public String getTopicBroadcastEndpoint();
 
     /**
+     * Returns the {@link #getDeadLetterDestinationName()} in the form of an endpoint URI i.e.
+     * jms://dlq
+      *
+     * @return the dead letter JMS endpoint
+     */
+    public String getDeadLetterEndpoint();
+
+    /**
      * The test inbound queue name.  For consistency this should always be 'in'. Note that you need to make
      * sure that this queue is available in the the JMS provider being tested.
      *
@@ -116,6 +125,14 @@ public interface JmsVendorConfiguration
      */
     public String getBroadcastDestinationName();
 
+    /**
+     * The test dead letter queue name.  For consistency this should always be 'dlq'. Note that you need to make
+     * sure that this queue is available in the the JMS provider being tested.
+     *
+     * @return The test dead letterdestination name
+     */
+    public String getDeadLetterDestinationName();
+    
     /**
      * Timeout in milliseconds used when checking that a message is NOT present. This is usually 1000-2000ms.
      * It is customizable so that slow connections i.e. over a wAN can be accounted for.
@@ -158,4 +175,10 @@ public interface JmsVendorConfiguration
      * @return a map of properties that will be made available in the registry
      */
     public Map getProperties();
+
+    /**
+     * @return a ConnectionFactory implementation used for unit testing of the provider, 
+     * usually consisting of some mocked-up methods.
+     */
+    public ConnectionFactory getTestConnectionFactory();
 }
