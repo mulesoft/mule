@@ -10,18 +10,19 @@
 
 package org.mule.transport.jms.integration;
 
-import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.MuleParameterized;
+import org.mule.transport.jms.JmsConstants;
+import org.mule.transport.jms.JmsMessageUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.net.URL;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -36,16 +37,14 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
+import javax.jms.Topic;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This is the base class for all integration tests that are part of the JMS integration test suite.  this is
@@ -90,8 +89,10 @@ import org.junit.Before;
  * test suite and configure the objects to match the configuration in the ActiveMQ tests.  Note that the object names must
  * be consistently the same for things to work.
  */
+@RunWith(MuleParameterized.class)
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
+    public static final String CONNECTOR = "jmsConnector";
 
     public static final String DEFAULT_INPUT_MESSAGE = "INPUT MESSAGE";
     public static final String DEFAULT_OUTPUT_MESSAGE = "OUTPUT MESSAGE";
@@ -107,19 +108,50 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     protected static final Log logger = LogFactory.getLog("MULE_TESTS");
 
     protected JmsVendorConfiguration jmsConfig = null;
-    protected Scenario scenarioNoTx;
-
-    protected Scenario scenarioCommit;
-    protected Scenario scenarioRollback;
-    protected Scenario scenarioNotReceive;
-    protected Scenario scenarioReceive;
-
-    private MuleClient client = null;
 
     /**
-     * This test case is refactored to support multiple JMS providers.
+     * This test case has been refactored to support multiple JMS providers.
      */
     private boolean multipleProviders = true;
+
+    /**
+     * Are we using transactions for this test case?
+     */
+    private boolean transacted = false;
+
+    /**
+     * Are we using persistent queues for this test case?
+     */
+    private boolean persistent = false;
+
+    /**
+     * Are we using auto-acknowledge or some other mode?
+     */
+    private int acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
+    
+    /**
+     * Which JMS spec. are we using?
+     */
+    private String jmsSpecification = JmsConstants.JMS_SPECIFICATION_102B;
+        
+    /**
+     * ClientID used when subscribing to JMS topics
+     */
+    private String clientId;
+
+    /**
+     * Are we working with JMS topics rather than queues?
+     */
+    private boolean useTopics = false;
+
+    /**
+     * Implement this interface to provide a callback which will be executed immediately 
+     * after sending/receiving a message.
+     */
+    interface MessagePostProcessor
+    {
+        void postProcess(Session session, Message message) throws JMSException;
+    };
     
     /**
      * Finds the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} instances to test with by looking
@@ -135,9 +167,9 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * TODO this method can return more than one provider, but our test class can only handle one at a time
      * IMPORTANT: Only set one class in 'jms-vendor-configs.txt'
      */
+    @Parameters
     public static Collection jmsProviderConfigs()
     {
-        JmsVendorConfiguration[][] configs;
         URL url = ClassUtils.getResource("jms-vendor-configs.txt", AbstractJmsFunctionalTestCase.class);
 
         if (url == null)
@@ -154,18 +186,22 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
         try
         {
+            List configs = new ArrayList();
             List classes = IOUtils.readLines(url.openStream());
-            configs = new JmsVendorConfiguration[1][classes.size()];
             int i = 0;
             for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
             {
                 String cls = (String) iterator.next();
-                configs[0][i] = (JmsVendorConfiguration) ClassUtils.instanciateClass(cls, ClassUtils.NO_ARGS);
+                configs.add(new Object[] { ClassUtils.instanciateClass(cls, ClassUtils.NO_ARGS) });
             }
-            return Arrays.asList(configs);
+            return configs;
         }
         catch (Exception e)
         {
+            if (logger.isDebugEnabled())
+            {
+                e.printStackTrace();
+            }
             fail("Please specify the org.mule.transport.jms.integration.JmsVendorConfiguration " +
                  "implementation to use in jms-vendor-configs.txt on classpath: " + e.getMessage());
             return CollectionUtils.EMPTY_COLLECTION;
@@ -194,22 +230,16 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     public void after() throws Exception
     {
         super.tearDown();
-    }
-
-    public AbstractJmsFunctionalTestCase()
-    {
-        // TODO jmsProviderConfigs() can return more than one provider, but our test class can only handle one at a time
-        this(((JmsVendorConfiguration[]) jmsProviderConfigs().iterator().next())[0]);
+        purge(getJmsConfig().getInboundDestinationName());
+        purge(getJmsConfig().getOutboundDestinationName());
+        purge(getJmsConfig().getMiddleDestinationName());
+        purge(getJmsConfig().getDeadLetterDestinationName());
     }
 
     public AbstractJmsFunctionalTestCase(JmsVendorConfiguration config)
     {
+        super();
         setJmsConfig(config);
-        scenarioNoTx = new NonTransactedScenario();
-        scenarioCommit = new ScenarioCommit();
-        scenarioRollback = new ScenarioRollback();
-        scenarioNotReceive = new ScenarioNotReceive();
-        scenarioReceive = new ScenarioReceive();
     }
 
     /**
@@ -363,34 +393,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     /**
-     * The test inbound queue name.  For consistency this should always be 'in'. Note that you need to make
-     * sure that this queue is available in the the JMS provider being tested.
-     * <p/>
-     * This calls through to {@link org.mule.transport.jms.integration.JmsVendorConfiguration#getInboundDestinationName()}
-     *
-     * @return The test inbound destination name
-     */
-    protected final String getInboundQueueName()
-    {
-        checkConfig();
-        return getJmsConfig().getInboundDestinationName();
-    }
-
-    /**
-     * The test outbound queue name.  For consistency this should always be 'out'. Note that you need to make
-     * sure that this queue is available in the the JMS provider being tested.
-     * <p/>
-     * This calls through to {@link org.mule.transport.jms.integration.JmsVendorConfiguration#getOutboundDestinationName()}
-     *
-     * @return The test outbound destination name
-     */
-    protected final String getOutboundQueueName()
-    {
-        checkConfig();
-        return getJmsConfig().getOutboundDestinationName();
-    }
-
-    /**
      * Timeout in milliseconds used when checking that a message is NOT present. This is usually 1000-2000ms.
      * It is customizable so that slow connections i.e. over a wAN can be accounted for.
      * <p/>
@@ -431,95 +433,96 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-    protected void dispatchMessage() throws Exception
+    public Message send() throws Exception
     {
-        client.dispatch(getInboundEndpoint(), DEFAULT_INPUT_MESSAGE, null);
+        return send(DEFAULT_INPUT_MESSAGE);
     }
 
-    protected void dispatchMessage(Object payload) throws Exception
+    public Message send(Object payload) throws Exception
     {
-        client.dispatch(getInboundEndpoint(), payload, null);
-    }
-
-    protected MuleMessage receiveMessage() throws Exception
-    {
-        return receiveMessage(DEFAULT_OUTPUT_MESSAGE);
-    }
-
-    protected MuleMessage receiveMessage(Object expected) throws Exception
-    {
-        MuleMessage result = client.request(getOutboundEndpoint(), getTimeout());
-        assertNotNull(result);
-        assertNotNull(result.getPayload());
-        assertNull(result.getExceptionPayload());
-        assertEquals(expected, result.getPayload());
-        return result;
-    }
-
-    protected MuleMessage receiveMessage(byte[] expected) throws Exception
-    {
-        MuleMessage result = client.request(getOutboundEndpoint(), getTimeout());
-        assertNotNull(result);
-        assertNotNull(result.getPayload());
-        assertNull(result.getExceptionPayload());
-        byte[] bytes = result.getPayloadAsBytes();
-        assertEquals("Wrong number of bytes", expected.length, bytes.length);
-        for (int i=0; i < expected.length; ++i)
+        if (isTransacted())
         {
-            assertEquals("Byte #" + i + " does not match", expected[i], bytes[i]);
+            throw new IllegalStateException("This test case is using transactions, you must call either sendAndCommit() or sendAndRollback()");
         }
-        return result;
-    }
-
-    public void runAsynchronousDispatching() throws Exception
-    {
-        dispatchMessage();
-        receiveMessage();
-        MuleMessage result = client.request(getOutboundEndpoint(), getSmallTimeout());
-        assertNull(result);
-    }
-
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        client = new MuleClient(isStartContext());
-    }
-
-    protected void doTearDown() throws Exception
-    {
-        super.doTearDown();
-        if (client != null)
+        else
         {
-            client.dispose();
+            return send(payload, null);
         }
     }
 
-    protected MuleClient getClient()
+    public Message sendAndCommit(Object payload) throws Exception
     {
-        return client;
+        return send(payload, new MessagePostProcessor() 
+        {
+            public void postProcess(Session session, Message message) throws JMSException
+            {
+                session.commit();
+            }
+        });
+    }
+    
+    public Message sendAndRollback(Object payload) throws Exception
+    {
+        return send(payload, new MessagePostProcessor() 
+        {
+            public void postProcess(Session session, Message message) throws JMSException
+            {
+                session.rollback();
+            }
+        });
     }
 
-    public void send(Scenario scenario) throws Exception
+    protected Message send(Object payload, MessagePostProcessor postProcessor) throws Exception
+    {
+        if (isUseTopics())
+        {
+            return send(getJmsConfig().getBroadcastDestinationName(), payload, postProcessor);
+        }
+        else
+        {
+            return send(getJmsConfig().getInboundDestinationName(), payload, postProcessor);
+        }
+    }
+    
+    protected Message send(String dest, Object payload, MessagePostProcessor postProcessor) throws Exception
     {
         Connection connection = null;
         try
         {
-            connection = getConnection(false, false);
+            connection = getConnection(isUseTopics(), false);
+            if (getClientId() != null)
+            {
+                connection.setClientID(getClientId());
+            }
             connection.start();
             Session session = null;
             try
             {
-                session = connection.createSession(scenario.isTransacted(), scenario.getAcknowledge());
-                Destination destination = createInputDestination(session, scenario);
+                session = connection.createSession(isTransacted(), getAcknowledgeMode());
+                Destination destination;
+                if (isUseTopics())
+                {
+                    destination = session.createTopic(dest);
+                }
+                else
+                {
+                    destination = session.createQueue(dest);
+                }
                 MessageProducer producer = null;
                 try
                 {
                     producer = session.createProducer(destination);
-                    if (scenario.isPersistent())
+                    if (isPersistent())
                     {
                         producer.setDeliveryMode(DeliveryMode.PERSISTENT);
                     }
-                    scenario.send(session, producer);
+                    Message message = createJmsMessage(payload, session);
+                    producer.send(message);
+                    if (postProcessor != null)
+                    {
+                        postProcessor.postProcess(session, message);
+                    }
+                    return message;
                 }
                 finally
                 {
@@ -546,51 +549,111 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-    /**
-     * By default this will create a Queue, override to create a topic
-     *
-     * @param session
-     * @param scenario
-     * @return
-     * @throws JMSException
-     */
-    protected Destination createInputDestination(Session session, Scenario scenario) throws JMSException
+    protected Message createJmsMessage(Object payload, Session session) throws JMSException
     {
-        return session.createQueue(scenario.getInputDestinationName());
+        return JmsMessageUtils.toMessage(payload, session);
+    }
+    
+    public Message receive() throws Exception
+    {
+        return receive((MessagePostProcessor) null);
     }
 
-    /**
-     * By default this will create a Queue, override to create a topic
-     *
-     * @param session
-     * @param scenario
-     * @return
-     * @throws JMSException
-     */
-    protected Destination createOutputDestination(Session session, Scenario scenario) throws JMSException
+    public Message receive(MessagePostProcessor postProcessor) throws Exception
     {
-        return session.createQueue(scenario.getOutputDestinationName());
+        if (isTransacted())
+        {
+            throw new IllegalStateException("This test case is using transactions, you must call either receiveAndCommit() or receiveAndRollback()");
+        }
+        else
+        {
+            return receive(getTimeout(), postProcessor);
+        }
+    }    
+    
+    /**
+     * Short timeout, use when no message is expected.
+     */
+    public Message receiveNoWait() throws Exception
+    {
+        return receive(getSmallTimeout(), null);
+    }
+    
+    public Message receiveAndCommit() throws Exception
+    {
+        return receive(getTimeout(), new MessagePostProcessor() 
+            {
+                public void postProcess(Session session, Message message) throws JMSException
+                {
+                    session.commit();
+                }
+            });
+    }
+    
+    public Message receiveAndRollback() throws Exception
+    {
+        return receive(getTimeout(), new MessagePostProcessor() 
+        {
+            public void postProcess(Session session, Message message) throws JMSException
+            {
+                session.rollback();
+            }
+        });
     }
 
-     /**/
-    public Message receive(Scenario scenario) throws Exception
+    protected Message receive(long timeout, MessagePostProcessor postProcessor) throws Exception
     {
-        assertNotNull("scenario is null!", scenario);
+        if (isUseTopics())
+        {
+            return receive(getJmsConfig().getBroadcastDestinationName(), timeout, postProcessor);
+        }
+        else
+        {
+            return receive(getJmsConfig().getOutboundDestinationName(), timeout, postProcessor);
+        }
+    }
+    
+    protected Message receive(String queue, long timeout, MessagePostProcessor postProcessor) throws Exception
+    {
         Connection connection = null;
         try
         {
-            connection = getConnection(false, false);
+            connection = getConnection(isUseTopics(), false);
+            if (getClientId() != null)
+            {
+                connection.setClientID(getClientId());
+            }
             connection.start();
             Session session = null;
             try
             {
-                session = connection.createSession(scenario.isTransacted(), scenario.getAcknowledge());
-                Destination destination = createOutputDestination(session, scenario);
+                session = connection.createSession(isTransacted(), getAcknowledgeMode());
+                Destination destination;
+                if (isUseTopics())
+                {
+                    destination = session.createTopic(queue);
+                }
+                else
+                {
+                    destination = session.createQueue(queue);
+                }
                 MessageConsumer consumer = null;
                 try
                 {
-                    consumer = session.createConsumer(destination);
-                    return scenario.receive(session, consumer);
+                    if (isUseTopics())
+                    {
+                        consumer = session.createDurableSubscriber((Topic) destination, getClientId());
+                    }
+                    else
+                    {
+                        consumer = session.createConsumer(destination);
+                    }
+                    Message message = consumer.receive(timeout);
+                    if (postProcessor != null)
+                    {
+                        postProcessor.postProcess(session, message);
+                    }
+                    return message;
                 }
                 finally
                 {
@@ -661,6 +724,49 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     }
 
+    /** Verify that no message is pending on the default output queue. */
+    protected void receiveAndAssertNone() throws Exception
+    {
+        assertNull(receiveNoWait());
+    }
+
+    /** Receive a message from the default output queue and compare it to the default output message. */
+    protected void receiveAndAssert() throws Exception
+    {
+        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, receive());
+    }
+    
+    protected void assertPayloadEquals(Object expected, Message message) 
+    {
+        assertNotNull("Message is null", message);
+        Object object = null;
+        try
+        {
+            object = JmsMessageUtils.toObject(message, getJmsSpecification(), muleContext.getConfiguration().getDefaultEncoding());
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+        }
+        if (expected instanceof byte[])
+        {
+            assertEquals((byte[]) expected, (byte[]) object);
+        }
+        else
+        {
+            assertEquals(expected, object);             
+        }
+    }
+
+    protected void assertEquals(byte[] expected, byte[] actual)
+    {
+        assertEquals("Wrong number of bytes", expected.length, actual.length);
+        for (int i=0; i < expected.length; ++i)
+        {
+            assertEquals("Byte #" + i + " does not match", expected[i], actual[i]);
+        }
+    }
+    
     public boolean isMultipleProviders()
     {
         return multipleProviders;
@@ -671,162 +777,64 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         this.multipleProviders = multipleProviders;
     }
 
-    // /////////////////////////////////////////////////////////////////////////////////////////////////
-    // Test Scenarios
-    // /////////////////////////////////////////////////////////////////////////////////////////////////
-
-    protected interface Scenario
+    public boolean isTransacted()
     {
-
-        boolean isPersistent();
-
-        void setPersistent(boolean persistent);
-
-        String getInputDestinationName();
-
-        void setInputDestinationName(String inputQueue);
-
-        String getOutputDestinationName();
-
-        void setOutputDestinationName(String outputQueue);
-
-        int getAcknowledge();
-
-        void send(Session session, MessageProducer producer)
-                throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException,
-                RollbackException;
-
-        Message receive(Session session, MessageConsumer consumer)
-                throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException,
-                RollbackException;
-
-        boolean isTransacted();
+        return transacted;
     }
 
-    protected abstract class AbstractScenario implements Scenario
+    public void setTransacted(boolean transacted)
     {
-
-        private String inputQueue = getInboundQueueName();
-        private String outputQueue = getOutboundQueueName();
-        private boolean persistent = false;
-
-        public boolean isPersistent()
-        {
-            return persistent;
-        }
-
-        public void setPersistent(boolean persistent)
-        {
-            this.persistent = persistent;
-        }
-
-        public String getInputDestinationName()
-        {
-            return inputQueue;
-        }
-
-        public String getOutputDestinationName()
-        {
-            return outputQueue;
-        }
-
-        public void setInputDestinationName(String inputQueue)
-        {
-            this.inputQueue = inputQueue;
-        }
-
-        public void setOutputDestinationName(String outputQueue)
-        {
-            this.outputQueue = outputQueue;
-        }
-
-        public int getAcknowledge()
-        {
-            return Session.AUTO_ACKNOWLEDGE;
-        }
-
-        public void send(Session session, MessageProducer producer) throws JMSException
-        {
-            producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
-            applyTransaction(session);
-        }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(getTimeout());
-            assertNotNull(message);
-            assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
-            assertEquals(DEFAULT_OUTPUT_MESSAGE, ((TextMessage) message).getText());
-            applyTransaction(session);
-            return message;
-        }
-
-        abstract protected void applyTransaction(Session session) throws JMSException;
+        this.transacted = transacted;
     }
 
-    protected class NonTransactedScenario extends AbstractScenario
+    public boolean isPersistent()
     {
-
-        public boolean isTransacted()
-        {
-            return false;
-        }
-
-        protected void applyTransaction(Session session) throws JMSException
-        {
-            // do nothing
-        }
+        return persistent;
     }
 
-    protected class ScenarioCommit extends AbstractScenario
+    public void setPersistent(boolean persistent)
     {
-
-        public boolean isTransacted()
-        {
-            return true;
-        }
-
-        protected void applyTransaction(Session session) throws JMSException
-        {
-            session.commit();
-        }
+        this.persistent = persistent;
     }
 
-    protected class ScenarioRollback extends AbstractScenario
+    public int getAcknowledgeMode()
     {
-
-        public boolean isTransacted()
-        {
-            return true;
-        }
-
-        protected void applyTransaction(Session session) throws JMSException
-        {
-            session.rollback();
-        }
+        return acknowledgeMode;
     }
 
-    protected class ScenarioNotReceive extends NonTransactedScenario
+    public void setAcknowledgeMode(int acknowledgeMode)
     {
-
-        @Override
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(getSmallTimeout());
-            assertNull(message);
-            return message;
-        }
+        this.acknowledgeMode = acknowledgeMode;
     }
 
-    protected class ScenarioReceive extends NonTransactedScenario
+    public String getJmsSpecification()
     {
-
-        @Override
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(getTimeout());
-            assertNotNull(message);
-            return message;
-        }
+        return jmsSpecification;
     }
+
+    public void setJmsSpecification(String jmsSpecification)
+    {
+        this.jmsSpecification = jmsSpecification;
+    }
+
+    public String getClientId()
+    {
+        return clientId;
+    }
+
+    public void setClientId(String clientId)
+    {
+        this.clientId = clientId;
+    }
+
+    public boolean isUseTopics()
+    {
+        return useTopics;
+    }
+
+    public void setUseTopics(boolean useTopics)
+    {
+        this.useTopics = useTopics;
+    }
+
 }
