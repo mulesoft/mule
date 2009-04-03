@@ -83,8 +83,8 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         assertNotSame(component.borrowComponentLifecycleAdaptor(), component.borrowComponentLifecycleAdaptor());
         component.stop();
         component.start();
-        assertNotSame(((DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject,
-            ((DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject);
+        assertNotSame(((DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject.get(),
+            ((DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject.get());
     }
 
     public void testCreatePool() throws Exception
@@ -273,19 +273,19 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
 
         Object obj;
 
-        obj = ((DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject;
+        obj = ((DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject.get();
         assertNotNull(obj);
         assertTrue("Object should be of type UniqueComponent", obj instanceof UniqueComponent);
         String id1 = ((UniqueComponent) obj).getId();
         assertNotNull(id1);
 
-        obj = ((DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject;
+        obj = ((DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject.get();
         assertNotNull(obj);
         assertTrue("Object should be of type UniqueComponent", obj instanceof UniqueComponent);
         String id2 = ((UniqueComponent) obj).getId();
         assertNotNull(id2);
 
-        obj = ((DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject;
+        obj = ((DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject.get();
         assertNotNull(obj);
         assertTrue("Object should be of type UniqueComponent", obj instanceof UniqueComponent);
         String id3 = ((UniqueComponent) obj).getId();
@@ -307,7 +307,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         component.returnComponentLifecycleAdaptor(lifecycleAdapter);
         component.dispose();
 
-        assertEquals("disposed", ((WaterMelon) lifecycleAdapter.componentObject).getState());
+        assertNull(lifecycleAdapter.componentObject.get());
     }
 
     public void testLifeCycleMethods() throws Exception

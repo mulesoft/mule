@@ -17,6 +17,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +35,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory
     public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";
 
     protected String objectClassName;
-    protected Class objectClass = null;
+    protected SoftReference<Class> objectClass = null;
     protected Map properties = null;
     protected List initialisationCallbacks = new ArrayList();
 
@@ -64,23 +65,23 @@ public abstract class AbstractObjectFactory implements ObjectFactory
 
     public AbstractObjectFactory(Class objectClass, Map properties)
     {
-        this.objectClass = objectClass;
+        this.objectClass = new SoftReference<Class>(objectClass);
         this.properties = properties;
     }
 
     public void initialise() throws InitialisationException
     {
-        if (objectClass == null && objectClassName == null)
+        if ((objectClass == null || (objectClass.get() == null)) && objectClassName == null)
         {
             throw new InitialisationException(
                 MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
         }
 
-        if (objectClass == null && objectClassName != null)
+        if ((objectClass == null || (objectClass.get() == null)) && objectClassName != null)
         {
             try
             {
-                objectClass = ClassUtils.getClass(objectClassName);
+                objectClass = new SoftReference<Class>(ClassUtils.getClass(objectClassName));
             }
             catch (ClassNotFoundException e)
             {
@@ -91,7 +92,8 @@ public abstract class AbstractObjectFactory implements ObjectFactory
 
     public void dispose()
     {
-        this.objectClass = null;
+        this.objectClass.clear();
+        this.objectClass.enqueue();
         this.objectClassName = null;
     }
 
@@ -100,13 +102,13 @@ public abstract class AbstractObjectFactory implements ObjectFactory
      */
     public Object getInstance() throws Exception
     {
-        if (objectClass == null)
+        if (objectClass == null || objectClass.get() == null)
         {
             throw new InitialisationException(
                 MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
         }
 
-        Object object = ClassUtils.instanciateClass(objectClass);
+        Object object = ClassUtils.instanciateClass(objectClass.get());
 
         if (properties != null)
         {
@@ -130,12 +132,12 @@ public abstract class AbstractObjectFactory implements ObjectFactory
 
     public Class getObjectClass()
     {
-        return objectClass;
+        return objectClass.get();
     }
 
     public void setObjectClass(Class objectClass)
     {
-        this.objectClass = objectClass;
+        this.objectClass = new SoftReference<Class>(objectClass);
     }
 
     protected String getObjectClassName()
