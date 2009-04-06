@@ -91,7 +91,9 @@ public class MuleUniversalDestination extends AbstractDestination
         public void prepare(Message message) throws IOException {
             // set an outputstream which will be used for things like attachment headers.
             // we'll stream the body later on down the line via the OutputHandler in CxfServiceComponent
-            message.setContent(OutputStream.class, new DelegatingOutputStream(new ByteArrayOutputStream()));
+            DelegatingOutputStream stream = new DelegatingOutputStream(new ByteArrayOutputStream());
+            message.setContent(OutputStream.class, stream);
+            message.setContent(DelegatingOutputStream.class, stream);
         }
 
         @Override

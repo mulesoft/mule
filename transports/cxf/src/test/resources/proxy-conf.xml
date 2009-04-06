@@ -89,7 +89,14 @@
         
         <service name="serverClientProxy">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:63081/services/proxy" proxy="true"/>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/proxy" proxy="true">
+                    <cxf:inInterceptors>
+                        <spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
+                    </cxf:inInterceptors>
+                    <cxf:outInterceptors>
+                        <spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+                    </cxf:outInterceptors>
+                </cxf:inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>

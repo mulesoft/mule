@@ -175,6 +175,7 @@ public class MuleUniversalConduit extends AbstractConduit
         final ByteArrayOutputStream cache = new ByteArrayOutputStream();
         final DelegatingOutputStream delegating = new DelegatingOutputStream(cache);
         message.setContent(OutputStream.class, delegating);
+        message.setContent(DelegatingOutputStream.class, delegating);
         
         AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM)
         {
