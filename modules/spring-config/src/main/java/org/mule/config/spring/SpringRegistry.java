@@ -10,7 +10,6 @@
 
 package org.mule.config.spring;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -26,6 +25,7 @@ import org.mule.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -43,6 +43,8 @@ public class SpringRegistry extends AbstractRegistry
     public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
     
     protected ApplicationContext applicationContext;
+
+    protected AtomicBoolean initialised = new AtomicBoolean(false);
 
     public SpringRegistry()
     {
@@ -87,26 +89,25 @@ public class SpringRegistry extends AbstractRegistry
         {
             ((ConfigurableApplicationContext) applicationContext).refresh();
         }
+        this.initialised.set(true);
     }
 
     protected void doDispose()
     {
-        // check we aren't trying to close an already closed context
-        if (applicationContext instanceof MuleApplicationContext)
+        // check we aren't trying to close a context which has never been started,
+        // spring's appContext.isActive() isn't working for this case
+        if (!this.initialised.get())
         {
-            MuleContext muleContext = ((MuleApplicationContext) applicationContext).getMuleContext();
-            if (!muleContext.isStarted())
-            {
-                // nothing to do
-                return;
-            }
+            return;
         }
-        
+
         if (applicationContext instanceof ConfigurableApplicationContext
             && ((ConfigurableApplicationContext) applicationContext).isActive())
         {
             ((ConfigurableApplicationContext) applicationContext).close();
         }
+
+        this.initialised.set(false);
     }
     
     protected LifecycleManager createLifecycleManager()
