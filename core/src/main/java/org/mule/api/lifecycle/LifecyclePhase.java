@@ -28,7 +28,7 @@ public interface LifecyclePhase
     
     String ALL_PHASES = "all";
 
-    void applyLifecycle(Registry registry, String currentPhase) throws MuleException;
+    void applyLifecycle(Registry registry) throws MuleException;
 
     void addOrderedLifecycleObject(LifecycleObject lco);
 

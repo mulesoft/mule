@@ -66,7 +66,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase
     }
 
     // TODO currentPhase is never used in the method, drop it?
-    public void applyLifecycle(Registry registry, String currentPhase) throws MuleException
+    public void applyLifecycle(Registry registry) throws MuleException
     {
         if (logger.isDebugEnabled())
         {

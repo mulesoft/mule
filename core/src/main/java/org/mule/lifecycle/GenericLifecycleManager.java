@@ -81,7 +81,7 @@ public class GenericLifecycleManager implements LifecycleManager
         try
         {
             setExecutingPhase(phase);
-            li.applyLifecycle(muleContext.getRegistry(), currentPhase);
+            li.applyLifecycle(muleContext.getRegistry());
             setCurrentPhase(li);
         }
         finally
@@ -93,7 +93,7 @@ public class GenericLifecycleManager implements LifecycleManager
     public LifecyclePhase applyPhase(Registry registry, String phase) throws MuleException
     {
         LifecyclePhase li = lookupPhase(phase);
-        li.applyLifecycle(registry, currentPhase);
+        li.applyLifecycle(registry);
         return li;
     }
 

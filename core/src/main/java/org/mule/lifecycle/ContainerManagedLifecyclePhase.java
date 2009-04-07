@@ -24,7 +24,7 @@ public class ContainerManagedLifecyclePhase extends DefaultLifecyclePhase
     }
 
     @java.lang.Override
-    public void applyLifecycle(Registry registry, String currentPhase) throws MuleException
+    public void applyLifecycle(Registry registry) throws MuleException
     {
         //The container manages this lifecycle
         return;
