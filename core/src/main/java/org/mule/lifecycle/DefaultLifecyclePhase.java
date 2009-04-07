@@ -80,13 +80,9 @@ public class DefaultLifecyclePhase implements LifecyclePhase
         {
             LifecycleObject lo = (LifecycleObject) iterator.next();
             
-            // TODO dol: the following is incorrect as we explicitly order the elements from the registry
-            // list so that ordering is preserved on retry
-            //List targets = new LinkedList(MuleServer.getMuleContext().getRegistry().lookupObjects(lo.getType()));
-            // TODO Colleciton -> List
+            // TODO Collecton -> List API refactoring
             Collection<?> targetsObj = registry.lookupObjects(lo.getType());
             List targets = new LinkedList(targetsObj);
-            //List targets = new LinkedList(CollectionUtils.select(registry, new InstanceofPredicate(lo.getType())));
             if (targets.size() == 0)
             {
                 continue;
