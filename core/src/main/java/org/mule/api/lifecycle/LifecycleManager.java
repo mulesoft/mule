@@ -11,8 +11,8 @@ package org.mule.api.lifecycle;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.registry.Registry;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -36,7 +36,7 @@ public interface LifecycleManager
     /**
      * Applies lifecycle phase to a collection of objects.
      */
-    LifecyclePhase applyPhase(Collection objects, String phase) throws MuleException;
+    LifecyclePhase applyPhase(Registry registry, String phase) throws MuleException;
     
     String getCurrentPhase();
 

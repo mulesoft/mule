@@ -9,11 +9,10 @@
  */
 package org.mule.api.lifecycle;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.registry.Registry;
 import org.mule.lifecycle.LifecycleObject;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -29,7 +28,7 @@ public interface LifecyclePhase
     
     String ALL_PHASES = "all";
 
-    void applyLifecycle(Collection objects, String currentPhase) throws MuleException;
+    void applyLifecycle(Registry registry, String currentPhase) throws MuleException;
 
     void addOrderedLifecycleObject(LifecycleObject lco);
 

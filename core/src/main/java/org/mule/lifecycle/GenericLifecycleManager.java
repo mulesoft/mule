@@ -13,10 +13,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.registry.Registry;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.util.StringMessageUtils;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -81,7 +81,7 @@ public class GenericLifecycleManager implements LifecycleManager
         try
         {
             setExecutingPhase(phase);
-            li.applyLifecycle(muleContext.getRegistry().lookupObjects(Object.class), currentPhase);
+            li.applyLifecycle(muleContext.getRegistry(), currentPhase);
             setCurrentPhase(li);
         }
         finally
@@ -90,10 +90,10 @@ public class GenericLifecycleManager implements LifecycleManager
         }
     }
 
-    public LifecyclePhase applyPhase(Collection objects, String phase) throws MuleException
+    public LifecyclePhase applyPhase(Registry registry, String phase) throws MuleException
     {
         LifecyclePhase li = lookupPhase(phase);
-        li.applyLifecycle(objects, currentPhase);
+        li.applyLifecycle(registry, currentPhase);
         return li;
     }
 

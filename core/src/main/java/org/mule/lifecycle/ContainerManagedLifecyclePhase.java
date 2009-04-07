@@ -10,8 +10,7 @@
 package org.mule.lifecycle;
 
 import org.mule.api.MuleException;
-
-import java.util.Collection;
+import org.mule.api.registry.Registry;
 
 /**
  * A container-managed lifecycle phase is called by the container itself. This class acts as a marker to enable
@@ -25,7 +24,7 @@ public class ContainerManagedLifecyclePhase extends DefaultLifecyclePhase
     }
 
     @java.lang.Override
-    public void applyLifecycle(Collection objects, String currentPhase) throws MuleException
+    public void applyLifecycle(Registry registry, String currentPhase) throws MuleException
     {
         //The container manages this lifecycle
         return;

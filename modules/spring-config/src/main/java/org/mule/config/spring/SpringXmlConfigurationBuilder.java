@@ -103,7 +103,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // If the MuleContext is started, start all objects in the new Registry.
         if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME))
         {
-            lifecycleManager.applyPhase(registry.lookupObjects(Object.class), Startable.PHASE_NAME);
+            lifecycleManager.applyPhase(registry, Startable.PHASE_NAME);
         }
     }
     
