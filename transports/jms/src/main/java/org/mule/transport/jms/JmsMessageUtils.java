@@ -100,8 +100,8 @@ public class JmsMessageUtils
             {
                 logger.warn(MessageFormat.format(
                         "Header: {0} is not compliant with JMS specification (sec. 3.5.1, 3.8.1.1). It will cause " +
-                        "problems in your and other applications. Please update your application code to correct this. " +
-                        "Mule renamed it to {1}", name, sb.toString()));
+                                "problems in your and other applications. Please update your application code to correct this. " +
+                                "Mule renamed it to {1}", name, sb.toString()));
             }
 
             return sb.toString();
@@ -118,7 +118,7 @@ public class JmsMessageUtils
         {
             return session.createTextMessage((String) object);
         }
-        else if (object instanceof Map)
+        else if (object instanceof Map && validateMapMessageType((Map)object))
         {
             MapMessage mMsg = session.createMapMessage();
             Map src = (Map) object;
@@ -160,8 +160,17 @@ public class JmsMessageUtils
             for (Iterator iter = list.iterator(); iter.hasNext();)
             {
                 Object o = iter.next();
-                validateStreamMessageType(o);
-                sMsg.writeObject(o);
+                if (validateStreamMessageType(o))
+                {
+                    sMsg.writeObject(o);
+                }
+                else
+                {
+                    throw new MessageFormatException(String.format("Invalid type passed to StreamMessage: %s . Allowed types are: " +
+                            "Boolean, Byte, Short, Character, Integer, Long, Float, Double," +
+                            "String and byte[]",
+                            ClassUtils.getShortClassName(o, "null")));
+                }
             }
             return sMsg;
         }
@@ -190,7 +199,7 @@ public class JmsMessageUtils
                 j.initCause(e);
                 throw j;
             }
-            
+
             BytesMessage bMsg = session.createBytesMessage();
             bMsg.writeBytes((byte[]) output.toByteArray());
             return bMsg;
@@ -436,28 +445,49 @@ public class JmsMessageUtils
      * JMS 1.1 spec, Section 7.3 Standard Exceptions, page 89, 1st paragraph.
      * <p/>
      * Unfortunately, some JMS vendors are not compliant in this area, enforce here for consistent behavior.
-     * 
+     *
      * @param candidate object to validate
      */
-    protected static void validateStreamMessageType(Object candidate) throws MessageFormatException
+    protected static boolean validateStreamMessageType(Object candidate)
     {
         if (candidate instanceof Boolean ||
-            candidate instanceof Byte ||
-            candidate instanceof Short ||
-            candidate instanceof Character ||
-            candidate instanceof Integer ||
-            candidate instanceof Long ||
-            candidate instanceof Float ||
-            candidate instanceof Double ||
-            candidate instanceof String ||
-            candidate instanceof byte[])
+                candidate instanceof Byte ||
+                candidate instanceof Short ||
+                candidate instanceof Character ||
+                candidate instanceof Integer ||
+                candidate instanceof Long ||
+                candidate instanceof Float ||
+                candidate instanceof Double ||
+                candidate instanceof String ||
+                candidate instanceof byte[])
         {
-            return;
+            return true;
         }
 
-        throw new MessageFormatException(String.format("Invalid type passed to StreamMessage: %s . Allowed types are: " +
-                                                       "Boolean, Byte, Short, Character, Integer, Long, Float, Double," +
-                                                       "String and byte[]",
-                                                       ClassUtils.getShortClassName(candidate, "null")));
+        return false;
+    }
+
+    /**
+     * {@link MapMessage#writeObject(Object)} accepts only primitives (and wrappers), String and byte[].
+     * An attempt to write anything else must fail with a MessageFormatException as per
+     * JMS 1.1 spec, Section 7.3 Standard Exceptions, page 89, 1st paragraph.
+     * <p/>
+     * Unfortunately, some JMS vendors are not compliant in this area, enforce here for consistent behavior.
+     * Here we handle non-primitive maps as {@link javax.jms.ObjectMessage} rather than creating a {@link javax.jms.MapMessage}
+     *
+     * @param candidate Map to validate
+     */
+    protected static boolean validateMapMessageType(Map candidate)
+    {
+        for (Iterator iterator = candidate.values().iterator(); iterator.hasNext();)
+        {
+            Object o = iterator.next();
+            if(!validateStreamMessageType(o) || !(o instanceof Serializable))
+            {
+                return false;
+            }
+
+        }
+        return true;
     }
 }

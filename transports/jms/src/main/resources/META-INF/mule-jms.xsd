@@ -333,7 +333,7 @@
     <xsd:element name="object-to-jmsmessage-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                The object-to-jmsmessage-transformer element configures a transformer that converts an object into one of five types of JMS messages, depending on the object passed in: java.lang.String -> javax.jms.TextMessage, byte[] -> javax.jms.BytesMessage, java.util.Map -> javax.jms.MapMessage, java.io.InputStream -> javax.jms.StreamMessage, and java.lang.Object -> javax.jms.ObjectMessage.
+                The object-to-jmsmessage-transformer element configures a transformer that converts an object into one of five types of JMS messages, depending on the object passed in: java.lang.String -> javax.jms.TextMessage, byte[] -> javax.jms.BytesMessage, java.util.Map (primitive types) -> javax.jms.MapMessage, java.io.InputStream (or java.util.List of primitive types) -> javax.jms.StreamMessage, and java.lang.Serializable including java.util.Map, java.util.List, and java.util.Set objects that contain serializable objects (including primitives) -> javax.jms.ObjectMessage.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

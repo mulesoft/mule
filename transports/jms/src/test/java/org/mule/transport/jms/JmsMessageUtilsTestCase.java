@@ -11,6 +11,8 @@
 package org.mule.transport.jms;
 
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.testmodels.fruit.BananaFactory;
 
 import com.mockobjects.constraint.IsInstanceOf;
 import com.mockobjects.dynamic.Mock;
@@ -18,6 +20,9 @@ import com.mockobjects.dynamic.Mock;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.io.NotSerializableException;
 
 import javax.jms.BytesMessage;
 import javax.jms.ConnectionFactory;
@@ -25,6 +30,10 @@ import javax.jms.MessageFormatException;
 import javax.jms.Session;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
+import javax.jms.Message;
+import javax.jms.MapMessage;
+import javax.jms.ObjectMessage;
+import javax.jms.JMSException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
@@ -143,6 +152,73 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
 
             assertTrue(Arrays.equals(new byte[] {9, 10}, (byte[]) result.readObject()));
 
+
+        }
+        finally
+        {
+            if (session != null)
+            {
+                session.close();
+            }
+        }
+    }
+
+    public void testMapMessageSerialization() throws Exception
+    {
+        Session session = null;
+        try
+        {
+            // get a live session
+            ConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
+            session = cf.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+            // create a test Map with data
+            Map data = new HashMap();
+            data.put("value1", new Float(4));
+            data.put("value2", new byte[]{1,2,3});
+            data.put("value3", "value3");
+            data.put("value4", new Double(67.9));
+            data.put("value5", true);
+
+            Message message = JmsMessageUtils.toMessage(data, session);
+            assertTrue(message instanceof MapMessage);
+
+            MapMessage mapMessage = (MapMessage)message;
+            assertEquals(new Float(4), mapMessage.getFloat("value1"));
+            assertTrue(Arrays.equals(new byte[]{1,2,3}, mapMessage.getBytes("value2")));
+            assertEquals("value3", mapMessage.getString("value3"));
+            assertEquals(new Double(67.9), mapMessage.getDouble("value4"));
+            assertTrue(mapMessage.getBoolean("value5"));
+
+            //Lets add a non-primitive object to the map, we should now get and Object message
+            data.put("orange", new Orange());
+
+            message = JmsMessageUtils.toMessage(data, session);
+            assertTrue(message instanceof ObjectMessage);
+
+            ObjectMessage objectMessage = (ObjectMessage)message;
+            Map values = (Map)objectMessage.getObject();
+
+            assertEquals(new Float(4), values.get("value1"));
+            assertTrue(Arrays.equals(new byte[]{1,2,3}, (byte[])values.get("value2")));
+            assertEquals("value3", values.get("value3"));
+            assertEquals(new Double(67.9), values.get("value4"));
+            assertTrue((Boolean)values.get("value5"));
+            assertEquals(new Orange(), values.get("orange"));
+
+            //Finally lets add an non-serializable object
+            data.put("notserializable", new BananaFactory());
+
+            try
+            {
+                message = JmsMessageUtils.toMessage(data, session);
+                fail("attempt to send a non-serializable object in a map should fail");
+            }
+            catch (Exception e)
+            {
+                //exprected
+                assertTrue(e.getCause() instanceof NotSerializableException);
+            }
 
         }
         finally

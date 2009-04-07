@@ -11,6 +11,7 @@
 package org.mule.transport.jms.integration;
 
 import org.mule.RequestContext;
+import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.transport.jms.transformers.JMSMessageToObject;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
@@ -24,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.HashMap;
 
 import javax.jms.BytesMessage;
 import javax.jms.MapMessage;
@@ -31,6 +33,7 @@ import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
+import javax.jms.Message;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Test;
@@ -113,10 +116,10 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
     {
         RequestContext.setEvent(getTestEvent("test"));
 
-        Properties p = new Properties();
-        p.setProperty("Key1", "Value1");
-        p.setProperty("Key2", "Value2");
-        p.setProperty("Key3", "Value3");
+        Map p = new HashMap();
+        p.put("Key1", "Value1");
+        p.put("Key2", new byte[]{1,2,3});
+        p.put("Key3", new Double(99.999));
 
         AbstractJmsTransformer trans = new SessionEnabledObjectToJMSMessage(session);
         trans.setReturnClass(MapMessage.class);
@@ -128,6 +131,42 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         trans2.setReturnClass(Map.class);
         Object result = trans2.transform(mMsg);
         assertTrue("Transformed object should be a Map", result instanceof Map);
+
+        Map m = (Map)result;
+        assertEquals("Value1", m.get("Key1"));
+        assertTrue(Arrays.equals(new byte[]{1,2,3}, (byte[])m.get("Key2")));
+        assertEquals(new Double(99.999), m.get("Key3"));
+
+    }
+
+    @Test
+    public void testTransformMapToObjectMessage() throws Exception
+    {
+        RequestContext.setEvent(getTestEvent("test"));
+
+        Map p = new HashMap();
+        p.put("Key1", "Value1");
+        p.put("Key2", new byte[]{1,2,3});
+        p.put("Key3", new Double(99.999));
+        p.put("Key4", new Orange());
+
+        AbstractJmsTransformer trans = new SessionEnabledObjectToJMSMessage(session);
+        trans.setReturnClass(ObjectMessage.class);
+        Object result2 = trans.transform(p);
+        assertTrue("Transformed object should be a ObjectMessage", result2 instanceof ObjectMessage);
+
+        ObjectMessage oMsg = (ObjectMessage) result2;
+        AbstractJmsTransformer trans2 = new JMSMessageToObject();
+        trans2.setReturnClass(Map.class);
+        Object result = trans2.transform(oMsg);
+        assertTrue("Transformed object should be a Map", result instanceof Map);
+
+        Map m = (Map)result;
+        assertEquals("Value1", m.get("Key1"));
+        assertTrue(Arrays.equals(new byte[]{1,2,3}, (byte[])m.get("Key2")));
+        assertEquals(new Double(99.999), m.get("Key3"));
+        assertEquals(new Orange(), m.get("Key4"));
+
     }
 
     @Test
