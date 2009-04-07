@@ -235,7 +235,7 @@ public class EventCorrelator
         {
             try
             {
-                logger.trace("Receive Async Reply Message for groug: " + groupId + "\n"
+                logger.trace("Received Async Reply Message for group: " + groupId + "\n"
                         + StringMessageUtils.truncate(StringMessageUtils.toString(event.getMessage().getPayload()), 200, false));
                 logger.trace("Receive Async Reply Message detail: \n" + StringMessageUtils.headersToString(event.getMessage()));
             }
