@@ -191,8 +191,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             int i = 0;
             for (Iterator iterator = classes.iterator(); iterator.hasNext(); i++)
             {
-                String cls = (String) iterator.next();
-                configs.add(new Object[] { ClassUtils.instanciateClass(cls, ClassUtils.NO_ARGS) });
+                String cls = ((String) iterator.next()).trim();
+                // ignore lines commented out with "#"
+                if (!cls.startsWith("#"))
+                {
+                    configs.add(new Object[] { ClassUtils.instanciateClass(cls, ClassUtils.NO_ARGS) });
+                }
             }
             return configs;
         }
