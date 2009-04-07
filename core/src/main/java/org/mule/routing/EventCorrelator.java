@@ -22,6 +22,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.util.MapUtils;
+import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.Latch;
 
 import java.text.MessageFormat;
@@ -230,6 +231,19 @@ public class EventCorrelator
         // the correlationId of the event's message
         final Object groupId = messageInfoMapping.getCorrelationId(event.getMessage());
 
+        if (logger.isTraceEnabled())
+        {
+            try
+            {
+                logger.trace("Receive Async Reply Message for groug: " + groupId + "\n"
+                        + StringMessageUtils.truncate(StringMessageUtils.toString(event.getMessage().getPayload()), 200, false));
+                logger.trace("Receive Async Reply Message detail: \n" + StringMessageUtils.headersToString(event.getMessage()));
+            }
+            catch (Exception e)
+            {
+                // ignore
+            }
+        }
         if (groupId == null || groupId.equals("-1"))
         {
             throw new RoutingException(CoreMessages.noCorrelationId(), event.getMessage(), event
@@ -413,6 +427,20 @@ public class EventCorrelator
      */
     public MuleMessage getResponse(MuleMessage message, int timeout) throws RoutingException
     {
+        if (logger.isTraceEnabled())
+        {
+            try
+            {
+                logger.trace("Waiting for response(s) for Message: \n"
+                        + StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false));
+                logger.trace("Response Message detail: \n" + StringMessageUtils.headersToString(message));
+            }
+            catch (Exception e)
+            {
+                // ignore
+            }
+        }
+
         Object responseId = messageInfoMapping.getMessageId(message);
 
         if (logger.isDebugEnabled())

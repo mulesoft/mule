@@ -226,7 +226,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
             {
                 logger.trace("Message Payload: \n"
                         + StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false));
-                logger.trace("Message detail: \n" + message);
+                logger.trace("Message detail: \n" + StringMessageUtils.headersToString(message));
             }
             catch (Exception e)
             {
