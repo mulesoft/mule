@@ -42,7 +42,6 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * as a parent registry using the SpringRegistry registry implementation to wraps
      * the spring ApplicationContext
      * 
-     * @param registry
      * @param configResources
      * @see org.mule.config.spring.SpringRegistry
      */
@@ -118,4 +117,8 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         return bf;
     }
 
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
 }

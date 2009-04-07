@@ -10,6 +10,7 @@
 
 package org.mule.config.spring;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -90,6 +91,17 @@ public class SpringRegistry extends AbstractRegistry
 
     protected void doDispose()
     {
+        // check we aren't trying to close an already closed context
+        if (applicationContext instanceof MuleApplicationContext)
+        {
+            MuleContext muleContext = ((MuleApplicationContext) applicationContext).getMuleContext();
+            if (!muleContext.isStarted())
+            {
+                // nothing to do
+                return;
+            }
+        }
+        
         if (applicationContext instanceof ConfigurableApplicationContext
             && ((ConfigurableApplicationContext) applicationContext).isActive())
         {
