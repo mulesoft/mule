@@ -1,1 +1,1 @@
-http\://www.mulesource.org/schema/mule/scripting/2.2=org.mule.module.scripting.config.ScriptingNamespaceHandler
+http\://www.mulesource.org/schema/mule/scripting=org.mule.module.scripting.config.ScriptingNamespaceHandler

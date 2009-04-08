@@ -1,1 +1,1 @@
-http\://www.mulesource.org/schema/mule/udp/2.2=org.mule.transport.udp.config.UdpNamespaceHandler
+http\://www.mulesource.org/schema/mule/udp=org.mule.transport.udp.config.UdpNamespaceHandler
