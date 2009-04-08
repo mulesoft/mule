@@ -15,17 +15,17 @@
 
   Example schema and their locations:
     transports/file/src/main/resources/META-INF/mule-file.xsd
-     -> http://www.mulesource.org/schema/mule/file/2.2/mule-file.xsd
+     -> http://www.mulesource.org/schema/mule/file/3.0/mule-file.xsd
     modules/acegi/src/main/resources/META-INF/mule-acegi.xsd
-     -> http://www.mulesource.org/schema/mule/acegi/2.2/mule-acegi.xsd
+     -> http://www.mulesource.org/schema/mule/acegi/3.0/mule-acegi.xsd
     core/src/main/resources/META-INF/mule.xsd
-     -> http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+     -> http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
 
   $Id$
 */
 
 // Schema version
-def version = 2.2
+def version = 3.0
 
 // Provide the location where https://dav.codehaus.org/dist/mule is mounted on your file system
 // as a parameter to the script.

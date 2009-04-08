@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
-      xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
-      xmlns:smtps="http://www.mulesource.org/schema/mule/smtps/2.2"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm"
+      xmlns:cxf="http://www.mulesource.org/schema/mule/cxf"
+      xmlns:smtps="http://www.mulesource.org/schema/mule/smtps"
       xmlns:cxf-core="http://cxf.apache.org/core"
-      xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
-      xmlns:jetty="http://www.mulesource.org/schema/mule/jetty/2.2"
+      xmlns:http="http://www.mulesource.org/schema/mule/http"
+      xmlns:jetty="http://www.mulesource.org/schema/mule/jetty"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-               http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-               http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
-               http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
-               http://www.mulesource.org/schema/mule/smtps/2.2 http://www.mulesource.org/schema/mule/smtps/2.2/mule-smtps.xsd
-               http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
-               http://www.mulesource.org/schema/mule/jetty/2.2 http://www.mulesource.org/schema/mule/jetty/2.2/mule-jetty.xsd
+               http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
+               http://www.mulesource.org/schema/mule/cxf http://www.mulesource.org/schema/mule/cxf/3.0/mule-cxf.xsd
+               http://www.mulesource.org/schema/mule/smtps http://www.mulesource.org/schema/mule/smtps/3.0/mule-smtps.xsd
+               http://www.mulesource.org/schema/mule/http http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd
+               http://www.mulesource.org/schema/mule/jetty http://www.mulesource.org/schema/mule/jetty/3.0/mule-jetty.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
   <!--<cxf:connector name="cxfConnector" configurationLocation="cxf.xml" initializeStaticBusInstance="false" /> -->

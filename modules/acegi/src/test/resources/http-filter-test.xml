@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
-       xmlns:acegi="http://www.mulesource.org/schema/mule/acegi/2.2"
+       xmlns:http="http://www.mulesource.org/schema/mule/http"
+       xmlns:acegi="http://www.mulesource.org/schema/mule/acegi"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-       http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
-       http://www.mulesource.org/schema/mule/acegi/2.2 http://www.mulesource.org/schema/mule/acegi/2.2/mule-acegi.xsd">
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesource.org/schema/mule/http http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd
+       http://www.mulesource.org/schema/mule/acegi http://www.mulesource.org/schema/mule/acegi/3.0/mule-acegi.xsd">
 
     <spring:bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
         <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>

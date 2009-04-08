@@ -36,7 +36,7 @@ public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestC
     // we define these locally so that tests use the latest version rather than grabbing xsi:location
     protected void doSetUp() throws Exception
     {
-        addSchema("http://www.mulesource.org/schema/mule/core/2.2", "META-INF/mule.xsd");
+        addSchema("http://www.mulesource.org/schema/mule/core", "META-INF/mule.xsd");
     }
 
     protected void addSchema(String name, String location)

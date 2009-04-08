@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
-      xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.2"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core"
+      xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts"
       xsi:schemaLocation="
-       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-       http://www.mulesource.org/schema/mule/jbossts/2.2 http://www.mulesource.org/schema/mule/jbossts/2.2/mule-jbossts.xsd">
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jbossts http://www.mulesource.org/schema/mule/jbossts/3.0/mule-jbossts.xsd">
 
     <jbossts:transaction-manager>
         <property key="test" value="TEST"/>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
-      xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core"
+      xmlns:test="http://www.mulesource.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
-       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd">
+       http://www.mulesource.org/schema/mule/test http://www.mulesource.org/schema/mule/test/3.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd">
 
 
      <model>

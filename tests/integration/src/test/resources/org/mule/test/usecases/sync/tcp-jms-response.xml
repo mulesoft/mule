@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.2"
-    xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+<mule xmlns="http://www.mulesource.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:tcp="http://www.mulesource.org/schema/mule/tcp"
+    xmlns:jms="http://www.mulesource.org/schema/mule/jms"
     xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-               http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-               http://www.mulesource.org/schema/mule/tcp/2.2 http://www.mulesource.org/schema/mule/tcp/2.2/mule-tcp.xsd
-               http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd">
+               http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesource.org/schema/mule/tcp http://www.mulesource.org/schema/mule/tcp/3.0/mule-tcp.xsd
+               http://www.mulesource.org/schema/mule/jms http://www.mulesource.org/schema/mule/jms/3.0/mule-jms.xsd">
 
     <tcp:connector name="tcpConnector" keepSendSocketOpen="true">
         <tcp:direct-protocol payloadOnly="true" />

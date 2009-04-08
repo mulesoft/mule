@@ -1,4 +1,4 @@
-http\://www.mulesource.org/schema/mule/core/2.2/mule.xsd=META-INF/mule.xsd
-http\://www.mulesource.org/schema/mule/simple/2.2/mule-simple.xsd=META-INF/mule-simple.xsd
-http\://www.mulesource.org/schema/mule/custom/2.2/mule-custom.xsd=META-INF/mule-custom.xsd
-http\://www.mulesource.org/schema/mule/schemadoc/2.2/mule-schemadoc.xsd=META-INF/mule-schemadoc.xsd
+http\://www.mulesource.org/schema/mule/core/3.0/mule.xsd=META-INF/mule.xsd
+http\://www.mulesource.org/schema/mule/simple/3.0/mule-simple.xsd=META-INF/mule-simple.xsd
+http\://www.mulesource.org/schema/mule/custom/3.0/mule-custom.xsd=META-INF/mule-custom.xsd
+http\://www.mulesource.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd=META-INF/mule-schemadoc.xsd

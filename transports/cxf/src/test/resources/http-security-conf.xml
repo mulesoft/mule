@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
-       xmlns:https="http://www.mulesource.org/schema/mule/https/2.2"
-       xmlns:acegi="http://www.mulesource.org/schema/mule/acegi/2.2"
+       xmlns:cxf="http://www.mulesource.org/schema/mule/cxf"
+       xmlns:https="http://www.mulesource.org/schema/mule/https"
+       xmlns:acegi="http://www.mulesource.org/schema/mule/acegi"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-       http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
-       http://www.mulesource.org/schema/mule/acegi/2.2 http://www.mulesource.org/schema/mule/acegi/2.2/mule-acegi.xsd
-       http://www.mulesource.org/schema/mule/https/2.2 http://www.mulesource.org/schema/mule/https/2.2/mule-https.xsd">
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf http://www.mulesource.org/schema/mule/cxf/3.0/mule-cxf.xsd
+       http://www.mulesource.org/schema/mule/acegi http://www.mulesource.org/schema/mule/acegi/3.0/mule-acegi.xsd
+       http://www.mulesource.org/schema/mule/https http://www.mulesource.org/schema/mule/https/3.0/mule-https.xsd">
 
     <cxf:connector name="cxf" defaultFrontend="simple"/>
    

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/nest-example-extension/2.2"
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/nest-example-extension"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:base="http://www.mulesource.org/schema/mule/nest-example-base/2.2"
-            targetNamespace="http://www.mulesource.org/schema/mule/nest-example-extension/2.2"
+            xmlns:base="http://www.mulesource.org/schema/mule/nest-example-base"
+            targetNamespace="http://www.mulesource.org/schema/mule/nest-example-extension"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/nest-example-base/2.2"
-                schemaLocation="http://www.mulesource.org/schema/mule/nest-example-base/2.2/nest-example-base.xsd"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/nest-example-base"
+                schemaLocation="http://www.mulesource.org/schema/mule/nest-example-base/3.0/nest-example-base.xsd"/>
 
     <xsd:element name="subclass" type="subclassType" substitutionGroup="base:abstract"/>
 

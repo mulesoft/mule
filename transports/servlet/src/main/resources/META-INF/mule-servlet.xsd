@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/servlet/2.2"
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/servlet"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
-            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.2" 
-            xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
-            targetNamespace="http://www.mulesource.org/schema/mule/servlet/2.2"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc"
+            xmlns:http="http://www.mulesource.org/schema/mule/http"
+            targetNamespace="http://www.mulesource.org/schema/mule/servlet"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.2" 
-                schemaLocation="http://www.mulesource.org/schema/mule/core/2.2/mule.xsd" />
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/http/2.2"
-                schemaLocation="http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd"/>
-    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.2"
-                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.2/mule-schemadoc.xsd"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/3.0/mule.xsd" />
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/http"
+                schemaLocation="http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd"/>
+    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd"/>
     
    <xsd:annotation>
         <xsd:documentation>

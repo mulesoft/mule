@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/pop3s/2.2"
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/pop3s"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
-            xmlns:pop3="http://www.mulesource.org/schema/mule/pop3/2.2"
-            xmlns:email="http://www.mulesource.org/schema/mule/email/2.2"
-            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.2"
-            targetNamespace="http://www.mulesource.org/schema/mule/pop3s/2.2"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core"
+            xmlns:pop3="http://www.mulesource.org/schema/mule/pop3"
+            xmlns:email="http://www.mulesource.org/schema/mule/email"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc"
+            targetNamespace="http://www.mulesource.org/schema/mule/pop3s"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.2" 
-                schemaLocation="http://www.mulesource.org/schema/mule/core/2.2/mule.xsd" />
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/pop3/2.2"
-                schemaLocation="http://www.mulesource.org/schema/mule/pop3/2.2/mule-pop3.xsd"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/email/2.2"
-                schemaLocation="http://www.mulesource.org/schema/mule/email/2.2/mule-email.xsd"/>
-    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.2"
-                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.2/mule-schemadoc.xsd"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/3.0/mule.xsd" />
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/pop3"
+                schemaLocation="http://www.mulesource.org/schema/mule/pop3/3.0/mule-pop3.xsd"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/email"
+                schemaLocation="http://www.mulesource.org/schema/mule/email/3.0/mule-email.xsd"/>
+    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd"/>
     
     <xsd:annotation>
         <xsd:documentation>The POP3S transport is similar to the [POP3 Transport] but uses secure connections over SSL/TLS.</xsd:documentation>

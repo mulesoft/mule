@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/core"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:spring="http://www.springframework.org/schema/beans"
             xmlns:spring-context="http://www.springframework.org/schema/context"
-            targetNamespace="http://www.mulesource.org/schema/mule/core/2.2"
+            targetNamespace="http://www.mulesource.org/schema/mule/core"
             attributeFormDefault="unqualified"
             elementFormDefault="qualified">
 

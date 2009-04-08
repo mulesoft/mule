@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/xmpps/2.2"
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/xmpps"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
-            xmlns:xmpp="http://www.mulesource.org/schema/mule/xmpp/2.2"
-            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc/2.2"
-            targetNamespace="http://www.mulesource.org/schema/mule/xmpps/2.2"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core"
+            xmlns:xmpp="http://www.mulesource.org/schema/mule/xmpp"
+            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc"
+            targetNamespace="http://www.mulesource.org/schema/mule/xmpps"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.2" 
-                schemaLocation="http://www.mulesource.org/schema/mule/core/2.2/mule.xsd" />
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/xmpp/2.2"
-                schemaLocation="http://www.mulesource.org/schema/mule/xmpp/2.2/mule-xmpp.xsd" />
-    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc/2.2"
-                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/2.2/mule-schemadoc.xsd"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/3.0/mule.xsd" />
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/xmpp"
+                schemaLocation="http://www.mulesource.org/schema/mule/xmpp/3.0/mule-xmpp.xsd" />
+    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc"
+                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd"/>
 
     <xsd:element name="connector" type="xmppsConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>

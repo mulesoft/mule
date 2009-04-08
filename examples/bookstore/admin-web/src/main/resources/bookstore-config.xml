@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
-      xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
-      xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.2"
-      xmlns:email="http://www.mulesource.org/schema/mule/email/2.2"
-      xmlns:servlet="http://www.mulesource.org/schema/mule/servlet/2.2"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm"
+      xmlns:cxf="http://www.mulesource.org/schema/mule/cxf"
+      xmlns:smtp="http://www.mulesource.org/schema/mule/smtp"
+      xmlns:email="http://www.mulesource.org/schema/mule/email"
+      xmlns:servlet="http://www.mulesource.org/schema/mule/servlet"
       xsi:schemaLocation="
-               http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-               http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
-               http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
-               http://www.mulesource.org/schema/mule/smtp/2.2 http://www.mulesource.org/schema/mule/smtp/2.2/mule-smtp.xsd
-               http://www.mulesource.org/schema/mule/email/2.2 http://www.mulesource.org/schema/mule/email/2.2/mule-email.xsd
-               http://www.mulesource.org/schema/mule/servlet/2.2 http://www.mulesource.org/schema/mule/servlet/2.2/mule-servlet.xsd">
+               http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
+               http://www.mulesource.org/schema/mule/cxf http://www.mulesource.org/schema/mule/cxf/3.0/mule-cxf.xsd
+               http://www.mulesource.org/schema/mule/smtp http://www.mulesource.org/schema/mule/smtp/3.0/mule-smtp.xsd
+               http://www.mulesource.org/schema/mule/email http://www.mulesource.org/schema/mule/email/3.0/mule-email.xsd
+               http://www.mulesource.org/schema/mule/servlet http://www.mulesource.org/schema/mule/servlet/3.0/mule-servlet.xsd">
     
     <!-- Configure some properties to work with GMail's SMTP -->
     <smtp:gmail-connector name="emailConnector" />

@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:file="http://www.mulesource.org/schema/mule/file/2.2"
-       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
-       xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.2"
-       xmlns:email="http://www.mulesource.org/schema/mule/email/2.2"
-       xmlns:xm="http://www.mulesource.org/schema/mule/xml/2.2"
+       xmlns:file="http://www.mulesource.org/schema/mule/file"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms"
+       xmlns:smtp="http://www.mulesource.org/schema/mule/smtp"
+       xmlns:email="http://www.mulesource.org/schema/mule/email"
+       xmlns:xm="http://www.mulesource.org/schema/mule/xml"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-       http://www.mulesource.org/schema/mule/file/2.2 http://www.mulesource.org/schema/mule/file/2.2/mule-file.xsd
-       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
-       http://www.mulesource.org/schema/mule/smtp/2.2 http://www.mulesource.org/schema/mule/smtp/2.2/mule-smtp.xsd
-       http://www.mulesource.org/schema/mule/email/2.2 http://www.mulesource.org/schema/mule/email/2.2/mule-email.xsd
-       http://www.mulesource.org/schema/mule/xml/2.2 http://www.mulesource.org/schema/mule/xml/2.2/mule-xml.xsd">
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesource.org/schema/mule/file http://www.mulesource.org/schema/mule/file/3.0/mule-file.xsd
+       http://www.mulesource.org/schema/mule/jms http://www.mulesource.org/schema/mule/jms/3.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/smtp http://www.mulesource.org/schema/mule/smtp/3.0/mule-smtp.xsd
+       http://www.mulesource.org/schema/mule/email http://www.mulesource.org/schema/mule/email/3.0/mule-email.xsd
+       http://www.mulesource.org/schema/mule/xml http://www.mulesource.org/schema/mule/xml/3.0/mule-xml.xsd">
 
     <description>
         This example demonstrates how to publish events to multiple outbound endpoints. 

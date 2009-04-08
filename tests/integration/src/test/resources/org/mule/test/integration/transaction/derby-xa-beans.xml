@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
-       xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.2"
-       xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.2"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms"
+       xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc"
+       xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
-       http://www.mulesource.org/schema/mule/jdbc/2.2 http://www.mulesource.org/schema/mule/jdbc/2.2/mule-jdbc.xsd
-       http://www.mulesource.org/schema/mule/jbossts/2.2 http://www.mulesource.org/schema/mule/jbossts/2.2/mule-jbossts.xsd">
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms http://www.mulesource.org/schema/mule/jms/3.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/jdbc http://www.mulesource.org/schema/mule/jdbc/3.0/mule-jdbc.xsd
+       http://www.mulesource.org/schema/mule/jbossts http://www.mulesource.org/schema/mule/jbossts/3.0/mule-jbossts.xsd">
 
     <!-- Beans for the JBoss transaction manager -->
     <spring:bean name="ArjunaFactory" class="org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory"/>

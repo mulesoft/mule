@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.2"
+       xmlns:tcp="http://www.mulesource.org/schema/mule/tcp"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/tcp/2.2 http://www.mulesource.org/schema/mule/tcp/2.2/mule-tcp.xsd
-       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd">
+       http://www.mulesource.org/schema/mule/tcp http://www.mulesource.org/schema/mule/tcp/3.0/mule-tcp.xsd
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd">
 
     <global-property name="test.endpoint" value="tcp://localhost:45441"/>
     
