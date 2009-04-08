@@ -1,2 +1,2 @@
-http\://www.mulesource.org/schema/mule/xml=org.mule.module.xml.config.XmlNamespaceHandler
+http\://www.mulesource.org/schema/mule/xml/2.2=org.mule.module.xml.config.XmlNamespaceHandler
 

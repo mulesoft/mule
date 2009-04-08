@@ -1,3 +1,3 @@
-http\://www.mulesource.org/schema/mule/core=org.mule.config.spring.handlers.MuleNamespaceHandler
-http\://www.mulesource.org/schema/mule/simple=org.mule.config.spring.handlers.SimpleNamespaceHandler
-http\://www.mulesource.org/schema/mule/custom=org.mule.config.spring.handlers.CustomNamespaceHandler
+http\://www.mulesource.org/schema/mule/core/2.2=org.mule.config.spring.handlers.MuleNamespaceHandler
+http\://www.mulesource.org/schema/mule/simple/2.2=org.mule.config.spring.handlers.SimpleNamespaceHandler
+http\://www.mulesource.org/schema/mule/custom/2.2=org.mule.config.spring.handlers.CustomNamespaceHandler

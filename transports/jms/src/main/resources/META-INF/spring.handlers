@@ -1,2 +1,2 @@
-http\://www.mulesource.org/schema/mule/jms=org.mule.transport.jms.config.JmsNamespaceHandler
+http\://www.mulesource.org/schema/mule/jms/2.2=org.mule.transport.jms.config.JmsNamespaceHandler
 
