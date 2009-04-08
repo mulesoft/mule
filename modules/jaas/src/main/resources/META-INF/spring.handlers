@@ -1,1 +1,1 @@
-http\://www.mulesource.org/schema/mule/jaas/2.2=org.mule.module.jaas.config.JaasNamespaceHandler
+http\://www.mulesource.org/schema/mule/jaas=org.mule.module.jaas.config.JaasNamespaceHandler
