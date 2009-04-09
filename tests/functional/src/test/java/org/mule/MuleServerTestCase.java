@@ -28,7 +28,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         MuleServer muleServer = new MuleServer();
         assertEquals(ClassUtils.getResource("mule-config.xml", MuleServer.class).toString(),
             muleServer.getConfigurationResources());
-        assertEquals("org.mule.config.builders.AutoConfigurationBuilder", MuleServer.getConfigBuilderClassName());
+        assertEquals(MuleServer.CLASSNAME_DEV_MODE_CONFIG_BUILDER, MuleServer.getConfigBuilderClassName());
         muleServer.initialize();
     }
 
@@ -36,7 +36,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
     {
         MuleServer muleServer = new MuleServer("org/mule/test/spring/config1/test-xml-mule2-config.xml");
         assertEquals("org/mule/test/spring/config1/test-xml-mule2-config.xml", muleServer.getConfigurationResources());
-        assertEquals("org.mule.config.builders.AutoConfigurationBuilder", MuleServer.getConfigBuilderClassName());
+        assertEquals(MuleServer.CLASSNAME_DEV_MODE_CONFIG_BUILDER, MuleServer.getConfigBuilderClassName());
         muleServer.initialize();
     }
 
@@ -45,7 +45,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         MuleServer muleServer = new MuleServer(new String[]{"-config",
             "org/mule/test/spring/config1/test-xml-mule2-config.xml"});
         assertEquals("org/mule/test/spring/config1/test-xml-mule2-config.xml", muleServer.getConfigurationResources());
-        assertEquals("org.mule.config.builders.AutoConfigurationBuilder", MuleServer.getConfigBuilderClassName());
+        assertEquals(MuleServer.CLASSNAME_DEV_MODE_CONFIG_BUILDER, MuleServer.getConfigBuilderClassName());
         muleServer.initialize();
     }
 
@@ -55,7 +55,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
             "mule-config.xml,org/mule/test/spring/config1/test-xml-mule2-config.xml"});
         assertEquals("mule-config.xml,org/mule/test/spring/config1/test-xml-mule2-config.xml",
             muleServer.getConfigurationResources());
-        assertEquals("org.mule.config.builders.AutoConfigurationBuilder", MuleServer.getConfigBuilderClassName());
+        assertEquals(MuleServer.CLASSNAME_DEV_MODE_CONFIG_BUILDER, MuleServer.getConfigBuilderClassName());
         muleServer.initialize();
     }
 

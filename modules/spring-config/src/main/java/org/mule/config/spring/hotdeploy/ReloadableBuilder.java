@@ -37,11 +37,14 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
     protected static final ClassLoader rootClassloader = Thread.currentThread().getContextClassLoader();
 
+    protected static final URL[] CLASSPATH_EMPTY = new URL[0];
+    
     protected final transient Log logger = LogFactory.getLog(getClass());
+
     // TODO multiple resource monitoring
     protected File monitoredResource;
 
-    private static final int RELOAD_INTERVAL_MS = 3000;
+    protected static final int RELOAD_INTERVAL_MS = 3000;
 
     public ReloadableBuilder(ConfigResource[] configResources)
     {
@@ -192,24 +195,29 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
             logger.info("Library directory: " + libDir);
         }
 
-        Collection jars = FileUtils.listFiles(libDir, new String[] {"jar"}, false);
+        URL[] urls = CLASSPATH_EMPTY;
 
-        File[] jarFiles = (File[]) jars.toArray(new File[jars.size()]);
-
-        URL[] urls = FileUtils.toURLs(jarFiles);
-
-        if (logger.isInfoEnabled())
+        if (libDir.exists() && libDir.canRead())
         {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Updating the following jars:").append(SystemUtils.LINE_SEPARATOR);
-            sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
-            for (URL url : urls)
-            {
-                sb.append(url).append(SystemUtils.LINE_SEPARATOR);
-            }
-            sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
+            Collection jars = FileUtils.listFiles(libDir, new String[] {"jar"}, false);
 
-            logger.info(sb.toString());
+            File[] jarFiles = (File[]) jars.toArray(new File[jars.size()]);
+
+            urls = FileUtils.toURLs(jarFiles);
+
+            if (urls.length > 0 && logger.isInfoEnabled())
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Updating the following jars:").append(SystemUtils.LINE_SEPARATOR);
+                sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
+                for (URL url : urls)
+                {
+                    sb.append(url).append(SystemUtils.LINE_SEPARATOR);
+                }
+                sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
+
+                logger.info(sb.toString());
+            }
         }
 
         // grab all jars in there
