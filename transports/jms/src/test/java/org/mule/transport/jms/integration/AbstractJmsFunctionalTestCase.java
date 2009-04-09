@@ -179,11 +179,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             return CollectionUtils.EMPTY_COLLECTION;
         }
 
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Parameterized test using: " + url);
-        }
-
         try
         {
             List configs = new ArrayList();
@@ -244,6 +239,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     {
         super();
         setJmsConfig(config);
+        System.out.print("\n===== Parameterized test using: " + config.getProviderName() + " =====");
     }
 
     /**
