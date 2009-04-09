@@ -50,6 +50,7 @@ public class MuleServer implements Runnable
         {"main", "true", "Main Class"},
         {"mode", "true", "Run Mode"},
         {"props", "true", "Startup Properties"},
+        {"production", "false", "Production Mode"},
         {"debug", "false", "Configure Mule for JPDA remote debugging."}
     };
 
@@ -70,6 +71,11 @@ public class MuleServer implements Runnable
      * for Mule 2.x
      */
     protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
+
+    /**
+     * Default dev-mode builder with hot-deployment.
+     */
+    protected static final String CLASSNAME_DEV_MODE_CONFIG_BUILDER = "org.mule.config.spring.hotdeploy.ReloadableBuilder";
 
     /**
      * logger used by this class
@@ -182,6 +188,24 @@ public class MuleServer implements Runnable
         {
             setConfigurationResources(config);
         }
+
+        // TODO old builders need to be retrofitted to understand the new app/lib
+        final String productionMode = (String) options.get("production");
+        if (productionMode == null)
+        {
+            try
+            {
+                setConfigBuilderClassName(CLASSNAME_DEV_MODE_CONFIG_BUILDER);
+            }
+            catch (Exception e)
+            {
+                logger.fatal(e);
+                final Message message = CoreMessages.failedToLoad("Builder: " + CLASSNAME_DEV_MODE_CONFIG_BUILDER);
+                System.err.println(StringMessageUtils.getBoilerPlate("FATAL: " + message.toString()));
+                System.exit(1);
+            }
+        }
+
 
         // Configuration builder
         String cfgBuilderClassName = (String) options.get("builder");
