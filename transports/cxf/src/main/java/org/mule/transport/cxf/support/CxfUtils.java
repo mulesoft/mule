@@ -13,8 +13,12 @@ package org.mule.transport.cxf.support;
 import org.mule.api.endpoint.EndpointNotFoundException;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.ChainInitiationObserver;
 import org.apache.cxf.transport.Destination;
@@ -23,6 +27,21 @@ import org.apache.cxf.transport.MessageObserver;
 
 public final class CxfUtils
 {
+
+    @SuppressWarnings("unchecked")
+    public static void removeInterceptor(List<Interceptor> inInterceptors, String name) {
+
+        for (Interceptor<?> i : inInterceptors) {
+            if (i instanceof PhaseInterceptor) {
+                PhaseInterceptor<Message> p = (PhaseInterceptor<Message>)i;
+
+                if (p.getId().equals(name)) {
+                    inInterceptors.remove(p);
+                    return;
+                }
+            }
+        }
+    }
 
     public static Endpoint getEndpoint(DestinationFactory df, String uri)
         throws IOException, EndpointNotFoundException

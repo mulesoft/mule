@@ -26,11 +26,14 @@ import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.cxf.i18n.CxfMessages;
 import org.mule.transport.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.transport.cxf.support.CopyAttachmentOutInterceptor;
+import org.mule.transport.cxf.support.CxfUtils;
 import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.transport.cxf.support.OutputPayloadInterceptor;
 import org.mule.transport.cxf.support.ProxyService;
 import org.mule.transport.cxf.support.ProxyServiceFactoryBean;
+import org.mule.transport.cxf.support.ResetStaxInterceptor;
+import org.mule.transport.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
@@ -44,6 +47,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBinding;
@@ -71,6 +75,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     private boolean applyTransformersToProtocol;
     private boolean applyFiltersToProtocol;
     private boolean enableHeaders;
+    private String payload;
     
     public CxfMessageReceiver(Connector connector, Service service, InboundEndpoint Endpoint)
         throws CreateException
@@ -96,6 +101,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             List<DataBinding> databinding = (List<DataBinding>) endpointProps.get(CxfConstants.DATA_BINDING);
             List<AbstractFeature> features = (List<AbstractFeature>) endpointProps.get(CxfConstants.FEATURES);
             String proxyStr = (String) endpointProps.get(CxfConstants.PROXY);
+            payload = (String) endpointProps.get(CxfConstants.PAYLOAD);
             
             applyFiltersToProtocol = isTrue((String) endpointProps.get(CxfConstants.APPLY_FILTERS_TO_PROTOCOL), true);
             applySecurityToProtocol = isTrue((String) endpointProps.get(CxfConstants.APPLY_SECURITY_TO_PROTOCOL), true);
@@ -224,6 +230,12 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                 sfb.getOutInterceptors().add(new OutputPayloadInterceptor());
                 sfb.getInInterceptors().add(new CopyAttachmentInInterceptor());
                 sfb.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
+                
+                if (isProxyEnvelope()) 
+                {
+                    sfb.getInInterceptors().add(new ReversibleStaxInInterceptor());
+                    sfb.getInInterceptors().add(new ResetStaxInterceptor());
+                }
             }
             
             sfb.setServiceClass(svcCls);
@@ -271,6 +283,11 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             }
 
             server = sfb.create();
+            
+            if (proxy && isProxyEnvelope()) 
+            {
+                CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), SoapOutInterceptor.class.getName());
+            }
         }
         catch (MuleException e)
         {
@@ -424,5 +441,10 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     public boolean isApplyFiltersToProtocol()
     {
         return applyFiltersToProtocol;
+    }
+
+    public boolean isProxyEnvelope()
+    {
+        return CxfConstants.PAYLOAD_ENVELOPE.equals(payload);
     }
 }

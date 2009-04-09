@@ -61,7 +61,7 @@
                 <cxf:inbound-endpoint address="http://localhost:63081/services/greeter"/>
             </inbound>
             <component>
-                <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
+                <prototype-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
             </component>
         </service>
         
@@ -102,6 +102,22 @@
                 <pass-through-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
+                        synchronous="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="serverClientProxyEnvelope">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/envelope-proxy" proxy="true" payload="envelope">
+
+                </cxf:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
+                        proxy="true"
+                        payload="envelope"
                         synchronous="true"/>
                 </pass-through-router>
             </outbound>

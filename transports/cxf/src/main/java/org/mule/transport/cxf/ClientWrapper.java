@@ -19,11 +19,14 @@ import org.mule.api.transport.DispatchException;
 import org.mule.transport.cxf.i18n.CxfMessages;
 import org.mule.transport.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.transport.cxf.support.CopyAttachmentOutInterceptor;
+import org.mule.transport.cxf.support.CxfUtils;
 import org.mule.transport.cxf.support.MuleHeadersInInterceptor;
 import org.mule.transport.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.transport.cxf.support.OutputPayloadInterceptor;
 import org.mule.transport.cxf.support.ProxyService;
+import org.mule.transport.cxf.support.ResetStaxInterceptor;
+import org.mule.transport.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.transport.cxf.support.StreamClosingInterceptor;
 import org.mule.transport.cxf.transport.MuleUniversalConduit;
 import org.mule.transport.soap.i18n.SoapMessages;
@@ -43,6 +46,7 @@ import javax.xml.ws.WebServiceClient;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.databinding.stax.StaxDataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
@@ -57,7 +61,6 @@ import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -82,6 +85,7 @@ public class ClientWrapper
     protected Method defaultMethod;
 
     protected boolean proxy;
+    protected boolean proxyEnvelope;
     private boolean applyTransformersToProtocol;
     private boolean enableHeaders;
     
@@ -242,25 +246,17 @@ public class ClientWrapper
         
         this.client = ClientProxy.getClient(cpf.create());
         
-        Binding binding = this.client.getEndpoint().getBinding();
-        
-        removeInterceptor(binding.getOutInterceptors(), WrappedOutInterceptor.class.getName());
-        
+
         proxy = true;
-    }
+        proxyEnvelope = CxfConstants.PAYLOAD_ENVELOPE.equals(endpoint.getProperty(CxfConstants.PAYLOAD));
 
-    @SuppressWarnings("unchecked")
-    private void removeInterceptor(List<Interceptor> inInterceptors, String name) {
-
-        for (Interceptor<?> i : inInterceptors) {
-            if (i instanceof PhaseInterceptor) {
-                PhaseInterceptor<Message> p = (PhaseInterceptor<Message>)i;
-
-                if (p.getId().equals(name)) {
-                    inInterceptors.remove(p);
-                    return;
-                }
-            }
+        Binding binding = this.client.getEndpoint().getBinding();
+        CxfUtils.removeInterceptor(binding.getOutInterceptors(), WrappedOutInterceptor.class.getName());
+        if (proxyEnvelope) 
+        {
+            CxfUtils.removeInterceptor(binding.getOutInterceptors(), SoapOutInterceptor.class.getName());
+            client.getInInterceptors().add(new ReversibleStaxInInterceptor());
+            client.getInInterceptors().add(new ResetStaxInterceptor());
         }
     }
 
@@ -503,6 +499,11 @@ public class ClientWrapper
     public boolean isProxy()
     {
         return proxy;
+    }
+
+    public boolean isProxyEnvelope()
+    {
+        return proxyEnvelope;
     }
 
     public boolean isApplyTransformersToProtocol()

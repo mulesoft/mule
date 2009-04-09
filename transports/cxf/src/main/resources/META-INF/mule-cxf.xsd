@@ -111,6 +111,19 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="payload">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Whether the whole SOAP Envelope, or just the body contents should be sent when in proxy mode.  
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+               <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="envelope"/>
+                    <xsd:enumeration value="body"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
         <xsd:attribute name="mtomEnabled" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
