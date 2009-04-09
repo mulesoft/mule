@@ -55,6 +55,11 @@ public class MuleServer implements Runnable
     };
 
     /**
+     * Default dev-mode builder with hot-deployment.
+     */
+    public static final String CLASSNAME_DEV_MODE_CONFIG_BUILDER = "org.mule.config.spring.hotdeploy.ReloadableBuilder";
+    
+    /**
      * Don't use a class object so the core doesn't depend on mule-module-spring-config.
      */
     protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.builders.AutoConfigurationBuilder";
@@ -71,11 +76,6 @@ public class MuleServer implements Runnable
      * for Mule 2.x
      */
     protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
-
-    /**
-     * Default dev-mode builder with hot-deployment.
-     */
-    protected static final String CLASSNAME_DEV_MODE_CONFIG_BUILDER = "org.mule.config.spring.hotdeploy.ReloadableBuilder";
 
     /**
      * logger used by this class
