@@ -10,28 +10,96 @@
    <name>Mule ${ModuleName} ${ModuleType}</name>
    <version>${version}</version>
    <description>${description}</description>
+   <url>http://www.muleforge.org/projects/${shortId}</url>
 
-    <properties>
-        <mule.version>${MuleVersion}</mule.version>
-        <!-- Tools properties -->
-        <eclipsePluginVersion>2.5</eclipsePluginVersion>
-        <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
-        <jdk5Name>jdk5</jdk5Name>
-        <jdk.version>1.5</jdk.version>
-    </properties>
+      <properties>
+           <mule.version>${MuleVersion}</mule.version>
+           #if($license.id)
+           <licenseId>${license.id}</licenseId>
+           <licenseUrl>${license.url}</licenseUrl>
+           #end
+           <!-- Tools properties -->
+           <eclipsePluginVersion>2.5</eclipsePluginVersion>
+           <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
+           <jdk5Name>jdk5</jdk5Name>
+           <jdk.version>1.5</jdk.version>
+       </properties>
+
+       #if($license.id)
+       <licenses>
+           <license>
+               <name>${licenseId}</name>
+               <url>${licenseUrl}</url>
+               <distribution>repo</distribution>
+           </license>
+       </licenses>
+       #end
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav</artifactId>
+                <version>1.0-beta-2</version>
+            </extension>
+        </extensions>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <encoding>ISO-8859-1</encoding>
+                </configuration>
+            </plugin>
+
+    #if($forgeProject == "y")
+            <!-- Responsible for creating the release distribution for this project -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <finalName>${artifactId}-\${version}</finalName>
+                    <finalName>${artifactId}-${version}</finalName>
                     <descriptors>
                         <descriptor>assembly.xml</descriptor>
                     </descriptors>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.0-beta-7</version>
+                <configuration>
+                    <!-- We only do this at release time. However, before doing a
+                        release of your project and deploying it you nedd to run 'mvn assembly:assembly' and check that
+                        the distribution is created correctly -->
+                    <preparationGoals>assembly:assembly</preparationGoals>
+                </configuration>
+            </plugin>
+
+            <!-- Used for deploying zip and tar.gz  distributions to MuleForge. Called using:
+           mvn muleforge:deploy-distro-->
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-muleforge-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>upload-muleforge-artifacts</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <!-- Attached to the deploy lifecycle this plugin is Used for deploying any config schemas
+                        for this module or transport -->
+                            <goal>deploy-schema</goal>
+                            <!-- Attached to the deploy lifecycle this plugin is Used for deploying the projects
+                            distribution archives (generated from the assembly.xml descriptor) -->
+                            <goal>deploy-distro</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+       #end
         </plugins>
     </build>
 
@@ -278,7 +346,7 @@
         </snapshotRepository>
         <site>
             <id>muleforge.webdav.sites</id>
-            <url>dav:https://dav.muleforge.org/${ModuleNameLower}/</url>
+            <url>dav:https://dav.muleforge.org/${ModuleNameLower}</url>
         </site>
     </distributionManagement>
 
