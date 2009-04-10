@@ -35,5 +35,5 @@ export MULE_LIB
 #     exec "$MULE_BASE/bin/mule" -config hello-config.xml
 # elif [ 2 = $i ]
 # then
-    exec "$MULE_BASE/bin/mule" -config hello-http-config.xml
+     "$MULE_BASE/bin/mule" -config $MULE_BASE/apps/hello/hello-http-config.xml    
 # fi
