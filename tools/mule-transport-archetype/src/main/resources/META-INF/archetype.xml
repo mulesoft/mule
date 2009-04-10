@@ -182,6 +182,11 @@ method on the Dispatcher)
             <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
+            <file>wiki-template.txt.vm</file>
+            <output>wiki-template.txt</output>
+            <dependsOnVar>forgeProject=y</dependsOnVar>
+        </template>
+        <template>
             <file>src/main/resources/META-INF/services/org/mule/transport/csd.vm</file>
             <output>src/main/resources/META-INF/services/org/mule/transport/${ModuleNameLower}.properties</output>
             <dependsOnVar>newProject=y</dependsOnVar>

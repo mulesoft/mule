@@ -73,19 +73,6 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
         }
     }
 
-    // overridden to properly check the byte[] by content and not just by reference
-    public void doTestMessageEqualsPayload(Object message, Object payload) throws Exception
-    {
-        if (message instanceof byte[] && payload instanceof byte[])
-        {
-            assertTrue(Arrays.equals((byte[])message, (byte[])payload));
-        }
-        else
-        {
-            fail("message and payload must both be byte[]");
-        }
-    }
-
     public void testMessageContentsProperlyLoaded() throws Exception
     {
         // get new message adapter to test
@@ -97,31 +84,4 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
         // slight detour for testing :)
         doTestMessageEqualsPayload(validMessage, adapter.getPayload());
     }
-
-    /**
-     * This is not a valid use case since Transport adapters are immutable, hence a new one should be created
-     * for each messages
-     */
-//    public void testMultipleSetMessageCalls() throws Exception
-//    {
-//        // get new message adapter to test
-//        FileContentsMessageAdapter adapter = new FileContentsMessageAdapter(messageFile);
-//
-//        // access first payload
-//        doTestMessageEqualsPayload(validMessage, adapter.getPayload());
-//
-//        // create another source file
-//        String secondMessageContent = "Hooray";
-//        byte[] secondMessage = secondMessageContent.getBytes();
-//        File secondFile = File.createTempFile("simple2", ".mule", messageFile.getParentFile());
-//        FileUtils.writeStringToFile(secondFile, secondMessageContent, null);
-//
-//        // replace the first message content
-        //This shouln't even be visible
-//        adapter.setFileMessage(secondFile);
-//
-//        // make sure the file was properly read
-//        doTestMessageEqualsPayload(secondMessage, adapter.getPayload());
-//    }
-
 }

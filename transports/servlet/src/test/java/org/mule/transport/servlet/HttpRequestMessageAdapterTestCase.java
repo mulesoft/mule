@@ -40,7 +40,7 @@ public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTes
     {
         assertTrue(payload instanceof InputStream);
     }
-    
+
     public MessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new HttpRequestMessageAdapter(payload);

@@ -30,8 +30,7 @@
 
 (options: axis, cxf, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
           jetty, jetty-ssl, jms, jnp, multicast, pop3, pop3s, quartz, rmi, servlet,
-          smtp, smtps, servlet, ssl, tls, stdio, tcp, udp, vm, xmpp):
-
+          smtp, smtps, servlet, ssl, tls, stdio, tcp, udp, vm, xmpp)
                     </description>
                     <defvalue>vm</defvalue>
                 </variable>
@@ -85,6 +84,11 @@ spring-extras, sxc, xml):
             <file>assembly.xml.vm</file>
             <output>assembly.xml</output>
             <dependsOnVar>newProject=y</dependsOnVar>
+        </template>
+        <template>
+            <file>wiki-template.txt.vm</file>
+            <output>wiki-template.txt</output>
+            <dependsOnVar>forgeProject=y</dependsOnVar>
         </template>
 
         <template>

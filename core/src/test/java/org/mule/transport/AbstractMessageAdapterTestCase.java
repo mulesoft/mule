@@ -17,6 +17,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.tck.AbstractMuleTestCase;
 
+import java.util.Arrays;
+
 public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCase
 {
     protected void doSetUp() throws Exception
@@ -29,11 +31,17 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
         RequestContext.clear();
     }
 
-    protected void doTestMessageEqualsPayload(Object message, Object payload) throws Exception
+    protected void doTestMessageEqualsPayload(Object payload1, Object payload2) throws Exception
     {
-        assertEquals(message, payload);
+        if (payload1 instanceof byte[] && payload2 instanceof byte[])
+        {
+            assertTrue(Arrays.equals((byte[]) payload1, (byte[]) payload2));
+        }
+        else
+        {
+            assertEquals(payload1, payload2);
+        }
     }
-
     public void testMessageRetrieval() throws Exception
     {
         Object message = getValidMessage();

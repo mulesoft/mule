@@ -1,0 +1,86 @@
+TODO This is a skeletal wiki page that you can use to start off the documentation for your project.  the content here can be cut n' pasted directly.
+You don't need to use this template if you'd prefer to write in your own style :)
+
+{expand-toc}
+
+h1. Overview
+${description}
+
+h1. Classpath Settings
+The latest Mule ${ModuleName} ${ModuleType} has been tested with Mule [${mule.version}|http://www.mulesource.org/display/MULE/Download].
+
+h2. Mule Standalone
+To set up the Mule classpath to use the ${ModuleName} ${ModuleType}, you must first [download|http://dist.muleforge.org/${ModuleNameLower}/] the Mule ${ModuleName} distribution. Then simply take all the JARs inside the distribution {{lib/}} directory and put them in {{MULE_HOME/lib/user}}.
+
+h2. Maven
+If you are using Maven, you can use the MuleForge repositories and add a dependency to Jersey that way. First add the MuleForge repository to your POM:
+{code:xml}
+<repositories>
+    <repository>
+      <id>muleforge</id>
+      <name>MuleForge Repository</name>
+      <url>http://repository.muleforge.org</url>
+    </repository>
+</repositories>
+{code}
+
+Then add the dependency:
+{code:xml}
+<dependencies>
+  <dependency>
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <version>${version}</version>
+  </dependency>
+</dependencies>
+{code}
+
+h1. Using the ${ModuleName} ${ModuleType}
+
+Once you have included the ${ModuleName} ${ModuleType} in your project or in the Mule distribution you can use it by adding the ${ModuleNameLower} namespace in your Mule XML configuration file -
+
+{code:xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:${ModuleNameLower}="http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}
+http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}/mule.xsd
+       http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}
+http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}/mule-${ModuleNameLower}.xsd">
+
+</mule>
+{code}
+
+Now you can start using ${ModuleName} elements in your configuration.
+
+h1. Configuration Reference
+
+TODO you can add one or more schema elements here so that the documentation in the schema will be embedded in the wiki
+TODO you can also add further information and examples. This xslt example processes a <foo-to-bar-transformer> element.
+
+{cache:showDate=false|showRefresh=false}
+{xslt:style=#http://svn.codehaus.org/mule/branches/mule-2.0.x/tools/schemadocs/src/main/resources/xslt/single-element.xsl|source=#http://repository.muleforge.org/${package}/${artifactId}/${MuleMajorMinorVersion}/mule-${ModuleNameLower}.xsd|elementName=foo-to-bar-transformer}
+{xslt}
+{cache}
+
+h3. Example
+TODO an example configuration and describe what it does
+
+{code:xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:${ModuleNameLower}="http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}
+http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}/mule.xsd
+       http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}
+http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}/mule-${ModuleNameLower}.xsd">
+
+    <!-- Add example config here -->
+    <${ModuleNameLower}:foo-to-bar-transformer name="testTransformer"/>
+
+</mule>
+{code}
