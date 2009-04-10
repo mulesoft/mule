@@ -78,8 +78,12 @@
               todir="${dir.mule.home}/apps/hello/lib"
               overwrite="true"
               verbose="true"/>
+
+       <copy file="${dir.classes}/hello-http-config.xml"
+             todir="${dir.mule.home}/apps/hello"
+             overwrite="true"
+             verbose="true"/>
               
-        <touch file="${dir.mule.home}/apps/hello/hello-http-config.xml"/>
    </target>
 
    <target name="setup">
