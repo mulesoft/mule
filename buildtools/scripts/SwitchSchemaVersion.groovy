@@ -13,6 +13,7 @@ cliBuilder.r(longOpt: "root", args: 1, "start scanning at this root folder")
 cliBuilder.t(longOpt: "to", args: 1, "switch to version (e.g. 2.1)")
 
 options = cliBuilder.parse(args)
+
 if (!options)
 {
     println ""
@@ -48,8 +49,8 @@ if (options.t)
 // this regex matches both, the CE (.org) and EE (.com) schema in the source version
 // There is one matching group around the whole schema so the matching schema name can be
 // accessed from the code below
-schemaRegex = /.*(http:\/\/www.mulesource.[org|com]{3}?\/schema\/mule\/.*\/$sourceSchemaVersion).*/
-
+schemaRegex = /(http:\/\/www.mulesource.[org|com]{3}?\/schema\/mule\/[\w]+\/$sourceSchemaVersion)/
+xsdRegex = /(http:\/\/www.mulesource.[org|com]{3}?\/schema\/mule\/[\w]+\/$sourceSchemaVersion\/.*xsd)/
 //
 // switch the version in all XSD and XML files
 //
@@ -73,7 +74,8 @@ def noChange = {
 scanner.each 
 {
     //println "switching schema version on $it"
-    switchSchemaVersion(it, noChange, noChange)
+    switchSchemaVersion(it, noChange, noChange, xsdRegex)
+    switchSchemaVersion(it, noChange, noChange, schemaRegex)
 }
 
 //
@@ -100,10 +102,11 @@ def postProcess = {
 scanner.each
 {
     //println "switching schema version on $it"
-    switchSchemaVersion(it, preProcess, postProcess)
+    switchSchemaVersion(it, preProcess, postProcess, xsdRegex)
+    switchSchemaVersion(it, preProcess, postProcess, schemaRegex)
 }
 
-def switchSchemaVersion(File inFile, def preProcessFunction, def postProcessFunction)
+def switchSchemaVersion(File inFile, def preProcessFunction, def postProcessFunction, def matcher)
 {    
     def filename = inFile.name + ".version-switched"
     def outFile = new File(inFile.parentFile, filename)
@@ -119,17 +122,27 @@ def switchSchemaVersion(File inFile, def preProcessFunction, def postProcessFunc
     
             line = preProcessFunction(line)
             
-            def match = (line =~ schemaRegex)
+            def match = (line =~ matcher)
             while (match.find())
             {
                 schemaReplaced = true
                 
-                def srcSchema = match[0][1]
-                def destSchema = srcSchema.replace(sourceSchemaVersion, destSchemaVersion)
-                
+                def srcSchema = null
+                srcSchema = match[0][1]
+                def destSchema = null
+                if(match =~ "xsd")
+                {
+                    destSchema = srcSchema.replace(sourceSchemaVersion, destSchemaVersion)
+                }
+                else
+                {
+                    destSchema = srcSchema.replace(sourceSchemaVersion, "")
+                    //strip last '/'
+                    destSchema = destSchema.substring(0,destSchema.length()-1)
+                }
                 line = line.replace(srcSchema, destSchema)
                 
-                match = (line =~ schemaRegex)
+                match = (line =~ matcher)
             }
             
             def convertedLine = postProcessFunction(line)
@@ -142,6 +155,7 @@ def switchSchemaVersion(File inFile, def preProcessFunction, def postProcessFunc
         def backupFile = new File(inFile.parentFile, inFile.name + ".bak")
         move(inFile, backupFile)
         move(outFile, inFile)
+        delete(backupFile)
     }
     else
     {
