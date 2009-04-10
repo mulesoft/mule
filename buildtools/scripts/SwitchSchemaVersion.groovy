@@ -7,10 +7,10 @@
 import org.codehaus.groovy.ant.FileScanner
 
 def cliBuilder = new CliBuilder()
-cliBuilder.f(longOpt: "from", args: 1, "switch from version (e.g. 2.0)")
+cliBuilder.f(longOpt: "from", args: 1, "switch from version (e.g. 2.2)")
 cliBuilder.h(longOpt: "help", "show usage info")
 cliBuilder.r(longOpt: "root", args: 1, "start scanning at this root folder")
-cliBuilder.t(longOpt: "to", args: 1, "switch to version (e.g. 2.1)")
+cliBuilder.t(longOpt: "to", args: 1, "switch to version (e.g. 3.0)")
 
 options = cliBuilder.parse(args)
 
@@ -34,13 +34,13 @@ if (options.r)
     root = options.r
 }    
 
-sourceSchemaVersion = "2.0"
+sourceSchemaVersion = "2.2"
 if (options.f)
 {
     sourceSchemaVersion = options.f
 }
 
-destSchemaVersion = "2.2"
+destSchemaVersion = "3.0"
 if (options.t)
 {
     destSchemaVersion = options.t
@@ -49,8 +49,8 @@ if (options.t)
 // this regex matches both, the CE (.org) and EE (.com) schema in the source version
 // There is one matching group around the whole schema so the matching schema name can be
 // accessed from the code below
-schemaRegex = /(http:\/\/www.mulesource.[org|com]{3}?\/schema\/mule\/[\w]+\/$sourceSchemaVersion)/
-xsdRegex = /(http:\/\/www.mulesource.[org|com]{3}?\/schema\/mule\/[\w]+\/$sourceSchemaVersion\/.*xsd)/
+schemaRegex = /(http:\/\/www.mulesource.[org|com]{3}?\/schema\/mule[\/\w+\/]+$sourceSchemaVersion)/
+xsdRegex = /(http:\/\/www.mulesource.[org|com]{3}?\/schema\/mule[\/\w+\/]+$sourceSchemaVersion\/.*xsd)/
 //
 // switch the version in all XSD and XML files
 //
@@ -73,7 +73,7 @@ def noChange = {
 
 scanner.each 
 {
-    //println "switching schema version on $it"
+    println "switching schema version on $it"
     switchSchemaVersion(it, noChange, noChange, xsdRegex)
     switchSchemaVersion(it, noChange, noChange, schemaRegex)
 }
@@ -101,7 +101,7 @@ def postProcess = {
 
 scanner.each
 {
-    //println "switching schema version on $it"
+    println "switching schema version on $it"
     switchSchemaVersion(it, preProcess, postProcess, xsdRegex)
     switchSchemaVersion(it, preProcess, postProcess, schemaRegex)
 }
