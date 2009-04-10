@@ -478,7 +478,8 @@
       <includes>
         <include>org.mule.examples:mule-example-echo</include>
         <include>org.mule.examples:mule-example-errorhandler</include>
-        <include>org.mule.examples:mule-example-hello</include>
+        <!-- TODO examples structure and location will be changed. They must not be in lib/user anymore -->
+        <!--<include>org.mule.examples:mule-example-hello</include>-->
         <include>org.mule.examples:mule-example-loanbroker-common</include>
         <include>org.mule.examples:mule-example-loanbroker-esn</include>
         <include>org.mule.examples:mule-example-loanbroker-esb</include>
