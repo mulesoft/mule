@@ -22,17 +22,18 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-echo "The Hello example is available in two variations:"
-echo "  1. Hello from the Command Line"
-echo "  2. Hello using the HTTP transport"
-echo "     (surf to http://localhost:8888/?name=Dolly)"
-echo "Select the one you wish to execute and press Enter..."
-read i
+# TODO stdio may have lifecycle issues currently, disable it
+# echo "The Hello example is available in two variations:"
+# echo "  1. Hello from the Command Line"
+# echo "  2. Hello using the HTTP transport"
+# echo "     (surf to http://localhost:8888/?name=Dolly)"
+# echo "Select the one you wish to execute and press Enter..."
+# read i
 
-if [ 1 = $i ]
-then
-    exec "$MULE_BASE/bin/mule" -config hello-config.xml
-elif [ 2 = $i ]
-then
+# if [ 1 = $i ]
+# then
+#     exec "$MULE_BASE/bin/mule" -config hello-config.xml
+# elif [ 2 = $i ]
+# then
     exec "$MULE_BASE/bin/mule" -config hello-http-config.xml
-fi
+# fi

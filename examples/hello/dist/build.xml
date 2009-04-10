@@ -75,9 +75,11 @@
            description="Deploy the application to the Mule server">
 
         <copy file="${dir.build}/${app.name}.jar"
-              todir="${dir.user.lib}"
+              todir="${dir.mule.home}/apps/hello/lib"
               overwrite="true"
               verbose="true"/>
+              
+        <touch file="${dir.mule.home}/apps/hello/hello-http-config.xml"/>
    </target>
 
    <target name="setup">

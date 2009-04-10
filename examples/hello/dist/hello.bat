@@ -10,11 +10,14 @@ REM This extends the classpath to include the configuration directory
 REM Any changes to the files in .\conf will take precedence over those deployed to %MULE_HOME%\lib\user
 SET MULE_LIB=.\conf
 
-ECHO The Hello example is available in two variations:
-ECHO   1. Hello from the Command Line
-ECHO   2. Hello using the HTTP transport
-ECHO      (surf to http://localhost:8888/?name=Dolly)
-SET /P Choice=Select the one you wish to execute and press Enter...
+REM TODO stdio may have lifecycle issues currently, disable it 
+REM ECHO The Hello example is available in two variations:
+REM ECHO   1. Hello from the Command Line
+REM ECHO   2. Hello using the HTTP transport
+REM ECHO      (surf to http://localhost:8888/?name=Dolly)
+REM SET /P Choice=Select the one you wish to execute and press Enter...
 
-IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -config hello-config.xml
-IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -config hello-http-config.xml
+REM IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -config hello-config.xml
+REM IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -config hello-http-config.xml
+
+call "%MULE_BASE%\bin\mule.bat" -config %MULE_BASE%\apps\hello\hello-http-config.xml
