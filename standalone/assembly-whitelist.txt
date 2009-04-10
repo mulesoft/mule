@@ -78,7 +78,6 @@ mule-core
 mule-core-tests
 mule-example-echo
 mule-example-errorhandler
-mule-example-hello
 mule-example-loanbroker-bpm
 mule-example-loanbroker-common
 mule-example-loanbroker-credit-agency
