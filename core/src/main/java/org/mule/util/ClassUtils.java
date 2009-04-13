@@ -23,6 +23,7 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
+import java.security.CodeSource;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -865,4 +866,13 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             methodAddUrl.invoke(sysCl, new Object[]{url});
         }
     }    
+
+    // this is a shorter version of the snippet from:
+    // http://www.davidflanagan.com/blog/2005_06.html#000060
+    // (see comments; DF's "manual" version works fine too)
+    public static URL getClassPathRoot(Class clazz)
+    {
+        CodeSource cs = clazz.getProtectionDomain().getCodeSource();
+        return (cs != null ? cs.getLocation() : null);
+    }
 }

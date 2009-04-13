@@ -29,6 +29,7 @@ import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
@@ -41,7 +42,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,9 +52,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -656,15 +658,6 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         // @GuardedBy(this)
         private Set registeredTestMethod = new HashSet();
 
-        // this is a shorter version of the snippet from:
-        // http://www.davidflanagan.com/blog/2005_06.html#000060
-        // (see comments; DF's "manual" version works fine too)
-        public static URL getClassPathRoot(Class clazz)
-        {
-            CodeSource cs = clazz.getProtectionDomain().getCodeSource();
-            return (cs != null ? cs.getLocation() : null);
-        }
-
         public TestInfo(TestCase test)
         {
             this.name = test.getClass().getName();
@@ -675,7 +668,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
                 // We find the physical classpath root URL of the test class and
                 // use that to find the correct resource. Works fine everywhere,
                 // regardless of classloaders. See MULE-2414
-                URL[] urls = new URL[]{getClassPathRoot(test.getClass())};
+                URL[] urls = new URL[]{ClassUtils.getClassPathRoot(test.getClass())};
                 URL fileUrl = new URLClassLoader(urls).getResource("mule-test-exclusions.txt");
 
                 if (fileUrl != null)

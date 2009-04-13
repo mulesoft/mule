@@ -10,6 +10,7 @@
 
 package org.mule.tck;
 
+import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 
@@ -18,7 +19,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -59,18 +59,6 @@ public class MuleParameterized extends Parameterized
     }
 
     /**
-     * FIXME: Copied from <code>AbstractMuletestCase</code>
-     * 
-     * @param clazz
-     * @return
-     */
-    public static URL getClassPathRoot(Class<? extends MuleParameterized> clazz)
-    {
-        CodeSource cs = clazz.getProtectionDomain().getCodeSource();
-        return (cs != null ? cs.getLocation() : null);
-    }
-
-    /**
      * Read the test exclusions file and find the tests to be excluded from running.
      */
     public void getExcluded()
@@ -80,7 +68,7 @@ public class MuleParameterized extends Parameterized
             // We find the physical classpath root URL of the test class and
             // use that to find the correct resource. Works fine everywhere,
             // regardless of classloaders. See MULE-2414
-            URL[] urls = new URL[]{MuleParameterized.getClassPathRoot(this.getClass())};
+            URL[] urls = new URL[]{ClassUtils.getClassPathRoot(getTestClass().getJavaClass())};
             URL fileUrl = new URLClassLoader(urls).getResource("mule-test-exclusions.txt");
 
             if (fileUrl != null)
