@@ -181,4 +181,6 @@ public interface JmsVendorConfiguration
      * usually consisting of some mocked-up methods.
      */
     public ConnectionFactory getTestConnectionFactory();
+
+    public void initialise(Class callingClass) throws Exception;
 }

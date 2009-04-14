@@ -27,6 +27,11 @@ public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
 {
     public static final String DEFAULT_BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
 
+    public void initialise(Class callingClass) throws Exception
+    {
+        // empty
+    }
+    
     public Connection getConnection(boolean topic, boolean xa) throws Exception
     {
         if (xa)

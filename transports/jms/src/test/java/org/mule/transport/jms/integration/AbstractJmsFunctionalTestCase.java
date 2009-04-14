@@ -238,6 +238,14 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     public AbstractJmsFunctionalTestCase(JmsVendorConfiguration config)
     {
         super();
+        try
+        {
+            config.initialise(getClass());
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
         setJmsConfig(config);
         System.out.print("\n===== Parameterized test using: " + config.getProviderName() + " =====");
     }
