@@ -10,11 +10,11 @@
 
 package org.mule.util;
 
-import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.config.MuleManifest;
+import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 
 import java.net.InetAddress;
@@ -73,13 +73,8 @@ public class ServerStartupSplashScreen extends SplashScreen
         }
 
         // Dev/Production mode
-        // TODO better put this info into registry/context?
-        final String builder = MuleServer.getConfigBuilderClassName();
-        // TODO compare classes to account for subclassing
-        final String mode = MuleServer.CLASSNAME_DEV_MODE_CONFIG_BUILDER.equals(builder)
-                            ? "Development"
-                            : "Production";
-        header.add("Mode: " + mode);
+        final boolean productionMode = StartupContext.get().getStartupOptions().containsKey("production");
+        header.add("Mode: " + (productionMode ? "Production" : "Development"));
 
         header.add(" ");
     }

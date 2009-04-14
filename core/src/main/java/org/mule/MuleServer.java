@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.ExceptionHelper;
+import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.context.DefaultMuleContextFactory;
@@ -191,8 +192,8 @@ public class MuleServer implements Runnable
 
         // TODO old builders need to be retrofitted to understand the new app/lib
         final String productionMode = (String) options.get("production");
-        if (productionMode == null)
-        {
+        //if (productionMode == null)
+        //{
             try
             {
                 setConfigBuilderClassName(CLASSNAME_DEV_MODE_CONFIG_BUILDER);
@@ -204,7 +205,7 @@ public class MuleServer implements Runnable
                 System.err.println(StringMessageUtils.getBoilerPlate("FATAL: " + message.toString()));
                 System.exit(1);
             }
-        }
+        //}
 
 
         // Configuration builder
@@ -243,6 +244,8 @@ public class MuleServer implements Runnable
         {
             setStartupPropertiesFile(propertiesFile);
         }
+
+        StartupContext.get().setStartupOptions(options);
     }
 
     /**

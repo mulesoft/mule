@@ -13,6 +13,7 @@ package org.mule.config.spring.hotdeploy;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.ConfigResource;
+import org.mule.config.StartupContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.util.FileUtils;
@@ -66,6 +67,8 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
     @Override
     public void configure(final MuleContext muleContext) throws ConfigurationException
     {
+        final boolean redeploymentEnabled = !StartupContext.get().getStartupOptions().containsKey("production");
+
         try
         {
             // TODO dup
@@ -83,6 +86,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
             // end dup
 
 
+            // need getUrl().getFile(), otherwise lastModified timestamp always returns 0
             this.monitoredResource = new File(allResources[1].getUrl().getFile());
 
             URLClassLoader cl = createNewClassloader(rootClassloader);
@@ -90,7 +94,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
 
 
-            if (logger.isInfoEnabled())
+            if (redeploymentEnabled && logger.isInfoEnabled())
             {
                 logger.info("Monitoring for hot-reload: " + monitoredResource);
             }
@@ -143,14 +147,17 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
                 }
             };
-            // need getUrl().getFile(), otherwise lastModified timestamp always returns 0
-            Timer timer = new Timer();
-            final int reloadIntervalMs = RELOAD_INTERVAL_MS;
-            timer.schedule(watcher, new Date(), reloadIntervalMs);
 
-            if (logger.isInfoEnabled())
+            if (redeploymentEnabled)
             {
-                logger.info("Reload interval: " + reloadIntervalMs);
+                Timer timer = new Timer();
+                final int reloadIntervalMs = RELOAD_INTERVAL_MS;
+                timer.schedule(watcher, new Date(), reloadIntervalMs);
+
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Reload interval: " + reloadIntervalMs);
+                }
             }
 
             super.configure(muleContext);
