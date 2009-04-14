@@ -205,7 +205,6 @@ public class StaxSource extends StAXSource
             try
             {
                 handler.bridge();
-                reader.close();
             }
             catch (XMLStreamException e)
             {
@@ -220,7 +219,17 @@ public class StaxSource extends StAXSource
                 // this is a fatal error. Even if the error handler
                 // returns, we will abort anyway.
                 throw se;
-
+            }
+            finally
+            {
+                try
+                {
+                    reader.close();
+                }
+                catch (XMLStreamException e)
+                {
+                    throw new SAXException(e);
+                }
             }
         }
     }
