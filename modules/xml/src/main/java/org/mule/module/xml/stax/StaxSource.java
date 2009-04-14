@@ -205,6 +205,7 @@ public class StaxSource extends StAXSource
             try
             {
                 handler.bridge();
+                reader.close();
             }
             catch (XMLStreamException e)
             {
