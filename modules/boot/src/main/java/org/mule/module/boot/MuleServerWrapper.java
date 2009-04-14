@@ -12,9 +12,6 @@ package org.mule.module.boot;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.List;
 
 import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;
@@ -54,16 +51,7 @@ public class MuleServerWrapper implements WrapperListener
     {
         try
         {
-            // TODO encapsulate this into MuleSystemClassLoader
-            DefaultMuleClassPathConfig classPath = new DefaultMuleClassPathConfig(MuleBootstrap.lookupMuleHome(),
-                                                                                  MuleBootstrap.lookupMuleBase());
-
-            final List urlsList = classPath.getURLs();
-
-            ClassLoader parent = MuleBootstrapUtils.class.getClassLoader();
-            URLClassLoader muleSystemCl = new URLClassLoader((URL[]) urlsList.toArray(new URL[urlsList.size()]),
-                                                             parent);
-            // end snippet 
+            ClassLoader muleSystemCl = new MuleSystemClassLoader();
 
             Thread.currentThread().setContextClassLoader(muleSystemCl);
 
@@ -77,7 +65,7 @@ public class MuleServerWrapper implements WrapperListener
         catch (Exception e)
         {
             e.printStackTrace();
-            return new Integer(1);
+            return 1;
         }
     }
 
@@ -137,4 +125,5 @@ public class MuleServerWrapper implements WrapperListener
             }
         }
     }
+
 }
