@@ -16,14 +16,11 @@ import org.mule.config.ConfigResource;
 import org.mule.config.StartupContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.util.FileUtils;
-import org.mule.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Timer;
 
@@ -39,7 +36,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
     protected static final ClassLoader rootClassloader = Thread.currentThread().getContextClassLoader();
 
     protected static final URL[] CLASSPATH_EMPTY = new URL[0];
-    
+
     protected final transient Log logger = LogFactory.getLog(getClass());
 
     // TODO multiple resource monitoring
@@ -89,7 +86,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
             // need getUrl().getFile(), otherwise lastModified timestamp always returns 0
             this.monitoredResource = new File(allResources[1].getUrl().getFile());
 
-            URLClassLoader cl = createNewClassloader(rootClassloader);
+            URLClassLoader cl = new MuleApplicationClassLoader(this.monitoredResource, rootClassloader);
             Thread.currentThread().setContextClassLoader(cl);
 
 
@@ -126,7 +123,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
                     {
                         muleContext.dispose();
                         Thread.currentThread().setContextClassLoader(null);
-                        URLClassLoader newCl = createNewClassloader(rootClassloader);
+                        URLClassLoader newCl = new MuleApplicationClassLoader(monitoredResource, rootClassloader);
                         Thread.currentThread().setContextClassLoader(newCl);
 
                         //muleContext.initialise();
@@ -189,48 +186,6 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
         createSpringRegistry(muleContext, createApplicationContext(muleContext, allResources));
 
-    }
-
-    protected URLClassLoader createNewClassloader(ClassLoader parentCl) throws IOException
-    {
-        // get lib dir on the same level as monitored resource and...
-        File parentFile = this.monitoredResource.getParentFile();
-        File libDir = new File(parentFile, "lib");
-
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Library directory: " + libDir);
-        }
-
-        URL[] urls = CLASSPATH_EMPTY;
-
-        if (libDir.exists() && libDir.canRead())
-        {
-            Collection jars = FileUtils.listFiles(libDir, new String[] {"jar"}, false);
-
-            File[] jarFiles = (File[]) jars.toArray(new File[jars.size()]);
-
-            urls = FileUtils.toURLs(jarFiles);
-
-            if (urls.length > 0 && logger.isInfoEnabled())
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Updating the following jars:").append(SystemUtils.LINE_SEPARATOR);
-                sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
-                for (URL url : urls)
-                {
-                    sb.append(url).append(SystemUtils.LINE_SEPARATOR);
-                }
-                sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
-
-                logger.info(sb.toString());
-            }
-        }
-
-        // grab all jars in there
-        final URLClassLoader cl = new URLClassLoader(urls, parentCl);
-
-        return cl;
     }
 
 }
