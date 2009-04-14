@@ -32,7 +32,10 @@ import org.apache.commons.logging.LogFactory;
 public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 {
 
-    protected static final ClassLoader rootClassloader = Thread.currentThread().getContextClassLoader();
+    /**
+     * A logical root for this application.
+     */
+    protected static final ClassLoader CLASSLOADER_ROOT = Thread.currentThread().getContextClassLoader();
 
     protected static final URL[] CLASSPATH_EMPTY = new URL[0];
 
@@ -85,7 +88,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
             // need getUrl().getFile(), otherwise lastModified timestamp always returns 0
             this.monitoredResource = new File(allResources[1].getUrl().getFile());
 
-            ClassLoader cl = new MuleApplicationClassLoader(this.monitoredResource, rootClassloader);
+            ClassLoader cl = new MuleApplicationClassLoader(this.monitoredResource, CLASSLOADER_ROOT);
             Thread.currentThread().setContextClassLoader(cl);
 
 
@@ -122,7 +125,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
                     {
                         muleContext.dispose();
                         Thread.currentThread().setContextClassLoader(null);
-                        ClassLoader newCl = new MuleApplicationClassLoader(monitoredResource, rootClassloader);
+                        ClassLoader newCl = new MuleApplicationClassLoader(monitoredResource, CLASSLOADER_ROOT);
                         Thread.currentThread().setContextClassLoader(newCl);
 
                         //muleContext.initialise();
