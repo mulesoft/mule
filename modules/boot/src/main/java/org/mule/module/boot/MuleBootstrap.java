@@ -85,17 +85,12 @@ public class MuleBootstrap
             muleBase = muleHome;
         }
 
-        if (setupClassLoader)
-        {
-            MuleBootstrapUtils.addLocalJarFilesToClasspath(muleHome, muleBase);
-        }
-        
         setSystemMuleVersion();
         requestLicenseAcceptance();        
 
     }
     
-    private static File lookupMuleHome() throws Exception
+    public static File lookupMuleHome() throws Exception
     {
         File muleHome = null;
         String muleHomeVar = System.getProperty("mule.home");
@@ -112,7 +107,7 @@ public class MuleBootstrap
         return muleHome;
     }
     
-    private static File lookupMuleBase() throws Exception
+    public static File lookupMuleBase() throws Exception
     {
         File muleBase = null;
         String muleBaseVar = System.getProperty("mule.base");

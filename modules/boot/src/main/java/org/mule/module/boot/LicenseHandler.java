@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.LinkedHashMap;
 
 /**
@@ -43,7 +45,21 @@ public final class LicenseHandler
     
     public static boolean isLicenseAccepted() throws Exception
     {
-        return MuleBootstrapUtils.getResource(LICENSE_PROPERTIES_JAR_FILE_PATH, LicenseHandler.class) != null;
+        // here we're temporarily adding the mule-local-install.jar to the classpath for a license check
+        ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            File localJar = MuleBootstrapUtils.getMuleLocalJarFile();
+            URLClassLoader cl = new URLClassLoader(new URL[] {localJar.toURI().toURL()}, oldCl);
+            Thread.currentThread().setContextClassLoader(cl);
+
+            return MuleBootstrapUtils.getResource(LICENSE_PROPERTIES_JAR_FILE_PATH, LicenseHandler.class) != null;
+        }
+        finally
+        {
+            // dereference the old classloader and revert to the original caller one, we're done
+            Thread.currentThread().setContextClassLoader(oldCl);
+        }
     }
     
     public static File getLicenseFile()

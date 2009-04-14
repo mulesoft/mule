@@ -10,14 +10,24 @@
 
 package org.mule.module.boot;
 
-import org.mule.MuleServer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.List;
 
 import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 public class MuleServerWrapper implements WrapperListener
 {
-    private MuleServer mule;
+
+    /**
+     * We can't reference MuleServer class literal here, as it will fail to resolve at runtime.
+     * Instead, make all calls anonymous through reflection, so we can safely pump up our new classloader
+     * and make it the default one for downstream applications. 
+     */
+    private Object mule;
 
     /*---------------------------------------------------------------
      * Constructors
@@ -44,8 +54,24 @@ public class MuleServerWrapper implements WrapperListener
     {
         try
         {
-            mule = new MuleServer(args);
-            mule.start(false, false);
+            // TODO encapsulate this into MuleSystemClassLoader
+            DefaultMuleClassPathConfig classPath = new DefaultMuleClassPathConfig(MuleBootstrap.lookupMuleHome(),
+                                                                                  MuleBootstrap.lookupMuleBase());
+
+            final List urlsList = classPath.getURLs();
+
+            ClassLoader parent = MuleBootstrapUtils.class.getClassLoader();
+            URLClassLoader muleSystemCl = new URLClassLoader((URL[]) urlsList.toArray(new URL[urlsList.size()]),
+                                                             parent);
+            // end snippet 
+
+            Thread.currentThread().setContextClassLoader(muleSystemCl);
+
+            Class muleClass = Thread.currentThread().getContextClassLoader().loadClass("org.mule.MuleServer");
+            Constructor c = muleClass.getConstructor(String[].class);
+            mule = c.newInstance(new Object[] {args});
+            Method startMethod = muleClass.getMethod("start", boolean.class, boolean.class);
+            startMethod.invoke(mule, false, false);
             return null;
         }
         catch (Exception e)
@@ -71,7 +97,16 @@ public class MuleServerWrapper implements WrapperListener
      */
     public int stop(int exitCode)
     {
-        mule.shutdown();
+        try
+        {
+            Method shutdownMethod = mule.getClass().getMethod("shutdown");
+            shutdownMethod.invoke(mule);
+        }
+        catch (Throwable t)
+        {
+            // ignore
+        }
+        
         return exitCode;
     }
 
