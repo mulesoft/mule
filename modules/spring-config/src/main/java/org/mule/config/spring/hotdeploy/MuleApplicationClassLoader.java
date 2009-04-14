@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.config.spring.hotdeploy;
 
 import org.mule.util.FileUtils;
@@ -15,6 +25,16 @@ import org.apache.commons.logging.LogFactory;
 public class MuleApplicationClassLoader extends URLClassLoader
 {
 
+    /**
+     * Library directory in Mule application.
+     */
+    public static final String PATH_LIBRARY = "lib";
+
+    /**
+     * Classes and resources directory in Mule application.
+     */
+    public static final String PATH_CLASSES = "classes";
+
     protected static final URL[] CLASSPATH_EMPTY = new URL[0];
     protected final transient Log logger = LogFactory.getLog(getClass());
     private File monitoredResource;
@@ -27,7 +47,10 @@ public class MuleApplicationClassLoader extends URLClassLoader
             this.monitoredResource = monitoredResource;
             // get lib dir on the same level as monitored resource and...
             File parentFile = monitoredResource.getParentFile();
-            File libDir = new File(parentFile, "lib");
+            File classesDir = new File(parentFile, PATH_CLASSES);
+            addURL(classesDir.toURI().toURL());
+            
+            File libDir = new File(parentFile, PATH_LIBRARY);
 
             if (logger.isInfoEnabled())
             {

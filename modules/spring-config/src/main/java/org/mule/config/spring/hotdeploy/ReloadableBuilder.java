@@ -20,7 +20,6 @@ import org.mule.context.DefaultMuleContextFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Date;
 import java.util.Timer;
 
@@ -86,7 +85,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
             // need getUrl().getFile(), otherwise lastModified timestamp always returns 0
             this.monitoredResource = new File(allResources[1].getUrl().getFile());
 
-            URLClassLoader cl = new MuleApplicationClassLoader(this.monitoredResource, rootClassloader);
+            ClassLoader cl = new MuleApplicationClassLoader(this.monitoredResource, rootClassloader);
             Thread.currentThread().setContextClassLoader(cl);
 
 
@@ -123,7 +122,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
                     {
                         muleContext.dispose();
                         Thread.currentThread().setContextClassLoader(null);
-                        URLClassLoader newCl = new MuleApplicationClassLoader(monitoredResource, rootClassloader);
+                        ClassLoader newCl = new MuleApplicationClassLoader(monitoredResource, rootClassloader);
                         Thread.currentThread().setContextClassLoader(newCl);
 
                         //muleContext.initialise();
