@@ -105,7 +105,7 @@ public class Jms102bSupport extends Jms11Support
         }
         else
         {
-            throw new IllegalArgumentException("Connection and domain type do not match");
+            return connection.createSession(transacted, ackMode);
         }
     }
 
