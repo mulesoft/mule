@@ -128,6 +128,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
                         muleContext.dispose();
                         Thread.currentThread().setContextClassLoader(null);
                         // TODO this is really a job of a deployer and deployment descriptor info
+                        // TODO I don't think shared domains can be safely redeployment, this will probably be removed 
                         ClassLoader sharedCl = new DefaultMuleSharedDomainClassLoader(CLASSLOADER_ROOT);
                         ClassLoader cl = new MuleApplicationClassLoader(monitoredResource, sharedCl);
                         Thread.currentThread().setContextClassLoader(cl);
