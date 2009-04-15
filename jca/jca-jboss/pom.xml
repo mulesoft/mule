@@ -59,7 +59,14 @@
             <version>${version}</version>
             <scope>provided</scope>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-boot</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!--
              Exclude bsh because it is already in JBoss lib dir and if it is deployed along with mule
              JBoss tries to delpoy embedded .bsh scripts.
