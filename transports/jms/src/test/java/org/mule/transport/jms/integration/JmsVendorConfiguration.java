@@ -10,7 +10,7 @@
 
 package org.mule.transport.jms.integration;
 
-import java.util.Map;
+import org.mule.tck.ParameterizedConfiguration;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -40,7 +40,7 @@ import javax.jms.ConnectionFactory;
  *
  * Fore more inforation about the JMS Integration tests see {@link AbstractJmsFunctionalTestCase}
  */
-public interface JmsVendorConfiguration
+public interface JmsVendorConfiguration extends ParameterizedConfiguration
 {
     /**
      * Create a connection factory for the Jms profider being tested
@@ -157,30 +157,8 @@ public interface JmsVendorConfiguration
     public String getProtocol();
 
     /**
-     * A string that identifies the Jms Provider i.e. WebsphereMQ
-     * @return the provider name
-     */
-    public String getProviderName();
-
-    /**
-     * These properties will get loaded into the registry. Good for adding property
-     * placeholders since provider or environment specific config info can be added as
-     * properties here and configuration files can use placeholders for these properties
-     * to make the tests portable. For example, if a property defined here was activemq.host=192.168.0.4
-     * an XML configuration file could access it using ${activemq.host} instead of putting the host name
-     * in the configuration file.
-     * It is good practice to prefix the property with a namespace just to ensure there are no conflicts, In
-     * this case the namespace is 'activemq'
-     * 
-     * @return a map of properties that will be made available in the registry
-     */
-    public Map getProperties();
-
-    /**
      * @return a ConnectionFactory implementation used for unit testing of the provider, 
      * usually consisting of some mocked-up methods.
      */
     public ConnectionFactory getTestConnectionFactory();
-
-    public void initialise(Class callingClass) throws Exception;
 }

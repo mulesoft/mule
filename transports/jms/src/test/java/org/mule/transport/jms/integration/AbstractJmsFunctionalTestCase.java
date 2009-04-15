@@ -247,7 +247,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             throw new RuntimeException(e);
         }
         setJmsConfig(config);
-        System.out.print("\n===== Parameterized test using: " + config.getProviderName() + " =====");
+        System.out.print("\n===== Parameterized test using: " + config.getName() + " =====");
     }
 
     /**
@@ -308,7 +308,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                                                    "config files as input: " + configResource);
             }
             String resources = configResource.substring(configResource.lastIndexOf("/") + 1);
-            resources = String.format("integration/%s/connector-%s,%s", getJmsConfig().getProviderName(),
+            resources = String.format("integration/%s/connector-%s,%s", getJmsConfig().getName(),
                     resources, getConfigResources());
             SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(resources);
             return builder;

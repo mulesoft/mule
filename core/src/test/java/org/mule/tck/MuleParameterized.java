@@ -15,17 +15,22 @@ import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.runner.Description;
+import org.junit.runner.Runner;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.Parameterized;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.TestClass;
 
 /**
  * <code>MuleParameterized</code> adds test exclusions to the
@@ -41,9 +46,32 @@ public class MuleParameterized extends Parameterized
      */
     private static ArrayList<String> excludedTests = new ArrayList<String>();
 
+    /**
+     * Override collection from org.junit.runners.Parameterized
+     */
+    private final ArrayList<Runner> muleRunners = new ArrayList<Runner>();
+
     public MuleParameterized(Class<?> klass) throws Throwable
     {
         super(klass);
+
+        // Create our own list of test runners, excluding any configurations which are not enabled.
+        List<Runner> runners = super.getChildren();        
+        List<Object[]> parametersList = getParametersList(getTestClass());
+        Object parameter;
+        for (int i = 0; i < parametersList.size(); i++)
+        {
+            parameter = parametersList.get(i)[0];
+            if (!(parameter instanceof ParameterizedConfiguration))
+            {
+                throw new IllegalArgumentException("Parameters for Mule test classes should implement the ParameterizedConfiguration interface");
+            }
+            if (((ParameterizedConfiguration) parameter).isEnabled())
+            {
+                muleRunners.add(runners.get(i));
+            }
+        }
+        
         getExcluded();
         try
         {
@@ -56,6 +84,12 @@ public class MuleParameterized extends Parameterized
         {
             // ignore
         }
+    }
+
+    @Override
+    protected List<Runner> getChildren() 
+    {
+        return muleRunners;
     }
 
     /**
@@ -132,4 +166,31 @@ public class MuleParameterized extends Parameterized
             return "excludes tests from mule-test-exclusions.txt";
         }
     };
+
+    //////////////////////////////////////////////////////////////////////////////
+    // The following code is a copy/paste from org.junit.runners.Parameterized
+    // which is unfortunately necessary in order to be able to override some of
+    // its functionality. Hopefully JUnit will make these methods protected rather 
+    // than private in a future version so that this is not necessary.
+    //////////////////////////////////////////////////////////////////////////////
+
+    @SuppressWarnings("unchecked")
+    private List<Object[]> getParametersList(TestClass klass) throws Throwable
+    {
+        return (List<Object[]>) getParametersMethod(klass).invokeExplosively(null);
+    }
+
+    private FrameworkMethod getParametersMethod(TestClass testClass) throws Exception
+    {
+        List<FrameworkMethod> methods = testClass.getAnnotatedMethods(Parameters.class);
+        for (FrameworkMethod each : methods)
+        {
+            int modifiers = each.getMethod().getModifiers();
+            if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) return each;
+        }
+
+        throw new Exception("No public static parameters method on class " + testClass.getName());
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
 }

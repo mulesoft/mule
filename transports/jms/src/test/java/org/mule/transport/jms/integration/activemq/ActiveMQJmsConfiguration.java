@@ -11,7 +11,6 @@ package org.mule.transport.jms.integration.activemq;
 
 import org.mule.transport.jms.integration.JmsVendorConfiguration;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.jms.Connection;
@@ -120,18 +119,23 @@ public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
         return "jms";
     }
 
-    public String getProviderName()
+    public String getName()
     {
         return "activemq";
     }
 
     public Map getProperties()
     {
-        return new HashMap();
+        return null;
     }
 
     public ConnectionFactory getTestConnectionFactory()
     {
         return new ActiveMQTestReconnectionConnectionFactoryWrapper();       
+    }
+    
+    public boolean isEnabled()
+    {
+        return true;
     }
 }
