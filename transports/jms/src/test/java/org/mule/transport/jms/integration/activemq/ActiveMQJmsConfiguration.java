@@ -11,6 +11,7 @@ package org.mule.transport.jms.integration.activemq;
 
 import org.mule.transport.jms.integration.JmsVendorConfiguration;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.jms.Connection;
@@ -126,7 +127,7 @@ public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
 
     public Map getProperties()
     {
-        return null;
+        return Collections.EMPTY_MAP;
     }
 
     public ConnectionFactory getTestConnectionFactory()
