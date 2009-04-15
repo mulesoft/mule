@@ -20,6 +20,11 @@
             <artifactId>mule-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-boot</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
@@ -39,7 +44,7 @@
         </dependency>
         
         
-<dependency>
+        <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
             <version>${dom4jVersion}</version>

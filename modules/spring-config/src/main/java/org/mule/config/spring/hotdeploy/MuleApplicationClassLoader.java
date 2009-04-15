@@ -57,36 +57,32 @@ public class MuleApplicationClassLoader extends URLClassLoader
                 logger.info("Library directory: " + libDir);
             }
 
-            URL[] urls = ReloadableBuilder.CLASSPATH_EMPTY;
-
             if (libDir.exists() && libDir.canRead())
             {
-                Collection jars = FileUtils.listFiles(libDir, new String[] {"jar"}, false);
+                Collection<File> jars = FileUtils.listFiles(libDir, new String[] {"jar"}, false);
 
-                File[] jarFiles = (File[]) jars.toArray(new File[jars.size()]);
-
-                urls = FileUtils.toURLs(jarFiles);
-
-                if (urls.length > 0 && logger.isInfoEnabled())
+                if (!jars.isEmpty() && logger.isInfoEnabled())
                 {
                     StringBuilder sb = new StringBuilder();
                     sb.append("Updating the following jars:").append(SystemUtils.LINE_SEPARATOR);
                     sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
-                    for (URL url : urls)
+
+                    for (File jar : jars)
                     {
-                        sb.append(url).append(SystemUtils.LINE_SEPARATOR);
+                        sb.append(jar.toURI().toURL()).append(SystemUtils.LINE_SEPARATOR);
                     }
+
                     sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
 
                     logger.info(sb.toString());
                 }
+
+                for (File jar : jars)
+                {
+                    addURL(jar.toURI().toURL());
+                }
             }
 
-            for (URL url : urls)
-            {
-                addURL(url);
-
-            }
         }
         catch (IOException e)
         {
