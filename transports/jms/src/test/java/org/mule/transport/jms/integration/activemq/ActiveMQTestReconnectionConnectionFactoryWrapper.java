@@ -79,6 +79,7 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
      * @seecom.mulesource.qatests.util.jms.activemq.TestReconnectionFactoryWrapper#
      * createQueueConnection()
      */
+    @Override
     public QueueConnection createQueueConnection() throws JMSException
     {
         registration();
@@ -94,6 +95,7 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
      * @seecom.mulesource.qatests.util.jms.activemq.TestReconnectionFactoryWrapper#
      * createQueueConnection(java.lang.String, java.lang.String)
      */
+    @Override
     public QueueConnection createQueueConnection(String userName, String password) throws JMSException
     {
         registration();
@@ -109,6 +111,7 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
      * @seecom.mulesource.qatests.util.jms.activemq.TestReconnectionFactoryWrapper#
      * createTopicConnection()
      */
+    @Override
     public TopicConnection createTopicConnection() throws JMSException
     {
         registration();
@@ -124,6 +127,7 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
      * @seecom.mulesource.qatests.util.jms.activemq.TestReconnectionFactoryWrapper#
      * createTopicConnection(java.lang.String, java.lang.String)
      */
+    @Override
     public TopicConnection createTopicConnection(String userName, String password) throws JMSException
     {
         registration();
