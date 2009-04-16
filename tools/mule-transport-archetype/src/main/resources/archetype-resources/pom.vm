@@ -84,6 +84,7 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-muleforge-plugin</artifactId>
+                <version>1.0</version>
                 <executions>
                     <execution>
                         <id>upload-muleforge-artifacts</id>
