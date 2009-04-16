@@ -95,6 +95,7 @@
                 </xsd:annotation>
             </xsd:element>
             <xsd:element ref="abstract-extension"/>
+            <xsd:element ref="abstract-agent"/>
             <xsd:element ref="abstract-security-manager"/>
             <xsd:element ref="abstract-transaction-manager"/>
             <xsd:element ref="abstract-connector"/>
@@ -136,6 +137,37 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+    </xsd:complexType>
+
+    <!-- Agents -->
+    <xsd:element name="abstract-agent" abstract="true" type="abstractAgentType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for agent elements. Are used to run processes as part of the server instance.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="abstractAgentType">
+    </xsd:complexType>
+
+     <xsd:element name="custom-agent" type="customAgentType" substitutionGroup="abstract-agent"/>
+    <xsd:complexType name="customAgentType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractAgentType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="name" type="substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the agent in the registry.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="abstract-global-endpoint" abstract="true" type="abstractGlobalEndpointType">
@@ -3958,17 +3990,6 @@
     <!--  Utils / Standard Types                                      -->
     <!--==============================================================-->
 
-
-    <xsd:complexType name="abstractAgentType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for agents. Not used in core, but common to several modules.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="abstractExtensionType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <!-- corresponds to TlsIndirectKeyStore, named as tls-client in transport namespace -->
     <xsd:complexType name="tlsClientKeyStoreType">

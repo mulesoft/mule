@@ -12,7 +12,7 @@
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"/>
 
     <!-- JMX Agent-->
-    <xsd:element name="jmx-server" type="jmxServerType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="jmx-server" type="jmxServerType" substitutionGroup="mule:abstract-agent"/>
     <xsd:complexType name="jmxServerType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractAgentType">
@@ -70,7 +70,7 @@
     </xsd:complexType>
 
     <!-- JMX Adaptors -->
-    <xsd:element name="jmx-mx4j-adaptor" type="jmxMx4jAdaptorType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="jmx-mx4j-adaptor" type="jmxMx4jAdaptorType" substitutionGroup="mule:abstract-agent"/>
     <xsd:complexType name="jmxMx4jAdaptorType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractAgentType">
@@ -147,7 +147,7 @@
     <!--  JMX Agents -->
 
     <!-- Rmi Registry Agent -->
-    <xsd:element name="rmi-server" type="rmiServerTyper" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="rmi-server" type="rmiServerTyper" substitutionGroup="mule:abstract-agent"/>
     <xsd:complexType name="rmiServerTyper">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractAgentType">
@@ -157,14 +157,14 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="jmx-log4j" type="jmxLog4jType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="jmx-log4j" type="jmxLog4jType" substitutionGroup="mule:abstract-agent"/>
     <xsd:complexType name="jmxLog4jType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractAgentType" />
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="jmx-default-config" type="jmxDefaultConfigType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="jmx-default-config" type="jmxDefaultConfigType" substitutionGroup="mule:abstract-agent"/>
     <xsd:complexType name="jmxDefaultConfigType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractAgentType">
@@ -275,14 +275,14 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="jmx-notifications" type="jmxNotificationType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="jmx-notifications" type="jmxNotificationType" substitutionGroup="mule:abstract-agent"/>
     <xsd:complexType name="jmxNotificationType">
         <xsd:complexContent>
             <xsd:extension base="notificationLoggerAgentType" />
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="log4j-notifications" type="log4jNotificationType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="log4j-notifications" type="log4jNotificationType" substitutionGroup="mule:abstract-agent"/>
     <xsd:complexType name="log4jNotificationType">
         <xsd:complexContent>
             <xsd:extension base="notificationLoggerAgentType">
@@ -300,7 +300,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="chainsaw-notifications" type="chainsawNotificationType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="chainsaw-notifications" type="chainsawNotificationType" substitutionGroup="mule:abstract-agent"/>
     <xsd:complexType name="chainsawNotificationType">
         <xsd:complexContent>
             <xsd:extension base="notificationLoggerAgentType">
@@ -352,34 +352,17 @@
         </xsd:restriction>
     </xsd:simpleType>
 
-    <xsd:element name="publish-notifications" type="publishNotificationType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="publish-notifications" type="publishNotificationType" substitutionGroup="mule:abstract-agent"/>
     <xsd:complexType name="publishNotificationType">
         <xsd:complexContent>
             <xsd:extension base="notificationLoggerAgentType">
-                <xsd:attribute name="endpointAddress" type="xsd:string" use="required" />
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="yourkit-profiler" substitutionGroup="mule:abstract-extension"/>
-
-    <xsd:element name="custom-agent" type="customAgentType" substitutionGroup="mule:abstract-extension"/>
-    <xsd:complexType name="customAgentType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractAgentType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="outbound-endpoint" type="mule:outboundEndpointType" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
-                <xsd:attribute name="name" type="mule:substitutableName" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the agent in the registry.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="yourkit-profiler" substitutionGroup="mule:abstract-agent"/>
 
 </xsd:schema>

@@ -19,9 +19,9 @@
 
     <management:jmx-mx4j-adaptor jmxAdaptorUrl="http://127.0.0.1:8000"/>
 
-    <management:custom-agent name="test-custom-agent" class="org.mule.tck.testmodels.mule.TestAgent">
+    <custom-agent name="test-custom-agent" class="org.mule.tck.testmodels.mule.TestAgent">
         <spring:property name="frobbit" value="woggle"/>
-    </management:custom-agent>
+    </custom-agent>
 
     <management:jmx-notifications/>
 
@@ -29,7 +29,9 @@
 
     <management:chainsaw-notifications chainsawPort="8080" chainsawHost="127.0.0.1"/>
 
-    <management:publish-notifications endpointAddress="test://test"/>
+    <management:publish-notifications>
+        <management:outbound-endpoint address="test://test"/>
+    </management:publish-notifications>
 
     <!-- needs profiler installed -->
     <!-- management:yourkit-profiler/ -->
