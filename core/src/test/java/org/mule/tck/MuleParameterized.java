@@ -66,6 +66,10 @@ public class MuleParameterized extends Parameterized
             {
                 throw new IllegalArgumentException("Parameters for Mule test classes should implement the ParameterizedConfiguration interface");
             }
+
+            // The class may need to be initialized before we know whether to enable it or not
+            ((ParameterizedConfiguration) parameter).initialise(getTestClass().getJavaClass());
+            
             if (((ParameterizedConfiguration) parameter).isEnabled())
             {
                 muleRunners.add(runners.get(i));
