@@ -38,8 +38,7 @@ import java.util.Map;
 public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerAgent
 {
 
-    private String endpointAddress;
-    private OutboundEndpoint logEndpoint = null;
+    private OutboundEndpoint endpoint = null;
     private MuleSession session;
     private List ignoredNotifications = new ArrayList();
 
@@ -62,14 +61,9 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         // first see if we're logging notifications to an endpoint
         try
         {
-            if (endpointAddress != null)
+            if (endpoint == null)
             {
-                logEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointAddress);
-            }
-            else
-            {
-                throw new InitialisationException(
-                    CoreMessages.propertiesNotSet("endpointAddress"), this);
+                throw new InitialisationException(CoreMessages.propertiesNotSet("endpoint"), this);
             }
             // Create a session for sending notifications
             session = new DefaultMuleSession(new DefaultMuleMessage(NullPayload.getInstance(), (Map) null), new NullSessionHandler(), muleContext);
@@ -88,10 +82,10 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
             return;
         }
         
-        if (logEndpoint != null && !ignoredNotifications.contains(new Integer(e.getAction())))
+        if (endpoint != null && !ignoredNotifications.contains(new Integer(e.getAction())))
         {
             if ((e.getAction() == ConnectionNotification.CONNECTION_FAILED || e.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED)
-                && ((Connector) e.getSource()).equals(logEndpoint.getConnector()))
+                && ((Connector) e.getSource()).equals(endpoint.getConnector()))
             {
                 // If this is a CONNECTION_FAILED or
                 // CONNECTION_DISCONNECTED notification for the same connector that
@@ -101,13 +95,13 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
             try
             {
                 MuleMessage msg = new DefaultMuleMessage(e.toString(), (Map) null);
-                MuleEvent event = new DefaultMuleEvent(msg, logEndpoint, session, false);
-                logEndpoint.dispatch(event);
+                MuleEvent event = new DefaultMuleEvent(msg, endpoint, session, false);
+                endpoint.dispatch(event);
             }
             catch (Exception e1)
             {
                 // TODO MULE-863: If this is an error, do something better than this
-                logger.error("Failed to dispatch event: " + e.toString() + " over endpoint: " + logEndpoint
+                logger.error("Failed to dispatch event: " + e.toString() + " over endpoint: " + endpoint
                              + ". Error is: " + e1.getMessage(), e1);
             }
         }
@@ -122,20 +116,20 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
     {
         StringBuffer buf = new StringBuffer();
         buf.append(getName()).append(": ");
-        if (endpointAddress != null)
+        if (endpoint != null)
         {
-            buf.append("Forwarding notifications to: " + endpointAddress);
+            buf.append("Forwarding notifications to: " + endpoint.getEndpointURI().getAddress());
         }
         return buf.toString();
     }
 
-    public String getEndpointAddress()
+    public OutboundEndpoint getEndpoint()
     {
-        return endpointAddress;
+        return endpoint;
     }
 
-    public void setEndpointAddress(String endpointAddress)
+    public void setEndpoint(OutboundEndpoint endpoint)
     {
-        this.endpointAddress = endpointAddress;
+        this.endpoint = endpoint;
     }
 }
