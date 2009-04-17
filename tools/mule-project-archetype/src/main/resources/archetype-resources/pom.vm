@@ -47,7 +47,7 @@
                     <!-- by default download all sources when generating project files -->
                     <downloadSources>true</downloadSources>
                     <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk15Name}
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk5Name}
                         </classpathContainer>
                     </classpathContainers>
                 </configuration>
