@@ -21,6 +21,7 @@
         <module>jaas</module>
         <module>jboss-transactions</module>
         <module>jca</module>
+        <module>json</module>
         <module>management</module>
         <module>ognl</module>
         <module>pgp</module>

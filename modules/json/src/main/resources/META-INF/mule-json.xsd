@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/json"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core"
+            targetNamespace="http://www.mulesource.org/schema/mule/json"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/3.0/mule.xsd"/>
+
+    <xsd:element name="is-json-filter" type="mule:abstractFilterType" substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                A filter that will determine if the current message payload is a JSON encoded message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="json-to-object-transformer" type="jsonTransformerType"
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that will convert a JSON encoded object graph to a java object. The object type is
+                determined by the 'returnClass' attribute. Note that this transformers supports Arrays and Lists. For
+                example, to
+                convert a JSON string to an array of org.foo.Person, set the the returnClass=[Lorg.foo.Person; .
+
+                The JSON engine can be configured using the jsonConfig attribute. This is an object reference to an
+                instance of:
+                net.sf.json.JsonConfig. This can be created as a spring bean.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="object-to-json-transformer" type="objectToJsonTransformerType"
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts a java object to a JSON encoded object that can be consumed by other languages such as
+                Javascript or Ruby.
+
+                The JSON engine can be configured using the jsonConfig attribute. This is an object reference to an
+                instance of:
+                net.sf.json.JsonConfig. This can be created as a spring bean.
+
+                Users can configure a comma-separated list of property names to exclude or include i.e.
+                excludeProperties="address,postcode".
+
+                The returnClass for this transformer is always java.lang.String, there is no need to set this.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="json-to-xml-transformer" type="jsonXmlTransformerType"
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts a JSON encoded object representation in to an XML representation. Each property and enclosing
+                element are wrapped in XML elements
+                these generated element names can be set on the transformer. Names can be configured for Object
+                elements, array elements and value elements.
+
+                The returnClass for this transformer is always java.lang.String, there is no need to set this.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="jsonXmlTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransformerType">
+                <xsd:attribute name="objectElementName" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The XML element name to use for representing objects in the JSON ecoded object. The default
+                            is 'o'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="arrayElementName" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The XML element name to use for representing objects in the JSON ecoded object. The default
+                            is 'a'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="valueElementName" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The XML element name to use for representing object values (properties) in the JSON ecoded
+                            object. The default
+                            is 'e'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="jsonTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransformerType">
+                <xsd:attribute name="jsonConfig-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The JSON engine can be configured using the jsonConfig attribute. This is an object
+                            reference to an instance of:
+                            net.sf.json.JsonConfig. This can be created as a spring bean.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="objectToJsonTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="jsonTransformerType">
+                <xsd:attribute name="excludeProperties" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Users can configure a comma-separated list of property names to exclude i.e.
+                            excludeProperties="address,postcode".
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="includeProperties" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Configure a comma-separated list of property names to include i.e.
+                            includeProperties="name,email".
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sourceClass" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Restrict the accepted source class object to a specific type. If not set the transformer
+                            will handle all source types. Note that if you need to specify an array type you need to
+                            postfix the class name with '[]'. For example, if you want to ensure the transformer only
+                            accepts an Orange[], you set the sourceClass to 'org.mule.tck.testmodels.fruit.Orange[]'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>

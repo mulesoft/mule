@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:json="http://www.mulesource.org/schema/mule/json"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesource.org/schema/mule/json http://www.mulesource.org/schema/mule/json/3.0/mule-json.xsd">
+
+    <json:is-json-filter name="jsonFilter"/>
+
+    <json:json-to-object-transformer name="jsonToOrangeArray" returnClass="org.mule.tck.testmodels.fruit.Orange"
+                                     jsonConfig-ref="jsonConfig"/>
+
+    <json:object-to-json-transformer name="orangeToJson" excludeProperties="brand, radius"
+                                     sourceClass="org.mule.tck.testmodels.fruit.Orange"/>
+
+    <json:json-to-xml-transformer name="jsonToXml" arrayElementName="array" objectElementName="obj"
+                                  valueElementName="value"/>
+
+    <spring:bean name="jsonConfig" class="net.sf.json.JsonConfig">
+        <spring:property name="classMap">
+            <spring:map value-type="java.lang.Class">
+                <spring:entry key="apple" value="org.mule.tck.testmodels.fruit.Apple"/>
+                <spring:entry key="banana" value="org.mule.tck.testmodels.fruit.Banana"/>
+            </spring:map>
+        </spring:property>
+    </spring:bean>
+</mule>
