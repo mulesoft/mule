@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:cometd="http://www.mulesource.org/schema/mule/cometd"
+      xmlns:test="http://www.mulesource.org/schema/mule/test"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm"
+      xsi:schemaLocation="
+      http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/test http://www.mulesource.org/schema/mule/test/3.0/mule-test.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesource.org/schema/mule/cometd http://www.mulesource.org/schema/mule/cometd/3.0/mule-cometd.xsd">
+
+    <vm:connector name="vm" queueEvents="true"/>
+
+    <cometd:connector name="foo" jsonCommented="true"/>    
+
+    <cometd:endpoint name="clientEndpoint" address="http://0.0.0.0:8080/service/test"/>
+    <cometd:endpoint name="clientEndpoint2" address="http://0.0.0.0:8080/service/test2"/>
+
+
+    <vm:endpoint name="in" path="in"/>
+
+    <model name="main">
+        <service name="testComponent">
+            <inbound>
+                <inbound-endpoint ref="clientEndpoint"/>
+            </inbound>
+            <test:component appendString=" Received"/>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="middle"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="testComponent2">
+            <inbound>
+                <inbound-endpoint ref="clientEndpoint2"/>
+            </inbound>
+            <echo-component/>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="middle2"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="testComponent3">
+            <inbound>
+                <inbound-endpoint ref="in"/>
+            </inbound>
+            <echo-component/>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="clientEndpoint2"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>
