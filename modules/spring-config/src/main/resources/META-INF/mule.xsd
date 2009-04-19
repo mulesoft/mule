@@ -1613,6 +1613,22 @@
     </xsd:element>
     <xsd:complexType name="abstractSecurityFilterType"/>
 
+    <xsd:element name="custom-security-filter" type="customSecurityFilterType" substitutionGroup="abstract-security-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allows developers to configure custom security filters
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="customSecurityFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractSecurityFilterType">
+                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:attributeGroup name="defaultEndpointAttributes">
         <xsd:attributeGroup ref="restrictedEndpointAttributes"/>
         <!-- these next two attributes are mutually exclusive and one is required.
