@@ -258,6 +258,8 @@ public abstract class AbstractConnector
      * until connection is successful.
      */
     protected boolean startOnConnect = false;
+
+    protected boolean initialStateStopped = false;
     /**
      * Whether to test a connection on each take.
      */
@@ -357,6 +359,13 @@ public abstract class AbstractConnector
 
     public final synchronized void start() throws MuleException
     {
+        if(isInitialStateStopped())
+        {
+            setInitialStateStopped(false);
+            logger.info("Connector not started because 'initialStateStopped' is true");
+            return;
+        }
+        
         if (this.isStarted())
         {
             logger.warn("Attempting to start a connector which is already started");
@@ -848,6 +857,16 @@ public abstract class AbstractConnector
         // we keep a reference to the unadapted factory, otherwise people might end
         // up with ClassCastExceptions on downcast to their implementation (sigh)
         this.requesterFactory = requesterFactory;
+    }
+
+    public boolean isInitialStateStopped()
+    {
+        return initialStateStopped;
+    }
+
+    public void setInitialStateStopped(boolean initialStateStopped)
+    {
+        this.initialStateStopped = initialStateStopped;
     }
 
     /**
