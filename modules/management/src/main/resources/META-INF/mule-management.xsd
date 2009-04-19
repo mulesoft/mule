@@ -357,7 +357,7 @@
         <xsd:complexContent>
             <xsd:extension base="notificationLoggerAgentType">
                 <xsd:sequence>
-                    <xsd:element name="outbound-endpoint" type="mule:outboundEndpointType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element ref="mule:abstract-outbound-endpoint" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
