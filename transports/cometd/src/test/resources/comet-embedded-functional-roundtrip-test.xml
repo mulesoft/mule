@@ -14,10 +14,8 @@
 
     <vm:connector name="vm" queueEvents="true"/>
 
-    <cometd:connector name="foo" jsonCommented="true"/>    
-
-    <cometd:endpoint name="clientEndpoint" address="http://0.0.0.0:8080/service/test"/>
-    <cometd:endpoint name="clientEndpoint2" address="http://0.0.0.0:8080/service/test2"/>
+    <cometd:endpoint name="clientEndpoint" address="http://0.0.0.0:58080/service/test"/>
+    <cometd:endpoint name="clientEndpoint2" address="http://0.0.0.0:58080/service/test2"/>
 
 
     <vm:endpoint name="in" path="in"/>
