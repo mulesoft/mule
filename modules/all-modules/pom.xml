@@ -56,7 +56,7 @@
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules.jca</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-json</artifactId>
             <version>${version}</version>
         </dependency>

@@ -1,15 +1,26 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.module.json.transformers;
 
-import java.util.List;
-import org.apache.commons.beanutils.DynaBean;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.api.transformer.TransformerException;
+import org.mule.tck.AbstractMuleTestCase;
+
+import java.util.Collection;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sf.json.JSON;
 import net.sf.json.JSONSerializer;
+
+import org.apache.commons.beanutils.DynaBean;
+import org.apache.commons.beanutils.PropertyUtils;
 
 public class JsonToDynaBeanTestCase extends AbstractMuleTestCase
 {
@@ -34,8 +45,8 @@ public class JsonToDynaBeanTestCase extends AbstractMuleTestCase
 		assertEquals(jsonObject.get("int"), PropertyUtils.getProperty(_bean, "int"));  
 		assertEquals(jsonObject.get("double"), PropertyUtils.getProperty(_bean, "double"));  
 		assertEquals(jsonObject.get("func"), PropertyUtils.getProperty(_bean, "func"));  
-		List expected = JSONArray.toList(jsonObject.getJSONArray("array"));  
-		assertEquals( expected, (List) PropertyUtils.getProperty(_bean, "array"));  	
+		Collection expected = JSONArray.toCollection(jsonObject.getJSONArray("array"));  
+		assertEquals(expected, PropertyUtils.getProperty(_bean, "array"));  	
 	}
 
 	public void testTransformException()
@@ -45,8 +56,11 @@ public class JsonToDynaBeanTestCase extends AbstractMuleTestCase
 			JsonToObject transformer = new JsonToObject();
 			transformer.transform("0xdeadbeef");
 			fail();
-		} catch (TransformerException tfe) {
+		} 
+		catch (TransformerException tfe) 
+		{
 			// Expected
 		}
 	}
+
 }

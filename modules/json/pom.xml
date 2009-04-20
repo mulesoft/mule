@@ -8,10 +8,8 @@
     </parent>
     <artifactId>mule-module-json</artifactId>
     <packaging>jar</packaging>
-    <groupId>org.mule.modules</groupId>
     <name>JSON Transformers</name>
     <description>Implementation of JSON transformers for Mule</description>
-    <version>3.0.0-M1-SNAPSHOT</version>
 
     <dependencies>
         <!-- Mule Dependencies -->
