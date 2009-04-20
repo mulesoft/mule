@@ -9,6 +9,8 @@ axis-1.4-osgi
 backport-util-concurrent-3.1-osgi
 bsh-2.0b4-osgi
 cglib-nodep-2.1_3-osgi
+cometd-api-0.9.20080221
+cometd-bayeux-6.1.11
 commons-beanutils-1.7.0-osgi
 commons-cli-1.0-osgi
 commons-codec-1.3-osgi
@@ -41,6 +43,7 @@ cxf-rt-ws-addr-2.1.2
 cxf-rt-ws-security-2.1.2
 cxf-tools-common-2.1.2
 dom4j-1.6.1-osgi
+ezmorph-1.0.6
 FastInfoset-1.2.2
 geronimo-annotation_1.0_spec-1.1.1
 geronimo-ejb_2.1_spec-1.1-osgi
@@ -69,6 +72,7 @@ jcr-1.0-osgi
 jdom-1.0-osgi
 jetty-6.1.11
 jetty-util-6.1.11
+json-lib-2.2.3-jdk15
 jsr250-api-1.0
 jug-2.0.0-osgi-asl
 junit-3.8.2
@@ -91,6 +95,7 @@ mule-module-builders
 mule-module-client
 mule-module-jaas
 mule-module-jbossts
+mule-module-json
 mule-module-management
 mule-module-ognl
 mule-module-pgp
@@ -103,6 +108,7 @@ mule-module-xml
 mule-tests-functional
 mule-transport-axis
 mule-transport-bpm
+mule-transport-cometd
 mule-transport-cxf
 mule-transport-ejb
 mule-transport-email
