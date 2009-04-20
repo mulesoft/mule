@@ -10,34 +10,14 @@
 
 package org.mule.module.pgp;
 
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.FileInputStream;
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
 
-import javax.crypto.Cipher;
-
-public class KeyBasedEncryptionStrategyTestCase extends AbstractMuleTestCase
+public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrategyTestCase
 {
     private KeyBasedEncryptionStrategy kbStrategy;
-
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // see MULE-3671
-        try
-        {
-            int maxKeyLength = Cipher.getMaxAllowedKeyLength("DES/CBC/PKCS5Padding");
-            // if JCE is not installed, maxKeyLength will be 64
-            return maxKeyLength != Integer.MAX_VALUE;
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new AssertionError(e);
-        }
-    }
 
     protected void doSetUp() throws Exception
     {

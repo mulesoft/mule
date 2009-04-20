@@ -10,16 +10,15 @@
 
 package org.mule.module.pgp;
 
-import java.net.URL;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.encryption.EncryptionTransformer;
 import org.mule.transformer.simple.ByteArrayToObject;
 
-public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractMuleTestCase
+import java.net.URL;
+
+public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncryptionStrategyTestCase
 {
     private KeyBasedEncryptionStrategy kbStrategy;
     

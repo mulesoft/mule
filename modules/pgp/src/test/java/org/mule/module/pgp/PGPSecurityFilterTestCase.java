@@ -31,6 +31,12 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     protected static final String DIRECTORY = "output";
     protected static final String MESSAGE_EXCEPTION = "No signed message found. Message payload is of type: String";
 
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        return (AbstractEncryptionStrategyTestCase.isCryptographyExtensionInstalled() == false);
+    }
+    
     protected String getConfigResources()
     {
         return "test-pgp-encrypt-config.xml";
