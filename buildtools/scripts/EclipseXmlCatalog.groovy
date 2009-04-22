@@ -41,7 +41,7 @@ if (options.e)
     base = "http://www.mulesource.com/schema/mule/"
 }
 
-schemaVersion = "2.2"
+schemaVersion = "3.0"
 if (options.s)
 {
     schemaVersion = options.s
