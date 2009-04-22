@@ -39,7 +39,12 @@ public class CustomTransactionManagerTestCase extends FunctionalTestCase
         assertEquals(properties.get("property2"), "Test");
     }
 
-/*
+
+    /*
+     * Attention: this test only runs successful when it's the only one. As soon
+     * as the test above is added, muleContext contains more than one transaction
+     * manager and all kinds of havoc happen here.
+     
     public void testWeblogicTransactionManager() throws Exception
     {
         TransactionManager transactionManager = muleContext.getTransactionManager();
@@ -50,5 +55,6 @@ public class CustomTransactionManagerTestCase extends FunctionalTestCase
         transactionManager.rollback();
         assertNull(transactionManager.getTransaction());
     }
-*/
+    */
+
 }
