@@ -144,6 +144,7 @@ saaj-api-1.3-osgi
 saaj-impl-1.3-osgi
 saxon-8.9.0.4-osgi
 saxon-dom-8.9.0.4-osgi
+saxon-xqj-8.9.0.4
 script-api-1.0-osgi-jdk14
 servlet-api-2.5-6.1.11
 slf4j-api-1.5.0
