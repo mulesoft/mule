@@ -14,20 +14,17 @@
 
     <vm:connector name="vm" queueEvents="true"/>
 
-    <cometd:servlet-connector name="cometdConnector" servletUrl="http://localhost:8080"/>
+    <cometd:servlet-connector name="cometdConnector" servletUrl="http://localhost:58883"/>
 
-
-    <endpoint name="clientCometEndpoint" address="cometd-servlet://mule/notification" connector-ref="cometdConnector">
-        <!--<json:object-to-json-transformer/>-->
-    </endpoint>
-
+    <cometd:servlet-endpoint name="endpoint1" path="/service/test"/>
+    <cometd:servlet-endpoint name="endpoint2" path="/service/test2"/>
 
     <vm:endpoint name="in" path="in"/>
 
     <model name="main">
         <service name="testComponent">
             <inbound>
-                <inbound-endpoint ref="clientEndpoint"/>
+                <cometd:inbound-endpoint ref="endpoint1"/>
             </inbound>
             <test:component appendString=" Received"/>
             <outbound>
@@ -39,7 +36,7 @@
 
         <service name="testComponent2">
             <inbound>
-                <inbound-endpoint ref="clientEndpoint2"/>
+                <cometd:inbound-endpoint ref="endpoint2"/>
             </inbound>
             <echo-component/>
             <outbound>
@@ -56,7 +53,7 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="clientEndpoint2"/>
+                    <vm:outbound-endpoint path="endpoint2"/>
                 </pass-through-router>
             </outbound>
         </service>

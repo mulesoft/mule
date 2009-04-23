@@ -16,13 +16,40 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.transport.cometd.container.MuleCometdServlet;
 
-public class CometdFunctionalTestCase extends FunctionalTestCase
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.jetty.nio.SelectChannelConnector;
+
+public class CometdContainerFunctionalTestCase extends FunctionalTestCase
 {
+    private Server httpServer;
+
+    // @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+
+        httpServer = new Server(58883);
+        Context context = new Context(httpServer, "/", Context.SESSIONS);
+        context.addServlet(new ServletHolder(new MuleCometdServlet()), "/cometd/*");
+
+        httpServer.start();
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        if(httpServer!=null) httpServer.stop();
+    }
+
     @Override
     protected String getConfigResources()
     {
-        return "comet-embedded-functional-roundtrip-test.xml";
+        return "comet-container-functional-roundtrip-test.xml";
     }
 
     public void testDispatchReceiveSimple() throws Exception

@@ -118,45 +118,45 @@
     </xsd:complexType>
 
     
-    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
+    <xsd:element name="inbound-endpoint" type="cometdInboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
                 Allows a Mule service to receive AJAX events over HTTP using a Jetty server.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="inboundEndpointType">
+    <xsd:complexType name="cometdInboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="http:inboundEndpointType"/>
+            <xsd:extension base="mule:inboundEndpointType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
+    <xsd:element name="outbound-endpoint" type="cometdOutboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
                 Allows a Mule service to send AJAX evnets over HTTP using Bayeux.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="outboundEndpointType">
+    <xsd:complexType name="cometdOutboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="http:outboundEndpointType">
+            <xsd:extension base="mule:outboundEndpointType">
               <xsd:attributeGroup ref="outboundCometdAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
 
     </xsd:complexType>
 
-    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
+    <xsd:element name="endpoint" type="cometdGlobalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
         <xsd:annotation>
             <xsd:documentation>
                 Allows users to configure a global Jetty CometD endpoint.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="globalEndpointType">
+    <xsd:complexType name="cometdGlobalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="http:globalEndpointType"/>
+            <xsd:extension base="mule:globalEndpointType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

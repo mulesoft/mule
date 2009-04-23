@@ -14,16 +14,15 @@
 
     <vm:connector name="vm" queueEvents="true"/>
 
-    <cometd:endpoint name="clientEndpoint" address="http://0.0.0.0:58080/service/test"/>
-    <cometd:endpoint name="clientEndpoint2" address="http://0.0.0.0:58080/service/test2"/>
-
+    <cometd:endpoint name="endpoint1" address="http://0.0.0.0:58080/service/test"/>
+    <cometd:endpoint name="endpoint2" address="http://0.0.0.0:58080/service/test2"/>
 
     <vm:endpoint name="in" path="in"/>
 
     <model name="main">
         <service name="testComponent">
             <inbound>
-                <inbound-endpoint ref="clientEndpoint"/>
+                <inbound-endpoint ref="endpoint1"/>
             </inbound>
             <test:component appendString=" Received"/>
             <outbound>
@@ -35,7 +34,7 @@
 
         <service name="testComponent2">
             <inbound>
-                <inbound-endpoint ref="clientEndpoint2"/>
+                <inbound-endpoint ref="endpoint2"/>
             </inbound>
             <echo-component/>
             <outbound>
@@ -52,7 +51,7 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="clientEndpoint2"/>
+                    <vm:outbound-endpoint path="endpoint2"/>
                 </pass-through-router>
             </outbound>
         </service>
