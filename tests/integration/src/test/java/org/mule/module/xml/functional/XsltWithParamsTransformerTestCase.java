@@ -11,7 +11,9 @@
 package org.mule.module.xml.functional;
 
 import org.mule.RequestContext;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.FunctionalTestCase;
 
@@ -25,19 +27,13 @@ public class XsltWithParamsTransformerTestCase extends FunctionalTestCase
         return "org/mule/module/xml/xml-namespace-test.xml";
     }
 
-    protected void doSetUp() throws Exception
-    {
-        MuleEvent event = getTestEvent("<testing/>");
-        //We need a current event to pull the parameter from
-        event.getMessage().setProperty("Welcome", "hello");
-        RequestContext.setEvent(event);
-    }
-
     public void testTransformWithParameter() throws Exception
     {
         Transformer trans = muleContext.getRegistry().lookupTransformer("test1");
         assertNotNull(trans);
-        Object result = trans.transform("<testing/>");
+        MuleMessage message = new DefaultMuleMessage("<testing/>");
+        message.setProperty("Welcome", "hello");
+        Object result = trans.transform(message);
         assertNotNull(result);
         XMLUnit.setIgnoreWhitespace(true);
         XMLAssert.assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><echo-value xmlns=\"http://test.com\">hello</echo-value>", result);
