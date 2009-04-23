@@ -52,4 +52,9 @@ public class XmlMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 7, transformerName);
     }
+
+    public static Message converterClassDoesNotImplementInterface(Class converter)
+    {
+        return factory.createMessage(BUNDLE_PATH, 8, converter);
+    }
 }

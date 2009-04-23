@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transformers.xml;
+package org.mule.transformers.xml.xstream;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XStreamFactory;
@@ -52,14 +52,14 @@ public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCas
     {
         XmlToObject transformer = new XmlToObject();
         // check for XStream's default
-        assertEquals(XStreamFactory.XSTREAM_XPP_DRIVER, transformer.getDriverClassName());
+        assertEquals(XStreamFactory.XSTREAM_XPP_DRIVER, transformer.getDriverClass());
     }
 
     public void testCustomDriver() throws Exception
     {
         XmlToObject transformer = new XmlToObject();
         // set custom driver
-        transformer.setDriverClassName(MyDOMDriver.class.getName());
+        transformer.setDriverClass(MyDOMDriver.class.getName());
         XStream xs = transformer.getXStream();
 
         assertNotNull(xs);
@@ -71,7 +71,7 @@ public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCas
     {
         XmlToObject transformer = new XmlToObject();
         // set nonexisting driver class
-        transformer.setDriverClassName("DudeWhereIsMyDriver");
+        transformer.setDriverClass("DudeWhereIsMyDriver");
 
         try
         {

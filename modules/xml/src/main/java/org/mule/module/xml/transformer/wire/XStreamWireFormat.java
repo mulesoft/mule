@@ -33,13 +33,13 @@ public class XStreamWireFormat extends TransformerPairWireFormat
         throws IllegalAccessException, InstantiationException, ClassNotFoundException
     {
         XmlToObject in = new XmlToObject();
-        in.setDriverClassName(driverClassName);
+        in.setDriverClass(driverClassName);
         in.setAliases(aliases);
         in.setConverters(converters);
         setInboundTransformer(in);
 
         ObjectToXml out = new ObjectToXml();
-        out.setDriverClassName(driverClassName);
+        out.setDriverClass(driverClassName);
         out.setAliases(aliases);
         out.setConverters(converters);
         // TODO This is currently needed as a workaround for MULE-2881, this needs to

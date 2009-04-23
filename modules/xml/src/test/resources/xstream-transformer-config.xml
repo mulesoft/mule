@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
+      xmlns:mulexml="http://www.mulesource.org/schema/mule/xml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/xml http://www.mulesource.org/schema/mule/xml/3.0/mule-xml.xsd
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd">
+
+
+
+    <mulexml:object-to-xml-transformer name="ObjectToXml">
+        <mulexml:alias name="apple" class="org.mule.tck.testmodels.fruit.Apple"/>
+        <mulexml:converter class="org.mule.transformers.xml.xstream.DummyConverter"/>
+    </mulexml:object-to-xml-transformer>
+
+    <!-- TODO: allow finer control over xstream configuration.  Sample shown here -->
+     <!--<mulexml:xstream-config>-->
+         <!--<mulexml:alias alias="apple" class="org.mule.tck.testmodels.fruit.Apple" default-implementation-class=""/>-->
+         <!--<mulexml:alias-field alias="apple" class="org.mule.tck.testmodels.fruit.Apple" field-name="fruit"/>-->
+         <!--<mulexml:alias-attribute class="apple" atrribute-name="org.mule.tck.testmodels.fruit.Apple" alias="fruit"/>-->
+         <!--<mulexml:alias-package package="apple" alias="fruit"/>-->
+         <!--<mulexml:alias-system-atrribute attribute-name="apple" alias="fruit"/>-->
+         <!--<mulexml:alias-type class="apple" alias="fruit"/>-->
+         <!--<mulexml:immutable-type class="apple"/>-->
+
+
+         <!--<mulexml:default-implementation default-class="apple" type-class="org.mule.tck.testmodels.fruit.Apple"/>-->
+         <!--<mulexml:implicit-collection owner-class-type="" field-name="" item-field-name="" item-class-type=""/>-->
+
+     <!--</mulexml:xstream-config>-->
+</mule>

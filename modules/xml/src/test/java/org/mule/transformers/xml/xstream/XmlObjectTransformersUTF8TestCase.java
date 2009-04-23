@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transformers.xml;
+package org.mule.transformers.xml.xstream;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.module.xml.transformer.XmlToObject;

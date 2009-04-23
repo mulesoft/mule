@@ -11,10 +11,12 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.Converter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,9 +33,9 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTransformer
 {
     private final AtomicReference/* XStream */xstream = new AtomicReference();
-    private volatile String driverClassName = XStreamFactory.XSTREAM_XPP_DRIVER;
-    private volatile Map aliases = null;
-    private volatile List converters = null;
+    private volatile String driverClass = XStreamFactory.XSTREAM_XPP_DRIVER;
+    private volatile Map<String, Class> aliases = null;
+    private volatile List<Class> converters = null;
 
     public final XStream getXStream() throws TransformerException
     {
@@ -43,7 +45,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
         {
             try
             {
-                instance = new XStreamFactory(driverClassName, aliases, converters).getInstance();
+                instance = new XStreamFactory(driverClass, aliases, converters).getInstance();
                 if (!xstream.compareAndSet(null, instance))
                 {
                     instance = (XStream)xstream.get();
@@ -61,29 +63,29 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
     public Object clone() throws CloneNotSupportedException
     {
         AbstractXStreamTransformer clone = (AbstractXStreamTransformer) super.clone();
-        clone.setDriverClassName(driverClassName);
+        clone.setDriverClass(driverClass);
 
         if (aliases != null)
         {
-            clone.setAliases(new HashMap(aliases));
+            clone.setAliases(new HashMap<String, Class>(aliases));
         }
         
         if (converters != null)
         {
-            clone.setConverters(new ArrayList(converters));
+            clone.setConverters(new ArrayList<Class>(converters));
         }
 
         return clone;
     }
 
-    public String getDriverClassName()
+    public String getDriverClass()
     {
-        return driverClassName;
+        return driverClass;
     }
 
-    public void setDriverClassName(String driverClassName)
+    public void setDriverClass(String driverClass)
     {
-        this.driverClassName = driverClassName;
+        this.driverClass = driverClass;
         // force XStream instance update
         this.xstream.set(null);
     }
@@ -93,7 +95,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
         return aliases;
     }
 
-    public void setAliases(Map aliases)
+    public void setAliases(Map<String, Class> aliases)
     {
         this.aliases = aliases;
         // force XStream instance update
@@ -105,16 +107,10 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
         return converters;
     }
 
-    public void setConverters(List converters)
+    public void setConverters(List<Class> converters)
     {
         this.converters = converters;
         // force XStream instance update
         this.xstream.set(null);
     }
-
-    protected boolean requiresCurrentEvent()
-    {
-        return false;
-    }
-
 }

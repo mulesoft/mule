@@ -436,7 +436,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
 
     <xsd:complexType name="objectToXmlType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractTransformerType">
+            <xsd:extension base="xstreamTransformerType">
                 <xsd:attribute name="acceptMuleMessage" type="mule:substitutableBoolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -456,7 +456,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="xml-to-object-transformer" type="mule:abstractTransformerType"
+    <xsd:element name="xml-to-object-transformer" type="xstreamTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
@@ -465,9 +465,43 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:complexType name="xstreamTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransformerType">
+                 <xsd:sequence>
+                    <xsd:element name="alias" type="aliasType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="converter" type="converterType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The core of XStream consists of a registry of Converters. The responsibility of a
+                                Converter is to provide a strategy for converting particular types of objects found in
+                                the object graph, to and from XML. XStream is provided with Converters for common types
+                                such as primitives, String, File, Collections, arrays, and Dates. For a list of defautl convers
+                                see: http://xstream.codehaus.org/converters.html
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="driverClass" type="mule:substitutableClass">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Which XStream driver class to use.  Unless you know what you are doing the default will be fine for most cases.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="xslt-transformer" type="xsltTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
-            <xsd:documentation>The XSLT transformer uses XSLT to transform the message payload. Transformation objects are pooled for better performance. You can set transformation context properties on the transformer and can pull these properties from the message using Expression Evaluators. This works in a very similar way to the <a href="http://www.muleforge.org/display/EXTENDEDXML/XQuery" target="_blank">XQuery Transformer</a> on <a href="http://www.muleforge.org" target="_blank">MuleForge</a>.
+            <xsd:documentation>The XSLT transformer uses XSLT to transform the message payload. Transformation objects are pooled for better performance. You can set transformation context properties on the transformer and can pull these properties from the message using Expression Evaluators.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -523,6 +557,66 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="xquery-transformer" type="xqueryTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>An Xml transformer uses XQuery to transform the message payload. Transformation objects are pooled for better performance. You can set transformation context properties on the transformer and can pull these properties from the message using Expression Evaluators.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="xqueryTransformerType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="xmlTransformerType">
+                <xsd:sequence>
+                    <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>A property that wil be made available to the XQuery transform context. Expression Evaluators can be used to grab these properties from the message at runtime.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    
+                    <xsd:element name="xquery-text" type="xsd:string" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>The inline XQuery script definition. This is not required if the &lt;xquery-file&gt; attribute is set.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                </xsd:sequence>
+                <xsd:attribute name="maxIdleTransformers" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>Transformers are pooled for better throughput, since performing and XQuery transformation can be expensive. This attribute controls how many instances will remain idle in the transformer pool.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="maxActiveTransformers" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>The total number of XQuery transformers that will get pooled at any given time.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="xquery-file" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>The full path to the XQuery template file to use when performing the transformation. This can be a path on the local file system or on the classpath. This attribute is not required if the &lt;xquery-text&gt; element has been set.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="configuration-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to a Saxon configuration object to configure the transformer (configured as a Spring bean). If not set, the default Saxon configuration is used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="xqueryTextType" mixed="true">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="mule:abstractExtensionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
     <xsd:complexType name="xsltTextType">
         <xsd:sequence maxOccurs="1" minOccurs="1">
             <xsd:any namespace="http://www.w3.org/1999/XSL/Transform" minOccurs="0" maxOccurs="1"
@@ -677,4 +771,22 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
         <xsd:attribute name="uri" type="xsd:string" use="required"/>
     </xsd:complexType>
 
+    <xsd:complexType name="aliasType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An alias used when serializing object to XML. The Alias replaces a fully qualified class name
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="converterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                defines one or more class names for converters to be used by XStream to handle different object types.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+    </xsd:complexType>
 </xsd:schema>

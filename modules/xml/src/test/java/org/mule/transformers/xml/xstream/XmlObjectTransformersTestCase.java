@@ -8,34 +8,43 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transformers.xml;
+package org.mule.transformers.xml.xstream;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.transformers.xml.AbstractXmlTransformerTestCase;
 
 import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCase
 {
     private Apple testObject = null;
+    private Map<String, Class> aliases = new HashMap<String, Class>();
 
     public XmlObjectTransformersTestCase()
     {
+        aliases.put("apple", Apple.class);
         testObject = new Apple();
         testObject.wash();
     }
 
     public Transformer getTransformer() throws Exception
     {
-        return new ObjectToXml();
+        ObjectToXml trans =  new ObjectToXml();
+        trans.setAliases(aliases);
+        return trans;
     }
 
     public Transformer getRoundTripTransformer() throws Exception
     {
-        return new XmlToObject();
+        XmlToObject trans = new XmlToObject();
+        trans.setAliases(aliases);
+        return trans;
     }
 
     public Object getTestData()
@@ -45,13 +54,14 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
 
     public Object getResultData()
     {
-        return "<org.mule.tck.testmodels.fruit.Apple>\n" + "  <bitten>false</bitten>\n"
-               + "  <washed>true</washed>\n" + "</org.mule.tck.testmodels.fruit.Apple>";
+        return "<apple>\n" + "  <bitten>false</bitten>\n"
+               + "  <washed>true</washed>\n" + "</apple>";
     }
     
     public void testStreaming() throws TransformerException
     {
         XmlToObject transformer = new XmlToObject();
+        transformer.setAliases(aliases);
         
         String input = (String) this.getResultData();
         assertEquals(testObject, transformer.transform(new ByteArrayInputStream(input.getBytes())));

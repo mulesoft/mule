@@ -11,6 +11,8 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.util.ClassUtils;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.module.xml.i18n.XmlMessages;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -41,7 +43,7 @@ public class XStreamFactory
         this(XSTREAM_XPP_DRIVER, null, null);
     }
 
-    public XStreamFactory(String driverClassName, Map aliases, List converters)
+    public XStreamFactory(String driverClassName, Map<String, Class> aliases, List<Class> converters)
         throws ClassNotFoundException, InstantiationException, IllegalAccessException
     {
         Class driverClass = ClassUtils.loadClass(driverClassName, this.getClass());
@@ -54,20 +56,17 @@ public class XStreamFactory
 
         if (aliases != null)
         {
-            for (Iterator iterator = aliases.entrySet().iterator(); iterator.hasNext();)
+            for (Map.Entry<String, Class> entry : aliases.entrySet())
             {
-                Map.Entry entry = (Map.Entry)iterator.next();
-                Class aliasClass = ClassUtils.loadClass(entry.getValue().toString(), getClass());
-                xstream.alias(entry.getKey().toString(), aliasClass);
+                xstream.alias(entry.getKey(), entry.getValue());
             }
         }
 
         if (converters != null)
         {
-            for (Iterator iterator = converters.iterator(); iterator.hasNext();)
+            for (Class converter : converters)
             {
-                Class converterClazz = ClassUtils.loadClass(iterator.next().toString(), getClass());
-                xstream.registerConverter((Converter)converterClazz.newInstance());
+                xstream.registerConverter((Converter)converter.newInstance());
             }
         }
     }
