@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--// START SNIPPET: full-config -->
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
+      xmlns:mxml="http://www.mulesource.org/schema/mule/xml"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm"
+      xmlns:stdio="http://www.mulesource.org/schema/mule/stdio"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+      http://www.mulesource.org/schema/mule/stdio http://www.mulesource.org/schema/mule/stdio/3.0/mule-stdio.xsd
+      http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
+      http://www.mulesource.org/schema/mule/xml http://www.mulesource.org/schema/mule/xml/3.0/mule-xml.xsd
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd">
+
+<!--// START SNIPPET: transformer-config -->
+    <mxml:xquery-transformer name="xquery">
+        <mxml:context-property key="title" value="#[mule:message.header(ListTitle)]"/>
+        <mxml:context-property key="rating" value="#[mule:message.header(ListRating)]"/>
+
+        <mxml:xquery-text>
+           <![CDATA[
+                declare variable $document external;
+                declare variable $title external;
+                declare variable $rating external;
+
+                <cd-listings title='{$title}' rating='{$rating}'> {
+                    for $cd in $document/catalog/cd
+                    return <cd-title>{data($cd/title)}</cd-title>
+                } </cd-listings>
+            ]]>
+        </mxml:xquery-text>
+    </mxml:xquery-transformer>
+<!--// END SNIPPET: transformer-config -->
+
+    <model name="main">
+    <service name="Echo">
+        <inbound>
+            <!-- this endpoint is used by the functional test -->
+            <vm:inbound-endpoint path="test.in" transformer-refs="xquery" synchronous="true"/>
+        </inbound>
+
+        <echo-component/>
+
+        <outbound>
+            <multicasting-router>
+                <vm:outbound-endpoint path="test.out"/>
+                <stdio:outbound-endpoint system="OUT"/>
+            </multicasting-router>
+        </outbound>
+    </service>
+    </model>
+
+</mule>
+<!--// END SNIPPET: full-config -->

@@ -136,6 +136,14 @@
             <version>${saxonVersion}-osgi</version>
         </dependency>
 
+        <!-- XQuery support -->
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon-xqj</artifactId>
+            <version>${saxonVersion}</version>
+        </dependency>
+
+
         <!-- Unit tests -->
         <dependency>
             <groupId>org.mule</groupId>

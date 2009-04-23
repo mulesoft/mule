@@ -12,6 +12,7 @@ package org.mule.module.xml.transformer;
 
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.MuleMessage;
 
 /** <code>DomDocumentToXml</code> Transform a org.w3c.dom.Document to XML String */
 public class DomDocumentToXml extends AbstractXmlTransformer implements DiscoverableTransformer
@@ -23,8 +24,9 @@ public class DomDocumentToXml extends AbstractXmlTransformer implements Discover
         setReturnClass(String.class);
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object transform(MuleMessage message, String encoding) throws TransformerException
     {
+        Object src = message.getPayload();
         try
         {
             // We now offer XML in byte OR String form.

@@ -10,6 +10,7 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
@@ -47,8 +48,9 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
         setReturnClass(OutputHandler.class);
     }
 
-    public Object doTransform(final Object src, final String encoding) throws TransformerException
+    public Object transform(MuleMessage message, final String encoding) throws TransformerException
     {
+        final Object src = message.getPayload();
         return new OutputHandler()
         {
             public void write(MuleEvent event, OutputStream out) throws IOException

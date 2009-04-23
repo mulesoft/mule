@@ -30,15 +30,36 @@ import org.w3c.dom.Node;
  */
 public class TextDefinitionParser extends ChildDefinitionParser
 {
+    private boolean requireCdata = false;
+
     public TextDefinitionParser(String setterMethod)
     {
         super(setterMethod, String.class);
+    }
+
+     public TextDefinitionParser(String setterMethod, boolean requireCdata)
+    {
+        super(setterMethod, String.class);
+        this.requireCdata = requireCdata;
     }
 
     @Override
     protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {        
         Node node = element.getFirstChild();
+
+        if(requireCdata && node.getNodeType() != Node.CDATA_SECTION_NODE)
+        {
+            node = node.getNextSibling();
+            if(node == null)
+            {
+                 throw new IllegalArgumentException("No CDATA node found in " + element.getNodeName());
+            }
+            else if(node.getNodeType() != Node.CDATA_SECTION_NODE)
+            {
+                 throw new IllegalArgumentException("Sibling node is not a CDATA section, but one should be defined. Elements is " + element.getNodeName());
+            }
+        }
         if (node != null)
         {
             String value = node.getNodeValue();

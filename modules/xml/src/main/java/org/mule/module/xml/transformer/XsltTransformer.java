@@ -13,6 +13,7 @@ package org.mule.module.xml.transformer;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
@@ -20,6 +21,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.util.XMLUtils;
+import org.mule.module.xml.util.LocalURIResolver;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -148,8 +150,9 @@ public class XsltTransformer extends AbstractXmlTransformer implements MuleConte
      * @param src The source XML (String, byte[], DOM, etc.)
      * @return The result in the type specified by the user
      */
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object transform(MuleMessage message, String encoding) throws TransformerException
     {
+        Object src = message.getPayload();
         try
         {
             Source sourceDoc = XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), src);
@@ -170,10 +173,10 @@ public class XsltTransformer extends AbstractXmlTransformer implements MuleConte
             // as it is the most efficient.
             if (holder == null || DelayedResult.class.equals(returnClass))
             {
-                return getDelayedResult(encoding, sourceDoc);
+                return getDelayedResult(message, encoding, sourceDoc);
             }
             
-            doTransform(encoding, sourceDoc, holder.getResult());
+            doTransform(message, encoding, sourceDoc, holder.getResult());
             
             return holder.getResultObject();
         }
@@ -183,7 +186,7 @@ public class XsltTransformer extends AbstractXmlTransformer implements MuleConte
         }
     }
 
-    protected Object getDelayedResult(final String encoding, final Source sourceDoc)
+    protected Object getDelayedResult(final MuleMessage message, final String encoding, final Source sourceDoc)
     {
         return new DelayedResult()
         {
@@ -191,7 +194,7 @@ public class XsltTransformer extends AbstractXmlTransformer implements MuleConte
             
             public void write(Result result) throws Exception
             {
-                doTransform(encoding, sourceDoc, result);
+                doTransform(message, encoding, sourceDoc, result);
             }
 
             public String getSystemId()
@@ -206,7 +209,7 @@ public class XsltTransformer extends AbstractXmlTransformer implements MuleConte
         };
     }
 
-    protected void doTransform(String encoding, Source sourceDoc, Result result)
+    protected void doTransform(MuleMessage message, String encoding, Source sourceDoc, Result result)
         throws Exception
     {
         DefaultErrorListener errorListener = new DefaultErrorListener(this);
@@ -226,7 +229,7 @@ public class XsltTransformer extends AbstractXmlTransformer implements MuleConte
                 {
                     Map.Entry parameter = (Entry) i.next();
                     String key = (String) parameter.getKey();
-                    transformer.setParameter(key, evaluateTransformParameter(key, parameter.getValue()));
+                    transformer.setParameter(key, evaluateTransformParameter(key, parameter.getValue(), message));
                 }
             }
 
@@ -495,44 +498,13 @@ public class XsltTransformer extends AbstractXmlTransformer implements MuleConte
      * @return the object to be set as the parameter value
      * @throws TransformerException
      */
-    protected Object evaluateTransformParameter(String name, Object value) throws TransformerException
+    protected Object evaluateTransformParameter(String name, Object value, MuleMessage message) throws TransformerException
     {
         if (value instanceof String)
         {
-            String stringValue = (String) value;
-
-            if (!stringValue.startsWith(PARAM_EXTRACTOR_TOKEN))
-            {
-                return stringValue;
-            }
-            else
-            {
-                MuleEventContext context = RequestContext.getEventContext();
-
-                if (context == null)
-                {
-                    throw new TransformerException(CoreMessages.noCurrentEventForTransformer(), this);
-                }
-                return muleContext.getExpressionManager().evaluate(value.toString(), context.getMessage());
-            }
+            return muleContext.getExpressionManager().parse(value.toString(), message);
         }
 
         return value;
-    }
-
-    private class LocalURIResolver implements URIResolver
-    {
-        public Source resolve(String href, String base)
-                throws javax.xml.transform.TransformerException
-        {
-            try
-            {
-                return new StreamSource(IOUtils.getResourceAsStream(href, getClass()));
-            }
-            catch (IOException e)
-            {
-                throw new javax.xml.transform.TransformerException(e);
-            }
-        }
     }
 }

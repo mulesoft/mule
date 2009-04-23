@@ -11,7 +11,9 @@
 package org.mule.transformers.xml;
 
 import org.mule.RequestContext;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -66,7 +68,10 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
     public Object getTestData()
     {
-        return srcData;
+        Map props = new HashMap();
+        props.put("ListTitle", "MyList");
+        props.put("ListRating", new Integer(6));
+        return new DefaultMuleMessage(srcData, props);
     }
 
     public Object getResultData()
@@ -160,6 +165,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
         XsltTransformer transformer = new XsltTransformer();
 
+        transformer.setMuleContext(muleContext);
         transformer.setReturnClass(String.class);
         // set stylesheet
         transformer.setXslt(xsl);
@@ -214,6 +220,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
         XsltTransformer transformer = new XsltTransformer();
 
+        transformer.setMuleContext(muleContext);        
         transformer.setReturnClass(String.class);
         transformer.setMuleContext(muleContext);
         // set stylesheet
@@ -227,13 +234,10 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         // init transformer
         transformer.initialise();
 
-        // set up MuleEventContext
-        MuleEvent event = MuleTestUtils.getTestEvent("test message data", muleContext);
-        event.getMessage().setProperty("myproperty", param);
-        RequestContext.setEvent(event);
-
+        MuleMessage message = new DefaultMuleMessage(xml);
+        message.setProperty("myproperty", param);
         // do transformation
-        String transformerResult = (String) transformer.transform(xml);
+        String transformerResult = (String) transformer.transform(message);
 
         // remove doc type and CRLFs
         transformerResult = transformerResult.substring(transformerResult.indexOf("?>") + 2);

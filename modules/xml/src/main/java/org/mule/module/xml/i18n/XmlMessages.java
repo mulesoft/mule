@@ -42,4 +42,14 @@ public class XmlMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 5);
     }
+
+    public static Message streamNotAvailble(String transformerName)
+    {
+        return factory.createMessage(BUNDLE_PATH, 6, transformerName);
+    }
+
+    public static Message objectNotAvailble(String transformerName)
+    {
+        return factory.createMessage(BUNDLE_PATH, 7, transformerName);
+    }
 }

@@ -12,6 +12,7 @@ package org.mule.module.xml.transformer;
 
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.MuleMessage;
 import org.mule.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLStreamReader;
@@ -26,8 +27,9 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
 {
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object transform(MuleMessage message, String encoding) throws TransformerException
     {
+        Object src = message.getPayload();
         try
         {
             Source sourceDoc = XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), src);

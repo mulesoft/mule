@@ -12,6 +12,7 @@ package org.mule.module.xml.transformer;
 
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.MuleMessage;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.module.xml.util.XMLUtils;
@@ -43,15 +44,16 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
         
     }
 
-    protected Object doTransform(Object payload, String encoding) throws TransformerException
+    public Object transform(MuleMessage message, String encoding) throws TransformerException
     {
-        try 
+        Object src = message.getPayload();
+        try
         {
-            XMLStreamReader xsr = XMLUtils.toXMLStreamReader(getXMLInputFactory(), payload);
+            XMLStreamReader xsr = XMLUtils.toXMLStreamReader(getXMLInputFactory(), src);
             if (xsr == null)
             {
                 throw new TransformerException(MessageFactory
-                    .createStaticMessage("Unable to convert " + payload.getClass() + " to XMLStreamReader."));
+                    .createStaticMessage("Unable to convert " + src.getClass() + " to XMLStreamReader."));
             }
         
             if (reversible && !(xsr instanceof ReversibleXMLStreamReader))
