@@ -1,4 +1,3 @@
-
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
@@ -8,12 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.transformers;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.util.IOUtils;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.util.IOUtils;
 
 import java.util.HashMap;
 import java.util.Map;
