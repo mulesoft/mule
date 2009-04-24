@@ -33,8 +33,6 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
         this.store = new ConcurrentSkipListMap();
     }
 
-    
-
     /**
      * Check whether the given Object is already registered with this store.
      *

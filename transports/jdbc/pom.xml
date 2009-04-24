@@ -33,7 +33,7 @@
             <artifactId>commons-dbutils</artifactId>
             <version>${commonsDbUtilsVersion}-osgi</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>com.experlog</groupId>
             <artifactId>xapool</artifactId>
             <version>${xaPoolVersion}-osgi</version>
