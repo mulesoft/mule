@@ -49,7 +49,6 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         super();
     }
 
-
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -61,11 +60,6 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         return id;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueuePersistenceStrategy#store(java.lang.Object)
-     */
     public Object store(String queue, Object obj) throws IOException
     {
         String id = getId(obj);
@@ -77,11 +71,6 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         return id;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueuePersistenceStrategy#remove(java.lang.Object)
-     */
     public void remove(String queue, Object id) throws IOException
     {
         File file = FileUtils.newFile(store, queue + File.separator + id + EXTENSION);
@@ -98,11 +87,6 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueuePersistenceStrategy#load(java.lang.Object)
-     */
     public Object load(String queue, Object id) throws IOException
     {
         File file = FileUtils.newFile(store, queue + File.separator + id + EXTENSION);
@@ -126,11 +110,6 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueuePersistenceStrategy#restore()
-     */
     public List restore() throws IOException
     {
         List msgs = new ArrayList();
@@ -176,11 +155,6 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.util.queue.QueuePersistenceStrategy#open()
-     */
     public void open() throws IOException
     {
         String path = muleContext.getConfiguration().getWorkingDirectory() + File.separator + DEFAULT_QUEUE_STORE;
@@ -188,11 +162,6 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         store.mkdirs();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueuePersistenceStrategy#close()
-     */
     public void close() throws IOException
     {
         // Nothing to do

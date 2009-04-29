@@ -16,8 +16,6 @@ import org.mule.transport.AbstractMessageAdapterTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
-import java.util.Arrays;
-
 
 public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
@@ -25,11 +23,7 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
     private byte[] validMessage = validMessageContent.getBytes();
     private File messageFile;
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see junit.framework.TestCase#setUp()
-     */
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -45,21 +39,11 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
         FileUtils.writeStringToFile(messageFile, validMessageContent, null);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#getValidMessage()
-     */
     public Object getValidMessage()
     {
         return validMessage;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
-     */
     public MessageAdapter createAdapter(Object payload) throws MessagingException
     {
         if (payload.equals(validMessage))

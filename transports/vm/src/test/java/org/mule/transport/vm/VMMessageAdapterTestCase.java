@@ -24,11 +24,6 @@ import org.mule.transport.DefaultMessageAdapter;
 public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
-     */
     public MessageAdapter createAdapter(Object payload) throws MessageTypeNotSupportedException
     {
         if (payload instanceof MuleMessage)
@@ -41,21 +36,11 @@ public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#getValidMessage()
-     */
     public Object getValidMessage() throws MuleException
     {
         return new DefaultMuleMessage("Valid Message");
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#getInvalidMessage()
-     */
     public Object getInvalidMessage()
     {
         return "Invalid message";

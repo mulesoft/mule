@@ -32,21 +32,11 @@ public class MailMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, "pop3", null);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
-     */
     public MessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new MailMessageAdapter(payload);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#getValidMessage()
-     */
     public Object getValidMessage() throws Exception
     {
         if (message == null)
@@ -57,5 +47,5 @@ public class MailMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 
         return message;
     }
-
+    
 }

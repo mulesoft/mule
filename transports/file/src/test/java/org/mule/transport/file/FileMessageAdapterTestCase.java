@@ -25,11 +25,6 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
     private File message;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -44,21 +39,11 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         message = File.createTempFile("simple", ".mule", dir);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#getValidMessage()
-     */
     public Object getValidMessage()
     {
         return message;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
-     */
     public MessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new FileMessageAdapter(payload);
@@ -108,6 +93,5 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         {
             fail("FileMessageAdaptor supports File or FileInputStream");
         }
-
     }
 }
