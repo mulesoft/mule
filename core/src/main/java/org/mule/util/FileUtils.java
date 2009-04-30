@@ -206,10 +206,11 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             if (resource.startsWith("file:/"))
             {
                 resource = resource.substring(6);
-            }
-            if (!resource.startsWith(File.separator))
-            {
-                resource = File.separator + resource;
+
+                if (!resource.startsWith(File.separator))
+                {
+                    resource = File.separator + resource;
+                }
             }
         }
         return resource;
