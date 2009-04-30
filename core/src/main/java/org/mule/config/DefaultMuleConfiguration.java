@@ -94,8 +94,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration
 
     public DefaultMuleConfiguration()  
     {
-        super();
-        
         // Apply any settings which come from the JVM system properties.
         applySystemProperties();
         

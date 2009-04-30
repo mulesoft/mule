@@ -14,10 +14,14 @@ import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.util.StringUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -107,8 +111,17 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
     protected MuleContext createMuleContext(String configResource, ServletContext context)
         throws ConfigurationException, InitialisationException
     {
+        final String serverId = StringUtils.defaultIfEmpty(context.getInitParameter("mule.serverId"), null);
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context, configResource);
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+
+        DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+        if (serverId != null)
+        {
+            muleConfiguration.setId(serverId);
+        }
+        MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder();
+        muleContextBuilder.setMuleConfiguration(muleConfiguration);
 
         // Support Spring-first configuration in webapps
         final ApplicationContext parentContext = (ApplicationContext) context.getAttribute(
@@ -117,7 +130,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
         {
             builder.setParentContext(parentContext);
         }
-        return muleContextFactory.createMuleContext(builder);
+        return muleContextFactory.createMuleContext(builder, muleContextBuilder);
     }
 
     /**

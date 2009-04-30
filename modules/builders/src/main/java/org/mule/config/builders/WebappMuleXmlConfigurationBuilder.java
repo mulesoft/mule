@@ -46,7 +46,7 @@ import org.springframework.web.context.support.ServletContextResource;
  * <li> Classpath resources should be in the webapp classpath and should not start
  * with '/'.
  * 
- * @see org.mule.config.builders.SpringXmlConfigurationBuilder
+ * @see org.mule.config.spring.SpringXmlConfigurationBuilder
  */
 public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBuilder
 {
