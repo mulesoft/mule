@@ -169,7 +169,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         }
         finally
         {
-            if (endpoint.getMuleContext().getTransactionManager() != null || tx == null)
+            if (tx == null || tx.isXA())
             {
                 // We are running in an XA transaction.
                 // This call is required here for compatibility with strict XA
