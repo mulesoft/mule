@@ -33,8 +33,8 @@ import java.text.MessageFormat;
  * compatibility. The following demonstrates how to achieve the same results when using the <code>ExpressionFilenameParser</code>
  * over the {@link org.mule.transport.file.SimpleFilenameParser}.
  * <ul>
- * <li>#[DATE] : #[function:dateStamp]</li>
- * <li>#[DATE:yy-MM-dd] : #[function:dateStamp(yy-MM-dd)]</li>
+ * <li>#[DATE] : #[function:datestamp]</li>
+ * <li>#[DATE:yy-MM-dd] : #[function:datestamp(yy-MM-dd)]</li>
  * <li>#[SYSTIME] : #[function:systime]</li>
  * <li>#[UUID] : #[function:uuid]</li>
  * <li>#[ORIGINALNAME] : #[header:originalFilename]</li>

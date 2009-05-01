@@ -31,7 +31,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
  * <li>now - returns an {@link java.sql.Timestamp} with the current time.</li>
  * <li>date - returns a {@link java.util.Date} with the current time.</li>
  * <li>dateStamp - returns a {@link java.lang.String} that contains the current date formatted according to {@link #DEFAULT_DATE_FORMAT}.</li>
- * <li>dateStamp(dd-MM-yyyy) - returns a {@link java.lang.String} that contains the current date formatted according to the format passed into the function.</li>
+ * <li>datestamp:dd-MM-yyyy - returns a {@link java.lang.String} that contains the current date formatted according to the format passed into the function.</li>
  * <li>uuid - returns a globally unique identifier</li>
  * <li>hostname - returns the hostname of the machine Mule is running on</li>
  * <li>ip - returns the ip address of the machine Mule is running on</li>
