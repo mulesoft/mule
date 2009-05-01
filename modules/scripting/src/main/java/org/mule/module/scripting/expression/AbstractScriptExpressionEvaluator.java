@@ -44,14 +44,7 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
     {
         Scriptable script = getScript(expression);
         Bindings bindings = script.getScriptEngine().createBindings();
-        if (message instanceof MuleMessage)
-        {
-            script.populateBindings(bindings, (MuleMessage) message);
-        }
-        else 
-        {
-            script.populateBindings(bindings, message);
-        }
+        script.populateBindings(bindings, message);
 
         try
         {
