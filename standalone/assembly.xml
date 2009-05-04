@@ -294,6 +294,21 @@
         <directory>../../examples/bookstore/dist</directory>
         <outputDirectory>examples/bookstore</outputDirectory>
     </fileSet>
+    <!-- bookstore api -->
+    <fileSet>
+        <directory>../../examples/bookstore/api/dist</directory>
+        <outputDirectory>examples/bookstore/api</outputDirectory>
+    </fileSet>
+    <!-- bookstore admin-web -->
+    <fileSet>
+        <directory>../../examples/bookstore/admin-web/dist</directory>
+        <outputDirectory>examples/bookstore/admin-web</outputDirectory>
+    </fileSet>
+    <!-- bookstore bookstore-web -->
+    <fileSet>
+        <directory>../../examples/bookstore/bookstore-web/dist</directory>
+        <outputDirectory>examples/bookstore/bookstore-web</outputDirectory>
+    </fileSet>
   </fileSets>
 
     <!--
