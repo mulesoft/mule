@@ -60,6 +60,10 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
                     }
                     contents = IOUtils.toByteArray(fileInputStream);
                     fileInputStream.close();
+                    
+                    // discard the fileInputStream here so that the MuleEvent referencing this
+                    // message adapter can be serialized properly
+                    fileInputStream = null;
                 }
                 catch (Exception noPayloadException)
                 {
