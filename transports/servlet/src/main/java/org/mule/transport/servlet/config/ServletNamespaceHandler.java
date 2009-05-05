@@ -24,7 +24,7 @@ public class ServletNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
-        registerStandardTransportEndpoints(ServletConnector.SERVLET, URIBuilder.SOCKET_ATTRIBUTES);
+        registerStandardTransportEndpoints(ServletConnector.SERVLET, URIBuilder.PATH_ATTRIBUTES);
         registerConnectorDefinitionParser(ServletConnector.class);
         registerBeanDefinitionParser("http-request-to-parameter-map", new TransformerDefinitionParser(HttpRequestToParameterMap.class));
         registerBeanDefinitionParser("http-request-to-input-stream", new TransformerDefinitionParser(HttpRequestToInputStream.class));

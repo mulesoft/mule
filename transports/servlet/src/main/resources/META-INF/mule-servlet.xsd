@@ -27,9 +27,11 @@
                                           requestEvents="true"
                                           transactions="false" streaming="true">
                 <schemadoc:inboundMEPs in-only="true" in-out="true" in-optional-out="true"/>
+                <schemadoc:outboundMEPs none="true"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
+
     <xsd:element name="connector" type="servletConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
@@ -54,21 +56,30 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="http:inboundEndpointType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
-    <xsd:complexType name="outboundEndpointType">
-        <xsd:complexContent>
-            <xsd:extension base="http:outboundEndpointType"/>
+            <xsd:extension base="mule:inboundEndpointType">
+                <xsd:attribute name="path" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            the servlett path to bind the service to.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="http:globalEndpointType"/>
+            <xsd:extension base="mule:globalEndpointType">
+                <xsd:attribute name="path" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            the servlett path to bind the service to.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 

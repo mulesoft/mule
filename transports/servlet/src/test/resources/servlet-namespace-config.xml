@@ -10,4 +10,6 @@
 
     <servlet:connector name="servletConnector" servletUrl="foo"/>
 
+    <servlet:endpoint name="ep" path="foo/bar"/>
+
 </mule>

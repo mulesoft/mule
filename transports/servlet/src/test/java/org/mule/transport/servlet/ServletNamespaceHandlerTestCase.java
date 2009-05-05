@@ -11,21 +11,25 @@
 package org.mule.transport.servlet;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.api.endpoint.EndpointBuilder;
 
 public class ServletNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     protected String getConfigResources()
     {
         return "servlet-namespace-config.xml";
     }
 
-    public void testConnectorProperties()
+    public void testElements() throws Exception
     {
         ServletConnector connector =
                 (ServletConnector) muleContext.getRegistry().lookupConnector("servletConnector");
 
         assertEquals("foo", connector.getServletUrl());
+
+        EndpointBuilder b = muleContext.getRegistry().lookupEndpointBuilder("ep");
+        assertNotNull(b);
+        assertEquals("foo/bar", b.buildInboundEndpoint().getEndpointURI().getAddress());
     }
 
 }
