@@ -850,9 +850,9 @@ public class CoreMessages extends MessageFactory
                 StringMessageUtils.toString(returnType));
     }
 
-    public static Message moreThanOneConnectorWithProtocol(String protocol)
+    public static Message moreThanOneConnectorWithProtocol(String protocol, String connectors)
     {
-        return factory.createMessage(BUNDLE_PATH, 221, protocol);
+        return factory.createMessage(BUNDLE_PATH, 221, protocol, connectors);
     }
 
     public static Message failedToGetOutputStream()

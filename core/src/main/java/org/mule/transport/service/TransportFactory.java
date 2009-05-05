@@ -24,6 +24,8 @@ import org.mule.util.ObjectNameHelper;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -152,24 +154,33 @@ public class TransportFactory
     public static Connector getConnectorByProtocol(String protocol)
     {
         Connector connector;
-        Connector resultConnector = null;
+        List<Connector> results = new ArrayList<Connector>();
         Collection connectors = RegistryContext.getRegistry().lookupObjects(Connector.class);
         for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
         {
             connector = (Connector)iterator.next();
             if (connector.supportsProtocol(protocol))
             {
-                if(resultConnector==null)
-                {
-                    resultConnector = connector;
-                }
-                else
-                {
-                    throw new IllegalStateException(
-                        CoreMessages.moreThanOneConnectorWithProtocol(protocol).getMessage());
-                }
+                results.add(connector);
             }
         }
-        return resultConnector;
+        if(results.size() > 1)
+        {
+            StringBuffer buf = new StringBuffer();
+            for (Connector result : results)
+            {
+                buf.append(result.getName()).append(", ");
+            }
+            throw new IllegalStateException(
+                        CoreMessages.moreThanOneConnectorWithProtocol(protocol, buf.toString()).getMessage());
+        }
+        else if(results.size() == 1)
+        {
+            return results.get(0);
+        }
+        else
+        {
+            return null;
+        }
     }
 }
