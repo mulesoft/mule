@@ -92,9 +92,16 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                 // is being used for notifications then ignore.
                 return;
             }
+            MuleMessage msg = new DefaultMuleMessage(e, (Map) null);
             try
             {
-                MuleMessage msg = new DefaultMuleMessage(e, (Map) null);
+                //TODO: Filters should really be applied by the endpoint
+                if(endpoint.getFilter()!=null && !endpoint.getFilter().accept(msg))
+                {
+                    if(logger.isInfoEnabled()) logger.info("Message not accepted with filter: " + endpoint.getFilter());
+                    return;
+                }
+
                 MuleEvent event = new DefaultMuleEvent(msg, endpoint, session, false);
                 endpoint.dispatch(event);
             }
