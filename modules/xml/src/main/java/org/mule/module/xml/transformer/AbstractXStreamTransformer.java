@@ -113,4 +113,19 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
         // force XStream instance update
         this.xstream.set(null);
     }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        //Initialise the Xstream object
+        try
+        {
+            getXStream();
+        }
+        catch (TransformerException e)
+        {
+            throw new InitialisationException(e, this);
+        }
+    }
 }
