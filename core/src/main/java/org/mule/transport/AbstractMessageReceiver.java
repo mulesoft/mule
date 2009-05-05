@@ -266,11 +266,6 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         return message;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.MessageReceiver#setSession(org.mule.api.MuleSession)
-     */
     public void setService(Service service)
     {
         if (service == null)
