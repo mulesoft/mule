@@ -29,6 +29,9 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jetty</artifactId>
             <version>${version}</version>
+            <!-- IF using Cometd embedded mode you need to a Jetty anyway and this should avoid other Jetty dependencies
+                 being pulled in -->
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
