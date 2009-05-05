@@ -52,8 +52,7 @@ class ReceiverFileInputStream extends FileInputStream
             {
                 try
                 {
-                    throw new DefaultMuleException(
-                        FileMessages.failedToDeleteFile(currentFile.getAbsolutePath()));
+                    throw new DefaultMuleException(FileMessages.failedToDeleteFile(currentFile));
                 }
                 catch (DefaultMuleException e)
                 {

@@ -14,6 +14,8 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 
+import java.io.File;
+
 public class FileMessages extends MessageFactory
 {
     private static final FileMessages factory = new FileMessages();
@@ -30,9 +32,9 @@ public class FileMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 2, name, string);
     }
 
-    public static Message failedToDeleteFile(String path)
+    public static Message failedToDeleteFile(File file)
     {
-        return factory.createMessage(BUNDLE_PATH, 3, path);
+        return factory.createMessage(BUNDLE_PATH, 3, file.getAbsolutePath());
     }
 
     public static Message failedToMoveFile(String from, String to)

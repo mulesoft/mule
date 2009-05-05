@@ -36,6 +36,7 @@ import java.nio.channels.FileLock;
 import java.util.Comparator;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+
 import org.apache.commons.collections.comparators.ReverseComparator;
 
 /**
@@ -290,7 +291,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                     // delete source
                     if (!sourceFile.delete())
                     {
-                        throw new DefaultMuleException(FileMessages.failedToDeleteFile(sourceFile.getAbsolutePath()));
+                        throw new DefaultMuleException(FileMessages.failedToDeleteFile(sourceFile));
                     }
                 }
                 else

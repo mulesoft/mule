@@ -187,7 +187,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                 // delete source
                 if (!sourceFile.delete())
                 {
-                    throw new DefaultMuleException(FileMessages.failedToDeleteFile(sourceFile.getAbsolutePath()));
+                    throw new DefaultMuleException(FileMessages.failedToDeleteFile(sourceFile));
                 }
             }
             else
