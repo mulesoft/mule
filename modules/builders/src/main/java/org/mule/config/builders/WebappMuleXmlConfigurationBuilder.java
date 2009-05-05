@@ -50,6 +50,8 @@ import org.springframework.web.context.support.ServletContextResource;
  */
 public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBuilder
 {
+    public static final String MULE_CONTEXT_ATTRIBUTE = "org.mule.MuleContext";
+    
     /**
      * Logger used by this class
      */
