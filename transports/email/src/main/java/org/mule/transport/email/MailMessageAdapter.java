@@ -25,8 +25,8 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 
 /**
- * <code>MailMessageAdapter</code> is a wrapper for a javax.mail.Message that 
- * separates multi-part mail messages, storing all but the first part as attachments 
+ * <code>MailMessageAdapter</code> is a wrapper for a javax.mail.Message that
+ * separates multi-part mail messages, storing all but the first part as attachments
  * to the underlying {@link AbstractMessageAdapter}.  Alternatively, you can use
  * {@link SimpleMailMessageAdapter}, which stores the message as a single
  * entity.
@@ -43,9 +43,9 @@ public class MailMessageAdapter extends SimpleMailMessageAdapter
     }
 
     /**
-     * Store only the first body part directly; add further parts as attachments.
+     * Add mime boday parts as attachments.
      */
-    // @Override
+    @Override
     protected void handleMessage(Message message) throws Exception
     {
         Object content = message.getContent();
@@ -53,31 +53,20 @@ public class MailMessageAdapter extends SimpleMailMessageAdapter
         if (content instanceof Multipart)
         {
             TreeMap attachments = new TreeMap();
-            MailUtils.getAttachments((Multipart)content, attachments);
+            MailUtils.getAttachments((Multipart) content, attachments);
 
-            logger.debug("Received Multipart message");
-            int i = 0;
-            for (Iterator iterator = attachments.entrySet().iterator(); iterator.hasNext();i++)
+            logger.debug("Received Multipart message. Adding attachments");
+            for (Iterator iterator = attachments.entrySet().iterator(); iterator.hasNext();)
             {
                 Map.Entry entry = (Map.Entry) iterator.next();
-                Part part = (Part)entry.getValue();
+                Part part = (Part) entry.getValue();
                 String name = entry.getKey().toString();
-                if(i==0)
-                {
-                    setMessage(part);
-                }
-                else
-                {
-                    addAttachment(name, part.getDataHandler());
-                    addAttachmentHeaders(name, part);
-                }
 
+                addAttachment(name, part.getDataHandler());
+                addAttachmentHeaders(name, part);
             }
         }
-        else
-        {
-            setMessage(message);
-        }
+        setMessage(message);
     }
 
     protected void addAttachmentHeaders(String name, Part part) throws javax.mail.MessagingException
@@ -85,7 +74,7 @@ public class MailMessageAdapter extends SimpleMailMessageAdapter
         Map headers = new HashMap(4);
         for (Enumeration e = part.getAllHeaders(); e.hasMoreElements();)
         {
-            Header h = (Header)e.nextElement();
+            Header h = (Header) e.nextElement();
             headers.put(h.getName(), h.getValue());
         }
         if (headers.size() > 0)
