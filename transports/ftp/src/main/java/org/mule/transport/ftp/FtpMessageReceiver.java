@@ -162,7 +162,6 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             }
 
             MuleMessage message;
-            // TODO MULE-3192
             if (connector.isStreaming())
             {
                 InputStream stream = client.retrieveFileStream(file.getName());
