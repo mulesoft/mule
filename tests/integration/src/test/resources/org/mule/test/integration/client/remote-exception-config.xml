@@ -6,6 +6,7 @@
       xmlns:client="http://www.mulesource.org/schema/mule/client"
       xmlns:test="http://www.mulesource.org/schema/mule/test"
       xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/tcp http://www.mulesource.org/schema/mule/tcp/3.0/mule-tcp.xsd
        http://www.mulesource.org/schema/mule/test http://www.mulesource.org/schema/mule/test/3.0/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
@@ -14,7 +15,7 @@
 
 
     <client:remote-dispatcher-agent>
-        <client:remote-endpoint address="tcp://localhost:5555" synchronous="true"/>
+        <client:remote-endpoint address="tcp://localhost:25551" synchronous="true" responseTimeout="10000"/>
     </client:remote-dispatcher-agent>
 
     <model name="model">
