@@ -1,0 +1,99 @@
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+         version="2.4">
+
+    <display-name>Mule Notifications Example</display-name>
+
+    <context-param>
+        <param-name>org.mule.config</param-name>
+        <param-value>mule-config.xml</param-value>
+    </context-param>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+    <!--
+    To use a MuleXml configuration file use this context listener
+    -->
+    <listener>
+        <listener-class>org.mule.config.builders.MuleXmlBuilderContextListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>cometd</servlet-name>
+        <servlet-class>org.mule.transport.cometd.container.MuleCometdServlet</servlet-class>
+        <!--<init-param>-->
+        <!--<param-name>filters</param-name>-->
+        <!--<param-value>/WEB-INF/filters.json</param-value>-->
+        <!--</init-param>-->
+        <init-param>
+            <param-name>timeout</param-name>
+            <param-value>120000</param-value>
+        </init-param>
+        <init-param>
+            <param-name>interval</param-name>
+            <param-value>1</param-value>
+        </init-param>
+        <init-param>
+            <param-name>maxInterval</param-name>
+            <param-value>10000</param-value>
+        </init-param>
+        <init-param>
+            <param-name>multiFrameInterval</param-name>
+            <param-value>2000</param-value>
+        </init-param>
+        <init-param>
+            <param-name>logLevel</param-name>
+            <param-value>2</param-value>
+        </init-param>
+        <init-param>
+            <param-name>directDeliver</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>asyncDeliver</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>muleServlet</servlet-name>
+        <servlet-class>org.mule.transport.servlet.MuleReceiverServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>muleResources</servlet-name>
+        <servlet-class>org.mule.transport.cometd.MuleJarResourcesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>muleServlet</servlet-name>
+        <url-pattern>/services/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>muleResources</servlet-name>
+        <url-pattern>/mule-resource/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>cometd</servlet-name>
+        <url-pattern>/cometd/*</url-pattern>
+    </servlet-mapping>
+
+    
+    <mime-mapping>
+        <extension>js</extension>
+        <mime-type>application/x-javascript</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>json</extension>
+        <mime-type>application/json</mime-type>
+    </mime-mapping>
+
+</web-app>
