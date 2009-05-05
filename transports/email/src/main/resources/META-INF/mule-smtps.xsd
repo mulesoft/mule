@@ -27,6 +27,7 @@
             <schemadoc:transport-features receiveEvents="false" dispatchEvents="true" responseEvents="false"
                                           requestEvents="true"
                                           transactions="false" streaming="false">
+                <schemadoc:inboundMEPs none="true"/>
                 <schemadoc:outboundMEPs out-only="true"/>
             </schemadoc:transport-features>
         </xsd:appinfo>

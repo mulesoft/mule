@@ -28,6 +28,7 @@
                                           requestEvents="false"
                                           transactions="false" streaming="false">
                 <schemadoc:inboundMEPs in-only="true"/>
+                <schemadoc:outboundMEPs none="true"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
@@ -37,7 +38,7 @@
     <xsd:complexType name="imapsConnectorType">
         <xsd:complexContent>
             <xsd:extension base="imap:imapConnectorType">
-                <xsd:sequence minOccurs="1" maxOccurs="1">
+                <xsd:sequence minOccurs="0" maxOccurs="1">
                     <xsd:element name="tls-client" type="mule:tlsClientKeyStoreType"/>
                     <xsd:element name="tls-trust-store" type="mule:tlsTrustStoreType"/>
                 </xsd:sequence>
