@@ -15,6 +15,7 @@ import org.mule.transport.service.TransportFactory;
 import org.mule.transport.cometd.i18n.CometdMessages;
 import org.mule.transport.AbstractConnector;
 import org.mule.RegistryContext;
+import org.mule.api.MuleException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -42,7 +43,16 @@ public class MuleCometdServlet extends ContinuationCometdServlet
             connector = (CometdServletConnector) TransportFactory.getConnectorByProtocol(CometdServletConnector.PROTOCOL);
             if (connector == null)
             {
-                throw new ServletException(CometdMessages.noConnectorForProtocol(CometdServletConnector.PROTOCOL).toString());
+                connector = new CometdServletConnector();
+                try
+                {
+                    RegistryContext.getRegistry().registerConnector(connector);
+                }
+                catch (MuleException e)
+                {
+                    throw new ServletException("Failed to register the CometdServletConnector", e);
+                }
+                //throw new ServletException(CometdMessages.noConnectorForProtocol(CometdServletConnector.PROTOCOL).toString());
             }
         }
         else

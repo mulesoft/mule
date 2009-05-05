@@ -64,7 +64,16 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             connector = (ServletConnector) TransportFactory.getConnectorByProtocol("servlet");
             if (connector == null)
             {
-                throw new ServletException(ServletMessages.noConnectorForProtocolServlet().toString());
+                connector = new ServletConnector();
+                try
+                {
+                    RegistryContext.getRegistry().registerConnector(connector);
+                }
+                catch (MuleException e)
+                {
+                    throw new ServletException("Failed to register the CometdServletConnector", e);
+                }
+                //throw new ServletException(ServletMessages.noConnectorForProtocolServlet().toString());
             }
         }
         else
