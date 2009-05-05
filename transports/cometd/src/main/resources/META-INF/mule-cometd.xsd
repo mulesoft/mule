@@ -2,8 +2,6 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/cometd"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core"
-            xmlns:jetty="http://www.mulesource.org/schema/mule/jetty"
-            xmlns:http="http://www.mulesource.org/schema/mule/http"
             xmlns:servlet="http://www.mulesource.org/schema/mule/servlet"
             xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc"
             targetNamespace="http://www.mulesource.org/schema/mule/cometd"
@@ -13,12 +11,8 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/3.0/mule.xsd"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/jetty"
-                schemaLocation="http://www.mulesource.org/schema/mule/jetty/3.0/mule-jetty.xsd"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/servlet"
                 schemaLocation="http://www.mulesource.org/schema/mule/servlet/3.0/mule-servlet.xsd"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/http"
-                schemaLocation="http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd"/>
     <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc"
                 schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd"/>
 
