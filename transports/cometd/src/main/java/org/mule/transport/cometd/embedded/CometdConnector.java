@@ -50,7 +50,6 @@ public class CometdConnector extends CometdServletConnector
     public CometdConnector()
     {
         super();
-        registerSupportedProtocol("http");
         registerSupportedProtocol(PROTOCOL);
         setInitialStateStopped(false);
     }
