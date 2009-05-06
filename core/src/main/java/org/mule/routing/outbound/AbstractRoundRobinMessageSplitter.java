@@ -99,7 +99,6 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
             props.put(propertyKey, message.getProperty(propertyKey));
         }
 
-        int i = 0;
         Counter counter = new Counter();
 
         for (Iterator iterator = payloads.iterator(); iterator.hasNext();)
