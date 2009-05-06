@@ -46,7 +46,7 @@ public class EndpointMessageNotification extends ServerNotification
         registerAction("requested", MESSAGE_REQUESTED);
     }
 
-    private ImmutableEndpoint endpoint;
+    private String endpoint;
 
     public EndpointMessageNotification(MuleMessage resource,
                                ImmutableEndpoint endpoint,
@@ -55,17 +55,9 @@ public class EndpointMessageNotification extends ServerNotification
     {
         super(cloneMessage(resource), action);
         resourceIdentifier = identifier;
-        this.endpoint = endpoint;
+        this.endpoint = endpoint.getEndpointURI().toString();
     }
 
-    protected static MuleMessage cloneMessage(MuleMessage message)
-    {
-        // TODO we probably need to support deep cloning here
-        synchronized (message)
-        {
-            return new DefaultMuleMessage(message.getPayload(), message);
-        }
-    }
 
     protected String getPayloadToString()
     {
@@ -81,14 +73,19 @@ public class EndpointMessageNotification extends ServerNotification
 
     public String toString()
     {
-        return EVENT_NAME + "{action=" + getActionName(action) + ", endpoint: " + endpoint.getEndpointURI()
+        return EVENT_NAME + "{action=" + getActionName(action) + ", endpoint: " + endpoint
                         + ", resourceId=" + resourceIdentifier + ", timestamp=" + timestamp + ", serverId="
                         + serverId + ", message: " + source + "}";
     }
 
-    public ImmutableEndpoint getEndpoint()
+    public String getEndpoint()
     {
         return endpoint;
+    }
+
+    public String getType()
+    {
+        return TYPE_TRACE;
     }
 
 }

@@ -49,12 +49,12 @@ public class RemoteDispatcherNotification extends ServerNotification
 
     public RemoteDispatcherNotification(MuleMessage message, int action)
     {
-        super(message, action);
+        super(cloneMessage(message), action);
     }
 
     public RemoteDispatcherNotification(MuleMessage message, int action, String resourceIdentifier)
     {
-        super(message, action, resourceIdentifier);
+        super(cloneMessage(message), action, resourceIdentifier);
         this.message = message;
     }
 

@@ -53,12 +53,7 @@ public class ModelNotification extends ServerNotification implements BlockingSer
 
     public ModelNotification(Model model, int action)
     {
-        super(model, action);
+        super(model.getName(), action);
         resourceIdentifier = model.getName();
-    }
-
-    protected String getPayloadToString()
-    {
-        return ((Model) source).getName();
     }
 }

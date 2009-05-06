@@ -88,7 +88,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleTestC
             this.notification = notification;
             assertEquals(ComponentMessageNotification.class, notification.getClass());
             assertTrue(notification.getSource() instanceof MuleMessage);
-            assertNotNull(((ComponentMessageNotification) notification).getComponent());
+            assertNotNull(((ComponentMessageNotification) notification).getServiceName());
 
             if (notification.getAction() == ComponentMessageNotification.COMPONENT_PRE_INVOKE)
             {

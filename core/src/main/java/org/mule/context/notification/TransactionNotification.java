@@ -39,7 +39,7 @@ public class TransactionNotification extends ServerNotification implements Block
 
     public TransactionNotification(Transaction transaction, int action)
     {
-        super(null, action, transaction.getId());
+        super(transaction.getId(), action, transaction.getId());
         this.transactionStringId = transaction.getId();
     }
 

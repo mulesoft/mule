@@ -44,12 +44,7 @@ public class ServiceNotification extends ServerNotification
 
     public ServiceNotification(Service message, int action)
     {
-        super(message, action);
+        super(message.getName(), action);
         resourceIdentifier = message.getName();
-    }
-
-    protected String getPayloadToString()
-    {
-        return ((Service) source).getName();
     }
 }

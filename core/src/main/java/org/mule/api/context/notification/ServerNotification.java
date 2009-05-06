@@ -11,7 +11,9 @@
 package org.mule.api.context.notification;
 
 import org.mule.MuleServer;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleMessage;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
 
@@ -30,6 +32,7 @@ public abstract class ServerNotification extends EventObject
     public static final int NO_ACTION_ID = Integer.MIN_VALUE;
     public static final String NO_ACTION_NAME = "none";
 
+    public static final String TYPE_TRACE = "trace";
     public static final String TYPE_INFO = "info";
     public static final String TYPE_WARNING = "warn";
     public static final String TYPE_ERROR = "error";
@@ -83,12 +86,28 @@ public abstract class ServerNotification extends EventObject
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
         this.resourceIdentifier = resourceIdentifier;
-        MuleContext mc = MuleServer.getMuleContext();
-        if (mc != null && message != null)
-        {
-            serverId = message.toString();
-        }
+
+        MuleContext mc = (message instanceof MuleContext ? (MuleContext)message : MuleServer.getMuleContext());
+
+        serverId = generateId(mc);
+
         timestamp = System.currentTimeMillis();
+    }
+
+    protected static String generateId(MuleContext context)
+    {
+        return context.getConfiguration().getDomainId() + "." + context.getConfiguration().getClusterId() + "." + context.getConfiguration().getId();
+    }
+
+    protected static MuleMessage cloneMessage(MuleMessage message)
+    {
+        if(message==null) {
+            return null;
+        }
+        synchronized (message)
+        {
+            return new DefaultMuleMessage(message.getPayload(), message);
+        }
     }
 
     public int getAction()

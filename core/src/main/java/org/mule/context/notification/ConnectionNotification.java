@@ -35,16 +35,12 @@ public class ConnectionNotification extends ServerNotification
 
     public ConnectionNotification(Connectable resource, String identifier, int action)
     {
-        super(resource, action);
+        super((resource == null ? identifier : resource.getConnectionDescription()), action);
         resourceIdentifier = identifier;
     }
 
     protected String getPayloadToString()
     {
-        if (source instanceof Connectable)
-        {
-            return ((Connectable) source).getConnectionDescription();
-        }
         return source.toString();
     }
 

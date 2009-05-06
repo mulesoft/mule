@@ -33,8 +33,6 @@ public class ComponentMessageNotification extends ServerNotification
         registerAction("component post invoke", COMPONENT_POST_INVOKE);
     }
 
-    protected transient Component component;
-
     /**
      * @param message
      * @param action
@@ -42,7 +40,7 @@ public class ComponentMessageNotification extends ServerNotification
     public ComponentMessageNotification(MuleMessage message, Component component, int action)
     {
         super(cloneMessage(message), action);
-        this.component = component;
+        //this.component = component;
         resourceIdentifier = component.getService().getName();
 
     }
@@ -71,16 +69,21 @@ public class ComponentMessageNotification extends ServerNotification
     /**
      * @return the message
      */
-    public Component getComponent()
+    public String getServiceName()
     {
-        return component;
+        return resourceIdentifier;
     }
 
     public String toString()
     {
         return EVENT_NAME + "{action=" + getActionName(action) + ", message: " + source + ", resourceId="
                + resourceIdentifier + ", timestamp=" + timestamp + ", serverId=" + serverId + ", component: "
-               + component + "}";
+               + "}";
     }
 
+    @Override
+    public String getType()
+    {
+        return "trace"; 
+    }
 }

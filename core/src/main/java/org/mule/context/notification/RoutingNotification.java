@@ -35,7 +35,7 @@ public class RoutingNotification extends ServerNotification
 
     public RoutingNotification(MuleMessage resource, String identifier, int action)
     {
-        super(resource, action);
+        super(cloneMessage(resource), action);
         resourceIdentifier = identifier;
     }
 

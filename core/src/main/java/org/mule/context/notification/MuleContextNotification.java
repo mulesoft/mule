@@ -57,15 +57,10 @@ public class MuleContextNotification extends ServerNotification implements Block
 
     public MuleContextNotification(MuleContext context, int action)
     {
-        super(getId(context), action);
-        resourceIdentifier = getId(context);
+        super(generateId(context), action);
+        resourceIdentifier = getSource().toString();
         this.clusterId = context.getConfiguration().getClusterId();
         this.domain = context.getConfiguration().getDomainId();
-    }
-
-    private static String getId(MuleContext context)
-    {
-        return context.getConfiguration().getDomainId() + "." + context.getConfiguration().getClusterId() + "." + context.getConfiguration().getId();
     }
 
     public String getClusterId()

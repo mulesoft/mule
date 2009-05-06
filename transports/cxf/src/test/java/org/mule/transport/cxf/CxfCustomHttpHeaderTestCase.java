@@ -76,7 +76,7 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements E
     {
         if (notification instanceof EndpointMessageNotification)
         {
-            String uri = ((EndpointMessageNotification) notification).getEndpoint().getEndpointURI().toString();
+            String uri = ((EndpointMessageNotification) notification).getEndpoint();
             if (endpointAddress.equals(uri))
             {
                 notificationMsg = (MuleMessage) notification.getSource();
