@@ -263,6 +263,7 @@ public class JmxAgent extends AbstractAgent
      */
     public void dispose()
     {
+        unregisterMBeansIfNecessary();
         if (serverCreated.get())
         {
             MBeanServerFactory.releaseMBeanServer(mBeanServer);
