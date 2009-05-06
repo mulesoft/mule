@@ -84,8 +84,8 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
         try
         {
             muleContext = createMuleContext(config, context);
-            muleContext.start();
             context.setAttribute(WebappMuleXmlConfigurationBuilder.MULE_CONTEXT_ATTRIBUTE, muleContext);
+            muleContext.start();
         }
         catch (MuleException ex)
         {
