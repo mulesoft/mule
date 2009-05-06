@@ -153,7 +153,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
 
     protected void doStart() throws MuleException
     {
-
+        // template method
     }
 
     protected void doStop() throws MuleException
