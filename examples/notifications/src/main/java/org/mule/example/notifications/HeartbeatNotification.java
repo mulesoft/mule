@@ -14,6 +14,9 @@ import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.MuleContext;
 import org.mule.context.notification.CustomNotification;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import javax.servlet.ServletContext;
 
 /**
@@ -34,14 +37,22 @@ public class HeartbeatNotification extends CustomNotification implements Blockin
 
     public HeartbeatNotification(MuleContext context)
     {
-        super(getId(context), HEARTBEAT, context.getConfiguration().getId());
+        super(getHostInfo(), HEARTBEAT, context.getConfiguration().getId());
     }
 
-    private static String getId(MuleContext context)
+
+    protected static String getHostInfo()
     {
-        return context.getConfiguration().getDomainId() + "." + context.getConfiguration().getClusterId() + "." + context.getConfiguration().getId();
+        try
+        {
+            InetAddress host = InetAddress.getLocalHost();
+            return host.getHostName() + " (" + host.getHostAddress() + ")";
+        }
+        catch (UnknownHostException e)
+        {
+            return "unknown";
+        }
     }
-
     public String toString()
     {
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier
