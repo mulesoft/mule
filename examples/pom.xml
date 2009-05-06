@@ -17,8 +17,10 @@
         <module>bookstore</module>
         <module>echo</module>
         <module>errorhandler</module>
+        <module>geomail</module>
         <module>hello</module>
         <module>loanbroker</module>
+        <module>notifications</module>
         <module>scripting</module>
         <module>stockquote</module>
         <module>webapp</module>
