@@ -67,7 +67,7 @@ public class Log4jAgent extends AbstractAgent
     }
 
     /**
-     * Unregister all log4j MBeans if there are any left over the old deployment
+     * Unregister log4j MBeans if there are any left over the old deployment
      */
     protected void unregisterMBeansIfNecessary()
         throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
@@ -102,7 +102,14 @@ public class Log4jAgent extends AbstractAgent
      */
     public void dispose()
     {
-        // nothing to do
+        try
+        {
+            unregisterMBeansIfNecessary();
+        }
+        catch (Exception ex)
+        {
+            // ignore
+        }
     }
 
     /*
