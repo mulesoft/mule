@@ -36,20 +36,36 @@ public final class MuleBootstrapUtils
     {
         // utility class only
     }
-    
+
+    /**
+     * Whether Mule is running embedded or standalone.
+     * @return true if running standalone
+     */
+    public static boolean isStandalone()
+    {
+        // when embedded, mule.home var is not set
+        return MULE_HOME != null;
+    }
+
+    /**
+     * @return null if running embedded
+     */
     public static File getMuleHomeFile()
     {
-        return new File(MULE_HOME);
+        return isStandalone() ? new File(MULE_HOME) : null;
     }
-    
+
+    /**
+     * @return null if running embedded
+     */
     public static File getMuleLibDir()
     {   
-        return new File(MULE_HOME + File.separator + MULE_LIB_FILENAME);
+        return isStandalone() ? new File(MULE_HOME + File.separator + MULE_LIB_FILENAME) : null;
     }
     
     public static File getMuleLocalJarFile()
     {
-        return new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME);
+        return isStandalone() ? new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME) : null;
     }
     
     public static void addLocalJarFilesToClasspath(File muleHome, File muleBase) throws Exception
@@ -127,7 +143,7 @@ public final class MuleBootstrapUtils
     //////////////////////////////////////////////////////////////////////////////////////////
     
     /**
-     * @see ClassUtils.getResource()
+     * @see org.mule.util.ClassUtils#getResource
      */
     public static URL getResource(final String resourceName, final Class callingClass)
     {
@@ -166,7 +182,7 @@ public final class MuleBootstrapUtils
     }
 
     /**
-     * @see FileUtils.renameFile()
+     * @see org.mule.util.FileUtils#renameFile
      */
     public static boolean renameFile(File srcFile, File destFile) throws IOException
     {
@@ -189,7 +205,7 @@ public final class MuleBootstrapUtils
     }
     
     /**
-     * @see FileUtils.renameFileHard()
+     * @see org.mule.util.FileUtils#renameFileHard
      */
     public static boolean renameFileHard(File srcFile, File destFile) throws IOException
     {
@@ -235,7 +251,7 @@ public final class MuleBootstrapUtils
     }
 
     /**
-     * @see IOUtils.copy()
+     * @see org.mule.util.IOUtils#copy
      */
     public static int copy(InputStream input, OutputStream output) throws IOException {
         long count = copyLarge(input, output);
@@ -246,7 +262,7 @@ public final class MuleBootstrapUtils
     }
 
     /**
-     * @see IOUtils.copyLarge()
+     * @see org.mule.util.IOUtils#copyLarge
      */
     public static long copyLarge(InputStream input, OutputStream output) throws IOException {
         byte[] buffer = new byte[1024 * 4];

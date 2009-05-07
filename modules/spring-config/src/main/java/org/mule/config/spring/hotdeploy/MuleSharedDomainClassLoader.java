@@ -78,11 +78,7 @@ public class MuleSharedDomainClassLoader extends URLClassLoader
         }
         catch (Throwable t)
         {
-            // TODO throw an error
-            if (logger.isErrorEnabled())
-            {
-                logger.error(t);
-            }
+            throw new RuntimeException(t);
         }
     }
 

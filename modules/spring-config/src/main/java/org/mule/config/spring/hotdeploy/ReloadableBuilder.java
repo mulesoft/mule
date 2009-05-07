@@ -16,6 +16,7 @@ import org.mule.config.ConfigResource;
 import org.mule.config.StartupContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.module.boot.MuleBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,8 +90,10 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
             this.monitoredResource = new File(allResources[1].getUrl().getFile());
 
             // TODO this is really a job of a deployer and deployment descriptor info
-            ClassLoader sharedCl = new DefaultMuleSharedDomainClassLoader(CLASSLOADER_ROOT);
-            ClassLoader cl = new MuleApplicationClassLoader(this.monitoredResource, sharedCl);
+            ClassLoader parent = MuleBootstrapUtils.isStandalone()
+                                                        ? new DefaultMuleSharedDomainClassLoader(CLASSLOADER_ROOT)
+                                                        : CLASSLOADER_ROOT;
+            ClassLoader cl = new MuleApplicationClassLoader(this.monitoredResource, parent);
             Thread.currentThread().setContextClassLoader(cl);
 
 
@@ -129,8 +132,10 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
                         Thread.currentThread().setContextClassLoader(null);
                         // TODO this is really a job of a deployer and deployment descriptor info
                         // TODO I don't think shared domains can be safely redeployment, this will probably be removed 
-                        ClassLoader sharedCl = new DefaultMuleSharedDomainClassLoader(CLASSLOADER_ROOT);
-                        ClassLoader cl = new MuleApplicationClassLoader(monitoredResource, sharedCl);
+                        ClassLoader parent = MuleBootstrapUtils.isStandalone()
+                                             ? new DefaultMuleSharedDomainClassLoader(CLASSLOADER_ROOT)
+                                             : CLASSLOADER_ROOT;
+                        ClassLoader cl = new MuleApplicationClassLoader(monitoredResource, parent);
                         Thread.currentThread().setContextClassLoader(cl);
 
                         //muleContext.initialise();
