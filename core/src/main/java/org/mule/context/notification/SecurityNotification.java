@@ -35,7 +35,7 @@ public class SecurityNotification extends ServerNotification
 
     public SecurityNotification(org.mule.api.security.SecurityException message, int action)
     {
-        super(message, action);
+        super(message.getDetailedMessage(), action);
         resourceIdentifier = message.getClass().getName();
     }
 
