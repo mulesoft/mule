@@ -47,11 +47,9 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         Connector connector = createConnector();
+        if(connector.getName()==null) connector.setName("test");
         connectorName = connector.getName();
-        if (connectorName == null)
-        {
-            fail("You need to set the connector name on the connector before returning it");
-        }
+        
         connector.setMuleContext(muleContext);
         muleContext.getRegistry().registerConnector(connector);
     }
