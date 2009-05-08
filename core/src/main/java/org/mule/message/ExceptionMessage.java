@@ -17,12 +17,13 @@ import org.mule.api.endpoint.EndpointURI;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.io.Serializable;
 
 /**
  * <code>ExceptionMessage</code> is used by the DefaultServiceExceptionStrategy
  * for wrapping an exception with a message to send via an endpointUri.
  */
-public class ExceptionMessage extends BaseMessage
+public class ExceptionMessage extends BaseMessageDTO
 {
     /**
      * Serial version
@@ -39,7 +40,7 @@ public class ExceptionMessage extends BaseMessage
                             String componentName,
                             EndpointURI endpointUri)
     {
-        super(message);
+        super(getAsSerializable(message));
         this.exception = exception;
         timeStamp = new Date();
         this.componentName = componentName;
@@ -54,6 +55,18 @@ public class ExceptionMessage extends BaseMessage
                 String propertyKey = (String) iterator.next();
                 setProperty(propertyKey, msg.getProperty(propertyKey));
             }
+        }
+    }
+
+    protected static Serializable getAsSerializable(Object message)
+    {
+        if(message instanceof Serializable)
+        {
+            return (Serializable)message;
+        }
+        else
+        {
+            return message.toString();
         }
     }
 
@@ -79,7 +92,7 @@ public class ExceptionMessage extends BaseMessage
 
     public String toString()
     {
-        return "ExceptionMessage{" + "message=" + message + ", context=" + context + "exception=" + exception
+        return "ExceptionMessage{" + "payload=" + payload + ", context=" + properties + "exception=" + exception
                + ", componentName='" + componentName + "'" + ", endpointUri=" + endpointUri + ", timeStamp="
                + timeStamp + "}";
     }

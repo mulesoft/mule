@@ -14,10 +14,12 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.json.util.JsonUtils;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.message.DefaultMuleMessageDTO;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
@@ -39,12 +41,16 @@ public class JsonToObject extends AbstractTransformer
 {
     protected JsonConfig jsonConfig;
 
+    protected Map dtoMappings;
+
     public JsonToObject()
     {
         this.registerSourceType(JSONObject.class);
         this.registerSourceType(String.class);
         this.registerSourceType(byte[].class);
         setReturnClass(Object.class);
+        dtoMappings = new HashMap(1);
+        dtoMappings.put("payload", HashMap.class);
     }
 
     @Override
@@ -83,6 +89,7 @@ public class JsonToObject extends AbstractTransformer
                 src = new String((byte[]) src, encoding);
             }
 
+
             if (src instanceof String)
             {
                 if (getReturnClass().equals(DynaBean.class))
@@ -92,7 +99,8 @@ public class JsonToObject extends AbstractTransformer
                 }
                 else
                 {
-                    returnValue = JsonUtils.convertJsonToBean((String) src, getJsonConfig(), getReturnClass(), null);
+                    returnValue = JsonUtils.convertJsonToBean((String) src, getJsonConfig(), getReturnClass(),
+                            (getReturnClass().equals(DefaultMuleMessageDTO.class) ? dtoMappings : null));
                 }
             }
             else if (src instanceof JSONObject)
