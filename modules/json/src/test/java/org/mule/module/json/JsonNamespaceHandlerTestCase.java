@@ -30,6 +30,7 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
     {
         IsJsonFilter filter = (IsJsonFilter) muleContext.getRegistry().lookupObject("jsonFilter");
         assertNotNull(filter);
+        assertTrue(filter.isValidateParsing());
 
         JsonToObject jsonToOrangeArray = (JsonToObject) muleContext.getRegistry().lookupObject("jsonToOrangeArray");
         assertNotNull(jsonToOrangeArray);

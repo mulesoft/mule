@@ -26,7 +26,12 @@ import org.apache.commons.logging.LogFactory;
 public class IsJsonFilter implements Filter
 {
 
-    private static Log log = LogFactory.getLog(IsJsonFilter.class);
+    /**
+     * logger used by this class
+     */
+    protected transient final Log logger = LogFactory.getLog(IsJsonFilter.class);
+
+    private boolean validateParsing = false;
 
     public IsJsonFilter()
     {
@@ -46,22 +51,33 @@ public class IsJsonFilter implements Filter
             {
                 if (!JSONUtils.mayBeJSON((String) obj))
                 {
-                    throw new JSONException("Message is not valid JSON");
+                    return false;
+                    //throw new JSONException("Message is not valid JSON");
                 }
-                JSONObject.fromObject(obj);
+                if(isValidateParsing()) JSONObject.fromObject(obj);
             }
             else
             {
-                throw new JSONException("Object must be a string");
+                //throw new JSONException("Object must be a string");
+                return false;
             }
-            log.debug("Filter result = true (message is valid JSON)");
+            logger.debug("Filter result = true (message is valid JSON)");
             return true;
         }
         catch (JSONException e)
         {
-            log.debug("Filter result = false (message is not valid JSON): " + e.getMessage());
+            logger.debug("Filter result = false (message is not valid JSON): " + e.getMessage());
             return false;
         }
     }
 
+    public boolean isValidateParsing()
+    {
+        return validateParsing;
+    }
+
+    public void setValidateParsing(boolean validateParsing)
+    {
+        this.validateParsing = validateParsing;
+    }
 }

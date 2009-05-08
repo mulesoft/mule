@@ -13,13 +13,27 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/3.0/mule.xsd"/>
 
-    <xsd:element name="is-json-filter" type="mule:abstractFilterType" substitutionGroup="mule:abstract-filter">
+    <xsd:element name="is-json-filter" type="jsonFilterType" substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
                 A filter that will determine if the current message payload is a JSON encoded message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+
+    <xsd:complexType name="jsonFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractFilterType">
+                <xsd:attribute name="validateParsing" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Will validate that the JSON string can be parsed. This can be expensive so the default is false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+    </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="json-to-object-transformer" type="jsonTransformerType"
                  substitutionGroup="mule:abstract-transformer">

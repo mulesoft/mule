@@ -21,6 +21,7 @@ public class IsJsonFilterTestCase extends AbstractMuleTestCase
 	protected void doSetUp() throws Exception 
 	{
 		filter = new IsJsonFilter();
+        filter.setValidateParsing(true);
 	}
 	
 	public void testFilterFalse() throws Exception

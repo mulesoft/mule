@@ -8,7 +8,7 @@
        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesource.org/schema/mule/json http://www.mulesource.org/schema/mule/json/3.0/mule-json.xsd">
 
-    <json:is-json-filter name="jsonFilter"/>
+    <json:is-json-filter name="jsonFilter" validateParsing="true"/>
 
     <json:json-to-object-transformer name="jsonToOrangeArray" returnClass="org.mule.tck.testmodels.fruit.Orange"
                                      jsonConfig-ref="jsonConfig"/>
