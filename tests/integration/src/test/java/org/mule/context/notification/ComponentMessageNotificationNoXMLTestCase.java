@@ -30,6 +30,11 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleTestC
     protected ServerNotificationManager manager;
     protected ComponentListener componentListener;
 
+    public ComponentMessageNotificationNoXMLTestCase()
+    {
+        setDisposeManagerPerSuite(true);
+    }
+
     protected void configureMuleContext(MuleContextBuilder contextBuilder)
     {
         ServerNotificationManager notificationManager = new ServerNotificationManager();
@@ -41,9 +46,10 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleTestC
 
     protected void doSetUp() throws Exception
     {
+        setDisposeManagerPerSuite(true);
         componentListener = new ComponentListener();
         service = getTestService("seda", EchoComponent.class);
-        muleContext.start();
+        if(!muleContext.isStarted()) muleContext.start();
     }
 
     public void testComponentNotificationNotRegistered() throws Exception
