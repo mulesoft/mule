@@ -16,15 +16,17 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.message.DefaultMuleMessageDTO;
 import org.mule.transport.cometd.container.MuleCometdServlet;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.jetty.nio.SelectChannelConnector;
 
-public class CometdContainerFunctionalTestCase extends CometdFunctionalTestCase
+public class CometdRPCContainerFunctionalTestCase extends CometdRPCFunctionalTestCase
 {
     private Server httpServer;
 
@@ -49,6 +51,6 @@ public class CometdContainerFunctionalTestCase extends CometdFunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "comet-container-functional-roundtrip-test.xml";
+        return "comet-container-rpc-test.xml";
     }
 }

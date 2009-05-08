@@ -10,10 +10,13 @@
 package org.mule.transport.cometd;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
 import org.mule.transport.AbstractMessageReceiver;
+import org.mule.transport.AbstractConnector;
 import org.mule.transport.cometd.container.CometdServletConnector;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.PropertyScope;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
@@ -56,16 +59,17 @@ public class CometdMessageReceiver extends AbstractMessageReceiver
 
         public Object route(Client client, Object data) throws Exception
         {
-            MessageAdapter adapter = endpoint.getConnector().getMessageAdapter(data);
+            MessageAdapter adapter = getConnector().getMessageAdapter(data);
+
+            Object replyTo = adapter.getReplyTo();
             MuleMessage message = CometdMessageReceiver.this.routeMessage(new DefaultMuleMessage(adapter));
-            if(message!=null)
+            //If a replyTo channel is set the client is expecting a response.
+            //Mule does not invoke the replyTo handler if an error occurs, but in this case we want it to.
+            if(message!=null && message.getExceptionPayload()!=null && replyTo!=null)
             {
-                return message.getPayload();
+                ((AbstractConnector)getConnector()).getReplyToHandler().processReplyTo(RequestContext.getEvent(), message, replyTo);
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
     }
 

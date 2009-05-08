@@ -128,10 +128,10 @@ public class CometdConnector extends CometdServletConnector
     {
         try
         {
-//            for (BayeuxHolder connectorRef : connectors.values())
-//            {
-//                connectorRef.connector.stop();
-//            }
+            for (BayeuxHolder connectorRef : connectors.values())
+            {
+                connectorRef.connector.stop();
+            }
 
             httpServer.stop();
 
@@ -199,6 +199,7 @@ public class CometdConnector extends CometdServletConnector
 
                 ContinuationCometdServlet servlet = createServletForConnector(connector, endpoint);
                 holder = new BayeuxHolder(connector, servlet);
+                if(getBayeux()==null) setBayeux(servlet.getBayeux());
                // connector.start();
 
                 connectors.put(connectorKey, holder);

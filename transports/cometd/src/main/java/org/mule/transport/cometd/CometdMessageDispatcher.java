@@ -9,24 +9,18 @@
  */
 package org.mule.transport.cometd;
 
-import org.mule.transport.AbstractMessageDispatcher;
-import org.mule.transport.cometd.container.CometdServletConnector;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.util.MapUtils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Queue;
-
-import org.mortbay.cometd.AbstractBayeux;
-import org.apache.commons.collections.buffer.BoundedBuffer;
-import org.apache.commons.collections.buffer.BoundedFifoBuffer;
-import org.apache.commons.collections.Buffer;
+import dojox.cometd.Channel;
 import dojox.cometd.Client;
+import org.apache.commons.collections.Buffer;
+import org.apache.commons.collections.buffer.BoundedFifoBuffer;
+import org.mortbay.cometd.AbstractBayeux;
 
 /**
  * Will dispatch Mule events to cometd clients available in Bayeux that are listening to this endpoint.
@@ -76,13 +70,31 @@ public class CometdMessageDispatcher extends AbstractMessageDispatcher
         if (!connector.isStarted())
         {
             //TODO MULE-4320
-            logger.warn("Servlet container has not yet initiailised, ignoring event: " + event.getMessage().getPayload());
+            logger.warn("Servlet container has not yet initialised, ignoring event: " + event.getMessage().getPayload());
             return;
         }
 
+        Channel chan = bayeux.getChannel(channel);
+        if(chan!=null)
+        {
+            if (chan.getSubscribers().size() > 0 && cacheMessages && !messageCache.isEmpty())
+            {
+                while (!messageCache.isEmpty())
+                {
+                    for (Client client : chan.getSubscribers())
+                    {
+                        deliver(client, channel, messageCache.remove());
+                    }
+                }
+            }
 
-        Collection<Client> clients = bayeux.getClients();
-        if (clients.size() == 0 && cacheMessages)
+            Object data = event.transformMessage();
+            for (Client client : chan.getSubscribers())
+            {
+                deliver(client, channel, data);
+            }
+        }
+        else if (cacheMessages)
         {
             Object message = event.transformMessage();
             if (logger.isTraceEnabled())
@@ -90,26 +102,6 @@ public class CometdMessageDispatcher extends AbstractMessageDispatcher
                 logger.trace("There are no clients waiting, adding message to cache: " + message);
             }
             messageCache.add(message);
-            return;
-        }
-
-        if (clients.size() > 0 && cacheMessages && !messageCache.isEmpty())
-        {
-            while (!messageCache.isEmpty())
-            {
-                for (Client client : clients)
-                {
-                    deliver(client, channel, messageCache.remove());
-                }
-            }
-        }
-
-        if (clients.size() > 0)
-        {
-            for (Client client : clients)
-            {
-                deliver(client, channel, event.transformMessage());
-            }
         }
     }
 

@@ -10,11 +10,14 @@
 package org.mule.transport.cometd.container;
 
 import org.mule.api.MuleException;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.transport.servlet.ServletConnector;
 import org.mule.transport.AbstractConnector;
+import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.cometd.CometdMessageReceiver;
+import org.mule.transport.cometd.CometdReplyToHandler;
 
 import javax.servlet.ServletContext;
 
@@ -229,5 +232,11 @@ public class CometdServletConnector extends ServletConnector
     public void setRefsThreshold(int refsThreshold)
     {
         this.refsThreshold = refsThreshold;
+    }
+
+    @Override
+    public ReplyToHandler getReplyToHandler()
+    {
+        return new CometdReplyToHandler(getDefaultResponseTransformers(), this);
     }
 }

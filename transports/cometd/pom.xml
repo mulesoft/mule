@@ -26,6 +26,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-json</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jetty</artifactId>
             <version>${version}</version>
