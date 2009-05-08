@@ -28,9 +28,7 @@
 
     <http:connector name="defaultHttpConnector"/>
 
-    <!-- ########################################################################################################### -->
-    <!-- # Transformer Definitions                                                                                 # -->
-    <!-- ########################################################################################################### -->
+    <!-- # Transformer Definitions -->
 
     <mulexml:xslt-transformer name="FraudlabsXSLT" xsl-file="xsl/IP2LocationToSender.xsl"/>
     <mulexml:xslt-transformer name="HostIpXSLT" xsl-file="xsl/HostIpToSender.xsl"/>
@@ -49,9 +47,7 @@
         <spring:property name="senderDao" ref="senderDao"/>
     </custom-filter>
 
-    <!-- ########################################################################################################### -->
-    <!-- # Endpoint Definitions                                                                                    # -->
-    <!-- ########################################################################################################### -->
+    <!-- # Endpoint Definitions -->
 
     <!-- Todo add your email server here, note that Gmail, Yahoo, etc cannot be used since they do not set the sender ip addrsss -->
     <!--<imaps:endpoint name="Input" host="imap.mycompany.com" user="x" password="y"/>-->
@@ -66,6 +62,7 @@
     <vm:endpoint name="Positions" path="channels/positions"/>
     <vm:endpoint name="Storage" path="channels/storage"/>
     <vm:endpoint name="Aggregator" path="channels/positions/aggregator"/>
+    
     <cometd:servlet-endpoint name="Output" path="/GEOMAIL" transformer-refs="SenderToJson"/>
 
     <model>
