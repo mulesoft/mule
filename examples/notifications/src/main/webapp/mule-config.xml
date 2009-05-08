@@ -32,7 +32,7 @@
     <model>
         <service name="TestEchoService">
             <inbound>
-                <cometd:servlet-inbound-endpoint path="/services/test" synchronous="true">
+                <cometd:servlet-inbound-endpoint path="/services/echo" synchronous="true">
                     <custom-security-filter class="org.mule.example.notifications.DummySecurityFilter"/>
                 </cometd:servlet-inbound-endpoint>
             </inbound>

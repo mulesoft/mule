@@ -17,6 +17,8 @@ import org.mule.api.security.*;
 import org.mule.api.security.SecurityException;
 import org.mule.config.i18n.CoreMessages;
 
+import java.util.Map;
+
 /**
  * TODO
  */
@@ -36,7 +38,13 @@ public class DummySecurityFilter extends AbstractEndpointSecurityFilter
     {
         try
         {
-            if (event.getMessageAsString().contains("anonymous"))
+            Map payload = (Map) event.getMessage().getPayload(Map.class);
+            String user = (String) payload.get("user");
+            if (user == null)
+            {
+                throw new UnauthorisedException(CoreMessages.authNoCredentials());
+            }
+            if ("anonymous".equals(user))
             {
                 throw new UnauthorisedException(CoreMessages.authFailedForUser("anonymous"));
             }

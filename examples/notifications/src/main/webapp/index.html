@@ -6,7 +6,7 @@
 
     <link rel="stylesheet" href="notifications.css"/>
 
-    <script type="text/javascript" src="http://o.aolcdn.com/dojo/1.3.0/dojo/dojo.xd.js.uncompressed.js"></script>
+    <script type="text/javascript" src="http://o.aolcdn.com/dojo/1.3.0/dojo/dojo.xd.js"></script>
     <script type="text/javascript" src="mule-resource/web/js/mule.js"></script>
     <script type="text/javascript">
         dojo.require("dojox.cometd");
@@ -15,13 +15,13 @@
         function init()
         {
             mule.subscribe("/mule/notifications", notif);
-            mule.subscribe("/services/test", rpcEchoResponse);
+//            mule.subscribe("/services/response", rpcEchoResponse);
         }
 
         function dispose()
         {
             mule.unsubscribe("/mule/notifications", notif);
-            mule.unsubscribe("/services/test", rpcEchoResponse);
+//            mule.unsubscribe("/services/response", rpcEchoResponse);
         }
 
         function notif(message)
@@ -51,12 +51,14 @@
         }
 
         function rpcEcho() {
-            var data = "{'phrase':'" + document.getElementById('phrase').value + "','user':'" + document.getElementById('user').value + "'}";
-            mule.publish("/services/test", data);
+            var data = new Object();
+            data.phrase = document.getElementById('phrase').value;
+            data.user = document.getElementById('user').value;
+            mule.rpc("/services/echo", data, rpcEchoResponse);
         }
 
         function rpcEchoResponse(message) {
-            document.getElementById("response").innerHTML = "<b>Response:</b>" + message.data + "\n";
+            document.getElementById("response").innerHTML = "<b>Response:&nbsp;</b>" + message.data + "\n";
         }
 
         dojo.addOnLoad(init);
