@@ -40,18 +40,8 @@ public class ComponentMessageNotification extends ServerNotification
     public ComponentMessageNotification(MuleMessage message, Component component, int action)
     {
         super(cloneMessage(message), action);
-        //this.component = component;
         resourceIdentifier = component.getService().getName();
 
-    }
-
-    protected static MuleMessage cloneMessage(MuleMessage message)
-    {
-        // TODO we probably need to support deep cloning here
-        synchronized (message)
-        {
-            return new DefaultMuleMessage(message.getPayload(), message);
-        }
     }
 
     protected String getPayloadToString()
