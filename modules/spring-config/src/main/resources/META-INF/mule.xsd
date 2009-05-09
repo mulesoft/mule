@@ -318,13 +318,6 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="not" type="substitutableBoolean">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Inverts the filter condition.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="outboundCollectionType">
