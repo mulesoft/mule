@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cometd="http://www.mulesource.org/schema/mule/cometd"
+      xmlns:quartz="http://www.mulesource.org/schema/mule/quartz"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/quartz http://www.mulesource.org/schema/mule/quartz/3.0/mule-quartz.xsd
+       http://www.mulesource.org/schema/mule/cometd http://www.mulesource.org/schema/mule/cometd/3.0/mule-cometd.xsd
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd">
+
+    <model>
+        <service name="StollerService">
+            <description>
+                A service that generates GPS coordinates in downtown San Francisco. These get mapped on a Google map
+                at the browser.
+            </description>
+            <inbound>
+                <quartz:inbound-endpoint repeatInterval="3000" jobName="walkGenerator">
+                    <quartz:event-generator-job/>
+                </quartz:inbound-endpoint>
+            </inbound>
+            <component class="org.mule.example.gpswalker.StrollAroundSanFran"/>
+            <outbound>
+                <pass-through-router>
+                    <cometd:servlet-outbound-endpoint path="/services/gps">
+                        <bean-to-map-transformer/>
+                    </cometd:servlet-outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

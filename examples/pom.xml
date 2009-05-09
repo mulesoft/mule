@@ -18,6 +18,7 @@
         <module>echo</module>
         <module>errorhandler</module>
         <module>geomail</module>
+        <module>gpswalker</module>
         <module>hello</module>
         <module>loanbroker</module>
         <module>notifications</module>
