@@ -37,7 +37,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="backupFolder" type="xsd:NMTOKEN">
+                <xsd:attribute name="backupFolder" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The folder where messages are moved after they have been read.
@@ -51,7 +51,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="mailboxFolder" type="xsd:NMTOKEN">
+                <xsd:attribute name="mailboxFolder" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The remote folder to check for email. Default is INBOX.
