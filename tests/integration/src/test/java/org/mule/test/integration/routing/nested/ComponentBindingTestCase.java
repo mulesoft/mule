@@ -13,6 +13,9 @@ package org.mule.test.integration.routing.nested;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.NullPayload;
+
+import java.util.Date;
 
 public class ComponentBindingTestCase extends FunctionalTestCase
 {
@@ -36,7 +39,18 @@ public class ComponentBindingTestCase extends FunctionalTestCase
         assertEquals("Received: Hello " + message + " " + number, reply.getPayload());
     }
 
-    public void testBinding() throws Exception
+    private void internalNullTest(String prefix) throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Date message = new Date();
+        client.dispatch(prefix + "invoker.in", message, null);
+        MuleMessage reply = client.request(prefix + "invoker.out", RECEIVE_TIMEOUT);
+        assertNotNull(reply);
+        assertNull(reply.getExceptionPayload());
+        assertEquals(NullPayload.getInstance(), reply.getPayload());
+    }
+
+    public void testVmBinding() throws Exception
     {
         internalTest("vm://");
     }
@@ -49,5 +63,20 @@ public class ComponentBindingTestCase extends FunctionalTestCase
     public void testJmsTopicBinding() throws Exception
     {
         internalTest("jms://topic:t");
+    }
+
+    public void testVmBindingReturnNull() throws Exception
+    {
+        internalNullTest("vm://");
+    }
+
+    public void testJmsQueueBindingReturnNull() throws Exception
+    {
+        internalNullTest("jms://");
+    }
+
+    public void testJmsTopicBindingReturnNull() throws Exception
+    {
+        internalNullTest("jms://topic:t");
     }
 }

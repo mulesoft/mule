@@ -13,4 +13,6 @@ package org.mule.test.integration.routing.nested;
 public interface HelloInterface
 {
     String hello(String s, Integer v);
+    
+    public Object returnNull();
 }

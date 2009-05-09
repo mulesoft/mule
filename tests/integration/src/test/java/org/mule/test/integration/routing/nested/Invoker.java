@@ -10,6 +10,8 @@
 
 package org.mule.test.integration.routing.nested;
 
+import java.util.Date;
+
 public class Invoker
 {
     private HelloInterface hello;
@@ -17,6 +19,11 @@ public class Invoker
     public String invoke(String s)
     {
         return "Received: " + hello.hello(s, new Integer(0xC0DE));
+    }
+
+    public Object returnNull(Date date)
+    {
+        return hello.returnNull();
     }
     
     public void setHello(HelloInterface hello)

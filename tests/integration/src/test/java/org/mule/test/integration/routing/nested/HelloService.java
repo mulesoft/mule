@@ -16,4 +16,9 @@ public class HelloService implements HelloInterface
     {
         return "Hello " + s + " " + v;
     }
+
+    public Object returnNull()
+    {
+        return null;
+    }
 }
