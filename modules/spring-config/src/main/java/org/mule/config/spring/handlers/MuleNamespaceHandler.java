@@ -153,6 +153,8 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.transformer.simple.MapToBean;
+import org.mule.transformer.simple.BeanToMap;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
 
@@ -234,6 +236,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("string-to-byte-array-transformer", new TransformerDefinitionParser(ObjectToByteArray.class));
 
         registerBeanDefinitionParser("append-string-transformer", new TransformerDefinitionParser(StringAppendTransformer.class));
+
+        registerBeanDefinitionParser("map-to-bean-transformer", new TransformerDefinitionParser(MapToBean.class));
+        registerBeanDefinitionParser("bean-to-map-transformer", new TransformerDefinitionParser(BeanToMap.class));
 
         //Transaction Managers
         registerBeanDefinitionParser("custom-transaction-manager", new TransactionManagerDefinitionParser());

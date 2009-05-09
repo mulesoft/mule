@@ -1176,4 +1176,15 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 302, streamType);
     }
+
+    public static Message propertiesOrNotSet(String name, String properties)
+    {
+        return factory.createMessage(BUNDLE_PATH, 303, name, properties);
+    }
+
+    public static Message transforemrMapBeanClassNotSet()
+    {
+        return factory.createMessage(BUNDLE_PATH, 304);
+    }
+
 }
