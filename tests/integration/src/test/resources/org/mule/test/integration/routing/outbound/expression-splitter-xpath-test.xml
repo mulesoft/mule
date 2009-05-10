@@ -36,22 +36,25 @@
         
         <service name="ServiceOne">
             <inbound>
-                <vm:inbound-endpoint path="service1.queue"/>
+                <vm:inbound-endpoint path="service1.queue">
+                    <response-transformers>
+                        <mulexml:dom-to-xml-transformer returnClass="java.lang.String"/>                        
+                    </response-transformers>
+                </vm:inbound-endpoint>
             </inbound>
-            <test:component>
-                <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
-            </test:component>
+            <component class="org.mule.test.integration.routing.outbound.AddReceivedNodeService"/>
         </service>
 
         <service name="ServiceTwo">
             <inbound>
-                <vm:inbound-endpoint path="service2.queue"/>
+                <vm:inbound-endpoint path="service2.queue">
+                    <response-transformers>
+                        <mulexml:dom-to-xml-transformer returnClass="java.lang.String"/>
+                    </response-transformers>
+                </vm:inbound-endpoint>
             </inbound>
-            <test:component>
-                <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
-            </test:component>
+            <component class="org.mule.test.integration.routing.outbound.AddReceivedNodeService"/>
         </service>
 
-       
     </model>
 </mule>

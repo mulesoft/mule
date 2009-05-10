@@ -17,6 +17,8 @@ import org.mule.tck.FunctionalTestCase;
 
 import java.util.List;
 
+import org.custommonkey.xmlunit.XMLUnit;
+
 public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
 {
     private final String MESSAGE = "<Batch xmlns=\"http://acme.com\">\n" +
@@ -33,6 +35,28 @@ public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
             "        <Date>28102008</Date>\n" +
             "    </Trade>    \n" +
             "</Batch>";
+
+    private final String EXPECTED_MESSAGE_1 = "<Trade xmlns=\"http://acme.com\">\n" +
+            "        <Type>CASH</Type>\n" +
+            "        <Amount>40000</Amount>\n" +
+            "        <Currency>USD</Currency>\n" +
+            "        <Date>28102008</Date>\n" +
+            "        <Received>ServiceOne</Received>\n" +
+            "    </Trade>";
+
+    private final String EXPECTED_MESSAGE_2 = "<Trade xmlns=\"http://acme.com\">\n" +
+            "        <Type>CASH</Type>\n" +
+            "        <Amount>2000</Amount>\n" +
+            "        <Currency>GBP</Currency>\n" +
+            "        <Date>28102008</Date>\n" +
+            "        <Received>ServiceTwo</Received>\n" +
+            "    </Trade>";
+
+
+    public ExpressionSplitterXPathTestCase()
+    {
+        XMLUnit.setIgnoreWhitespace(true);
+    }
 
     protected String getConfigResources()
     {
@@ -52,7 +76,7 @@ public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
         assertEquals(2, coll.size());
         List results = (List) coll.getPayload();
 
-        assertTrue(results.contains("DefaultDocument Received in ServiceOne"));
-        assertTrue(results.contains("DefaultDocument Received in ServiceTwo"));
+        XMLUnit.compareXML(EXPECTED_MESSAGE_1, results.get(0).toString());
+        XMLUnit.compareXML(EXPECTED_MESSAGE_2, results.get(1).toString());
     }
 }
