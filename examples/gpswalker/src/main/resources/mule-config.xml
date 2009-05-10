@@ -19,7 +19,7 @@
                     <quartz:event-generator-job/>
                 </quartz:inbound-endpoint>
             </inbound>
-            <component class="org.mule.example.gpswalker.StrollAroundSanFran"/>
+            <component class="org.mule.example.gpswalker.CityStroller"/>
             <outbound>
                 <pass-through-router>
                     <cometd:servlet-outbound-endpoint path="/services/gps">

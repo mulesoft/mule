@@ -10,7 +10,7 @@
 package org.mule.example.gpswalker;
 
 /**
- * TODO
+ * A bean that holds Geo Coordinates
  */
 public class GpsCoord {
 
