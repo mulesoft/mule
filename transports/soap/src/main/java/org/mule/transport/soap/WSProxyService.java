@@ -220,7 +220,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
                     {
                         throw new InitialisationException(MessageFactory.createStaticMessage("urlWebservice has not been set, service has not been initialized properly"), this);
                     }
-                    this.wsdlEndpoint = this.urlWebservice.concat("?WSDL");
+                    this.wsdlEndpoint = this.urlWebservice.concat("?wsdl");
                     logger.info("Defaulting to: " + this.wsdlEndpoint);
                 }
                 else
