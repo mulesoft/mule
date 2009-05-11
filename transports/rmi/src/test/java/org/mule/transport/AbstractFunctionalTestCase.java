@@ -10,7 +10,6 @@
 
 package org.mule.transport;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.Message;

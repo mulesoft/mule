@@ -179,9 +179,8 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         transformers.add(trans1);
         transformers.add(trans2);
 
-        
-        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test", null, transformers, new PayloadTypeFilter(
-            Object.class), null);
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test", null, transformers, 
+            new PayloadTypeFilter(Object.class), null);
 
         MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
         Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
@@ -311,7 +310,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     }
 
 
-    private class TestEventTransformer extends AbstractTransformer
+    private static class TestEventTransformer extends AbstractTransformer
     {
         public Object doTransform(Object src, String encoding) throws TransformerException
         {
