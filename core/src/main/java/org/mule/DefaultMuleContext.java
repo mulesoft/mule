@@ -242,6 +242,8 @@ public class DefaultMuleContext implements MuleContext
             logger.info(splashScreen.toString());
         }
 
+        // SplashScreen holds static variables which need to be cleared in case we restart the server.
+        SplashScreen.dispose();
     }
 
 

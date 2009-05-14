@@ -60,6 +60,11 @@ public abstract class SplashScreen
         return splashScreen;
     }
 
+    public static void dispose()
+    {
+        instances.clear();
+    }
+
     /**
      * Setting the header clears body and footer assuming a new
      * splash-screen is built.
