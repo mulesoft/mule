@@ -11,7 +11,6 @@
 package org.mule.transport.file.transformers;
 
 import org.mule.api.transformer.TransformerException;
-import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -39,22 +38,18 @@ public class FileToString extends FileToByteArray
      * <code>byte[]</code> is passed in as a source object this transformer accepts
      * it and tries the usual transformation.
      */
-    // @Override
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         byte[] bytes;
 
-        if (src instanceof InputStream)
-        {
-            bytes = IOUtils.toByteArray((InputStream) src);
-        }
-        else if (src instanceof byte[])
+        if (src instanceof byte[])
         {
             bytes = (byte[])src;
         }
         else
         {
-            bytes = (byte[])super.doTransform(src, encoding);
+            bytes = (byte[]) super.doTransform(src, encoding);
         }
 
         try
