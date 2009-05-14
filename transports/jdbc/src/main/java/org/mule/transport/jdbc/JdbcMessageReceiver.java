@@ -79,7 +79,6 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             logger.warn(JdbcMessages.forcePropertyNoTransaction(RECEIVE_MESSAGES_IN_XA_TRANSCTION, "XA transaction"));
             receiveMessagesInXaTransaction = false;
         }
-    
         
         this.connector = (JdbcConnector) connector;
         this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().isTransacted()
