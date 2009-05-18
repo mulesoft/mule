@@ -109,7 +109,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
 
         //Test Count
-        assertEquals(3, eval.evaluate("#", message));
+        assertEquals(3, eval.evaluate("{count}", message));
 
         //Test All
         result = eval.evaluate("*", message);
@@ -215,7 +215,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         {
             //exprected
         }
-        assertEquals(3, muleContext.getExpressionManager().evaluate("#[attachments:#]", message));
+        assertEquals(3, muleContext.getExpressionManager().evaluate("#[attachments:{count}]", message));
 
     }
 

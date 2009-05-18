@@ -40,7 +40,7 @@ public final class TemplateParser
     public static final Pattern ANT_TEMPLATE_PATTERN = Pattern.compile("\\$\\{[^\\}]+\\}");
     public static final Pattern SQUARE_TEMPLATE_PATTERN = Pattern.compile("\\[[^\\]]+\\]");
     public static final Pattern CURLY_TEMPLATE_PATTERN = Pattern.compile("\\{[^\\}]+\\}");
-    public static final Pattern WIGGLY_MULE_TEMPLATE_PATTERN = Pattern.compile("#\\[[^\\]]+\\]");
+    public static final Pattern WIGGLY_MULE_TEMPLATE_PATTERN = Pattern.compile("#\\[[^#]+\\]");
 
     private final Pattern pattern;
     private final int pre;

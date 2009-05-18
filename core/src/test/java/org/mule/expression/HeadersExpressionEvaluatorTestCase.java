@@ -84,7 +84,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
 
         //Test count
-        assertEquals(3, eval.evaluate("#", message));
+        assertEquals(3, eval.evaluate("{count}", message));
 
         //Test all
         result = eval.evaluate("*", message);
@@ -182,7 +182,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
             //exprected
         }
 
-        assertEquals(3, muleContext.getExpressionManager().evaluate("#[headers:#]", message));
+        assertEquals(3, muleContext.getExpressionManager().evaluate("#[headers:{count}]", message));
     }
 
     public void testListHeadersUsingManager() throws Exception
