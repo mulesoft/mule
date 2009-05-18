@@ -50,7 +50,7 @@ public class CometdConnector extends CometdServletConnector
     public CometdConnector()
     {
         super();
-        registerSupportedProtocol(PROTOCOL);
+        registerSupportedProtocol("ajax");
         setInitialStateStopped(false);
     }
 

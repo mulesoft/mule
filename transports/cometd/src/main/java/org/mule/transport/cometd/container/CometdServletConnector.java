@@ -91,6 +91,7 @@ public class CometdServletConnector extends ServletConnector
     public CometdServletConnector()
     {
         super();
+        registerSupportedProtocol("ajax");
         //Dont start until the servletContianer is up
         setInitialStateStopped(true);
 
