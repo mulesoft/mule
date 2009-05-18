@@ -28,9 +28,6 @@ import org.apache.cxf.message.AbstractWrappedMessage;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 
-/**
- *
- */
 public class CxfMessageAdapter extends AbstractMessageAdapter
 {
     /**
@@ -116,8 +113,7 @@ public class CxfMessageAdapter extends AbstractMessageAdapter
         {
             // @TODO: Maybe pass the connector down and use connector exception
             // instead?
-            throw new DefaultMuleException(CxfMessages.inappropriateMessageTypeForAttachments(payload.getClass()
-                .getName()));
+            throw new DefaultMuleException(CxfMessages.inappropriateMessageTypeForAttachments(payload));
         }
     }
 }
