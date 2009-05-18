@@ -120,6 +120,6 @@ public class RegistryExpressionEvaluator implements ExpressionEvaluator, MuleCon
      */
     public void setName(String name)
     {
-        throw new UnsupportedOperationException("setName");
+        throw new UnsupportedOperationException();
     }
 }

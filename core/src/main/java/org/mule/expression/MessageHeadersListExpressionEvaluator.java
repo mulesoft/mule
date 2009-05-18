@@ -28,12 +28,9 @@ import java.util.StringTokenizer;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageHeadersListExpressionEvaluator implements ExpressionEvaluator
+public class MessageHeadersListExpressionEvaluator implements ExpressionEvaluator, ExpressionConstants
 {
     public static final String NAME = "headers-list";
-    public static final String DELIM = ",";
-
-    public static final String ALL_ARGUMENT = "{all}";
 
     public Object evaluate(String expression, MuleMessage message)
     {
@@ -57,9 +54,9 @@ public class MessageHeadersListExpressionEvaluator implements ExpressionEvaluato
             {
                 String s = tokenizer.nextToken();
                 s = s.trim();
-                if (s.endsWith("*"))
+                if (s.endsWith(OPTIONAL_ARGUMENT))
                 {
-                    s = s.substring(s.length() - 1);
+                    s = s.substring(0, s.length() - OPTIONAL_ARGUMENT.length());
                     required = false;
                 }
                 else
@@ -100,6 +97,6 @@ public class MessageHeadersListExpressionEvaluator implements ExpressionEvaluato
      */
     public void setName(String name)
     {
-        throw new UnsupportedOperationException("setName");
+        throw new UnsupportedOperationException();
     }
 }

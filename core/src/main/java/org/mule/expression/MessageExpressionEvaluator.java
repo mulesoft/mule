@@ -114,6 +114,6 @@ public class MessageExpressionEvaluator implements ExpressionEvaluator
      */
     public void setName(String name)
     {
-        throw new UnsupportedOperationException("setName");
+        throw new UnsupportedOperationException();
     }
 }

@@ -83,7 +83,17 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
             //Expected
         }
 
-        assertEquals(3, eval.evaluate("{count}", message));
+        //Test count
+        assertEquals(3, eval.evaluate("#", message));
+
+        //Test all
+        result = eval.evaluate("*", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(3, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("moo"));
+        assertTrue(((Map)result).values().contains("maz"));
+        assertTrue(((Map)result).values().contains("mar"));
     }
 
     public void testListHeaders() throws Exception
@@ -111,6 +121,15 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         {
             //Expected
         }
+        
+        //Test All
+        result = eval.evaluate("*", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(3, ((List)result).size());
+        assertTrue(((List)result).contains("moo"));
+        assertTrue(((List)result).contains("maz"));
+        assertTrue(((List)result).contains("mar"));
     }
 
 
@@ -163,7 +182,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
             //exprected
         }
 
-        assertEquals(3, muleContext.getExpressionManager().evaluate("#[headers:{count}]", message));
+        assertEquals(3, muleContext.getExpressionManager().evaluate("#[headers:#]", message));
     }
 
     public void testListHeadersUsingManager() throws Exception

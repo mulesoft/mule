@@ -25,7 +25,7 @@ import javax.activation.DataHandler;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
+public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator, ExpressionConstants
 {
     public static final String NAME = "attachment";
 
@@ -37,9 +37,9 @@ public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
         }
 
         boolean required;
-        if (expression.endsWith("*"))
+        if (expression.endsWith(OPTIONAL_ARGUMENT))
         {
-            expression = expression.substring(expression.length() - 1);
+            expression = expression.substring(expression.length() - OPTIONAL_ARGUMENT.length());
             required = false;
         }
         else
@@ -68,6 +68,6 @@ public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
      */
     public void setName(String name)
     {
-        throw new UnsupportedOperationException("setName");
+        throw new UnsupportedOperationException();
     }
 }

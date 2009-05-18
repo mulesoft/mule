@@ -25,17 +25,17 @@ import org.mule.config.i18n.CoreMessages;
  * @see ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
+public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator, ExpressionConstants
 {
     public static final String NAME = "header";
 
     public Object evaluate(String expression, MuleMessage message)
     {
-        Object result = null;
+        Object result;
         boolean required;
-        if (expression.endsWith("*"))
+        if (expression.endsWith(OPTIONAL_ARGUMENT))
         {
-            expression = expression.substring(expression.length() - 1);
+            expression = expression.substring(expression.length() - OPTIONAL_ARGUMENT.length());
             required = false;
         }
         else
@@ -71,6 +71,6 @@ public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
      */
     public void setName(String name)
     {
-        throw new UnsupportedOperationException("setName");
+        throw new UnsupportedOperationException();
     }
 }

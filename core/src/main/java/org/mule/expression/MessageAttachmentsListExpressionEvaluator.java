@@ -29,12 +29,9 @@ import java.util.StringTokenizer;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageAttachmentsListExpressionEvaluator implements ExpressionEvaluator
+public class MessageAttachmentsListExpressionEvaluator implements ExpressionEvaluator, ExpressionConstants
 {
     public static final String NAME = "attachments-list";
-    public static final String DELIM = ",";
-
-    public static final String ALL_ARGUMENT = "{all}";
 
     public Object evaluate(String expression, MuleMessage message)
     {
@@ -58,9 +55,9 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
             {
                 String s = tokenizer.nextToken();
                 s = s.trim();
-                if (s.endsWith("*"))
+                if (s.endsWith(OPTIONAL_ARGUMENT))
                 {
-                    s = s.substring(s.length() - 1);
+                    s = s.substring(0, s.length() - OPTIONAL_ARGUMENT.length());
                     required = false;
                 }
                 else

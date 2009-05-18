@@ -23,7 +23,7 @@ import java.util.Map;
  * If the message payload is a map this extractor will look up the property value in
  * the map
  */
-public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
+public class MapPayloadExpressionEvaluator implements ExpressionEvaluator, ExpressionConstants
 {
     public static final String NAME = "map-payload";
 
@@ -36,10 +36,10 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
             return null;
         }
         
-        if (expression.indexOf(",") > -1)
+        if (expression.indexOf(DELIM) > -1)
         {
 
-            String[] strings = StringUtils.splitAndTrim(expression, ",");
+            String[] strings = StringUtils.splitAndTrim(expression, DELIM);
             Map<String, Object> result = new HashMap<String, Object>(strings.length);
 
             for (String s : strings)
@@ -47,9 +47,9 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
                 Object val = getValue(s, (Map) payload);
                 if (val != null)
                 {
-                    if (s.endsWith("*"))
+                    if (s.endsWith(OPTIONAL_ARGUMENT))
                     {
-                        s = s.substring(s.length() - 1);
+                        s = s.substring(s.length() - OPTIONAL_ARGUMENT.length());
                     }
                     result.put(s, val);
                 }
@@ -65,9 +65,9 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
     protected Object getValue(String key, Map map)
     {
         boolean required;
-        if (key.endsWith("*"))
+        if (key.endsWith(OPTIONAL_ARGUMENT))
         {
-            key = key.substring(0, key.length() - 1);
+            key = key.substring(0, key.length() - OPTIONAL_ARGUMENT.length());
             required = false;
         }
         else
@@ -99,7 +99,7 @@ public class MapPayloadExpressionEvaluator implements ExpressionEvaluator
      */
     public void setName(String name)
     {
-        throw new UnsupportedOperationException("setName");
+        throw new UnsupportedOperationException();
     }
 
 }

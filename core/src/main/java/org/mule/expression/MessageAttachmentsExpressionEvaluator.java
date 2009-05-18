@@ -29,13 +29,9 @@ import java.util.StringTokenizer;
  * @see ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluator
+public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluator, ExpressionConstants
 {
     public static final String NAME = "attachments";
-    public static final String DELIM = ",";
-
-    public static final String ALL_ARGUMENT = "{all}";
-    public static final String COUNT_ARGUMENT = "{count}";
 
     public Object evaluate(String expression, MuleMessage message)
     {
@@ -63,9 +59,9 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
             {
                 String s = tokenizer.nextToken();
                 s = s.trim();
-                if (s.endsWith("*"))
+                if (s.endsWith(OPTIONAL_ARGUMENT))
                 {
-                    s = s.substring(s.length() - 1);
+                    s = s.substring(0, s.length() - OPTIONAL_ARGUMENT.length());
                     required = false;
                 }
                 else
@@ -106,6 +102,6 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
      */
     public void setName(String name)
     {
-        throw new UnsupportedOperationException("setName");
+        throw new UnsupportedOperationException();
     }
 }

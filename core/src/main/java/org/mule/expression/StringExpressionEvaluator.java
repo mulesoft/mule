@@ -50,6 +50,6 @@ public class StringExpressionEvaluator implements ExpressionEvaluator, MuleConte
      */
     public void setName(String name)
     {
-        throw new UnsupportedOperationException("setName");
+        throw new UnsupportedOperationException();
     }
 }

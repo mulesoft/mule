@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.routing.filters.WildcardFilter;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,13 +29,9 @@ import java.util.StringTokenizer;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageHeadersExpressionEvaluator implements ExpressionEvaluator
+public class MessageHeadersExpressionEvaluator implements ExpressionEvaluator, ExpressionConstants
 {
     public static final String NAME = "headers";
-    public static final String DELIM = ",";
-
-    public static final String ALL_ARGUMENT = "{all}";
-    public static final String COUNT_ARGUMENT = "{count}";
 
     public Object evaluate(String expression, MuleMessage message)
     {
@@ -62,15 +59,16 @@ public class MessageHeadersExpressionEvaluator implements ExpressionEvaluator
             {
                 String s = tokenizer.nextToken();
                 s = s.trim();
-                if (s.endsWith("*"))
+                if (s.endsWith(OPTIONAL_ARGUMENT))
                 {
-                    s = s.substring(0, s.length() - 1);
+                    s = s.substring(0, s.length() - OPTIONAL_ARGUMENT.length());
                     required = false;
                 }
                 else
                 {
                     required = true;
                 }
+                
                 Object val = message.getProperty(s);
                 if (val != null)
                 {
@@ -105,6 +103,6 @@ public class MessageHeadersExpressionEvaluator implements ExpressionEvaluator
      */
     public void setName(String name)
     {
-        throw new UnsupportedOperationException("setName");
+        throw new UnsupportedOperationException();
     }
 }
