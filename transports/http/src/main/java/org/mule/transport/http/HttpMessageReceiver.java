@@ -72,13 +72,13 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         super(connector, service, endpoint);
     }
 
-    // @Override
+    @Override
     protected Work createWork(Socket socket) throws IOException
     {
         return new HttpWorker(socket);
     }
 
-    // @Override
+    @Override
     protected void doConnect() throws ConnectException
     {
         // If we already have an endpoint listening on this socket don't try and
@@ -109,8 +109,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return true;
     }
 
-
-    // @Override
+    @Override
     protected MuleMessage handleUnacceptedFilter(MuleMessage message)
     {
         if (logger.isDebugEnabled())

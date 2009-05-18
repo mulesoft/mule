@@ -41,11 +41,14 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         if (message instanceof Object[])
         {
             // This case comes from the HttpMessageReceiver...
+            Object[] messageParts = (Object[]) message;
+            
+            this.message = messageParts[0];
+
             Map headers = new HashMap();
-            this.message = ((Object[]) message)[0];
-            if (((Object[]) message).length > 1)
+            if (messageParts.length > 1)
             {
-                Object second = ((Object[]) message)[1];
+                Object second = messageParts[1];
                 if (second instanceof Map)
                 {
                     Map props = (Map) second;
@@ -158,5 +161,5 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
     {
         return new HttpMessageAdapter(this);
     }
-
+    
 }
