@@ -63,7 +63,7 @@ public class ExpressionConfig
             expressionString = expressionString.substring(0, expressionString.length() - expressionPostfix.length());
         }
         
-        int i = expressionString.indexOf(":");
+        int i = expressionString.indexOf(EXPRESSION_SEPARATOR);
         if(i < 0)
         {
             throw new IllegalArgumentException("Expression is invalid: " + expressionString);
@@ -105,7 +105,7 @@ public class ExpressionConfig
         if (fullExpression == null)
         {
             validate(manager);
-            fullExpression = expressionPrefix + evaluator + ":" + expression + expressionPostfix;
+            fullExpression = expressionPrefix + evaluator + EXPRESSION_SEPARATOR + expression + expressionPostfix;
         }
         return fullExpression;
     }
