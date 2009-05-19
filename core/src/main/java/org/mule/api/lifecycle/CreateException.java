@@ -13,10 +13,8 @@ package org.mule.api.lifecycle;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>InitialisationException</code> is thrown by the initialise method defined
- * in the <code>org.mule.api.lifecycle.Initialisable</code> interface.
- * IinitialisationExceptions are fatal and will cause the current Mule instance to
- * shutdown.
+ * <code>CreateException</code> is thrown when creating an object inside Mule wasn't possible due
+ * to inconsistent internal state or wrong input.
  */
 public class CreateException extends LifecycleException
 {
