@@ -56,6 +56,11 @@ public class FileMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 7, string);
     }
+
+    public static Message invalidFilter(Object filter)
+    {
+        return factory.createMessage(BUNDLE_PATH, 8, filter.getClass().getName());
+    }
 }
 
 

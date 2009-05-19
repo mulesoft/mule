@@ -23,6 +23,7 @@ import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.InputStream;
@@ -96,7 +97,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    protected static File getNextFile(String dir, FilenameFilter filter) throws MuleException
+    protected static File getNextFile(String dir, Object filter) throws MuleException
     {
         File[] files;
         File file = FileUtils.newFile(dir);
@@ -113,7 +114,18 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                 {
                     if (filter != null)
                     {
-                        files = file.listFiles(filter);
+                        if (filter instanceof FileFilter)
+                        {
+                            files = file.listFiles((FileFilter) filter);
+                        }
+                        else if (filter instanceof FilenameFilter)
+                        {
+                            files = file.listFiles((FilenameFilter) filter);
+                        }
+                        else
+                        {
+                            throw new DefaultMuleException(FileMessages.invalidFilter(filter));
+                        }
                     }
                     else
                     {

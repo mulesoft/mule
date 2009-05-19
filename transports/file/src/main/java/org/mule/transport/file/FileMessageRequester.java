@@ -11,22 +11,22 @@
 package org.mule.transport.file;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.MuleServer;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.CreateException;
+import org.mule.api.routing.filter.Filter;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.DefaultMessageAdapter;
-import org.mule.transport.file.filters.FilenameWildcardFilter;
 import org.mule.transport.file.i18n.FileMessages;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
-import java.net.URLDecoder;
 
 /**
  * <code>FileMessageDispatcher</code> is used to read/write files to the filesystem
@@ -35,10 +35,27 @@ public class FileMessageRequester extends AbstractMessageRequester
 {
     private final FileConnector connector;
 
-    public FileMessageRequester(InboundEndpoint endpoint)
+    private FilenameFilter filenameFilter = null;
+    private FileFilter fileFilter = null;
+    
+    public FileMessageRequester(InboundEndpoint endpoint) throws MuleException
     {
         super(endpoint);
         this.connector = (FileConnector) endpoint.getConnector();
+        
+        Filter filter = endpoint.getFilter();
+        if (filter instanceof FilenameFilter)
+        {
+            filenameFilter = (FilenameFilter) filter;
+        }
+        else if (filter instanceof FileFilter)
+        {
+            fileFilter = (FileFilter) filter;
+        }
+        else if (filter != null)
+        {
+            throw new CreateException(FileMessages.invalidFileFilter(endpoint.getEndpointURI()), this);
+        }
     }
 
     /**
@@ -66,13 +83,7 @@ public class FileMessageRequester extends AbstractMessageRequester
     {
         File file = FileUtils.newFile(endpoint.getEndpointURI().getAddress());
         File result = null;
-        FilenameFilter filenameFilter = null;
-        String filter = (String) endpoint.getProperty("filter");
-        if (filter != null)
-        {
-            filter = URLDecoder.decode(filter, MuleServer.getMuleContext().getConfiguration().getDefaultEncoding());
-            filenameFilter = new FilenameWildcardFilter(filter);
-        }
+        
         if (file.exists())
         {
             if (file.isFile())
@@ -81,8 +92,18 @@ public class FileMessageRequester extends AbstractMessageRequester
             }
             else if (file.isDirectory())
             {
-                result = FileMessageDispatcher.getNextFile(endpoint.getEndpointURI().getAddress(), filenameFilter);
+                if (fileFilter != null)
+                {
+                    result = FileMessageDispatcher.getNextFile(
+                        endpoint.getEndpointURI().getAddress(), fileFilter);
+                }
+                else
+                {
+                    result = FileMessageDispatcher.getNextFile(
+                        endpoint.getEndpointURI().getAddress(), filenameFilter);
+                }
             }
+            
             if (result != null)
             {
                 boolean checkFileAge = connector.getCheckFileAge();
