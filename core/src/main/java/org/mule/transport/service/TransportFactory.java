@@ -66,7 +66,7 @@ public class TransportFactory
             String scheme = url.getSchemeMetaInfo();
 
             TransportServiceDescriptor sd = (TransportServiceDescriptor)
-                RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, scheme, null);
+                muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, scheme, null);
             if (sd == null)
             {
                 throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
@@ -75,6 +75,7 @@ public class TransportFactory
             connector = sd.createConnector();
             if (connector != null)
             {
+                connector.setMuleContext(muleContext);
                 if (connector instanceof AbstractConnector)
                 {
                     ((AbstractConnector)connector).initialiseFromUrl(url);
