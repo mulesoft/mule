@@ -80,7 +80,6 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         }
         this.componentObject = new SoftReference<Object>(componentObject);
         this.component = component;
-        this.entryPointResolver = entryPointResolver;
     }
     
     public DefaultLifecycleAdapter(Object componentObject,
