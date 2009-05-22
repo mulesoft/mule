@@ -35,7 +35,7 @@ public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator, Ex
         boolean required;
         if (expression.endsWith(OPTIONAL_ARGUMENT))
         {
-            expression = expression.substring(expression.length() - OPTIONAL_ARGUMENT.length());
+            expression = expression.substring(0, expression.length() - OPTIONAL_ARGUMENT.length());
             required = false;
         }
         else

@@ -43,6 +43,9 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         result = eval.evaluate("fool*", message);
         assertNull(result);
 
+        result = eval.evaluate("foo*", message);
+        assertNotNull(result);
+        assertEquals("moo", result);
         try
         {
             result = eval.evaluate("fool", message);
