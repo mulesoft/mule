@@ -99,7 +99,7 @@ public class ExpressionArgument implements MuleContextAware
      */
     public Object evaluate(MuleMessage message) throws ExpressionRuntimeException
     {
-        Object result = muleContext.getExpressionManager().evaluate(getExpression(), getEvaluator(), message, isOptional());
+        Object result = muleContext.getExpressionManager().evaluate(getExpression(), getEvaluator(), message, !isOptional());
         if(getReturnClass()!=null && result != null)
         {
             if (!getReturnClass().isInstance(result))
