@@ -56,4 +56,38 @@ public class Banana implements Fruit
     {
         return bitten;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof Banana))
+        {
+            return false;
+        }
+
+        Banana banana = (Banana) o;
+
+        if (bitten != banana.bitten)
+        {
+            return false;
+        }
+        if (peeled != banana.peeled)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = (peeled ? 1 : 0);
+        result = 31 * result + (bitten ? 1 : 0);
+        return result;
+    }
 }

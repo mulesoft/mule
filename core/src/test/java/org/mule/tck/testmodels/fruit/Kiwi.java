@@ -43,4 +43,32 @@ public class Kiwi implements Fruit
     {
         return this.bitten;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof Kiwi))
+        {
+            return false;
+        }
+
+        Kiwi kiwi = (Kiwi) o;
+
+        if (bitten != kiwi.bitten)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return (bitten ? 1 : 0);
+    }
 }
