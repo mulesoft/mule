@@ -8,18 +8,10 @@
        default-init-method="initialise">
 
     <bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-        <property name="customEditors">
-            <map>
-                <entry key="org.mule.api.transport.Connector">
-                    <bean class="org.mule.config.spring.editors.ConnectorPropertyEditor"/>
-                </entry>
-                <!-- entry key="org.mule.api.endpoint.UMOEndpointURI">
-                    <bean class="org.mule.config.spring.editors.EndpointURIPropertyEditor"/>
-                </entry -->
-                <entry key="org.mule.endpoint.URIBuilder">
-                    <bean class="org.mule.config.spring.editors.URIBuilderPropertyEditor"/>
-                </entry>
-            </map>
+        <property name="propertyEditorRegistrars">
+            <list>
+                <bean class="org.mule.config.spring.editors.MulePropertyEditorRegistrar"/>
+            </list>
         </property>
     </bean>
 
