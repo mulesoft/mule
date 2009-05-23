@@ -83,7 +83,7 @@ public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
         if (x > -1)
         {
             String resourceInfo = address.substring(y, x);
-            props.setProperty("resourceInfo", resourceInfo);
+            props.setProperty(RESOURCE_INFO_PROPERTY, resourceInfo);
             address = address.substring(x + 1);
         }
     }

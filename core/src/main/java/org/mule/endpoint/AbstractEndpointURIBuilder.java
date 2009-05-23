@@ -13,7 +13,10 @@ package org.mule.endpoint;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.MalformedEndpointException;
+import org.mule.api.MuleContext;
 import org.mule.util.PropertiesUtils;
+import org.mule.RegistryContext;
+import org.mule.MuleServer;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -33,9 +36,11 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
     protected String transformers;
     protected String responseTransformers;
     protected String userInfo;
+    private URI uri;
 
     public EndpointURI build(URI uri) throws MalformedEndpointException
     {
+        this.uri = uri;
         Properties props = getPropertiesForURI(uri);
         String replaceAddress = null;
         //If the address has been set as a parameter on the URI, then we must ensure that that value is used
@@ -53,13 +58,19 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
         }
 
         EndpointURI ep = new MuleEndpointURI(address, endpointName, connectorName, transformers,
-            responseTransformers, props, uri, userInfo);
+            responseTransformers, props, this.uri, userInfo);
         address = null;
         endpointName = null;
         connectorName = null;
         transformers = null;
         responseTransformers = null;
+        uri = null;
         return ep;
+    }
+
+    protected void rewriteURI(URI newURI)
+    {
+        this.uri = newURI;
     }
 
     protected abstract void setEndpoint(URI uri, Properties props) throws MalformedEndpointException;
@@ -105,8 +116,13 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
     {
         try
         {
-            //TODO RM* URGENT:
-            return URLDecoder.decode(string, "UTF-8" /*RegistryContext.getConfiguration().getDefaultEncoding()*/);
+            MuleContext context = MuleServer.getMuleContext();
+            String encoding = "UTF-8";
+            if(context!=null)
+            {
+                encoding = context.getConfiguration().getDefaultEncoding();
+            }
+            return URLDecoder.decode(string, encoding);
         }
         catch (UnsupportedEncodingException e)
         {

@@ -131,4 +131,25 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("password", url.getPassword());
         assertEquals("jms://user:password@myQueues/myQueue", url.toString());
     }
+
+    public void testSonicJmsTopicDestinations() throws Exception
+    {
+        EndpointURI url = new MuleEndpointURI("jms:topic://?address=[[testgroup]]test.topic");
+        url.initialise();
+        assertEquals("jms", url.getScheme());
+        assertEquals("[[testgroup]]test.topic", url.getAddress());
+        assertEquals("topic", url.getResourceInfo());
+        assertEquals("jms://?address=[[testgroup]]test.topic", url.toString());
+    }
+
+    public void testSonicJmsQueueDestinations() throws Exception
+    {
+        EndpointURI url = new MuleEndpointURI("jms://?address=[[testgroup]]test.queue");
+        url.initialise();
+        assertEquals("jms", url.getScheme());
+        assertEquals("[[testgroup]]test.queue", url.getAddress());
+        assertNull( url.getResourceInfo());
+        assertEquals("jms://?address=[[testgroup]]test.queue", url.toString());
+    }
 }
+
