@@ -18,12 +18,16 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
-import org.mule.transport.quartz.i18n.QuartzMessages;
 import org.mule.transport.quartz.config.JobConfig;
+import org.mule.transport.quartz.i18n.QuartzMessages;
+import org.mule.transport.quartz.jobs.CustomJob;
+import org.mule.transport.quartz.jobs.CustomJobConfig;
+import org.mule.transport.quartz.jobs.EventGeneratorJobConfig;
 
 import java.util.Date;
 
 import org.quartz.CronTrigger;
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.ObjectAlreadyExistsException;
@@ -61,11 +65,12 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
         {
             Scheduler scheduler = connector.getQuartzScheduler();
 
-            JobConfig jobConfig = (JobConfig)endpoint.getProperty(QuartzConnector.PROPERTY_JOB_CONFIG);
-            if(jobConfig==null)
+            JobConfig jobConfig = (JobConfig) endpoint.getProperty(QuartzConnector.PROPERTY_JOB_CONFIG);
+            if (jobConfig == null)
             {
                 throw new IllegalArgumentException(CoreMessages.objectIsNull(QuartzConnector.PROPERTY_JOB_CONFIG).getMessage());
             }
+            
             JobDetail jobDetail = new JobDetail();
             jobDetail.setName(endpoint.getEndpointURI().getAddress());
             jobDetail.setJobClass(jobConfig.getJobClass());
@@ -73,8 +78,27 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             jobDataMap.put(QUARTZ_RECEIVER_PROPERTY, this.getReceiverKey());
             jobDataMap.put(QUARTZ_CONNECTOR_PROPERTY, this.connector.getName());
             jobDataMap.putAll(endpoint.getProperties());
-            jobDetail.setJobDataMap(jobDataMap);
 
+            if(jobConfig instanceof EventGeneratorJobConfig)
+            {
+                jobDataMap.put(QuartzConnector.PROPERTY_PAYLOAD, ((EventGeneratorJobConfig)jobConfig).getPayload());
+            }
+            jobDataMap.put(QuartzConnector.PROPERTY_JOB_CONFIG, jobConfig);
+            
+            Job job = null;
+            if(jobConfig instanceof CustomJobConfig)
+            {
+                job = ((CustomJobConfig) jobConfig).getJob();
+            }
+            // If there has been a job created or found then we default to a customJob configuration
+            if (job != null)
+            {
+                jobDataMap.put(QuartzConnector.PROPERTY_JOB_OBJECT, job);
+                jobDetail.setJobClass(CustomJob.class);
+            }
+
+            jobDetail.setJobDataMap(jobDataMap);
+            
             Trigger trigger;
             String cronExpression = (String)endpoint.getProperty(QuartzConnector.PROPERTY_CRON_EXPRESSION);
             String repeatInterval = (String)endpoint.getProperty(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
