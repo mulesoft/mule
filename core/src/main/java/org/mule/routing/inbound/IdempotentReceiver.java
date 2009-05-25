@@ -72,7 +72,7 @@ public class IdempotentReceiver extends SelectiveConsumer
         return s;
     }
 
-    // @Override
+    @Override
     public boolean isMatch(MuleEvent event) throws MessagingException
     {
         if (!super.isMatch(event))
@@ -102,7 +102,7 @@ public class IdempotentReceiver extends SelectiveConsumer
         }
     }
 
-    // @Override
+    @Override
     public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
         String eventComponentName = event.getService().getName();
