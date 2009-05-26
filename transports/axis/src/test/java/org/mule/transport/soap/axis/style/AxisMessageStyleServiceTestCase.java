@@ -41,7 +41,7 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
         return "http://localhost:63080/ServiceEntryPoint";
     }
 
-    public void testDocumentWithNamesapce() throws Exception
+    public void testDocumentWithNamespace() throws Exception
     {
         doSoapRequest(new QName("http://muleumo.org", "document"), "axis:" + getServiceEndpoint(), false,
             false, false);

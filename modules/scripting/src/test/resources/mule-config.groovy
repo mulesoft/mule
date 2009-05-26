@@ -11,6 +11,8 @@ import org.mule.config.ChainedThreadingProfile
 import org.mule.endpoint.DefaultEndpointFactory
 import org.mule.endpoint.EndpointURIEndpointBuilder
 import org.mule.interceptor.InterceptorStack
+import org.mule.interceptor.LoggingInterceptor
+import org.mule.interceptor.TimerInterceptor
 import org.mule.model.seda.SedaModel
 import org.mule.model.seda.SedaService
 import org.mule.object.SingletonObjectFactory
@@ -36,7 +38,7 @@ import org.mule.tck.testmodels.mule.TestResponseAggregator
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory
 import org.mule.util.queue.MemoryPersistenceStrategy
 import org.mule.util.queue.QueueManager
-import org.mule.util.queue.TransactionalQueueManager;
+import org.mule.util.queue.TransactionalQueueManager
 
 // Set up defaults / system objects
 QueueManager queueManager = new TransactionalQueueManager();
@@ -158,7 +160,9 @@ muleContext.registry.registerModel(model)
 Service service = new SedaService();
 service.model = model
 service.name = "orangeComponent"
-service.component = new DefaultJavaComponent(new SingletonObjectFactory(Orange.class.name))
+def component = new DefaultJavaComponent(new SingletonObjectFactory(Orange.class.name))
+component.muleContext = muleContext
+service.component = component
 List interceptorList = new ArrayList()
 interceptorList.add(new org.mule.interceptor.LoggingInterceptor())
 interceptorList.add(interceptorStack)

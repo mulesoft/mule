@@ -39,7 +39,6 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import edu.emory.mathcs.backport.java.util.Collections;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -200,14 +199,17 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         uriToServer.put(server.getEndpoint().getEndpointInfo().getAddress(), server);
         
         // TODO MULE-2228 Simplify this API
-        SedaService c = new SedaService();
-        c.setName(CXF_SERVICE_COMPONENT_NAME + server.getEndpoint().getService().getName() + c.hashCode());
-        c.setModel(muleContext.getRegistry().lookupSystemModel());
+        SedaService service = new SedaService();
+        service.setMuleContext(muleContext);
+        service.setName(CXF_SERVICE_COMPONENT_NAME + server.getEndpoint().getService().getName() + service.hashCode());
+        service.setModel(muleContext.getRegistry().lookupSystemModel());
 
         CxfServiceComponent svcComponent = new CxfServiceComponent(this, (CxfMessageReceiver) receiver);
         svcComponent.setBus(bus);
 
-        c.setComponent(new DefaultJavaComponent(new SingletonObjectFactory(svcComponent)));
+        final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(svcComponent));
+        component.setMuleContext(muleContext);
+        service.setComponent(component);
 
         // No determine if the endpointUri requires a new connector to be
         // registed in the case of http we only need to register the new
@@ -305,9 +307,9 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
 
         receiver.setEndpoint(receiverEndpoint);
         
-        c.setInboundRouter(new DefaultInboundRouterCollection());
-        c.getInboundRouter().addEndpoint(protocolEndpoint);
-        services.add(c);
+        service.setInboundRouter(new DefaultInboundRouterCollection());
+        service.getInboundRouter().addEndpoint(protocolEndpoint);
+        services.add(service);
     }
 
     /**
@@ -344,11 +346,11 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         // listener is available
         if (event.getAction() == MuleContextNotification.CONTEXT_STARTED)
         {
-            for (Service c : services)
+            for (Service service : services)
             {
                 try
                 {
-                    muleContext.getRegistry().registerService(c);
+                    muleContext.getRegistry().registerService(service);
                 }
                 catch (MuleException e)
                 {

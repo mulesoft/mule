@@ -439,22 +439,24 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
     // Another consideration is how/when this implicit component gets disposed.
     protected Service getOrCreateAxisComponent() throws MuleException
     {
-        Service c = muleContext.getRegistry().lookupService(AXIS_SERVICE_PROPERTY + getName());
+        Service service = muleContext.getRegistry().lookupService(AXIS_SERVICE_PROPERTY + getName());
 
-        if (c == null)
+        if (service == null)
         {
             // TODO MULE-2228 Simplify this API
-            c = new SedaService();
-            c.setName(AXIS_SERVICE_PROPERTY + getName());
-            c.setModel(muleContext.getRegistry().lookupSystemModel());
+            service = new SedaService();
+            service.setName(AXIS_SERVICE_PROPERTY + getName());
+            service.setModel(muleContext.getRegistry().lookupSystemModel());
 
             Map props = new HashMap();
             props.put(AXIS, axis);
             SingletonObjectFactory of = new SingletonObjectFactory(AxisServiceComponent.class, props);
             of.initialise();
-            c.setComponent(new DefaultJavaComponent(of));
+            final DefaultJavaComponent component = new DefaultJavaComponent(of);
+            component.setMuleContext(muleContext);
+            service.setComponent(component);
         }
-        return c;
+        return service;
     }
 
     /**
