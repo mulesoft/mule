@@ -28,20 +28,24 @@ public class ServiceServiceTestCase extends AbstractMuleJmxTestCase
     {
         final String domainOriginal = "TEST_DOMAIN_1";
 
-        final SedaService component = new SedaService();
-        component.setName("TEST_SERVICE");
-        component.setComponent(new DefaultJavaComponent(new SingletonObjectFactory(Object.class)));
+        final SedaService service = new SedaService();
+        service.setName("TEST_SERVICE");
+        final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(Object.class));
+        component.setMuleContext(muleContext);
+        service.setComponent(component);
+        service.setMuleContext(muleContext);
 
-        component.setThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
+        service.setThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
         SedaModel model = new SedaModel();
-        component.setModel(model);
+        model.setMuleContext(muleContext);
+        service.setModel(model);
         muleContext.getRegistry().registerModel(model);
-        muleContext.getRegistry().registerService(component);
+        muleContext.getRegistry().registerService(service);
         muleContext.start();
 
-        final ServiceService service = new ServiceService("TEST_SERVICE");
+        final ServiceService jmxService = new ServiceService("TEST_SERVICE");
         final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_SERVICE");
-        mBeanServer.registerMBean(service, name);
+        mBeanServer.registerMBean(jmxService, name);
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(domainOriginal + ":*"), null);
 
         // Expecting following mbeans to be registered:

@@ -168,8 +168,9 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     protected Latch configureService(File inFile, boolean streaming, boolean filePayload) throws Exception
     {
 
-        Service s = new SedaService();
-        s.setName("moveDeleteBridgeService");
+        Service service = new SedaService();
+        service.setMuleContext(muleContext);
+        service.setName("moveDeleteBridgeService");
         String url = fileToUrl(inFile.getParentFile()) + "?connector=moveDeleteConnector";
         org.mule.api.transformer.Transformer transformer = null;
         if (streaming)
@@ -202,11 +203,11 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
             endpointBuilder.addTransformer(new NoActionTransformer());
         }
         endpointBuilder.setSynchronous(true);
-        s.getInboundRouter().addEndpoint(
+        service.getInboundRouter().addEndpoint(
             muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder));
         final Latch latch = new Latch();
-        FunctionalTestComponent component = new FunctionalTestComponent();
-        component.setEventCallback(new EventCallback()
+        FunctionalTestComponent testComponent = new FunctionalTestComponent();
+        testComponent.setEventCallback(new EventCallback()
         {
             public void eventReceived(final MuleEventContext context, final Object message) throws Exception
             {
@@ -216,11 +217,14 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
             }
         });
 
-        component.initialise();
-        s.setComponent(new DefaultJavaComponent(new SingletonObjectFactory(component)));
-        s.setModel(muleContext.getRegistry().lookupSystemModel());
-        muleContext.getRegistry().registerService(s);
-        s.start();
+        testComponent.initialise();
+        final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(testComponent));
+        component.setMuleContext(muleContext);
+        service.setComponent(component);
+        service.setMuleContext(muleContext);
+        service.setModel(muleContext.getRegistry().lookupSystemModel());
+        muleContext.getRegistry().registerService(service);
+        service.start();
         return latch;
     }
 
