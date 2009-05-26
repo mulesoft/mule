@@ -50,7 +50,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -435,7 +434,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
     {
         String key = new AbstractServiceDescriptor.Key(name, overrides).getKey();
-        //TODO If we want these descriptors loaded form Spring we need to checnge the key mechanism
+        //TODO If we want these descriptors loaded from Spring we need to change the key mechanism
         //and the scope, and then deal with circular reference issues.
         ServiceDescriptor sd = (ServiceDescriptor) registry.lookupObject(key);
 
