@@ -13,7 +13,6 @@ package org.mule.transport.jdbc.functional;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.transport.NullPayload;
 
 import java.io.Serializable;
 import java.util.List;
@@ -21,6 +20,7 @@ import java.util.Map;
 
 public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return super.getConfigResources() + ",jdbc-select-outbound.xml";
