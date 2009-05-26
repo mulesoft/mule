@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" 
+    xmlns:quartz="http://www.mulesource.org/schema/mule/quartz"
+    xmlns:test="http://www.mulesource.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesource.org/schema/mule/test http://www.mulesource.org/schema/mule/test/3.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/quartz http://www.mulesource.org/schema/mule/quartz/3.0/mule-quartz.xsd">
+
+    <!-- 
+        This latch is used in the test's code to determine if the custom job did its work
+    -->
+    <spring:bean id="latch" class="edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch">
+        <spring:constructor-arg type="int" value="1" />
+    </spring:bean>
+
+    <spring:bean id="job" class="org.mule.transport.quartz.QuartzCustomJobTestCase$MockJob">
+        <spring:constructor-arg ref="latch" />
+    </spring:bean>
+    
+    <quartz:endpoint name="quartz.in" jobName="eventTimer" repeatInterval="1000" repeatCount="1">
+        <quartz:custom-job job-ref="job" />
+    </quartz:endpoint>
+
+    <model>
+        <service name="quartzService">
+            <inbound>
+                <inbound-endpoint ref="quartz.in" />
+            </inbound>
+            <test:component />
+        </service>
+    </model>
+</mule>
