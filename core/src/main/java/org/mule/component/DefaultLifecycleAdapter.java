@@ -26,6 +26,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.EntryPointResolverSet;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.service.ServiceAware;
 import org.mule.api.service.ServiceException;
@@ -68,6 +69,8 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
     private boolean started = false;
     private boolean disposed = false;
 
+    private MuleContext muleContext;
+
     public DefaultLifecycleAdapter(Object componentObject, JavaComponent component, MuleContext muleContext) throws MuleException
     {
         if (componentObject == null)
@@ -80,6 +83,22 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         }
         this.componentObject = new SoftReference<Object>(componentObject);
         this.component = component;
+
+        if (muleContext == null)
+        {
+            throw new IllegalStateException("No muleContext provided");
+        }
+
+        // save a ref for later disposal call
+        this.muleContext = muleContext;
+        // store a hard ref to the component object in the registry, so it's not GC'ed too early
+        MuleRegistry r = muleContext.getRegistry();
+        final String key = "_component." + component.getService().getName();
+        // register only if none registered yet
+        if (r.lookupObject(key) == null)
+        {
+            r.registerObject(key, componentObject);
+        }
     }
     
     public DefaultLifecycleAdapter(Object componentObject,
@@ -169,9 +188,13 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         {
             try
             {
+                // unregister a hard ref to the component object
+                muleContext.getRegistry().unregisterObject("_component." + component.getService().getName());
+
                 ((Disposable) componentObject.get()).dispose();
                 componentObject.clear();
                 componentObject.enqueue();
+
             }
             catch (Exception e)
             {
@@ -179,6 +202,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
                 logger.error("failed to dispose: " + component.getService().getName(), e);
             }
         }
+
         disposed = true;
     }
 

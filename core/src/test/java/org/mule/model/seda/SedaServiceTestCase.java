@@ -35,9 +35,8 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
-import junit.framework.AssertionFailedError;
-
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import junit.framework.AssertionFailedError;
 
 public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractServiceTestCase
 {
@@ -85,6 +84,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
             (QueueManager) mockTransactionalQueueManager.proxy());
 
         SedaService service = new SedaService();
+        service.setMuleContext(muleContext);
         service.setName("test");
         service.setModel(new SedaModel());
         service.setQueueProfile(new QueueProfile(capacity, persistent));
@@ -154,6 +154,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
     public void testDispatchToPausedService() throws Exception
     {
         Service service = getTestService();
+        service.setMuleContext(muleContext);
         service.start();
         service.pause();
         service.dispatchEvent(getTestInboundEvent("test"));

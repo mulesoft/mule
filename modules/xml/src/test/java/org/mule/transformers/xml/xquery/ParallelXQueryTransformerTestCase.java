@@ -9,12 +9,12 @@
  */
 package org.mule.transformers.xml.xquery;
 
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.IOUtils;
 import org.mule.RequestContext;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XQueryTransformer;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.IOUtils;
 
 import java.util.Iterator;
 

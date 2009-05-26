@@ -51,6 +51,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_FAIL);
 
         PooledJavaComponent component = new PooledJavaComponent(objectFactory, pp);
+        component.setMuleContext(muleContext);
         assertNotNull(component.getObjectFactory());
         assertEquals(objectFactory, component.getObjectFactory());
         assertEquals(Orange.class, component.getObjectFactory().getObjectClass());
@@ -65,6 +66,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         PooledJavaComponent component = new PooledJavaComponent(getObjectFactory(), getDefaultPoolingProfile());
         assertNull(component.lifecycleAdapterPool);
         component.setService(getTestService());
+        component.setMuleContext(muleContext);
         component.initialise();
         assertNull(component.lifecycleAdapterPool);
         component.start();
@@ -78,6 +80,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
     {
         PooledJavaComponent component = new PooledJavaComponent(getObjectFactory(), getDefaultPoolingProfile());
         component.setService(getTestService());
+        component.setMuleContext(muleContext);
         component.initialise();
         component.start();
         assertNotSame(component.borrowComponentLifecycleAdaptor(), component.borrowComponentLifecycleAdaptor());
@@ -91,6 +94,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
     {
         PooledJavaComponent component = new PooledJavaComponent(getObjectFactory(), getDefaultPoolingProfile());
         component.setService(getTestService());
+        component.setMuleContext(muleContext);
         component.initialise();
         component.start();
 
@@ -115,6 +119,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         PoolingProfile pp = getDefaultPoolingProfile();
         pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_WAIT);
         PooledJavaComponent component = new PooledJavaComponent(getObjectFactory(), pp);
+        component.setMuleContext(muleContext);
         component.setService(getTestService());
         component.initialise();
         component.start();
@@ -145,6 +150,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_WAIT);
         PooledJavaComponent component = new PooledJavaComponent(getObjectFactory(), pp);
         component.setService(getTestService());
+        component.setMuleContext(muleContext);
         component.initialise();
         component.start();
 
@@ -183,6 +189,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_WAIT);
         PooledJavaComponent component = new PooledJavaComponent(getObjectFactory(), pp);
         component.setService(getTestService());
+        component.setMuleContext(muleContext);
         component.initialise();
         component.start();
 
@@ -225,6 +232,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         PoolingProfile pp = getDefaultPoolingProfile();
         pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_GROW);
         PooledJavaComponent component = new PooledJavaComponent(getObjectFactory(), pp);
+        component.setMuleContext(muleContext);
         component.setService(getTestService());
         component.initialise();
         component.start();
@@ -247,6 +255,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         PoolingProfile pp = getDefaultPoolingProfile();
         pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_FAIL);
         PooledJavaComponent component = new PooledJavaComponent(getObjectFactory(), pp);
+        component.setMuleContext(muleContext);
         component.setService(getTestService());
         component.initialise();
         component.start();
@@ -265,6 +274,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         PoolingProfile pp = getDefaultPoolingProfile();
         pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_FAIL);
         PooledJavaComponent component = new PooledJavaComponent(new PrototypeObjectFactory(UniqueComponent.class), pp);
+        component.setMuleContext(muleContext);
         component.setService(getTestService());
         component.initialise();
         component.start();
@@ -299,6 +309,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
     {
         PooledJavaComponent component = new PooledJavaComponent(new PrototypeObjectFactory(WaterMelon.class),
             getDefaultPoolingProfile());
+        component.setMuleContext(muleContext);
         component.setService(getTestService());
         component.initialise();
         component.start();
@@ -314,6 +325,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
     {
         PooledJavaComponent component = new PooledJavaComponent(new PrototypeObjectFactory(WaterMelon.class),
             getDefaultPoolingProfile());
+        component.setMuleContext(muleContext);
         component.setService(getTestService());
         component.initialise();
         component.start();

@@ -36,6 +36,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
         DefaultJavaComponent component = 
             new DefaultJavaComponent(new PrototypeObjectFactory(Orange.class));
         component.setService(getTestService());
+        component.setMuleContext(muleContext);
         component.initialise();
         component.start();
 
@@ -60,6 +61,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
             new PrototypeObjectFactory(WaterMelon.class));
         
         component.setService(getTestService());
+        component.setMuleContext(muleContext);
         component.initialise();
         component.start();
 
