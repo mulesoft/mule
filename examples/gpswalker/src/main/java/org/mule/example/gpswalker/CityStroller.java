@@ -9,12 +9,6 @@
  */
 package org.mule.example.gpswalker;
 
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-
-import java.util.Random;
-
-
 /**
  * Generates a random walk around a city
  */

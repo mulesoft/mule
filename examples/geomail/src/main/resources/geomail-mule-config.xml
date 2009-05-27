@@ -6,14 +6,14 @@
       xmlns:imaps="http://www.mulesource.org/schema/mule/imaps"
       xmlns:http="http://www.mulesource.org/schema/mule/http"
       xmlns:mulexml="http://www.mulesource.org/schema/mule/xml"
-      xmlns:cometd="http://www.mulesource.org/schema/mule/cometd"
+      xmlns:ajax="http://www.mulesource.org/schema/mule/ajax"
       xmlns:json="http://www.mulesource.org/schema/mule/json"
       xmlns:quartz="http://www.mulesource.org/schema/mule/quartz"
       xsi:schemaLocation="
        http://www.mulesource.org/schema/mule/quartz http://www.mulesource.org/schema/mule/quartz/3.0/mule-quartz.xsd
        http://www.mulesource.org/schema/mule/json http://www.mulesource.org/schema/mule/json/3.0/mule-json.xsd
        http://www.mulesource.org/schema/mule/imaps http://www.mulesource.org/schema/mule/imaps/3.0/mule-imaps.xsd
-       http://www.mulesource.org/schema/mule/cometd http://www.mulesource.org/schema/mule/cometd/3.0/mule-cometd.xsd
+       http://www.mulesource.org/schema/mule/ajax http://www.mulesource.org/schema/mule/ajax/3.0/mule-ajax.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesource.org/schema/mule/http http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd
@@ -63,7 +63,7 @@
     <vm:endpoint name="Storage" path="channels/storage"/>
     <vm:endpoint name="Aggregator" path="channels/positions/aggregator"/>
     
-    <cometd:servlet-endpoint name="Output" path="/GEOMAIL" transformer-refs="SenderToJson"/>
+    <ajax:servlet-endpoint name="Output" path="/GEOMAIL" transformer-refs="SenderToJson"/>
 
     <model>
 

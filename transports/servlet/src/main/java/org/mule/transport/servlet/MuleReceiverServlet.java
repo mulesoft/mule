@@ -71,7 +71,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 }
                 catch (MuleException e)
                 {
-                    throw new ServletException("Failed to register the CometdServletConnector", e);
+                    throw new ServletException("Failed to register the AjaxServletConnector", e);
                 }
                 //throw new ServletException(ServletMessages.noConnectorForProtocolServlet().toString());
             }
