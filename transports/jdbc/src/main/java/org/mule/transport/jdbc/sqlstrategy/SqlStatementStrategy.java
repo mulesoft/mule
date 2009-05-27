@@ -25,8 +25,8 @@ public interface SqlStatementStrategy
 {
     
     public MuleMessage executeStatement(JdbcConnector connector,
-                                               ImmutableEndpoint endpoint,
-                                               MuleEvent event,
-                                               long timeout) throws Exception;
-
+                                         ImmutableEndpoint endpoint,
+                                         MuleEvent event,
+                                         long timeout) throws Exception;
+    
 }

@@ -10,11 +10,6 @@
 
 package org.mule.transport.jdbc.sqlstrategy;
 
-/**
- * Implements strategy for handling normal select statements + acks.  
- * 
- */
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -33,8 +28,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-public  class SelectSqlStatementStrategy
-    implements SqlStatementStrategy
+/**
+ * Implements strategy for handling normal select statements + acks.  
+ */
+public  class SelectSqlStatementStrategy implements SqlStatementStrategy
 {
     protected transient Logger logger = Logger.getLogger(getClass());
     
@@ -162,8 +159,5 @@ public  class SelectSqlStatementStrategy
             }
             throw e;
         }
-
     }
-
-
 }

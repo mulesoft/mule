@@ -12,8 +12,6 @@ package org.mule.transport.jdbc.sqlstrategy;
 
 public class DefaultSqlStatementStrategyFactory implements SqlStatementStrategyFactory
 {
-
-
     protected SimpleUpdateSqlStatementStrategy simpleUpdateSQLStrategy;
     protected SelectSqlStatementStrategy selectSQLStrategy;
     protected CallableSqlStatementStrategy callableSQLStrategy;

@@ -14,7 +14,5 @@ package org.mule.transport.jdbc.sqlstrategy;
  */
 public interface SqlStatementStrategyFactory
 {
-
-    SqlStatementStrategy create(String sql, Object payload)
-        throws Exception;
+    SqlStatementStrategy create(String sql, Object payload) throws Exception;
 }

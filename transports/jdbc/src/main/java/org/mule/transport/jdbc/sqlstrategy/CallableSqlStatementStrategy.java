@@ -17,10 +17,8 @@ package org.mule.transport.jdbc.sqlstrategy;
  * 
  */
 
-public  class CallableSqlStatementStrategy 
-    extends SimpleUpdateSqlStatementStrategy
+public  class CallableSqlStatementStrategy extends SimpleUpdateSqlStatementStrategy
 {
-
     protected static final String STORED_PROCEDURE_PREFIX = "{ ";
     protected static final String STORED_PROCEDURE_SUFFIX = " }";
     
