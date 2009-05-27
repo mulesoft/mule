@@ -9,23 +9,22 @@
  */
 package org.mule.util.scan;
 
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.BloodOrange;
 import org.mule.tck.testmodels.fruit.Fruit;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.RedApple;
-import org.mule.tck.testmodels.fruit.OrangeInterface;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.util.scan.annotations.SampleBeanWithAnnotations;
-import org.mule.util.scan.annotations.Meta;
+import org.mule.tck.testmodels.fruit.OrangeInterface;
+import org.mule.tck.testmodels.fruit.RedApple;
 import org.mule.util.scan.annotations.Marker;
+import org.mule.util.scan.annotations.Meta;
 import org.mule.util.scan.annotations.NonMeta;
+import org.mule.util.scan.annotations.SampleBeanWithAnnotations;
 import org.mule.util.scan.annotations.SampleClassWithAnnotations;
 
 import java.util.Set;
 
-import junit.framework.TestCase;
-
-public class ClasspathScannerTestCase extends TestCase
+public class ClasspathScannerTestCase extends AbstractMuleTestCase
 {
 
 
