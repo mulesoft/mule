@@ -19,6 +19,7 @@ import org.mule.api.security.SecurityManager;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ArrayUtils;
 
+import java.io.Serializable;
 import java.util.StringTokenizer;
 
 /**
@@ -26,7 +27,7 @@ import java.util.StringTokenizer;
  * that can be stored in a message header.
  */
 
-public class MuleCredentials implements Credentials
+public class MuleCredentials implements Credentials, Serializable
 {
     public static final String TOKEN_DELIM = "::";
 

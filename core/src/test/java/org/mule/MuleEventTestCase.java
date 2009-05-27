@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.security.Credentials;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -26,7 +27,9 @@ import org.mule.transformer.simple.SerializableToByteArray;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
 
 public class MuleEventTestCase extends AbstractMuleTestCase
 {
@@ -153,19 +156,19 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 //
 //    }
 //
-//    /**
-//     * See http://mule.mulesource.org/jira/browse/MULE-384 for details.
-//     */
-//    public void testNoPasswordNoNullPointerException() throws Exception
-//    {
-//        // provide the username, but not the password, as is the case for SMTP
-//        // cannot set SMTP endpoint type, because the module doesn't have this
-//        // dependency
-//        ImmutableEndpoint endpoint = getTestOutboundEndpoint("AuthTest", "test://john.doe@xyz.fr");
-//        MuleEvent event = getTestEvent(new Object(), endpoint);
-//        Credentials credentials = event.getCredentials();
-//        assertNull("Credentials must not be created for endpoints without a password.", credentials);
-//    }
+    /*
+     * See http://mule.mulesource.org/jira/browse/MULE-384 for details.
+     */
+    public void testNoPasswordNoNullPointerException() throws Exception
+    {
+        // provide the username, but not the password, as is the case for SMTP
+        // cannot set SMTP endpoint type, because the module doesn't have this
+        // dependency
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint("AuthTest", "test://john.doe@xyz.fr");
+        MuleEvent event = getTestEvent(new Object(), endpoint);
+        Credentials credentials = event.getCredentials();
+        assertNull("Credentials must not be created for endpoints without a password.", credentials);
+    }
 
     public void testEventSerialization() throws Exception
     {
@@ -175,7 +178,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         Transformer trans2 = new TestEventTransformer();
         trans2.setName("Bumblebee");
 
-        List transformers = new ArrayList();
+        List<Transformer> transformers = new ArrayList<Transformer>();
         transformers.add(trans1);
         transformers.add(trans2);
 
@@ -275,6 +278,26 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals(PayloadTypeFilter.class, deserialized.getEndpoint().getFilter().getClass());
     }
     
+    public void testMuleCredentialsSerialization() throws Exception
+    {
+        String username = "mule";
+        String password = "rulez";
+        String url = "test://" + username + ":" + password + "@localhost";
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test", url);
+
+        MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
+        Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
+        assertNotNull(serialized);
+
+        MuleEvent deserialized = (MuleEvent) new ByteArrayToObject().transform(serialized);
+        assertNotNull(deserialized);
+        
+        Credentials credentials = deserialized.getCredentials();
+        assertNotNull(credentials);
+        assertEquals(username, credentials.getUsername());
+        assertTrue(Arrays.equals(password.toCharArray(), credentials.getPassword()));
+    }
+    
     private MuleEvent createEventToSerialize() throws Exception
     {
         createAndRegisterTransformersEndpointBuilderService();
@@ -294,7 +317,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         trans2.setName("Bumblebee");
         muleContext.getRegistry().registerTransformer(trans2);
 
-        List transformers = new ArrayList();
+        List<Transformer> transformers = new ArrayList<Transformer>();
         transformers.add(trans1);
         transformers.add(trans2);
 
@@ -308,7 +331,6 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
         getTestService();
     }
-
 
     private static class TestEventTransformer extends AbstractTransformer
     {
