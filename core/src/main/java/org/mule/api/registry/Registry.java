@@ -32,14 +32,14 @@ public interface Registry extends Initialisable, Disposable
      * Look up all objects of a given type. 
      * @return collection of objects or empty collection if none found
      */
-    Collection lookupObjects(Class type);
+    <T>Collection lookupObjects(Class<T> type);
 
     /** 
      * Look up a single object by type. 
      * @return object or null if not found
      * @throws RegistrationException if more than one object is found.
      * */
-    Object lookupObject(Class type) throws RegistrationException;
+    <T> T lookupObject(Class<T> clazz) throws RegistrationException;
 
     // /////////////////////////////////////////////////////////////////////////
     // Registration methods
@@ -49,7 +49,7 @@ public interface Registry extends Initialisable, Disposable
 
     void registerObject(String key, Object value, Object metadata) throws RegistrationException;
 
-    void registerObjects(Map objects) throws RegistrationException;
+    void registerObjects(Map<String, Object> objects) throws RegistrationException;
 
     void unregisterObject(String key) throws RegistrationException;
 

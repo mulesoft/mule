@@ -147,7 +147,7 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
-    public Collection lookupObjects(Class returntype)
+    public <T>Collection lookupObjects(Class<T> returntype)
     {
         synchronized(registry)
         {

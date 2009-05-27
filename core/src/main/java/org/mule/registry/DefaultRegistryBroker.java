@@ -15,12 +15,27 @@ import org.mule.api.registry.Registry;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.Comparator;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultRegistryBroker extends AbstractRegistryBroker
 {
-    private Map/*<Registry>*/ registries = new ConcurrentHashMap();
+    private Map<Long, Registry> registries = new TreeMap<Long, Registry>(new Comparator<Long>(){
+        public int compare(Long o1, Long o2)
+        {
+            if(o1.longValue() < o2.longValue())
+            {
+                return -1;
+            }
+            else if(o1.longValue() > o2.longValue())
+            {
+                return 1;
+            }
+            return 0;
+        }
+    });
 
     public DefaultRegistryBroker(MuleContext context)
     {

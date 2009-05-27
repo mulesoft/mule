@@ -148,7 +148,7 @@ public class SpringRegistry extends AbstractRegistry
         }
     }
 
-    public Collection lookupObjects(Class type)
+    public <T>Collection lookupObjects(Class<T> type)
     {
         try
         {

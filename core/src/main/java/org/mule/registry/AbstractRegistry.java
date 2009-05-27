@@ -77,10 +77,10 @@ public abstract class AbstractRegistry implements Registry
         }
     }
 
-    public Object lookupObject(Class type) throws RegistrationException
+    public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
         // Accumulate objects from all registries.
-        Collection objects = lookupObjects(type);
+        Collection<T> objects = lookupObjects(type);
         
         if (objects.size() == 1)
         {
