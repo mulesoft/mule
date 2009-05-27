@@ -218,11 +218,12 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             logger.debug("Deleted processed file " + file.getName());
         }
         
-        if (!client.completePendingCommand())
-        {
-            throw new IOException(MessageFormat.format("Failed to complete a pending command. Retrieveing file {0}. Ftp error: {1}",
-                                                       file.getName(), client.getReplyCode()));
-        }
+        // MULE-4372 This causes the receiver to hang indefinitely
+        //if (!client.completePendingCommand())
+        //{
+        //    throw new IOException(MessageFormat.format("Failed to complete a pending command. Retrieveing file {0}. Ftp error: {1}",
+        //                                               file.getName(), client.getReplyCode()));
+        //}
     }
     
     protected void doConnect() throws Exception
