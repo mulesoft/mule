@@ -110,6 +110,18 @@
         </dependency>
 
         <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>3.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
