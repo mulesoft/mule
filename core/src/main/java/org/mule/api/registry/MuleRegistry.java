@@ -31,6 +31,16 @@ import java.util.Properties;
  */
 public interface MuleRegistry extends Registry
 {
+
+    /**
+     * Pass this flag as metadata of the {@link Registry#registerObject(String, Object, Object)}  method to have lifecycle
+     * method calls on the registered objects omitted. Unless extending Mule, one will
+     * probably never have a use for this.
+     *
+     * @see Registry#registerObject(String, Object, Object)
+     */
+    String LIFECYCLE_BYPASS_FLAG = "LIFECYCLE_BYPASS_FLAG";
+
     // /////////////////////////////////////////////////////////////////////////
     // Lookup methods - these should NOT create a new object, only return existing ones
     // /////////////////////////////////////////////////////////////////////////

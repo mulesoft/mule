@@ -210,6 +210,12 @@ public abstract class AbstractComponent implements Component, Interceptor, MuleC
     public void setService(Service service)
     {
         this.service = service;
+
+        // propagate MuleContext from the enclosing service if provided
+        if (this.muleContext == null && service.getMuleContext() != null)
+        {
+            this.muleContext = service.getMuleContext();
+        }
     }
 
     public Service getService()

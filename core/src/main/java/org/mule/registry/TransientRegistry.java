@@ -19,6 +19,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ObjectProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
@@ -100,7 +101,7 @@ public class TransientRegistry extends AbstractRegistry
                 if (obj instanceof Disposable)
                 {
                     ((Disposable) obj).dispose();
-                }        
+                }
             }
         }
     }
@@ -187,7 +188,6 @@ public class TransientRegistry extends AbstractRegistry
      * Allows for arbitary registration of transient objects
      *
      * @param key
-     * @param value
      */
     public void registerObject(String key, Object object, Object metadata) throws RegistrationException
     {
@@ -197,10 +197,13 @@ public class TransientRegistry extends AbstractRegistry
         }
         
         logger.debug("registering object");
-        if (MuleServer.getMuleContext().isInitialised() || MuleServer.getMuleContext().isInitialising())
+        if (!MuleRegistry.LIFECYCLE_BYPASS_FLAG.equals(metadata))
         {
-            logger.debug("applying processors");
-            object = applyProcessors(object);
+            if (MuleServer.getMuleContext().isInitialised() || MuleServer.getMuleContext().isInitialising())
+            {
+                logger.debug("applying processors");
+                object = applyProcessors(object);
+            }
         }
 
         synchronized(registry)
@@ -217,11 +220,14 @@ public class TransientRegistry extends AbstractRegistry
 
         try
         {
-            if(logger.isDebugEnabled())
+            if (!MuleRegistry.LIFECYCLE_BYPASS_FLAG.equals(metadata))
             {
-                logger.debug("applying lifecycle to object: " + object);
+                if(logger.isDebugEnabled())
+                {
+                    logger.debug("applying lifecycle to object: " + object);
+                }
+                context.getLifecycleManager().applyCompletedPhases(object);
             }
-            context.getLifecycleManager().applyCompletedPhases(object);
         }
         catch (MuleException e)
         {

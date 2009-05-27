@@ -17,6 +17,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
+import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.context.MuleContextAware;
@@ -93,14 +94,15 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         this.muleContext = muleContext;
         // store a hard ref to the component object in the registry, so it's not GC'ed too early
         MuleRegistry r = muleContext.getRegistry();
-        final String key = "_component." + component.getService().getName();
+        final String key = createRegistryHardRefName(component);
         // register only if none registered yet
-        if (r.lookupObject(key) == null)
+        if (r.lookupObjects(componentObject.getClass()).isEmpty())
         {
-            r.registerObject(key, componentObject);
+            // don't mess up the current component's lifecycle, just put a direct ref without any callbacks executed
+            r.registerObject(key, componentObject, MuleRegistry.LIFECYCLE_BYPASS_FLAG);
         }
     }
-    
+
     public DefaultLifecycleAdapter(Object componentObject,
                                    JavaComponent component,
                                    EntryPointResolverSet entryPointResolver, MuleContext muleContext) throws MuleException
@@ -189,7 +191,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
             try
             {
                 // unregister a hard ref to the component object
-                muleContext.getRegistry().unregisterObject("_component." + component.getService().getName());
+                muleContext.getRegistry().unregisterObject(createRegistryHardRefName(component));
 
                 ((Disposable) componentObject.get()).dispose();
                 componentObject.clear();
@@ -320,4 +322,14 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         }
     }
 
+    /**
+     * Generate a registry key name for this component. Used to bind component's hard reference to the Mule's
+     * lifecycle and prevent the garbage collector from kicking in too early.
+     * @param component component to generate the name for
+     * @return registry key name
+     */
+    protected String createRegistryHardRefName(Component component)
+    {
+        return "_component.hardref." + component.getService().getName();
+    }
 }
