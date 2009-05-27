@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/guice"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core"
+            targetNamespace="http://www.mulesource.org/schema/mule/guice"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/3.0/mule.xsd"/>
+
+    <xsd:element name="object" type="guiceObjectFactoryType" substitutionGroup="mule:abstract-object-factory"/>
+
+    <xsd:complexType name="guiceObjectFactoryType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractObjectFactoryType">
+                <xsd:attribute name="classBinding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Refers to an object bound by an interface type in a Guice module
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="stringBinding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Refers to an object bound by an string name in a Guice module. Note that Guice binds all
+                            objects by Interface or Key. Mule adds support for String bindings only for use with the
+                            Mule Xml Configuration. We recommend that you shouldn't use string bindings for any other
+                            purpose since it kinda goes against the principles of the guice project.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+
+    </xsd:complexType>
+
+</xsd:schema>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:guice="http://www.mulesource.org/schema/mule/guice"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/guice http://www.mulesource.org/schema/mule/guice/3.0/mule-guice.xsd
+       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd">
+
+    <!-- The transformer configured in the Guice module OrangeToAppleTransformer -->
+    <auto-transformer name="auto-transform" returnClass="org.mule.tck.testmodels.fruit.Apple"/>
+
+    <model name="main">
+        <service name="MyService1">
+            <component>
+                <guice:object stringBinding="myService"/>                
+            </component>
+        </service>
+
+        <service name="MyService2">
+            <inbound>
+                <vm:inbound-endpoint path="myservice2" transformer-refs="auto-transform"/>
+            </inbound>
+            <component>
+                <guice:object classBinding="org.mule.module.guice.AutoTransformServiceInterface"/>
+            </component>
+        </service>
+
+        <service name="MyService3">
+            <inbound>
+                <vm:inbound-endpoint path="myservice3"/>
+            </inbound>
+            <component>
+                <guice:object classBinding="org.mule.module.guice.BananaServiceInterface"/>
+            </component>
+        </service>
+    </model>
+
+</mule>
