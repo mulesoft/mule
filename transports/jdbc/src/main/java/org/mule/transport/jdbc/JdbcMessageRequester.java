@@ -28,11 +28,7 @@ public class JdbcMessageRequester extends AbstractMessageRequester
         this.connector = (JdbcConnector) endpoint.getConnector();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.transport.AbstractMessageDispatcher#doDispose()
-     */
+    @Override
     protected void doDispose()
     {
         // template method
@@ -70,16 +66,16 @@ public class JdbcMessageRequester extends AbstractMessageRequester
     }
 
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
-
-
 
 }

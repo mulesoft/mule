@@ -300,7 +300,6 @@ public class JdbcConnector extends AbstractConnector
     public Object[] getParams(ImmutableEndpoint endpoint, List paramNames, MuleMessage message, String query)
             throws Exception
     {
-
         Object[] params = new Object[paramNames.size()];
         for (int i = 0; i < paramNames.size(); i++)
         {

@@ -131,9 +131,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createMessageAdapter(java.lang.Object)
-     */
     public MessageAdapter createMessageAdapter(Object message) throws TransportServiceException
     {
         return createMessageAdapter(message, messageAdapter);
@@ -163,9 +160,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createSessionHandler()
-     */
     public SessionHandler createSessionHandler() throws TransportServiceException
     {
         if (sessionHandler == null)
