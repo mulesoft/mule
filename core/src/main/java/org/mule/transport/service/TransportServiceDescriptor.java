@@ -40,6 +40,9 @@ public interface TransportServiceDescriptor extends ServiceDescriptor
         
     public MessageAdapter createMessageAdapter(Object message) throws TransportServiceException;
 
+    public MessageAdapter createMessageAdapter(Object message, MessageAdapter originalMessageAdapter)
+        throws TransportServiceException;
+
     public SessionHandler createSessionHandler() throws TransportServiceException;
 
     public MessageReceiver createMessageReceiver(Connector connector,
@@ -70,5 +73,4 @@ public interface TransportServiceDescriptor extends ServiceDescriptor
     public void setExceptionMappings(Properties props);
 
     public Properties getExceptionMappings();
-
 }

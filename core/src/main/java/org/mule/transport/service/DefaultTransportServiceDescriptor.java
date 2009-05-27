@@ -133,21 +133,36 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
     public MessageAdapter createMessageAdapter(Object message) throws TransportServiceException
     {
-        return createMessageAdapter(message, messageAdapter);
+        return createMessageAdapter(message, null, messageAdapter);
+    }
+    
+    public MessageAdapter createMessageAdapter(Object message, MessageAdapter originalMessageAdapter)
+        throws TransportServiceException
+    {
+        return createMessageAdapter(message, originalMessageAdapter, messageAdapter);
     }
 
-    protected MessageAdapter createMessageAdapter(Object message, String clazz)
-            throws TransportServiceException
+    protected MessageAdapter createMessageAdapter(Object message, MessageAdapter originalMessageAdapter,
+        String clazz) throws TransportServiceException
     {
         if (message == null)
         {
             message = NullPayload.getInstance();
         }
         if (messageAdapter != null)
-        {
+        {   
             try
             {
-                return (MessageAdapter) ClassUtils.instanciateClass(clazz, new Object[]{message}, classLoader);
+                if (originalMessageAdapter != null)
+                {
+                    return (MessageAdapter) ClassUtils.instanciateClass(clazz, 
+                        new Object[] {message, originalMessageAdapter}, classLoader);
+                }
+                else
+                {
+                    return (MessageAdapter) 
+                        ClassUtils.instanciateClass(clazz, new Object[]{message}, classLoader);
+                }
             }
             catch (Exception e)
             {
@@ -181,22 +196,15 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createMessageReceiver(org.mule.api.transport.Connector, org.mule.api.Component, org.mule.api.endpoint.Endpoint)
-     */
     public MessageReceiver createMessageReceiver(Connector connector,
                                                     Service service,
                                                     InboundEndpoint endpoint) throws MuleException
     {
 
         MessageReceiver mr = createMessageReceiver(connector, service, endpoint, null);
-//        mr.initialise();
         return mr;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createMessageReceiver(org.mule.api.transport.Connector, org.mule.api.Component, org.mule.api.endpoint.Endpoint, java.lang.Object[])
-     */
     public MessageReceiver createMessageReceiver(Connector connector,
                                                     Service service,
                                                     InboundEndpoint endpoint,
@@ -243,7 +251,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             try
             {
                 MessageReceiver mr = (MessageReceiver) ClassUtils.instanciateClass(receiverClass, newArgs, classLoader);
-//                mr.initialise();
                 return mr;
             }
             catch (Exception e)
@@ -258,9 +265,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createDispatcherFactory()
-     */
     public MessageDispatcherFactory createDispatcherFactory() throws TransportServiceException
     {
         if (dispatcherFactory != null)
@@ -304,9 +308,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createTransactionFactory()
-     */
     public TransactionFactory createTransactionFactory() throws TransportServiceException
     {
         if (transactionFactory != null)
@@ -327,9 +328,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createConnector(java.lang.String)
-     */
     public Connector createConnector() throws TransportServiceException
     {
         Connector newConnector;
@@ -370,9 +368,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         return newConnector;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createInboundTransformer()
-     */
     public List createInboundTransformers() throws TransportFactoryException
     {
         if (inboundTransformer != null)
@@ -397,9 +392,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createOutboundTransformer()
-     */
     public List createOutboundTransformers() throws TransportFactoryException
     {
         if (outboundTransformer != null)
@@ -424,9 +416,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createResponseTransformer()
-     */
     public List createResponseTransformers() throws TransportFactoryException
     {
         if (responseTransformer != null)
@@ -451,9 +440,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.service.TransportServiceDescriptor#createEndpointBuilder()
-     */
     public EndpointURIBuilder createEndpointBuilder() throws TransportFactoryException
     {
         if (endpointBuilder == null)

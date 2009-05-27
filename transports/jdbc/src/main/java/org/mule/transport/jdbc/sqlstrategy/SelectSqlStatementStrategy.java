@@ -78,7 +78,7 @@ public  class SelectSqlStatementStrategy
             {
                 //Get the actual param values from the message.
                 Object[] params = connector.getParams(endpoint, readParams,
-                    event!=null ? event.getMessage() : null,
+                    event != null ? event.getMessage() : null,
                     endpoint.getEndpointURI().getAddress());
                 
                 if (logger.isDebugEnabled())
@@ -134,8 +134,16 @@ public  class SelectSqlStatementStrategy
                 }
             }
             
-            //Package up result
-            MessageAdapter msgAdapter = connector.getMessageAdapter(result);
+            // Package up result
+            MessageAdapter msgAdapter = null;
+            if (event != null)
+            {
+                msgAdapter = connector.getMessageAdapter(result,  event.getMessage().getAdapter());
+            }
+            else
+            {
+                msgAdapter = connector.getMessageAdapter(result);
+            }
             MuleMessage message = new DefaultMuleMessage(msgAdapter);
             
             //Close or return connection if not in a transaction

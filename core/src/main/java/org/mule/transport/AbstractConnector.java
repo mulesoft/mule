@@ -2230,7 +2230,21 @@ public abstract class AbstractConnector
                 message, e);
         }
     }
-
+    
+    public MessageAdapter getMessageAdapter(Object message, MessageAdapter originalMessageAdapter)
+        throws MessagingException
+    {
+        try
+        {
+            return serviceDescriptor.createMessageAdapter(message, originalMessageAdapter);
+        }
+        catch (TransportServiceException tse)
+        {
+            throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"),
+                message, tse);
+        }
+    }
+    
     /**
      * A map of fully qualified class names that should override those in the
      * connectors' service descriptor This map will be null if there are no overrides
