@@ -4,6 +4,7 @@ antlr-2.7.7-osgi
 ant-1.6.5-osgi
 aopalliance-1.0
 asm-3.1-osgi
+asm-commons-3.1
 aspectjrt-1.5.4
 axis-1.4-osgi
 backport-util-concurrent-3.1-osgi
@@ -93,6 +94,7 @@ mule-module-acegi
 mule-module-boot
 mule-module-builders
 mule-module-client
+mule-module-guice
 mule-module-jaas
 mule-module-jbossts
 mule-module-json
@@ -108,7 +110,7 @@ mule-module-xml
 mule-tests-functional
 mule-transport-axis
 mule-transport-bpm
-mule-transport-cometd
+mule-transport-ajax
 mule-transport-cxf
 mule-transport-ejb
 mule-transport-email
