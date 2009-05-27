@@ -132,7 +132,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://user:password@myQueues/myQueue", url.toString());
     }
 
-    public void testSonicJmsTopicDestinations() throws Exception
+    public void testJmsTopicDestinationsWithAddressParam() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms:topic://?address=[[testgroup]]test.topic");
         url.initialise();
@@ -142,7 +142,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://?address=[[testgroup]]test.topic", url.toString());
     }
 
-    public void testSonicJmsQueueDestinations() throws Exception
+    public void testJmsQueueDestinationsWithAddressParam() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://?address=[[testgroup]]test.queue");
         url.initialise();
@@ -151,5 +151,36 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertNull( url.getResourceInfo());
         assertEquals("jms://?address=[[testgroup]]test.queue", url.toString());
     }
-}
 
+    public void testJmsQueueDestinationsWithEncoding() throws Exception
+    {
+        EndpointURI url = new MuleEndpointURI("jms://%5B%5Btestgroup%5D%5Dtest.queue");
+        url.initialise();
+        assertEquals("jms", url.getScheme());
+        assertEquals("[[testgroup]]test.queue", url.getAddress());
+        assertNull( url.getResourceInfo());
+        assertEquals("jms://%5B%5Btestgroup%5D%5Dtest.queue", url.toString());
+    }
+
+    public void testJmsTopicDestinationsWithEncoding() throws Exception
+    {
+        EndpointURI url = new MuleEndpointURI("jms:topic://%5B%5Btestgroup%5D%5Dtest.topic");
+        url.initialise();
+        assertEquals("jms", url.getScheme());
+        assertEquals("[[testgroup]]test.topic", url.getAddress());
+        assertEquals("topic", url.getResourceInfo());
+        assertEquals("jms://%5B%5Btestgroup%5D%5Dtest.topic", url.toString());
+    }
+
+    public void testJmsLegacyTopicDestinationsWithEncoding() throws Exception
+    {
+        EndpointURI url = new MuleEndpointURI("jms://topic:%5B%5Btestgroup%5D%5Dtest.topic");
+        url.initialise();
+        assertEquals("jms", url.getScheme());
+        assertEquals("[[testgroup]]test.topic", url.getAddress());
+        assertEquals("topic", url.getResourceInfo());
+        assertEquals("jms://topic:%5B%5Btestgroup%5D%5Dtest.topic", url.toString());
+    }
+
+
+}
