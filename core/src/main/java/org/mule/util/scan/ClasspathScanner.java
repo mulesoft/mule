@@ -9,37 +9,38 @@
  */
 package org.mule.util.scan;
 
+import org.mule.config.ExceptionHelper;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
-import org.mule.util.scan.annotations.MetaAnnotationTypeFilter;
+import org.mule.util.scan.annotations.AnnotationFilter;
 import org.mule.util.scan.annotations.AnnotationTypeFilter;
 import org.mule.util.scan.annotations.AnnotationsScanner;
-import org.mule.util.scan.annotations.AnnotationFilter;
-import org.mule.config.ExceptionHelper;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.jar.JarFile;
-import java.util.jar.JarEntry;
-import java.net.URL;
+import org.mule.util.scan.annotations.MetaAnnotationTypeFilter;
+
 import java.io.File;
 import java.io.IOException;
-import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
-import org.objectweb.asm.ClassReader;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.objectweb.asm.ClassReader;
 
 /**
  * This class can be used to scan the classpath for classtypes (or interfaces they implement) or for annotations on the classpath.
  * The type of scanner used depends on the class type passed in. There are currently 3 types of scanner;
  * <ul>
- * <li>{@link org.mule.util.scan.InterfaceClassScanner} - will search for all class that are assignable to the interface provided</li>
- * <li>{@link org.mule.util.scan.ImplementationClassScanner} - will search for all classes that extend a base type</li>
- * <li>{@link org.mule.util.scan.annotations.AnnotationsScanner} - will searhc for classes with specific annotations, this can also seach for meta annotations</li>
+ * <li>{@link InterfaceClassScanner} - will search for all class that are assignable to the interface provided</li>
+ * <li>{@link ImplementationClassScanner} - will search for all classes that extend a base type</li>
+ * <li>{@link AnnotationsScanner} - will searhc for classes with specific annotations, this can also seach for meta annotations</li>
  * </ul>
  * This scanner uses ASM to search class byte code rather than the classes themselves making orders of magnitude more performant and uses a lot less memory. ASM is the fasted of the
  * byte code manipulation libraries i.e. JavaAssist or BCEL

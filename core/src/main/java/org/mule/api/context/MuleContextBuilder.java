@@ -27,8 +27,6 @@ public interface MuleContextBuilder
     /**
      * Builds a new {@link MuleContext} instance using configured builder instance.
      * Does not initialise or start MuleContext, only constructs the instance.
-     * 
-     * @return
      */
     MuleContext buildMuleContext();
 

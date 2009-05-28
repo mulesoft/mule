@@ -36,7 +36,6 @@ import org.mule.util.CollectionUtils;
 import java.util.List;
 import java.util.Properties;
 
-/** @inheritDocs */
 public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor implements TransportServiceDescriptor
 {
     private String connector;

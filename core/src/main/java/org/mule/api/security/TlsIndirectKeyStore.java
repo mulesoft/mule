@@ -53,9 +53,6 @@ public interface TlsIndirectKeyStore
      */
     void setClientKeyStorePassword(String clientKeyStorePassword);
 
-    /**
-     * @return The type of keystore used in {@link #getClientKeyStore()}
-     */
     void setClientKeyStoreType(String clientKeyStoreType);
 
     /**

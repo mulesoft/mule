@@ -12,12 +12,12 @@ package org.mule.module.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A mule specific Guice module that allows bindings to be associated with a string key.  Note that Guice binds all
- * objects by {@link Class} or {@link com.google.inject.Key}. Mule adds support for String bindings only for use with the
+ * objects by {@link Class} or {@link Key}. Mule adds support for String bindings only for use with the
  * Mule Xml Configuration. We recommend that you shouldn't use string bindings for any other
  * purpose since it kinda goes against the principles of the guice project.
  */

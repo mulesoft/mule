@@ -29,7 +29,6 @@ public interface MuleContextFactory
      * Returns an existing instance of {@link MuleContext} is one exists, otherwise a
      * new {@link MuleContext} instance is created with defaults.
      * 
-     * @return
      * @throws InitialisationException
      * @throws ConfigurationException
      * @see DefaultsConfigurationBuilder
@@ -40,7 +39,6 @@ public interface MuleContextFactory
      * Creates a new MuleContext using the {@link MuleContextBuilder} provided.
      * 
      * @param configurationBuilder
-     * @return
      * @throws InitialisationException
      * @throws ConfigurationException
      */
@@ -51,7 +49,6 @@ public interface MuleContextFactory
      * Creates a new MuleContext using the given configurationBuilder
      * 
      * @param configurationBuilder
-     * @return
      * @throws InitialisationException
      * @throws ConfigurationException
      */
@@ -64,7 +61,6 @@ public interface MuleContextFactory
      * configurationBuilder
      * 
      * @param configurationBuilder
-     * @return
      * @throws InitialisationException
      * @throws ConfigurationException
      */
@@ -78,7 +74,6 @@ public interface MuleContextFactory
      * will be invoked in the same or as provided in the List.
      * 
      * @param configurationBuilder
-     * @return
      * @throws InitialisationException
      * @throws ConfigurationException
      */

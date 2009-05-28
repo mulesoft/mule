@@ -14,11 +14,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.registry.Registry;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Comparator;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultRegistryBroker extends AbstractRegistryBroker
 {

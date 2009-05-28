@@ -35,7 +35,6 @@ public interface EndpointFactory extends MuleContextAware
      * 
      * @param uri endpoint identifier or uri
      * @param muleContext
-     * @return
      * @throws MuleException
      */
     InboundEndpoint getInboundEndpoint(String uri) throws MuleException;
@@ -48,7 +47,6 @@ public interface EndpointFactory extends MuleContextAware
      * 
      * @param uri endpoint identifier or uri
      * @param muleContext
-     * @return
      * @throws MuleException
      */
     OutboundEndpoint getOutboundEndpoint(String uri) throws MuleException;
@@ -58,7 +56,6 @@ public interface EndpointFactory extends MuleContextAware
      * 
      * @param builder
      * @param muleContext
-     * @return
      * @throws MuleException
      */
     InboundEndpoint getInboundEndpoint(EndpointBuilder builder) throws MuleException;
@@ -68,14 +65,12 @@ public interface EndpointFactory extends MuleContextAware
      * 
      * @param builder
      * @param muleContext
-     * @return
      * @throws MuleException
      */
     OutboundEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException;
 
     /**
      * @param endpointUri
-     * @return
      * @throws MuleException
      * @deprecated
      */
@@ -83,7 +78,6 @@ public interface EndpointFactory extends MuleContextAware
 
     /**
      * @param endpointUri
-     * @return
      * @throws MuleException
      * @deprecated
      */
@@ -104,7 +98,6 @@ public interface EndpointFactory extends MuleContextAware
      * 
      * @param uri endpoint identifier or uri
      * @param muleContext
-     * @return
      * @throws MuleException
      * @see EndpointBuilder
      * @see EndpointURIEndpointBuilder

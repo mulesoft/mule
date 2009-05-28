@@ -28,7 +28,6 @@ public interface Initialisable
      * 
      * @throws InitialisationException if a fatal error occurs causing the Mule instance to shutdown
      * @throws RecoverableException if an error occurs that can be recovered from
-     * @return Status of transition
      */
     void initialise() throws InitialisationException;
 }

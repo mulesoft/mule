@@ -21,7 +21,7 @@ public class StartException extends LifecycleException
 
     /**
      * @param message   the exception message
-     * @param service the object that failed during a lifecycle method call
+     * @param component the object that failed during a lifecycle method call
      */
     public StartException(Message message, Startable component)
     {
@@ -31,7 +31,7 @@ public class StartException extends LifecycleException
     /**
      * @param message   the exception message
      * @param cause     the exception that cause this exception to be thrown
-     * @param service the object that failed during a lifecycle method call
+     * @param component the object that failed during a lifecycle method call
      */
     public StartException(Message message, Throwable cause, Startable component)
     {
@@ -40,7 +40,7 @@ public class StartException extends LifecycleException
 
     /**
      * @param cause     the exception that cause this exception to be thrown
-     * @param service the object that failed during a lifecycle method call
+     * @param component the object that failed during a lifecycle method call
      */
     public StartException(Throwable cause, Startable component)
     {

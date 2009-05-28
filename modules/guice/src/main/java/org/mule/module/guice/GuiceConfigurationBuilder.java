@@ -28,8 +28,8 @@ import java.util.Set;
 
 /**
  * Provides the configuration entry point for loading Guice modules into Mule.  Users can pass in an array of
- * {@link com.google.inject.Module} into this builder or provide a base search path that Mule will use to search the
- * classpath for any modules that implement {@link com.google.inject.Module}. The basepath is a path on the classpath.
+ * {@link Module} into this builder or provide a base search path that Mule will use to search the
+ * classpath for any modules that implement {@link Module}. The basepath is a path on the classpath.
  * Note for better performance, any basepath set should be qualified to your application. For example, if your application
  * has a package com.mycompany.app, its better to set the base path to 'com/mycompany/app' over 'com/' or '/' since they will
  * seach everything on the classpath that matches the specified package.

@@ -25,7 +25,7 @@ public class InitialisationException extends LifecycleException
 
     /**
      * @param message   the exception message
-     * @param service the object that failed during a lifecycle method call
+     * @param component the object that failed during a lifecycle method call
      */
     public InitialisationException(Message message, Initialisable component)
     {
@@ -35,7 +35,7 @@ public class InitialisationException extends LifecycleException
     /**
      * @param message   the exception message
      * @param cause     the exception that cause this exception to be thrown
-     * @param service the object that failed during a lifecycle method call
+     * @param component the object that failed during a lifecycle method call
      */
     public InitialisationException(Message message, Throwable cause, Initialisable component)
     {
@@ -44,7 +44,7 @@ public class InitialisationException extends LifecycleException
 
     /**
      * @param cause     the exception that cause this exception to be thrown
-     * @param service the object that failed during a lifecycle method call
+     * @param component the object that failed during a lifecycle method call
      */
     public InitialisationException(Throwable cause, Initialisable component)
     {

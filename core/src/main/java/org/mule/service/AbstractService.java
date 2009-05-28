@@ -54,6 +54,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -153,7 +154,7 @@ public abstract class AbstractService implements Service
      * ServiceDescriptor and then initialise a pool based on the attributes in the
      * ServiceDescriptor .
      *
-     * @seee org.mule.api.registry.ServiceDescriptor
+     * @see org.mule.api.registry.ServiceDescriptor
      * @throws org.mule.api.lifecycle.InitialisationException
      *          if the service fails
      *          to initialise

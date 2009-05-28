@@ -20,7 +20,6 @@ import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connectable;
 import org.mule.api.transport.Connector;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.util.ClassUtils;
 import org.mule.util.concurrent.WaitableBoolean;
@@ -28,6 +27,7 @@ import org.mule.util.concurrent.WaitableBoolean;
 import java.beans.ExceptionListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -245,8 +245,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
 
     /**
      * Returns a string identifying the underlying resource
-     *
-     * @return
      */
     public String getConnectionDescription()
     {

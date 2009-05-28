@@ -169,9 +169,6 @@ public interface MuleContext extends Lifecycle
     /**
      * Gets the queue manager used by mule for queuing events. This is used for
      * service queues.
-     *
-     * @return
-     *
      */
     QueueManager getQueueManager();
 

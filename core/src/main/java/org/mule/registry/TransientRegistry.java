@@ -38,8 +38,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * @ThreadSafe Use synchronized(registry) when reading/writing/iterating over the contents of the registry hashmap.
+ * Use synchronized(registry) when reading/writing/iterating over the contents of the registry hashmap.
  */
+//@ThreadSafe
 public class TransientRegistry extends AbstractRegistry
 {
     /** logger used by this class */

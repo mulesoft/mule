@@ -255,7 +255,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * </ol>
      *
      * @param key
-     * @return
      */
     protected boolean ignoreProperty(String key)
     {

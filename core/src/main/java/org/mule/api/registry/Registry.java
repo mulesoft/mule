@@ -24,18 +24,21 @@ public interface Registry extends Initialisable, Disposable
 
     /** 
      * Look up a single object by name. 
+     * 
      * @return object or null if not found
      */
     Object lookupObject(String key);
 
     /** 
      * Look up all objects of a given type. 
+     * 
      * @return collection of objects or empty collection if none found
      */
     <T>Collection lookupObjects(Class<T> type);
 
     /** 
      * Look up a single object by type. 
+     * 
      * @return object or null if not found
      * @throws RegistrationException if more than one object is found.
      * */

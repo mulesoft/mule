@@ -39,7 +39,7 @@ public class SpringRegistry extends AbstractRegistry
     /**
      * Key used to lookup Spring Application Context from SpringRegistry via Mule's
      * Registry interface.
-     **/
+     */
     public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
     
     protected ApplicationContext applicationContext;

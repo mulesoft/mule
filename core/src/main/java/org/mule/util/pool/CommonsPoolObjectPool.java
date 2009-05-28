@@ -53,9 +53,6 @@ public class CommonsPoolObjectPool implements ObjectPool
 
     /**
      * Creates a new pool and an Object factory with the ServiceDescriptor
-     * 
-     * @param descriptor the descriptor to use when constructing MuleProxy objects in
-     *            the pool
      */
     public CommonsPoolObjectPool(ObjectFactory objectFactory, PoolingProfile poolingProfile)
     {
@@ -90,8 +87,6 @@ public class CommonsPoolObjectPool implements ObjectPool
     /**
      * Template method to be overridden by implementations that do more than just
      * invoke objectFactory
-     * 
-     * @return
      */
     protected PoolableObjectFactory getPooledObjectFactory()
     {

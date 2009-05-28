@@ -179,9 +179,6 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
      * Sets the initial state of this service
      *
      * @param state the initial state of this service
-     * @see org.mule.ImmutableMuleDescriptor#INITIAL_STATE_STARTED
-     * @see org.mule.ImmutableMuleDescriptor#INITIAL_STATE_STOPPED
-     * @see org.mule.ImmutableMuleDescriptor#INITIAL_STATE_PAUSED
      */
     void setInitialState(String state);
 
@@ -194,8 +191,6 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
     /**
      * Returns the Component that is a invoked by a {@link Service} for each incoming
      * {@link MuleEvent} routed on by the {@link InboundRouterCollection}.
-     * 
-     * @return
      */
     Component getComponent();
 
@@ -209,7 +204,6 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
     
     /**
      * Returns the Service statistics.  This provides Service router and component statistics.
-     * @return
      */
     ServiceStatistics getStatistics();
     

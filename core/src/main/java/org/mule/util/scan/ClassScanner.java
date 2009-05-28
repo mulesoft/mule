@@ -12,7 +12,7 @@ package org.mule.util.scan;
 import org.objectweb.asm.ClassVisitor;
 
 /**
- * This interface is used by scanners to let the {@link org.mule.util.scan.ClasspathScanner} know if there was a
+ * This interface is used by scanners to let the {@link ClasspathScanner} know if there was a
  * match on the class and whan the class was.
  */
 public interface ClassScanner extends ClassVisitor

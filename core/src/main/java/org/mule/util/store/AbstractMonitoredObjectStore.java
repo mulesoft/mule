@@ -10,19 +10,20 @@
 package org.mule.util.store;
 
 import org.mule.api.MuleContext;
-import org.mule.api.store.ObjectStore;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Disposable;
+import org.mule.api.store.ObjectStore;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.concurrent.DaemonThreadFactory;
 import org.mule.util.UUID;
+import org.mule.util.concurrent.DaemonThreadFactory;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * TODO
@@ -31,22 +32,6 @@ public abstract class AbstractMonitoredObjectStore implements ObjectStore, Runna
 {
     protected final Log logger = LogFactory.getLog(this.getClass());
 
-    /**
-     * Default constructor for IdempotentInMemoryMessageIdStore.
-     *
-     * @param name               a name for this store, can be used for logging and identification
-     * purposes
-     * @param maxEntries         the maximum number of entries that this store keeps around.
-     * Specify <em>-1</em> if the store is supposed to be "unbounded".
-     * @param entryTTL           the time-to-live for each message ID, specified in seconds, or
-     * <em>-1</em> for entries that should never expire. <b>DO NOT</b>
-     * combine this with an unbounded store!
-     * @param expirationInterval the interval for periodic bounded size enforcement and
-     * entry expiration, specified in seconds. Arbitrary positive values
-     * between 1 second and several hours or days are possible, but should be
-     * chosen carefully according to the expected message rate to prevent
-     * OutOfMemory conditions.
-     */
     protected ScheduledThreadPoolExecutor scheduler;
     protected int maxEntries = 4000;
     protected int entryTTL = -1;

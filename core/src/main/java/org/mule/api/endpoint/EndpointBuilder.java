@@ -35,7 +35,6 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
     /**
      * Constructs inbound endpoints
      * 
-     * @return
      * @throws EndpointException
      * @throws InitialisationException
      */
@@ -44,7 +43,6 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
     /**
      * Constructs outbound endpoints
      * 
-     * @return
      * @throws EndpointException
      * @throws InitialisationException
      */

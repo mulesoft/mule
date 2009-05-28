@@ -26,7 +26,6 @@ public interface MuleMessage extends MessageAdapter
     /**
      * Returns the currently edited Message adapter for this message. If no edits have been made
      * this methd will return the same as {@link #getOriginalAdapter()}
-     * @return
      */
     MessageAdapter getAdapter();
 

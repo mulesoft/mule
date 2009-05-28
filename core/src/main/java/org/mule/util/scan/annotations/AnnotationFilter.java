@@ -17,8 +17,9 @@ package org.mule.util.scan.annotations;
 public interface AnnotationFilter
 {
     /**
-     * Should the annotation represented by an {@link org.mule.util.scan.annotations.AnnotationInfo} object be
+     * Should the annotation represented by an {@link AnnotationInfo} object be
      * accepted
+     * 
      * @param info the annotation information to select on
      * @return true if the annotation matches the criteria for this filter
      */
