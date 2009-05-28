@@ -85,10 +85,11 @@ public class DefaultDataContentHandlerFactory implements DataContentHandlerFacto
     }
 
     /**
-     * Registers a {@link DataContenetHandler} for use with certain mime types. To use this registration
+     * Registers a {@link DataContentHandler} for use with certain mime types. To use this registration
      * method the DataHandler has to be implmented correctly. This method uses the DataFalvour of the
      * DataHandler to obtain the mimeType and DefaultRepresentation class. If there is more than one DataFlavour
      * on the DataHandler, then each flavour will be registered seperately.
+     * 
      * @param handler
      */
     public void register(DataContentHandler handler)

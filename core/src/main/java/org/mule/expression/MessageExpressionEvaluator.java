@@ -22,20 +22,20 @@ import org.apache.commons.logging.LogFactory;
  * Returns properties on the MuleMessage itself. The supported expressions map directly to methods on the message.
  * For example:
  * <ul>
- * <li>id - returns the value of {@link org.mule.api.MuleMessage#getUniqueId()}</li>
- * <li>correlationId - returns the value of {@link org.mule.api.MuleMessage#getCorrelationId()}</li>
- * <li>correlationGroupSize - returns the value of {@link org.mule.api.MuleMessage#getCorrelationGroupSize()}</li>
- * <li>correlationSequence - returns the value of {@link org.mule.api.MuleMessage#getCorrelationSequence()}</li>
- * <li>replyTo - returns the value of {@link org.mule.api.MuleMessage#getReplyTo()}</li>
- * <li>payload - returns the value of {@link org.mule.api.MuleMessage#getPayload()}</li>
- * <li>encoding - returns the value of {@link org.mule.api.MuleMessage#getEncoding()}</li>
- * <li>exception - returns the value of {@link org.mule.api.MuleMessage#getExceptionPayload().getException()} or null if there is no exception payload</li>
+ * <li>id - returns the value of {@link MuleMessage#getUniqueId()}</li>
+ * <li>correlationId - returns the value of {@link MuleMessage#getCorrelationId()}</li>
+ * <li>correlationGroupSize - returns the value of {@link MuleMessage#getCorrelationGroupSize()}</li>
+ * <li>correlationSequence - returns the value of {@link MuleMessage#getCorrelationSequence()}</li>
+ * <li>replyTo - returns the value of {@link MuleMessage#getReplyTo()}</li>
+ * <li>payload - returns the value of {@link MuleMessage#getPayload()}</li>
+ * <li>encoding - returns the value of {@link MuleMessage#getEncoding()}</li>
+ * <li>exception - returns the value of {@link MuleMessage#getExceptionPayload().getException()} or null if there is no exception payload</li>
  * </ul>
  * If no expression is set the MuleMessage itself will be returned.
  * <p/>
  * If the object passed in is not a MuleMessage, the same object will be returned.
  *
- * @see org.mule.api.expression.ExpressionEvaluator
+ * @see ExpressionEvaluator
  * @see DefaultExpressionManager
  */
 public class MessageExpressionEvaluator implements ExpressionEvaluator

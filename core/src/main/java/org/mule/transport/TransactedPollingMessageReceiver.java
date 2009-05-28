@@ -49,7 +49,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     /**
      * @deprecated please use
-     *             {@link TransactedPollingMessageReceiver(Connector,Service,InboundEndpoint)}
+     *             {@link #TransactedPollingMessageReceiver(Connector,Service,InboundEndpoint)}
      *             instead
      */
     public TransactedPollingMessageReceiver(Connector connector,

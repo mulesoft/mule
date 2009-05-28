@@ -21,7 +21,7 @@ import org.mule.endpoint.URIBuilder;
  *
  * <p>It generates both an endpoint (which should subclass {@link ImmutableEndpoint}) and a
  * {@link URIBuilder}.  The URI is then injected into the endpoint. So the associated schema 
- * can enable any of the suitable {@link URIBuilder# ALL_ATTRIBUTES} or add appropriate mappings.
+ * can enable any of the suitable {@link URIBuilder#ALL_ATTRIBUTES} or add appropriate mappings.
  */
 public class TransportEndpointDefinitionParser extends AddressedEndpointDefinitionParser
 {
