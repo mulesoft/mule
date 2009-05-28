@@ -11,12 +11,15 @@
 package org.mule.api.transport;
 
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+
+import org.apache.commons.pool.KeyedPoolableObjectFactory;
 
 /**
  * <code>MessageDispatcherFactory</code> is a factory interface for managing the
  * lifecycles of a transport's message dispatchers. The methods basically implement
- * the {@link org.apache.commons.pool.KeyedPoolableObjectFactory} lifecycle, with a
+ * the {@link KeyedPoolableObjectFactory} lifecycle, with a
  * {@link ImmutableEndpoint} as the key and the dispatcher as pooled object.
  */
 public interface MessageDispatcherFactory

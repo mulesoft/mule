@@ -10,6 +10,9 @@
 
 package org.mule.api.security;
 
+import org.mule.api.security.provider.AutoDiscoverySecurityProviderFactory;
+import org.mule.api.security.tls.TlsConfiguration;
+
 import javax.net.ssl.TrustManagerFactory;
 
 /**
@@ -23,7 +26,7 @@ import javax.net.ssl.TrustManagerFactory;
  * It may therefore be specific to a single
  * connector, or global to all connectors made by that protocol, or even (in the case of the SSL transport)
  * become a global default value.  For more information see the documentation for the connector or protocol in
- * question.  The comments in {@link org.mule.api.security.tls.TlsConfiguration} may also be useful.</p>
+ * question.  The comments in {@link TlsConfiguration} may also be useful.</p>
  */
 public interface TlsDirectTrustStore extends TlsIndirectTrustStore
 {
@@ -40,20 +43,20 @@ public interface TlsDirectTrustStore extends TlsIndirectTrustStore
     void setTrustStoreType(String trustStoreType);
 
     /**
-     * @return The algorithm used by the trust store.  The default comes from {
-     * @link org.mule.api.security.provider.AutoDiscoverySecurityProviderFactory}
+     * @return The algorithm used by the trust store.  The default comes from 
+     * {@link AutoDiscoverySecurityProviderFactory}
      */
     String getTrustManagerAlgorithm();
 
     /**
-     * @param trustManagerAlgorithm The algorithm used by the trust store.  The default comes from {
-     * @link org.mule.api.security.provider.AutoDiscoverySecurityProviderFactory}
+     * @param trustManagerAlgorithm The algorithm used by the trust store.  The default comes from 
+     * {@link AutoDiscoverySecurityProviderFactory}
      */
     void setTrustManagerAlgorithm(String trustManagerAlgorithm);
 
     /**
      * @return Either the factory defined by {@link #setTrustManagerFactory(TrustManagerFactory)} or one
-     * constructed from the parameters in this interface ({@link #setTrustStore(String)} etc).
+     * constructed from the parameters in this interface ({@link #setTrustStoreType(String)} etc).
      */
     TrustManagerFactory getTrustManagerFactory();
 
@@ -66,7 +69,7 @@ public interface TlsDirectTrustStore extends TlsIndirectTrustStore
 
     /**
      * If the trust store is undefined and the trust store generated via System properties then the
-     * key store certificates defined via {@link TODO} can be used as a source of trust information.
+     * key store certificates defined via <b>TODO</b> can be used as a source of trust information.
      * 
      * @return true if the key store data should <em>not</em> be used when a trust store is otherwise 
      * undefined
@@ -75,7 +78,7 @@ public interface TlsDirectTrustStore extends TlsIndirectTrustStore
 
     /**
      * If the trust store is undefined and the trust store generated via System properties then the
-     * key store certificates defined via {@link TODO} can be used as a source of trust information.
+     * key store certificates defined via <b>TODO</b> can be used as a source of trust information.
      * 
      * @param explicitTrustStoreOnly true if the key store data should <em>not<em> be used when a trust 
      * store is otherwise undefined

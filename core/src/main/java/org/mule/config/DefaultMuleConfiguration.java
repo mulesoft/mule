@@ -225,9 +225,9 @@ public class DefaultMuleConfiguration implements MuleConfiguration
      * 1.4. Use the supplied launcher or specify a proper JAXP implementation via
      * <code>-Djava.endorsed.dirs</code>. See the following URLs for more information:
      * <ul>
-     * <li> {@link http://xerces.apache.org/xerces2-j/faq-general.html#faq-4}
-     * <li> {@link http://xml.apache.org/xalan-j/faq.html#faq-N100D6}
-     * <li> {@link http://java.sun.com/j2se/1.4.2/docs/guide/standards/}
+     * <li><a href="http://xerces.apache.org/xerces2-j/faq-general.html#faq-4">Xerces</a>
+     * <li><a href="http://xml.apache.org/xalan-j/faq.html#faq-N100D6">Xalan</a>
+     * <li><a href="http://java.sun.com/j2se/1.4.2/docs/guide/standards/">Endorsed Standards Override Mechanism</a>
      * </ul>
      */
     protected void validateXML() throws FatalException

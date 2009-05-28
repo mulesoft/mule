@@ -16,17 +16,15 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * This is the interface all Mule BDPs implement.  It is a bit odd because it had to be retro-fitted
- * to existing code.  In particular {@link org.springframework.beans.factory.xml.BeanDefinitionParser#parse(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}
- * and {@link #muleParse(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}
- * seem to duplicate each other.  This is because many Mule classes subclass a Spring helper which makes
- * parse() final.  So instead we need to use {@link #muleParse(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)},
- * to allow over-rides.
- *
- * <p>In case that's not clear - always call {@link # muleParse (org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}
- * rather than {@link org.springframework.beans.factory.xml.BeanDefinitionParser#parse(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}.
- * The {@link org.springframework.beans.factory.xml.BeanDefinitionParser} is here only to allow the BDP
- * to be handed over to Spring.
+ * This is the interface all Mule BDPs implement. It is a bit odd because it had to be retro-fitted
+ * to existing code. In particular {@link BeanDefinitionParser#parse(Element, ParserContext)}
+ * and {@link #muleParse(Element, ParserContext)} seem to duplicate each other. This is because 
+ * many Mule classes subclass a Spring helper which makes <code>parse()</code> final. So instead 
+ * we need to use {@link #muleParse(Element, ParserContext)}, to allow over-rides.
+ * <p>
+ * In case that's not clear - always call {@link #muleParse(Element, ParserContext)} rather than 
+ * {@link BeanDefinitionParser#parse(Element, ParserContext)}. The {@link BeanDefinitionParser} 
+ * is here only to allow the BDP to be handed over to Spring.
  */
 public interface MuleDefinitionParser extends BeanDefinitionParser, MuleDefinitionParserConfiguration
 {

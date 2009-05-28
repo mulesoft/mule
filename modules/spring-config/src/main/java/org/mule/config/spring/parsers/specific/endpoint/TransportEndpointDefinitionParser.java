@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.parsers.specific.endpoint;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.endpoint.URIBuilder;
@@ -18,12 +19,9 @@ import org.mule.endpoint.URIBuilder;
  * This is intended for use by endpoint-specific parsers for non-global endpoint
  * elements.
  *
- * <p>It generates both an endpoint (which should subclass
- * {@link org.mule.api.endpoint.ImmutableEndpoint}) and a
- * {@link org.mule.endpoint.URIBuilder}.  The URI is
- * then injected into the endpoint.  So the associated schema can enable any of the
- * suitable {@link org.mule.endpoint.URIBuilder# ALL_ATTRIBUTES}
- * or add appropriate mappings.
+ * <p>It generates both an endpoint (which should subclass {@link ImmutableEndpoint}) and a
+ * {@link URIBuilder}.  The URI is then injected into the endpoint. So the associated schema 
+ * can enable any of the suitable {@link URIBuilder# ALL_ATTRIBUTES} or add appropriate mappings.
  */
 public class TransportEndpointDefinitionParser extends AddressedEndpointDefinitionParser
 {

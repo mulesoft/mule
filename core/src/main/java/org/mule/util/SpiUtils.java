@@ -29,7 +29,10 @@ public class SpiUtils
     private static final Log logger = LogFactory.getLog(SpiUtils.class);
 
     public static final String SERVICE_ROOT = "META-INF/services/";
-    /** @deprecated use {@link #TRANSPORT_SERVICE_PATH */
+    
+    /** 
+     * @deprecated use {@link #TRANSPORT_SERVICE_PATH}
+     */
     @Deprecated
     public static final String PROVIDER_SERVICE_PATH = "org/mule/providers/";
     public static final String TRANSPORT_SERVICE_PATH = "org/mule/transport/";

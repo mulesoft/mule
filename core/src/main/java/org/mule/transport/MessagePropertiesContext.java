@@ -29,13 +29,13 @@ import java.util.TreeSet;
  * This object maintains a scoped map of properties.  This means that certian properties will only be visiable under some
  * scopes. The scopes support by Mule are:
  * <ol>
- * <li> {@link org.mule.api.transport.PropertyScope.INBOUND} Contains properties that were on the message when it was
+ * <li> {@link org.mule.api.transport.PropertyScope#INBOUND} Contains properties that were on the message when it was
  * received by Mule. this scope is read-only.</li>
- * <li>{@link org.mule.api.transport.PropertyScope.INVOCATION} Any properties set on the invocation scope will be
+ * <li>{@link org.mule.api.transport.PropertyScope#INVOCATION} Any properties set on the invocation scope will be
  * available to the current service but will not be attached to any outound messages.  This is the default scope.</li>
- * <li>{@link org.mule.api.transport.PropertyScope.OUTBOUND} Any properties set in this scope will be attached to any
+ * <li>{@link org.mule.api.transport.PropertyScope#OUTBOUND} Any properties set in this scope will be attached to any
  * outbound messages resulting from this message</li>
- * <li>{@link org.mule.api.transport.PropertyScope.SESSION} Any properties set on this scope will be added to the session.
+ * <li>{@link org.mule.api.transport.PropertyScope#SESSION} Any properties set on this scope will be added to the session.
  * Note that this is a convinience scope in that you cannot directly access session properties from this scope.  Session
  * properties can be accessed from the {@link MuleEvent}</li>
  * </ol>

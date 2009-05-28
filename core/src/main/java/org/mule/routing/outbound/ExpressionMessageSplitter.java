@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing.outbound;
 
 import org.mule.api.MuleMessage;
@@ -18,9 +19,6 @@ import java.util.List;
 
 /**
  * Evaluates a single expression and adds the results of the expression as individual message parts.
- * If you require to execute different expressions for each message part you can use the {@link org.mule.routing.outbound.MultiExpressionMessageSplitter}.
- *
- * @see org.mule.routing.outbound.MultiExpressionMessageSplitter
  */
 public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
 {

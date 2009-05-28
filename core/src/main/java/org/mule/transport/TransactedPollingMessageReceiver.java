@@ -25,7 +25,6 @@ import java.util.List;
 import javax.resource.spi.work.Work;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * The TransactedPollingMessageReceiver is an abstract receiver that handles polling
@@ -50,7 +49,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     /**
      * @deprecated please use
-     *             {@link #TransactedPollingMessageReceiver(Connector,Service,InboundEndpoint,long,TimeUnit)}
+     *             {@link TransactedPollingMessageReceiver(Connector,Service,InboundEndpoint)}
      *             instead
      */
     public TransactedPollingMessageReceiver(Connector connector,

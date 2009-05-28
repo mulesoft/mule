@@ -15,8 +15,8 @@ import org.mule.util.StringUtils;
 
 /**
  * A simple configuration object for holding the common Expression evaluator configuration.
- * The {@link #getFullExpression()} will return the evaluator and expression information in a format
- * that can be passed into the {@link DefaultExpressionManager}
+ * The {@link #getFullExpression(ExpressionManager)} will return the evaluator and expression 
+ * information in a format that can be passed into the {@link DefaultExpressionManager}
  */
 public class ExpressionConfig
 {
@@ -35,7 +35,7 @@ public class ExpressionConfig
 
     public ExpressionConfig()
     {
-
+        super();
     }
 
     public ExpressionConfig(String expression, String evaluator, String customEvaluator)

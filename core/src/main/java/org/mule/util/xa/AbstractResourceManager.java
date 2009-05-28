@@ -160,17 +160,17 @@ public abstract class AbstractResourceManager
     /**
      * Starts a new transaction and associates it with the current thread. All
      * subsequent changes in the same thread made to the map are invisible from other
-     * threads until {@link #commitTransaction()} is called. Use
-     * {@link #rollbackTransaction()} to discard your changes. After calling either
-     * method there will be no transaction associated to the current thread any
+     * threads until {@link #commitTransaction(AbstractTransactionContext)} is called. Use
+     * {@link #rollbackTransaction(AbstractTransactionContext)} to discard your changes. After 
+     * calling either method there will be no transaction associated to the current thread any
      * longer. <br>
      * <br>
      * <em>Caution:</em> Be careful to finally call one of those methods, as
      * otherwise the transaction will lurk around for ever.
      * 
-     * @see #prepareTransaction()
-     * @see #commitTransaction()
-     * @see #rollbackTransaction()
+     * @see #prepareTransaction(AbstractTransactionContext)
+     * @see #commitTransaction(AbstractTransactionContext)
+     * @see #rollbackTransaction(AbstractTransactionContext)
      */
     public AbstractTransactionContext startTransaction(Object session) throws ResourceManagerException
     {
