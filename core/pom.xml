@@ -35,14 +35,6 @@
             <artifactId>commons-beanutils</artifactId>
         </dependency>
 
-        <!-- UUID generator, only called directly by mule-core -->
-        <dependency>
-            <groupId>org.safehaus.jug</groupId>
-            <artifactId>jug</artifactId>
-            <version>${jugVersion}-osgi</version>
-            <classifier>asl</classifier>
-        </dependency>
-
         <!--
             OTHERS. group/artifact id only, version and exclusions are specified
             via dependency management

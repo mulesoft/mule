@@ -10,16 +10,13 @@
 
 package org.mule.util;
 
-import org.safehaus.uuid.UUIDGenerator;
-
 /**
- * <code>UUID</code> Generates a UUID using the JUG library
+ * <code>UUID</code> Generates a UUID using JDK 5. THe reason for this class is that we have changed the UUID impl in the past.
+ * using this class makes it easy to switch out implementations
  */
 // @ThreadSafe
 public final class UUID
 {
-    private static final UUIDGenerator generator = UUIDGenerator.getInstance();
-
     private UUID()
     {
         // no go
@@ -27,7 +24,7 @@ public final class UUID
 
     public static String getUUID()
     {
-        return generator.generateTimeBasedUUID().toString();
+        return java.util.UUID.randomUUID().toString();
     }
 
 }

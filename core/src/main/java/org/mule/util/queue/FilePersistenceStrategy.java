@@ -13,6 +13,7 @@ package org.mule.util.queue;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.util.FileUtils;
+import org.mule.util.UUID;
 import org.mule.util.file.DeleteException;
 
 import java.io.File;
@@ -27,7 +28,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.safehaus.uuid.UUIDGenerator;
 
 public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleContextAware
 {
@@ -39,8 +39,6 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
     public static final String EXTENSION = ".msg";
 
     private File store;
-
-    private UUIDGenerator gen = UUIDGenerator.getInstance();
 
     protected MuleContext muleContext;
 
@@ -56,15 +54,17 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
 
     protected String getId(Object obj)
     {
-        String id = gen.generateRandomBasedUUID().toString();
-        return id;
+        return UUID.getUUID();
     }
 
     public Object store(String queue, Object obj) throws IOException
     {
         String id = getId(obj);
         File file = FileUtils.newFile(store, queue + File.separator + id + EXTENSION);
-        file.getParentFile().mkdirs();
+        if(!file.getParentFile().exists() && !file.getParentFile().mkdirs())
+        {
+            throw new IOException("Failed to create directory: " + file.getAbsolutePath());
+        }
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
         oos.writeObject(obj);
         oos.close();
@@ -94,8 +94,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         try
         {
             ois = new ObjectInputStream(new FileInputStream(file));
-            Object obj = ois.readObject();
-            return obj;
+            return ois.readObject();
         }
         catch (ClassNotFoundException e)
         {
@@ -110,9 +109,9 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         }
     }
 
-    public List restore() throws IOException
+    public List<Holder> restore() throws IOException
     {
-        List msgs = new ArrayList();
+        List<Holder> msgs = new ArrayList<Holder>();
         if (store == null)
         {
             logger.warn("No store has be set on the File Persistence Strategy. Not restoring at this time");
@@ -130,7 +129,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         }
     }
 
-    protected void restoreFiles(File dir, List msgs) throws IOException, ClassNotFoundException
+    protected void restoreFiles(File dir, List<Holder> msgs) throws IOException, ClassNotFoundException
     {
         File[] files = dir.listFiles();
         if (files == null)
@@ -159,7 +158,10 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
     {
         String path = muleContext.getConfiguration().getWorkingDirectory() + File.separator + DEFAULT_QUEUE_STORE;
         store = FileUtils.newFile(path).getCanonicalFile();
-        store.mkdirs();
+        if(!store.exists() && !store.mkdirs())
+        {
+            throw new IOException("Failed to create directory: " + store.getAbsolutePath());
+        }
     }
 
     public void close() throws IOException

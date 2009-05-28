@@ -10,6 +10,8 @@
 
 package org.mule.util.queue;
 
+import org.mule.util.UUID;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,18 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.uuid.UUIDGenerator;
 
 public class MemoryPersistenceStrategy implements QueuePersistenceStrategy
 {
-
-    private UUIDGenerator gen = UUIDGenerator.getInstance();
-
     private Map map = Collections.synchronizedMap(new HashMap());
 
     protected Object getId(Object obj)
     {
-        return gen.generateRandomBasedUUID();
+        return UUID.getUUID();
     }
 
     /*

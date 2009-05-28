@@ -10,16 +10,13 @@
 
 package org.mule.util.xa;
 
-import javax.transaction.Status;
+import org.mule.util.UUID;
 
-import org.safehaus.uuid.UUIDGenerator;
+import javax.transaction.Status;
 
 public abstract class AbstractTransactionContext
 {
-
-    private static UUIDGenerator gen = UUIDGenerator.getInstance();
-
-    protected String id = gen.generateTimeBasedUUID().toString();
+    protected String id = UUID.getUUID();
     protected long timeout;
     protected int status;
     protected boolean readOnly;
