@@ -5,6 +5,7 @@ ant-1.6.5-osgi
 aopalliance-1.0
 asm-3.1-osgi
 asm-commons-3.1
+asm-tree-3.1
 aspectjrt-1.5.4
 axis-1.4-osgi
 backport-util-concurrent-3.1-osgi
@@ -48,6 +49,7 @@ FastInfoset-1.2.2
 geronimo-stax-api_1.0_spec-1.0.1
 groovy-all-1.5.6-osgi
 groovy-engine-1.1-osgi-jdk14
+guice-2.0
 hibernate-3.2.2.ga-osgi
 javassist-3.6.ga-osgi
 jaxb-api-2.1-osgi
