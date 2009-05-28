@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * <li>replyTo - returns the value of {@link MuleMessage#getReplyTo()}</li>
  * <li>payload - returns the value of {@link MuleMessage#getPayload()}</li>
  * <li>encoding - returns the value of {@link MuleMessage#getEncoding()}</li>
- * <li>exception - returns the value of {@link MuleMessage#getExceptionPayload().getException()} or null if there is no exception payload</li>
+ * <li>exception - returns the value of <code>MuleMessage.getExceptionPayload().getException()</code> or null if there is no exception payload</li>
  * </ul>
  * If no expression is set the MuleMessage itself will be returned.
  * <p/>
