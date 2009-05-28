@@ -185,8 +185,7 @@ public class DefaultMuleContext implements MuleContext
      * Stops the <code>MuleManager</code> which stops all sessions and
      * connectors
      *
-     * @throws MuleException if either any of the sessions or connectors fail to
-     *                      stop
+     * @throws MuleException if either any of the sessions or connectors fail to stop
      */
     public synchronized void stop() throws MuleException
     {
@@ -343,7 +342,7 @@ public class DefaultMuleContext implements MuleContext
 
     /**
      * Fires a server notification to all registered
-     * {@link org.mule.api.context.notification.listener.CustomNotificationListener} notificationManager.
+     * {@link org.mule.api.context.notification.CustomNotificationListener} notificationManager.
      *
      * @param notification the notification to fire. This must be of type
      *                     {@link org.mule.context.notification.CustomNotification} otherwise an
