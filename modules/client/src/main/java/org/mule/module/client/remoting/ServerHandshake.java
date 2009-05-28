@@ -16,7 +16,7 @@ import java.io.Serializable;
 
 /**
  * The message type used for the handshake between the client {@link RemoteDispatcher} and the server
- * {@link org.mule.extras.client.remoting.RemoteDispatcherAgent}.
+ * {@link RemoteDispatcherAgent}.
  */
 public class ServerHandshake implements Serializable
 {
