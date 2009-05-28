@@ -130,7 +130,7 @@ public class ClasspathScanner
                 catch (Exception e)
                 {
                     Throwable t = ExceptionHelper.getRootException(e);
-                    logger.warn(e.toString() + ": caused by: " + t.toString());
+                    logger.debug(e.toString() + ": caused by: " + t.toString());
                 }
             }
         }
@@ -170,7 +170,7 @@ public class ClasspathScanner
             catch (IOException e)
             {
                 Throwable t = ExceptionHelper.getRootException(e);
-                logger.warn(e.toString() + ": caused by: " + t.toString());
+                logger.debug(e.toString() + ": caused by: " + t.toString());
             }
         }
         return set;
