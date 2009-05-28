@@ -10,12 +10,13 @@
 
 package org.mule.retry;
 
-import org.mule.api.retry.RetryPolicy;
 
 /**
- * Indicates the current state of a {@link RetryPolicy}
- * - ok: The policy is active
- * - exhausted: The policy has run through the actions for the policy
+ * Indicates the current state of a RetryPolicy
+ * <ul>
+ * <li>ok: The policy is active</li>
+ * <li>exhausted: The policy has run through the actions for the policy</li>
+ * </ul>
  *
  * For example, a RetryPolicy may have a RetryCount - how many times the policy can be invoked.
  * Once the retryCount has been reached, the policy is exhausted and cannot be used again.
