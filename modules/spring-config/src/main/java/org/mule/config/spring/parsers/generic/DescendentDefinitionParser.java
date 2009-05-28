@@ -15,7 +15,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * An extension to {@line ChildDefinitionParser} which recurses up the DOM
+ * An extension to {@link ChildDefinitionParser} which recurses up the DOM
  * tree until it finds a named parent.
  */
 public class DescendentDefinitionParser extends ChildDefinitionParser
