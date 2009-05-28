@@ -26,9 +26,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-/**
- * NOTE: Don't forget to duplicate all the changes in {@link org.mule.example.loanbroker.bpm.DbUtils}
- */
 public class MuleDerbyTestUtils
 {
     private static final String DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver";
@@ -96,7 +93,9 @@ public class MuleDerbyTestUtils
         FileUtils.deleteTree(new File(derbySystemHome + File.separator + databaseName));
     }
     
-    /** Start a previously created (and stopped) database */
+    /** 
+     * Start a previously created (and stopped) database 
+     */
     public static void startDataBase(String databaseName) throws Exception
     {
         Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS);
