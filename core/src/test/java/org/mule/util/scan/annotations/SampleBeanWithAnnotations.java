@@ -7,13 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.scan.annotations;
 
 import java.io.Serializable;
 
 public class SampleBeanWithAnnotations implements Serializable
 {
-
     @Marker("foo")
     @NonMeta("bar")
     public String doSomething(Object data)
