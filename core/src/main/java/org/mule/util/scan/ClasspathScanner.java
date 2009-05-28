@@ -111,6 +111,7 @@ public class ClasspathScanner
                 {
                     String name = entry.getName();
                     //Ignore anonymous
+                    // TODO RM what about the other anonymous classes like $2, $3 ?
                     if (name.contains("$1"))
                     {
                         continue;
@@ -129,8 +130,11 @@ public class ClasspathScanner
                 }
                 catch (Exception e)
                 {
-                    Throwable t = ExceptionHelper.getRootException(e);
-                    logger.debug(e.toString() + ": caused by: " + t.toString());
+                    if (logger.isDebugEnabled())
+                    {
+                        Throwable t = ExceptionHelper.getRootException(e);
+                        logger.debug(String.format("%s: caused by: %s", e.toString(), t.toString()));
+                    }
                 }
             }
         }
@@ -169,8 +173,11 @@ public class ClasspathScanner
             }
             catch (IOException e)
             {
-                Throwable t = ExceptionHelper.getRootException(e);
-                logger.debug(e.toString() + ": caused by: " + t.toString());
+                if (logger.isDebugEnabled())
+                {
+                    Throwable t = ExceptionHelper.getRootException(e);
+                    logger.debug(String.format("%s: caused by: %s", e.toString(), t.toString()));
+                }
             }
         }
         return set;
@@ -185,7 +192,10 @@ public class ClasspathScanner
         }
         catch (ClassNotFoundException e)
         {
-            logger.warn(c + " : " + e.toString());
+            if (logger.isWarnEnabled())
+            {
+                logger.warn(String.format("%s : %s", c, e.toString()));
+            }
             return null;
         }
     }
