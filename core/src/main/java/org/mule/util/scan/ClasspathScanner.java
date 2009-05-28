@@ -54,13 +54,13 @@ public class ClasspathScanner
     private ClassLoader classLoader;
     private String[] basepaths = new String[]{""};
 
-    public ClasspathScanner(String[] basepaths)
+    public ClasspathScanner(String... basepaths)
     {
         this.classLoader = getClass().getClassLoader();
         this.basepaths = basepaths;
     }
 
-    public ClasspathScanner(String[] basepaths, ClassLoader classLoader)
+    public ClasspathScanner(ClassLoader classLoader, String... basepaths)
     {
         this.classLoader = classLoader;
         this.basepaths = basepaths;
