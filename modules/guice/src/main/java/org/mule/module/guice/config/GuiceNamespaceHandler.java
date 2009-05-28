@@ -11,7 +11,6 @@ package org.mule.module.guice.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
-import org.mule.config.spring.util.SpringBeanLookup;
 
 /**
  * Parsers for handing elements in the guice namespace

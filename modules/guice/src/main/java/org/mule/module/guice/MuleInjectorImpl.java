@@ -10,20 +10,17 @@
 package org.mule.module.guice;
 
 import org.mule.util.ClassUtils;
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.CoreMessages;
 
-import com.google.inject.Injector;
-import com.google.inject.MembersInjector;
-import com.google.inject.TypeLiteral;
 import com.google.inject.Binding;
+import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.Provider;
+import com.google.inject.MembersInjector;
 import com.google.inject.Module;
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 
-import java.util.Map;
 import java.util.List;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A wrapper of the GuiceInjectorImpl that provides support for String bindings.

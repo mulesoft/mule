@@ -9,11 +9,11 @@
  */
 package org.mule.module.guice;
 
-import org.mule.transformer.AbstractTransformer;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.DiscoverableTransformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.transformer.AbstractTransformer;
 
 /**
  * TODO
@@ -38,6 +38,6 @@ public class OrangetoAppleTransformer extends AbstractTransformer implements Dis
 
     public void setPriorityWeighting(int weighting)
     {
-
+        // ignore
     }
 }

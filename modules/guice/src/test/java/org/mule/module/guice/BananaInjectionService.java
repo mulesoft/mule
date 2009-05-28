@@ -9,9 +9,8 @@
  */
 package org.mule.module.guice;
 
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.BananaFactory;
 import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.BananaFactory;
 
 import com.google.inject.Inject;
 

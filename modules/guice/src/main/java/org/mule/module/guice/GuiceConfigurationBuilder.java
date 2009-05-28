@@ -9,23 +9,21 @@
  */
 package org.mule.module.guice;
 
+import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationException;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.api.MuleContext;
-import org.mule.api.transport.Connector;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.config.ConfigurationException;
-import org.mule.util.scan.ClasspathScanner;
 import org.mule.util.ClassUtils;
+import org.mule.util.scan.ClasspathScanner;
 
-import com.google.inject.Module;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.Stage;
 
-import java.util.Set;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -48,6 +46,7 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 
     public GuiceConfigurationBuilder()
     {
+        super();
     }
 
     public GuiceConfigurationBuilder(String basepath)
