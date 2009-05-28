@@ -12,7 +12,7 @@ package org.mule.util.scan.annotations;
 import java.util.List;
 import java.util.ArrayList;
 
-class AnnotationInfo
+public class AnnotationInfo
 {
     private String className;
     private List<NameValue> params = new ArrayList<NameValue>();
