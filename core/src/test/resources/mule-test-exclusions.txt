@@ -30,5 +30,3 @@ org.mule.context.DefaultMuleContextTestCase
 
 #Fails on CE CI server MULE-4008
 org.mule.util.TimedSocketTestCase
-
-org.mule.util.scan.ClasspathScannerTestCase
