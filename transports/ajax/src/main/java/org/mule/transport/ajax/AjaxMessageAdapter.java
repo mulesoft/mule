@@ -30,7 +30,7 @@ import java.util.Map;
  * <li>payload - the object to use a the payload, this can be a JSON encoded string. If JSON is used a {@link java.util.Map} will be created. {@link AjaxMessageAdapter.PAYLOAD_PARAM}</li>
  * <li>replyTo - the return ajax channel for this message. {@link AjaxMessageAdapter.REPLYTO_PARAM}</li>
  * </ul>
- * Any additional properties will be set on the message in the {@link org.mule.api.transport.PropertyScope.INVOCATION} scope.
+ * Any additional properties will be set on the message in the {@link org.mule.api.transport.PropertyScope} INVOCATION scope.
  */
 public class AjaxMessageAdapter extends AbstractMessageAdapter
 {
