@@ -82,7 +82,7 @@
 
     <servlet-mapping>
         <servlet-name>ajax</servlet-name>
-        <url-pattern>/ajax/*</url-pattern>
+        <url-pattern>/cometd/*</url-pattern>
     </servlet-mapping>
 
 </web-app>
