@@ -80,7 +80,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
      * @throws RejectedExecutionException
      * @throws NullPointerException
      * @throws IllegalArgumentException
-     * @see {@link ScheduledExecutorService#scheduleWithFixedDelay(Runnable, long, long, TimeUnit)}
+     * @see ScheduledExecutorService#scheduleWithFixedDelay(Runnable, long, long, TimeUnit)
      */
     protected void schedule()
         throws RejectedExecutionException, NullPointerException, IllegalArgumentException
@@ -108,7 +108,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
     /**
      * This method cancels the schedules which were created in {@link #schedule()}.
      * 
-     * @see {@link Future#cancel(boolean)}
+     * @see Future#cancel(boolean)
      */
     protected void unschedule()
     {

@@ -24,7 +24,7 @@ public interface Interceptor
 
     /**
      * Invoked when the component should be called. The implementation can call
-     * {@link Invocation#execute()} to call the component.
+     * {@link Invocation#invoke()} to call the component.
      * 
      * @param invocation the invocation containing info about the current message and
      *            service

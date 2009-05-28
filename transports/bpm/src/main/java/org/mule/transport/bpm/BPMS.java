@@ -18,7 +18,7 @@ import java.util.Map;
  * Theoretically, any Process Engine can be "plugged into" Mule via the BPM connector
  * if it implements this interface.  
  * 
- * @see {@link MessageService}
+ * @see MessageService
  */
 public interface BPMS
 {

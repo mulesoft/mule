@@ -33,7 +33,7 @@ public class SingleCorrelatorCallback implements EventCorrelatorCallback
      *
      * @param events event group to consider
      * @return true if the event group size is 1 or greater
-     * @see {@link EventCorrelatorCallback#shouldAggregateEvents(EventGroup)}
+     * @see EventCorrelatorCallback#shouldAggregateEvents(EventGroup)
      */
     public boolean shouldAggregateEvents(EventGroup events)
     {
@@ -58,7 +58,7 @@ public class SingleCorrelatorCallback implements EventCorrelatorCallback
      *          if the aggregation fails. in
      *          this scenario the whole event group is removed and passed to the
      *          exception handler for this componenet
-     * @see {@link org.mule.routing.response.AbstractResponseAggregator#aggregateEvents(EventGroup)}
+     * @see org.mule.routing.response.AbstractResponseAggregator#aggregateEvents(EventGroup)
      */
     public MuleMessage aggregateEvents(EventGroup events) throws RoutingException
     {

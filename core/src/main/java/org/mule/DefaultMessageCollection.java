@@ -176,7 +176,6 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
 
     /**
      * We need to overload this if we find we want to make this class available to users, but the copy will be expensive;
-     * @return
      */
     public ThreadSafeAccess newThreadCopy()
     {

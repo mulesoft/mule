@@ -45,7 +45,6 @@ import java.util.Set;
  * <li>{@link #hashCode}
  * <li>{@link #wait}
  * <li>{@link java.lang.reflect.Proxy#getInvocationHandler}
- * <li>{@link Cloneable#clone()}
  * <li>'is*'
  * <li>'get*'.
  * <li>'set*'.

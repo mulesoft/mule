@@ -11,7 +11,6 @@
 package org.mule.api.transport;
 
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 
 
 /**
@@ -25,7 +24,7 @@ public interface MessageRequester extends Connectable, MessageRequesting
      * This method can perform necessary state updates before any of the
      * {@link org.mule.api.transport.MessageDispatching} methods are invoked.
      *
-     * @see {@link org.mule.api.transport.MessageDispatcherFactory#activate(org.mule.api.endpoint.ImmutableEndpoint, org.mule.api.transport.MessageDispatcher)}
+     * @see org.mule.api.transport.MessageDispatcherFactory#activate(org.mule.api.endpoint.ImmutableEndpoint, org.mule.api.transport.MessageDispatcher)
      */
     void activate();
 
@@ -34,7 +33,7 @@ public interface MessageRequester extends Connectable, MessageRequesting
      * clean up its internal state (if it has any) or return pooled resources to
      * whereever it got them during {@link #activate()}.
      *
-     * @see {@link org.mule.api.transport.MessageDispatcherFactory#passivate(org.mule.api.endpoint.ImmutableEndpoint, org.mule.api.transport.MessageDispatcher)}
+     * @see org.mule.api.transport.MessageDispatcherFactory#passivate(org.mule.api.endpoint.ImmutableEndpoint, org.mule.api.transport.MessageDispatcher)
      */
     void passivate();
 

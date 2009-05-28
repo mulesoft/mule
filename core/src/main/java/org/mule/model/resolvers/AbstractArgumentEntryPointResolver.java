@@ -37,7 +37,6 @@ import java.util.Set;
  * <li>{@link #notifyAll}
  * <li>{@link #hashCode}
  * <li>{@link #wait}
- * <li>{@link Cloneable#clone()}
  * <li>'is*'
  * <li>'get*'.
  * </ul>

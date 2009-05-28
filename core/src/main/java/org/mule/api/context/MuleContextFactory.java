@@ -32,7 +32,7 @@ public interface MuleContextFactory
      * @return
      * @throws InitialisationException
      * @throws ConfigurationException
-     * @see {@link DefaultsConfigurationBuilder}
+     * @see DefaultsConfigurationBuilder
      */
     MuleContext createMuleContext() throws InitialisationException, ConfigurationException;
 

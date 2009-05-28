@@ -11,6 +11,7 @@
 package org.mule.component;
 
 import org.mule.api.MuleException;
+import org.mule.api.component.Component;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
@@ -20,6 +21,7 @@ import org.mule.api.routing.BindingCollection;
 import org.mule.config.PoolingProfile;
 import org.mule.util.pool.DefaultLifecycleEnabledObjectPool;
 import org.mule.util.pool.LifecyleEnabledObjectPool;
+import org.mule.util.pool.ObjectPool;
 
 /**
  * <code>PooledJavaComponent</code> implements pooling.
@@ -101,11 +103,12 @@ public class PooledJavaComponent extends AbstractJavaComponent
 
     /**
      * <code>LifeCycleAdaptorFactory</code> wraps the Component' s
-     * {@link ObjectFactory}. The LifeCycleAdaptorFactory "getInstance()" method
+     * {@link ObjectFactory}. The LifeCycleAdaptorFactory <code>getInstance()</code> method
      * creates a new {@link LifecycleAdapter} wrapping the object instance obtained
-     * for the component instance {@link ObjectFactory} set on the {@link Component}.<br/>
+     * for the component instance {@link ObjectFactory} set on the {@link Component}.
+     * <br/>
      * This allows us to keep {@link LifecycleAdapter} creation in the Component and
-     * out of the {@link DefaultLifecyleEnabledObjectPool} and to use the generic
+     * out of the {@link DefaultLifecycleEnabledObjectPool} and to use the generic
      * {@link ObjectPool} interface.
      */
     protected class LifeCycleAdaptorFactory implements ObjectFactory

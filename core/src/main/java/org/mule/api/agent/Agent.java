@@ -24,8 +24,6 @@ public interface Agent extends Lifecycle, NamedObject
 {
     /**
      * Should be a 1 line description of the agent
-     * 
-     * @return
      */
     String getDescription();
 

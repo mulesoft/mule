@@ -40,7 +40,7 @@ public class OGNLFilter implements Filter
      *
      * @param expression the expression to use for message evaluation
      * @throws ConfigurationException if the expression cannot be parsed
-     * @see {@link Ognl#parseExpression(String)}
+     * @see Ognl#parseExpression(String)
      */
     public void setExpression(String expression) throws ConfigurationException
     {

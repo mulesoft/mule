@@ -201,9 +201,9 @@ public final class StringMessageUtils
     }
 
     /**
-     * @see {@link ArrayUtils#toString(Object, int)}
-     * @see {@link CollectionUtils#toString(Collection, int)}
-     * @see {@link MapUtils#toString(Map, boolean)}
+     * @see ArrayUtils#toString(Object, int)
+     * @see CollectionUtils#toString(Collection, int)
+     * @see MapUtils#toString(Map, boolean)
      */
     public static String toString(Object o)
     {

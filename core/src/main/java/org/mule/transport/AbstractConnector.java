@@ -188,12 +188,12 @@ public abstract class AbstractConnector
     private volatile ThreadingProfile receiverThreadingProfile;
     
     /**
-     * @see {@link #isCreateMultipleTransactedReceivers()}
+     * @see #isCreateMultipleTransactedReceivers()
      */
     protected volatile boolean createMultipleTransactedReceivers = true;
 
     /**
-     * @see {@link #getNumberOfConcurrentTransactedReceivers()}
+     * @see #getNumberOfConcurrentTransactedReceivers()
      */
     protected volatile int numberOfConcurrentTransactedReceivers = DEFAULT_NUM_CONCURRENT_TX_RECEIVERS;
 
@@ -1637,7 +1637,7 @@ public abstract class AbstractConnector
     }
 
     /**
-     * @see {@link #isCreateMultipleTransactedReceivers()}
+     * @see #isCreateMultipleTransactedReceivers()
      * @param createMultipleTransactedReceivers if true, multiple receivers will be
      *            created for this connection
      */
@@ -1658,7 +1658,7 @@ public abstract class AbstractConnector
     }
 
     /**
-     * @see {@link #getNumberOfConcurrentTransactedReceivers()}
+     * @see #getNumberOfConcurrentTransactedReceivers()
      * @param count the number of concurrent transacted receivers to start
      */
     public void setNumberOfConcurrentTransactedReceivers(int count)
