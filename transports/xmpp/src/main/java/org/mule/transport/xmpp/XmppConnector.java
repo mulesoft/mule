@@ -130,7 +130,6 @@ public class XmppConnector extends AbstractConnector
      * Subclasses can override this method to create a more specialized {@link XMPPConnection}.
      * 
      * @param endpointURI
-     * @return
      * @throws XMPPException
      */
     protected XMPPConnection doCreateXmppConnection(EndpointURI endpointURI) throws XMPPException
