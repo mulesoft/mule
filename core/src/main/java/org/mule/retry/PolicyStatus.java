@@ -10,6 +10,8 @@
 
 package org.mule.retry;
 
+import org.mule.api.retry.RetryPolicy;
+
 /**
  * Indicates the current state of a {@link RetryPolicy}
  * - ok: The policy is active
