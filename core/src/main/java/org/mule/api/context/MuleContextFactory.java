@@ -19,9 +19,8 @@ import org.mule.config.builders.DefaultsConfigurationBuilder;
 import java.util.List;
 
 /**
- * A {@link CopyOfMuleContextFactory} is used to create instances of
- * {@link MuleContext}. The instances of {@link MuleContext} returned by this factory
- * are initialised but not started.
+ * A MuleContextFactory is used to create instances of {@link MuleContext}. The instances of 
+ * {@link MuleContext} returned by this factory are initialised but not started.
  */
 public interface MuleContextFactory
 {
