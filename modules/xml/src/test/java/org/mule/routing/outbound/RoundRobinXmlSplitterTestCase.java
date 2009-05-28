@@ -41,7 +41,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     private XmlMessageSplitter asyncXmlSplitter;
     private XmlMessageSplitter syncXmlSplitter;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         // setup async endpoints

@@ -255,7 +255,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
     }
 
 
-    public static final Service getSerivce(InboundEndpoint endpoint,
+    public static Service getSerivce(InboundEndpoint endpoint,
                                                     WireFormat wireFormat,
                                                     String encoding,
                                                     int eventTimeout,

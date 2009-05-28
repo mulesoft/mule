@@ -60,7 +60,7 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
         return messageEndpointFactory.createEndpoint(null);
     }
 
-    // @Override
+    @Override
     public Object doInvoke(MuleEvent event)
     {
         try
@@ -79,20 +79,20 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
         return MessageEndpoint.class;
     }
 
-    // @Override
+    @Override
     protected LifecycleAdapter borrowComponentLifecycleAdaptor() throws Exception
     {
         // Template method unused because doOnCall and doOnEvent have been overridden
         return null;
     }
 
-    // @Override
+    @Override
     protected void returnComponentLifecycleAdaptor(LifecycleAdapter lifecycleAdapter)
     {
         // Template method unused because doOnCall and doOnEvent have been overridden
     }
 
-    // @Override
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         // no-op no object-factory

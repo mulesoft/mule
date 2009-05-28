@@ -21,7 +21,7 @@ import java.net.DatagramPacket;
 public class MulticastConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         MulticastConnector c = new MulticastConnector();

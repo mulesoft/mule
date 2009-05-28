@@ -50,7 +50,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
      * We only need to start scheduling this receiver if event queueing is enabled on the connector; otherwise
      * events are delivered via onEvent/onCall.
      */
-    // @Override
+    @Override
     protected void schedule() throws RejectedExecutionException, NullPointerException, IllegalArgumentException
     {
         if (connector.isQueueEvents())
@@ -193,7 +193,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     /*
      * We create our own "polling" worker here since we need to evade the standard scheduler.
      */
-    // @Override
+    @Override
     protected PollingReceiverWorker createWork()
     {
         return new VMReceiverWorker(this);

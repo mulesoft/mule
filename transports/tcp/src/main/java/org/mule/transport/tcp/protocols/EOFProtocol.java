@@ -24,7 +24,7 @@ public class EOFProtocol extends DirectProtocol
      * @param available Amount available
      * @return true if the transfer should continue
      */
-    // @Override
+    @Override
     protected boolean isRepeat(int len, int available)
     {
         return true;

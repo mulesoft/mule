@@ -33,7 +33,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
     private ThreadPoolExecutor executor;
     private ReentrantLock executorLock;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -54,7 +54,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         SleepyTask.activeTasks.set(0);
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         executor.shutdown();
@@ -265,7 +265,7 @@ class LastRejectedWaitPolicy extends WaitPolicy
         return _rejected;
     }
 
-    // @Override
+    @Override
     public void rejectedExecution(Runnable r, ThreadPoolExecutor e)
     {
         _rejected = r;
@@ -334,7 +334,7 @@ class ExceptionCollectingThreadGroup extends ThreadGroup
     }
 
     // all uncaught Thread exceptions end up here
-    // @Override
+    @Override
     public void uncaughtException(Thread t, Throwable e)
     {
         synchronized (exceptions)

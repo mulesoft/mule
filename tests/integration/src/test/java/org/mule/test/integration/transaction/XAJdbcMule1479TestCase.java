@@ -21,7 +21,7 @@ public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
         return "org/mule/test/integration/transaction/jdbc-xatransaction-1479.xml";
     }
 
-    // @Override
+    @Override
     protected void emptyTable() throws Exception
     {
         try

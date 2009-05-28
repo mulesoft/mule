@@ -27,13 +27,13 @@ public class ExceptionThrowingVMMessageReceiver extends VMMessageReceiver
         super(connector, service, endpoint);
     }
 
-    // @Override
+    @Override
     protected void processMessage(Object msg) throws Exception
     {
         throw new RuntimeException();
     }
 
-    // @Override
+    @Override
     public Object onCall(MuleMessage message, boolean synchronous) throws MuleException
     {
         throw new RuntimeException();

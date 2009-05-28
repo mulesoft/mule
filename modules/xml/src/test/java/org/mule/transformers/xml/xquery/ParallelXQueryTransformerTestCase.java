@@ -28,7 +28,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleTestCase
     private String resultData;
     private ConcurrentLinkedQueue actualResults = new ConcurrentLinkedQueue();
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         srcData = IOUtils.toString(IOUtils.getResourceAsStream("cd-catalog.xml", getClass()));

@@ -59,7 +59,7 @@ public abstract class AbstractTlsRetrieveMailConnector
         super.doInitialise();
     }
 
-    // @Override
+    @Override
     protected void extendPropertiesForSession(Properties global, Properties local, URLName url)
     {
         super.extendPropertiesForSession(global, local, url);

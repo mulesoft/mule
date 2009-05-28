@@ -29,7 +29,7 @@ import java.io.UnsupportedEncodingException;
 public class ByteArrayToObject extends ByteArrayToSerializable
 {
 
-    // @Override
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         if (src instanceof byte[])

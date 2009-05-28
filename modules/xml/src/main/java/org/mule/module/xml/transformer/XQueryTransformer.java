@@ -426,7 +426,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
             return connection.prepareExpression(xquery);
         }
 
-        //@Override
+        @Override
         public void destroyObject(Object o) throws Exception
         {
             ((XQPreparedExpression) o).close();
@@ -529,7 +529,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         return value;
     }
 
-    //@Override
+    @Override
     public Object clone() throws CloneNotSupportedException
     {
         Object clone = super.clone();

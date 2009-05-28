@@ -25,7 +25,7 @@ import java.util.Iterator;
 public class TestAggregator extends ResponseCorrelationAggregator
 {
 
-    // @Override
+    @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
         return new CollectionCorrelatorCallback()

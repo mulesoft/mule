@@ -17,7 +17,7 @@ import org.mule.transport.rmi.RmiConnector;
 public class RmiConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         RmiConnector c = new RmiConnector();

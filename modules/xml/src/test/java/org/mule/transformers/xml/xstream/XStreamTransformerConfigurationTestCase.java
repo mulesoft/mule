@@ -34,14 +34,14 @@ public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCas
         }
     }
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         MyDriverDidInitialize = true;
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         MyDriverDidInitialize = false;

@@ -36,7 +36,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         return message;
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         RequestContext.setEvent(null);

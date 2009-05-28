@@ -15,13 +15,13 @@ import org.mule.transport.tcp.protocols.XmlMessageEOFProtocol;
 public class XmlMessageEOFProtocolTestCase extends XmlMessageProtocolTestCase
 {
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         setProtocol(new XmlMessageEOFProtocol());
     }
 
-    // @Override
+    @Override
     public void testSlowStream() throws Exception
     {
         String msgData = "<?xml version=\"1.0\"?><data>hello</data>";

@@ -166,7 +166,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    // @Override
+    @Override
     protected MuleMessage handleUnacceptedFilter(MuleMessage message)
     {
         super.handleUnacceptedFilter(message);

@@ -22,7 +22,7 @@ import org.mule.tck.exceptions.FunctionalTestException;
 public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
 {
 
-    // @Override
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/exceptions/default-service-exception-strategy-config.xml";

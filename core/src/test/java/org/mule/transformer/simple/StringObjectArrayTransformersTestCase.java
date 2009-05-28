@@ -36,7 +36,7 @@ public class StringObjectArrayTransformersTestCase extends AbstractTransformerTe
         return new String[]{"test1", "test2", "test3"};
     }
 
-    // @Override
+    @Override
     public boolean compareResults(Object src, Object result)
     {
         if (src == null || result == null)
@@ -56,7 +56,7 @@ public class StringObjectArrayTransformersTestCase extends AbstractTransformerTe
         return false;
     }
 
-    // @Override
+    @Override
     public boolean compareRoundtripResults(Object src, Object result)
     {
         if (src == null || result == null)

@@ -15,14 +15,14 @@ import java.io.ByteArrayInputStream;
 public class XmlEntityTransformersStreamingTestCase extends XMLEntityTransformersTestCase
 {
 
-    // @Override
+    @Override
     public Object getTestData()
     {
         String string = (String)super.getTestData();
         return new ByteArrayInputStream(string.getBytes());
     }
 
-    // @Override
+    @Override
     public Object getResultData()
     {
         String string = (String)super.getResultData();

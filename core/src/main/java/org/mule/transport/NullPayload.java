@@ -44,19 +44,19 @@ public final class NullPayload implements Serializable
         return NullPayloadHolder.instance;
     }
 
-    // @Override
+    @Override
     public boolean equals(Object obj)
     {
         return obj instanceof NullPayload;
     }
 
-    // @Override
+    @Override
     public int hashCode ()
     {
         return 1; // random, 0 is taken by VoidResult
     }
 
-    // @Override
+    @Override
     public String toString()
     {
         return "{NullPayload}";

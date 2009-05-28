@@ -27,7 +27,7 @@ public class RetrieveMessageRequesterFactory extends AbstractMessageRequesterFac
     /**
      * By default client connections are closed after the request.
      */
-    // @Override
+    @Override
     public boolean isCreateRequesterPerRequest()
     {
         return true;

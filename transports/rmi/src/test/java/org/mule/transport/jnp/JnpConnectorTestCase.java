@@ -17,7 +17,7 @@ import org.mule.transport.jnp.JnpConnector;
 public class JnpConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         JnpConnector c = new JnpConnector();

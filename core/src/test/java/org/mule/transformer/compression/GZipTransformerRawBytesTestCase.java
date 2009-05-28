@@ -18,7 +18,7 @@ import java.io.UnsupportedEncodingException;
 public class GZipTransformerRawBytesTestCase extends GZipTransformerTestCase
 {
 
-    // @Override
+    @Override
     public Object getResultData()
     {
         try
@@ -32,7 +32,7 @@ public class GZipTransformerRawBytesTestCase extends GZipTransformerTestCase
         }
     }
 
-    // @Override
+    @Override
     public Object getTestData()
     {
         try
@@ -46,7 +46,7 @@ public class GZipTransformerRawBytesTestCase extends GZipTransformerTestCase
         }
     }
 
-    // @Override
+    @Override
     public Transformer getRoundTripTransformer()
     {
         GZipUncompressTransformer transformer = new GZipUncompressTransformer();
@@ -63,7 +63,7 @@ public class GZipTransformerRawBytesTestCase extends GZipTransformerTestCase
         return transformer;
     }
 
-    // @Override
+    @Override
     public void doTestBadReturnType(Transformer tran, Object src) throws Exception
     {
         /*

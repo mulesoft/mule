@@ -19,14 +19,14 @@ public class ObjectByteArrayTransformersWithResultStreamTestCase extends
     ObjectByteArrayTransformersWithObjectsTestCase
 {
 
-    // @Override
+    @Override
     public Object getResultData()
     {
         byte[] resultData = (byte[])super.getResultData();
         return new ByteArrayInputStream(resultData);
     }
 
-    // @Override
+    @Override
     public boolean compareResults(Object expected, Object result)
     {
         if (expected instanceof InputStream)

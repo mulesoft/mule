@@ -23,7 +23,7 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 
     private Server httpServer;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -40,7 +40,7 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
         httpServer.start();
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         super.doTearDown();

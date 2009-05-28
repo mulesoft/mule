@@ -68,7 +68,7 @@ public abstract class AbstractMessageRequesterFactory implements MessageRequeste
         return (!this.isCreateRequesterPerRequest() && requester.validate());
     }
 
-    // @Override
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer(60);

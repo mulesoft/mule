@@ -32,13 +32,13 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         assertFalse(ctx.isStarted());
     }
 
-    // @Override
+    @Override
     protected MuleContext createMuleContext() throws Exception
     {
         return null;
     }
 
-    // @Override
+    @Override
     protected void disposeManager()
     {
     }

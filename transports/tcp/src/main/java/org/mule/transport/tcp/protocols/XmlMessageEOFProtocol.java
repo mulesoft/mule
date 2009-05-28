@@ -25,7 +25,7 @@ public class XmlMessageEOFProtocol extends XmlMessageProtocol
      * @param available The amount of data available to read
      * @return true if the read should continue
      */
-    // @Override
+    @Override
     protected boolean isRepeat(int patternIndex, int len, int available)
     {
         return patternIndex < 0;

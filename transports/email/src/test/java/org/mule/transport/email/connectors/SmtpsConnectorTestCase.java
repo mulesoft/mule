@@ -23,7 +23,7 @@ public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
         super(ServerSetup.PROTOCOL_SMTPS, 50008);
     }
 
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         SmtpsConnector connector = new SmtpsConnector();

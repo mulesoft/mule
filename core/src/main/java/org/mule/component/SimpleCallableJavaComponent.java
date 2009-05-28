@@ -160,7 +160,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         // no-op
     }
 
-    // @Override
+    @Override
     protected Object invokeComponentInstance(MuleEvent event) throws Exception
     {
         Object result = ((Callable) objectFactory.getInstance()).onCall(new DefaultMuleEventContext(event));
@@ -190,7 +190,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         }
     }
 
-    // @Override
+    @Override
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         if (!(Callable.class.isAssignableFrom(objectFactory.getObjectClass())))

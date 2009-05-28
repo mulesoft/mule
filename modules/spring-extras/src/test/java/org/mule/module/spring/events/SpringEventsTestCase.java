@@ -38,7 +38,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
     private volatile AtomicInteger eventCounter1;
     private volatile AtomicInteger eventCounter2;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -46,7 +46,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         eventCounter2 = new AtomicInteger(0);
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         super.doTearDown();
@@ -378,7 +378,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
             this.setName("dummyTransformer");
         }
 
-        // @Override
+        @Override
         public Object clone() throws CloneNotSupportedException
         {
             TestEventAwareTransformer clone = (TestEventAwareTransformer) super.clone();

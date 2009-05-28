@@ -47,7 +47,7 @@ public class OptionalChildDefinitionParser extends ChildDefinitionParser
         super(setterMethod, clazz, constraint, allowClassAttribute);
     }
 
-    // @Override
+    @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         isChild = isChild(element, parserContext, builder);

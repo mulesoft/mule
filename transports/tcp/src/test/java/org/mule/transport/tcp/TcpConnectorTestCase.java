@@ -16,7 +16,7 @@ import org.mule.transport.AbstractConnectorTestCase;
 public class TcpConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         TcpConnector c = new TcpConnector();

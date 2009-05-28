@@ -26,7 +26,7 @@ public class ServiceTestCase extends AbstractMuleTestCase
     private Connector testConnector;
     private Service service;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();

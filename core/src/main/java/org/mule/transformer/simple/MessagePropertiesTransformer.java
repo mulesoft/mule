@@ -50,7 +50,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
         setReturnClass(Object.class);
     }
 
-    // @Override
+    @Override
     public Object clone() throws CloneNotSupportedException
     {
         MessagePropertiesTransformer clone = (MessagePropertiesTransformer)super.clone();

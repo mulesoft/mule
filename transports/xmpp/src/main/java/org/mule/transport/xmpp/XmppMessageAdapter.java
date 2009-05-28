@@ -105,7 +105,7 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
-    // @Override
+    @Override
     public String getUniqueId()
     {
         return message.getPacketID();

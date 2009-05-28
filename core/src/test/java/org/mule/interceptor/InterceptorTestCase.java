@@ -38,7 +38,6 @@ public class InterceptorTestCase extends AbstractMuleTestCase
                                                        + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER
                                                        + INTERCEPTOR_ONE + AFTER;
 
-    // @Override
     public void testSingleInterceptor() throws Exception
     {
         Service service = getTestService();
@@ -54,7 +53,6 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getPayloadAsString());
     }
 
-    // @Override
     public void testMultipleInterceptor() throws Exception
     {
         Service service = getTestService();
@@ -144,7 +142,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
             this.name = name;
         }
 
-        // @Override
+        @Override
         public void after(Invocation invocation)
         {
             try
@@ -159,7 +157,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
             }
         }
 
-        // @Override
+        @Override
         public void before(Invocation invocation)
         {
             try
@@ -177,7 +175,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
 
     class TestComponent extends AbstractComponent
     {
-        // @Override
+        @Override
         protected Object doInvoke(MuleEvent event) throws Exception
         {
             return event.getMessageAsString() + COMPONENT;

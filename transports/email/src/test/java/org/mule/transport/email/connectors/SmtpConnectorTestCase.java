@@ -60,7 +60,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
      * superclass makes no sense here.  Instead, we simply check that
      * a listener is rejected.
      */
-    // @Override
+    @Override
     public void testConnectorListenerSupport() throws Exception
     {
         Connector connector = getConnector();

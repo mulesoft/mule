@@ -21,7 +21,7 @@ public class QuartzConnectorTestCase extends AbstractConnectorTestCase
      * 
      * @see org.mule.tck.providers.AbstractConnectorTestCase#getConnector()
      */
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         QuartzConnector c = new QuartzConnector();

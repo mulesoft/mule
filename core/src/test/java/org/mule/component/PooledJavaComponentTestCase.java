@@ -34,13 +34,11 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         return pp;
     }
 
-    // @Override
     protected PrototypeObjectFactory getObjectFactory()
     {
         return new PrototypeObjectFactory(Orange.class);
     }
 
-    // @Override
     public void testComponentCreation() throws Exception
     {
         PrototypeObjectFactory objectFactory = getObjectFactory();
@@ -75,8 +73,7 @@ public class PooledJavaComponentTestCase extends AbstractComponentTestCase
         assertNull(component.lifecycleAdapterPool);
     }
 
-    // @Override
-    public void test() throws Exception
+    public void testLifecycle() throws Exception
     {
         PooledJavaComponent component = new PooledJavaComponent(getObjectFactory(), getDefaultPoolingProfile());
         component.setService(getTestService());

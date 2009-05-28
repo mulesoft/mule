@@ -35,7 +35,7 @@ public class ObjectToByteArray extends SerializableToByteArray
         setReturnClass(byte[].class);
     }
 
-    // @Override
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

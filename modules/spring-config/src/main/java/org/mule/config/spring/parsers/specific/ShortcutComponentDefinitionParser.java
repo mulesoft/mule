@@ -31,7 +31,7 @@ public class ShortcutComponentDefinitionParser extends ComponentDefinitionParser
         super(clazz);
     }
 
-    // @Override
+    @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         Element parent = (Element) element.getParentNode();

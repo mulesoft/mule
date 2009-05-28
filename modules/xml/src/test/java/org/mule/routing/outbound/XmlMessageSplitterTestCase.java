@@ -49,7 +49,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
     private XmlMessageSplitter asyncXmlSplitter;
     private XmlMessageSplitter syncXmlSplitter;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         // setup sync endpoints

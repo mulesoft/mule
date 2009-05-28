@@ -20,7 +20,7 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
     private String srcData;
     private String resultData;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         srcData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()), "UTF-8");
@@ -43,7 +43,7 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
         return null;
     }
 
-    // @Override
+    @Override
     public void testRoundtripTransform() throws Exception
     {
         // disable this test

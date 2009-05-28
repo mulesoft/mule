@@ -42,7 +42,7 @@ public class SignallingOutputStream extends OutputStream
         delegate.write(b, off, len);
     }
 
-    // @Override
+    @Override
     public void close() throws IOException
     {
         delegate.close();

@@ -58,14 +58,14 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         this.port = port;
     }
     
-    // @Override
+    @Override
     protected synchronized void doSetUp() throws Exception
     {
         super.doSetUp();
         startServers();
     }
     
-    // @Override
+    @Override
     protected synchronized void doTearDown() throws Exception 
     {
         stopServers();
@@ -114,7 +114,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         return servers;
     }
 
-    // @Override
+    @Override
     public Object getValidMessage() throws Exception
     {
         if (null == message)

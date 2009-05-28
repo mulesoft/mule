@@ -161,7 +161,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractXmlTransformerTe
         return true;
     }
 
-    // @Override
+    @Override
     public boolean compareRoundtripResults(Object expected, Object result)
     {
         if (expected == null && result == null)

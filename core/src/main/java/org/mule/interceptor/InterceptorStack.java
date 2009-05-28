@@ -127,7 +127,7 @@ public class InterceptorStack implements Interceptor, Initialisable, Disposable
         }
     }
 
-    // @Override
+    @Override
     public int hashCode()
     {
         final int prime = 31;
@@ -136,7 +136,7 @@ public class InterceptorStack implements Interceptor, Initialisable, Disposable
         return result;
     }
 
-    // @Override
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;

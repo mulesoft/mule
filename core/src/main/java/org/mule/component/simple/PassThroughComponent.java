@@ -21,7 +21,7 @@ import org.mule.component.AbstractComponent;
 public class PassThroughComponent extends AbstractComponent
 {
 
-    // @Override
+    @Override
     protected Object doInvoke(MuleEvent event) throws Exception
     {
         event.transformMessage();

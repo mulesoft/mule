@@ -59,7 +59,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     }
 
 
-    // @Override
+    @Override
     public void testManagerConfig() throws Exception
     {
         super.testManagerConfig();
@@ -67,7 +67,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(muleContext.getTransactionManager());
     }
 
-    // @Override
+    @Override
     public void testConnectorConfig() throws Exception
     {
         super.testConnectorConfig();
@@ -78,7 +78,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
     }
 
-    // @Override
+    @Override
     public void testGlobalEndpointConfig() throws MuleException
     {
         super.testGlobalEndpointConfig();
@@ -91,7 +91,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals("foo=bar", filter.getPattern());
     }
 
-    // @Override
+    @Override
     public void testEndpointConfig() throws MuleException
     {
         super.testEndpointConfig();
@@ -113,7 +113,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertTrue(DefaultExceptionStrategy.class.isAssignableFrom(service.getExceptionListener().getClass()));
     }
 
-    // @Override
+    @Override
     public void testTransformerConfig()
     {
         super.testTransformerConfig();
@@ -125,7 +125,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
     }
 
-    // @Override
+    @Override
     public void testModelConfig() throws Exception
     {
         super.testModelConfig();        

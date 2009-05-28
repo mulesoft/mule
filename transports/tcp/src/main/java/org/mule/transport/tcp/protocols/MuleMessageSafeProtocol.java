@@ -23,13 +23,13 @@ import java.io.OutputStream;
 public class MuleMessageSafeProtocol extends SafeProtocol
 {
 
-    // @Override
+    @Override
     public Object read(InputStream is) throws IOException
     {
         return MuleMessageWorker.doRead(super.read(is));
     }
 
-    // @Override
+    @Override
     public void write(OutputStream os, Object unused) throws IOException
     {
         super.write(os, MuleMessageWorker.doWrite());

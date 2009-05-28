@@ -61,13 +61,13 @@ public class ExceptionThrowingVMMessageDispatcherFactory implements MessageDispa
             super(endpoint);
         }
 
-        // @Override
+        @Override
         protected MuleMessage doSend(MuleEvent event) throws Exception
         {
             throw new RuntimeException("");
         }
 
-        // @Override
+        @Override
         protected void doDispatch(MuleEvent event) throws Exception
         {
             throw new RuntimeException("");

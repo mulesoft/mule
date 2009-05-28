@@ -52,7 +52,7 @@ public class HttpsConnector extends HttpConnector
         setValidateConnections(false);
     }
 
-    // @Override
+    @Override
     protected ServerSocket getServerSocket(URI uri) throws IOException
     {
         SSLServerSocket serverSocket = (SSLServerSocket) super.getServerSocket(uri);

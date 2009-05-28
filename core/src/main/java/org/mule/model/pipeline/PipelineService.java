@@ -82,7 +82,7 @@ public class PipelineService extends DirectService
         sendEvent(event);
     }
 
-    // @Override
+    @Override
     public void setComponent(Component component)
     {
         if (!(component instanceof SimpleCallableJavaComponent))

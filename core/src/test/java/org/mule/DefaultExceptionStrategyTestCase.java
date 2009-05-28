@@ -65,14 +65,14 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
     {
         private volatile int count = 0;
 
-        // @Override
+        @Override
         protected void defaultHandler(Throwable t)
         {
             count++;
             super.defaultHandler(t);
         }
 
-        // @Override
+        @Override
         protected void logException(Throwable t)
         {
             // do not log anything here, we're running as part of a unit test

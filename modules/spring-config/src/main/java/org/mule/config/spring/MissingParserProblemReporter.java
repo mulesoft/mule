@@ -25,7 +25,7 @@ public class MissingParserProblemReporter extends FailFastProblemReporter
 
     public static final String NO_PARSER_PREFIX = "Cannot locate BeanDefinitionParser";
 
-    // @Override
+    @Override
     public void fatal(Problem problem)
     {
         if (isMissingParser(problem))

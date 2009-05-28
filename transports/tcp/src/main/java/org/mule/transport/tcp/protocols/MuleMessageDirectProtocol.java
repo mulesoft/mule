@@ -23,19 +23,13 @@ import java.io.OutputStream;
 public class MuleMessageDirectProtocol extends DirectProtocol
 {
 
-    // @Override
+    @Override
     public Object read(InputStream is) throws IOException
     {
         return MuleMessageWorker.doRead(super.read(is));
     }
 
-    // @Override
-    public void write(OutputStream os, byte[] data) throws IOException
-    {
-        super.write(os, MuleMessageWorker.doWrite());
-    }
-
-    // @Override
+    @Override
     public void write(OutputStream os, Object data) throws IOException
     {
         super.write(os, MuleMessageWorker.doWrite());

@@ -69,7 +69,7 @@ public abstract class AbstractMessageDispatcherFactory implements MessageDispatc
         return (this.isCreateDispatcherPerRequest() ? false : dispatcher.validate());
     }
 
-    // @Override
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer(60);

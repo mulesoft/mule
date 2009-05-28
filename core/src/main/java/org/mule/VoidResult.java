@@ -41,19 +41,19 @@ public final class VoidResult implements Serializable
         return VoidResultHolder.instance;
     }
 
-    // @Override
+    @Override
     public boolean equals(Object obj)
     {
         return obj instanceof VoidResult;
     }
 
-    // @Override
+    @Override
     public int hashCode ()
     {
         return 0;
     }
 
-    // @Override
+    @Override
     public String toString()
     {
         return "{VoidResult}";

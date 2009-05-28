@@ -16,7 +16,7 @@ import org.mule.transport.AbstractConnectorTestCase;
 public class ServletConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         ServletConnector c = new ServletConnector();

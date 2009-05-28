@@ -40,7 +40,7 @@ public class ObjectToMimeMessage extends StringToEmailMessage
 
     private Log logger = LogFactory.getLog(getClass());
     
-    // @Override
+    @Override
     protected void setContent(Object payload, Message msg, String contentType, MuleMessage message)
         throws Exception
     {

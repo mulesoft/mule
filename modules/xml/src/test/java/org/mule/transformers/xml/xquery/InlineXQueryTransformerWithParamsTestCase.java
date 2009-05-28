@@ -83,7 +83,7 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
         return resultData;
     }
 
-    // @Override
+    @Override
     public boolean compareResults(Object expected, Object result)
     {
         if (expected instanceof Document && result instanceof Document)

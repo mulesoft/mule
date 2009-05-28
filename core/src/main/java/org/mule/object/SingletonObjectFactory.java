@@ -58,7 +58,7 @@ public class SingletonObjectFactory extends AbstractObjectFactory
         this.instance = new SoftReference<Object>(instance);
     }
 
-    // @Override
+    @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
@@ -75,7 +75,7 @@ public class SingletonObjectFactory extends AbstractObjectFactory
         }
     }
 
-    // @Override
+    @Override
     public void dispose()
     {
         instance.clear();
@@ -86,7 +86,7 @@ public class SingletonObjectFactory extends AbstractObjectFactory
     /**
      * Always returns the same instance of the object.
      */
-    // @Override
+    @Override
     public Object getInstance() throws Exception
     {
         if (instance != null && instance.get() != null)
@@ -100,7 +100,7 @@ public class SingletonObjectFactory extends AbstractObjectFactory
         }
     }
 
-    // @Override
+    @Override
     public Class getObjectClass()
     {
         if (instance != null && instance.get() != null)

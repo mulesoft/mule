@@ -63,7 +63,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         session = getConnection(false, false).createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         RequestContext.setEvent(null);
@@ -292,7 +292,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
             transformerSession = session;
         }
 
-        // @Override
+        @Override
         protected Session getSession()
         {
             return transformerSession;

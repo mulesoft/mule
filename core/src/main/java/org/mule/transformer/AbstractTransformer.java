@@ -332,7 +332,7 @@ public abstract class AbstractTransformer implements Transformer
         this.ignoreBadInput = ignoreBadInput;
     }
 
-    // @Override
+    @Override
     public String toString()
     {
         StringBuffer sb = new StringBuffer(80);

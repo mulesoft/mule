@@ -130,7 +130,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
 
     protected abstract void returnComponentLifecycleAdaptor(LifecycleAdapter lifecycleAdapter) throws Exception;
 
-    // @Override
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         if (objectFactory == null)
@@ -144,7 +144,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         objectFactory.initialise();
     }
 
-    // @Override
+    @Override
     protected void doStart() throws MuleException
     {
         // We need to resolve entry point resolvers here rather than in initialise()
@@ -157,7 +157,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         }
     }
 
-    // @Override
+    @Override
     protected void doDispose()
     {
         // TODO This can't be implemented currently because AbstractService allows

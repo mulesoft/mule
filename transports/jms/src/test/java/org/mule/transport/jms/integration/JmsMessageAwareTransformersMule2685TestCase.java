@@ -51,7 +51,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
         session = getConnection(false, false).createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         RequestContext.setEvent(null);
@@ -105,7 +105,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
             transformerSession = session;
         }
 
-        // @Override
+        @Override
         protected Session getSession()
         {
             return transformerSession;

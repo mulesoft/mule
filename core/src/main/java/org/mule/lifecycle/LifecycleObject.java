@@ -71,7 +71,7 @@ public class LifecycleObject
         }
     }
 
-    // @Override
+    @Override
     public String toString()
     {
         return super.toString() + " (" + ClassUtils.getSimpleName(type) + ")";

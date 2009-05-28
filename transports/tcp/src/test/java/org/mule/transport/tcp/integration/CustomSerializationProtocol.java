@@ -21,7 +21,7 @@ import org.apache.commons.lang.SerializationUtils;
 public class CustomSerializationProtocol extends DirectProtocol
 {
 
-    // @Override
+    @Override
     public void write(OutputStream os, Object data) throws IOException
     {
         if (data instanceof NonSerializableMessageObject)
@@ -39,7 +39,7 @@ public class CustomSerializationProtocol extends DirectProtocol
         }
     }
 
-    // @Override
+    @Override
     public Object read(InputStream is) throws IOException
     {
         byte[] tmp = (byte[]) super.read(is);

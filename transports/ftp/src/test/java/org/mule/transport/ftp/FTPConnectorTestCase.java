@@ -35,7 +35,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
      * 
      * @see org.mule.tck.providers.AbstractConnectorTestCase#createConnector()
      */
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         return internalGetConnector(false);

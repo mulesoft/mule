@@ -36,13 +36,13 @@ public class OGNLFilterTestCase extends FunctionalTestCase
 
     private OGNLFilter filter;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         filter = new OGNLFilter();
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         filter = null;

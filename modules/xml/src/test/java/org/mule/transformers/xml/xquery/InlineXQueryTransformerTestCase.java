@@ -65,7 +65,7 @@ public class InlineXQueryTransformerTestCase extends AbstractTransformerTestCase
         return resultData;
     }
 
-    // @Override
+    @Override
     public boolean compareResults(Object expected, Object result)
     {
         if (expected instanceof Document && result instanceof Document)

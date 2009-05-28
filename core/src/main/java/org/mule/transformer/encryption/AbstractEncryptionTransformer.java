@@ -39,7 +39,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
         setReturnClass(byte[].class);
     }
 
-    // @Override
+    @Override
     public Object clone() throws CloneNotSupportedException
     {
         AbstractEncryptionTransformer clone = (AbstractEncryptionTransformer) super.clone();

@@ -2297,7 +2297,7 @@ public abstract class AbstractConnector
         updateCachedNotificationHandler();
     }
 
-    // @Override
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer(120);

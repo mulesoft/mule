@@ -35,7 +35,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
         return "jdbc-connector.xml";
     }
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -57,7 +57,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         deleteTable();
@@ -91,7 +91,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
         logger.debug(updated + " rows updated");
     }
     
-    // @Override
+    @Override
     protected void suitePreSetUp() throws Exception
     {
         MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");

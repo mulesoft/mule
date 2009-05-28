@@ -97,7 +97,7 @@ public class SpringBeanLookup extends AbstractObjectFactory implements Applicati
         this.bean = bean;
     }
     
-    // @Override
+    @Override
     public boolean isSingleton()
     {
         return applicationContext.isSingleton(bean);

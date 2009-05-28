@@ -22,7 +22,7 @@ public class ResourceLoaderServletTestCase extends AbstractMuleTestCase
 {
      private Server httpServer;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -39,7 +39,7 @@ public class ResourceLoaderServletTestCase extends AbstractMuleTestCase
         httpServer.start();
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         super.doTearDown();

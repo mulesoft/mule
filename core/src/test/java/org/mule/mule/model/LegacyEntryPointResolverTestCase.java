@@ -129,7 +129,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
 //        return mappings;
 //    }
 
-//    // @Override
+//    @Override
 //    public UMODescriptor getDescriptorToResolve(String className) throws Exception
 //    {
 //        UMODescriptor descriptor = super.getDescriptorToResolve(className);

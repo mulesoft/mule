@@ -264,7 +264,7 @@ public class AjaxConnector extends AjaxServletConnector
 
         ContinuationCometdServlet servlet = new ContinuationCometdServlet();
 
-        Context context = new Context(this.getHttpServer(), "/", Context.NO_SECURITY | Context.NO_SESSIONS);
+        Context context = new Context(this.getHttpServer(), "/", Context.NO_SESSIONS);
         context.setConnectorNames(new String[]{connector.getName()});
 
         ServletHolder holder = new ServletHolder();

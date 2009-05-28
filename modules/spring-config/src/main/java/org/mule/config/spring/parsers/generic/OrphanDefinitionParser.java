@@ -42,7 +42,7 @@ public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
         this.singleton = singleton;
     }
 
-    // @Override
+    @Override
     protected void preProcess(Element element)
     {
         super.preProcess(element);
@@ -54,7 +54,7 @@ public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
         }
     }
 
-    // @Override
+    @Override
     protected Class getBeanClass(Element element)
     {
         return beanClass;

@@ -17,7 +17,7 @@ import org.mule.util.ClassUtils;
 public class MuleServerTestCase extends AbstractMuleTestCase
 {
 
-    // @Override
+    @Override
     protected MuleContext createMuleContext() throws Exception
     {
         return null;

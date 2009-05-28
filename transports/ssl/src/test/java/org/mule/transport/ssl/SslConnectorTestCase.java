@@ -18,7 +18,7 @@ import org.mule.transport.AbstractConnectorTestCase;
 
 public class SslConnectorTestCase extends AbstractConnectorTestCase
 {
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         SslConnector cnn = new SslConnector();

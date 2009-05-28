@@ -48,7 +48,7 @@ public class NamedPayload
         this.name = name;
     }
 
-    // @Override
+    @Override
     public String toString()
     {
         try

@@ -31,7 +31,7 @@ public class ImapConnectorTestCase extends AbstractReceivingMailConnectorTestCas
         super(ServerSetup.PROTOCOL_IMAP, port);
     }
 
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         ImapConnector connector = new ImapConnector();

@@ -35,7 +35,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
         return "axis-servlet-security-config.xml";
     }
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         httpServer = new Server();
@@ -51,7 +51,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
         httpServer.start();
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         if (httpServer != null)

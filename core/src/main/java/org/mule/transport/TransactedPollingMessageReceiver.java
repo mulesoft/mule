@@ -82,7 +82,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         useMultipleReceivers = useMultiple;
     }
 
-    // @Override
+    @Override
     public void doStart() throws MuleException
     {
         // Connector property overrides any implied value

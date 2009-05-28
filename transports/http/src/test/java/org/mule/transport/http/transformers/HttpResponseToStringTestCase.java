@@ -37,7 +37,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleTestCase
 
     private HttpResponse _resp = null;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();

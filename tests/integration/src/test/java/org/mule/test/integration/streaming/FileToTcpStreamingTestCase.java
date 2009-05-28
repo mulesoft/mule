@@ -17,13 +17,13 @@ import java.io.File;
 
 public class FileToTcpStreamingTestCase extends FunctionalTestCase
 {
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         FileUtils.deleteDirectory(FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory() + "/test-data"));
     }
 
-    // @Override
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/streaming/file-to-tcp-streaming.xml";

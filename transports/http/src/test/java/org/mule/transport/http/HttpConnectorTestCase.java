@@ -22,7 +22,7 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 public class HttpConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         HttpConnector c = new HttpConnector();

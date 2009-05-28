@@ -116,7 +116,7 @@ public class FileConnector extends AbstractConnector
     }
 
 
-    // @Override
+    @Override
     public void setMaxDispatchersActive(int value)
     {
         if (isOutputAppend() && value != 1)
@@ -129,7 +129,7 @@ public class FileConnector extends AbstractConnector
         }
     }
 
-    // @Override
+    @Override
     protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         if (endpoint.getFilter() != null && endpoint.getFilter() instanceof FilenameWildcardFilter)

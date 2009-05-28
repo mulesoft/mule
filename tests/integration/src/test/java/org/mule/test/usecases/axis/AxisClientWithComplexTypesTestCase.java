@@ -32,7 +32,7 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
         return "org/mule/test/usecases/routing/axis/axis-client-test.xml";
     }
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         trade = new Trade();

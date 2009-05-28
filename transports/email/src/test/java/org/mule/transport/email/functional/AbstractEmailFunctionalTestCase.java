@@ -79,14 +79,14 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         return configFile;
     }
 
-    // @Override
+    @Override
     protected void suitePreSetUp() throws Exception
     {
         startServer();
     }
 
 
-    // @Override
+    @Override
     protected void suitePostTearDown() throws Exception
     {
         stopServer();

@@ -24,7 +24,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     
     private PasswordBasedEncryptionStrategy strat;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         strat = new PasswordBasedEncryptionStrategy();
@@ -81,7 +81,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         return transformer;
     }
 
-    // @Override
+    @Override
     public boolean compareResults(Object src, Object result)
     {
         if (src == null && result == null)

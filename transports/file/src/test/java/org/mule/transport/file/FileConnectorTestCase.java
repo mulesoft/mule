@@ -31,7 +31,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
     private File validMessage;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -48,7 +48,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         FileUtils.writeStringToFile(validMessage, "validMessage");
     }
 
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         // TestConnector dispatches events via the test: protocol to test://test

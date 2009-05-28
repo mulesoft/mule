@@ -78,7 +78,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return otherwise;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName)
     {
         super.addAlias(alias, propertyName);
@@ -89,7 +89,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration addBeanFlag(String flag)
     {
         super.addBeanFlag(flag);
@@ -100,7 +100,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration addCollection(String propertyName)
     {
         super.addCollection(propertyName);
@@ -111,7 +111,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration addIgnored(String propertyName)
     {
         super.addIgnored(propertyName);
@@ -122,7 +122,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings)
     {
         super.addMapping(propertyName, mappings);
@@ -133,7 +133,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings)
     {
         super.addMapping(propertyName, mappings);
@@ -144,7 +144,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings)
     {
         super.addMapping(propertyName, mappings);
@@ -155,7 +155,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration addReference(String propertyName)
     {
         super.addReference(propertyName);
@@ -166,7 +166,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor)
     {
         super.registerPostProcessor(postProcessor);
@@ -177,7 +177,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor)
     {
         super.registerPreProcessor(preProcessor);
@@ -188,7 +188,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration removeIgnored(String propertyName)
     {
         super.removeIgnored(propertyName);
@@ -199,7 +199,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    // @Override
+    @Override
     public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll)
     {
         super.setIgnoredDefault(ignoreAll);

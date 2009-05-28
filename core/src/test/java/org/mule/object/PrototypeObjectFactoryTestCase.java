@@ -16,13 +16,13 @@ import org.mule.object.PrototypeObjectFactory;
 public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCase
 {
 
-    // @Override
+    @Override
     public ObjectFactory getObjectFactory()
     {
         return new PrototypeObjectFactory();
     }
 
-    // @Override
+    @Override
     public void testGetObjectClass() throws Exception
     {
         PrototypeObjectFactory factory = (PrototypeObjectFactory) getObjectFactory();
@@ -31,7 +31,7 @@ public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCas
         assertEquals(Object.class, factory.getObjectClass());
     }
 
-    // @Override
+    @Override
     public void testGet() throws Exception
     {
         PrototypeObjectFactory factory = (PrototypeObjectFactory) getObjectFactory();

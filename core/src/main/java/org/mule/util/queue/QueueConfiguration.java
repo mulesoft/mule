@@ -69,7 +69,7 @@ public class QueueConfiguration
         this.persistent = persistent;
     }
 
-    // @Override
+    @Override
     public int hashCode()
     {
         final int prime = 31;
@@ -79,7 +79,7 @@ public class QueueConfiguration
         return result;
     }
 
-    // @Override
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj)

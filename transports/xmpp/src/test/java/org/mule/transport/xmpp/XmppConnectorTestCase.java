@@ -18,7 +18,7 @@ import org.jivesoftware.smack.packet.Message;
 
 public class XmppConnectorTestCase extends AbstractConnectorTestCase
 {
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         XmppConnector cnn = new XmppConnector();

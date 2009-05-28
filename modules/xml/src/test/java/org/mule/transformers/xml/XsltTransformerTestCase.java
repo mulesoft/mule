@@ -37,7 +37,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     private String srcData;
     private String resultData;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         srcData = IOUtils.getResourceAsString("cdcatalog.xml", getClass());
@@ -60,7 +60,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         return null;
     }
 
-    // @Override
+    @Override
     public void testRoundtripTransform() throws Exception
     {
         // disable this test

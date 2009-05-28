@@ -35,7 +35,7 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
         super(endpoint);
     }
 
-    // @Override
+    @Override
     protected void doConnect() throws Exception
     {
         try

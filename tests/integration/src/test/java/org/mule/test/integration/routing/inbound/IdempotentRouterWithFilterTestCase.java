@@ -70,7 +70,7 @@ public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
         assertNull(response);
     }
 
-    // @Override
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/inbound/idempotent-router-with-filter.xml";

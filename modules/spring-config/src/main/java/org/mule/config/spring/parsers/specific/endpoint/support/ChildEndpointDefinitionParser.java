@@ -42,7 +42,7 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
         EndpointUtils.addPostProcess(this);
     }
 
-    // @Override
+    @Override
     public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
     {
         BeanDefinitionBuilder builder = super.createBeanDefinitionBuilder(element, beanClass);
@@ -55,7 +55,7 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
         return builder;
     }
 
-    // @Override
+    @Override
     public String getBeanName(Element element)
     {
         if (null != element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF))

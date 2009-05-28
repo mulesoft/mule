@@ -23,7 +23,7 @@ public class XABridgeJmsJdbcTestCase extends AbstractDerbyTestCase
         return "org/mule/test/integration/transaction/xabridge-jms-jdbc-mule.xml";
     }
 
-    // @Override
+    @Override
     protected void emptyTable() throws Exception
     {
         try

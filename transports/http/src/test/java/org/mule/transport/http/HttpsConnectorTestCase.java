@@ -25,7 +25,7 @@ import java.io.IOException;
 public class HttpsConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         return createConnector(muleContext, false);

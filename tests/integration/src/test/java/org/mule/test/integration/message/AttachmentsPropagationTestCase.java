@@ -27,7 +27,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
         fail("Convert this test to an XML-based configuration");
     }    
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();

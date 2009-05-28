@@ -13,7 +13,7 @@ package org.mule.module.spring.events;
 public class AsyncSpringEventsTestCase extends SpringEventsTestCase
 {
 
-    // @Override
+    @Override
     protected String getConfigResources()
     {
         return "async-mule-events-app-context.xml";
@@ -27,7 +27,7 @@ public class AsyncSpringEventsTestCase extends SpringEventsTestCase
      * enough this seems to work fine for the synchronous case, which makes me think
      * there is still something deeper going on.
      */
-    // @Override
+    @Override
     public void testReceivingAllEvents() throws Exception
     {
         // TODO fix synchronisation issue

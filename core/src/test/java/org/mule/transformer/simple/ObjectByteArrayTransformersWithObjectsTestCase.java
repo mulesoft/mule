@@ -15,13 +15,13 @@ import org.mule.api.transformer.Transformer;
 public class ObjectByteArrayTransformersWithObjectsTestCase extends SerialisedObjectTransformersTestCase
 {
 
-    // @Override
+    @Override
     public Transformer getTransformer() throws Exception
     {
         return new ObjectToByteArray();
     }
 
-    // @Override
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         return new ByteArrayToObject();

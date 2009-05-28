@@ -37,7 +37,7 @@ public class CloseStreanOnMuleExceptionTestCase extends FunctionalTestCase
     private TestByteArrayInputStream inputStream;
     MuleClient client;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -134,7 +134,7 @@ public class CloseStreanOnMuleExceptionTestCase extends FunctionalTestCase
 //    }
 
 
-    // @Override
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/streaming/close-stream-on-mule-exception-test.xml";
@@ -159,7 +159,7 @@ public class CloseStreanOnMuleExceptionTestCase extends FunctionalTestCase
             super(buf, offset, length);
         }
 
-        // @Override
+        @Override
         public void close() throws IOException
         {
             super.close();
@@ -181,7 +181,7 @@ public class CloseStreanOnMuleExceptionTestCase extends FunctionalTestCase
             super(reader);
         }
 
-        // @Override
+        @Override
         public void close() throws XMLStreamException
         {
             super.close();

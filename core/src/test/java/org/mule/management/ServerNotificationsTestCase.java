@@ -42,7 +42,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         setStartContext(true);
     }
     
-    // @Override
+    @Override
     protected void doTearDown() throws Exception
     {
         managerStopped.set(true);

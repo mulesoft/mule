@@ -33,7 +33,7 @@ public class ObjectToInputStream extends SerializableToByteArray
         setReturnClass(InputStream.class);
     }
 
-    // @Override
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

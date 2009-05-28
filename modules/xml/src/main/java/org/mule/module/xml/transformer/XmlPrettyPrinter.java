@@ -38,7 +38,7 @@ public class XmlPrettyPrinter extends AbstractTransformer
         return outputFormat;
     }
 
-    // @Override
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

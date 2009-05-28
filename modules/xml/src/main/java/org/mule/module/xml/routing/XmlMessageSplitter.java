@@ -155,7 +155,7 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
      *
      * @param message the message being routed
      */
-    // @Override
+    @Override
     protected List splitMessage(MuleMessage message)
     {
         if (logger.isDebugEnabled())

@@ -22,7 +22,7 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
     protected static final String TEST_DATA = "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";
     protected GZipCompression strat;
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         strat = new GZipCompression();

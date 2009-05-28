@@ -36,7 +36,7 @@ public final class NoActionTransformer extends AbstractTransformer
         return src;
     }
 
-    // @Override
+    @Override
     public boolean isAcceptNull()
     {
         return true;

@@ -39,7 +39,7 @@ public class IdempotentSecureHashReceiver extends IdempotentReceiver
     private final SerializableToByteArray objectToByteArray = new SerializableToByteArray();
     private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
 
-    // @Override
+    @Override
     protected String getIdForEvent(MuleEvent event) throws MessagingException
     {
         try

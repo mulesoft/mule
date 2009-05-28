@@ -35,7 +35,7 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
         this.setReturnClass(byte[].class);
     }
 
-    // @Override
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         byte[] buffer;

@@ -27,7 +27,7 @@ public class ComponentDefinitionParser extends ChildDefinitionParser
         addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS);
     }
 
-    // @Override
+    @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         Element parent = (Element) element.getParentNode();

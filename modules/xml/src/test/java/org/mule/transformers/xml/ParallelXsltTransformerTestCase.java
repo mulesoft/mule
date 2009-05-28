@@ -29,7 +29,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     private String resultData;
     private Collection actualResults = new ConcurrentLinkedQueue();
 
-    // @Override
+    @Override
     protected void doSetUp() throws Exception
     {
         srcData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()), "UTF-8");

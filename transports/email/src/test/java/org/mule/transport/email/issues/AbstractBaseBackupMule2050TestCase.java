@@ -28,7 +28,7 @@ public abstract class AbstractBaseBackupMule2050TestCase extends ImapConnectorTe
         this.backupEnabled = backupEnabled;
     }
 
-    // @Override
+    @Override
     public Connector createConnector() throws Exception
     {
         Connector connector = super.createConnector();

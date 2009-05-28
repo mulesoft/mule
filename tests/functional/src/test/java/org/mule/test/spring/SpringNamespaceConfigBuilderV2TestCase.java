@@ -58,7 +58,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
                 "org/mule/test/spring/config2/test-xml-mule2-config-split-properties.xml";
     }
 
-    // @Override
+    @Override
     public ConfigurationBuilder getBuilder() throws ConfigurationException
     {
         return new SpringXmlConfigurationBuilder(getConfigResources());
@@ -130,7 +130,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertNotNull(responseTransformers.get(0));
     }
 
-    // @Override
+    @Override
     public void testTransformerConfig()
     {
         // first of all test generic transformer configuration
