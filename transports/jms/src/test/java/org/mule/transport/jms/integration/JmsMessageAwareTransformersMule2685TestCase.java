@@ -17,7 +17,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transport.jms.transformers.AbstractJmsTransformer;
-import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 
 import javax.jms.Message;
 import javax.jms.Session;
@@ -88,28 +87,6 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
         assertEquals("vm://recipient1, vm://recipient1, vm://recipient3",
             result2.getStringProperty("recipients"));
 
-    }
-
-    /*
-     * This class overrides getSession() to return the specified test MuleSession;
-     * otherwise we would need a full-fledged JMS connector with dispatchers etc.
-     * TODO check if we really need this stateful transformer now
-     */
-    public static class SessionEnabledObjectToJMSMessage extends ObjectToJMSMessage
-    {
-        private final Session transformerSession;
-
-        public SessionEnabledObjectToJMSMessage(Session session)
-        {
-            super();
-            transformerSession = session;
-        }
-
-        @Override
-        protected Session getSession()
-        {
-            return transformerSession;
-        }
     }
 
     /** Test <i>AbstractMessageAwareTransformer</i> which sets Message properties */
