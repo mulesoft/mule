@@ -17,7 +17,7 @@ import org.mule.transport.ajax.container.AjaxServletConnector;
 import org.mule.transport.ajax.embedded.AjaxConnector;
 
 /**
- * Registers a Bean Definition Parser for handling <code><ajax:connector></code> elements and
+ * Registers a Bean Definition Parser for handling <code>&lt;ajax:connector&gt;</code> elements and
  * <code>&lt;ajax:servlet-connector&gt;</code> elements.
  */
 public class AjaxNamespaceHandler extends AbstractMuleNamespaceHandler
