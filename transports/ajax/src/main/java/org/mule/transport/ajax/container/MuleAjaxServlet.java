@@ -9,22 +9,24 @@
  */
 package org.mule.transport.ajax.container;
 
-import org.mule.transport.service.TransportFactory;
-import org.mule.transport.ajax.i18n.AjaxMessages;
 import org.mule.RegistryContext;
 import org.mule.api.MuleException;
+import org.mule.transport.ajax.i18n.AjaxMessages;
+import org.mule.transport.service.TransportFactory;
 
 import javax.servlet.ServletException;
 
 import org.mortbay.cometd.continuation.ContinuationCometdServlet;
 
 /**
- * Wraps the {@link org.mortbay.cometd.continuation.ContinuationCometdServlet} servlet and binds the Bayeux object to
+ * Wraps the {@link ContinuationCometdServlet} servlet and binds the Bayeux object to
  * the Mule {@link AjaxServletConnector}.
  */
 public class MuleAjaxServlet extends ContinuationCometdServlet
 {
-     /** The name of the ajax connector to use with this Servlet */
+    /** 
+     * The name of the ajax connector to use with this Servlet 
+     */
     public static final String COMETD_CONNECTOR_NAME_PROPERTY = "org.mule.ajax.connector.name";
 
     protected AjaxServletConnector connector = null;

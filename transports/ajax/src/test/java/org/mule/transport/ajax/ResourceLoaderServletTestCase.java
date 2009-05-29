@@ -9,18 +9,18 @@
  */
 package org.mule.transport.ajax;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.NullPayload;
-import org.mule.module.client.MuleClient;
-import org.mule.api.MuleMessage;
 
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.servlet.ServletHandler;
 
 public class ResourceLoaderServletTestCase extends AbstractMuleTestCase
 {
-     private Server httpServer;
+    private Server httpServer;
 
     @Override
     protected void doSetUp() throws Exception

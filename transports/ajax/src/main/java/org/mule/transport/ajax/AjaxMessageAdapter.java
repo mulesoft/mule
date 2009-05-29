@@ -23,15 +23,16 @@ import org.mule.transport.AbstractMessageAdapter;
 import java.util.Map;
 
 /**
- * A message adapter that will accept JSON endcode {@link org.mule.message.DefaultMuleMessageDTO} 
- * objects, or a map of objects or just raw payload object.
+ * A message adapter that will accept JSON endcode {@link DefaultMuleMessageDTO} objects, 
+ * or a map of objects or just raw payload object.
  * <p/>
  * If the payload is a Map, this adapter will recognise the following keys:
  * <ul>
- * <li>payload - the object to use a the payload, this can be a JSON encoded string. If JSON is used a {@link java.util.Map} will be created. {@link AjaxMessageAdapter#PAYLOAD_PARAM}</li>
+ * <li>payload - the object to use a the payload, this can be a JSON encoded string. 
+ * If JSON is used a {@link java.util.Map} will be created. {@link AjaxMessageAdapter#PAYLOAD_PARAM}</li>
  * <li>replyTo - the return ajax channel for this message. {@link AjaxMessageAdapter#REPLYTO_PARAM}</li>
  * </ul>
- * Any additional properties will be set on the message in the {@link org.mule.api.transport.PropertyScope} INVOCATION scope.
+ * Any additional properties will be set on the message in the {@link PropertyScope#INVOCATION} scope.
  */
 public class AjaxMessageAdapter extends AbstractMessageAdapter
 {

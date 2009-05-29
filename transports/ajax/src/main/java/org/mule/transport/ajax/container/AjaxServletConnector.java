@@ -21,25 +21,28 @@ import dojox.cometd.DataFilter;
 import org.mortbay.cometd.AbstractBayeux;
 
 /**
- * A servlet connector that binds to the container and makes a configured Bayeux available to dispatchers and receivers.
+ * A servlet connector that binds to the container and makes a configured 
+ * Bayeux available to dispatchers and receivers.
  */
 public class AjaxServletConnector extends ServletConnector
 {
     public static final String PROTOCOL = "ajax-servlet";
 
     /**
-     * he client side poll timeout in milliseconds (default 0). How long a client
+     * The client side poll timeout in milliseconds (default 0). How long a client
      * will wait between reconnects
      */
     private int interval = INT_VALUE_NOT_SET;
 
     /**
-     * The max client side poll timeout in milliseconds (default 30000). A client will be removed if a connection is not received in this time.
+     * The max client side poll timeout in milliseconds (default 30000). A client 
+     * will be removed if a connection is not received in this time.
      */
     private int maxInterval = INT_VALUE_NOT_SET;
 
     /**
-     * the client side poll timeout if multiple connections are detected from the same browser (default 1500).
+     * The client side poll timeout if multiple connections are detected from the 
+     * same browser (default 1500).
      */
     private int multiFrameInterval = INT_VALUE_NOT_SET;
 
@@ -49,12 +52,14 @@ public class AjaxServletConnector extends ServletConnector
     private int logLevel = INT_VALUE_NOT_SET;
 
     /**
-     * The server side poll timeout in milliseconds (default 250000). This is how long the server will hold a reconnect request before responding.
+     * The server side poll timeout in milliseconds (default 250000). This is how long 
+     * the server will hold a reconnect request before responding.
      */
     private int timeout = INT_VALUE_NOT_SET;
 
     /**
-     * If "true" (default) then the server will accept JSON wrapped in a comment and will generate JSON wrapped in a comment. This is a defence against Ajax Hijacking.
+     * If "true" (default) then the server will accept JSON wrapped in a comment and 
+     * will generate JSON wrapped in a comment. This is a defence against Ajax Hijacking.
      */
     private boolean jsonCommented = true;
 
@@ -65,12 +70,14 @@ public class AjaxServletConnector extends ServletConnector
     private String filters;
 
     /**
-     * If true, the current request is made available via the {@link AbstractBayeux#getCurrentRequest()} method
+     * If true, the current request is made available via the 
+     * {@link AbstractBayeux#getCurrentRequest()} method
      */
     private boolean requestAvailable = true;
 
     /**
-     * true if published messages are delivered directly to subscribers (default). If false, a message copy is created with only supported fields (default true).
+     * true if published messages are delivered directly to subscribers (default). 
+     * If false, a message copy is created with only supported fields (default true).
      */
     private boolean directDeliver = true;
 

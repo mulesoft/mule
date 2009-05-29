@@ -11,24 +11,26 @@ package org.mule.transport.ajax;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
-import org.mule.transport.AbstractMessageReceiver;
-import org.mule.transport.AbstractConnector;
-import org.mule.api.transport.MessageAdapter;
-import org.mule.api.transport.Connector;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
-import org.mule.api.lifecycle.CreateException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
+import org.mule.api.transport.Connector;
+import org.mule.api.transport.MessageAdapter;
+import org.mule.transport.AbstractConnector;
+import org.mule.transport.AbstractMessageReceiver;
 
-import org.mortbay.cometd.AbstractBayeux;
-import org.mortbay.cometd.BayeuxService;
 import dojox.cometd.Bayeux;
 import dojox.cometd.Client;
 
+import org.mortbay.cometd.AbstractBayeux;
+import org.mortbay.cometd.BayeuxService;
+
 /**
- * Registers a receiver service with Bayeux.  The {@link AjaxMessageReceiver.ReceiverService#route(dojox.cometd.Client, Object)}
+ * Registers a receiver service with Bayeux.  
+ * The {@link AjaxMessageReceiver.ReceiverService#route(dojox.cometd.Client, Object)}
  * is invoked when a message is received on the subscription channel
  */
 public class AjaxMessageReceiver extends AbstractMessageReceiver

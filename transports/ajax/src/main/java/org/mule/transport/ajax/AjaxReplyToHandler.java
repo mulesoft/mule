@@ -9,22 +9,23 @@
  */
 package org.mule.transport.ajax;
 
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.Transformer;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.ajax.container.AjaxServletConnector;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleException;
-import org.mule.api.transformer.Transformer;
+
+import dojox.cometd.Channel;
+import dojox.cometd.Client;
 
 import java.util.List;
 
 import org.mortbay.cometd.AbstractBayeux;
-import dojox.cometd.Channel;
-import dojox.cometd.Client;
 
 /**
- * Handles the sending of sending result messages back to the client when the a replyTo channel is specified in the
- * client request.
+ * Handles the sending of sending result messages back to the client when the a replyTo 
+ * channel is specified in the client request.
  */
 public class AjaxReplyToHandler extends DefaultReplyToHandler
 {

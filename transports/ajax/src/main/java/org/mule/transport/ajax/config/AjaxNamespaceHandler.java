@@ -11,14 +11,14 @@ package org.mule.transport.ajax.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.transport.ajax.container.AjaxServletConnector;
 import org.mule.transport.ajax.embedded.AjaxConnector;
 
 /**
  * Registers a Bean Definition Parser for handling <code><ajax:connector></code> elements and
- * <code><ajax:servlet-connector></code> elements.
+ * <code>&lt;ajax:servlet-connector&gt;</code> elements.
  */
 public class AjaxNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -39,8 +39,6 @@ public class AjaxNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("servlet-endpoint", new TransportGlobalEndpointDefinitionParser(AjaxServletConnector.PROTOCOL, false, getGlobalEndpointBuilderBeanClass(), new String[]{"path"}, new String[]{}));
         registerBeanDefinitionParser("servlet-inbound-endpoint", new TransportEndpointDefinitionParser(AjaxServletConnector.PROTOCOL, false, getInboundEndpointFactoryBeanClass(), new String[]{"path"}, new String[]{}));
         registerBeanDefinitionParser("servlet-outbound-endpoint", new TransportEndpointDefinitionParser(AjaxServletConnector.PROTOCOL, false, getOutboundEndpointFactoryBeanClass(), new String[]{"path"}, new String[]{}));
-
-
     }
 
 }

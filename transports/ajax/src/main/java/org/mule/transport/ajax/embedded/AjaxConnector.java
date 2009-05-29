@@ -9,32 +9,33 @@
  */
 package org.mule.transport.ajax.embedded;
 
-import org.mule.transport.ajax.i18n.AjaxMessages;
-import org.mule.transport.ajax.AjaxMessageReceiver;
-import org.mule.transport.ajax.container.AjaxServletConnector;
-import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.MuleException;
 import org.mule.api.service.Service;
-import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MessageDispatcherFactory;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.ajax.AjaxMessageReceiver;
+import org.mule.transport.ajax.container.AjaxServletConnector;
+import org.mule.transport.ajax.i18n.AjaxMessages;
 
 import java.util.HashMap;
 
-import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.jetty.servlet.Context;
+import org.mortbay.cometd.AbstractBayeux;
+import org.mortbay.cometd.continuation.ContinuationCometdServlet;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.cometd.continuation.ContinuationCometdServlet;
-import org.mortbay.cometd.AbstractBayeux;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
 
 /**
- * Creates an 'embedded' Ajax server using Jetty and allows Mule to receiver and send events to browsers. The browser will need to use
- * the <pre>mule.js</pre> class to publish and subscribe events.
+ * Creates an 'embedded' Ajax server using Jetty and allows Mule to receiver and send events 
+ * to browsers. The browser will need to use the <pre>mule.js</pre> class to publish and 
+ * subscribe events.
  */
 public class AjaxConnector extends AjaxServletConnector
 {
@@ -144,8 +145,6 @@ public class AjaxConnector extends AjaxServletConnector
 
     /**
      * Template method where any connections should be made for the connector
-     *
-     * @throws Exception
      */
     protected void doConnect() throws Exception
     {
@@ -155,8 +154,6 @@ public class AjaxConnector extends AjaxServletConnector
     /**
      * Template method where any connected resources used by the connector should be
      * disconnected
-     *
-     * @throws Exception
      */
     protected void doDisconnect() throws Exception
     {
