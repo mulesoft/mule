@@ -103,13 +103,13 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         assertEquals(2, s.size());
     }
 
-    public void testCompareTo()
+    public void testCompareTo() throws InterruptedException
     {
         String uuid = UUID.getUUID();
         EventGroup g1 = new EventGroup(uuid);
         EventGroup g2 = new EventGroup(uuid);
         EventGroup g3 = new EventGroup(UUID.getUUID());
-
+        
         // test comparison against null
         try
         {
@@ -133,10 +133,19 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         }
 
         // these tests use the groupId
+        assertNotNull(g1);
+        assertNotNull(g2);
+        assertNotNull(g3);
+        
         assertEquals(0, g1.compareTo(g2));
-        assertTrue(g1.compareTo(g3) < 0);
-        assertTrue(g3.compareTo(g1) > 0);
-        assertTrue(g3.compareTo(g2) > 0);
+        /*
+         * guids are randomly generated, we cannot compare them with '<' '>'
+         * we used to generate them this way: generator.generateTimeBasedUUID().toString()
+         * but now we generate them as java.util.UUID.randomUUID().toString() 
+         */               
+        assertTrue(g1.compareTo(g3) != 0);
+        assertTrue(g3.compareTo(g1) != 0);
+        assertTrue(g3.compareTo(g2) != 0);
 
         // when the groupId is not Comparable, the creation time is used as fallback
         g1 = new EventGroup(new Object());
