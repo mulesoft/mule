@@ -25,7 +25,8 @@ public class MuleConfigurationTestCase extends TestCase
 {
     
     private boolean failOnMessageScribbling;
-
+    protected String workingDirectory = "target";
+        
     @Override
     protected void setUp() throws Exception
     {
@@ -55,7 +56,7 @@ public class MuleConfigurationTestCase extends TestCase
         config.setSystemModelType("direct");
         config.setDefaultResponseTimeout(30000);
         config.setDefaultTransactionTimeout(60000);
-        config.setWorkingDirectory("/some/directory");
+        config.setWorkingDirectory(workingDirectory);
         config.setClientMode(true);
         ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(false);
         config.setId("MY_SERVER");
@@ -85,7 +86,7 @@ public class MuleConfigurationTestCase extends TestCase
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "timeout.synchronous", "30000");
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "timeout.transaction", "60000");
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "remoteSync", "true");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "workingDirectory", "/some/directory");
+        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "workingDirectory", workingDirectory);
         System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "clientMode", "true");
         
         // this is just to make the test work for now. Since the initialization of the threadsafe
@@ -144,7 +145,7 @@ public class MuleConfigurationTestCase extends TestCase
 
         // These are not OK to change after init
         mutableConfig.setDefaultEncoding("UTF-16");
-        mutableConfig.setWorkingDirectory("/some/directory");
+        mutableConfig.setWorkingDirectory(workingDirectory);
         mutableConfig.setId("MY_SERVER");
         mutableConfig.setClusterId("MY_CLUSTER");
         mutableConfig.setDomainId("MY_DOMAIN");
@@ -160,7 +161,7 @@ public class MuleConfigurationTestCase extends TestCase
         
         // These are not OK to change after init
         assertFalse("UTF-16".equals(config.getDefaultEncoding()));
-        assertFalse("/some/directory".equals(config.getWorkingDirectory()));
+        assertFalse(workingDirectory.equals(config.getWorkingDirectory()));
         assertFalse("MY_SERVER".equals(config.getId()));
         assertFalse("MY_CLUSTER".equals(config.getClusterId()));
         assertFalse("MY_DOMAIN".equals(config.getDomainId()));
@@ -196,7 +197,7 @@ public class MuleConfigurationTestCase extends TestCase
         assertEquals(30000, config.getDefaultResponseTimeout());
         assertEquals(60000, config.getDefaultTransactionTimeout());
         // on windows this ends up with a c:/ in it
-        assertTrue(config.getWorkingDirectory().indexOf("/some/directory") != -1);
+        assertTrue(config.getWorkingDirectory().indexOf(workingDirectory) != -1);
         assertTrue(config.isClientMode());
         assertFalse(ThreadSafeAccess.AccessControl.isFailOnMessageScribbling());
         assertEquals("MY_SERVER", config.getId());
