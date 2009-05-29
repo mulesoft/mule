@@ -14,6 +14,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import org.junit.Test;
+
 public class JmsHeaderTypeTestCase extends AbstractJmsFunctionalTestCase
 {
     public JmsHeaderTypeTestCase(JmsVendorConfiguration config)
@@ -34,6 +36,7 @@ public class JmsHeaderTypeTestCase extends AbstractJmsFunctionalTestCase
         return message;
     }
     
+    @Test
     public void testTranspJmsH2() throws Exception
     {
         Message input = send(DEFAULT_INPUT_MESSAGE);
