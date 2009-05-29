@@ -198,7 +198,6 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
      * Gets an XMLStreamReader for this message.
      * 
      * @param message
-     * @return
      * @throws TransformerException
      */
     protected ReversibleXMLStreamReader getXMLStreamReader(MuleMessage message) throws TransformerException

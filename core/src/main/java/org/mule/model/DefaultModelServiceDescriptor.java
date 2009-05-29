@@ -21,9 +21,6 @@ import org.mule.util.ClassUtils;
 
 import java.util.Properties;
 
-/**
- * @inheritDocs
- */
 public class DefaultModelServiceDescriptor extends AbstractServiceDescriptor implements ModelServiceDescriptor
 {
     private String modelClass;

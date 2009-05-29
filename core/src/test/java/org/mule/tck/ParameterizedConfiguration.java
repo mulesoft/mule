@@ -13,6 +13,7 @@ package org.mule.tck;
 import java.util.Map;
 
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 
 /**
@@ -21,7 +22,7 @@ import org.junit.runners.Parameterized;
  * 
  * @see MuleParameterized
  * @see Parameterized
- * @see @Parameters
+ * @see Parameters
  */
 public interface ParameterizedConfiguration
 {

@@ -90,7 +90,6 @@ public class DefaultEndpointFactory implements EndpointFactory
     /**
      * 
      * @param endpoint
-     * @return
      * @throws RegistrationException
      */
     protected ImmutableEndpoint registerEndpoint(ImmutableEndpoint endpoint) throws RegistrationException

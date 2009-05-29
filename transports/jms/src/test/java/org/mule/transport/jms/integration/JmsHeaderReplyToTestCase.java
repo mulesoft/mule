@@ -38,20 +38,6 @@ public class JmsHeaderReplyToTestCase extends AbstractJmsFunctionalTestCase
         return message;
     }
     
-    /**
-     * @name TC-TRANSP-JMS-H-1
-     * @description The JMSReplyTo header field contains a Destination supplied by a client when a message is sent.
-     * It is the destination where a reply to the message should be sent.
-     * A client can use the JMSCorrelationID header field to link one message with another.
-     * A typical use is to link a response message with its request message.
-     * @configuration Component contains only inbound endpoint
-     * @test-procedure
-     *  - Create a message and set JMSReplyTo header
-     * - Send message to Queue, save messageId
-     * - get processed message from Destination indicated in the JMSReplyTo header, JMSCorrelationId has to equal
-     * stored messageId
-     * @expected Output message is successful received, sent messageId is equal to received correlationId
-     */
     @Test
     public void testTranspJmsH1() throws Exception
     {        

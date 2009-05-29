@@ -21,6 +21,7 @@ public class GrapeFruit implements Fruit
 
     public GrapeFruit()
     {
+        super();
     }
 
     public GrapeFruit(Integer segments, Double radius, String brand)
@@ -30,54 +31,35 @@ public class GrapeFruit implements Fruit
         this.brand = brand;
     }
 
-    /**
-     * @return
-     */
     public String getBrand()
     {
         return brand;
     }
 
-    /**
-     * @return
-     */
     public Integer getSegments()
     {
         return segments;
     }
 
-    /**
-     * @return
-     */
     public Double getRadius()
     {
         return radius;
     }
 
-    /**
-     * @param string
-     */
     public void setBrand(String string)
     {
         brand = string;
     }
 
-    /**
-     * @param integer
-     */
     public void setSegments(Integer integer)
     {
         segments = integer;
     }
 
-    /**
-     * @param double1
-     */
     public void setRadius(Double double1)
     {
         radius = double1;
     }
-
 
     public void bite()
     {

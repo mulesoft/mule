@@ -147,8 +147,6 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      * transports like Axis/CXF can determine if synchronous should be default depending on the 
      * endpoint transport e.g. http/vm/jms etc.
      * 
-     * @param endpoint
-     * @return
      * @see ImmutableEndpoint#isSynchronous()
      */
     boolean isSyncEnabled(String protocol);

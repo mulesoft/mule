@@ -378,52 +378,62 @@ public class DefaultSpringJndiContext implements Context, Serializable {
      *
      * @param name
      * @param value
-     * @return
      * @throws javax.naming.NamingException
      */
-    protected Map internalBind(String name, Object value) throws NamingException {
+    protected Map internalBind(String name, Object value) throws NamingException 
+    {
         return internalBind(name, value, false);
 
     }
-    protected Map internalBind(String name, Object value, boolean allowRebind) throws NamingException {
-
-        if (name == null || name.length() == 0){
+    
+    protected Map internalBind(String name, Object value, boolean allowRebind) throws NamingException 
+    {
+        if (name == null || name.length() == 0)
+        {
             throw new NamingException("Invalid Name " + name);
         }
-        if (frozen){
+        if (frozen)
+        {
             throw new NamingException("Read only");
         }
 
         Map newBindings = new HashMap();
         int pos = name.indexOf('/');
-        if (pos == -1) {
+        if (pos == -1) 
+        {
             Object oldValue = treeBindings.put(name, value);
-            if (!allowRebind && oldValue != null) {
+            if (!allowRebind && oldValue != null) 
+            {
                 throw new NamingException("Something already bound at " + name);
             }
             bindings.put(name, value);
             newBindings.put(name, value);
         }
-        else {
+        else 
+        {
             String segment = name.substring(0, pos);
 
-            if (segment == null || segment.length()==0){
+            if (segment == null || segment.length() == 0)
+            {
                 throw new NamingException("Invalid segment " + segment);
             }
             Object o = treeBindings.get(segment);
-            if (o == null) {
+            if (o == null) 
+            {
                 o = newContext();
                 treeBindings.put(segment, o);
                 bindings.put(segment, o);
                 newBindings.put(segment, o);
             }
-            else if (!(o instanceof DefaultSpringJndiContext)) {
+            else if (!(o instanceof DefaultSpringJndiContext)) 
+            {
                 throw new NamingException("Something already bound where a subcontext should go");
             }
             DefaultSpringJndiContext defaultContext = (DefaultSpringJndiContext) o;
             String remainder = name.substring(pos + 1);
             Map subBindings = defaultContext.internalBind(remainder, value, allowRebind);
-            for (Iterator iterator = subBindings.entrySet().iterator(); iterator.hasNext();) {
+            for (Iterator iterator = subBindings.entrySet().iterator(); iterator.hasNext();) 
+            {
                 Map.Entry entry = (Map.Entry) iterator.next();
                 String subName = segment + "/" + (String) entry.getKey();
                 Object bound = entry.getValue();

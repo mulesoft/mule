@@ -361,7 +361,6 @@ public class TcpConnector extends AbstractConnector
     }
 
     /**
-     * @return
      * @deprecated should use {@link #getReceiveBacklog()}
      */
     public int getBacklog()

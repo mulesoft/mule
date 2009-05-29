@@ -65,7 +65,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     }
 
     /**
-     * {@inheritDoc
+     * {@inheritDoc}
      */
     public MuleContext createMuleContext(List configurationBuilders, MuleContextBuilder muleContextBuilder)
         throws InitialisationException, ConfigurationException
@@ -83,7 +83,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     }
 
     /**
-     * {@inheritDoc
+     * {@inheritDoc}
      */
     public MuleContext createMuleContext(ConfigurationBuilder configurationBuilder,
                                          MuleContextBuilder muleContextBuilder)
@@ -106,8 +106,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
      * {@link ConfigurationBuilder} to implement this, or do some auto-detection to
      * determine the {@link ConfigurationBuilder} that should be used.
      * 
-     * @param configResources comma seperated list of configuration resources.
-     * @return
+     * @param resource comma seperated list of configuration resources.
      * @throws InitialisationException
      * @throws ConfigurationException
      */
@@ -125,9 +124,8 @@ public class DefaultMuleContextFactory implements MuleContextFactory
      * provided are used to replace "property placeholder" value in configuration
      * files.
      * 
-     * @param resource
+     * @param configResources
      * @param properties
-     * @return
      * @throws InitialisationException
      * @throws ConfigurationException
      */
@@ -157,7 +155,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory
      * 
      * @param configurationBuilder
      * @param properties
-     * @return
      * @throws InitialisationException
      * @throws ConfigurationException
      */

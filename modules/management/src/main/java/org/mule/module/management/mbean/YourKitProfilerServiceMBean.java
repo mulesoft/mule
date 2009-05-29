@@ -195,8 +195,6 @@ public interface YourKitProfilerServiceMBean
 
     /**
      * Stops daemon thread started by {@link #startCapturingMemSnapshot(int)}
-     *
-     * @see # startCapturingMemSnapshot (int)
      */
     void stopCapturingMemSnapshot();
 

@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.filter.Filter;
@@ -89,10 +90,8 @@ public class RestServiceWrapper extends AbstractComponent
 
     /**
      * Optional params that are pulled from the message. If these params don't exist
-     * execution will continue. Note that you can use {@link org.mule.api.expression.ExpressionEvaluator}
+     * execution will continue. Note that you can use {@link ExpressionEvaluator}
      * expressions such as xpath, header, xquery, etc
-     *
-     * @param requiredParams
      */
     public Map getOptionalParams()
     {

@@ -10,18 +10,17 @@
 package org.mule.example.geomail.components;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleException;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.Message;
 
@@ -35,13 +34,6 @@ public class Mail implements Callable
 
     private static final Logger log = Logger.getLogger(Mail.class.getName());
 
-    /**
-     * We imple
-     *
-     * @param eventContext
-     * @return
-     * @throws Exception
-     */
     public Object onCall(MuleEventContext eventContext) throws Exception {
 
         MuleMessage message = eventContext.getMessage();
@@ -91,6 +83,5 @@ public class Mail implements Callable
 
         return result;
     }
-
 
 }

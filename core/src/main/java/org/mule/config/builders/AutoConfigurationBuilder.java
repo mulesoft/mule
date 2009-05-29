@@ -13,7 +13,6 @@ package org.mule.config.builders;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
-import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.config.ConfigResource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
@@ -58,11 +57,6 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         autoConfigure(muleContext, configResources);
     }
 
-    /**
-     * @param muleContext
-     * @return
-     * @throws ConfigurationException
-     */
     protected void autoConfigure(MuleContext muleContext, ConfigResource[] configResources) throws ConfigurationException
     {
 

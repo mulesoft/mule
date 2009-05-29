@@ -108,7 +108,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      * two ways-
      * <ol>
      * <li>use the method {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)} using the
-     * {@link org.mule.api.transport.PropertyScope.INBOUND}</li>
+     * {@link PropertyScope#INBOUND}</li>
      * <li>use the {@link #addInboundProperties(java.util.Map)} method to add all inbound properties at once.
      * </ol>
      * 

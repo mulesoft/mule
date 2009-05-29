@@ -314,7 +314,6 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider
          * Gets the configuration entries using the application Name
          *
          * @param applicationName
-         * @return
          */
         public final AppConfigurationEntry[] getAppConfigurationEntry(String applicationName)
         {

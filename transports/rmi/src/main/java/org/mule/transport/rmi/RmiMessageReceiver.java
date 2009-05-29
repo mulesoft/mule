@@ -131,8 +131,6 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
     /**
      * Returns the method arguments to use when invoking the method on the Remote
      * object. This method can be overloaded to enable dynamic method arguments
-     *
-     * @return
      */
     protected Object[] getMethodArguments()
     {

@@ -50,19 +50,7 @@ public interface MessageReceiver extends Connectable
     void setEndpoint(InboundEndpoint endpoint);
 
     /**
-     * @param service the service to associate with the receiver. When data is
-     *            received the service <code>dispatchEvent</code> or
-     *            <code>sendEvent</code> is used to dispatch the data to the
-     *            relevant component.
-     */
-    //void setService(Service service);
-
-    //Connector getConnector();
-
-    /**
      * The endpointUri that this receiver listens on
-     * 
-     * @return
      */
     EndpointURI getEndpointURI();
 

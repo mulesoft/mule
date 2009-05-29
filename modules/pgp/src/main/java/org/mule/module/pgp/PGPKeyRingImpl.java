@@ -95,13 +95,11 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         return secretKeyBundle;
     }
 
-    /** @return  */
     public String getPublicKeyRingFileName()
     {
         return publicKeyRingFileName;
     }
 
-    /** @param value  */
     public void setPublicKeyRingFileName(String value)
     {
         this.publicKeyRingFileName = value;

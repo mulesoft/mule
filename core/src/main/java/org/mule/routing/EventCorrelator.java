@@ -39,6 +39,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
+
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -203,7 +204,6 @@ public class EventCorrelator
     }
 
     /**
-     * @return
      * @deprecated this is used by a test, but I would like to remove this method
      */
     public Map getResponseMessages()
@@ -409,7 +409,6 @@ public class EventCorrelator
      * aggregated response message
      *
      * @param message
-     * @return
      * @throws RoutingException
      */
     public MuleMessage getResponse(MuleMessage message) throws RoutingException
@@ -422,7 +421,6 @@ public class EventCorrelator
      * aggregated response message
      *
      * @param message
-     * @return
      * @throws RoutingException
      */
     public MuleMessage getResponse(MuleMessage message, int timeout) throws RoutingException

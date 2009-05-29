@@ -153,7 +153,6 @@ public class QuartzConnector extends AbstractConnector
 
     /**
      * A shared MuleClient for EndpointPollingJobs.
-     * @return
      * @throws MuleException
      */
     public MuleClient getClient() throws MuleException

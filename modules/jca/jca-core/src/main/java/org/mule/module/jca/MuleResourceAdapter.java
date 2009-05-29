@@ -314,49 +314,31 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         return new XAResource[]{};
     }
 
-    /**
-     * @return
-     */
     public String getPassword()
     {
         return info.getPassword();
     }
 
-    /**
-     * @return
-     */
     public String getConfigurations()
     {
         return info.getConfigurations();
     }
 
-    /**
-     * @return
-     */
     public String getUserName()
     {
         return info.getUserName();
     }
 
-    /**
-     * @param password
-     */
     public void setPassword(String password)
     {
         info.setPassword(password);
     }
 
-    /**
-     * @param configurations
-     */
     public void setConfigurations(String configurations)
     {
         info.setConfigurations(configurations);
     }
 
-    /**
-     * @param userid
-     */
     public void setUserName(String userid)
     {
         info.setUserName(userid);
@@ -372,14 +354,12 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         info.setConfigurationBuilder(configbuilder);
     }
 
-    /**
-     * @return Returns the info.
-     */
     public MuleConnectionRequestInfo getInfo()
     {
         return info;
     }
 
+    @Override
     public boolean equals(Object o)
     {
         if (this == o)
@@ -401,6 +381,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         return true;
     }
 
+    @Override
     public int hashCode()
     {
         return (info != null ? info.hashCode() : 0);

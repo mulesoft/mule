@@ -470,7 +470,6 @@ public class MuleUniversalConduit extends AbstractConduit
      * 
      * @param ei the corresponding EndpointInfo
      * @param t the given target EPR if available
-     * @param bus the Bus
      * @return the actual target
      */
     protected static EndpointReferenceType getTargetReference(EndpointInfo ei, EndpointReferenceType t)

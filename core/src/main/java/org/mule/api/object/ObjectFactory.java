@@ -37,8 +37,6 @@ public interface ObjectFactory extends Initialisable, Disposable
     /**
      * Returns true if the ObjectFactory implementation always returns the same object
      * instance.
-     * 
-     * @return
      */
     boolean isSingleton();
 
@@ -47,8 +45,6 @@ public interface ObjectFactory extends Initialisable, Disposable
      * This is normally false except when an ObjectFactory implementation obtains instance from containers
      * (e.g. Spring) that already manages the objects lifecycle.
      * instance.
-     * 
-     * @return
      */
     boolean isExternallyManagedLifecycle();
     

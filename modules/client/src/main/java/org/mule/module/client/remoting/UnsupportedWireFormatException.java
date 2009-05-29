@@ -16,9 +16,6 @@ import org.mule.module.client.i18n.ClientMessages;
  */
 public class UnsupportedWireFormatException extends RemoteDispatcherException
 {
-    /**
-     * @param message the exception message
-     */
     public UnsupportedWireFormatException(String wireFormat, Exception e)
     {
         super(ClientMessages.unsupportedServerWireForat(wireFormat), e);

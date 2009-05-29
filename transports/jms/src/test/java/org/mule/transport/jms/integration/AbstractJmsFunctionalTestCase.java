@@ -47,32 +47,32 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * This is the base class for all integration tests that are part of the JMS integration test suite.  this is
+ * This is the base class for all integration tests that are part of the JMS integration test suite.  This is
  * a suite that can be run on multiple JMS providers since all configuration for the provider is abstracted into
- * a single class which implements {@link org.mule.transport.jms.integration.JmsVendorConfiguration}.  The implementation
+ * a single class which implements {@link JmsVendorConfiguration}.  The implementation
  * of this class is loaded by looking for the classname in a properties file called 'jms-vendor-configs.txt'in the root
  * classpath.
  * <p/>
  * This test case provides a number of support methods for testing Jms providers with Mule.  This implementation is based
  * around the concept of scenarios.  Scenarios define an action or set of actions and are represented as implementations
- * of {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.Scenario}.  Scenarios can be combined to create
+ * of {@link AbstractJmsFunctionalTestCase.Scenario}.  Scenarios can be combined to create
  * a test.  The default scenarios are usually sufficient to create a test.  These are:
- * {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.ScenarioReceive}
- * {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.ScenarioNotReceive}
- * {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.ScenarioCommit}
- * {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.ScenarioRollback}
- * {@link org.mule.transport.jms.integration.AbstractJmsFunctionalTestCase.NonTransactedScenario}
+ * {@link AbstractJmsFunctionalTestCase.ScenarioReceive}
+ * {@link AbstractJmsFunctionalTestCase.ScenarioNotReceive}
+ * {@link AbstractJmsFunctionalTestCase.ScenarioCommit}
+ * {@link AbstractJmsFunctionalTestCase.ScenarioRollback}
+ * {@link AbstractJmsFunctionalTestCase.NonTransactedScenario}
  * <p/>
  * This object will also add properties to the registry that can be accessed withn Xml config files using placeholders.
  * The following properties are made available -
  * <ul>
- * <li>${inbound.destination} - the URI of the inbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
- * <li>${outbound.destination} - the URI of the outbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration implementation)</li>
- * <li>${middle.destination} - the URI of the middle destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+ * <li>${inbound.destination} - the URI of the inbound destination (retrieved from an {@link JmsVendorConfiguration} implementation)</li>
+ * <li>${outbound.destination} - the URI of the outbound destination (retrieved from an {@link JmsVendorConfiguration} implementation)</li>
+ * <li>${middle.destination} - the URI of the middle destination (retrieved from an {@link JmsVendorConfiguration} implementation)</li>
  * <li>${middle2.destination} - the URI of a second middle destination 'middle2'.</li>
  * <li>${middle3.destination} - the URI of a third middle destination 'middle3'.</li>
- * <li>${broadcast.destination} - the URI of the broadcast topic (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
- * <li>${protocol} - the protocol of the current messaging connector (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+ * <li>${broadcast.destination} - the URI of the broadcast topic (retrieved from an {@link JmsVendorConfiguration} implementation)</li>
+ * <li>${protocol} - the protocol of the current messaging connector (retrieved from an {@link JmsVendorConfiguration} implementation)</li>
  * </ul>
  * <p/>
  * For each integration test there are 2 configuration files. One is provided by the JMS integration suite and defines the
@@ -81,9 +81,9 @@ import org.junit.runners.Parameterized.Parameters;
  * file name as the generic configuration file prepended with 'connector-'.  The location of these files must be
  * <p/>
  * <code>
- * integration/&lt;provider_name>/connector-&lt;event_flow_config_name></code>
+ * integration/&lt;provider_name>/connector-&lt;event_flow_config_name&gt;</code>
  * <p/>
- * The 'provider_name' is obtained from the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation.
+ * The 'provider_name' is obtained from the {@link JmsVendorConfiguration} implementation.
  * <p/>
  * In order to know what objects to define in the 'connector-' files you must copy the connector files from the ActiveMQ (default)
  * test suite and configure the objects to match the configuration in the ActiveMQ tests.  Note that the object names must
@@ -151,15 +151,14 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     interface MessagePostProcessor
     {
         void postProcess(Session session, Message message) throws JMSException;
-    };
+    }
     
     /**
-     * Finds the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} instances to test with by looking
-     * in a file called "jms-vendor-configs.txt" which contains one or more fuly qualified classnames of
-     * {@link org.mule.transport.jms.integration.JmsVendorConfiguration} instances to load.
+     * Finds the {@link JmsVendorConfiguration} instances to test with by looking
+     * in a file called <tt>jms-vendor-configs.txt</tt> which contains one or more fuly qualified classnames of
+     * {@link JmsVendorConfiguration} instances to load.
      *
-     * @return a collection of {@link org.mule.transport.jms.integration.JmsVendorConfiguration} instance to test
-     * against.
+     * @return a collection of {@link JmsVendorConfiguration} instance to test against.
      *
      * @throws Exception if the 'jms-vendor-configs.txt' cannot be loaded or the classes defined within that file
      * are not on the classpath
@@ -254,13 +253,13 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * Adds the following properties to the registry so that the Xml configuration files can reference them.
      * <p/>
      * <ul>
-     * <li>${inbound.destination} - the URI of the inbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
-     * <li>${outbound.destination} - the URI of the outbound destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration implementation)</li>
-     * <li>${middle.destination} - the URI of the middle destination (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+     * <li>${inbound.destination} - the URI of the inbound destination (retrieved from an {@link JmsVendorConfiguration} implementation)</li>
+     * <li>${outbound.destination} - the URI of the outbound destination (retrieved from an {@link JmsVendorConfiguration} implementation)</li>
+     * <li>${middle.destination} - the URI of the middle destination (retrieved from an {@link JmsVendorConfiguration} implementation)</li>
      * <li>${middle2.destination} - the URI of a second middle destination 'middle2'.</li>
      * <li>${middle3.destination} - the URI of a third middle destination 'middle3'.</li>
-     * <li>${broadcast.destination} - the URI of the broadcast topic (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
-     * <li>${protocol} - the protocol of the current messaging connector (retrieved from an {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implementation)</li>
+     * <li>${broadcast.destination} - the URI of the broadcast topic (retrieved from an {@link JmsVendorConfiguration} implementation)</li>
+     * <li>${protocol} - the protocol of the current messaging connector (retrieved from an {@link JmsVendorConfiguration} implementation)</li>
      * </ul>
      *
      * @return
@@ -288,8 +287,8 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     /**
-     * This creates a {@link org.mule.config.spring.SpringXmlConfigurationBuilder} as expected but also figures out
-     * which 'connector' configuration file to load with the event flow configuration (obtained from the overriding \
+     * This creates a {@link SpringXmlConfigurationBuilder} as expected but also figures out
+     * which 'connector' configuration file to load with the event flow configuration (obtained from the overriding 
      * class which implements {@link #getConfigResources()}).
      *
      * @return The config builder used to create the Mule instance for this test
@@ -320,8 +319,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     /**
-     * Returns the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implemetation to be used
-     * with this test
+     * Returns the {@link JmsVendorConfiguration} implemetation to be used with this test
      *
      * @return settings for this test
      */
@@ -335,8 +333,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     /**
-     * Sets the {@link org.mule.transport.jms.integration.JmsVendorConfiguration} implemetation to be used
-     * with this test
+     * Sets the {@link JmsVendorConfiguration} implemetation to be used with this test
      *
      * @param jmsConfig the settings for this test
      */
@@ -347,7 +344,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     /**
      * Overriding classes must override this or inject this object. It is responsible for creating the
-     * {@link org.mule.transport.jms.integration.JmsVendorConfiguration} instance to be used by this test.
+     * {@link JmsVendorConfiguration} instance to be used by this test.
      *
      * @return the settings for this test
      */

@@ -26,7 +26,6 @@ public class ChatString implements Serializable
 
     /**
      * @param str
-     * @return
      */
     public StringBuffer append(String str)
     {
@@ -35,7 +34,6 @@ public class ChatString implements Serializable
 
     /**
      * @param sb
-     * @return
      */
     public StringBuffer append(StringBuffer sb)
     {
@@ -45,7 +43,6 @@ public class ChatString implements Serializable
     /**
      * @param offset
      * @param str
-     * @return
      */
     public StringBuffer insert(int offset, char[] str)
     {
@@ -57,18 +54,13 @@ public class ChatString implements Serializable
      * @param str
      * @param offset
      * @param len
-     * @return
      */
     public StringBuffer insert(int index, char[] str, int offset, int len)
     {
         return string.insert(index, str, offset, len);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
+    @Override
     public String toString()
     {
         return string.toString();

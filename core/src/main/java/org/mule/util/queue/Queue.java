@@ -18,8 +18,6 @@ public interface Queue
 
     /**
      * Returns the number of elements in this queue.
-     * 
-     * @return
      */
     int size();
 

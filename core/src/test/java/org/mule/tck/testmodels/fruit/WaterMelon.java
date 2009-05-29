@@ -70,49 +70,31 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
         bite();
     }
 
-    /**
-     * @return
-     */
     public String getBrand()
     {
         return brand;
     }
 
-    /**
-     * @return
-     */
     public Integer getSeeds()
     {
         return seeds;
     }
 
-    /**
-     * @return
-     */
     public Double getRadius()
     {
         return radius;
     }
 
-    /**
-     * @param string
-     */
     public void setBrand(String string)
     {
         brand = string;
     }
 
-    /**
-     * @param integer
-     */
     public void setSeeds(Integer integer)
     {
         seeds = integer;
     }
 
-    /**
-     * @param double1
-     */
     public void setRadius(Double double1)
     {
         radius = double1;
@@ -138,11 +120,7 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
         state = "disposed";
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
+    @Override
     public boolean equals(Object obj)
     {
         if (obj instanceof WaterMelon)
@@ -155,6 +133,7 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
         return super.equals(obj);
     }
 
+    @Override
     public int hashCode ()
     {
         int result;

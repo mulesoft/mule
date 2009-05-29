@@ -11,6 +11,7 @@
 package org.mule.module.management.mbean;
 
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 
@@ -53,7 +54,7 @@ public interface ServiceServiceMBean extends Stoppable, Startable, ServiceStatsM
      * state.
      * 
      * @throws MuleException if the service failed to pause.
-     * @see org.mule.config.MuleConfiguration
+     * @see MuleConfiguration
      */
     void pause() throws MuleException;
 

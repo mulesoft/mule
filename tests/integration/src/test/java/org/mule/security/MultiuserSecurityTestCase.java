@@ -26,7 +26,7 @@ import java.util.Map;
  * a single user at a time (i.e., authentication of a new user overwrites the 
  * previous authentication).  
  * 
- * @see EE-979
+ * see EE-979
  */
 public class MultiuserSecurityTestCase extends FunctionalTestCase
 {

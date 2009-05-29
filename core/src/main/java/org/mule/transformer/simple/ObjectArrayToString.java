@@ -60,7 +60,6 @@ public class ObjectArrayToString extends AbstractTransformer implements Discover
         return out;
     }
 
-    /** @return the delimiter */
     public String getDelimiter()
     {
         if (delimiter == null)
@@ -73,7 +72,6 @@ public class ObjectArrayToString extends AbstractTransformer implements Discover
         }
     }
 
-    /** @param sets the delimiter */
     public void setDelimiter(String delimiter)
     {
         this.delimiter = delimiter;

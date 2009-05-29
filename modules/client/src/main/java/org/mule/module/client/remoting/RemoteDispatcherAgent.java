@@ -10,8 +10,6 @@
 
 package org.mule.module.client.remoting;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -22,6 +20,9 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
 import org.mule.module.client.remoting.notification.RemoteDispatcherNotificationListener;
 import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>RemoteDispatcherAgent</code> manages the server endpoint that receives Admin and
@@ -48,8 +49,6 @@ public class RemoteDispatcherAgent extends AbstractAgent
 
     /**
      * Should be a 1 line description of the agent
-     *
-     * @return
      */
     public String getDescription()
     {

@@ -171,7 +171,6 @@ public class UdpConnector extends AbstractConnector
      * socket
      *
      * @param endpoint
-     * @return
      */
     DatagramSocket getSocket(ImmutableEndpoint endpoint) throws Exception
     {

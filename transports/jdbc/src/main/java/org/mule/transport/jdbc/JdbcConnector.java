@@ -270,7 +270,6 @@ public class JdbcConnector extends AbstractConnector
      *
      * @param stmt
      * @param params
-     * @return
      */
     public String parseStatement(String stmt, List params)
     {

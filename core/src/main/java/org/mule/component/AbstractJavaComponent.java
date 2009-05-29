@@ -97,7 +97,6 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
      * Creates and initialises a new LifecycleAdaptor instance wrapped the component
      * object instance obtained from the configured object factory.
      * 
-     * @return
      * @throws MuleException
      * @throws Exception
      */

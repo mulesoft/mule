@@ -12,6 +12,7 @@ package org.mule.module.management.mbean;
 
 import org.mule.MuleServer;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.service.Service;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.model.seda.SedaService;
@@ -74,8 +75,8 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
      * Muleconfiguration to true. this causes all internal queues to store their
      * state.
      * 
-     * @throws org.mule.api.MuleException if the service failed to pause.
-     * @see org.mule.config.MuleConfiguration
+     * @throws MuleException if the service failed to pause.
+     * @see MuleConfiguration
      */
     public void pause() throws MuleException
     {
@@ -86,7 +87,7 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
      * Resumes the Service that has been paused. If the service is not paused
      * nothing is executed.
      * 
-     * @throws org.mule.api.MuleException if the service failed to resume
+     * @throws MuleException if the service failed to resume
      */
     public void resume() throws MuleException
     {
@@ -128,22 +129,11 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
         getComponent().start();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.management.mbeans.ServiceServiceMBean#getStatistics()
-     */
     public ObjectName getStatistics()
     {
         return statsName;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.management.MBeanRegistration#preRegister(javax.management.MBeanServer,
-     *      javax.management.ObjectName)
-     */
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception
     {
         this.server = server;
@@ -151,11 +141,6 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
         return name;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.management.MBeanRegistration#postRegister(java.lang.Boolean)
-     */
     public void postRegister(Boolean registrationDone)
     {
         try
@@ -179,11 +164,6 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.management.MBeanRegistration#preDeregister()
-     */
     public void preDeregister() throws Exception
     {
         try
@@ -199,11 +179,6 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.management.MBeanRegistration#postDeregister()
-     */
     public void postDeregister()
     {
         // nothing to do
@@ -216,153 +191,96 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
 
     // ///// Service stats impl /////////
 
-    /**
-     *
-     */
     public void clearStatistics()
     {
         statistics.clear();
     }
 
-    /**
-     * @return
-     */
     public long getAsyncEventsReceived()
     {
         return statistics.getAsyncEventsReceived();
     }
 
-    /**
-     * @return
-     */
     public long getAsyncEventsSent()
     {
         return statistics.getAsyncEventsSent();
     }
 
-    /**
-     * @return
-     */
     public long getAverageExecutionTime()
     {
         return statistics.getAverageExecutionTime();
     }
 
-    /**
-     * @return
-     */
     public long getAverageQueueSize()
     {
         return statistics.getAverageQueueSize();
     }
 
-    /**
-     * @return
-     */
     public long getExecutedEvents()
     {
         return statistics.getExecutedEvents();
     }
 
-    /**
-     * @return
-     */
     public long getExecutionErrors()
     {
         return statistics.getExecutionErrors();
     }
 
-    /**
-     * @return
-     */
     public long getFatalErrors()
     {
         return statistics.getFatalErrors();
     }
 
-    /**
-     * @return
-     */
     public long getMaxExecutionTime()
     {
         return statistics.getMaxExecutionTime();
     }
 
-    /**
-     * @return
-     */
     public long getMaxQueueSize()
     {
         return statistics.getMaxQueueSize();
     }
 
-    /**
-     * @return
-     */
     public long getMinExecutionTime()
     {
         return statistics.getMinExecutionTime();
     }
 
-    /**
-     * @return
-     */
     public String getName()
     {
         return name;
     }
 
-    /**
-     * @return
-     */
     public long getQueuedEvents()
     {
         return statistics.getQueuedEvents();
     }
 
-    /**
-     * @return
-     */
     public long getReplyToEventsSent()
     {
         return statistics.getReplyToEventsSent();
     }
 
-    /**
-     * @return
-     */
     public long getSyncEventsReceived()
     {
         return statistics.getSyncEventsReceived();
     }
 
-    /**
-     * @return
-     */
     public long getSyncEventsSent()
     {
         return statistics.getSyncEventsSent();
     }
 
-    /**
-     * @return
-     */
     public long getTotalEventsReceived()
     {
         return statistics.getTotalEventsReceived();
     }
 
-    /**
-     * @return
-     */
     public long getTotalEventsSent()
     {
         return statistics.getTotalEventsSent();
     }
 
-    /**
-     * @return
-     */
     public long getTotalExecutionTime()
     {
         return statistics.getTotalExecutionTime();

@@ -39,7 +39,7 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
      * we disable the test case so as to not report a test failure which has nothing to do
      * with Mule.
      * 
-     * @see EE-947
+     * see EE-947
      */
     protected boolean isDisabledInThisEnvironment()
     {

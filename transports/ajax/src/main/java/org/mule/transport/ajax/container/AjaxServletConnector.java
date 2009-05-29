@@ -16,6 +16,8 @@ import org.mule.transport.ajax.AjaxMessageReceiver;
 import org.mule.transport.ajax.AjaxReplyToHandler;
 import org.mule.transport.servlet.ServletConnector;
 
+import dojox.cometd.DataFilter;
+
 import org.mortbay.cometd.AbstractBayeux;
 
 /**

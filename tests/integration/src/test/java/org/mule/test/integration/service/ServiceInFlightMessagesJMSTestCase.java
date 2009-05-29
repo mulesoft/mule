@@ -36,13 +36,6 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         return "org/mule/test/integration/service/service-inflight-messages-jms.xml";
     }
 
-    /**
-     * @assert Message are not lost when an un-paused seda service with
-     *         non-persistent queue is stopped.
-     * @assert All messages in non-persistent queue are processed before service is
-     *         stopped.
-     * @throws Exception
-     */
     public void testInFlightMessages() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestService");
@@ -59,11 +52,6 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         assertSedaQueueEmpty(service);
     }
 
-    /**
-     * @assert Messages are lost when an paused seda service with non-persistent
-     *         queue is stopped.
-     * @throws Exception
-     */
     public void testInFlightMessagesPausedService() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("PausedTestService");
@@ -78,13 +66,6 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         // assertOutboundQueueEmpty(listener);
     }
 
-    /**
-     * @assert Messages are not lost when an un-paused seda service with persistent
-     *         queue is stopped.
-     * @assert NOT all messages in persistent queue are processed before service is
-     *         stopped.
-     * @throws Exception
-     */
     public void testInFlightStopPersistentMessages() throws Exception
     {
         // TODO MULE-4253 (THIS SCENARIO FAILS INTERMITTENTLY)
@@ -113,14 +94,6 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
 
     }
 
-    /**
-     * @assert Message are not lost when a paused seda service with persistent queue
-     *         is stopped.
-     * @assert NO messages are processed before service is stopped.
-     * @assert When service is resumed all messages are processed.
-     * @throws Exception
-     */
-
     public void testInFlightStopPersistentMessagesPausedService() throws Exception
     {
         // TODO MULE-4253 (THIS SCENARIO FAILS INTERMITTENTLY)
@@ -147,14 +120,6 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         // assertSedaQueueEmpty(service);
     }
 
-    /**
-     * @assert Messages are not lost when an seda service with persistent queue when
-     *         mule is stopped and restarted as a new process
-     * @assert NOT all messages in persistent queue are processed before service is
-     *         stopped.
-     * @assert Once mule is restarted messages in persistent queue are processed.
-     * @throws Exception
-     */
     public void testInFlightDisposePersistentMessages() throws Exception
     {
         // TODO MULE-4253 (THIS SCENARIO FAILS INTERMITTENTLY)

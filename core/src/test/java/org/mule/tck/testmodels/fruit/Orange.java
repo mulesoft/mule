@@ -84,49 +84,31 @@ public class Orange implements Callable, OrangeInterface
         return null;
     }
 
-    /**
-     * @return
-     */
     public String getBrand()
     {
         return brand;
     }
 
-    /**
-     * @return
-     */
     public Integer getSegments()
     {
         return segments;
     }
 
-    /**
-     * @return
-     */
     public Double getRadius()
     {
         return radius;
     }
 
-    /**
-     * @param string
-     */
     public void setBrand(String string)
     {
         brand = string;
     }
 
-    /**
-     * @param integer
-     */
     public void setSegments(Integer integer)
     {
         segments = integer;
     }
 
-    /**
-     * @param double1
-     */
     public void setRadius(Double double1)
     {
         radius = double1;
@@ -180,7 +162,6 @@ public class Orange implements Callable, OrangeInterface
         this.arrayProperties = arrayProperties;
     }
 
-
     public FruitCleaner getCleaner()
     {
         return cleaner;
@@ -201,6 +182,7 @@ public class Orange implements Callable, OrangeInterface
         cleaner.polish(this);
     }
 
+    @Override
     public int hashCode()
     {
         final int prime = 31;
@@ -212,6 +194,7 @@ public class Orange implements Callable, OrangeInterface
         return result;
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj)

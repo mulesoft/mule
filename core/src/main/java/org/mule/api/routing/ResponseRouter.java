@@ -79,7 +79,6 @@ public interface ResponseRouter extends Router
      * Should the router fail and throw an exception if a timeout occurs or should it return
      * the events received so far.
      * //TODO This method is not implemented yet
-     * @return
      */
     boolean isFailOnTimeout();
 }

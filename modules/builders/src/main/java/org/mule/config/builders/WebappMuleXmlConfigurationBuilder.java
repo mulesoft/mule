@@ -118,7 +118,6 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
      * ApplicationContext for a spring WebAppplicationContext
      * 
      * @param servletContext
-     * @return
      * @throws BeansException
      */
     protected ApplicationContext loadParentContext(ServletContext servletContext) throws BeansException

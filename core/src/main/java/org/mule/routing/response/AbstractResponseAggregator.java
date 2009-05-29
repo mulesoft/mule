@@ -64,7 +64,6 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      * aggregated response message
      *
      * @param message
-     * @return
      * @throws RoutingException
      */
     public MuleMessage getResponse(MuleMessage message) throws RoutingException

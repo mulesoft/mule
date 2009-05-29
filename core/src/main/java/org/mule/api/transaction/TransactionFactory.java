@@ -15,7 +15,6 @@ import org.mule.api.MuleContext;
 
 /**
  * <code>TransactionFactory</code> creates a transaction.
- *
  */
 public interface TransactionFactory
 {
@@ -32,8 +31,6 @@ public interface TransactionFactory
      * Determines whether this transaction factory creates transactions that are
      * really transacted or if they are being used to simulate batch actions, such as
      * using Jms Client Acknowledge.
-     * 
-     * @return
      */
     boolean isTransacted();
 }

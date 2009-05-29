@@ -61,7 +61,6 @@ public abstract class AbstractFilterCollection implements Filter
 
     /**
      * @deprecated
-     * @return
      */
     public Filter getLeftFilter()
     {
@@ -71,7 +70,6 @@ public abstract class AbstractFilterCollection implements Filter
 
     /**
      * @deprecated
-     * @return
      */
     public Filter getRightFilter()
     {

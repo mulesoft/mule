@@ -74,8 +74,6 @@ public class ConfigScannerAgent extends AbstractAgent
 
     /**
      * Should be a 1 line description of the agent
-     * 
-     * @return
      */
     public String getDescription()
     {

@@ -107,9 +107,6 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
      * If the message payload is of type {@link org.mule.transport.NullPayload} the resolver will look for a no-argument
      * method to call that doesn't match the set of ignoredMethods on the resover.
      *
-     * @param service
-     * @param context
-     * @return
      * @throws Exception
      */
     public InvocationResult invoke(Object component, MuleEventContext context) throws Exception

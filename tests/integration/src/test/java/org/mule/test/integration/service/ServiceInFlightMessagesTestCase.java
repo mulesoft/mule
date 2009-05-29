@@ -29,13 +29,6 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         return "org/mule/test/integration/service/service-inflight-messages.xml";
     }
 
-    /**
-     * @assert Message are not lost when an un-paused seda service with
-     *         non-persistent queue is stopped.
-     * @assert All messages in non-persistent queue are processed before service is
-     *         stopped.
-     * @throws Exception
-     */
     public void testInFlightMessages() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestService");
@@ -49,11 +42,6 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertSedaQueueEmpty(service);
     }
 
-    /**
-     * @assert Messages are lost when an paused seda service with non-persistent
-     *         queue is stopped.
-     * @throws Exception
-     */
     public void testInFlightMessagesPausedService() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("PausedTestService");
@@ -68,13 +56,6 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         // assertOutboundVMQueueEmpty();
     }
 
-    /**
-     * @assert Messages are not lost when an un-paused seda service with persistent
-     *         queue is stopped.
-     * @assert NOT all messages in persistent queue are processed before service is
-     *         stopped.
-     * @throws Exception
-     */
     public void testInFlightStopPersistentMessages() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
@@ -104,13 +85,6 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 
     }
 
-    /**
-     * @assert Message are not lost when a paused seda service with persistent queue
-     *         is stopped.
-     * @assert NO messages are processed before service is stopped.
-     * @assert When service is resumed all messages are processed.
-     * @throws Exception
-     */
     public void testInFlightStopPersistentMessagesPausedService() throws Exception
     {
 
@@ -141,14 +115,6 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertSedaQueueEmpty(service);
     }
 
-    /**
-     * @assert Messages are not lost when an seda service with persistent queue when
-     *         mule is stopped and restarted as a new process
-     * @assert NOT all messages in persistent queue are processed before service is
-     *         stopped.
-     * @assert Once mule is restarted messages in persistent queue are processed.
-     * @throws Exception
-     */
     public void testInFlightDisposePersistentMessages() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");

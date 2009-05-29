@@ -19,22 +19,11 @@ import org.mule.component.DefaultLifecycleAdapter;
 /** <code>TestDefaultLifecycleAdapter</code> TODO document */
 public class TestDefaultLifecycleAdapter extends DefaultLifecycleAdapter
 {
-    /**
-     * @param service
-     * @param descriptor
-     * @throws MuleException
-     */
     public TestDefaultLifecycleAdapter(Object pojoService, JavaComponent service, MuleContext muleContext) throws MuleException
     {
         super(pojoService, service, muleContext);
     }
 
-    /**
-     * @param service
-     * @param descriptor
-     * @param epResolver
-     * @throws MuleException
-     */
     public TestDefaultLifecycleAdapter(Object pojoService,
                                        JavaComponent service,
                                        EntryPointResolverSet epResolver,

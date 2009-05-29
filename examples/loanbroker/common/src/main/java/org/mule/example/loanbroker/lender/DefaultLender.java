@@ -31,7 +31,7 @@ public class DefaultLender implements LenderService
     }
 
     /**
-     * @inheritDocs
+     * {@inheritDoc}
      */
     public Bank[] getLenders(CreditProfile creditProfile, Double loanAmount)
     {

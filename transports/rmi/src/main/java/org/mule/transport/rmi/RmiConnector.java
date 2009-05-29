@@ -153,41 +153,21 @@ public class RmiConnector extends AbstractJndiConnector
         }
     }
 
-    /**
-     * Method getServerCodebase
-     *
-     * @return
-     */
     public String getServerCodebase()
     {
         return (this.serverCodebase);
     }
 
-    /**
-     * Method setServerCodebase
-     *
-     * @param serverCodebase
-     */
     public void setServerCodebase(String serverCodebase)
     {
         this.serverCodebase = serverCodebase;
     }
 
-    /**
-     * Method getServerClassName
-     *
-     * @return
-     */
     public String getServerClassName()
     {
         return (this.serverClassName);
     }
 
-    /**
-     * Method setServerClassName
-     *
-     * @param serverClassName
-     */
     public void setServerClassName(String serverClassName)
     {
         this.serverClassName = serverClassName;
@@ -215,7 +195,6 @@ public class RmiConnector extends AbstractJndiConnector
      *
      * @param remoteObject The remote object on which to invoke the method
      * @param event The current event being processed
-     * @return
      * @throws org.mule.api.MuleException
      * @throws NoSuchMethodException
      * @throws ClassNotFoundException

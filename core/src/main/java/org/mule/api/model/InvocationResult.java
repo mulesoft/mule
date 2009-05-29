@@ -94,8 +94,6 @@ public class InvocationResult
      * attempt to make the invocation
      * {@link #STATE_INVOKED_FAILED} If an invocation attempt is made but fails
      * {@link #STATE_INVOKED_SUCESSFUL} If the invocation was successful
-     *
-     * @return
      */
     public int getState()
     {

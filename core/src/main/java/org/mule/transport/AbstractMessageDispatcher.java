@@ -246,11 +246,6 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             this.event = event;
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Runnable#run()
-         */
         public void run()
         {
             try
@@ -287,8 +282,6 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
 
     /**
      * Checks to see if the current transaction has been rolled back
-     * 
-     * @return
      */
     protected boolean isTransactionRollback()
     {

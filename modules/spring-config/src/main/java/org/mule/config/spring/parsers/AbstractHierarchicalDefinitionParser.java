@@ -88,7 +88,6 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
      * @deprecated
      * @param element
      * @param bean
-     * @return
      */
     protected BeanAssembler getOrphanBeanAssembler(Element element, BeanDefinitionBuilder bean)
     {

@@ -208,9 +208,9 @@ public class ClasspathScanner
      *
      * @param clazz the type to scan for
      * @return a scanner suitable for handling the type passed in
-     * @see org.mule.util.annotations.AnnotationsScanner
-     * @see org.mule.util.scan.InterfaceClassScanner
-     * @see org.mule.util.scan.ImplementationClassScanner
+     * @see AnnotationsScanner
+     * @see InterfaceClassScanner
+     * @see ImplementationClassScanner
      */
     protected ClassScanner getScanner(Class clazz)
     {

@@ -163,16 +163,19 @@ public class MuleInvoker implements Invoker
      * 
      * @param methodToMatch The method to be used when finding a matching method
      *            in targetObject
-     * @param targetObject The object to search in for the method.
+     * @param targetClass The class to search in for the method.
      * @return The methodToMatch if no such method exist in the class of
      *         targetObject; otherwise, a method from the class of targetObject
      *         matching the matchToMethod method.
      */
-    private static Method matchMethod(Method methodToMatch, Class<?> targetClass) {
+    private static Method matchMethod(Method methodToMatch, Class<?> targetClass) 
+    {
         Class<?>[] interfaces = targetClass.getInterfaces();
-        for (int i = 0; i < interfaces.length; i++) {
+        for (int i = 0; i < interfaces.length; i++) 
+        {
             Method m = getMostSpecificMethod(methodToMatch, interfaces[i]);
-            if (!methodToMatch.equals(m)) {
+            if (!methodToMatch.equals(m)) 
+            {
                 return m;
             }
         }
@@ -185,7 +188,8 @@ public class MuleInvoker implements Invoker
      * @param object the object to check
      * @see java.lang.reflect.Proxy#isProxyClass
      */
-    public static boolean isJdkDynamicProxy(Object object) {
+    public static boolean isJdkDynamicProxy(Object object) 
+    {
         return object != null && Proxy.isProxyClass(object.getClass());
     }
 

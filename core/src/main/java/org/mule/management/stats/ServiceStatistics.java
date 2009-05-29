@@ -161,7 +161,6 @@ public class ServiceStatistics implements Statistics
 
     /**
      * @deprecated
-     * @return
      */
     public long getMaxExecutionTime()
     {
@@ -175,7 +174,6 @@ public class ServiceStatistics implements Statistics
 
     /**
      * @deprecated
-     * @return
      */
     public long getMinExecutionTime()
     {
@@ -184,7 +182,6 @@ public class ServiceStatistics implements Statistics
 
     /**
      * @deprecated
-     * @return
      */
     public long getTotalExecutionTime()
     {
@@ -293,51 +290,33 @@ public class ServiceStatistics implements Statistics
 
     }
 
-    /**
-     * @return Returns the inboundRouterStat.
-     */
     public RouterStatistics getInboundRouterStat()
     {
         return inboundRouterStat;
     }
 
-    /**
-     * @param inboundRouterStat The inboundRouterStat to set.
-     */
     public void setInboundRouterStat(RouterStatistics inboundRouterStat)
     {
         this.inboundRouterStat = inboundRouterStat;
         this.inboundRouterStat.setEnabled(enabled);
     }
 
-    /**
-     * @return Returns the outboundRouterStat.
-     */
     public RouterStatistics getOutboundRouterStat()
     {
         return outboundRouterStat;
     }
 
-    /**
-     * @param outboundRouterStat The outboundRouterStat to set.
-     */
     public void setOutboundRouterStat(RouterStatistics outboundRouterStat)
     {
         this.outboundRouterStat = outboundRouterStat;
         this.outboundRouterStat.setEnabled(enabled);
     }
     
-    /**
-     * @return Returns the outboundRouterStat.
-     */
     public ComponentStatistics getComponentStat()
     {
         return componentStat;
     }
 
-    /**
-     * @param outboundRouterStat The outboundRouterStat to set.
-     */
     public void setComponentStat(ComponentStatistics componentStat)
     {
         this.componentStat = componentStat;

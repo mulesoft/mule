@@ -35,7 +35,6 @@ public class JcaService extends AbstractService
      * a JCA container
      * 
      * @param event
-     * @return
      * @throws MuleException
      */
     public MuleMessage sendEvent(MuleEvent event) throws MuleException

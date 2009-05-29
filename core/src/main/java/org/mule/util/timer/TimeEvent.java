@@ -28,14 +28,8 @@ public class TimeEvent extends EventObject
      */
     private String name;
 
-    /**  */
     private long timeExpired;
 
-    /**
-     * @param source
-     * @param name
-     * @param timeExpired
-     */
     public TimeEvent(Object source, String name, long timeExpired)
     {
         super(source);
@@ -43,17 +37,11 @@ public class TimeEvent extends EventObject
         this.timeExpired = timeExpired;
     }
 
-    /**
-     * @return
-     */
     public String getName()
     {
         return name;
     }
 
-    /**
-     * @return
-     */
     public long getTimeExpired()
     {
         return timeExpired;

@@ -70,10 +70,6 @@ public class CreditAgencyBean implements SessionBean
 
     /**
      * Used by Ejb Call
-     * 
-     * @param name
-     * @param ssn
-     * @return
      */
     public String getCreditProfile(String name, Integer ssn)
     {

@@ -198,7 +198,6 @@ public class IOUtils extends org.apache.commons.io.IOUtils
      * Variables configured on the system.
      * 
      * @param src
-     * @return
      */
     private static String parseResourceName(String src)
     {

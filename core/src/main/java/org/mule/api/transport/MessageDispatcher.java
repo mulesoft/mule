@@ -24,7 +24,7 @@ public interface MessageDispatcher extends Connectable, MessageDispatching
      * This method can perform necessary state updates before any of the
      * {@link MessageDispatching} methods are invoked.
      * 
-     * @see MessageDispatcherFactory#activate(org.mule.api.endpoint.ImmutableEndpoint, MessageDispatcher)
+     * @see MessageDispatcherFactory#activate(OutboundEndpoint, MessageDispatcher)
      */
     void activate();
 
@@ -33,7 +33,7 @@ public interface MessageDispatcher extends Connectable, MessageDispatching
      * clean up its internal state (if it has any) or return pooled resources to
      * whereever it got them during {@link #activate()}.
      * 
-     * @see MessageDispatcherFactory#passivate(org.mule.api.endpoint.ImmutableEndpoint, MessageDispatcher)
+     * @see MessageDispatcherFactory#passivate(OutboundEndpoint, MessageDispatcher)
      */
     void passivate();
 

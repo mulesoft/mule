@@ -75,7 +75,6 @@ public interface Transaction
     /**
      * Suspend the XA transaction
      *
-     * @return
      * @throws TransactionException if any error
      */
     javax.transaction.Transaction suspend() throws TransactionException;

@@ -19,12 +19,12 @@ import junit.framework.Assert;
 
 /**
  * Tests that lifecycle methods on a connector are not processed more than once.  
- * @see MULE-3062
  */
 public class ConnectorLifecycleTestCase extends AbstractMuleTestCase 
 {
     private TestConnector connector;
 
+    @Override
     public void doSetUp() throws Exception
     {
         connector = new TestConnector();
@@ -32,6 +32,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         connector.initialise();
     }
 
+    @Override
     public void doTearDown() throws Exception
     {
         connector = null;

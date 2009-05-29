@@ -10,9 +10,7 @@
 
 package org.mule.module.xml.transformer;
 
-import org.mule.RequestContext;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
@@ -20,8 +18,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.xml.util.XMLUtils;
 import org.mule.module.xml.util.LocalURIResolver;
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -49,7 +47,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * <code>XsltTransformer</code> performs an XSLT transform on a DOM (or other XML-ish)
  * object.
  * <p/>
- * This transformer maintains a pool of {@link javax.xml.Transformer} objects to speed up processing of concurrent requests.
+ * This transformer maintains a pool of {@link javax.xml.transform.Transformer} objects to speed up processing of concurrent requests.
  * The pool can be configured using {@link #setMaxIdleTransformers(int)}.
  * <p/>
  * Parameter can also be set as part of the transformation context and these can be mapped to conent in the current message using
@@ -147,7 +145,6 @@ public class XsltTransformer extends AbstractXmlTransformer implements MuleConte
     /**
      * Transform, using XSLT, a XML String to another String.
      *
-     * @param src The source XML (String, byte[], DOM, etc.)
      * @return The result in the type specified by the user
      */
     public Object transform(MuleMessage message, String encoding) throws TransformerException

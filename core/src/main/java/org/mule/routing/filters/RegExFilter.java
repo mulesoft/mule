@@ -104,7 +104,6 @@ public class RegExFilter implements Filter, ObjectFilter
     }
 
     /**
-     * @return
      * @deprecated Use {@link #getPattern()} This method name was changed to be
      *             consistent with other filters
      */
@@ -114,8 +113,7 @@ public class RegExFilter implements Filter, ObjectFilter
     }
 
     /**
-     * @param
-     * @deprecated Use {@link #getPattern()} This method name was changed to be
+     * @deprecated Use {@link #setPattern(String)} This method name was changed to be
      *             consistent with other filters
      */
     public void setExpression(String expression)

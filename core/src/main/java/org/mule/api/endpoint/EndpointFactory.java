@@ -34,7 +34,6 @@ public interface EndpointFactory extends MuleContextAware
      * MULE-2292
      * 
      * @param uri endpoint identifier or uri
-     * @param muleContext
      * @throws MuleException
      */
     InboundEndpoint getInboundEndpoint(String uri) throws MuleException;
@@ -46,7 +45,6 @@ public interface EndpointFactory extends MuleContextAware
      * MULE-2292
      * 
      * @param uri endpoint identifier or uri
-     * @param muleContext
      * @throws MuleException
      */
     OutboundEndpoint getOutboundEndpoint(String uri) throws MuleException;
@@ -55,7 +53,6 @@ public interface EndpointFactory extends MuleContextAware
      * Creates an endpoint with the "INBOUND" role using the builder provided.
      * 
      * @param builder
-     * @param muleContext
      * @throws MuleException
      */
     InboundEndpoint getInboundEndpoint(EndpointBuilder builder) throws MuleException;
@@ -64,7 +61,6 @@ public interface EndpointFactory extends MuleContextAware
      * Creates an endpoint with the "OUTBOUND" role using the builder provided.
      * 
      * @param builder
-     * @param muleContext
      * @throws MuleException
      */
     OutboundEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException;
@@ -94,10 +90,7 @@ public interface EndpointFactory extends MuleContextAware
      * allow the uri parameter to be either a uri or a global endpoint identifier you need this method.</i> <br/><br/>
      * Each and every call to this method, even if it is for the same uri/global endpoint name will return a new EndpoointBuilder instance.
      * 
-     * 
-     * 
      * @param uri endpoint identifier or uri
-     * @param muleContext
      * @throws MuleException
      * @see EndpointBuilder
      * @see EndpointURIEndpointBuilder

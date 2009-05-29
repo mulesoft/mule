@@ -63,9 +63,6 @@ public class JsonUtils
     /**
      * @param jsonString  Either an object, an array, or null. Otherwise, invalid JSON
      *                    string occurs.
-     * @param targetClass
-     * @param classMap
-     * @return
      */
     public static Object convertJsonToBean(String jsonString, JsonConfig config, Class returnType, Map classMapping)
     {
@@ -91,7 +88,6 @@ public class JsonUtils
      * note that BigDecimal is more resource-intensive.
      *
      * @param jsonString
-     * @return
      */
     public static BigDecimal[] convertJsonToNumberArray(String jsonString, JsonConfig config)
     {
@@ -121,15 +117,8 @@ public class JsonUtils
         return jsonString;
     }
 
-    /**
-     * @param jsonString
-     * @param targetClass
-     * @param classMap
-     * @return
-     */
     public static Object convertJsonToJavaObject(String jsonString, JsonConfig config, Class returnType, Map mappings)
     {
-
         if (logger.isDebugEnabled())
         {
             logger.debug("Converting jsonString to Java object: jsonString=" + jsonString + ", config=" + config);
@@ -218,7 +207,6 @@ public class JsonUtils
      * entire string.
      *
      * @param jsonString
-     * @return
      */
     public static boolean isArray(String jsonString)
     {
@@ -240,7 +228,6 @@ public class JsonUtils
      * entire string.
      *
      * @param jsonString
-     * @return
      */
     public static boolean isNumber(String jsonString)
     {
@@ -252,7 +239,6 @@ public class JsonUtils
      * entire string.
      *
      * @param jsonString
-     * @return
      */
     public static boolean isObject(String jsonString)
     {
@@ -264,7 +250,6 @@ public class JsonUtils
      * entire string.
      *
      * @param jsonString
-     * @return
      */
     public static boolean isString(String jsonString)
     {
@@ -286,7 +271,6 @@ public class JsonUtils
      *
      * @param clazz
      * @param dynaBean
-     * @return
      */
     public static Object getObjectFromDynaBean(Class clazz, DynaBean dynaBean) throws Exception
     {
@@ -318,7 +302,6 @@ public class JsonUtils
      * Object[] not List or its subtype.
      *
      * @param jsonString
-     * @return
      */
     public static Object getObjectFromJsonString(String jsonString, JsonConfig config, Class returnClass) throws Exception
     {

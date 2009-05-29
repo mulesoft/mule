@@ -57,7 +57,6 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
      * Implementations of this method should ensure that the correct connector is set
      * on the endpoint
      * 
-     * @return
      * @throws Exception
      */
     public abstract InboundEndpoint getEndpoint() throws Exception;

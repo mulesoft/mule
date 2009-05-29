@@ -103,7 +103,7 @@ public interface ThreadSafeAccess
         
         /**
          * Should we fail when we detect "message scribbling"?  
-         * @see e.g. AbstractMessageAdapter.checkMutable()
+         * (see AbstractMessageAdapter#checkMutable())
          */
         public static boolean isFailOnMessageScribbling()
         {

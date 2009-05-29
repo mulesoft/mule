@@ -182,10 +182,6 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
      */
     void setInitialState(String state);
 
-    /**
-     * Sets the Model name that this descriptor is registered within.
-     * @param modelName name of the model
-     */
     void setModel(Model model);
 
     /**

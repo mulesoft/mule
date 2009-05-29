@@ -124,8 +124,6 @@ public interface OutboundRouter extends Router
      * Determines whether this router supports dynamic endpoint. i.e. endpoints that
      * are not configured at design time. Endpoints might be pulled from the message
      * or payload.
-     * 
-     * @return
      */
     boolean isDynamicEndpoints();
 
@@ -137,8 +135,6 @@ public interface OutboundRouter extends Router
     
     /**
      * Determines is this router requires a new message copy.
-     * 
-     * @return
      */
     boolean isRequiresNewMessage();
 

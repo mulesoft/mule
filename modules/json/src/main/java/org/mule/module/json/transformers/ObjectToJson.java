@@ -136,8 +136,6 @@ public class ObjectToJson extends AbstractMessageAwareTransformer
     /**
      * The reason of having this is because the original exception object is way too
      * complex and it breaks JSON-lib.
-     *
-     * @return
      */
     private Exception getException(Throwable t)
     {

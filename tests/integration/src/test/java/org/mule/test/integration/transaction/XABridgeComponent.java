@@ -55,7 +55,6 @@ public class XABridgeComponent
      * the current transaction as rollback only.
      * 
      * @param msg
-     * @return
      * @throws Exception
      */
     public Object onJdbcMessage(Map msg) throws Exception
@@ -69,7 +68,6 @@ public class XABridgeComponent
      * transaction as rollback only.
      * 
      * @param msg
-     * @return
      * @throws Exception
      */
     public Object onJmsMessage(String msg) throws Exception

@@ -32,8 +32,6 @@ public interface OutboundRouterCollection extends RouterCollection
 
     /**
      * Determines if any endpoints have been set on this router.
-     * 
-     * @return
      */
     boolean hasEndpoints();
 }

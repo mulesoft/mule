@@ -114,7 +114,6 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
 
     /**
      * @param event
-     * @return
      * @throws UnsupportedOperationException
      */
     protected MuleMessage doSend(MuleEvent event) throws Exception
@@ -214,7 +213,6 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
      * folder.hasNewMessages() cannot be used
      *
      * @param folder
-     * @return
      * @throws javax.mail.MessagingException
      */
     protected static boolean hasMessages(Folder folder) throws MessagingException

@@ -159,7 +159,6 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
      *
      * @return java.rmi.Remote and RmiAble implementing class
      * @throws org.mule.api.lifecycle.ConnectException
-     *
      */
     private RmiAble getRmiObject() throws ConnectException
     {
@@ -188,7 +187,6 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
      * Routes message forward
      *
      * @param message
-     * @return
      * @throws org.mule.api.MuleException
      */
     public Object routeMessage(Object message) throws MuleException

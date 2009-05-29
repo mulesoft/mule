@@ -42,19 +42,11 @@ public interface Component extends Lifecycle
     /**
      * Component statistics are used to gather component statistics such as
      * sync/async invocation counts and total and average execution time.
-     * 
-     * @return
      */
     ComponentStatistics getStatistics();
 
-    /**
-     * @param service
-     */
     void setService(Service service);
 
-    /**
-     * @return
-     */
     Service getService();
 
 }
