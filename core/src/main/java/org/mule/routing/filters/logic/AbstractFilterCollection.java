@@ -21,77 +21,34 @@ import java.util.List;
 
 public abstract class AbstractFilterCollection implements Filter
 {
-    private List filters;
+    private List<Filter> filters;
 
     public AbstractFilterCollection()
     {
-        filters = new ArrayList();
-
+        filters = new ArrayList<Filter>();
     }
 
-    /**
-     * @param left
-     * @param right
-     */
-    public AbstractFilterCollection(Filter left, Filter right)
+    public AbstractFilterCollection(List<Filter> filters)
     {
         this();
-        filters.add(left);
-        filters.add(right);
+        this.filters = filters;
     }
 
-    /**
-     * @deprecated
-     * @param leftFilter
-     */
-    public void setLeftFilter(Filter leftFilter)
+    public AbstractFilterCollection(Filter... filters)
     {
-        filters.add(0, leftFilter);
-    }
-
-    /**
-     * @deprecated
-     * @param rightFilter
-     */
-    public void setRightFilter(Filter rightFilter)
-    {
-        filters.add(rightFilter);
-
-    }
-
-    /**
-     * @deprecated
-     */
-    public Filter getLeftFilter()
-    {
-        if(filters.size()==0) return null;
-        return (Filter)filters.get(0);
-    }
-
-    /**
-     * @deprecated
-     */
-    public Filter getRightFilter()
-    {
-        if(filters.size() > 1)
+        this();
+        for (int i = 0; i < filters.length; i++)
         {
-            return (Filter)filters.get(1);
-        } else if(filters.size()==0) {
-            return null;
-        }
-        else
-        {
-            return (Filter)filters.get(0);
-
+            this.filters.add(filters[i]);
         }
     }
 
-    public List getFilters()
+    public List<Filter> getFilters()
     {
         return filters;
     }
 
-    public void setFilters(List filters)
+    public void setFilters(List<Filter> filters)
     {
         this.filters = filters;
     }

@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>OrFilter</code> accepts if any of the filters accept the message
@@ -26,20 +27,20 @@ public class OrFilter extends AbstractFilterCollection
         super();
     }
 
-    /**
-     * @param left
-     * @param right
-     */
-    public OrFilter(Filter left, Filter right)
+    public OrFilter(Filter... filters)
     {
-        super(left, right);
+        super(filters);
+    }
+
+    public OrFilter(List<Filter> filters)
+    {
+        super(filters);
     }
 
     public boolean accept(MuleMessage message)
     {
-        for (Iterator iterator = getFilters().iterator(); iterator.hasNext();)
+        for (Filter filter : getFilters())
         {
-            Filter filter = (Filter) iterator.next();
             if(filter.accept(message))
             {
                 return true;

@@ -13,6 +13,8 @@ package org.mule.routing.filters.logic;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
+import java.util.List;
+
 /**
  * <code>AndFilter</code> accepts only if all the filters
  * accept.
@@ -25,14 +27,14 @@ public class AndFilter extends AbstractFilterCollection
         super();
     }
 
-    /**
-     *
-     * @param left
-     * @param right
-     */
-    public AndFilter(Filter left, Filter right)
+    public AndFilter(Filter... filters)
     {
-        super(left, right);
+        super(filters);
+    }
+
+    public AndFilter(List<Filter> filters)
+    {
+        super(filters);
     }
 
     public boolean accept(MuleMessage message)
@@ -41,9 +43,8 @@ public class AndFilter extends AbstractFilterCollection
         {
             return false;
         }
-        for (Object o : getFilters())
+        for (Filter filter : getFilters())
         {
-            Filter filter = (Filter) o;
             if (!filter.accept(message))
             {
                 return false;
