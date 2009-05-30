@@ -14,11 +14,11 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.registry.AbstractRegistry;
 
 import com.google.inject.ConfigurationException;
+import com.google.inject.Injector;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class GuiceRegistry extends AbstractRegistry
 {
-    private MuleInjectorImpl injector = null;
+    private Injector injector = null;
 
     public GuiceRegistry()
     {
@@ -36,10 +36,10 @@ public class GuiceRegistry extends AbstractRegistry
     }
 
 
-    GuiceRegistry(MuleInjectorImpl injector)
+    GuiceRegistry(Injector injector)
     {
         this();
-        this.injector = new MuleInjectorImpl(injector, new HashMap<String, Object>());
+        this.injector = injector;
     }
 
     protected void doInitialise() throws InitialisationException
@@ -54,7 +54,7 @@ public class GuiceRegistry extends AbstractRegistry
 
     public Object lookupObject(String key)
     {
-        return injector.getInstance(key);
+        return null;
     }
 
     public <T> T lookupObject(Class<T> clazz)

@@ -9,6 +9,9 @@
  */
 package org.mule.module.guice;
 
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.MuleContext;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 
@@ -16,45 +19,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A mule specific Guice module that allows bindings to be associated with a string key.  Note that Guice binds all
- * objects by {@link Class} or {@link Key}. Mule adds support for String bindings only for use with the
- * Mule Xml Configuration. We recommend that you shouldn't use string bindings for any other
- * purpose since it kinda goes against the principles of the guice project.
+ * A mule specific Guice module that allows users to override the {@link #configureMuleContext(org.mule.api.MuleContext)} method
+ * to do any Mule configuration such as register notifications.  Most users will not need to override this method so the
+ * {@link com.google.inject.AbstractModule} can be used.
+ *
+ * Note that Mule objects such as Connectors and Agents can be registered in a Guice module too.  To do this create provider methods
+ * on a module and mark with the {@link com.google.inject.Provides} annotation.
+ *
+ * Its recommended that you put all your Mule configuration objects in a separate Guice module.
  */
 public abstract class AbstractMuleGuiceModule extends AbstractModule
 {
 
-    StringBindings stringBindings = new StringBindings();
+    private MuleContext muleContext;
 
-    public AbstractMuleGuiceModule()
+    void setMuleContext(MuleContext context)
     {
-        configureStringBindings(stringBindings);
+        muleContext = context;
+        configureMuleContext(muleContext);
     }
 
-    Map<String, Object> getStringBindings()
+    public void configureMuleContext(MuleContext muleContext)
     {
-        return stringBindings.getBindings();
-    }
 
-    protected abstract void configureStringBindings(StringBindings stringBindings);
-
-    protected class StringBindings
-    {
-        private Map<String, Object> stringBindings = new HashMap<String, Object>();
-
-        protected void bindString(String name, Class type)
-        {
-            stringBindings.put(name, type);
-        }
-
-        protected void bindString(String name, Key key)
-        {
-            stringBindings.put(name, key);
-        }
-
-        Map<String, Object> getBindings()
-        {
-            return stringBindings;
-        }
     }
 }

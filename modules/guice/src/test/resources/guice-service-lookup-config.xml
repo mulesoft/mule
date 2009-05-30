@@ -12,12 +12,6 @@
     <auto-transformer name="auto-transform" returnClass="org.mule.tck.testmodels.fruit.Apple"/>
 
     <model name="main">
-        <service name="MyService1">
-            <component>
-                <guice:object stringBinding="myService"/>                
-            </component>
-        </service>
-
         <service name="MyService2">
             <inbound>
                 <vm:inbound-endpoint path="myservice2" transformer-refs="auto-transform"/>

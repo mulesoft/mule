@@ -22,16 +22,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="stringBinding" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Refers to an object bound by an string name in a Guice module. Note that Guice binds all
-                            objects by Interface or Key. Mule adds support for String bindings only for use with the
-                            Mule Xml Configuration. We recommend that you shouldn't use string bindings for any other
-                            purpose since it kinda goes against the principles of the guice project.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
 

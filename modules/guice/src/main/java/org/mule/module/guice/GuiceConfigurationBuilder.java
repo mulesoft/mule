@@ -10,20 +10,25 @@
 package org.mule.module.guice;
 
 import org.mule.api.MuleContext;
+import org.mule.api.agent.Agent;
+import org.mule.api.transport.Connector;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
+import org.mule.util.ObjectNameHelper;
 import org.mule.util.scan.ClasspathScanner;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
+import com.google.inject.Key;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Iterator;
 
 
 /**
@@ -36,8 +41,6 @@ import java.util.Set;
  */
 public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 {
-    public static final String INJECTOR_OBJECT_NAME = "_guiceInjector";
-
     private String basepath = "";
 
     private Module[] modules = null;
@@ -69,7 +72,7 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
     {
         //TODO how do people specify specific modules and stage for this configuration
         Injector injector;
-        if(basepath!=null && basepath.startsWith("/"))
+        if (basepath != null && basepath.startsWith("/"))
         {
             basepath = basepath.substring(1);
         }
@@ -78,15 +81,15 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
         {
             ClasspathScanner scanner = new ClasspathScanner(new String[]{basepath});
             Set<Class> classes = scanner.scanFor(Module.class);
-            
+
             //TODO add the ability to do excludes
             classes.remove(AbstractMuleGuiceModule.class);
 
-            if(classes.size()==0)
+            if (classes.size() == 0)
             {
                 throw new ConfigurationException(CoreMessages.createStaticMessage("There are no Guice module objects on the classpath under: " + basepath));
             }
-            
+
             modules = new Module[classes.size()];
             int i = 0;
             for (Class module : classes)
@@ -102,7 +105,7 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
             Module module = modules[i];
             if (module instanceof AbstractMuleGuiceModule)
             {
-                stringBindings.putAll(((AbstractMuleGuiceModule) module).getStringBindings());
+                ((AbstractMuleGuiceModule) module).setMuleContext(muleContext);
             }
         }
         if (stage != null)
@@ -113,23 +116,26 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
         {
             injector = Guice.createInjector(modules);
         }
-        MuleInjectorImpl muleInjector = new MuleInjectorImpl(injector, stringBindings);
-        GuiceRegistry registry = new GuiceRegistry(muleInjector);
+        GuiceRegistry registry = new GuiceRegistry(injector);
         muleContext.addRegistry(2, registry);
-        //Make this available in the registry so that we can use GuiceInjectorAware
-        muleContext.getRegistry().registerObject(INJECTOR_OBJECT_NAME, muleInjector);
 
-        //TODO We could wire mule system objects here
-//        for (Map.Entry<String, Object> entry : stringBindings.entrySet())
-//        {
-//            if(entry.getValue() instanceof Class && Connector.class.isAssignableFrom(((Class)entry.getValue())))
-//            {
-//                Connector c = (Connector)muleInjector.getInstance(entry.getKey());
-//                c.setName(entry.getKey());
-//                c.setMuleContext(muleContext);
-//                muleContext.getRegistry().registerConnector(c);
-//            }
-//        }
+        for (Iterator<Key<?>> iterator = injector.getBindings().keySet().iterator(); iterator.hasNext();)
+        {
+            Key key = iterator.next();
+            if (Connector.class.isAssignableFrom(key.getTypeLiteral().getRawType()))
+            {
+                Connector c = (Connector) injector.getInstance(key);
+                c.setName(ObjectNameHelper.getConnectorName(c));
+                c.setMuleContext(muleContext);
+                muleContext.getRegistry().registerConnector(c);
+            }
+            else if (Agent.class.isAssignableFrom(key.getTypeLiteral().getRawType()))
+            {
+                Agent a = (Agent) injector.getInstance(key);
+                muleContext.getRegistry().registerAgent(a);
+            }
+
+        }
         registry.initialise();
     }
 }

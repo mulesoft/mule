@@ -11,6 +11,7 @@ package org.mule.module.guice;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.testmodels.fruit.BananaFactory;
+import org.mule.tck.testmodels.mule.TestAgent;
 
 import com.google.inject.Provides;
 
@@ -19,12 +20,6 @@ import com.google.inject.Provides;
  */
 public class ConfigServiceModule extends AbstractMuleGuiceModule
 {
-    protected void configureStringBindings(StringBindings stringBindings)
-    {
-        //Bind the service Binding to a string so it can be referenced by the string 
-        stringBindings.bindString("myService", AutoTransformServiceInterface.class);
-    }
-
     protected void configure()
     {
         //Our auto transform service component
@@ -43,5 +38,11 @@ public class ConfigServiceModule extends AbstractMuleGuiceModule
     BananaFactory provideBananaFactory()
     {
         return new BananaFactory();
+    }
+
+    @Provides
+    TestAgent provideTestAgent()
+    {
+        return new TestAgent();
     }
 }

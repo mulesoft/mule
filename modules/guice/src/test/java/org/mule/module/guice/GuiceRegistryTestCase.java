@@ -61,11 +61,8 @@ public class GuiceRegistryTestCase extends FunctionalTestCase
 
     public void testServiceLookup() throws Exception
     {
-        Object service = this.getComponent("MyService1");
-        assertNotNull(service);
-        assertTrue(service instanceof DefaultAutoTransformService);
 
-        service = this.getComponent("MyService2");
+        Object service = this.getComponent("MyService2");
         assertNotNull(service);
         assertTrue(service instanceof DefaultAutoTransformService);
     }
