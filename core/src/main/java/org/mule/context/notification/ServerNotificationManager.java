@@ -22,6 +22,7 @@ import org.mule.util.ClassUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -30,7 +31,6 @@ import javax.resource.spi.work.WorkListener;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -92,12 +92,12 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         }
     }
 
-    public void addInterfaceToType(Class iface, Class event)
+    public void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> event)
     {
         configuration.addInterfaceToType(iface, event);
     }
 
-    public void setInterfaceToTypes(Map interfaceToEvents) throws ClassNotFoundException
+    public void setInterfaceToTypes(Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToEvents) throws ClassNotFoundException
     {
         configuration.addAllInterfaceToTypes(interfaceToEvents);
     }
@@ -130,27 +130,27 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.removeListener(listener);
     }
 
-    public void removeAllListeners(Collection listeners)
+    public void removeAllListeners(Collection<ServerNotificationListener> listeners)
     {
         configuration.removeAllListeners(listeners);
     }
 
-    public void disableInterface(Class iface) throws ClassNotFoundException
+    public void disableInterface(Class<? extends ServerNotificationListener> iface) throws ClassNotFoundException
     {
         configuration.disableInterface(iface);
     }
 
-    public void setDisabledInterfaces(Collection interfaces) throws ClassNotFoundException
+    public void setDisabledInterfaces(Collection<Class<? extends ServerNotificationListener>> interfaces) throws ClassNotFoundException
     {
         configuration.disabledAllInterfaces(interfaces);
     }
 
-    public void disableType(Class type) throws ClassNotFoundException
+    public void disableType(Class<? extends ServerNotification> type) throws ClassNotFoundException
     {
         configuration.disableType(type);
     }
 
-    public void setDisabledTypes(Collection types) throws ClassNotFoundException
+    public void setDisabledTypes(Collection<Class<? extends ServerNotificationListener>> types) throws ClassNotFoundException
     {
         configuration.disableAllTypes(types);
     }
@@ -184,7 +184,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         }
     }
 
-    public boolean isNotificationEnabled(Class type)
+    public boolean isNotificationEnabled(Class<? extends ServerNotification> type)
     {
         boolean enabled = false;
         if (configuration != null)
@@ -240,7 +240,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     /**
      * Support string or class parameters
      */
-    public static Class toClass(Object value) throws ClassNotFoundException
+    static Class toClass(Object value) throws ClassNotFoundException
     {
         Class clazz;
         if (value instanceof String)
@@ -265,14 +265,14 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         return configuration.getPolicy();
     }
 
-    public Map getInterfaceToTypes()
+    public Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> getInterfaceToTypes()
     {
         return Collections.unmodifiableMap(configuration.getInterfaceToTypes());
     }
 
-    public Collection getListeners()
+    public Set<ListenerSubscriptionPair> getListeners()
     {
-        return Collections.unmodifiableCollection(configuration.getListeners());
+        return Collections.unmodifiableSet(configuration.getListeners());
     }
 
 }

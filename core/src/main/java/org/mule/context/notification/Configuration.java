@@ -13,6 +13,7 @@ package org.mule.context.notification;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.config.i18n.CoreMessages;
+import static org.mule.context.notification.ServerNotificationManager.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -32,14 +33,15 @@ class Configuration
 {
 
     protected Log logger = LogFactory.getLog(getClass());
-    private Map interfaceToTypes = new HashMap(); // map from interface to collection of events
-    private Set listenerSubscriptionPairs = new HashSet();
-    private Set disabledInterfaces = new HashSet();
-    private Set disabledNotificationTypes = new HashSet();
+    private Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes =
+            new HashMap<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>>(); // map from interface to collection of events
+    private Set<ListenerSubscriptionPair> listenerSubscriptionPairs = new HashSet<ListenerSubscriptionPair>();
+    private Set<Class<? extends ServerNotificationListener>> disabledInterfaces = new HashSet<Class<? extends ServerNotificationListener>>();
+    private Set<Class<? extends ServerNotification>> disabledNotificationTypes = new HashSet<Class<? extends ServerNotification>>();
     private boolean dirty = true;
     private Policy policy;
 
-    synchronized void addInterfaceToType(Class iface, Class type)
+    synchronized void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> type)
     {
         dirty = true;
         if (!ServerNotification.class.isAssignableFrom(type))
@@ -50,9 +52,9 @@ class Configuration
         }
         if (!interfaceToTypes.containsKey(iface))
         {
-            interfaceToTypes.put(iface, new HashSet());
+            interfaceToTypes.put(iface, new HashSet<Class<? extends ServerNotification>>());
         }
-        Set events = (Set) interfaceToTypes.get(iface);
+        Set<Class<? extends ServerNotification>> events = interfaceToTypes.get(iface);
         events.add(type);
         if (logger.isDebugEnabled())
         {
@@ -63,15 +65,16 @@ class Configuration
 
     /**
      * @param interfaceToTypes map from interace to a particular event
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException if the interface is a key, but the corresponding class cannot be loaded
      */
-    synchronized void addAllInterfaceToTypes(Map interfaceToTypes) throws ClassNotFoundException
+    synchronized void addAllInterfaceToTypes(Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes) throws ClassNotFoundException
     {
         dirty = true;
+       
         for (Iterator ifaces = interfaceToTypes.keySet().iterator(); ifaces.hasNext();)
         {
             Object iface = ifaces.next();
-            addInterfaceToType(ServerNotificationManager.toClass(iface), ServerNotificationManager.toClass(interfaceToTypes.get(iface)));
+            addInterfaceToType(toClass(iface), toClass(interfaceToTypes.get(iface)));
         }
     }
 
@@ -93,7 +96,7 @@ class Configuration
     synchronized void removeListener(ServerNotificationListener listener)
     {
         dirty = true;
-        Set toRemove = new HashSet();
+        Set<ListenerSubscriptionPair> toRemove = new HashSet<ListenerSubscriptionPair>();
         for (Iterator listeners = listenerSubscriptionPairs.iterator(); listeners.hasNext();)
         {
             ListenerSubscriptionPair pair = (ListenerSubscriptionPair) listeners.next();
@@ -114,22 +117,22 @@ class Configuration
         }
     }
 
-    synchronized void disableInterface(Class iface)
+    synchronized void disableInterface(Class<? extends ServerNotificationListener> iface)
     {
         dirty = true;
         disabledInterfaces.add(iface);
     }
 
-    synchronized void disabledAllInterfaces(Collection interfaces) throws ClassNotFoundException
+    synchronized void disabledAllInterfaces(Collection<Class<? extends ServerNotificationListener>> interfaces) throws ClassNotFoundException
     {
         dirty = true;
         for (Iterator iface = interfaces.iterator(); iface.hasNext();)
         {
-            disableInterface(ServerNotificationManager.toClass(iface.next()));
+            disableInterface(toClass(iface.next()));
         }
     }
 
-    synchronized void disableType(Class type)
+    synchronized void disableType(Class<? extends ServerNotification> type)
     {
         dirty = true;
         disabledNotificationTypes.add(type);
@@ -140,7 +143,7 @@ class Configuration
         dirty = true;
         for (Iterator event = types.iterator(); event.hasNext();)
         {
-            disableType(ServerNotificationManager.toClass(event.next()));
+            disableType(toClass(event.next()));
         }
     }
 
@@ -156,14 +159,14 @@ class Configuration
 
     // for tests -------------------------------
 
-    Map getInterfaceToTypes()
+    Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> getInterfaceToTypes()
     {
         return Collections.unmodifiableMap(interfaceToTypes);
     }
 
-    Collection getListeners()
+    Set<ListenerSubscriptionPair> getListeners()
     {
-        return Collections.unmodifiableCollection(listenerSubscriptionPairs);
+        return Collections.unmodifiableSet(listenerSubscriptionPairs);
     }
 
 }

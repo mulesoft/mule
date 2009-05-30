@@ -27,6 +27,6 @@ public interface ServerNotificationHandler
      * @param notfnClass Either the notification class being generated or some superclass
      * @return false if there is no need to dispatch the notification
      */
-    boolean isNotificationEnabled(Class notfnClass);
+    boolean isNotificationEnabled(Class<? extends ServerNotification> notfnClass);
 
 }
