@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
+import java.io.IOException;
 
 
 /**
@@ -70,7 +71,6 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
-        //TODO how do people specify specific modules and stage for this configuration
         Injector injector;
         if (basepath != null && basepath.startsWith("/"))
         {
@@ -87,6 +87,14 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 
             if (classes.size() == 0)
             {
+                try
+                {
+                    basepath = getClass().getClassLoader().getResources(basepath).toString();
+                }
+                catch (Exception e)
+                {
+                    basepath = (basepath.equals("") ? "/" : basepath);
+                }
                 //lets just log a noticable exception as a warning since the Guice build can compliment other configuration builders
                 logger.warn(new ConfigurationException(CoreMessages.createStaticMessage("There are no Guice module objects on the classpath under: " + basepath)));
             }
@@ -134,6 +142,9 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
                 Agent a = (Agent) injector.getInstance(key);
                 muleContext.getRegistry().registerAgent(a);
             }
+            //TODO EndpointBuilders
+            //TODO Security Providers
+            //Note transformers will automatically be available since they are created in the Guice container
 
         }
         registry.initialise();
