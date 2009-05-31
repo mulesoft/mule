@@ -87,7 +87,8 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 
             if (classes.size() == 0)
             {
-                throw new ConfigurationException(CoreMessages.createStaticMessage("There are no Guice module objects on the classpath under: " + basepath));
+                //lets just log a noticable exception as a warning since the Guice build can compliment other configuration builders
+                logger.warn(new ConfigurationException(CoreMessages.createStaticMessage("There are no Guice module objects on the classpath under: " + basepath)));
             }
 
             modules = new Module[classes.size()];
@@ -99,7 +100,6 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
             }
         }
 
-        Map<String, Object> stringBindings = new HashMap<String, Object>();
         for (int i = 0; i < modules.length; i++)
         {
             Module module = modules[i];
