@@ -35,13 +35,26 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <!--
+            For the hello HTTP example
+        -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${muleVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
+            <artifactId>mule-transport-servlet</artifactId>
             <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
         </dependency>
 
         <dependency>
