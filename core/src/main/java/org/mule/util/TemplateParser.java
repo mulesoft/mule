@@ -32,6 +32,8 @@ public final class TemplateParser
     public static final String CURLY_TEMPLATE_STYLE = "curly";
     public static final String WIGGLY_MULE_TEMPLATE_STYLE = "mule";
 
+    private static final String DOLLAR_ESCAPE = "@@@";
+
     /**
      * logger used by this class
      */
@@ -134,7 +136,8 @@ public final class TemplateParser
     protected String parse(Map props, String template, TemplateCallback callback)
     {
         String result = template;
-        Matcher m = pattern.matcher(template);
+
+        Matcher m = pattern.matcher(result);
 
         while (m.find())
         {
@@ -163,6 +166,12 @@ public final class TemplateParser
             {
                 String matchRegex = escape(match);
                 String valueString = value.toString();
+                //need to escape $ as they resolve into group references, escaping them was not enough
+                //This smells a bit like a hack, but one way or another these characters need to be escaped
+                if (valueString.indexOf('$') != -1)
+                {
+                    valueString = valueString.replaceAll("\\$", DOLLAR_ESCAPE);
+                }
 
                 if (valueString.indexOf('\\') != -1)
                 {
@@ -171,6 +180,10 @@ public final class TemplateParser
 
                 result = result.replaceAll(matchRegex, valueString);
             }
+        }
+        if (result.indexOf(DOLLAR_ESCAPE) != -1)
+        {
+            result = result.replaceAll(DOLLAR_ESCAPE, "\\$");
         }
         return result;
     }
