@@ -19,6 +19,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -27,10 +31,11 @@ public class HttpCookieTestCase extends FunctionalTestCase
 {
     private static final int LISTEN_PORT = 60212;
     private static final String COOKIE_HEADER = "Cookie:";
-    
+
     private CountDownLatch simpleServerLatch = new CountDownLatch(1);
     private CountDownLatch latch = new CountDownLatch(1);
     private boolean cookieFound = false;
+    private List<String> cookieHeaders  = new ArrayList<String>();
 
     protected String getConfigResources()
     {
@@ -49,12 +54,18 @@ public class HttpCookieTestCase extends FunctionalTestCase
     {
         // wait for the simple server thread started in doSetUp to come up
         assertTrue(simpleServerLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        
+
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put("COOKIE_HEADER","MYCOOKIE");
         MuleClient client = new MuleClient();
-        client.send("vm://vm-in", "foobar", null);
-    
+        client.send("vm://vm-in", "foobar", properties);
+
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertTrue(cookieFound);
+
+        assertTrue(cookieHeaders.size() == 2);
+        assertEquals("Cookie: $Version=0; customCookie=yes", cookieHeaders.get(0));
+        assertEquals("Cookie: $Version=0; expressionCookie=MYCOOKIE", cookieHeaders.get(1));
     }
 
     private class SimpleHttpServer extends Object implements Runnable
@@ -64,14 +75,14 @@ public class HttpCookieTestCase extends FunctionalTestCase
             try
             {
                 ServerSocket serverSocket = new ServerSocket(LISTEN_PORT);
-                
+
                 // now that we are up and running, the test may send
                 simpleServerLatch.countDown();
-                
+
                 Socket socket = serverSocket.accept();
                 InputStream in = socket.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                
+
                 String line = reader.readLine();
                 while (line != null)
                 {
@@ -80,9 +91,9 @@ public class HttpCookieTestCase extends FunctionalTestCase
                     if (line.indexOf(COOKIE_HEADER) > -1)
                     {
                         cookieFound = true;
-                        break;
+                        cookieHeaders.add(line);
                     }
-                    
+
                     line = reader.readLine();
                     // only read the header, i.e. if we encounter an empty line 
                     // stop reading (we're only interested in the headers anyway)
@@ -91,10 +102,10 @@ public class HttpCookieTestCase extends FunctionalTestCase
                         line = null;
                     }
                 }
-                
+
                 OutputStream out = socket.getOutputStream();
                 out.write("HTTP/1.1 200 OK\n\n".getBytes());
-                
+
                 in.close();
                 out.close();
                 socket.close();

@@ -130,21 +130,23 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
-        
+
     }
 
     protected void processCookies(MuleEvent event)
     {
         MuleMessage msg = event.getMessage();
-        
-        processCookies(msg.removeProperty(HttpConnector.HTTP_COOKIES_PROPERTY), 
-                       (String)msg.removeProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY));
-        
-        processCookies(endpoint.getProperty(HttpConnector.HTTP_COOKIES_PROPERTY), 
-                       (String)endpoint.getProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY));
+
+        Object cookiesProperty = msg.removeProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+        String cookieSpecProperty = (String) msg.removeProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY);
+        processCookies(cookiesProperty, cookieSpecProperty, event);
+
+        cookiesProperty = endpoint.getProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+        cookieSpecProperty = (String) endpoint.getProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY);
+        processCookies(cookiesProperty, cookieSpecProperty, event);
     }
 
-    private void processCookies(Object cookieObject, String policy)
+    private void processCookies(Object cookieObject, String policy, MuleEvent event)
     {
         if (cookieObject instanceof Cookie[])
         {
@@ -168,7 +170,11 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             while (keyIter.hasNext())
             {
                 String key = (String) keyIter.next();
-                String value = (String) cookieMap.get(key);
+                String cookieValue = (String) cookieMap.get(key);
+
+                String value = event.getMuleContext().getExpressionManager().parse(cookieValue, 
+                    event.getMessage());
+
                 Cookie cookie = new Cookie(host, key, value, path, null, false);
                 client.getState().addCookie(cookie);
             }
@@ -191,11 +197,11 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             httpMethod = (HttpMethod) body;
         }
-        else 
+        else
         {
             httpMethod = (HttpMethod) sendTransformer.transform(msg);
         }
-        
+
         httpMethod.setFollowRedirects(connector.isFollowRedirects());
         return httpMethod;
     }
@@ -203,7 +209,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected void setPropertyFromEndpoint(MuleEvent event, MuleMessage msg, String prop)
     {
         Object o = msg.getProperty(prop, PropertyScope.OUTBOUND);
-        if (o == null) 
+        if (o == null)
         {
             o = event.getEndpoint().getProperty(prop);
             if (o != null)
@@ -228,33 +234,33 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getEncoding()));
             httpMethod = postMethod;
         }
-        else 
+        else
         {
-            if (!(body instanceof OutputHandler)) 
+            if (!(body instanceof OutputHandler))
             {
                 body = event.transformMessage(OutputHandler.class);
             }
-            
+
             OutputHandler outputHandler = (OutputHandler) body;
             postMethod.setRequestEntity(new StreamPayloadRequestEntity(outputHandler, event));
             postMethod.setContentChunked(true);
             httpMethod = postMethod;
         }
-        
+
         return httpMethod;
     }
 
     protected MuleMessage doSend(MuleEvent event) throws Exception
-    {        
+    {
         HttpMethod httpMethod = getMethod(event);
         connector.setupClientAuthorization(event, httpMethod, client, endpoint);
-        
+
         httpMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new MuleHttpMethodRetryHandler());
 
         Object body = null;
         boolean releaseConn = false;
         try
-        {   
+        {
             httpMethod = execute(event, httpMethod);
 
             DefaultExceptionPayload ep = null;
@@ -263,19 +269,19 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 ep = new DefaultExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
                     new HttpResponseException(httpMethod.getStatusText(), httpMethod.getStatusCode())));
             }
-            
+
             InputStream is = httpMethod.getResponseBodyAsStream();
             if (is == null)
             {
                 body = StringUtils.EMPTY;
                 releaseConn = true;
-            }            
+            }
             else
             {
                 is = new ReleasingInputStream(is, httpMethod);
                 body = is;
             }
-            
+
             Header[] headers = httpMethod.getResponseHeaders();
             HttpMessageAdapter adapter = new HttpMessageAdapter(new Object[]{body, headers});
 
@@ -286,9 +292,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             {
                 logger.debug("Http response is: " + status);
             }
-            
+
             MuleMessage m = new DefaultMuleMessage(adapter);
-          
+
             m.setExceptionPayload(ep);
             return m;
         }
@@ -299,12 +305,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             {
                 throw (DispatchException) e;
             }
-            
+
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
         finally
         {
-            if (releaseConn) 
+            if (releaseConn)
             {
                 httpMethod.releaseConnection();
             }
@@ -331,5 +337,5 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         // template method
     }
-    
+
 }
