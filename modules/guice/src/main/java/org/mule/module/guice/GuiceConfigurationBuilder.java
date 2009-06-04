@@ -48,14 +48,29 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 
     private Stage stage;
 
+    private ClassLoader classLoader;
+
     public GuiceConfigurationBuilder()
     {
         super();
+        classLoader = Thread.currentThread().getContextClassLoader();
+    }
+
+    public GuiceConfigurationBuilder(ClassLoader classLoader)
+    {
+        this.classLoader = classLoader;
     }
 
     public GuiceConfigurationBuilder(String basepath)
     {
+        this();
         this.basepath = basepath;
+    }
+
+    public GuiceConfigurationBuilder(String basepath, ClassLoader classLoader)
+    {
+        this.basepath = basepath;
+        this.classLoader = classLoader;
     }
 
     public GuiceConfigurationBuilder(Module... modules)
@@ -79,7 +94,7 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 
         if (modules == null)
         {
-            ClasspathScanner scanner = new ClasspathScanner(new String[]{basepath});
+            ClasspathScanner scanner = new ClasspathScanner(classLoader, new String[]{basepath});
             Set<Class> classes = scanner.scanFor(Module.class);
 
             //TODO add the ability to do excludes

@@ -10,6 +10,7 @@
 package org.mule.util.scan;
 
 import java.io.IOException;
+import java.net.URL;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.commons.EmptyVisitor;
@@ -25,13 +26,21 @@ public class ImplementationClassScanner extends EmptyVisitor implements ClassSca
 
     private String className;
 
+    private ClassLoader classLoader;
+
     public ImplementationClassScanner(Class implementationClass)
+    {
+        this(implementationClass, Thread.currentThread().getContextClassLoader());
+    }
+
+    public ImplementationClassScanner(Class implementationClass, ClassLoader classLoader)
     {
         if(implementationClass.isInterface())
         {
             throw new IllegalArgumentException("The class need to be an implementation not an interface");
         }
         this.implementationClass = implementationClass;
+        this.classLoader = classLoader;
     }
 
     public void visit(int i, int i1, String s, String s1, String superName, String[] interfaces)
@@ -51,7 +60,8 @@ public class ImplementationClassScanner extends EmptyVisitor implements ClassSca
             try
             {
                 ImplementationClassScanner scanner = new ImplementationClassScanner(implementationClass);
-                ClassReader r = new ClassReader(superName);
+                URL classURL = getClassURL(superName);
+                ClassReader r = new ClassReader(classURL.openStream());
                 r.accept(scanner, 0);
                 match = scanner.isMatch();
                 className = scanner.getClassName();
@@ -72,5 +82,11 @@ public class ImplementationClassScanner extends EmptyVisitor implements ClassSca
     public String getClassName()
     {
         return className;
+    }
+
+    public URL getClassURL(String className)
+    {
+        String resource = className.replace(".", "/") + ".class";
+        return classLoader.getResource(resource);
     }
 }

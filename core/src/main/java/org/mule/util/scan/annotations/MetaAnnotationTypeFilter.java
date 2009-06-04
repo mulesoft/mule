@@ -11,6 +11,8 @@ package org.mule.util.scan.annotations;
 
 import java.lang.annotation.Annotation;
 import java.io.IOException;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.AnnotationVisitor;
@@ -30,16 +32,40 @@ public class MetaAnnotationTypeFilter implements AnnotationFilter
 
     private Class<? extends Annotation> annotation;
 
+    private ClassLoader classLoader;
+
+    /**
+     * Creates an Meta Annotation Filter that look for Meta annotation on an annotation class
+     * @param annotation the annotation class to read
+     * @param basepath the base path of the location of the class. Specifying this will be more
+     * reliable in applications that use Multiple classloaders since ASM uses the system classloader
+     * to read classes and thus ignores child classloaders.  The basepath should also start with a scheme,
+     * usually file: or jar:
+     */
+    public MetaAnnotationTypeFilter(Class<? extends Annotation> annotation, ClassLoader classLoader)
+    {
+        this.annotation = annotation;
+        this.classLoader = classLoader;
+    }
+
+    /**
+     * Creates an Meta Annotation Filter that look for Meta annotation on an annotation class. This constructor
+     * will cause the class reading to read from the System clssloader
+     * @param annotation the annotation class to read
+     */
     public MetaAnnotationTypeFilter(Class<? extends Annotation> annotation)
     {
         this.annotation = annotation;
+        classLoader = Thread.currentThread().getContextClassLoader();
     }
 
     public boolean accept(AnnotationInfo info)
     {
         try
         {
-            ClassReader r = new ClassReader(info.getClassName());
+            URL classUrl = getClassURL(info.getClassName());
+            ClassReader r = new ClassReader(classUrl.openStream());
+          
             MetaAnnotationScanner scanner = new MetaAnnotationScanner(new AnnotationTypeFilter(annotation));
             r.accept(scanner, 0);
 
@@ -78,5 +104,12 @@ public class MetaAnnotationTypeFilter implements AnnotationFilter
 
             return this;
         }
+
+    }
+
+    public URL getClassURL(String className)
+    {
+        String resource = className.replace(".", "/") + ".class";
+        return classLoader.getResource(resource);
     }
 }

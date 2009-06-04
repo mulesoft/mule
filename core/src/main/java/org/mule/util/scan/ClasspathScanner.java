@@ -18,6 +18,7 @@ import org.mule.util.scan.annotations.AnnotationsScanner;
 import org.mule.util.scan.annotations.MetaAnnotationTypeFilter;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -116,7 +117,8 @@ public class ClasspathScanner
                     {
                         continue;
                     }
-                    ClassReader reader = new ClassReader(classLoader.getResourceAsStream(name));
+                    URL classURL = classLoader.getResource(name);
+                    ClassReader reader = new ClassReader(classURL.openStream());
                     ClassScanner visitor = getScanner(clazz);
                     reader.accept(visitor, 0);
                     if (visitor.isMatch())
@@ -145,21 +147,12 @@ public class ClasspathScanner
     {
         Set<Class> set = new HashSet<Class>();
         String urlBase = url.getFile();
-        Collection<File> files = FileUtils.listFiles(new File(url.getFile()), new String[]{"class"}, true);
-        String name = null;
+        Collection<File> files = FileUtils.listFiles(new File(urlBase), new String[]{"class"}, true);
         for (File file : files)
         {
             try
             {
-                //Get the actual class name (urlBase - bathpath)
-                name = file.getAbsolutePath().substring(urlBase.length() - basepath.length());
-                name = name.replaceAll("/", ".");
-                if (name.endsWith(".class"))
-                {
-                    name = name.substring(0, name.length() - 6);
-                }
-
-                ClassReader reader = new ClassReader(name);
+                ClassReader reader = new ClassReader(new FileInputStream(file));
                 ClassScanner visitor = getScanner(clazz);
                 reader.accept(visitor, 0);
                 if (visitor.isMatch())
@@ -227,7 +220,7 @@ public class ClasspathScanner
                     {
                         if (((Target) anno).value()[0] == ElementType.ANNOTATION_TYPE)
                         {
-                            filter = new MetaAnnotationTypeFilter(clazz);
+                            filter = new MetaAnnotationTypeFilter(clazz, classLoader);
                         }
                     }
                 }
