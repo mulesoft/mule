@@ -25,14 +25,16 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class MuleJarResourcesServlet extends HttpServlet
 {
-    public static final String BASE_PATH = "META-INF";
+    public static final String DEFAULT_BASE_PATH = "META-INF";
 
     public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
+
+    private String basepath = DEFAULT_BASE_PATH;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-        String file = BASE_PATH + req.getPathInfo();
+        String file = getBasepath() + req.getPathInfo();
 
         InputStream in = IOUtils.getResourceAsStream(file, getClass(), false, false);
         if (in == null)
@@ -69,5 +71,15 @@ public class MuleJarResourcesServlet extends HttpServlet
             in.close();
             resp.getOutputStream().flush();
         }
+    }
+
+    public String getBasepath()
+    {
+        return basepath;
+    }
+
+    public void setBasepath(String basepath)
+    {
+        this.basepath = basepath;
     }
 }
