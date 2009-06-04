@@ -7,7 +7,7 @@ var mule = {
 
     _replyToChannels : new Array(),
 
-    uri: '/cometd/cometd',
+    uri: '/ajax/cometd',
 
     /* set this to 0.0.0.0 for all local adapters or 127.0.0.1 for loopback */
     localAdapter: 'localhost',

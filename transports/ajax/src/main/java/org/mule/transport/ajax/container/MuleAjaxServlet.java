@@ -27,7 +27,7 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
     /** 
      * The name of the ajax connector to use with this Servlet 
      */
-    public static final String COMETD_CONNECTOR_NAME_PROPERTY = "org.mule.ajax.connector.name";
+    public static final String AJAX_CONNECTOR_NAME_PROPERTY = "org.mule.ajax.connector.name";
 
     protected AjaxServletConnector connector = null;
 
@@ -35,10 +35,10 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
     public void init() throws ServletException
     {
         super.init();
-        String servletConnectorName = getServletConfig().getInitParameter(COMETD_CONNECTOR_NAME_PROPERTY);
+        String servletConnectorName = getServletConfig().getInitParameter(AJAX_CONNECTOR_NAME_PROPERTY);
         if (servletConnectorName == null)
         {
-            connector = (AjaxServletConnector) TransportFactory.getConnectorByProtocol(AjaxServletConnector.PROTOCOL);
+            connector = (AjaxServletConnector) TransportFactory.getConnectorByProtocol(getConnectorProtocol());
             if (connector == null)
             {
                 connector = new AjaxServletConnector();
@@ -50,7 +50,6 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
                 {
                     throw new ServletException("Failed to register the AjaxServletConnector", e);
                 }
-                //throw new ServletException(AjaxMessages.noConnectorForProtocol(AjaxServletConnector.PROTOCOL).toString());
             }
         }
         else
@@ -58,10 +57,15 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
             connector = (AjaxServletConnector) RegistryContext.getRegistry().lookupConnector(servletConnectorName);
             if (connector == null)
             {
-                throw new ServletException(AjaxMessages.noAjaxConnectorWithName(servletConnectorName, COMETD_CONNECTOR_NAME_PROPERTY).toString());
+                throw new ServletException(AjaxMessages.noAjaxConnectorWithName(servletConnectorName, AJAX_CONNECTOR_NAME_PROPERTY).toString());
             }
         }
         connector.setBayeux(getBayeux());
+    }
+
+    protected String getConnectorProtocol()
+    {
+        return AjaxServletConnector.PROTOCOL;
     }
     
 }

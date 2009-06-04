@@ -17,7 +17,6 @@ import org.mule.transport.ajax.AjaxReplyToHandler;
 import org.mule.transport.servlet.ServletConnector;
 
 import dojox.cometd.DataFilter;
-
 import org.mortbay.cometd.AbstractBayeux;
 
 /**
@@ -94,7 +93,7 @@ public class AjaxServletConnector extends ServletConnector
     public AjaxServletConnector()
     {
         super();
-        registerSupportedProtocol("ajax");
+        registerSupportedProtocolWithoutPrefix("ajax");
         //Dont start until the servletContianer is up
         setInitialStateStopped(true);
 
