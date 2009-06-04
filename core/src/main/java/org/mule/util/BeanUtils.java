@@ -158,9 +158,9 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
         for (int i = 0; i < object.getClass().getMethods().length; i++)
         {
             Method method = object.getClass().getMethods()[i];
-            if (method.getName().startsWith("get"))
+            if (method.getName().startsWith("get") || method.getName().startsWith("is"))
             {
-                String field = method.getName().substring(3);
+                String field = (method.getName().startsWith("is") ? method.getName().substring(2) : method.getName().substring(3));
                 String setter = "set" + field;
                 try
                 {

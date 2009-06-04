@@ -34,7 +34,7 @@ public class MapBeanTransformersTestCase extends AbstractTransformerTestCase
 
     public Object getTestData()
     {
-        return new GrapeFruit(new Integer(6), new Double(4.56), "Maximus Juicius");
+        return new GrapeFruit(new Integer(6), new Double(4.56), "Maximus Juicius", true);
     }
 
     public Object getResultData()
@@ -43,6 +43,7 @@ public class MapBeanTransformersTestCase extends AbstractTransformerTestCase
         m.put("segments", new Integer(6));
         m.put("radius", new Double(4.56));
         m.put("brand", "Maximus Juicius");
+        m.put("red", new Boolean(true));
         return m;
     }
 }

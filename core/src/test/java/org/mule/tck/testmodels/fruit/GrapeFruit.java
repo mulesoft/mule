@@ -17,6 +17,7 @@ public class GrapeFruit implements Fruit
     private Integer segments = new Integer(10);
     private Double radius = new Double(4.34);
     private String brand = "Pirulo";
+    private boolean red = false;
     private boolean bitten = false;
 
     public GrapeFruit()
@@ -24,11 +25,12 @@ public class GrapeFruit implements Fruit
         super();
     }
 
-    public GrapeFruit(Integer segments, Double radius, String brand)
+    public GrapeFruit(Integer segments, Double radius, String brand, boolean red)
     {
         this.segments = segments;
         this.radius = radius;
         this.brand = brand;
+        this.red = red;
     }
 
     public String getBrand()
@@ -61,6 +63,16 @@ public class GrapeFruit implements Fruit
         radius = double1;
     }
 
+    public boolean isRed()
+    {
+        return red;
+    }
+
+    public void setRed(boolean red)
+    {
+        this.red = red;
+    }
+
     public void bite()
     {
         bitten = true;
@@ -85,7 +97,7 @@ public class GrapeFruit implements Fruit
 
         GrapeFruit that = (GrapeFruit) o;
 
-        if (bitten != that.bitten)
+        if (red != that.red)
         {
             return false;
         }
@@ -111,6 +123,7 @@ public class GrapeFruit implements Fruit
         int result = segments != null ? segments.hashCode() : 0;
         result = 31 * result + (radius != null ? radius.hashCode() : 0);
         result = 31 * result + (brand != null ? brand.hashCode() : 0);
+        result = 31 * result + (red ? 1 : 0);
         result = 31 * result + (bitten ? 1 : 0);
         return result;
     }
