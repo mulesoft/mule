@@ -23,6 +23,10 @@ import java.util.Properties;
 
 import org.apache.commons.pool.ObjectPool;
 
+/**
+ * Test configuration of FTP connector. It's all done in code, no configuration files
+ * are used and Mule is not started.
+ */
 public class FTPConnectorTestCase extends AbstractConnectorTestCase
 {
     static final long POLLING_FREQUENCY = 1234;
@@ -82,6 +86,10 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
             ((FtpMessageReceiver)receiver).getFrequency());
     }
 
+    /**
+     * Test setting a connection factory on a ftp endpoint.
+     * @throws Exception
+     */
     public void testCustomFtpConnectionFactory() throws Exception
     {
         final String testObject = "custom object";

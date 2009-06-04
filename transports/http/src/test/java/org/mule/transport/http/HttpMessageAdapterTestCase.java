@@ -13,11 +13,9 @@ package org.mule.transport.http;
 import org.mule.api.MessagingException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
-import org.mule.transport.http.HttpMessageAdapter;
 
 public class HttpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
-    protected static final String TEST_MESSAGE = "Hello";
 
     private byte[] message = TEST_MESSAGE.getBytes();
 
@@ -30,4 +28,5 @@ public class HttpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     {
         return new HttpMessageAdapter(payload);
     }
+    
 }

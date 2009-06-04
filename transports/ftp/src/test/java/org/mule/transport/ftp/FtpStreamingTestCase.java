@@ -14,7 +14,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
-import org.mule.transport.ftp.server.NamedPayload;
 
 import java.util.HashMap;
 
@@ -74,23 +73,20 @@ public class FtpStreamingTestCase extends AbstractFtpServerTestCase
 
         MuleClient client = new MuleClient();
 
-        Object ftc = getComponent("testComponent");
-        assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
+        Object component = getComponent("testComponent");
+        assertTrue("FunctionalStreamingTestComponent expected", 
+            component instanceof FunctionalStreamingTestComponent);
+        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
         assertNotNull(ftc);
-        // assertEquals(1, ftc.getNumber());
+        //assertEquals(1, ftc.getNumber());
 
-        ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, TEST_MESSAGE.length());
-
+        ftc.setEventCallback(callback, TEST_MESSAGE.length());
+       
         // send out to FTP server via streaming model
         client.dispatch("tcp://localhost:60196", TEST_MESSAGE, new HashMap());
-        NamedPayload payload = awaitUpload();
-        assertNotNull(payload);
-        logger.info("received message: " + payload);
-        assertEquals(TEST_MESSAGE, new String(payload.getPayload()));
-
+               
         // poll and pull back through test service
         latch.await(getTimeout(), TimeUnit.MILLISECONDS);
         assertEquals("Received stream; length: 16; 'Test...sage'", message.get());
     }
-
 }

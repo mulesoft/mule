@@ -55,16 +55,17 @@ public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 
     public void testIllegalSpecification() throws Exception
     {
-        JmsMessageAdapter a = (JmsMessageAdapter)this.createAdapter(this.getValidMessage());
+        JmsMessageAdapter messageAdapter = (JmsMessageAdapter)this.createAdapter(this.getValidMessage());
 
         // these will work
-        a.setSpecification(JmsConstants.JMS_SPECIFICATION_102B);
-        a.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
+        messageAdapter.setSpecification(JmsConstants.JMS_SPECIFICATION_102B);
+        messageAdapter.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
 
         try
         {
             // this will not :)
-            a.setSpecification("1.2");
+            messageAdapter.setSpecification("1.2");
+            fail("JmsMessageAdapter should fail on setting an invalid specification");
         }
         catch (IllegalArgumentException iax)
         {

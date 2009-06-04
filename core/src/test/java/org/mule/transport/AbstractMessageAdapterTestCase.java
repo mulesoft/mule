@@ -90,7 +90,7 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
 
     public abstract MessageAdapter createAdapter(Object payload) throws MessagingException;
 
-    final class InvalidMessage
+    final static class InvalidMessage
     {
         public String toString()
         {

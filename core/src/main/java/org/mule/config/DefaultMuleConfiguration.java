@@ -60,8 +60,18 @@ public class DefaultMuleConfiguration implements MuleConfiguration
      * has been set on the transaction config
      */
     private int defaultTransactionTimeout = 30000;
-
     
+    /**
+     * The default queue timeout value used when polling queues.
+     */
+    private int defaultQueueTimeout = 200;
+
+    /**
+     * The default graceful shutdown timeout used when shutting stopping mule cleanly
+     * without message loss.
+     */
+    private int shutdownTimeout = 5000;
+
     /** Where Mule stores any runtime files to disk */
     private String workingDirectory = "./.mule";
 
@@ -464,4 +474,31 @@ public class DefaultMuleConfiguration implements MuleConfiguration
             return true;
         }
     }
+
+    public int getDefaultQueueTimeout()
+    {
+        return defaultQueueTimeout;
+    }
+
+    public void setDefaultQueueTimeout(int defaultQueueTimeout)
+    {
+        if (verifyContextNotStarted())
+        {
+            this.defaultQueueTimeout = defaultQueueTimeout;
+        }
+    }
+
+    public int getShutdownTimeout()
+    {
+        return shutdownTimeout;
+    }
+
+    public void setShutdownTimeout(int shutdownTimeout)
+    {
+        if (verifyContextNotStarted())
+        {
+            this.shutdownTimeout = shutdownTimeout;
+        }
+    }
+    
 }

@@ -35,7 +35,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
         
         assertFalse(c.isQueueEvents());
-        assertEquals(1000, c.getQueueTimeout());
+        assertEquals(muleContext.getConfiguration().getDefaultQueueTimeout(), c.getQueueTimeout());
         QueueProfile queueProfile = c.getQueueProfile();
         assertNull(queueProfile);
         
@@ -49,7 +49,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
         
         assertTrue(c.isQueueEvents());
-        assertEquals(1000, c.getQueueTimeout());
+        assertEquals(muleContext.getConfiguration().getDefaultQueueTimeout(), c.getQueueTimeout());
         QueueProfile queueProfile = c.getQueueProfile();
         assertNotNull(queueProfile);
         assertFalse(queueProfile.isPersistent());

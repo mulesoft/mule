@@ -10,14 +10,21 @@
 
 package org.mule.transport.email.adapters;
 
+import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.SimpleMailMessageAdapter;
+import org.mule.util.SystemUtils;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.Session;
+import javax.mail.Message.RecipientType;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 public class SimpleMailMessageAdapterTestCase extends AbstractMuleTestCase
@@ -47,6 +54,58 @@ public class SimpleMailMessageAdapterTestCase extends AbstractMuleTestCase
         List list2 = (List) adapter.getProperty(SimpleMailMessageAdapter.toListHeader(NAME_2));
         assertTrue(list2.contains(VALUE_2));
         assertEquals(1, list2.size());
+    }
+
+
+    public void testInvalidFrom() throws Exception
+    {
+        Message message = new javax.mail.internet.MimeMessage(Session.getDefaultInstance(new Properties()));
+
+        // do not use the ctor taking a string here as it tries to parse the string and we're
+        // trying to use an invalid address here.
+        InternetAddress fromAddress = new InternetAddress();
+        fromAddress.setAddress("foo@bar@baz");
+        message.setFrom(fromAddress);
+
+        InternetAddress replyToAddrress = new InternetAddress();
+        replyToAddrress.setAddress("baz@bletch@buzz");
+        message.setReplyTo(new Address[]{replyToAddrress});
+
+        SimpleMailMessageAdapter adapter = new SimpleMailMessageAdapter(message);
+        assertEquals(null, adapter.getProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY));
+        assertEquals(null, adapter.getProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY));
+    }
+
+    public void testGetPayloadAsString() throws Exception
+    {
+        testGetPayloadAsString(Locale.US, "US-ASCII");
+        testGetPayloadAsString(Locale.US, "UTF-8");
+        testGetPayloadAsString(Locale.US, "UTF-8");
+        testGetPayloadAsString(new Locale("be", "", ""), "UTF-16be");
+
+        testGetPayloadAsString(Locale.JAPAN, "UTF-8");
+        testGetPayloadAsString(Locale.JAPAN, "Shift_JIS");
+        testGetPayloadAsString(Locale.JAPAN, "Windows-31J");
+        testGetPayloadAsString(Locale.JAPAN, "EUC-JP");
+    }
+
+    public void testGetPayloadAsString(Locale locale, String encoding) throws Exception
+    {
+        Message message = new MimeMessage(Session.getDefaultInstance(new Properties()));
+
+        InternetAddress fromAddress = new InternetAddress();
+        fromAddress.setAddress("foo@example.com");
+        message.setFrom(fromAddress);
+
+        InternetAddress toAddrress = new InternetAddress();
+        toAddrress.setAddress("bar@example.com");
+        message.setRecipient(RecipientType.TO, toAddrress);
+
+        String text = LocaleMessageHandler.getString("test-data", locale, "SimpleMailMessageAdapterTestCase.testGetPayloadAsString", new Object[]{});
+        message.setContent(text, "text/plain; charset="+ encoding);
+
+        SimpleMailMessageAdapter adapter = new SimpleMailMessageAdapter(message);
+        assertEquals(text + SystemUtils.LINE_SEPARATOR, adapter.getPayloadAsString(encoding));
     }
 
 }

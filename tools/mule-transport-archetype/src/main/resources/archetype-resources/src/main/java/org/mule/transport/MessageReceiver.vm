@@ -67,7 +67,7 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
              throw new ConnectException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         */
 
-        // TODO the code necessay to Connect to the underlying resource
+        // TODO the code necessary to connect to the underlying resource
     }
 
     public void doDisconnect() throws ConnectException
@@ -80,6 +80,7 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
         // TODO release any resources here
     }
 
+    #if( $isPollingReceiver == "n")
     public void doStart()
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -102,6 +103,7 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
         /* IMPLEMENTATION NOTE: Should perform any actions necessary to stop
            the reciever from receiving events. */
     }
+    #end
 
     public void doDispose()
     {

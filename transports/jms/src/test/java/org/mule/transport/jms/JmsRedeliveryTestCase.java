@@ -49,7 +49,6 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
         final Latch mrexFired = new Latch();
         muleContext.registerListener(new ExceptionNotificationListener()
         {
-
             public void onNotification(ServerNotification notification)
             {
                 ExceptionNotification n = (ExceptionNotification) notification;

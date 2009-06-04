@@ -57,7 +57,12 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         super(legacy);
     }
-
+    
+    @Override
+    protected boolean isGracefulShutdown()
+    {
+        return true;
+    }
 
     @Override
     public void testManagerConfig() throws Exception
@@ -351,6 +356,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testMuleConfiguration()
     {
         assertTrue(muleContext.getConfiguration().isDefaultSynchronousEndpoints());
+        assertEquals(10,muleContext.getConfiguration().getDefaultResponseTimeout());
+        assertEquals(20,muleContext.getConfiguration().getDefaultTransactionTimeout());
+        assertEquals(30,muleContext.getConfiguration().getShutdownTimeout());
     }
 
     public void testGlobalInterceptorStack()

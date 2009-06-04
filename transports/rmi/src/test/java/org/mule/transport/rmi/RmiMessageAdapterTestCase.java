@@ -10,10 +10,12 @@
 
 package org.mule.transport.rmi;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
-import org.mule.transport.rmi.RmiMessageAdapter;
+
+import org.apache.commons.lang.SerializationUtils;
 
 public class RmiMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
@@ -28,9 +30,26 @@ public class RmiMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         return new RmiMessageAdapter(payload);
     }
 
+    @Override
     public Object getInvalidMessage()
     {
         return null;
+    }
+
+    public void testSerialization() throws Exception
+    {
+        MessageAdapter messageAdapter = createAdapter(TEST_MESSAGE);
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter);
+        
+        byte[] serializedMessage = SerializationUtils.serialize(muleMessage);
+
+        DefaultMuleMessage readMessage = 
+            (DefaultMuleMessage) SerializationUtils.deserialize(serializedMessage);
+        assertNotNull(readMessage.getAdapter());
+
+        MessageAdapter readMessageAdapter = readMessage.getAdapter();
+        assertTrue(readMessageAdapter instanceof RmiMessageAdapter);
+        assertEquals(TEST_MESSAGE, readMessageAdapter.getPayload());
     }
 
 }

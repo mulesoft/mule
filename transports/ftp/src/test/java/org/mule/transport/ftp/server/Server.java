@@ -10,67 +10,69 @@
 
 package org.mule.transport.ftp.server;
 
-import java.util.Properties;
+import org.mule.util.IOUtils;
 
-import org.apache.ftpserver.ConfigurableFtpServerContext;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
 import org.apache.ftpserver.FtpServer;
-import org.apache.ftpserver.config.PropertiesConfiguration;
-import org.apache.ftpserver.ftplet.Configuration;
-import org.apache.ftpserver.interfaces.FtpServerContext;
+import org.apache.ftpserver.FtpServerFactory;
+import org.apache.ftpserver.listener.ListenerFactory;
+import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 
 /**
- * An initial wrapper for the Apache ftpServer.  This will progress into a provider of its own,
+ * A wrapper for the Apache ftpServer.  This will progress into a provider of its own,
  * but for now is necessary to avoid duplicating code in FTP tests using FTPClient.
  */
 public class Server
 {
-
-    private static final String FTP_STATE_KEY = "ftp-state-key-";
     private FtpServer server;
-    private ServerState state;
-    private int port;
+    public static int port;
+    public static final int DEFAULT_PORT = 60196; //default for most/all tests
 
+    /**
+     * Initialize the ftp server on a given port
+     * 
+     * @param port The port to start the server on. Note, you need special
+     *            permissions on *nux to open port 22, so we usually choose a very
+     *            high port number.
+     * @throws Exception
+     */
     public Server(int port) throws Exception
     {
         this.port = port;
-        this.state = new InOutState();
 
-        // this must be set BEFORE the configuration is created
-        // it is accessed BEFORE server startup
-        System.getProperties().put(FTP_STATE_KEY + port, state);
+        FtpServerFactory serverFactory = new FtpServerFactory();        
+        ListenerFactory factory = new ListenerFactory();                
+        // set the port of the listener
+        factory.setPort(port);
+        // replace the default listener
+        serverFactory.addListener("default", factory.createListener());
+        factory.setIdleTimeout(60000);
+                
+        PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
+        URL usersFile = IOUtils.getResourceAsUrl("users.properties", getClass());
+        if(usersFile == null)
+        {
+            throw new IOException("users.properties file not found in the classpath");
+        }
+        
+        userManagerFactory.setFile(new File(usersFile.getFile()));
+        serverFactory.setUserManager(userManagerFactory.createUserManager());
 
-        Properties properties = new Properties();
-        properties.setProperty("config.listeners.default.port", Integer.toString(port));
-        properties.setProperty("config.file-system-manager.class", FileManager.class.getName());
-        properties.setProperty("config.file-system-manager.stateFromSystemProperties", FTP_STATE_KEY + port);
-        properties.setProperty("config.connection-manager.default-idle-time", "1");
-        properties.setProperty("config.connection-manager.max-login", "1000");
-        properties.setProperty("config.connection-manager.max-anonymous-login", "1000");
-        properties.setProperty("config.user-manager.class", InMemoryUserManager.class.getName());
-        properties.setProperty("config.ip-restrictor.class", InMemoryIpRestrictor.class.getName());
-
-        Configuration config = new PropertiesConfiguration(properties);
-        FtpServerContext context = new ConfigurableFtpServerContext(config);
-
-
-        server = new FtpServer(context);
+        // start the server
+        server = serverFactory.createServer();
         server.start();
     }
 
-    public void awaitStart(long ms) throws InterruptedException
-    {
-        state.awaitStart(ms);
-    }
-
-    public NamedPayload awaitUpload(long ms) throws InterruptedException
-    {
-        return state.awaitUpload(ms);
-    }
-
+    /**
+     * Stop the ftp server TODO DZ: we may want to put a port check + wait time in
+     * here to make sure that the port is released before we continue. Windows tends
+     * to hold on to ports longer than it should.
+     */
     public void stop()
-    {
+    {        
         server.stop();
-        System.getProperties().remove(FTP_STATE_KEY + port);
     }
-
 }

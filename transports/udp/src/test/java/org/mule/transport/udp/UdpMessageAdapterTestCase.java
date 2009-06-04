@@ -14,16 +14,18 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
-import org.mule.transport.udp.UdpMessageAdapter;
 
 import java.net.DatagramPacket;
+import java.util.Arrays;
+
+import org.apache.commons.lang.SerializationUtils;
 
 public class UdpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
 
     public Object getValidMessage() throws Exception
     {
-        return new DatagramPacket("Hello".getBytes(), 5);
+        return new DatagramPacket(TEST_MESSAGE.getBytes(), TEST_MESSAGE.length());
     }
 
     public MessageAdapter createAdapter(Object payload) throws MessagingException
@@ -54,6 +56,23 @@ public class UdpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         {
             // expected
         }
+    }
+
+    public void testSerialization() throws Exception
+    {
+        MessageAdapter messageAdapter = createAdapter(getValidMessage());
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter);
+
+        byte[] serializedMessage = SerializationUtils.serialize(muleMessage);
+
+        DefaultMuleMessage readMessage = 
+            (DefaultMuleMessage) SerializationUtils.deserialize(serializedMessage);
+        assertNotNull(readMessage.getAdapter());
+
+        MessageAdapter readMessageAdapter = readMessage.getAdapter();
+        assertTrue(readMessageAdapter instanceof UdpMessageAdapter);
+        assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), 
+            (byte[]) readMessageAdapter.getPayload()));
     }
 
 }

@@ -23,10 +23,14 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.DefaultMessageAdapter;
+import org.mule.transport.MessageAdapterSerialization;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,10 +55,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
     private static final long serialVersionUID = 1541720810851984842L;
     private static Log logger = LogFactory.getLog(DefaultMuleMessage.class);
 
-    private MessageAdapter adapter;
-    private MessageAdapter originalAdapter = null;
+    private transient MessageAdapter adapter;
+    private transient MessageAdapter originalAdapter = null;
     private transient List<Integer> appliedTransformerHashCodes = new CopyOnWriteArrayList();
-    private byte[] cache;
+    private transient byte[] cache;
     
     private static final List<Class> consumableClasses = new ArrayList<Class>();
     
@@ -67,6 +71,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         }
         catch (ClassNotFoundException e)
         {
+            // ignore
         }
         
         try
@@ -76,6 +81,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         }
         catch (ClassNotFoundException e)
         {
+            // ignore
         }
         
         consumableClasses.add(OutputHandler.class);
@@ -185,8 +191,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         // List transformers = RegistryContext.getRegistry().lookupTransformers(inputCls, outputType);
 
         //The transformer to execute on this message
-        Transformer transformer;
-        transformer = MuleServer.getMuleContext().getRegistry().lookupTransformer(inputCls, outputType);
+        Transformer transformer = MuleServer.getMuleContext().getRegistry().lookupTransformer(
+            inputCls, outputType);
 
         //no transformers found
         if (transformer == null)
@@ -703,6 +709,114 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
     public boolean isConsumable()
     {
         return isConsumedFromAdditional(this.getPayload().getClass());
+    }
+
+    private void writeObject(ObjectOutputStream out) throws Exception
+    {
+        out.defaultWriteObject();
+        marshalMessageAdapter(out);
+    }
+
+    private void marshalMessageAdapter(ObjectOutputStream out) throws Exception
+    {
+        if (adapter instanceof MessageAdapterSerialization)
+        {
+            customMessageAdapterMarshalling(out);
+        }
+        else
+        {
+            defaultMessageAdapterMarshalling(out);
+        }
+    }
+    
+    private void customMessageAdapterMarshalling(ObjectOutputStream out) throws Exception
+    {
+        out.writeObject(MessageAdapterSerialization.Type.CustomSerialization);
+        
+        byte[] payload = ((MessageAdapterSerialization) adapter).getPayloadForSerialization();
+        out.writeInt(payload.length);
+        out.write(payload);
+
+        marshalMessageAdapterProperties(out);
+        marshalMessageAdapterAttachments(out);
+    }
+    
+    private void defaultMessageAdapterMarshalling(ObjectOutputStream out) throws Exception
+    {
+        out.writeObject(MessageAdapterSerialization.Type.DefaultSerialization);
+        out.writeObject(adapter);
+    }
+
+    private void marshalMessageAdapterProperties(ObjectOutputStream out) throws IOException
+    {
+        Set propertyNames = adapter.getPropertyNames();
+        out.writeInt(propertyNames.size());
+        for (Object property : propertyNames)
+        {
+            String key = property.toString();
+            out.writeObject(key);
+            out.writeObject(getProperty(key));
+        }
+    }
+
+    private void marshalMessageAdapterAttachments(ObjectOutputStream out)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        unmarshalMessageAdapter(in);
+    }
+    
+    private void unmarshalMessageAdapter(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        MessageAdapterSerialization.Type type = (MessageAdapterSerialization.Type) in.readObject();
+        if (type == MessageAdapterSerialization.Type.DefaultSerialization)
+        {
+            defaultMessageAdapterUnmarshalling(in);
+        }
+        else
+        {
+            adapter = customMessageAdapterUnmarshalling(in);
+            unmarshalMessageAdapterProperties(in, adapter);
+            unmarshalMessageAdapterAttachments(in, adapter);
+        }
+    }
+
+    private MessageAdapter customMessageAdapterUnmarshalling(ObjectInputStream in) throws IOException
+    {
+        int payloadSize = in.readInt();
+        
+        byte[] payload = new byte[payloadSize];
+        in.read(payload);
+        
+        return new DefaultMessageAdapter(payload);
+    }
+
+    private void defaultMessageAdapterUnmarshalling(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        adapter = (MessageAdapter) in.readObject();
+    }
+    
+    private void unmarshalMessageAdapterProperties(ObjectInputStream in, MessageAdapter messageAdapter) 
+        throws IOException, ClassNotFoundException 
+    {
+        int propertyCount = in.readInt();
+        for (int i = 0; i < propertyCount; i++)
+        {
+            String key = (String) in.readObject();
+            Object value = in.readObject();            
+            messageAdapter.setProperty(key, value);
+        }        
+    }
+    
+    private void unmarshalMessageAdapterAttachments(ObjectInputStream in, MessageAdapter messageAdapter) 
+        throws IOException, ClassNotFoundException
+    {
+        // TODO implement me
     }
 
 }

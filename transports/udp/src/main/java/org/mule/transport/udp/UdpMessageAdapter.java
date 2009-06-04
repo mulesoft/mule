@@ -37,7 +37,7 @@ public class UdpMessageAdapter extends AbstractMessageAdapter
     {
         if (message instanceof DatagramPacket)
         {
-            DatagramPacket dp = (DatagramPacket)message;
+            DatagramPacket dp = (DatagramPacket) message;
             this.message = new byte[dp.getLength()];
             System.arraycopy(dp.getData(), 0, this.message, 0, dp.getLength());
 

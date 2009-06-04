@@ -10,7 +10,6 @@
     <packaging>bundle</packaging>
     <name>FTP Transport</name>
     <description>A Mule transport for Ftp Connectivity.</description>
-
     <build>
          <plugins>
              <plugin>
@@ -24,11 +23,27 @@
                      </execution>
                  </executions>
              </plugin>
+             <!-- create a defined directory that's used by the unit tests -->
+             <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="target/ftpserver"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
          </plugins>
     </build>
 
     <dependencies>
-        
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
@@ -39,7 +54,6 @@
             <artifactId>oro</artifactId>
             <version>${oroVersion}-osgi</version>
         </dependency>
-        
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-file</artifactId>
@@ -61,33 +75,21 @@
         </dependency>
         <dependency>
             <groupId>org.apache.ftpserver</groupId>
+            <artifactId>ftpserver-deprecated</artifactId>
+            <version>1.0.0-M2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ftpserver</groupId>
             <artifactId>ftpserver-core</artifactId>
-            <version>1.0-mule-temp</version>
+            <version>1.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.ftpserver</groupId>
             <artifactId>ftplet-api</artifactId>
-            <version>1.0-mule-temp</version>
+            <version>1.0.0</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-core</artifactId>
-            <version>1.0.2</version>
-            <scope>test</scope>
-            <exclusions>
-                <!-- exclude older concurrency backport -->
-                <exclusion>
-                    <groupId>backport-util-concurrent</groupId>
-                    <artifactId>backport-util-concurrent</artifactId>
-                </exclusion>
-                <!-- exclude older slf4j -->
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>mockobjects</groupId>

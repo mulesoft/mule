@@ -62,8 +62,13 @@ public class ${ModuleName}MessageDispatcher extends AbstractMessageDispatcher
            that should be invoked.  This method is executed in a different
            thread to the request thread. */
 
-        // TODO Write the client code here to dispatch the event over this
-        // transport
+
+        /* IMPLEMENTATION NOTE: The event message needs to be transformed for the outbound transformers to take effect. This
+           isn't done automatically in case the dispatcher needs to modify the message before apllying transformers.  To
+           get the transformed outbound message call -
+           event.transformMessage(); */
+
+        // TODO Write the client code here to dispatch the event over this transport
 
         throw new UnsupportedOperationException("doDispatch");
     }
@@ -76,6 +81,11 @@ public class ${ModuleName}MessageDispatcher extends AbstractMessageDispatcher
            endpoint is running synchronously and any response returned will
            ultimately be passed back to the callee. This method is executed in
            the same thread as the request thread. */
+
+        /* IMPLEMENTATION NOTE: The event message needs to be transformed for the outbound transformers to take effect. This
+           isn't done automatically in case the dispatcher needs to modify the message before apllying transformers.  To
+           get the transformed outbound message call -
+           event.transformMessage(); */
 
         // TODO Write the client code here to send the event over this
         // transport (or to dispatch the event to a store or repository)

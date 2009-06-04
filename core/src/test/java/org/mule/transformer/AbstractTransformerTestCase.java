@@ -138,9 +138,6 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         if (expected instanceof Object[] && result instanceof Object[])
         {
             return Arrays.equals((Object[]) expected, (Object[]) result);
-            // TODO check if RetroTranslating Mule to JDK 1.4 makes this method
-            // available
-            // return Arrays.deepEquals((Object[])src, (Object[])result);
         }
         else if (expected instanceof byte[] && result instanceof byte[])
         {

@@ -16,6 +16,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMessageAdapter;
+import org.mule.transport.MessageAdapterSerialization;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -32,7 +33,7 @@ import javax.jms.Message;
  * IllegalArgumentException if the source message type is not compatible. The
  * JmsMessageAdapter should be suitable for all JMS Connector implementations.
  */
-public class JmsMessageAdapter extends AbstractMessageAdapter
+public class JmsMessageAdapter extends AbstractMessageAdapter implements MessageAdapterSerialization
 {
     /**
      * Serial version
@@ -104,8 +105,8 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Decomposes the received message into a payload, properties (headers) and possibly attachements too.
-     * Important note: when adding properties you must assign them to the inbound scope.  this can be done in
-     * two ways-
+     * Important note: when adding properties you must assign them to the inbound scope. This can be done in
+     * two ways
      * <ol>
      * <li>use the method {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)} using the
      * {@link PropertyScope#INBOUND}</li>
@@ -272,7 +273,6 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         addInboundProperties(props);
     }
 
-
     /**
      * Sets a correlationId for this message. The correlation Id can be used by
      * components in the system to manage message relations <p/> transport protocol.
@@ -284,12 +284,12 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      *
      * @param id the Id reference for this relationship
      */
+    @Override
     public void setCorrelationId(String id)
     {
         super.setCorrelationId(id);
         setProperty(JmsConstants.JMS_CORRELATION_ID, id);
     }
-
 
     /**
      * Sets a replyTo address for this message. This is useful in an asynchronous
@@ -299,6 +299,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      *
      * @param replyTo the endpointUri url to reply to
      */
+    @Override
     public void setReplyTo(Object replyTo)
     {
         if (replyTo instanceof Destination)
@@ -308,9 +309,15 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         super.setReplyTo(replyTo);
     }
 
+    @Override
     public ThreadSafeAccess newThreadCopy()
     {
         return new JmsMessageAdapter(this);
+    }
+
+    public byte[] getPayloadForSerialization() throws Exception
+    {
+        return JmsMessageUtils.toByteArray(jmsMessage, jmsSpec, getEncoding());
     }
 
 }

@@ -1,66 +1,69 @@
-<!--
-Assembly descriptor for the full distribution.
--->
-<assembly>
-    <id>${ModuleName}</id>
+<assembly
+        xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+
+    <!-- this file describes how to build the file distribution for this project
+         Developers should not change the structure, but may need edit the dependency sets at the bottom as necessary
+    -->
+    <id>${artifactId}</id>
     <formats>
-        <format>zip</format>
         <format>tar.gz</format>
+        <format>zip</format>
     </formats>
     <fileSets>
         <fileSet>
-            <directory>src</directory>
-            <outputDirectory>src</outputDirectory>
-        </fileSet>
-        <!-- If a licenses directory is present, copy it.  this would contain text files describing the licenses for each
-             non-Mule dependencies -->
-        <fileSet>
-            <directory>licenses</directory>
-            <outputDirectory>licenses</outputDirectory>
-        </fileSet>
-
-        <!-- Example Dist and execs -->
-        <fileSet>
-            <directory>dist</directory>
-            <outputDirectory>dist</outputDirectory>
-            <excludes>
-                <exclude>${ModuleNameLower}</exclude>
-                <exclude>${ModuleNameLower}.bat</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>dist</directory>
-            <outputDirectory></outputDirectory>
-            <fileMode>755</fileMode>
+            <directory>target</directory>
+            <outputDirectory>lib</outputDirectory>
             <includes>
-                <include>${ModuleNameLower}</include>
-                <include>${ModuleNameLower}.bat</include>
+                <include>*.jar</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>dist</directory>
+            <directory>examples</directory>
+            <outputDirectory>lib</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory></directory>
             <outputDirectory></outputDirectory>
             <includes>
                 <include>README.txt</include>
+                <include>LICENSE.txt</include>
             </includes>
         </fileSet>
-
     </fileSets>
     <dependencySets>
         <dependencySet>
-            <outputDirectory>lib/user</outputDirectory>
-            <scope>runtime</scope>
-            <!-- Include only the non-Mule libraries needed by your application -->
+            <outputDirectory>lib</outputDirectory>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useStrictFiltering>false</useStrictFiltering>
             <includes>
-                <!-- Make sure we include this project's artifact -->
                 <include>${groupId}:${artifactId}</include>
-
-                <!--
-                Add any 3rd party libraries here.  Note you can use wildcards i.e.
-                <include>net.sf.someproject:*</include>
-                -->
             </includes>
+            <excludes>
+                <!-- exclude all Mule dependencies since they will be avialable in the container -->
+                <exclude>org.mule:mule-core</exclude>
+                <exclude>org.mule.modules:*</exclude>
+                <exclude>org.mule.tests:*</exclude>
+                <exclude>org.mule.transports:*</exclude>
 
+                <!-- exclude common transitive dependencies that Mule makes available anyway -->
+                <exclude>org.springframework:spring-context</exclude>
+
+                <!-- remove all Xml apis. If they are required the Mule Xml module should be used by the user of this module -->
+                <exclude>dom4j:*</exclude>
+                <exclude>jdom:*</exclude>
+                <exclude>xalan:*</exclude>
+                <exclude>jaxen:*</exclude>
+                <exclude>xml-apis:*</exclude>
+                <exclude>xerces:*</exclude>
+
+                <!-- Mule uses SLF4J with Log4J, not including these in the distribution will avoid unnecessary logging headaches -->
+                <exclude>commons-logging:*</exclude>
+                <exclude>log4j:*</exclude>
+            </excludes>
+            <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
 </assembly>

@@ -15,7 +15,8 @@
         <mule:global-property name="OS_Version" value="${os.version}"/>
         <mule:global-property name="system-prop2" value="${system-prop2-cannot-loop}"/> <!-- defaultValue="default" -->
 
-        <mule:configuration defaultSynchronousEndpoints="true">
+        <mule:configuration defaultSynchronousEndpoints="true" defaultResponseTimeout="10" defaultTransactionTimeout="20"
+            shutdownTimeout="30">
             <mule:default-threading-profile maxBufferSize="42" maxThreadsActive="16"
                 maxThreadsIdle="3" poolExhaustedAction="WAIT" threadTTL="60001"/>
         </mule:configuration>

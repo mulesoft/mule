@@ -329,7 +329,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
                     // If service is resumed as part of stopping 
                     if (stopping.get())
                     {
-                        if (!queueProfile.isPersistent() && (queueSession != null && getQueueSize() > 0))
+                        if (!isPersistent() && (queueSession != null && getQueueSize() > 0))
                         {
                             // Any messages in a non-persistent queue went paused service is stopped are lost
                             logger.warn(CoreMessages.stopPausedSedaServiceNonPeristentQueueMessageLoss(getQueueSize(), this));
@@ -343,7 +343,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
                 // before stopping
                 if (stopping.get())
                 {
-                    if (queueProfile.isPersistent() || queueSession == null || getQueueSize() <= 0)
+                    if (isPersistent() || queueSession == null || getQueueSize() <= 0)
                     {
                         stopping.set(false);
                         break;
@@ -405,6 +405,12 @@ public class SedaService extends AbstractService implements Work, WorkListener
                 }
             }
         }
+    }
+
+    /** Are the events in the SEDA queue persistent? */
+    protected boolean isPersistent()
+    {
+        return queueProfile.isPersistent();
     }
 
     public void release()

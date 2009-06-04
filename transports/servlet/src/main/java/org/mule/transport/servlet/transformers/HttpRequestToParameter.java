@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import javax.servlet.http.HttpServletRequest;
-
 public class HttpRequestToParameter extends AbstractMessageAwareTransformer
 {
 
@@ -35,23 +33,21 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        HttpServletRequest request = ((HttpRequestMessageAdapter) message.getAdapter()).getRequest();
+        HttpRequestMessageAdapter messageAdapter = (HttpRequestMessageAdapter) message.getAdapter();
 
-        String payloadParam = (String)request.getAttribute(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME);
-        if (null == payloadParam)
-        {
-            payloadParam = AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME;
-        }
+        String payloadParam = messageAdapter.getStringProperty(
+            AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME, 
+            AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME);
 
-        String payload = request.getParameter(payloadParam);
+        String payload = messageAdapter.getStringProperty(payloadParam, null);
         if (null == payload)
         {
-            if (isText(request.getContentType()))
+            if (isText(messageAdapter.getContentType()))
             {
                 try
                 {
                     InputStream is = (InputStream) message.getPayload();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, request.getCharacterEncoding()));
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, messageAdapter.getCharacterEncoding()));
                     StringBuffer buffer = new StringBuffer(8192);
                     String line = reader.readLine();
                     while (line != null)

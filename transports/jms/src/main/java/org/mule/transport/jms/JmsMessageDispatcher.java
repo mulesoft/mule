@@ -70,6 +70,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispatch(MuleEvent event) throws Exception
     {
+        if (connector.getConnection() == null)
+        {
+            throw new IllegalStateException("No JMS Connection");
+        }
         dispatchMessage(event);
     }
 

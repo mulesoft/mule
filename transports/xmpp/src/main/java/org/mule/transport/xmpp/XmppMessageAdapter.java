@@ -14,6 +14,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMessageAdapter;
+import org.mule.transport.MessageAdapterSerialization;
 import org.mule.util.StringUtils;
 
 import java.util.Iterator;
@@ -24,7 +25,7 @@ import org.jivesoftware.smack.packet.Packet;
 /**
  * <code>XmppMessageAdapter</code> wraps a Smack XMPP packet
  */
-public class XmppMessageAdapter extends AbstractMessageAdapter
+public class XmppMessageAdapter extends AbstractMessageAdapter implements MessageAdapterSerialization
 {
     public static final String DEFAULT_SUBJECT = "(no subject)";
     public static final String DEFAULT_THREAD = "(no thread)";
@@ -40,7 +41,7 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
     {
         if (message instanceof Packet)
         {
-            this.message = (Packet)message;
+            this.message = (Packet) message;
 
             for (Iterator iter = this.message.getPropertyNames(); iter.hasNext();)
             {
@@ -50,10 +51,10 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
 
             if (this.message instanceof Message)
             {
-                this.setProperty("subject", StringUtils.defaultIfEmpty(((Message)this.message).getSubject(),
-                    DEFAULT_SUBJECT));
-                this.setProperty("thread", StringUtils.defaultIfEmpty(((Message)this.message).getThread(),
-                    DEFAULT_THREAD));
+                Message msg = (Message) this.message;
+                
+                this.setProperty("subject", StringUtils.defaultIfEmpty(msg.getSubject(), DEFAULT_SUBJECT));
+                this.setProperty("thread", StringUtils.defaultIfEmpty(msg.getThread(), DEFAULT_THREAD));
             }
         }
         else
@@ -111,9 +112,15 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
         return message.getPacketID();
     }
 
+    @Override
     public ThreadSafeAccess newThreadCopy()
     {
         return new XmppMessageAdapter(this);
+    }
+
+    public byte[] getPayloadForSerialization() throws Exception
+    {
+        return this.getPayloadAsBytes();
     }
 
 }

@@ -15,6 +15,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.lifecycle.Callable;
+import org.mule.api.model.Model;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.component.DefaultJavaComponent;
@@ -86,7 +87,10 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
         SedaService service = new SedaService();
         service.setMuleContext(muleContext);
         service.setName("test");
-        service.setModel(new SedaModel());
+        Model model = new SedaModel();
+        model.setMuleContext(muleContext);
+        model.initialise();
+        service.setModel(model);
         service.setQueueProfile(new QueueProfile(capacity, persistent));
 
         try

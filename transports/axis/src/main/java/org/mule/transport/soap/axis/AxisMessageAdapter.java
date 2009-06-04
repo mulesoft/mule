@@ -80,8 +80,9 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
                 {
                     for (Iterator i = this.soapMessage.getAttachments(); i.hasNext(); x++)
                     {
-                        super.addAttachment(String.valueOf(x), ((AttachmentPart)i.next())
-                            .getActivationDataHandler());
+                        String name = String.valueOf(x);
+                        AttachmentPart attachmentPart = (AttachmentPart) i.next();
+                        super.addAttachment(name, attachmentPart.getActivationDataHandler());
                     }
                 }
                 catch (Exception e)

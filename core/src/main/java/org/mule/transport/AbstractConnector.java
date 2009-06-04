@@ -74,6 +74,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -131,6 +132,8 @@ public abstract class AbstractConnector
      * Default number of concurrent transactional receivers.
      */
     public static final int DEFAULT_NUM_CONCURRENT_TX_RECEIVERS = 4;
+    
+    private static final long SCHEDULER_FORCED_SHUTDOWN_TIMEOUT = 5000l;
 
     /**
      * logger used by this class
@@ -470,8 +473,8 @@ public abstract class AbstractConnector
         }
 
         // shutdown our scheduler service
-        ((ScheduledExecutorService) scheduler.get()).shutdown();
-
+        shutdownScheduler();
+        
         this.doStop();
         started.set(false);
 
@@ -514,6 +517,56 @@ public abstract class AbstractConnector
         if (logger.isInfoEnabled())
         {
             logger.info("Stopped: " + this);
+        }
+    }
+
+    protected void shutdownScheduler()
+    {
+        ScheduledExecutorService schedulerExecutor = ((ScheduledExecutorService) scheduler.get());
+        if (schedulerExecutor != null)
+        {
+            // Disable new tasks from being submitted
+            schedulerExecutor.shutdown();
+            try
+            {
+                // Wait a while for existing tasks to terminate
+                if (!schedulerExecutor.awaitTermination(muleContext.getConfiguration().getShutdownTimeout(),
+                    TimeUnit.MILLISECONDS))
+                {
+                    // Cancel currently executing tasks and return list of pending
+                    // tasks
+                    List outstanding = schedulerExecutor.shutdownNow();
+                    // Wait a while for tasks to respond to being cancelled
+                    if (!schedulerExecutor.awaitTermination(SCHEDULER_FORCED_SHUTDOWN_TIMEOUT,
+                        TimeUnit.MILLISECONDS))
+                    {
+                        logger.warn(MessageFormat.format(
+                            "Pool {0} did not terminate in time; {1} work items were cancelled.", name,
+                            outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())));
+                    }
+                    else
+                    {
+                        if (!outstanding.isEmpty())
+                        {
+                            logger.warn(MessageFormat.format(
+                                "Pool {0} terminated; {1} work items were cancelled.", name,
+                                Integer.toString(outstanding.size())));
+                        }
+                    }
+
+                }
+            }
+            catch (InterruptedException ie)
+            {
+                // (Re-)Cancel if current thread also interrupted
+                schedulerExecutor.shutdownNow();
+                // Preserve interrupt status
+                Thread.currentThread().interrupt();
+            }
+            finally
+            {
+                schedulerExecutor = null;
+            }
         }
     }
 

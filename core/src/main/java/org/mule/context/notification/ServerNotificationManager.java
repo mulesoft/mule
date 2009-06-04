@@ -10,6 +10,7 @@
 
 package org.mule.context.notification;
 
+import org.mule.MuleServer;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
@@ -30,6 +31,7 @@ import javax.resource.spi.work.WorkListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -227,8 +229,13 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         {
             try
             {
-                ServerNotification notification = (ServerNotification) eventQueue.take();
-                notifyListeners(notification);
+                ServerNotification notification = (ServerNotification) eventQueue.poll(
+                    MuleServer.getMuleContext().getConfiguration().getDefaultQueueTimeout(),
+                    TimeUnit.MILLISECONDS);
+                if (notification != null)
+                {
+                    notifyListeners(notification);
+                }
             }
             catch (InterruptedException e)
             {

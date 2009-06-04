@@ -16,6 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -24,6 +25,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
@@ -408,6 +410,10 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
             configureMuleContext(contextBuilder);
             context = muleContextFactory.createMuleContext(builders, contextBuilder);
+            if (!isGracefulShutdown())
+            {
+                ((DefaultMuleConfiguration) context.getConfiguration()).setShutdownTimeout(0);
+            }
         }
         return context;
     }
@@ -762,5 +768,15 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     public void setFailOnTimeout(boolean failOnTimeout)
     {
         this.failOnTimeout = failOnTimeout;
+    }
+    
+    /**
+     * Determines if the test case should perform graceful shutdown or not.
+     * Default is false so that tests run more quickly.
+     * @return
+     */
+    protected boolean isGracefulShutdown()
+    {
+        return false;
     }
 }

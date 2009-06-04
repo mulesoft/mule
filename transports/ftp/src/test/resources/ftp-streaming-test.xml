@@ -26,14 +26,14 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <ftp:outbound-endpoint user="anonymous" password="email" host="localhost" port="60197"/>
+                    <ftp:outbound-endpoint user="anonymous" password="password" host="localhost" port="60197"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="testComponent">
             <inbound>
-                <ftp:inbound-endpoint address="ftp://anonymous:email@localhost:60197"/>
+                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:60197"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>

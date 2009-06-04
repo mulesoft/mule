@@ -28,6 +28,12 @@ public class SchemaDefaultsTestCase extends AbstractMuleTestCase
         SAXReader reader = new SAXReader();
         schema = reader.read(ClassUtils.getResource("META-INF/mule.xsd", this.getClass()).openStream());
     }
+    
+    @Override
+    protected boolean isGracefulShutdown()
+    {
+        return true;
+    }
 
     public void testConfigurationDefaults()
     {
@@ -42,7 +48,9 @@ public class SchemaDefaultsTestCase extends AbstractMuleTestCase
         assertEquals(muleContext.getConfiguration().getDefaultTransactionTimeout(),
             configurationType.numberValueOf("xsd:attribute[@name='defaultTransactionTimeout']/@default")
                 .intValue());
-
+        assertEquals(muleContext.getConfiguration().getShutdownTimeout(),
+            configurationType.numberValueOf("xsd:attribute[@name='shutdownTimeout']/@default")
+                .intValue());
     }
 
 }

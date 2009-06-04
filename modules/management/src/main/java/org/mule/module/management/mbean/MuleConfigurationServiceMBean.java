@@ -25,6 +25,8 @@ public interface MuleConfigurationServiceMBean
     public String getWorkingDirectory();
 
     public int getTransactionTimeout();
-
+    
+    public int getShutdownTimeout();
+    
     public String getEncoding();
 }

@@ -15,7 +15,6 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
 import org.mule.transport.ftp.AbstractFtpServerTestCase;
-import org.mule.transport.ftp.server.NamedPayload;
 
 import java.util.HashMap;
 
@@ -64,11 +63,11 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
     {
         MuleClient client = new MuleClient();
 
-        Object ftc = getComponent("testComponent");
+        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent)getComponent("testComponent");
         assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
 
-        assertNotNull(ftc);
-//        assertEquals(1, ftc.getNumber());
+        //assertNotNull(ftc);
+        //assertEquals(1, ftc.getNumber());
 
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference message = new AtomicReference();
@@ -77,10 +76,6 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
 
         // send out to FTP server via streaming model
         client.dispatch("tcp://localhost:60196", TEST_MESSAGE, new HashMap());
-        NamedPayload payload = awaitUpload();
-        assertNotNull(payload);
-        logger.info("received message: " + payload);
-        assertEquals(TEST_MESSAGE, new String(payload.getPayload()));
 
         // poll and pull back through test service
         latch.await(getTimeout(), TimeUnit.MILLISECONDS);
@@ -88,7 +83,7 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
 
         // repeat, but restart server due to simple state, connection limitations
         stopServer();
-        Thread.sleep(3000); // wait for scket to close
+        Thread.sleep(3000); // wait for socket to close
         startServer();
 
         CountDownLatch latch2 = new CountDownLatch(1);
@@ -97,10 +92,6 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback2, TEST_MESSAGE_2.length());
 
         client.dispatch("tcp://localhost:60196", TEST_MESSAGE_2, new HashMap());
-        NamedPayload payload2 = awaitUpload();
-        assertNotNull(payload2);
-        logger.info("received message: " + payload2);
-        assertEquals(TEST_MESSAGE_2, new String(payload2.getPayload()));
 
         latch2.await(getTimeout(), TimeUnit.MILLISECONDS);
         assertEquals("Received stream; length: 20; 'Anot...sage'", message2.get());

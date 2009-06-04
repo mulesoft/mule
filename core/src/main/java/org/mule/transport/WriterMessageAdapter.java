@@ -21,7 +21,7 @@ import java.io.Writer;
  * <code>WriterMessageAdapter</code> wraps a java.io.StringWriter and allows meta
  * information to be associated with the Writer.
  */
-public class WriterMessageAdapter extends AbstractMessageAdapter
+public class WriterMessageAdapter extends AbstractMessageAdapter implements MessageAdapterSerialization
 {
     /**
      * Serial version
@@ -113,6 +113,11 @@ public class WriterMessageAdapter extends AbstractMessageAdapter
     public ThreadSafeAccess newThreadCopy()
     {
         return new WriterMessageAdapter(this);
+    }
+
+    public byte[] getPayloadForSerialization() throws Exception
+    {
+        return writer.toString().getBytes();
     }
 
 }

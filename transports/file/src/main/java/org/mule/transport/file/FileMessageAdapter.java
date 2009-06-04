@@ -92,4 +92,11 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         return new FileMessageAdapter(this);
     }
 
+    /*
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+        out.defaultWriteObject();
+    }
+    */
+    
 }

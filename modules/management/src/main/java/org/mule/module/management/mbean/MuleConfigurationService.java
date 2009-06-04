@@ -53,6 +53,11 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         return muleConfiguration.getDefaultTransactionTimeout();
     }
 
+    public int getShutdownTimeout()
+    {
+        return muleConfiguration.getShutdownTimeout();
+    }
+
     public boolean isClientMode()
     {
         return muleConfiguration.isClientMode();

@@ -63,7 +63,7 @@ import org.junit.runners.Parameterized.Parameters;
  * {@link AbstractJmsFunctionalTestCase.ScenarioRollback}
  * {@link AbstractJmsFunctionalTestCase.NonTransactedScenario}
  * <p/>
- * This object will also add properties to the registry that can be accessed withn Xml config files using placeholders.
+ * This object will also add properties to the registry that can be accessed within XML config files using placeholders.
  * The following properties are made available -
  * <ul>
  * <li>${inbound.destination} - the URI of the inbound destination (retrieved from an {@link JmsVendorConfiguration} implementation)</li>

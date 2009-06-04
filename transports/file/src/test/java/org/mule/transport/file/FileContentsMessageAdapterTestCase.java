@@ -10,12 +10,16 @@
 
 package org.mule.transport.file;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.util.Arrays;
+
+import org.apache.commons.lang.SerializationUtils;
 
 public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
@@ -52,7 +56,6 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
         }
         else
         {
-            // properly throw
             return new FileContentsMessageAdapter(payload);
         }
     }
@@ -68,4 +71,23 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
         // slight detour for testing :)
         doTestMessageEqualsPayload(validMessage, adapter.getPayload());
     }
+    
+    public void testSerialization() throws Exception
+    {
+        MessageAdapter messageAdapter = createAdapter(messageFile);        
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter);
+
+        byte[] serializedMessage = SerializationUtils.serialize(muleMessage);
+
+        DefaultMuleMessage readMessage = 
+            (DefaultMuleMessage) SerializationUtils.deserialize(serializedMessage);
+        assertNotNull(readMessage.getAdapter());
+
+        MessageAdapter readMessageAdapter = readMessage.getAdapter();
+        assertTrue(readMessageAdapter instanceof FileContentsMessageAdapter);
+        
+        assertTrue(Arrays.equals((byte[]) getValidMessage(), 
+            (byte[]) readMessageAdapter.getPayload()));
+    }
+
 }

@@ -19,8 +19,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * Returns a simple Map of the parameters sent with the HTTP Request.  
  * If the same parameter is given more than once, only the first value for it will be in the Map.
@@ -35,15 +33,15 @@ public class HttpRequestToParameterMap extends AbstractMessageAwareTransformer
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        HttpServletRequest request = ((HttpRequestMessageAdapter) message.getAdapter()).getRequest();
-        Enumeration <String> paramNames = request.getParameterNames();
+        HttpRequestMessageAdapter messageAdapter = (HttpRequestMessageAdapter) message.getAdapter();
+        Enumeration<String> paramNames = messageAdapter.getParameterNames();
         
         Map <String, String> parameters = new HashMap();
         String paramName;
         while (paramNames.hasMoreElements())
         {
-            paramName = (String) paramNames.nextElement();            
-            parameters.put(paramName, request.getParameterValues(paramName)[0]);
+            paramName = paramNames.nextElement();            
+            parameters.put(paramName, messageAdapter.getParameterValues(paramName)[0]);
         }
         return parameters;
     }

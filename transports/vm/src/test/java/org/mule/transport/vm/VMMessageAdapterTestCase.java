@@ -18,6 +18,8 @@ import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMessageAdapterTestCase;
 import org.mule.transport.DefaultMessageAdapter;
 
+import org.apache.commons.lang.SerializationUtils;
+
 /**
  * <code>VMMessageAdapterTestCase</code> TODO (document class)
  */
@@ -38,12 +40,27 @@ public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 
     public Object getValidMessage() throws MuleException
     {
-        return new DefaultMuleMessage("Valid Message");
+        return new DefaultMuleMessage(TEST_MESSAGE);
     }
 
     public Object getInvalidMessage()
     {
         return "Invalid message";
+    }
+
+    public void testSerialization() throws Exception
+    {
+        DefaultMuleMessage muleMessage = (DefaultMuleMessage) getValidMessage();
+
+        byte[] serializedMessage = SerializationUtils.serialize(muleMessage);
+
+        DefaultMuleMessage readMessage = 
+            (DefaultMuleMessage) SerializationUtils.deserialize(serializedMessage);
+        assertNotNull(readMessage.getAdapter());
+
+        MessageAdapter readMessageAdapter = readMessage.getAdapter();
+        assertTrue(readMessageAdapter instanceof DefaultMessageAdapter);
+        assertEquals(TEST_MESSAGE, readMessageAdapter.getPayload());
     }
 
 }

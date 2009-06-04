@@ -17,7 +17,6 @@ import org.mule.transport.AbstractMessageAdapter;
 /**
  * Wraps an object obtained by calling a method on a Remote object
  */
-
 public class RmiMessageAdapter extends AbstractMessageAdapter
 {
     /**
@@ -60,6 +59,7 @@ public class RmiMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
+    @Override
     public ThreadSafeAccess newThreadCopy()
     {
         return new RmiMessageAdapter(this);

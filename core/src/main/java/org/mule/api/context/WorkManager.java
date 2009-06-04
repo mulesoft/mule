@@ -21,5 +21,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
  */
 public interface WorkManager extends javax.resource.spi.work.WorkManager, Startable, Disposable, Executor
 {
-    // no additional methods
+    /** Is the WorkManager ready to accept work? */
+    public boolean isStarted();
 }

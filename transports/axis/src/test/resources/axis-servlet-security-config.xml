@@ -23,7 +23,6 @@
     <byte-array-to-string-transformer name="ByteArrayToString"/>
 
     <servlet:connector name="servletConnector" servletUrl="http://localhost:18088/services">
-        <!--  TODO DO: this should not be necessary, see MULE-1508 -->
         <custom-exception-strategy class="org.mule.transport.soap.axis.UnitTestExceptionStrategy"/>
     </servlet:connector>
 

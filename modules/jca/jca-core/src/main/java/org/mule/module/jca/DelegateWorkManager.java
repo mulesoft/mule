@@ -84,6 +84,11 @@ public class DelegateWorkManager implements org.mule.api.context.WorkManager
         // nothing to do
     }
 
+    public boolean isStarted()
+    {
+        return true;
+    }
+
     public void stop() throws MuleException
     {
         // nothing to do

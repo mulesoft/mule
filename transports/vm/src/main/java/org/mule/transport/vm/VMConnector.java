@@ -45,12 +45,16 @@ public class VMConnector extends AbstractConnector
     public static final String VM = "vm";
     private boolean queueEvents = false;
     private QueueProfile queueProfile;
-    private int queueTimeout = 1000;
+    private Integer queueTimeout;
     /** The queue manager to use for vm queues only */
     private QueueManager queueManager;
 
     protected void doInitialise() throws InitialisationException
     {
+        if (queueTimeout == null)
+        {
+            queueTimeout = muleContext.getConfiguration().getDefaultQueueTimeout();
+        }
         if (queueEvents)
         {
             if (queueManager == null)

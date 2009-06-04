@@ -14,6 +14,9 @@ import org.mule.transport.file.DummyFilenameParser;
 import org.mule.transport.file.FilenameParser;
 import org.mule.transport.ftp.FtpConnector;
 
+/**
+ * Load a mule config and verify that the parameters are set as expected
+ */
 public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
@@ -39,5 +42,4 @@ public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
     }
-
 }

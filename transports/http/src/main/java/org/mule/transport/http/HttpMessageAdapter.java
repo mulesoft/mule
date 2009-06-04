@@ -12,7 +12,12 @@ package org.mule.transport.http;
 
 import org.mule.api.ThreadSafeAccess;
 import org.mule.transport.AbstractMessageAdapter;
+import org.mule.transport.MessageAdapterSerialization;
+import org.mule.util.IOUtils;
 
+import java.io.InputStream;
+import java.io.NotSerializableException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -20,12 +25,13 @@ import java.util.Map;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HeaderElement;
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making the
  * payload and headers available as standard message adapter.
  */
-public class HttpMessageAdapter extends AbstractMessageAdapter
+public class HttpMessageAdapter extends AbstractMessageAdapter implements MessageAdapterSerialization
 {
     /**
      * Serial version
@@ -45,33 +51,22 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
             
             this.message = messageParts[0];
 
-            Map headers = new HashMap();
+            Map<Object, Object> headers = new HashMap<Object, Object>();
             if (messageParts.length > 1)
             {
                 Object second = messageParts[1];
                 if (second instanceof Map)
                 {
-                    Map props = (Map) second;
-                    for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
-                    {
-                        Map.Entry e = (Map.Entry) iterator.next();
-                        String key = (String) e.getKey();
-                        Object value = e.getValue();
-                        // skip incoming null values
-                        if (value != null)
-                        {
-                            headers.put(key, value);
-                        }
-                    }
+                    setupHeadersFromMap(headers, (Map) second);
                 }
                 else if (second instanceof Header[])
                 {
-                    Header[] inboundHeaders = (Header[]) second;
-                    for (int i = 0; i < inboundHeaders.length; i++)
-                    {
-                        headers.put(inboundHeaders[i].getName(), inboundHeaders[i].getValue());
-                    }
+                    setupHeadersFromHeaderArray(headers, (Header[]) second);
                 }
+                
+                determineHttpVersion(headers);
+                rewriteConnectionAndKeepAliveHeaders(headers);
+                
                 addInboundProperties(headers);
             }
         }
@@ -85,17 +80,12 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
             this.message = message;
         }
 
-        String temp = getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, null);
-        if (HttpConstants.HTTP10.equalsIgnoreCase(temp))
+        String contentType = getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+        if (contentType != null)
         {
-            http11 = false;
-        }
-
-        // set the encoding
-        Header contenttype = getHeader(HttpConstants.HEADER_CONTENT_TYPE);
-        if (contenttype != null)
-        {
-            HeaderElement values[] = contenttype.getElements();
+            // set the encoding
+            Header contentTypeHeader = new Header(HttpConstants.HEADER_CONTENT_TYPE, contentType);
+            HeaderElement values[] = contentTypeHeader.getElements();
             if (values.length == 1)
             {
                 NameValuePair param = values[0].getParameterByName("charset");
@@ -105,6 +95,63 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
                 }
             }
         }
+    }
+
+    private void setupHeadersFromMap(Map<Object, Object> headers, Map props)
+    {
+        for (Iterator<?> iterator = props.entrySet().iterator(); iterator.hasNext();)
+        {
+            Map.Entry e = (Map.Entry) iterator.next();
+            String key = (String) e.getKey();
+            Object value = e.getValue();
+            // skip incoming null values
+            if (value != null)
+            {
+                headers.put(key, value);
+            }
+        }        
+    }
+
+    private void setupHeadersFromHeaderArray(Map<Object, Object> headers, Header[] inboundHeaders)
+    {
+        for (int i = 0; i < inboundHeaders.length; i++)
+        {
+            headers.put(inboundHeaders[i].getName(), inboundHeaders[i].getValue());
+        }        
+    }
+
+    private void determineHttpVersion(Map headers)
+    {
+        String httpVersion = (String) headers.get(HttpConnector.HTTP_VERSION_PROPERTY);
+        if (HttpConstants.HTTP10.equalsIgnoreCase(httpVersion))
+        {
+            http11 = false;
+        }        
+    }
+
+    private void rewriteConnectionAndKeepAliveHeaders(Map<Object, Object> headers)
+    {
+        // rewrite Connection and Keep-Alive headers based on HTTP version
+        String headerValue = null;
+        if (!http11)
+        {
+            String connection = (String) headers.get(HttpConstants.HEADER_CONNECTION);
+            if ((connection != null) && connection.equalsIgnoreCase("close"))
+            {
+                headerValue = "false";
+            }
+            else
+            {
+                headerValue = "true";
+            }
+        }
+        else
+        {
+            headerValue =  (headers.get(HttpConstants.HEADER_CONNECTION) != null ? "true" : "false");
+        }
+
+        headers.put(HttpConstants.HEADER_CONNECTION, headerValue);
+        headers.put(HttpConstants.HEADER_KEEP_ALIVE, headerValue);        
     }
 
     protected HttpMessageAdapter(HttpMessageAdapter template)
@@ -120,33 +167,10 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
-    public Object getProperty(String key)
-    {
-        if (HttpConstants.HEADER_KEEP_ALIVE.equals(key) || HttpConstants.HEADER_CONNECTION.equals(key))
-        {
-            if (!http11)
-            {
-                String connection = super.getStringProperty(HttpConstants.HEADER_CONNECTION, null);
-                if (connection != null && connection.equalsIgnoreCase("close"))
-                {
-                    return "false";
-                }
-                else
-                {
-                    return "true";
-                }
-            }
-            else
-            {
-                return (super.getProperty(HttpConstants.HEADER_CONNECTION) != null ? "true" : "false");
-            }
-        }
-        else
-        {
-            return super.getProperty(key);
-        }
-    }
-
+    /**
+     * @deprecated use getStringProperty
+     */
+    @Deprecated
     public Header getHeader(String name)
     {
         String value = getStringProperty(name, null);
@@ -157,9 +181,29 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         return new Header(name, value);
     }
 
+    @Override
     public ThreadSafeAccess newThreadCopy()
     {
         return new HttpMessageAdapter(this);
+    }
+
+    public byte[] getPayloadForSerialization() throws Exception
+    {        
+        if (message instanceof InputStream)
+        {
+            // message is an InputStream when the HTTP method was POST
+            return IOUtils.toByteArray((InputStream) message);
+        }
+        else if (message instanceof Serializable)
+        {
+            // message is a String when the HTTP method was GET
+            return SerializationUtils.serialize((Serializable) message);
+        }
+        else
+        {
+            throw new NotSerializableException("Don't know how to serialize payload of type " 
+                + message.getClass().getName());
+        }
     }
     
 }

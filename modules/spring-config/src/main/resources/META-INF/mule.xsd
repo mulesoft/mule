@@ -411,6 +411,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="shutdownTimeout" type="substitutableInt" default="5000">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The time in milliseconds to wait for any in-progress messages to finish processing before Mule shuts down.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="notificationManagerType">

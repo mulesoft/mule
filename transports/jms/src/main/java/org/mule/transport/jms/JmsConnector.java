@@ -752,6 +752,10 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         if (session != null)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Closing session " + session);
+            }
             session.close();
         }
     }
