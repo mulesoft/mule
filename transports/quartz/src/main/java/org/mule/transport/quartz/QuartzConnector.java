@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.ConnectorException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.client.MuleClient;
 import org.mule.transport.AbstractConnector;
 
 import java.util.Properties;
@@ -57,8 +56,6 @@ public class QuartzConnector extends AbstractConnector
      */
     private Scheduler quartzScheduler = null;
 
-    private MuleClient client;
-
     protected void doInitialise() throws InitialisationException
     {
         try
@@ -75,8 +72,6 @@ public class QuartzConnector extends AbstractConnector
                     quartzScheduler = StdSchedulerFactory.getDefaultScheduler();
                 }
             }
-            
-            this.client = new MuleClient(muleContext);
         }
         catch (Exception e)
         {
@@ -149,14 +144,5 @@ public class QuartzConnector extends AbstractConnector
     public void setFactoryProperties(Properties factoryProperties)
     {
         this.factoryProperties = factoryProperties;
-    }
-
-    /**
-     * A shared MuleClient for EndpointPollingJobs.
-     * @throws MuleException
-     */
-    public MuleClient getClient() throws MuleException
-    {
-        return client;
     }
 }

@@ -10,17 +10,16 @@
 
 package org.mule.transport.quartz.jobs;
 
+import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
+import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.QuartzMessageReceiver;
 import org.mule.transport.quartz.i18n.QuartzMessages;
-import org.mule.transport.AbstractConnector;
-import org.mule.transport.AbstractMessageReceiver;
-import org.mule.RegistryContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -80,7 +79,7 @@ public class EndpointPollingJob implements Job
 
         try
         {
-            MuleClient client = connector.getClient();
+            MuleClient client = new MuleClient(connector.getMuleContext());
             logger.debug("Attempting to receive event on: " + jobConfig.getEndpointRef());
             MuleMessage result = client.request(jobConfig.getEndpointRef(), jobConfig.getTimeout());
             if (result != null)
