@@ -34,12 +34,6 @@ public class JettyReceiverServlet extends MuleReceiverServlet
     private ConcurrentMap receivers = new ConcurrentHashMap(4);
 
     @Override
-    protected void doInit(ServletConfig servletConfig) throws ServletException
-    {
-        //do nothing
-    }
-
-    @Override
     protected MessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
         throws EndpointException
     {

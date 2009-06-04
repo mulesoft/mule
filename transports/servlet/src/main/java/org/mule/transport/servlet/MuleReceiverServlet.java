@@ -56,24 +56,24 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
     protected ServletConnector connector = null;
 
-    protected void doInit(ServletConfig servletConfig) throws ServletException
+    protected void doInit() throws ServletException
     {
-        String servletConnectorName = servletConfig.getInitParameter(SERVLET_CONNECTOR_NAME_PROPERTY);
+        String servletConnectorName = getServletConfig().getInitParameter(SERVLET_CONNECTOR_NAME_PROPERTY);
         if (servletConnectorName == null)
         {
             connector = (ServletConnector) TransportFactory.getConnectorByProtocol("servlet");
             if (connector == null)
             {
                 connector = new ServletConnector();
+                connector.setName("_generatedServletConnector");
                 try
                 {
                     RegistryContext.getRegistry().registerConnector(connector);
                 }
                 catch (MuleException e)
                 {
-                    throw new ServletException("Failed to register the AjaxServletConnector", e);
+                    throw new ServletException("Failed to register the ServletConnector", e);
                 }
-                //throw new ServletException(ServletMessages.noConnectorForProtocolServlet().toString());
             }
         }
         else
@@ -91,7 +91,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MuleMessage responseMessage = doMethod(request, "HEAD");
+            MuleMessage responseMessage = doMethod(request, response, "HEAD");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
@@ -112,7 +112,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MuleMessage responseMessage = doMethod(request, "GET");
+            MuleMessage responseMessage = doMethod(request, response, "GET");
             writeResponse(response, responseMessage);
         }
         catch (RuntimeException e)
@@ -194,7 +194,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MuleMessage responseMessage = doMethod(request, "POST");
+            MuleMessage responseMessage = doMethod(request, response, "POST");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
@@ -210,7 +210,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
     }
 
-    protected MuleMessage doMethod(HttpServletRequest request, String method)
+    protected MuleMessage doMethod(HttpServletRequest request, HttpServletResponse response, String method)
         throws MuleException
     {
         MessageReceiver receiver = getReceiverForURI(request);
@@ -234,7 +234,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MuleMessage responseMessage = doMethod(request, "OPTIONS");
+            MuleMessage responseMessage = doMethod(request, response, "OPTIONS");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
@@ -251,7 +251,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MuleMessage responseMessage = doMethod(request, "PUT");
+            MuleMessage responseMessage = doMethod(request, response, "PUT");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
@@ -269,7 +269,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MuleMessage responseMessage = doMethod(request, "DELETE");
+            MuleMessage responseMessage = doMethod(request, response, "DELETE");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
@@ -286,7 +286,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MuleMessage responseMessage = doMethod(request, "TRACE");
+            MuleMessage responseMessage = doMethod(request, response, "TRACE");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);
@@ -303,7 +303,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            MuleMessage responseMessage = doMethod(request, "CONNECT");
+            MuleMessage responseMessage = doMethod(request, response, "CONNECT");
             if (responseMessage != null)
             {
                 writeResponse(response, responseMessage);

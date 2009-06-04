@@ -61,15 +61,10 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     protected String defaultContentType = HttpConstants.DEFAULT_CONTENT_TYPE;
 
     private MuleMessageToHttpResponse responseTransformer = new MuleMessageToHttpResponse();
-    
+
     public final void init() throws ServletException
     {
-        doInit();
-    }
-
-    public final void init(ServletConfig servletConfig) throws ServletException
-    {
-        String timeoutString = servletConfig.getInitParameter(REQUEST_TIMEOUT_PROPERTY);
+        String timeoutString = getServletConfig().getInitParameter(REQUEST_TIMEOUT_PROPERTY);
         if (timeoutString != null)
         {
             timeout = Long.parseLong(timeoutString);
@@ -79,7 +74,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             logger.info("Default request timeout for GET methods is: " + timeout);
         }
 
-        String feedbackString = servletConfig.getInitParameter(FEEDBACK_PROPERTY);
+        String feedbackString = getServletConfig().getInitParameter(FEEDBACK_PROPERTY);
         if (feedbackString != null)
         {
             feedback = Boolean.valueOf(feedbackString);
@@ -89,7 +84,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             logger.info("feedback is set to: " + feedback);
         }
 
-        String ct = servletConfig.getInitParameter(DEFAULT_CONTENT_TYPE_PROPERTY);
+        String ct = getServletConfig().getInitParameter(DEFAULT_CONTENT_TYPE_PROPERTY);
         if (ct != null)
         {
             if (logger.isDebugEnabled())
@@ -103,7 +98,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             logger.info("Default content type is: " + defaultContentType);
         }
 
-        payloadParameterName = servletConfig.getInitParameter(PAYLOAD_PARAMETER_NAME);
+        payloadParameterName = getServletConfig().getInitParameter(PAYLOAD_PARAMETER_NAME);
         if (payloadParameterName == null)
         {
             payloadParameterName = DEFAULT_PAYLOAD_PARAMETER_NAME;
@@ -121,13 +116,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         {
             throw new ServletException(e);
         }
-        
-        doInit(servletConfig);
-    }
-
-    protected void doInit(ServletConfig servletConfig) throws ServletException
-    {
-        // nothing to do
+        doInit();
     }
 
     protected void doInit() throws ServletException

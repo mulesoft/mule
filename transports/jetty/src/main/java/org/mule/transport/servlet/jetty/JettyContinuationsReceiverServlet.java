@@ -19,6 +19,7 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.HttpRequestMessageAdapter;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.mortbay.util.ajax.Continuation;
 import org.mortbay.util.ajax.ContinuationSupport;
@@ -28,7 +29,7 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
     private Object mutex = new Object();
 
     @Override
-    protected MuleMessage doMethod(HttpServletRequest request, String method) throws MuleException
+    protected MuleMessage doMethod(HttpServletRequest request, HttpServletResponse response, String method) throws MuleException
     {
         final Continuation continuation = ContinuationSupport.getContinuation(request, mutex);
         synchronized (mutex)

@@ -23,6 +23,7 @@ import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractMessageReceiver;
+import org.mule.transport.service.TransportFactory;
 import org.mule.transport.servlet.ServletConnector;
 import org.mule.transport.servlet.i18n.ServletMessages;
 import org.mule.util.StringUtils;
@@ -45,23 +46,26 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         {
             // We need to have a Servlet Connector pointing to our servlet so the Servlets can
             // find the listeners for incoming requests
-            ServletConnector scon = (ServletConnector) RegistryContext.getRegistry().lookupConnector(JETTY_SERVLET_CONNECTOR_NAME);
-            if (scon != null)
+            ServletConnector scon = (ServletConnector) TransportFactory.getConnectorByProtocol("servlet");
+            if (scon == null)
             {
-                throw new CreateException(
-                        ServletMessages.noServletConnectorFound(JETTY_SERVLET_CONNECTOR_NAME), this);
-            }
-
-            scon = new ServletConnector();
-            scon.setName(JETTY_SERVLET_CONNECTOR_NAME);
-            scon.setServletUrl(endpoint.getEndpointURI().getAddress());
-            try
-            {
+                scon = new ServletConnector();
+                scon.setName(JETTY_SERVLET_CONNECTOR_NAME);
+                scon.setServletUrl(endpoint.getEndpointURI().getAddress());
                 MuleContext muleContext = MuleServer.getMuleContext();
                 scon.setMuleContext(muleContext);
-                //muleContext.applyLifecycle(scon);
-                muleContext.getRegistry().registerConnector(scon);
+                try
+                {
+                    muleContext.getRegistry().registerConnector(scon);
+                }
+                catch (MuleException e)
+                {
+                    throw new CreateException(e, this);
+                }
+            }
 
+            try
+            {
                 String path = endpoint.getEndpointURI().getPath();
                 if (StringUtils.isEmpty(path))
                 {
@@ -69,12 +73,12 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
                 }
 
                 EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("servlet://" + path.substring(1),
-                    connector.getMuleContext());
+                        connector.getMuleContext());
                 endpointBuilder.setTransformers(endpoint.getTransformers());
                 InboundEndpoint ep = connector.getMuleContext()
-                    .getRegistry()
-                    .lookupEndpointFactory()
-                    .getInboundEndpoint(endpointBuilder);
+                        .getRegistry()
+                        .lookupEndpointFactory()
+                        .getInboundEndpoint(endpointBuilder);
                 scon.registerListener(service, ep);
             }
             catch (Exception e)
@@ -110,7 +114,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            ((JettyHttpConnector)connector).registerListener(this);
+            ((JettyHttpConnector) connector).registerListener(this);
         }
         catch (Exception e)
         {
@@ -122,7 +126,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            ((JettyHttpConnector)connector).unregisterListener(this);
+            ((JettyHttpConnector) connector).unregisterListener(this);
         }
         catch (Exception e)
         {
