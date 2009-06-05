@@ -30,7 +30,7 @@ import org.mortbay.jetty.security.SslSocketConnector;
 
 /**
  * The <code>JettyHttpsConnector</code> can be using to embed a Jetty server to receive requests on an http inbound endpoint.
- * One server is created for each connector declared, Many Jetty endpoints can share the same connector.
+ * One server is created for each connector declared, many Jetty endpoints can share the same connector.
  */
 
 public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler

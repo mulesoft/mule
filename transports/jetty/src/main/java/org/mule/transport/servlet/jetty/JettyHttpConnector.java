@@ -33,7 +33,7 @@ import org.mortbay.xml.XmlConfiguration;
 
 /**
  * The <code>JettyConnector</code> can be using to embed a Jetty server to receive requests on an http inound endpoint.
- * One server is created for each connector declared, Many Jetty endpoints can share the same connector.
+ * One server is created for each connector declared, many Jetty endpoints can share the same connector.
  */
 
 public class JettyHttpConnector extends AbstractConnector
