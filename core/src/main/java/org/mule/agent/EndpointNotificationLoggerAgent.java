@@ -20,7 +20,6 @@ import org.mule.api.MuleSession;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.ModelNotification;
@@ -49,7 +48,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         // List of notifications to ignore, because when these notifications are
         // received the notification endpoint is no longer available
         ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_STOPPED));
-        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSING));   
+        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSING));
         ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSED));
         ignoredNotifications.add(new Integer(ModelNotification.MODEL_STOPPED));
         ignoredNotifications.add(new Integer(ModelNotification.MODEL_DISPOSING));
@@ -76,16 +75,15 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
 
     protected void logEvent(ServerNotification e)
     {
-        if(!endpoint.getConnector().isStarted())
-        {
-            logger.warn("Endpoint not started yet: "+ endpoint.getEndpointURI() + ". Cannot dispatch notification: " + e);
-            return;
-        }
-        
         if (endpoint != null && !ignoredNotifications.contains(new Integer(e.getAction())))
         {
+            if (!endpoint.getConnector().isStarted())
+            {
+                logger.warn("Endpoint not started: " + endpoint.getEndpointURI() + ". Cannot dispatch notification: " + e);
+                return;
+            }
             if ((e.getAction() == ConnectionNotification.CONNECTION_FAILED || e.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED)
-                && ((Connector) e.getSource()).equals(endpoint.getConnector()))
+                    && (e.getSource()).equals(endpoint.getConnector()))
             {
                 // If this is a CONNECTION_FAILED or
                 // CONNECTION_DISCONNECTED notification for the same connector that
@@ -96,9 +94,12 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
             try
             {
                 //TODO: Filters should really be applied by the endpoint
-                if(endpoint.getFilter()!=null && !endpoint.getFilter().accept(msg))
+                if (endpoint.getFilter() != null && !endpoint.getFilter().accept(msg))
                 {
-                    if(logger.isInfoEnabled()) logger.info("Message not accepted with filter: " + endpoint.getFilter());
+                    if (logger.isInfoEnabled())
+                    {
+                        logger.info("Message not accepted with filter: " + endpoint.getFilter());
+                    }
                     return;
                 }
 
@@ -109,7 +110,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
             {
                 // TODO MULE-863: If this is an error, do something better than this
                 logger.error("Failed to dispatch event: " + e.toString() + " over endpoint: " + endpoint
-                             + ". Error is: " + e1.getMessage(), e1);
+                        + ". Error is: " + e1.getMessage(), e1);
             }
         }
     }
