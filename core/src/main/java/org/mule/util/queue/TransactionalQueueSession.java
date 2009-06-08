@@ -30,11 +30,6 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         this.queueManager = queueManager;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueueSession#getQueue(java.lang.String)
-     */
     public Queue getQueue(String name)
     {
         QueueInfo queue = queueManager.getQueue(name);
