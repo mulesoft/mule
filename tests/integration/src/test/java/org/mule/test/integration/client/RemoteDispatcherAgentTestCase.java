@@ -13,7 +13,7 @@ import org.mule.module.client.remoting.RemoteDispatcherAgent;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
 
-public class RemoteDispatcherTestCase extends FunctionalTestCase
+public class RemoteDispatcherAgentTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
