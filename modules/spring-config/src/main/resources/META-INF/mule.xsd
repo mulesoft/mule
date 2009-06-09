@@ -1865,6 +1865,7 @@
                             <xsd:enumeration value="groovy"/>
                             <xsd:enumeration value="bean"/>
                             <xsd:enumeration value="custom"/>
+                            <xsd:enumeration value="registry"/>
                         </xsd:restriction>
                     </xsd:simpleType>
                 </xsd:attribute>
