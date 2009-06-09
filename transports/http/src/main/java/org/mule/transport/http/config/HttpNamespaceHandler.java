@@ -23,6 +23,7 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpPollingConnector;
 import org.mule.transport.http.components.RestServiceWrapper;
+import org.mule.transport.http.filters.HttpRequestWildcardFilter;
 import org.mule.transport.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.transport.http.transformers.HttpResponseToString;
 import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
@@ -52,5 +53,6 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("object-to-http-request-transformer", new TransformerDefinitionParser(ObjectToHttpClientMethodRequest.class));
         registerBeanDefinitionParser("message-to-http-response-transformer", new TransformerDefinitionParser(MuleMessageToHttpResponse.class));
         registerBeanDefinitionParser("error-filter", new ChildDefinitionParser("filter", ErrorFilterFactoryBean.class));
+        registerBeanDefinitionParser("request-wildcard-filter", new ChildDefinitionParser("filter", HttpRequestWildcardFilter.class));
     }
 }

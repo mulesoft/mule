@@ -45,4 +45,7 @@
         <http:object-to-http-request-transformer ignoreBadInput="true" name="test4" returnClass="java.lang.Object"/>
     </endpoint>
     
+    <endpoint name="ep5" address="test://ep5">
+        <http:request-wildcard-filter pattern="foo*"/>
+    </endpoint>
 </mule>

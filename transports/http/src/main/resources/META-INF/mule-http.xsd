@@ -340,4 +340,13 @@
             <xsd:enumeration value="DELETE"/>
         </xsd:restriction>
     </xsd:simpleType>
+    
+    <xsd:element name="request-wildcard-filter" type="mule:wildcardFilterType"
+                 substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                This filter can be used to restrict the request by applying wildcard expressions to the URL.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 </xsd:schema>

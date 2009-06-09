@@ -31,14 +31,11 @@ public class HttpRequestWildcardFilter extends WildcardFilter
         super(pattern);
     }
 
-    public boolean accept(Object object)
+    @Override
+    public boolean accept(MuleMessage message)
     {
-        if (object instanceof MuleMessage)
-        {
-            object = ((MuleMessage) object).getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
-        }
-
-        return super.accept(object);
+        Object requestProperty = message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        return super.accept(requestProperty);
     }
-
+    
 }

@@ -8,27 +8,23 @@
        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesource.org/schema/mule/http http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd">
 
-    <model name="main">
-
+    <model>
         <service name="httpIn">
             <inbound>
                 <http:inbound-endpoint host="localhost" port="60201" synchronous="true">
                     <not-filter>
-                        <wildcard-filter pattern="*xyz*"/>
+                        <http:request-wildcard-filter pattern="*xyz*"/>
                     </not-filter>
                 </http:inbound-endpoint>
             </inbound>
-            <component class="org.mule.component.simple.EchoComponent"/>
+            <echo-component/>
         </service>
 
         <service name="reference">
             <inbound>
-                <inbound-endpoint address="http://localhost:60199" synchronous="true">
-                </inbound-endpoint>
+                <inbound-endpoint address="http://localhost:60199" synchronous="true"/>
             </inbound>
-            <component class="org.mule.component.simple.EchoComponent"/>
+            <echo-component/>
         </service>
-
     </model>
-
 </mule>

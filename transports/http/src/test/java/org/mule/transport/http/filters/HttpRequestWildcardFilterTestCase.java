@@ -22,16 +22,15 @@ import java.util.Map;
 public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
 {
 
-    protected String getConfigResources()
-    {
-        return "http-wildcard-filter-test.xml";
-    }
-
     private static final String HTTP_ENDPOINT = "http://localhost:60201";
     private static final String REF_ENDPOINT = "http://localhost:60199";
     private static final String TEST_MESSAGE = "Hello=World";
     private static final String TEST_BAD_MESSAGE = "xyz";
 
+    protected String getConfigResources()
+    {
+        return "http-wildcard-filter-test.xml";
+    }
 
     public void testReference() throws Exception
     {
@@ -49,24 +48,27 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
         assertEquals(TEST_MESSAGE, result.getPayloadAsString());
     }
 
-    public void testHttpGetNotFilter() throws Exception
+    public void testHttpGetNotFiltered() throws Exception
     {
         Map props = new HashMap();
         props.put(HttpConstants.METHOD_GET, "true");
+        
         MuleClient client = new MuleClient();
-        MuleMessage result = client.send(HTTP_ENDPOINT, TEST_MESSAGE, props);
+        MuleMessage result = client.send(HTTP_ENDPOINT + "/" + "mulerulez", TEST_MESSAGE, props);
 
         assertEquals(TEST_MESSAGE, result.getPayloadAsString());
     }
 
-    public void testHttpGetFilter() throws Exception
+    public void testHttpGetFiltered() throws Exception
     {
         Map props = new HashMap();
         props.put(HttpConstants.METHOD_GET, "true");
+        
         MuleClient client = new MuleClient();
-        MuleMessage result = client.send(HTTP_ENDPOINT, TEST_BAD_MESSAGE, props);
+        MuleMessage result = client.send(HTTP_ENDPOINT + "/" + TEST_BAD_MESSAGE, "mule", props);
+        
         assertEquals(HttpConstants.SC_NOT_ACCEPTABLE, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertNotNull(result.getExceptionPayload());
     }
-
+    
 }
