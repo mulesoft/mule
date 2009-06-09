@@ -266,7 +266,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
-     public void testGettingAllAttachments() throws Exception
+    public void testGettingAllAttachments() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
         eval.setMuleContext(muleContext);
@@ -351,7 +351,6 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         {
             //Exprected
         }
-
     }
 
     public void testMapHeaders() throws Exception
@@ -422,7 +421,6 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
-
     public void testGettingAllHeaders() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -439,7 +437,6 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(3, ((List)result).size());
-
     }
 
     public void testGettingAllHeadersUsingManager() throws Exception
@@ -455,7 +452,6 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(3, ((List)result).size());
-
     }
 
     public void testSingleHeaderUsingManager() throws Exception
@@ -722,8 +718,6 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
         eval.setMuleContext(muleContext);
-        MuleMessage message = new DefaultMuleMessage("test");
-
 
         //no expression
         Object result = eval.evaluate(null, null);
@@ -770,21 +764,21 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
     }
 
     public void testMessagePayloadWithTransformUsingManager() throws Exception
-        {
-            MuleMessage message = new DefaultMuleMessage("test");
+    {
+        MuleMessage message = new DefaultMuleMessage("test");
 
-            //i.e. ${payload:byte[]}
-            Object result = muleContext.getExpressionManager().evaluate("#[mule:message.payload(byte[])]", message);
-            assertNotNull(result);
-            assertTrue(result instanceof byte[]);
-            assertEquals("test", new String((byte[]) result));
+        //i.e. ${payload:byte[]}
+        Object result = muleContext.getExpressionManager().evaluate("#[mule:message.payload(byte[])]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof byte[]);
+        assertEquals("test", new String((byte[]) result));
 
-            ByteArrayInputStream bais = new ByteArrayInputStream("test2".getBytes());
-            //i.e. ${payload:java.lang.String}
-            result = muleContext.getExpressionManager().evaluate("#[mule:message.payload(java.lang.String)]", new DefaultMuleMessage(bais));
-            assertNotNull(result);
-            assertEquals("test2", result);
-        }
+        ByteArrayInputStream bais = new ByteArrayInputStream("test2".getBytes());
+        //i.e. ${payload:java.lang.String}
+        result = muleContext.getExpressionManager().evaluate("#[mule:message.payload(java.lang.String)]", new DefaultMuleMessage(bais));
+        assertNotNull(result);
+        assertEquals("test2", result);
+    }
 
     public void testMessagePayloadWithMoreComplexTransform() throws Exception
     {
