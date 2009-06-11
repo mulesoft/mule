@@ -10,17 +10,19 @@
 package org.mule.module.json.transformers;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.message.DefaultMuleMessageDTO;
 import org.mule.module.json.util.JsonUtils;
 import org.mule.transformer.AbstractTransformer;
-import org.mule.message.DefaultMuleMessageDTO;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 
+import net.sf.ezmorph.bean.MorphDynaBean;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -37,11 +39,13 @@ import org.apache.commons.beanutils.DynaBean;
  * The JSON engine can be configured using the jsonConfig attribute. This is an object reference to an
  * instance of: {@link net.sf.json.JsonConfig}. This can be created as a spring bean.
  */
-public class JsonToObject extends AbstractTransformer
+public class JsonToObject extends AbstractTransformer implements DiscoverableTransformer
 {
     protected JsonConfig jsonConfig;
 
     protected Map dtoMappings;
+
+    protected int weighting = DiscoverableTransformer.MAX_PRIORITY_WEIGHTING;
 
     public JsonToObject()
     {
@@ -51,6 +55,16 @@ public class JsonToObject extends AbstractTransformer
         setReturnClass(Object.class);
         dtoMappings = new HashMap(1);
         dtoMappings.put("payload", HashMap.class);
+    }
+
+    public int getPriorityWeighting()
+    {
+        return weighting;
+    }
+
+    public void setPriorityWeighting(int weighting)
+    {
+        this.weighting = weighting;
     }
 
     @Override
@@ -96,6 +110,7 @@ public class JsonToObject extends AbstractTransformer
                 {
                     JSON json = JSONSerializer.toJSON(src.toString(), getJsonConfig());
                     returnValue = JSONObject.toBean((JSONObject) json, getJsonConfig());
+                    returnValue = new JsonDynaBean((MorphDynaBean)returnValue);
                 }
                 else
                 {
