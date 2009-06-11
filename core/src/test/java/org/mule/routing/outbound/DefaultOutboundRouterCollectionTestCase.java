@@ -46,9 +46,13 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         testService.setOutboundRouter(new TestOutboundRouterCollection());
     }
 
+    /**
+     * If there is just one outbound router we don't need to do any copying at all
+     * regardless of if matchAll is true or not or if the router mutates the message
+     * in isMatch or not . The outbound phase already has a new message copy.
+     */
     public void testSingleDoesNotRequireCopyRouterMatchAllFalse() throws Exception
     {
-
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.start();
@@ -59,14 +63,15 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
         assertTrue(TestDoesNotRequireNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
             TimeUnit.MILLISECONDS));
-
     }
 
+    /**
+     * If there is just one outbound router we don't need to do any copying at all
+     * regardless of if matchAll is true or not or if the router mutates the message
+     * in isMatch or not . The outbound phase already has a new message copy.
+     */
     public void testSingleDoesNotRequireCopyRouterMatchAllTrue() throws Exception
     {
-
-        MuleEvent testEvent = getTestInboundEvent("TEST_MESSAGE");
-
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.start();
@@ -77,12 +82,15 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
         assertTrue(TestDoesNotRequireNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
             TimeUnit.MILLISECONDS));
-
     }
 
+    /**
+     * If there is just one outbound router we don't need to do any copying at all
+     * regardless of if matchAll is true or not or if the router mutates the message
+     * in isMatch or not . The outbound phase already has a new message copy.
+     */
     public void testSingleRequiresCopyRouterMatchAllFalse() throws Exception
     {
-
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
         testService.start();
@@ -93,12 +101,15 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
         assertTrue(TestRequiresNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
             TimeUnit.MILLISECONDS));
-
     }
 
+    /**
+     * If there is just one outbound router we don't need to do any copying at all
+     * regardless of if matchAll is true or not or if the router mutates the message
+     * in isMatch or not . The outbound phase already has a new message copy.
+     */
     public void testSingleRequiresCopyRouterMatchAllTrue() throws Exception
     {
-
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
         testService.start();
@@ -109,14 +120,17 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
         assertTrue(TestRequiresNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
             TimeUnit.MILLISECONDS));
-
     }
 
     // MULTIPLE
 
+    /**
+     * If there are multiple outbound routers but matchAll is false then we only need
+     * to copy message if the router might mutate it in isMatch, if not then no need
+     * to copy.
+     */
     public void testMultipleDoesNotRequireCopyRouterMatchAllFalse() throws Exception
     {
-
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
@@ -129,18 +143,19 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
         assertTrue(TestDoesNotRequireNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
             TimeUnit.MILLISECONDS));
-
     }
 
+    /**
+     * If there are multiple outbound routers and matchAll is true then we need a new
+     * message copy for all but the *last* router independent of whether the routers
+     * may mutate the message in isMatch or not. See MULE- 4352.
+     */
     public void testMultipleDoesNotRequireCopyRouterMatchAllTrue() throws Exception
     {
-
-        MuleEvent testEvent = getTestInboundEvent("TEST_MESSAGE");
-
         testService.getOutboundRouter().setMatchAll(true);
+        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
         testService.start();
 
         TestDoesNotRequireNewMessageOutboundRouter.latch = new CountDownLatch(3);
@@ -149,16 +164,19 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
         assertTrue(TestDoesNotRequireNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
             TimeUnit.MILLISECONDS));
-
     }
 
+    /**
+     * If there are multiple outbound routers and matchAll is false then we need a
+     * new message copy for all but the *last* router that may mutate the message in
+     * isMatch.
+     */
     public void testMultipleRequiresCopyRouterMatchAllFalse() throws Exception
     {
-
         testService.getOutboundRouter().setMatchAll(false);
+        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
         testService.start();
 
         TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(3);
@@ -167,38 +185,42 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
         assertTrue(TestRequiresNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
             TimeUnit.MILLISECONDS));
-
     }
 
+    /**
+     * If there are multiple outbound routers and matchAll is true then we need a new
+     * message copy for all but the *last* router independent of whether the routers
+     * may mutate the message in isMatch or not. See MULE- 4352.
+     */
     public void testMultipleRequiresCopyRouterMatchAllTrue() throws Exception
     {
-
         testService.getOutboundRouter().setMatchAll(true);
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
         testService.start();
 
         TestDoesNotRequireNewMessageOutboundRouter.latch = new CountDownLatch(3);
 
         testService.sendEvent(testEvent);
 
-        assertTrue(TestDoesNotRequireNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
+        assertTrue(TestRequiresNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
             TimeUnit.MILLISECONDS));
-
     }
 
     // MIX
 
+    /**
+     * If matchAll is true then we need a new message copy for each and every router except the last one.
+     */
     public void testMultipleMixMatchAllTrue() throws Exception
     {
-
         testService.getOutboundRouter().setMatchAll(true);
+        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
         testService.start();
 
         TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(3);
@@ -210,22 +232,25 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
             TimeUnit.MILLISECONDS));
         assertTrue(TestDoesNotRequireNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
             TimeUnit.MILLISECONDS));
-
     }
 
+    /**
+     * If matchAll is false then we need a new message copy for each router that may
+     * mutate the message in isMatch unless it is the last router.
+     */
     public void testMultipleMixMatchAllFalse() throws Exception
     {
-
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
         testService.start();
 
         TestDoesNotRequireNewMessageOutboundRouter.latch = new CountDownLatch(3);
-        TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(2);
+        TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(3);
 
         testService.sendEvent(testEvent);
 
@@ -233,12 +258,15 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
             TimeUnit.MILLISECONDS));
         assertTrue(TestDoesNotRequireNewMessageOutboundRouter.latch.await(LATCH_AWAIT_TIMEOUT_MS,
             TimeUnit.MILLISECONDS));
-
     }
 
+    /**
+     * If the message is a stream and message copying is required due to any of the
+     * scenarios tested above then an exception should be thrown as the stream
+     * payload cannot be copied.
+     */
     public void testStreamPayload() throws Exception
     {
-
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
@@ -254,7 +282,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         });
         MuleMessage result = testService.sendEvent(testEvent);
         assertTrue(result.getExceptionPayload() != null);
-
     }
 
     private static class TestRequiresNewMessageOutboundRouter extends OutboundPassThroughRouter

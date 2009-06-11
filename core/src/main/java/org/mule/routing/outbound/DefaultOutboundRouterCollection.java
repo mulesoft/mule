@@ -44,7 +44,6 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
             throws MessagingException
     {
         MuleMessage result;
-        boolean first = true;
         boolean matchfound = false;
 
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
@@ -52,10 +51,10 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
             OutboundRouter outboundRouter = (OutboundRouter) iterator.next();
 
             final MuleMessage outboundRouterMessage;
-            // Create copy of message for router 2..n if matchAll="true" or if
+            // Create copy of message for router 1..n-1 if matchAll="true" or if
             // routers require copy because it may mutate payload before match is
             // chosen
-            if (!first && (isMatchAll() || outboundRouter.isRequiresNewMessage()))
+            if (iterator.hasNext() && (isMatchAll() || outboundRouter.isRequiresNewMessage()))
             {
                 if (((DefaultMuleMessage) message).isConsumable())
                 {
@@ -69,7 +68,6 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
             {
                 outboundRouterMessage = message;
             }
-            first = false;
 
             if (outboundRouter.isMatch(outboundRouterMessage))
             {
