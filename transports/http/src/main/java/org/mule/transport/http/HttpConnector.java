@@ -18,6 +18,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.tcp.TcpConnector;
 
@@ -163,7 +164,6 @@ public class HttpConnector extends TcpConnector
             params.setTcpNoDelay(isSendTcpNoDelay());
             params.setMaxTotalConnections(getDispatcherThreadingProfile().getMaxThreadsActive());
             params.setDefaultMaxConnectionsPerHost(getDispatcherThreadingProfile().getMaxThreadsActive());
-
             clientConnectionManager.setParams(params);
         }
     }
@@ -345,18 +345,19 @@ public class HttpConnector extends TcpConnector
             throws UnsupportedEncodingException
     {
         httpMethod.setDoAuthentication(true);
+        client.getParams().setAuthenticationPreemptive(true);
+
         if (event != null && event.getCredentials() != null)
         {
             MuleMessage msg = event.getMessage();
-            String authScopeHost = msg.getStringProperty(HTTP_PREFIX + "auth.scope.host", null);
-            int authScopePort = msg.getIntProperty(HTTP_PREFIX + "auth.scope.port", -1);
-            String authScopeRealm = msg.getStringProperty(HTTP_PREFIX + "auth.scope.realm", null);
-            String authScopeScheme = msg.getStringProperty(HTTP_PREFIX + "auth.scope.scheme", null);
+            String authScopeHost = msg.getStringProperty(HTTP_PREFIX + "auth.scope.host", event.getEndpoint().getEndpointURI().getHost());
+            int authScopePort = msg.getIntProperty(HTTP_PREFIX + "auth.scope.port", event.getEndpoint().getEndpointURI().getPort());
+            String authScopeRealm = msg.getStringProperty(HTTP_PREFIX + "auth.scope.realm", AuthScope.ANY_REALM);
+            String authScopeScheme = msg.getStringProperty(HTTP_PREFIX + "auth.scope.scheme", AuthScope.ANY_SCHEME);
             client.getState().setCredentials(
                 new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
                 new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
                     event.getCredentials().getPassword())));
-            client.getParams().setAuthenticationPreemptive(true);
         }
         else if (endpoint.getEndpointURI().getUserInfo() != null
             && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
@@ -367,6 +368,11 @@ public class HttpConnector extends TcpConnector
             header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(
                 endpoint.getEncoding()))));
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
+        }
+        else if (event!=null && event.getMessage().getProperty(HttpConstants.HEADER_AUTHORIZATION, PropertyScope.OUTBOUND)!=null)
+        {
+            httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION,
+                    event.getMessage().getProperty(HttpConstants.HEADER_AUTHORIZATION, PropertyScope.OUTBOUND).toString());
         }
         else
         {

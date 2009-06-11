@@ -289,7 +289,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     public Credentials getCredentials()
     {
-        return credentials;
+        return (credentials!=null ? credentials : (MuleCredentials)message.getProperty(MuleProperties.MULE_CREDENTIALS_PROPERTY));
     }
 
     Object getCachedMessage()

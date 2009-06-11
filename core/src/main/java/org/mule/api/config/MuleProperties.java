@@ -57,6 +57,7 @@ public class MuleProperties
     public static final String MULE_SOAP_METHOD = PROPERTY_PREFIX + "SOAP_METHOD";
     public static final String MULE_JMS_SESSION = PROPERTY_PREFIX + "JMS_SESSION";
     public static final String MULE_MANAGEMENT_CONTEXT_PROPERTY = PROPERTY_PREFIX + "MANAGEMENT_CONTEXT";
+    public static final String MULE_CREDENTIALS_PROPERTY = PROPERTY_PREFIX + "CREDENTIALS";
     // End MuleEvent Level properties
 
     /********************************************************************************
