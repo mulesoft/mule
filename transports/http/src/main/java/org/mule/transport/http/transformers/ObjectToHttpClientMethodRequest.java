@@ -215,15 +215,24 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 PostMethod postMethod = new PostMethod(uri.toString());
                 String paramName = msg.getStringProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, null);
 
-                if (paramName == null)
+                if(src instanceof Map)
+                {
+                    for (Iterator iterator = ((Map)src).entrySet().iterator(); iterator.hasNext();)
+                    {
+                        Map.Entry entry = (Map.Entry)iterator.next();
+                        postMethod.addParameter(entry.getKey().toString(), entry.getValue().toString());
+                    }
+                }
+                else if(paramName!=null)
+                {
+                    postMethod.addParameter(paramName, src.toString());
+
+                }
+                else
                 {
                     // Call method to manage the parameter array
                     addParameters(uri.getQuery(), postMethod, msg);
                     setupEntityMethod(src, outputEncoding, msg, uri, postMethod);
-                }
-                else
-                {
-                    postMethod.addParameter(paramName, src.toString());
                 }
 
                 httpMethod = postMethod;
