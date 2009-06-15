@@ -46,6 +46,9 @@ import javax.xml.ws.WebServiceClient;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
+import org.apache.cxf.binding.soap.interceptor.Soap11FaultInInterceptor;
+import org.apache.cxf.binding.soap.interceptor.Soap12FaultInInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.databinding.stax.StaxDataBinding;
@@ -245,13 +248,16 @@ public class ClientWrapper
         }
         
         this.client = ClientProxy.getClient(cpf.create());
-        
 
         proxy = true;
         proxyEnvelope = CxfConstants.PAYLOAD_ENVELOPE.equals(endpoint.getProperty(CxfConstants.PAYLOAD));
 
         Binding binding = this.client.getEndpoint().getBinding();
         CxfUtils.removeInterceptor(binding.getOutInterceptors(), WrappedOutInterceptor.class.getName());
+        CxfUtils.removeInterceptor(binding.getInInterceptors(), Soap11FaultInInterceptor.class.getName());
+        CxfUtils.removeInterceptor(binding.getInInterceptors(), Soap12FaultInInterceptor.class.getName());
+        CxfUtils.removeInterceptor(binding.getInInterceptors(), CheckFaultInterceptor.class.getName());
+
         if (proxyEnvelope) 
         {
             CxfUtils.removeInterceptor(binding.getOutInterceptors(), SoapOutInterceptor.class.getName());

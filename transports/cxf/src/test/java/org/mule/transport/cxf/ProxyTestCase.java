@@ -23,11 +23,10 @@ public class ProxyTestCase extends FunctionalTestCase
     String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
         + "<soap:Body><test xmlns=\"http://foo\"> foo </test>" + "</soap:Body>" + "</soap:Envelope>";
 
-    
     public void testServerWithEcho() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage result = client.send("http://localhost:63081/services/Echo", msg, null);
+        MuleMessage result = client.send("http://localhost:63443/service", msg, null);
         String resString = result.getPayloadAsString();
 //        System.out.println(resString);
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"> foo </test>") != -1);
@@ -41,6 +40,7 @@ public class ProxyTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         MuleMessage result = client.send("http://localhost:63081/services/proxy", msg, null);
         String resString = result.getPayloadAsString();
+        System.out.println(resString);
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
     }
 
@@ -87,9 +87,22 @@ public class ProxyTestCase extends FunctionalTestCase
                     "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient();
-        MuleMessage result = client.send("http://localhost:63081/services/greeterProxy", msg, null);
+        MuleMessage result = client.send("http://localhost:63081/services/greeter-databinding-proxy", msg, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("greetMeResponse") != -1);
+    }
+
+    public void testProxyWithFault() throws Exception 
+    {
+        String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+            + "<soap:Body><invalid xmlns=\"http://apache.org/hello_world_soap_http/types\"><requestType>Dan</requestType></invalid>" +
+                    "</soap:Body>" + "</soap:Envelope>";
+
+        MuleClient client = new MuleClient();
+        MuleMessage result = client.send("http://localhost:63081/services/greeter-proxy", msg, null);
+        String resString = result.getPayloadAsString();
+        
+        assertTrue(resString.indexOf("invalid was not recognized") != -1);
     }
 
     public void testProxyWithIntermediateTransform() throws Exception 
