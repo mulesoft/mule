@@ -70,10 +70,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
      */
     protected void doConnect() throws Exception
     {
-        wrapper = new ClientWrapper();
-        wrapper.setBus(connector.getCxfBus());
-        wrapper.setEndpoint(endpoint);
-        wrapper.initialize();
+        wrapper = new ClientWrapper(connector.getCxfBus(), endpoint);
     }
 
     protected void doDisconnect() throws Exception

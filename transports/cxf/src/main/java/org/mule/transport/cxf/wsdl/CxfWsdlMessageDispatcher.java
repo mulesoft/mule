@@ -10,12 +10,11 @@
 
 package org.mule.transport.cxf.wsdl;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.transport.cxf.ClientWrapper;
 import org.mule.transport.cxf.CxfMessageDispatcher;
 import org.mule.util.StringUtils;
-
-import java.io.IOException;
 
 import javax.xml.namespace.QName;
 
@@ -40,49 +39,7 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
     {
         try
         {
-            wrapper = new ClientWrapper() {
-
-                @Override
-                public void initialize() throws Exception, IOException
-                {
-                    String wsdlUrl = endpoint.getEndpointURI().getAddress();
-                    String serviceName = null;
-                    String portName = null;
-
-                    // If the property specified an alternative WSDL url, use it
-                    if (endpoint.getProperty("wsdlLocation") != null && StringUtils.isNotBlank(endpoint.getProperty("wsdlLocation").toString()))
-                    {
-                        wsdlUrl = (String) endpoint.getProperty("wsdlLocation");
-                    }
-                    
-                    // If the property specified an alternative service, use it
-                    if (endpoint.getProperty("service") != null && StringUtils.isNotBlank(endpoint.getProperty("service").toString()))
-                    {
-                        serviceName = (String) endpoint.getProperty("service");
-                    }
-                    
-                    // If the property specified an alternative port, use it
-                    if (endpoint.getProperty("port") != null && StringUtils.isNotBlank(endpoint.getProperty("port").toString()))
-                    {
-                        portName = (String) endpoint.getProperty("port");
-                    }
-                    
-                    try
-                    {
-                        this.client = createClient(bus, wsdlUrl, serviceName, portName);
-    
-                        addMuleInterceptors();
-                    }
-                    catch (Exception ex)
-                    {
-                        disconnect();
-                        throw ex;
-                    }
-                }
-            };
-            wrapper.setBus(connector.getCxfBus());
-            wrapper.setEndpoint(endpoint);
-            wrapper.initialize();
+            wrapper = new WsdlClientWrapper(connector.getCxfBus(), endpoint);
         }
         catch (Exception ex)
         {
@@ -101,4 +58,46 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
                (portName == null ? null : QName.valueOf(portName)));
         }
     }
+
+    class WsdlClientWrapper extends ClientWrapper
+    {
+        public WsdlClientWrapper(Bus bus, ImmutableEndpoint endpoint) throws Exception
+        {
+            super(endpoint);
+            
+            String wsdlUrl = endpoint.getEndpointURI().getAddress();
+            String serviceName = null;
+            String portName = null;
+
+            // If the property specified an alternative WSDL url, use it
+            if (endpoint.getProperty("wsdlLocation") != null && StringUtils.isNotBlank(endpoint.getProperty("wsdlLocation").toString()))
+            {
+                wsdlUrl = (String) endpoint.getProperty("wsdlLocation");
+            }
+            
+            // If the property specified an alternative service, use it
+            if (endpoint.getProperty("service") != null && StringUtils.isNotBlank(endpoint.getProperty("service").toString()))
+            {
+                serviceName = (String) endpoint.getProperty("service");
+            }
+            
+            // If the property specified an alternative port, use it
+            if (endpoint.getProperty("port") != null && StringUtils.isNotBlank(endpoint.getProperty("port").toString()))
+            {
+                portName = (String) endpoint.getProperty("port");
+            }
+            
+            try
+            {
+                this.client = createClient(bus, wsdlUrl, serviceName, portName);
+
+                addMuleInterceptors();
+            }
+            catch (Exception ex)
+            {
+                disconnect();
+                throw ex;
+            }
+        }
+    };
 }
