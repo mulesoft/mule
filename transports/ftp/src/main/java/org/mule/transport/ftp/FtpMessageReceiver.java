@@ -180,15 +180,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                     throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
                                                                file.getName(), client.getReplyCode()));
                 }
-                byte[] bytes = baos.toByteArray();
-                if (bytes.length > 0)
-                {
-                    message = new DefaultMuleMessage(connector.getMessageAdapter(bytes));            
-                }
-                else
-                {
-                    throw new IOException("File " + file.getName() + " is empty (zero bytes)");
-                }
+                message = new DefaultMuleMessage(connector.getMessageAdapter(baos.toByteArray()));            
             }
 
             message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
