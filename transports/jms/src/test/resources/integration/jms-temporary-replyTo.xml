@@ -75,5 +75,33 @@
             <test:component appendString=" #[mule:context.serviceName]"/>
         </service>
 
+		<service name="Part1">
+			<inbound>
+				<vm:inbound-endpoint path="in5" synchronous="true"/>
+			</inbound> 
+			<outbound>
+				<pass-through-router>
+					<outbound-endpoint address="${middle.destination}" synchronous="true" connector-ref="jmsConnector1" />
+				</pass-through-router>
+			</outbound>
+		</service>
+		
+		<service name="Part2">
+			<inbound>
+				<inbound-endpoint address="${middle.destination}" synchronous="true" connector-ref="jmsConnector1" />
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="part3" synchronous="true"/>
+				</pass-through-router>
+			</outbound>
+		</service>
+		
+		<service name="Part3">
+			<inbound>
+				<vm:inbound-endpoint path="part3" synchronous="true"/>
+			</inbound>
+			<test:component appendString=" #[mule:context.serviceName]"/>
+		</service>
     </model>
 </mule>

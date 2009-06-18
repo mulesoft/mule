@@ -68,4 +68,13 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
         // We get the original message back, not the result from the remote component
         assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
     }
+
+    @Test
+    public void testMultipleServices() throws MuleException
+    {
+        MuleClient muleClient = new MuleClient();
+        MuleMessage response = muleClient.send("vm://in5", TEST_MESSAGE, null);
+        assertEquals(TEST_MESSAGE + " Part3", response.getPayload());
+    }
+
 }
