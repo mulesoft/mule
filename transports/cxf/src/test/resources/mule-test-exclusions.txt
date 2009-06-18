@@ -25,4 +25,4 @@ org.mule.transport.cxf.WSProxyTestCase
 org.mule.transport.cxf.CxfConnectorVMFunctionalTestCase
 
 # MULE-3710
-org.mule.transport.cxf.HttpSecurityTestCase
+# org.mule.transport.cxf.HttpSecurityTestCase

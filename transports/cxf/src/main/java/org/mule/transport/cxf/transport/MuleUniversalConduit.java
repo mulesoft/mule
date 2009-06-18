@@ -53,6 +53,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -340,9 +341,18 @@ public class MuleUniversalConduit extends AbstractConduit
         String value = (String) message.get(Message.ENDPOINT_ADDRESS);
         String pathInfo = (String) message.get(Message.PATH_INFO);
         String queryString = (String) message.get(Message.QUERY_STRING);
+        String username = (String) message.get(BindingProvider.USERNAME_PROPERTY);
+        String password = (String) message.get(BindingProvider.PASSWORD_PROPERTY);
 
         String result = value != null ? value : getTargetOrEndpoint();
 
+        if (username != null) {
+        	 int slashIdx = result.indexOf("//");
+        	 if (slashIdx != -1) {
+        		 result = result.substring(0, slashIdx + 2) + username + ":" + password + "@" + result.substring(slashIdx+2);
+        	 }
+        }
+        
         // REVISIT: is this really correct?
         if (null != pathInfo && !result.endsWith(pathInfo))
         {

@@ -371,7 +371,15 @@ public class ClientWrapper
         {
             uri = uri.substring(0, idx);
         }
-
+        
+        // remove username/password
+        idx = uri.indexOf('@');
+    	int slashIdx = uri.indexOf("//");
+        if (idx != -1 && slashIdx != -1)
+        {
+            uri = uri.substring(0, slashIdx + 2) + uri.substring(idx + 1);
+        }
+        
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress(uri);
 

@@ -13,7 +13,6 @@ package org.mule.transport.cxf;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.providers.soap.AbstractSoapUrlEndpointFunctionalTestCase;
-import org.mule.transport.http.HttpConnector;
 
 import java.util.HashMap;
 import java.util.Iterator;

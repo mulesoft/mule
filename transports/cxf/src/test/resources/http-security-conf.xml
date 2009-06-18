@@ -33,7 +33,9 @@
     <acegi:security-manager>
         <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
     </acegi:security-manager>
-
+    
+    <cxf:endpoint name="cxfOutbound" address="http://admin:admin@localhost:61080/services/Echo?method=echo"/>
+    
     <model name="test">
         <service name="mycomponent">
             <inbound>
@@ -41,6 +43,12 @@
                    address="https://localhost:60443/services/Echo"
                    frontend="simple"
                    protocolConnector="httpConnector"
+                   applySecurityToProtocol="true">
+                    <acegi:http-security-filter realm="mule-realm"/>
+                </cxf:inbound-endpoint>
+                <cxf:inbound-endpoint 
+                   address="http://localhost:61080/services/Echo"
+                   frontend="simple"
                    applySecurityToProtocol="true">
                     <acegi:http-security-filter realm="mule-realm"/>
                 </cxf:inbound-endpoint>
