@@ -206,7 +206,7 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
             }
         });
 
-        message.applyTransformers(Arrays.asList(new Object[]{trans}));
+        message.applyTransformers(Arrays.asList(trans));
     }
 
     protected abstract void authenticateInbound(MuleEvent event)

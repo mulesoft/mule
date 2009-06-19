@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,17 +45,9 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
 
     public void testAuthenticationAuthorised() throws Exception
     {
-        URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
-        
-        
-        int length = (int) FileUtils.newFile(url.getFile()).length();
-        byte[] msg = new byte[length];
+        byte[] msg = loadEncryptedMessage();
 
-        FileInputStream in = new FileInputStream(url.getFile());
-        in.read(msg);
-        in.close();
-
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("TARGET_FILE", TARGET);
         MuleClient client = new MuleClient();
         MuleMessage reply = client.send("vm://echo", new String(msg), props);
@@ -62,18 +55,32 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         
         try
         {
-            //check if file exists
-            FileReader outputFile = new FileReader(DIRECTORY+TARGET);
+            // check if file exists
+            FileReader outputFile = new FileReader(DIRECTORY + TARGET);
             outputFile.close();
             
-            //delete file not to be confused with tests to be performed later
-            File f = FileUtils.newFile(DIRECTORY+TARGET);
-            f.delete();
+            // delete file not to be confused with tests to be performed later
+            File f = FileUtils.newFile(DIRECTORY + TARGET);
+            assertTrue("Deleting the output file failed", f.delete());
         }
         catch (FileNotFoundException fileNotFound)
         {
             fail("File not successfully created");
         }
+    }
+    
+    private byte[] loadEncryptedMessage() throws IOException
+    {
+        URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
+        
+        int length = (int) FileUtils.newFile(url.getFile()).length();
+        byte[] msg = new byte[length];
+
+        FileInputStream in = new FileInputStream(url.getFile());
+        in.read(msg);
+        in.close();
+        
+        return msg;
     }
 
     public void testAuthenticationNotAuthorised() throws Exception
@@ -85,6 +92,6 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         assertNotNull(reply.getExceptionPayload());
         ExceptionPayload excPayload = reply.getExceptionPayload();
         assertEquals(MESSAGE_EXCEPTION, excPayload.getMessage());
-
     }
+
 }

@@ -25,14 +25,15 @@ import org.mule.module.pgp.PGPKeyRing;
 import org.mule.module.pgp.i18n.PGPMessages;
 import org.mule.security.AbstractEndpointSecurityFilter;
 
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
-
 import cryptix.message.LiteralMessage;
 import cryptix.message.Message;
 import cryptix.message.MessageFactory;
 import cryptix.message.SignedMessage;
 import cryptix.pki.KeyBundle;
+
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,11 +52,6 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
     private PGPKeyRing keyManager;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.security.AbstractEndpointSecurityFilter#authenticateInbound(org.mule.api.MuleEvent)
-     */
     protected void authenticateInbound(MuleEvent event)
         throws SecurityException, UnauthorisedException, UnknownAuthenticationTypeException
     {
@@ -115,7 +111,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
         try
         {
-            updatePayload(event.getMessage(), getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult));
+            updatePayload(message, getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult));
 //            TODO RequestContext.rewriteEvent(new DefaultMuleMessage(
 //                getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult)));
         }
@@ -155,11 +151,6 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.security.AbstractEndpointSecurityFilter#authenticateOutbound(org.mule.api.MuleEvent)
-     */
     protected void authenticateOutbound(MuleEvent event) throws SecurityException, UnauthorisedException
     {
         logger.debug("authenticateOutbound:" + event.getId());

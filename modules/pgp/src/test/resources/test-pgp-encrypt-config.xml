@@ -16,6 +16,7 @@
         <spring:property name="secretAliasId" value="0x6168F39C"/>
         <spring:property name="secretPassphrase" value="TestingPassphrase"/>
     </spring:bean>
+    
     <spring:bean id="fakeCredentialAccessor" class="org.mule.module.pgp.FakeCredentialAccessor"/>
 
     <file:connector name="sendConnector" outputPattern="[TARGET_FILE]"/>
@@ -34,7 +35,7 @@
                                          keyManager-ref="pgpKeyManager"/>
                 </inbound-endpoint>
             </inbound>
-            <component class="org.mule.module.pgp.EchoMsg"/>
+            <echo-component/>
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="file://output">
@@ -46,5 +47,4 @@
             </outbound>
         </service>
     </model>
-
 </mule>

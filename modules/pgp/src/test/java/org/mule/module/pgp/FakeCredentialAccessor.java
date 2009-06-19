@@ -16,22 +16,11 @@ import org.mule.api.security.CredentialsAccessor;
 public class FakeCredentialAccessor implements CredentialsAccessor
 {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.CredentialsAccessor#getCredentials(org.mule.api.MuleEvent)
-     */
     public Object getCredentials(MuleEvent event)
     {
         return "Mule client <mule_client@mule.com>";
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.CredentialsAccessor#setCredentials(org.mule.api.MuleEvent,
-     *      java.lang.Object)
-     */
     public void setCredentials(MuleEvent event, Object credentials)
     {
         // dummy
