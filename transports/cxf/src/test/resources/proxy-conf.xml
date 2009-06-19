@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.mulesource.org/schema/mule/core"
-    xmlns:cxf="http://www.mulesource.org/schema/mule/cxf"
-    xmlns:cxf-core="http://cxf.apache.org/core" xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml"
-    xmlns:vm="http://www.mulesource.org/schema/mule/vm"
-    xsi:schemaLocation="
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.mulesource.org/schema/mule/core"
+       xmlns:cxf="http://www.mulesource.org/schema/mule/cxf"
+       xmlns:cxf-core="http://cxf.apache.org/core"
+       xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml"
+         xmlns:vm="http://www.mulesource.org/schema/mule/vm"
+       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesource.org/schema/mule/cxf http://www.mulesource.org/schema/mule/cxf/3.0/mule-cxf.xsd
@@ -12,40 +14,189 @@
                http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
-    <model name="BridgeTest">
+    <mule-xml:xslt-transformer xsl-file="proxy.xsl" name="TestXslt" returnClass="org.mule.module.xml.transformer.DelayedResult"/>
 
+    <model name="BridgeTest">
+    
+        <service name="jaxwsProxy">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/greeterProxy"
+                    serviceClass="org.apache.hello_world_soap_http.GreeterImpl"/>
+                <forwarding-router/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint
+                        name="clientEndpoint"
+                        address="http://localhost:63081/services/greeter"
+                        clientClass="org.apache.hello_world_soap_http.SOAPService"
+                        wsdlPort="SoapPort"
+                        operation="greetMe"
+                        wsdlLocation="classpath:/wsdl/hello_world.wsdl"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="proxyWithTransform">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/transform-proxy" proxy="true">
+                    <!-- we're just ensuring that cxf proxies can handle non XMLStreamReader types here -->
+                    <transformers>
+                        <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document"/>
+                    </transformers>
+                    <response-transformers>
+                        <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document"/>
+                    </response-transformers>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/greeter" proxy="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="greeter">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/greeter"/>
+            </inbound>
+            <component>
+                <prototype-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
+            </component>
+        </service>
+        
+        <service name="serverEcho">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/Echo" proxy="true">
+                    <cxf:features>
+                        <cxf-core:logging/>
+                    </cxf:features>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="test" synchronous="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="echoService">
+            <inbound>
+                <inbound-endpoint address="vm://test" synchronous="true"/>
+            </inbound>
+            <echo-component/>
+        </service>
+        
+        <service name="serverClientProxy">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/proxy" proxy="true">
+                    <cxf:inInterceptors>
+                        <spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
+                    </cxf:inInterceptors>
+                    <cxf:outInterceptors>
+                        <spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+                    </cxf:outInterceptors>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
+                        proxy="true"
+                        synchronous="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="serverClientProxyEnvelope">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/envelope-proxy" proxy="true" payload="envelope">
+
+                </cxf:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
+                        proxy="true"
+                        payload="envelope"
+                        synchronous="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="serverClientProxyWithWsdl">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/proxyWithWsdl" 
+                  namespace="http://www.muleumo.org"
+                  serviceName="WebService"
+                  proxy="true" 
+                  wsdlLocation="localWsdl.wsdl"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
+                        proxy="true"
+                        synchronous="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        
+        <service name="serverClientProxyWithTransform">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/proxyWithTransform" proxy="true"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
+                        proxy="true"
+                        synchronous="true">
+                         <response-transformers>
+                             <transformer ref="TestXslt"/>
+                         </response-transformers>
+                    </cxf:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+                
         <service name="routeBasedOnSoapAction">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:63443/service"
-                    proxy="true" synchronous="true" />
+                <cxf:inbound-endpoint address="http://localhost:63081/services/routeBasedOnSoapAction" proxy="true">
+                    <cxf:features>
+                        <cxf-core:logging/>
+                    </cxf:features>
+                </cxf:inbound-endpoint>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <cxf:outbound-endpoint
-                        address="http://localhost:63443/services/Echo"
-                        proxy="true" synchronous="true" />
-                    <message-property-filter
-                        pattern="SOAPAction=http://acme.com/v2/bid" />
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
+                        proxy="true"
+                        synchronous="true"/>
+                    <message-property-filter pattern="SOAPAction=http://acme.com/no-transform"/>
                 </filtering-router>
                 <filtering-router>
-                    <cxf:outbound-endpoint
-                        address="http://localhost:63443/services/Echo"
-                        proxy="true" synchronous="true">
-                        <transformers>
-                            <mule-xml:xslt-transformer
-                                xsl-file="v1-to-v2.xsl"
-                                returnClass="org.mule.module.xml.transformer.DelayedResult" />
-                        </transformers>
-                        <response-transformers>
-                            <mule-xml:xslt-transformer
-                                xsl-file="v2-to-v1.xsl"
-                                returnClass="org.mule.module.xml.transformer.DelayedResult" />
-                        </response-transformers>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
+                        proxy="true"
+                        synchronous="true">
+                         <response-transformers>
+                             <transformer ref="TestXslt"/>
+                         </response-transformers>
                     </cxf:outbound-endpoint>
-                    <message-property-filter
-                        pattern="SOAPAction=http://acme.com/v1/bid" />
+                    <message-property-filter pattern="SOAPAction=http://acme.com/transform"/>
+                </filtering-router>
+                <filtering-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/oneway" 
+                        proxy="true"
+                        synchronous="true"/>
+                    <message-property-filter pattern="SOAPAction=http://acme.com/oneway"/>
                 </filtering-router>
             </outbound>
+        </service>
+        
+        <service name="asyncService">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/oneway"/>
+            </inbound>
+             <component class="org.mule.transport.cxf.testmodels.AsyncService"/>
         </service>
     </model>
 
