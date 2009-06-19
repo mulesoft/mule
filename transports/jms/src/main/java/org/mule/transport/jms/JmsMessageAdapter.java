@@ -306,31 +306,10 @@ public class JmsMessageAdapter extends AbstractMessageAdapter implements Message
         {
             setProperty(JmsConstants.JMS_REPLY_TO, replyTo, PropertyScope.INVOCATION);
         }
-        else
-        {
-            super.setReplyTo(replyTo);
-        }
+        super.setReplyTo(replyTo);
     }
 
-    /**
-     * Sets a replyTo address for this message. This is useful in an asynchronous
-     * environment where the caller doesn't wait for a response and the response
-     * needs to be routed somewhere for further processing. The value of this field
-     * can be any valid endpointUri url.
-     *
-     * @return the endpointUri url to reply to or null if one has not been set
-     */
     @Override
-    public Object getReplyTo()
-    {
-        Object replyTo = getProperty(JmsConstants.JMS_REPLY_TO);
-        if (replyTo == null)
-        {
-            replyTo = getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-        }
-        return replyTo;
-    }
-
     public ThreadSafeAccess newThreadCopy()
     {
         return new JmsMessageAdapter(this);
