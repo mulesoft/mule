@@ -26,7 +26,7 @@ public class ProxyTestCase extends FunctionalTestCase
     public void testServerWithEcho() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage result = client.send("http://localhost:63443/service", msg, null);
+        MuleMessage result = client.send("http://localhost:63081/services/Echo", msg, null);
         String resString = result.getPayloadAsString();
 //        System.out.println(resString);
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"> foo </test>") != -1);
