@@ -72,7 +72,15 @@
             <artifactId>xstream</artifactId>
             <version>${xstreamVersion}-osgi</version>
         </dependency>
-         <dependency>
+        <!-- 
+            This dependency is needed by some extra XStream converters
+        -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>1.6</version>
+        </dependency>
+        <dependency>
             <groupId>xpp3</groupId>
             <artifactId>xpp3_min</artifactId>
             <version>${xmlPullVersion}-osgi</version>
@@ -168,6 +176,5 @@
             <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
         </dependency>
-    
     </dependencies>
 </project>

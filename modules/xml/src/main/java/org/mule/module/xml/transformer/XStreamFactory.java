@@ -11,18 +11,19 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.util.ClassUtils;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.module.xml.i18n.XmlMessages;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.converters.collections.MapConverter;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.mapper.Mapper;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Initializes the XStream utility for converting Objects to XML and XML to Objects.
@@ -36,6 +37,8 @@ public class XStreamFactory
     public static final String XSTREAM_STAX_DRIVER = "com.thoughtworks.xstream.io.xml.StaxDriver";
     public static final String XSTREAM_XPP_DRIVER = "com.thoughtworks.xstream.io.xml.XppDriver";
 
+    private static final Log logger = LogFactory.getLog(XStreamFactory.class);
+    
     private final XStream xstream;
 
     public XStreamFactory() throws ClassNotFoundException, InstantiationException, IllegalAccessException
@@ -54,6 +57,12 @@ public class XStreamFactory
         // box.
         xstream.registerConverter(new XStreamFactory.ConcurrentHashMapConverter(xstream.getMapper()), -1);
 
+        registerAliases(aliases);
+        registerConverters(converters);
+    }
+
+    private void registerAliases(Map<String, Class> aliases)
+    {
         if (aliases != null)
         {
             for (Map.Entry<String, Class> entry : aliases.entrySet())
@@ -61,12 +70,27 @@ public class XStreamFactory
                 xstream.alias(entry.getKey(), entry.getValue());
             }
         }
+    }
 
+    private void registerConverters(List<Class> converters) throws InstantiationException, IllegalAccessException
+    {
         if (converters != null)
         {
             for (Class converter : converters)
             {
-                xstream.registerConverter((Converter)converter.newInstance());
+                Object converterInstance = converter.newInstance();
+                if (converterInstance instanceof Converter)
+                {
+                    xstream.registerConverter((Converter) converterInstance);
+                }
+                else if (converterInstance instanceof SingleValueConverter)
+                {
+                    xstream.registerConverter((SingleValueConverter) converterInstance);
+                }
+                else
+                {
+                    logger.warn("Invalid converter class specified - ignoring: " + converter.getName());
+                }
             }
         }
     }
@@ -90,5 +114,4 @@ public class XStreamFactory
                             || className.equals("edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap");
         }
     }
-
 }
