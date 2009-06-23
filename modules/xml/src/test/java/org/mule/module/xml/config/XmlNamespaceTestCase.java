@@ -26,7 +26,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
 
     public void testGlobalNamespaces() throws Exception
     {
-        NamespaceManager manager = (NamespaceManager)muleContext.getRegistry().lookupObject(NamespaceManager.class);
+        NamespaceManager manager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
         assertNotNull(manager);
         assertTrue(manager.isIncludeConfigNamespaces());
         assertEquals(4, manager.getNamespaces().size());

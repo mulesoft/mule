@@ -10,13 +10,12 @@
 
 package org.mule.module.xml.transformer;
 
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.Converter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -102,7 +101,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
         this.xstream.set(null);
     }
 
-    public List getConverters()
+    public List<Class> getConverters()
     {
         return converters;
     }

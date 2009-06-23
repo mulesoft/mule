@@ -9,12 +9,9 @@
  */
 package org.mule.transformers.xml.xstream;
 
+import org.mule.module.xml.transformer.AbstractXStreamTransformer;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.module.xml.transformer.AbstractXStreamTransformer;
-import org.mule.transformers.xml.xstream.DummyConverter;
-
-import com.thoughtworks.xstream.converters.basic.ByteConverter;
 
 public class XStreamConfigurationTestCase extends FunctionalTestCase
 {
@@ -25,22 +22,20 @@ public class XStreamConfigurationTestCase extends FunctionalTestCase
 
     public void testConfig() throws Exception
     {
-        AbstractXStreamTransformer trans = (AbstractXStreamTransformer)muleContext.getRegistry().lookupTransformer("ObjectToXml");
+        AbstractXStreamTransformer transformer = 
+            (AbstractXStreamTransformer)muleContext.getRegistry().lookupTransformer("ObjectToXml");
 
-        assertNotNull(trans);
-        assertNotNull(trans.getAliases());
-        assertEquals(Apple.class, trans.getAliases().get("apple"));
-        assertNotNull(trans.getConverters());
-        assertEquals(1, trans.getConverters().size());
-        assertTrue(trans.getConverters().contains(DummyConverter.class));
+        assertNotNull(transformer);
+        assertNotNull(transformer.getAliases());
+        assertEquals(Apple.class, transformer.getAliases().get("apple"));
+        assertNotNull(transformer.getConverters());
+        assertEquals(1, transformer.getConverters().size());
+        assertTrue(transformer.getConverters().contains(DummyConverter.class));
 
         Apple apple = new Apple();
         apple.wash();
-        Object result = trans.transform(apple);
+        Object result = transformer.transform(apple);
 
         assertEquals("<apple>\n  <bitten>false</bitten>\n  <washed>true</washed>\n</apple>", result);
-
-
     }
-
 }
