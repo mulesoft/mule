@@ -75,6 +75,7 @@ jcr-1.0-osgi
 jdom-1.0-osgi
 jetty-6.1.11
 jetty-util-6.1.11
+joda-time-1.6
 json-lib-2.2.3-jdk15
 jsr250-api-1.0
 junit-3.8.2
