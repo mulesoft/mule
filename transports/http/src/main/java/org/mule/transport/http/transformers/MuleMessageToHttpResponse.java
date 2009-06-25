@@ -35,9 +35,8 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 
 /**
- * Converts a UMOMEssage into an Http response.
+ * Converts a {@link MuleMessage} into an Http response.
  */
-
 public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
 {
     public static final String CUSTOM_HEADER_PREFIX = "";
@@ -181,7 +180,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             status = HttpConstants.SC_INTERNAL_SERVER_ERROR;
         }
         
-        String version = (String) msg.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, PropertyScope.OUTBOUND);
+        String version = (String) msg.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, PropertyScope.INBOUND);
         if (version == null)
         {
             version = HttpConstants.HTTP11;
@@ -192,7 +191,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             date = format.format(new Date());
         }
 
-        String contentType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND);
+        String contentType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INBOUND);
         if (contentType == null)
         {
             contentType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INVOCATION);

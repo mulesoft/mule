@@ -40,6 +40,7 @@ public class HttpServerConnection
     private Socket socket;
     private final InputStream in;
     private final OutputStream out;
+    // this should rather be isKeepSocketOpen as this is the main purpose of this flag
     private boolean keepAlive = false;
     private final String encoding;
 
@@ -54,6 +55,7 @@ public class HttpServerConnection
 
         this.socket = socket;
         this.socket.setTcpNoDelay(true);
+        this.socket.setKeepAlive(connector.isKeepAlive());
         
         if (connector.getReceiveBufferSize() != Connector.INT_VALUE_NOT_SET
             && socket.getReceiveBufferSize() != connector.getReceiveBufferSize())
@@ -250,13 +252,7 @@ public class HttpServerConnection
             return;
         }
         
-        if (response.isKeepAlive()) 
-        {
-            Header header = new Header(HttpConstants.HEADER_CONNECTION, "keep-alive");
-            response.setHeader(header);
-            // if there was a timeout set
-        }
-        else
+        if (!response.isKeepAlive()) 
         {
             Header header = new Header(HttpConstants.HEADER_CONNECTION, "close");
             response.setHeader(header);
