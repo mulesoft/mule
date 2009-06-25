@@ -317,6 +317,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         Header header = new Header(HttpConstants.HEADER_KEEP_ALIVE, "timeout=" 
                             + httpConnector.getKeepAliveTimeout());
                         response.addHeader(header); 
+                        
+                        if (response.getHttpVersion().equals(HttpVersion.HTTP_1_0))
+                        {
+                            connectionHeader = new Header(HttpConstants.HEADER_CONNECTION, "Keep-Alive");
+                            response.setHeader(connectionHeader);
+                        }
                     }
                     else if ("close".equalsIgnoreCase(value))
                     {
@@ -330,12 +336,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     {
                         response.setKeepAlive(false);
                     }
-                }
-                
-                if (response.getHttpVersion().equals(HttpVersion.HTTP_1_0))
-                {
-                    Header header = new Header(HttpConstants.HEADER_CONNECTION, "Keep-Alive");
-                    response.setHeader(header);
                 }
             }
             else
