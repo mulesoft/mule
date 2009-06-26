@@ -16,7 +16,10 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultMuleMessageDTO;
 import org.mule.module.json.util.JsonUtils;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.util.IOUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +54,7 @@ public class JsonToObject extends AbstractTransformer implements DiscoverableTra
     {
         this.registerSourceType(JSONObject.class);
         this.registerSourceType(String.class);
+        this.registerSourceType(InputStream.class);
         this.registerSourceType(byte[].class);
         setReturnClass(Object.class);
         dtoMappings = new HashMap(1);
@@ -102,7 +106,12 @@ public class JsonToObject extends AbstractTransformer implements DiscoverableTra
             {
                 src = new String((byte[]) src, encoding);
             }
-
+            else if (src instanceof InputStream)
+            {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                IOUtils.copy((InputStream) src, baos);
+                src = baos.toString();
+            }
 
             if (src instanceof String)
             {
@@ -110,7 +119,7 @@ public class JsonToObject extends AbstractTransformer implements DiscoverableTra
                 {
                     JSON json = JSONSerializer.toJSON(src.toString(), getJsonConfig());
                     returnValue = JSONObject.toBean((JSONObject) json, getJsonConfig());
-                    returnValue = new JsonDynaBean((MorphDynaBean)returnValue);
+                    returnValue = new JsonDynaBean((MorphDynaBean) returnValue);
                 }
                 else
                 {
@@ -128,6 +137,13 @@ public class JsonToObject extends AbstractTransformer implements DiscoverableTra
         catch (Exception e)
         {
             throw new TransformerException(CoreMessages.transformFailed("json", getReturnClass().getName()), this, e);
+        }
+        finally
+        {
+            if (src instanceof InputStream)
+            {
+                IOUtils.closeQuietly((InputStream) src);
+            }
         }
     }
 
