@@ -9,15 +9,14 @@
  */
 package org.mule.util.scan.annotations;
 
-import java.lang.annotation.Annotation;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.URL;
-import java.net.MalformedURLException;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.AnnotationVisitor;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
 
 /**
  * Will filter for a meta annotation type specified as the annotation class.  Meta annotations are annotations on other
@@ -64,6 +63,11 @@ public class MetaAnnotationTypeFilter implements AnnotationFilter
         try
         {
             URL classUrl = getClassURL(info.getClassName());
+            if(classUrl==null)
+            {
+                logger.debug("Failed to load annotation class: " + info);
+                return false;
+            }
             ClassReader r = new ClassReader(classUrl.openStream());
           
             MetaAnnotationScanner scanner = new MetaAnnotationScanner(new AnnotationTypeFilter(annotation));
