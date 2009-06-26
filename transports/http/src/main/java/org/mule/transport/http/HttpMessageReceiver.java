@@ -294,22 +294,15 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     response = transformResponse(returnMessage);
                 }
                 
+                response.setupKeepAliveFromRequestVersion(request.getRequestLine().getHttpVersion());
                 HttpConnector httpConnector = (HttpConnector) connector;
                 response.disableKeepAlive(!httpConnector.isKeepAlive());
-                
-                // Check if endpoint has a keep-alive property configured. Note the translation from
-                // keep-alive in the schema to keepAlive here.
-                boolean endpointOverride = true;
-                String keepAliveEndpointValue = (String) endpoint.getProperty("keepAlive");
-                if (keepAliveEndpointValue != null)
-                {
-                    endpointOverride = Boolean.parseBoolean(keepAliveEndpointValue);
-                }
                 
                 Header connectionHeader = request.getFirstHeader("Connection");
                 if (connectionHeader != null)
                 {
                     String value = connectionHeader.getValue();
+                    boolean endpointOverride = getEndpointKeepAliveValue(endpoint);
 					if ("keep-alive".equalsIgnoreCase(value) && endpointOverride) 
                     {
                         response.setKeepAlive(true);
@@ -328,14 +321,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     {
                         response.setKeepAlive(false);
                     } 
-                    else if (response.getHttpVersion().greaterEquals(HttpVersion.HTTP_1_1))
-                    {
-                        response.setKeepAlive(true);
-                    }
-                    else
-                    {
-                        response.setKeepAlive(false);
-                    }
                 }
             }
             else
@@ -344,7 +329,21 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
             return response;
         }
-
+        
+        /**
+         * Check if endpoint has a keep-alive property configured. Note the translation from
+         * keep-alive in the schema to keepAlive here.
+         */
+        private boolean getEndpointKeepAliveValue(ImmutableEndpoint endpoint)
+        {
+            String value = (String) endpoint.getProperty("keepAlive");
+            if (value != null)
+            {
+                return Boolean.parseBoolean(value);
+            }
+            return true;
+        }
+        
         protected HttpResponse doOtherValid(RequestLine requestLine, String method) throws MuleException
         {
             MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());

@@ -353,6 +353,16 @@ public class HttpResponse
     {
         this.keepAlive = keepAlive;
     }
+    
+    /**
+     * The HTTTP spec suggests that for HTTP 1.1 persistent connections should be used, 
+     * for HTTP 1.0 the connection should not be kept alive. This method sets up the keepAlive flag
+     * according to the <code>version</code> that was passed in.
+     */
+    protected void setupKeepAliveFromRequestVersion(HttpVersion version)
+    {
+        setKeepAlive(version.equals(HttpVersion.HTTP_1_1));
+    }
 
     public void disableKeepAlive(boolean keepalive)
     {
