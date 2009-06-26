@@ -51,7 +51,6 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         setReturnClass(HttpResponse.class);
     }
 
-
     @Override
     public void initialise() throws InitialisationException
     {
