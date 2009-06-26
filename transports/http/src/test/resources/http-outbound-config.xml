@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesource.org/schema/mule/http"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+          http://www.mulesource.org/schema/mule/http http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd
+          http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
+          http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd">
+
+    <model>
+        <!-- 
+            HTTP method CONNECT is missing here because it's not supported by the HttpClientMessageDispatcher
+         -->
+         
+        <service name="OutboundDelete">
+            <inbound>
+                <vm:inbound-endpoint path="doDelete"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="DELETE"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="OutboundGet">
+            <inbound>
+                <vm:inbound-endpoint path="doGet"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="GET"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="OutboundHead">
+            <inbound>
+                <vm:inbound-endpoint path="doHead"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="HEAD"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="OutboundOptions">
+            <inbound>
+                <vm:inbound-endpoint path="doOptions"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="OPTIONS"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="OutboundPost">
+            <inbound>
+                <vm:inbound-endpoint path="doPost"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="POST"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="OutboundPut">
+            <inbound>
+                <vm:inbound-endpoint path="doPut"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="PUT"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="OutboundTrace">
+            <inbound>
+                <vm:inbound-endpoint path="doTrace"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="TRACE"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

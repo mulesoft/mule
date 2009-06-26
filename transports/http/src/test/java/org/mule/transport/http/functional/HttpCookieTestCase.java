@@ -14,11 +14,6 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +42,7 @@ public class HttpCookieTestCase extends FunctionalTestCase
         super.doSetUp();
 
         // start a simple HTTP server that parses the request sent from Mule
-        new Thread(new SimpleHttpServer()).start();
+        new Thread(new SimpleHttpServer(LISTEN_PORT, simpleServerLatch, latch)).start();
     }
 
     public void testCookies() throws Exception
@@ -68,56 +63,34 @@ public class HttpCookieTestCase extends FunctionalTestCase
         assertEquals("Cookie: $Version=0; expressionCookie=MYCOOKIE", cookieHeaders.get(1));
     }
 
-    private class SimpleHttpServer extends Object implements Runnable
-    {
-        public void run()
+    private class SimpleHttpServer extends MockHttpServer
+    {   
+        public SimpleHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
         {
-            try
+            super(listenPort, startupLatch, testCompleteLatch);
+        }
+
+        @Override
+        protected void readHttpRequest(BufferedReader reader) throws Exception
+        {
+            String line = reader.readLine();
+            while (line != null)
             {
-                ServerSocket serverSocket = new ServerSocket(LISTEN_PORT);
-
-                // now that we are up and running, the test may send
-                simpleServerLatch.countDown();
-
-                Socket socket = serverSocket.accept();
-                InputStream in = socket.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
-                String line = reader.readLine();
-                while (line != null)
+                // Check that we receive a 'Cookie:' header as it would be 
+                // send by a regular http client
+                if (line.indexOf(COOKIE_HEADER) > -1)
                 {
-                    // Check that we receive a 'Cookie:' header as it would be 
-                    // send by a regular http client
-                    if (line.indexOf(COOKIE_HEADER) > -1)
-                    {
-                        cookieFound = true;
-                        cookieHeaders.add(line);
-                    }
-
-                    line = reader.readLine();
-                    // only read the header, i.e. if we encounter an empty line 
-                    // stop reading (we're only interested in the headers anyway)
-                    if (line.trim().length() == 0)
-                    {
-                        line = null;
-                    }
+                    cookieFound = true;
+                    cookieHeaders.add(line);
                 }
-
-                OutputStream out = socket.getOutputStream();
-                out.write("HTTP/1.1 200 OK\n\n".getBytes());
-
-                in.close();
-                out.close();
-                socket.close();
-                serverSocket.close();
-            }
-            catch (Exception ex)
-            {
-                throw new RuntimeException(ex);
-            }
-            finally
-            {
-                latch.countDown();
+    
+                line = reader.readLine();
+                // only read the header, i.e. if we encounter an empty line 
+                // stop reading (we're only interested in the headers anyway)
+                if (line.trim().length() == 0)
+                {
+                    line = null;
+                }
             }
         }
     }

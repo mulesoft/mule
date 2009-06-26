@@ -16,6 +16,8 @@ import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
 import org.mule.endpoint.URIBuilder;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpsConnector;
 import org.mule.transport.http.HttpsPollingConnector;
 
@@ -26,7 +28,10 @@ public class HttpsNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
-        registerStandardTransportEndpoints(HttpsConnector.HTTPS, URIBuilder.SOCKET_ATTRIBUTES);
+        registerStandardTransportEndpoints(HttpsConnector.HTTPS, URIBuilder.SOCKET_ATTRIBUTES)
+            .addAlias("contentType", HttpConstants.HEADER_CONTENT_TYPE)
+            .addAlias("method", HttpConnector.HTTP_METHOD_PROPERTY);
+        
         registerConnectorDefinitionParser(HttpsConnector.class);
         registerBeanDefinitionParser("polling-connector", new MuleOrphanDefinitionParser(HttpsPollingConnector.class, true));
 

@@ -34,11 +34,11 @@ import org.mule.transport.http.transformers.ObjectToHttpClientMethodRequest;
  */
 public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
-
     public void init()
     {
         registerStandardTransportEndpoints(HttpConnector.HTTP, URIBuilder.SOCKET_ATTRIBUTES)
-                .addAlias("contentType", HttpConstants.HEADER_CONTENT_TYPE);
+            .addAlias("contentType", HttpConstants.HEADER_CONTENT_TYPE)
+            .addAlias("method", HttpConnector.HTTP_METHOD_PROPERTY);
         
         registerConnectorDefinitionParser(HttpConnector.class);
         registerBeanDefinitionParser("polling-connector", new MuleOrphanDefinitionParser(HttpPollingConnector.class, true));
