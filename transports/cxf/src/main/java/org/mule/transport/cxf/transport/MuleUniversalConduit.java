@@ -95,7 +95,7 @@ public class MuleUniversalConduit extends AbstractConduit
 
     private int decoupledDestinationRefCount;
 
-    private boolean closeInput;
+    private boolean closeInput = true;
 
     private boolean applyTransformersToProtocol;
     
