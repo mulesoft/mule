@@ -24,7 +24,6 @@ import org.mule.transport.AbstractMessageReceiver;
 
 import dojox.cometd.Bayeux;
 import dojox.cometd.Client;
-
 import org.mortbay.cometd.AbstractBayeux;
 import org.mortbay.cometd.BayeuxService;
 
@@ -65,7 +64,7 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver
             MuleMessage message = AjaxMessageReceiver.this.routeMessage(new DefaultMuleMessage(adapter));
             //If a replyTo channel is set the client is expecting a response.
             //Mule does not invoke the replyTo handler if an error occurs, but in this case we want it to.
-            if(message!=null && message.getExceptionPayload()!=null && replyTo!=null)
+            if((message!=null || message.getExceptionPayload()!=null) && replyTo!=null)
             {
                 ((AbstractConnector)getConnector()).getReplyToHandler().processReplyTo(RequestContext.getEvent(), message, replyTo);
             }
