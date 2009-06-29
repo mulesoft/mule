@@ -203,7 +203,11 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         {
             setProperty(HttpConstants.HEADER_LOCATION, replyTo);
         }
-        setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
+        else
+        {
+            removeProperty(HttpConstants.HEADER_LOCATION);
+        }
+        super.setReplyTo(replyTo);
     }
 
     /**

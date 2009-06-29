@@ -302,9 +302,13 @@ public class JmsMessageAdapter extends AbstractMessageAdapter implements Message
     @Override
     public void setReplyTo(Object replyTo)
     {
-        if (replyTo instanceof Destination)
+        if (replyTo != null && replyTo instanceof Destination)
         {
             setProperty(JmsConstants.JMS_REPLY_TO, replyTo, PropertyScope.INVOCATION);
+        }
+        else
+        {
+            removeProperty(JmsConstants.JMS_REPLY_TO);
         }
         super.setReplyTo(replyTo);
     }
