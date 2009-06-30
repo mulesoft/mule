@@ -52,8 +52,8 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispatch(MuleEvent event) throws Exception
     {
-        JobConfig jobConfig = (JobConfig)endpoint.getProperty(QuartzConnector.PROPERTY_JOB_CONFIG);
-        if(jobConfig==null)
+        JobConfig jobConfig = (JobConfig) endpoint.getProperty(QuartzConnector.PROPERTY_JOB_CONFIG);
+        if (jobConfig == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull(QuartzConnector.PROPERTY_JOB_CONFIG).getMessage());
         }
@@ -66,7 +66,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         MuleMessage msg = event.getMessage();
         for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
         {
-            String propertyKey = (String)iterator.next();
+            String propertyKey = (String) iterator.next();
             jobDataMap.put(propertyKey, msg.getProperty(propertyKey));
         }
         jobDetail.setJobDataMap(jobDataMap);
@@ -77,27 +77,25 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
         if(jobConfig instanceof CustomJobConfig)
         {
-            job = ((CustomJobConfig)jobConfig).getJob();
+            job = ((CustomJobConfig) jobConfig).getJob();
         }
         else if(jobConfig instanceof CustomJobFromMessageConfig)
         {
-            job = ((CustomJobFromMessageConfig)jobConfig).getJob(msg);
+            job = ((CustomJobFromMessageConfig) jobConfig).getJob(msg);
             //rewrite the jobConfig to the real Jobconfig on the message
-            jobConfig = ((CustomJobFromMessageConfig)jobConfig).getJobConfig(msg);
+            jobConfig = ((CustomJobFromMessageConfig) jobConfig).getJobConfig(msg);
         }
 
         jobDataMap.put(QuartzConnector.PROPERTY_JOB_CONFIG, jobConfig);        
         jobDetail.setJobClass(jobConfig.getJobClass());
         // If there has been a job created or found then we default to a customJob configuration
-        if (job!=null )
+        if (job != null)
         {
             jobDataMap.put(QuartzConnector.PROPERTY_JOB_OBJECT, job);
             jobDetail.setJobClass(CustomJob.class);
         }
-
        
-        // The payload will be ignored by the CustomJob - don't know why
-        // we need it here
+        // The payload will be ignored by the CustomJob - don't know why we need it here
         //RM: The custom job may want the message and the Job type may not be delegating job
         jobDataMap.put(QuartzConnector.PROPERTY_PAYLOAD, payload);
 

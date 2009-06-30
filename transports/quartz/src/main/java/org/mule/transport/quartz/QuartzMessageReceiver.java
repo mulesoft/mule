@@ -54,11 +54,13 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
         this.connector = (QuartzConnector) connector;
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         try
@@ -81,7 +83,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
 
             if(jobConfig instanceof EventGeneratorJobConfig)
             {
-                jobDataMap.put(QuartzConnector.PROPERTY_PAYLOAD, ((EventGeneratorJobConfig)jobConfig).getPayload());
+                jobDataMap.put(QuartzConnector.PROPERTY_PAYLOAD, ((EventGeneratorJobConfig) jobConfig).getPayload());
             }
             jobDataMap.put(QuartzConnector.PROPERTY_JOB_CONFIG, jobConfig);
             
@@ -154,15 +156,13 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             trigger.setJobName(endpoint.getEndpointURI().getAddress());
             trigger.setJobGroup(jobGroupName);
 
-            // We need to handle cases when the job has already been
-            // persisted
+            // We need to handle cases when the job has already been persisted
             try
             {
                 scheduler.scheduleJob(jobDetail, trigger);
             }
             catch (ObjectAlreadyExistsException oaee)
             {
-                // Do anything here?
                 logger.warn("A quartz Job with name: " + endpoint.getEndpointURI().getAddress() +
                         " has already been registered. Cannot register again");
             }
@@ -175,16 +175,19 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // nothing to do
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // nothing to do
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // nothing to do
