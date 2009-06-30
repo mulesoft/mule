@@ -112,7 +112,7 @@ public class BindingInvocationHandler implements InvocationHandler
             }
             else
             {
-                if (method.getReturnType().equals(MuleMessage.class))
+                if (MuleMessage.class.isAssignableFrom(method.getReturnType()))
                 {
                     return reply;
                 }
