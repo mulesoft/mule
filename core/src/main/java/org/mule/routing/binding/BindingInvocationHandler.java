@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,10 +37,12 @@ public class BindingInvocationHandler implements InvocationHandler
 
     protected static Log logger = LogFactory.getLog(BindingInvocationHandler.class);
 
-    protected Map routers = new ConcurrentHashMap();
+    protected Map<String, InterfaceBinding> routers = null;
 
+    @SuppressWarnings("unchecked")
     public BindingInvocationHandler(InterfaceBinding router)
     {
+        routers = new ConcurrentHashMap();
         addRouterForInterface(router);
     }
 
@@ -70,7 +73,6 @@ public class BindingInvocationHandler implements InvocationHandler
         }
 
         MuleMessage message;
-
         if (args == null)
         {
             message = new DefaultMuleMessage(NullPayload.getInstance());
@@ -84,13 +86,13 @@ public class BindingInvocationHandler implements InvocationHandler
             message = new DefaultMuleMessage(args);
         }
 
-        //Some transports such as Axis, RMI and EJB can use the method information
+        // Some transports such as Axis, RMI and EJB can use the method information
         message.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method.getName(), PropertyScope.INVOCATION);
 
-        InterfaceBinding router = (InterfaceBinding) routers.get(method.getName());
+        InterfaceBinding router = routers.get(method.getName());
         if (router == null)
         {
-            router = (InterfaceBinding) routers.get(DEFAULT_METHOD_NAME_TOKEN);
+            router = routers.get(DEFAULT_METHOD_NAME_TOKEN);
         }
 
         if (router == null)
@@ -110,7 +112,14 @@ public class BindingInvocationHandler implements InvocationHandler
             }
             else
             {
-                return reply.getPayload();
+                if (method.getReturnType().equals(MuleMessage.class))
+                {
+                    return reply;
+                }
+                else
+                {
+                    return reply.getPayload();
+                }
             }
         }
         else
@@ -118,7 +127,8 @@ public class BindingInvocationHandler implements InvocationHandler
             return null;
         }
     }
-
+    
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();
@@ -127,4 +137,5 @@ public class BindingInvocationHandler implements InvocationHandler
         sb.append('}');
         return sb.toString();
     }
+    
 }
