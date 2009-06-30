@@ -8,14 +8,13 @@
                http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesource.org/schema/mule/ftp http://www.mulesource.org/schema/mule/ftp/3.0/mule-ftp.xsd">
 
-    <ftp:connector name="ftpConnector" validateConnections="true">
-    </ftp:connector>
+    <ftp:connector name="ftpConnector" validateConnections="true"/>
                    
     <model name="main">
         <service name="testComponent">
             <inbound>
-                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:60198" synchronous="true" binary="true" passive="true"  
-                connector-ref="ftpConnector"/>                
+                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:60198" synchronous="true" 
+                    binary="true" passive="true" connector-ref="ftpConnector"/>                
             </inbound>
             <component>
                 <!--  this is to verify the data coming in on the endpoint -->

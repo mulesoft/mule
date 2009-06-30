@@ -59,9 +59,6 @@ public class FileConnector extends AbstractConnector
     public static final String PROPERTY_READ_FROM_DIRECTORY = "readFromDirectoryName";
     // outbound only
     public static final String PROPERTY_OUTPUT_PATTERN = "outputPattern";
-    // apparently unused (once strange override code deleted)
-//    public static final String PROPERTY_DELETE_ON_READ = "autoDelete";
-//    public static final String PROPERTY_SERVICE_OVERRIDE = "serviceOverrides";
 
     // message properties
     public static final String PROPERTY_FILENAME = "filename";
@@ -69,6 +66,7 @@ public class FileConnector extends AbstractConnector
     public static final String PROPERTY_DIRECTORY = "directory";
     public static final String PROPERTY_WRITE_TO_DIRECTORY = "writeToDirectoryName";
     public static final String PROPERTY_FILE_SIZE = "fileSize";
+    public static final String PROPERTY_FILE_TIMESTAMP = "timestamp";
 
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
 
@@ -104,17 +102,11 @@ public class FileConnector extends AbstractConnector
 
     public FilenameParser filenameParser;
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.transport.AbstractConnector#doInitialise()
-     */
     public FileConnector()
     {
         super();
         filenameParser = new SimpleFilenameParser();
     }
-
 
     @Override
     public void setMaxDispatchersActive(int value)
@@ -150,6 +142,7 @@ public class FileConnector extends AbstractConnector
      * <li>pollingFrequency</li>
      * </ul>
      */
+    @Override
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         String readDir = endpoint.getEndpointURI().getAddress();
@@ -214,21 +207,6 @@ public class FileConnector extends AbstractConnector
                     logger.error("Failed to set fileAge", ex1);
                 }
             }
-
-            // this is surreal! what on earth was it useful for?
-            // Map srvOverride = (Map) props.get(PROPERTY_SERVICE_OVERRIDE);
-            // if (srvOverride != null)
-            // {
-            // if (serviceOverrides == null)
-            // {
-            // serviceOverrides = new Properties();
-            // }
-            // serviceOverrides.setProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER,
-            // NoActionTransformer.class.getName());
-            // serviceOverrides.setProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER,
-            // NoActionTransformer.class.getName());
-            // }
-
         }
 
         try
@@ -272,7 +250,6 @@ public class FileConnector extends AbstractConnector
         }
     }
 
-
     protected void doInitialise() throws InitialisationException
     {
         // MULE-1773: limit the number of dispatchers per endpoint to 1 until
@@ -314,89 +291,56 @@ public class FileConnector extends AbstractConnector
         }
     }
 
-    /**
-     * @return Returns the moveToDirectoryName.
-     */
     public String getMoveToDirectory()
     {
         return moveToDirectoryName;
     }
 
-    /**
-     * @param dir The moveToDirectoryName to set.
-     */
     public void setMoveToDirectory(String dir)
     {
         this.moveToDirectoryName = dir;
     }
 
-    /**
-     * @return Returns the outputAppend.
-     */
     public boolean isOutputAppend()
     {
         return outputAppend;
     }
 
-    /**
-     * @param outputAppend The outputAppend to set.
-     */
     public void setOutputAppend(boolean outputAppend)
     {
         this.outputAppend = outputAppend;
     }
 
-    /**
-     * @return Returns the outputPattern.
-     */
     public String getOutputPattern()
     {
         return outputPattern;
     }
 
-    /**
-     * @param outputPattern The outputPattern to set.
-     */
     public void setOutputPattern(String outputPattern)
     {
         this.outputPattern = outputPattern;
     }
 
-    /**
-     * @return Returns the outputStream.
-     */
     public FileOutputStream getOutputStream()
     {
         return outputStream;
     }
 
-    /**
-     * @param outputStream The outputStream to set.
-     */
     public void setOutputStream(FileOutputStream outputStream)
     {
         this.outputStream = outputStream;
     }
 
-    /**
-     * @return Returns the pollingFrequency.
-     */
     public long getPollingFrequency()
     {
         return pollingFrequency;
     }
 
-    /**
-     * @param pollingFrequency The pollingFrequency to set.
-     */
     public void setPollingFrequency(long pollingFrequency)
     {
         this.pollingFrequency = pollingFrequency;
     }
 
-    /**
-     * @return Returns the fileAge.
-     */
     public long getFileAge()
     {
         return fileAge;
@@ -416,17 +360,11 @@ public class FileConnector extends AbstractConnector
         this.checkFileAge = true;
     }
 
-    /**
-     * @return Returns the writeToDirectory.
-     */
     public String getWriteToDirectory()
     {
         return writeToDirectoryName;
     }
 
-    /**
-     * @param dir The writeToDirectory to set.
-     */
     public void setWriteToDirectory(String dir) throws IOException
     {
         this.writeToDirectoryName = dir;
@@ -441,17 +379,11 @@ public class FileConnector extends AbstractConnector
         }
     }
 
-    /**
-     * @return Returns the readFromDirectory.
-     */
     public String getReadFromDirectory()
     {
         return readFromDirectoryName;
     }
 
-    /**
-     * @param dir The readFromDirectory to set.
-     */
     public void setReadFromDirectory(String dir) throws IOException
     {
         this.readFromDirectoryName = dir;

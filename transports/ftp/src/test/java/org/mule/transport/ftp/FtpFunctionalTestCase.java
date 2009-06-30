@@ -11,12 +11,9 @@
 package org.mule.transport.ftp;
 
 import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalStreamingTestComponent;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transport.file.FileConnector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -87,7 +84,6 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         
         logger.debug("before dispatch");
         client.dispatch(getMuleFtpEndpoint(), TEST_MESSAGE, properties);
-        //client.send(getMuleFtpEndpoint(), TEST_MESSAGE, properties);
         logger.debug("before retrieve");
         
         // TODO DZ: need a reliable way to check the file once it's been written to
