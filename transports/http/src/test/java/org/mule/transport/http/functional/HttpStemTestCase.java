@@ -10,9 +10,12 @@
 
 package org.mule.transport.http.functional;
 
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.http.HttpConnector;
 
 public class HttpStemTestCase extends FunctionalTestCase
@@ -23,24 +26,35 @@ public class HttpStemTestCase extends FunctionalTestCase
         return "http-stem-test.xml";
     }
 
-    public void testStemMatchingHttp() throws Exception
+    public void testStemMatching() throws Exception
     {
         MuleClient client = new MuleClient();
-        doTest(client, "http://localhost:60200/foo");
-        doTest(client, "http://localhost:60200/foo/bar");
+        doTest(client, "http://localhost:60200/foo", "/foo", "/foo");
+        doTest(client, "http://localhost:60200/foo/baz", "/foo", "/foo/baz");
+        doTest(client, "http://localhost:60200/bar", "/bar", "/bar");
+        doTest(client, "http://localhost:60200/bar/baz", "/bar", "/bar/baz");
     }
     
-    public void testStemMatchingJetty() throws Exception
+    protected void doTest(MuleClient client, final String url, final String contextPath, final String requestPath) throws Exception
     {
-        MuleClient client = new MuleClient();
-        doTest(client, "http://localhost:60201/foo");
-        doTest(client, "http://localhost:60201/foo/bar");
-    }
-
-    protected void doTest(MuleClient client, String url) throws Exception
-    {
+    	FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(contextPath);
+        assertNotNull(testComponent);
+         
+        EventCallback callback = new EventCallback()
+        {
+            public void eventReceived(final MuleEventContext context, final Object component) throws Exception
+            {
+                MuleMessage msg = context.getMessage();
+                assertEquals(requestPath, msg.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
+                assertEquals(requestPath, msg.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
+                assertEquals(contextPath, msg.getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
+            }
+        };
+     
+        testComponent.setEventCallback(callback);
+         
         MuleMessage result = client.send(url, "Hello World", null);
-        assertEquals("Hello World", result.getPayloadAsString());
+        assertEquals("Hello World Received", result.getPayloadAsString());
         assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
 

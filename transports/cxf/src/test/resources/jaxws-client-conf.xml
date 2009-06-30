@@ -1,21 +1,20 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:spring="http://www.springframework.org/schema/beans"
+  xmlns:quartz="http://www.mulesource.org/schema/mule/quartz"
   xmlns:cxf="http://www.mulesource.org/schema/mule/cxf"
   xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesource.org/schema/mule/cxf http://www.mulesource.org/schema/mule/cxf/3.0/mule-cxf.xsd">
+       http://www.mulesource.org/schema/mule/cxf http://www.mulesource.org/schema/mule/cxf/3.0/mule-cxf.xsd
+       http://www.mulesource.org/schema/mule/quartz http://www.mulesource.org/schema/mule/quartz/3.0/mule-quartz.xsd">
   
-  <endpoint name="quartz.in" address="quartz:/eventTimer">
-    <properties>
-     <spring:entry key="repeatInterval" value="1000" />
-     <spring:entry key="repeatCount" value="0" />
-     <spring:entry key="startDelay" value="1000" />
-     <spring:entry key="payloadClassName" value="" />
-    </properties>
-  </endpoint>
-  
+  <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000" repeatCount="1">
+       <quartz:scheduled-dispatch-job>
+           <quartz:job-endpoint address="vm://quartz.in"/>
+       </quartz:scheduled-dispatch-job>
+  </quartz:endpoint>
+    
   <cxf:endpoint 
       name="clientEndpoint" 
       address="http://localhost:63081/services/greeter"
@@ -43,7 +42,7 @@
     
     <service name="cxfClient">
       <inbound>
-        <inbound-endpoint ref="quartz.in"/>
+        <inbound-endpoint address="vm://quartz.in"/>
       </inbound>
       <component>
           <singleton-object class="org.mule.transport.cxf.jaxws.ClientMessageGenerator"/>

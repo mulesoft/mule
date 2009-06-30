@@ -260,17 +260,17 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
             }
 
-            message.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, 
-                HttpConnector.normalizeUrl(endpoint.getEndpointURI().getPath()));
-            
             // determine if the request path on this request denotes a different receiver
             MessageReceiver receiver = getTargetReceiver(message, endpoint);
-
+            
             HttpResponse response;
             // the response only needs to be transformed explicitly if
             // A) the request was not served or B) a null result was returned
             if (receiver != null)
             {
+            	message.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, 
+    	                HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()));
+            	
                 preRouteMessage(message);
                 MuleMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), null);
 

@@ -3,23 +3,27 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http"
+        xmlns:test="http://www.mulesource.org/schema/mule/test"
     xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/test http://www.mulesource.org/schema/mule/test/3.0/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesource.org/schema/mule/http http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd">
 
     <model name="main">
-        <service name="httpIn">
+        <custom-service name="/foo" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="60200" path="foo" synchronous="true"/>
+                <http:inbound-endpoint address="http://localhost:60200/foo" synchronous="true"/>
             </inbound>
-            <echo-component/>
-        </service>
-        <service name="jettyIn">
+            <test:component appendString=" Received"/>
+        </custom-service>
+        
+        <custom-service name="/bar" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="60201" path="foo" synchronous="true"/>
+                <http:inbound-endpoint address="http://localhost:60200/bar" synchronous="true"/>
             </inbound>
-            <echo-component/>
-        </service>
+            <test:component appendString=" Received"/>
+        </custom-service>
     </model>
 </mule>
+
