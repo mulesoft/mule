@@ -96,16 +96,6 @@ public class MuleManifest
         return getManifestProperty("Dev-List-Email");
     }
 
-    public static String getDTDSystemId()
-    {
-        return getManifestProperty("Dtd-System-Id");
-    }
-
-    public static String getDTDPublicId()
-    {
-        return getManifestProperty("Dtd-Public-Id");
-    }
-
     public static Manifest getManifest()
     {
         if (manifest == null)
@@ -117,9 +107,9 @@ public class MuleManifest
             {
                 // We want to load the MANIFEST.MF from the mule-core jar. Sine we
                 // don't know the version we're using we have to search for the jar on the classpath
-                URL url = (URL) AccessController.doPrivileged(new PrivilegedAction()
+                URL url = AccessController.doPrivileged(new PrivilegedAction<URL>()
                 {
-                    public Object run()
+                    public URL run()
                     {
                         try
                         {
