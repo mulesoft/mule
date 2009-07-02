@@ -13,9 +13,9 @@ package org.mule.test.integration;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -48,7 +48,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
         Service service = muleContext.getRegistry().lookupService("component1");
         MuleSession session = new DefaultMuleSession(service, muleContext);
         MuleEvent event =
-                new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent"),
+                new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
                         (ImmutableEndpoint)service.getInboundRouter().getEndpoints().get(0), session, true);
         session.sendEvent(event);
     }
@@ -67,7 +67,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
                 props.put("integerParam", new Integer(12345));
                 props.put("longParam", new Long(123456789));
                 props.put("booleanParam", Boolean.TRUE);
-                MuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props);
+                MuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props, muleContext);
                 msg.addAttachment("test1", new DataHandler(new DataSource()
                 {
                     public InputStream getInputStream() throws IOException

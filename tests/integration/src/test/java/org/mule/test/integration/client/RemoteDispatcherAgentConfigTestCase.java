@@ -11,7 +11,7 @@ package org.mule.test.integration.client;
 
 import org.mule.module.client.remoting.RemoteDispatcherAgent;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transformer.wire.TransformerPairWireFormat;
+import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
 
 public class RemoteDispatcherAgentConfigTestCase extends FunctionalTestCase
 {
@@ -26,7 +26,7 @@ public class RemoteDispatcherAgentConfigTestCase extends FunctionalTestCase
         assertNotNull(agent.getEndpoint());
         assertEquals("test://12345",agent.getEndpoint().getEndpointURI().toString());
         assertNotNull(agent.getWireFormat());
-        assertTrue(agent.getWireFormat() instanceof TransformerPairWireFormat);
+        assertTrue(agent.getWireFormat() instanceof SerializedMuleMessageWireFormat);
     }
     
 }

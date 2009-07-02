@@ -31,7 +31,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         MuleMessage result = client.send("wsdl-cxf:http://localhost:6065/WebService?wsdl&method=echo", 
-            new DefaultMuleMessage("mule"));
+            new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
     }
 
@@ -56,7 +56,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         MuleMessage result = client.send("wsdl-cxf:http://localhost:6070/webServiceProxy?wsdl&method=echo", 
-            new DefaultMuleMessage("mule"));
+            new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
     }
     
@@ -80,7 +80,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         MuleMessage result = client.send("wsdl-cxf:http://localhost:6075/webServiceProxy?wsdl&method=echo", 
-            new DefaultMuleMessage("mule"));
+            new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
     }
     

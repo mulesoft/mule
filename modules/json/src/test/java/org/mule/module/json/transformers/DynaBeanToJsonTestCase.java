@@ -27,6 +27,7 @@ public class DynaBeanToJsonTestCase extends AbstractMuleTestCase
     public void testTransform() throws Exception
     {
         transformer.setReturnClass(String.class);
+        transformer.setMuleContext(muleContext);
         TestBean bean = new TestBean("json", 23, 2.2, "function(i){ return i; }");
         String trasfRes = (String) transformer.transform(bean);
         assertEquals(JSON_RESULT, trasfRes);

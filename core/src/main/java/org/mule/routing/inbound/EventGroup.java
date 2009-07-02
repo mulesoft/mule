@@ -39,7 +39,7 @@ public class EventGroup implements Comparable, Serializable
 
     private final Object groupId;
     // @GuardedBy("this")
-    private final List events;
+    private final List<MuleEvent> events;
     private final long created;
     private final int expectedSize;
 
@@ -52,7 +52,7 @@ public class EventGroup implements Comparable, Serializable
     {
         super();
         this.created = Utils.nanoTime();
-        this.events = new ArrayList(expectedSize > 0 ? expectedSize : 10);
+        this.events = new ArrayList<MuleEvent>(expectedSize > 0 ? expectedSize : 10);
         this.expectedSize = expectedSize;
         this.groupId = groupId;
     }
@@ -284,7 +284,8 @@ public class EventGroup implements Comparable, Serializable
 
     public MuleMessageCollection toMessageCollection()
     {
-        MuleMessageCollection col = new DefaultMessageCollection();
+        if(events.size()==0) return new DefaultMessageCollection(null);
+        MuleMessageCollection col = new DefaultMessageCollection(events.get(0).getMuleContext());
         for (Iterator iterator = events.iterator(); iterator.hasNext();)
         {
             MuleEvent event = (MuleEvent) iterator.next();

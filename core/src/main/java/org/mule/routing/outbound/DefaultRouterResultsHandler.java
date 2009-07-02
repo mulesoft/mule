@@ -10,6 +10,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMessageCollection;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.routing.RouterResultsHandler;
@@ -34,7 +35,7 @@ import java.util.List;
  */
 public class DefaultRouterResultsHandler implements RouterResultsHandler
 {
-    public MuleMessage aggregateResults(List /*<MuleMessage>*/ results, MuleMessage orginalMessage)
+    public MuleMessage aggregateResults(List<MuleMessage> results, MuleMessage orginalMessage, MuleContext muleContext)
     {
         if (results == null || results.size() == 0)
         {
@@ -42,11 +43,11 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         }
         else if (results.size() == 1)
         {
-            return (MuleMessage) results.get(0);
+            return results.get(0);
         }
         else
         {
-            MuleMessageCollection coll = new DefaultMessageCollection();
+            MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
             for (Iterator iterator = results.iterator(); iterator.hasNext();)
             {
                 MuleMessage muleMessage = (MuleMessage) iterator.next();

@@ -11,7 +11,6 @@
 package org.mule.transformer;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.MuleServer;
 import org.mule.RequestContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -48,9 +47,9 @@ public abstract class AbstractMessageAwareTransformer extends AbstractTransforme
         {
             message = (MuleMessage) src;
         }
-        else if (MuleServer.getMuleContext().getConfiguration().isAutoWrapMessageAwareTransform())
+        else if (muleContext.getConfiguration().isAutoWrapMessageAwareTransform())
         {
-            message = new DefaultMuleMessage(src);
+            message = new DefaultMuleMessage(src, muleContext);
         }
         else
         {

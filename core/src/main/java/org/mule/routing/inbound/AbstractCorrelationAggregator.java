@@ -10,6 +10,7 @@
 
 package org.mule.routing.inbound;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.routing.AggregationException;
 import org.mule.routing.CollectionCorrelatorCallback;
@@ -25,13 +26,18 @@ public abstract class AbstractCorrelationAggregator extends AbstractEventAggrega
 
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
-        return new DelegateCorrelatorCallback();
+        return new DelegateCorrelatorCallback(muleContext);
     }
 
     protected abstract MuleMessage aggregateEvents(EventGroup events) throws AggregationException;
 
     private class DelegateCorrelatorCallback extends CollectionCorrelatorCallback
     {
+        private DelegateCorrelatorCallback(MuleContext muleContext)
+        {
+            super(muleContext);
+        }
+
         public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
         {
             return AbstractCorrelationAggregator.this.aggregateEvents(events);

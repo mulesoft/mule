@@ -148,7 +148,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
             try
             {
                 invocation.setMessage(new DefaultMuleMessage(invocation.getMessage().getPayloadAsString()
-                                                             + name + AFTER));
+                                                             + name + AFTER, muleContext));
             }
             catch (Exception e)
             {
@@ -163,7 +163,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
             try
             {
                 invocation.setMessage(new DefaultMuleMessage(invocation.getMessage().getPayloadAsString()
-                                                             + name + BEFORE));
+                                                             + name + BEFORE, muleContext));
             }
             catch (Exception e)
             {

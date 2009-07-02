@@ -158,7 +158,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
             else
             {
                 logger.info("There is no current event available, routing Null message with the exception");
-                handleMessagingException(new DefaultMuleMessage(NullPayload.getInstance()), e);
+                handleMessagingException(new DefaultMuleMessage(NullPayload.getInstance(), muleContext), e);
             }
             return;
         }
@@ -296,11 +296,11 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                 MuleMessage exceptionMessage;
                 if (ctx == null)
                 {
-                    exceptionMessage = new DefaultMuleMessage(msg);
+                    exceptionMessage = new DefaultMuleMessage(msg, muleContext);
                 }
                 else
                 {
-                    exceptionMessage = new DefaultMuleMessage(msg, ctx.getMessage());
+                    exceptionMessage = new DefaultMuleMessage(msg, ctx.getMessage(), muleContext);
                 }
 
                 for (int i = 0; i < endpoints.size(); i++)

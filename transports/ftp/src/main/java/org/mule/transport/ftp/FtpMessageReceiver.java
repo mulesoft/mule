@@ -170,7 +170,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                     throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
                                                                file.getName(), client.getReplyCode()));
                 }
-                message = new DefaultMuleMessage(connector.getMessageAdapter(stream));
+                message = new DefaultMuleMessage(connector.getMessageAdapter(stream), connector.getMuleContext());
             }
             else
             {
@@ -180,7 +180,15 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                     throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
                                                                file.getName(), client.getReplyCode()));
                 }
-                message = new DefaultMuleMessage(connector.getMessageAdapter(baos.toByteArray()));            
+                byte[] bytes = baos.toByteArray();
+                if (bytes.length > 0)
+                {
+                    message = new DefaultMuleMessage(connector.getMessageAdapter(bytes), connector.getMuleContext());            
+                }
+                else
+                {
+                    throw new IOException("File " + file.getName() + " is empty (zero bytes)");
+                }
             }
 
             message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());

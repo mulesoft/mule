@@ -9,6 +9,7 @@
  */
 package org.mule.transport.servlet.jetty;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -23,9 +24,9 @@ import org.mortbay.util.ajax.Continuation;
  */
 public class JettyContinuationsReplyToHandler extends DefaultReplyToHandler
 {
-    public JettyContinuationsReplyToHandler(List transformers)
+    public JettyContinuationsReplyToHandler(List transformers, MuleContext muleContext)
     {
-        super(transformers);
+        super(transformers, muleContext);
     }
 
     @Override

@@ -12,15 +12,13 @@ package org.mule.test.integration.security;
 
 import org.mule.module.spring.security.HttpFilterFunctionalTestCase;
 import org.mule.transport.servlet.MuleReceiverServlet;
-
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.ServletHandler;
+import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
 public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTestCase
 {
     public static final int HTTP_PORT = 4567;
 
-    private Server httpServer;
+    private EmbeddedJettyServer httpServer;
 
     protected String getConfigResources()
     {
@@ -29,7 +27,7 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
     
     protected String getUrl()
     {
-        return "http://localhost:4567/test/index.html";
+        return "http://localhost:" + HTTP_PORT + "/test/index.html";
     }
 
     @Override
@@ -37,12 +35,8 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
     {
         super.doSetUp();
         
-        httpServer = new Server(HTTP_PORT);
-        
-        ServletHandler handler = new ServletHandler();
-        handler.addServletWithMapping(MuleReceiverServlet.class, "/*");
-        httpServer.addHandler(handler);
-        
+        httpServer = new EmbeddedJettyServer(HTTP_PORT, "/*", new MuleReceiverServlet(), muleContext);
+
         httpServer.start();
     }
 

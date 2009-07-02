@@ -122,7 +122,7 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
            this transport and calling routeMessage i.e.
 
             MessageAdapter adapter = connector.getMessageAdapter(object);
-            routeMessage(new MuleMessage(adapter), endpoint.isSynchronous());
+            routeMessage(new MuleMessage(adapter, connector.getMuleContext()), endpoint.isSynchronous());
         */
 
         // TODO request a message from the underlying technology e.g. Read a file

@@ -37,7 +37,7 @@ public class SpringTransactionFactory implements TransactionFactory
 
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
-        Transaction tx = new SpringTransaction();
+        Transaction tx = new SpringTransaction(muleContext);
         tx.begin();
         return tx;
     }
@@ -70,8 +70,9 @@ public class SpringTransactionFactory implements TransactionFactory
     {
         protected final TransactionStatus status;
 
-        public SpringTransaction()
+        public SpringTransaction(MuleContext muleContext)
         {
+            super(muleContext);
             status = manager.getTransaction(null);
         }
 

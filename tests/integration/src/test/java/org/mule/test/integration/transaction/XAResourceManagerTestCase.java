@@ -30,7 +30,7 @@ public class XAResourceManagerTestCase extends AbstractMuleTestCase
 
     protected void doSetUp() throws Exception
     {
-        tm = new JBossArjunaTransactionManagerFactory().create();
+        tm = new JBossArjunaTransactionManagerFactory().create(muleContext.getConfiguration());
     }
 
     protected void doTearDown() throws Exception

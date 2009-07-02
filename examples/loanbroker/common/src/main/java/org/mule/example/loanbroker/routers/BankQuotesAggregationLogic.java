@@ -64,6 +64,6 @@ public class BankQuotesAggregationLogic
         }
 
         logger.info(LocaleMessage.lowestQuote(lowestQuote));
-        return new DefaultMuleMessage(lowestQuote, event.getMessage());
+        return new DefaultMuleMessage(lowestQuote, event.getMessage(), event.getMuleContext());
     }
 }

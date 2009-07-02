@@ -13,14 +13,13 @@ package org.mule.transport.tcp;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.tcp.TcpConnector;
 
 public class TcpEndpointTestCase extends AbstractMuleTestCase
 {
 
     public void testHostPortUrl() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("tcp://localhost:7856");
+        EndpointURI url = new MuleEndpointURI("tcp://localhost:7856", muleContext);
         url.initialise();
         assertEquals(TcpConnector.TCP, url.getScheme());
         assertEquals("tcp://localhost:7856", url.getAddress());
@@ -33,7 +32,7 @@ public class TcpEndpointTestCase extends AbstractMuleTestCase
 
     public void testQueryParams1() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("tcp://localhost:7856?param=1");
+        EndpointURI url = new MuleEndpointURI("tcp://localhost:7856?param=1", muleContext);
         url.initialise();
 
         assertEquals(TcpConnector.TCP, url.getScheme());
@@ -49,7 +48,7 @@ public class TcpEndpointTestCase extends AbstractMuleTestCase
     public void testQueryParams2() throws Exception
     {
         EndpointURI url = new MuleEndpointURI(
-            "tcp://localhost:7856?param=1&endpointName=tcpProvider&blankParam=");
+            "tcp://localhost:7856?param=1&endpointName=tcpProvider&blankParam=", muleContext);
         url.initialise();
         
         assertEquals(TcpConnector.TCP, url.getScheme());

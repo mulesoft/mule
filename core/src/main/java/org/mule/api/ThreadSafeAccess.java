@@ -10,7 +10,7 @@
 
 package org.mule.api;
 
-import org.mule.api.config.MuleConfiguration;
+import org.mule.api.config.MuleProperties;
 
 import org.apache.commons.lang.BooleanUtils;
 
@@ -78,13 +78,13 @@ public interface ThreadSafeAccess
         
         static
         {
-            String propertyValue = System.getProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "message.assertAccess");
+            String propertyValue = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.assertAccess");
             if (propertyValue != null)
             {
                 assertMessageAccess = BooleanUtils.toBoolean(propertyValue);
             }
 
-            propertyValue = System.getProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages");
+            propertyValue = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages");
             if (propertyValue != null)
             {
                 failOnMessageScribbling = !BooleanUtils.toBoolean(propertyValue);

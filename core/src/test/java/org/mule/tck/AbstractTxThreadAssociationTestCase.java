@@ -37,7 +37,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
     {
         super.doSetUp();
         TransactionManagerFactory factory = getTransactionManagerFactory();
-        tm = factory.create();
+        tm = factory.create(muleContext.getConfiguration());
         assertNotNull("Transaction Manager should be available.", tm);
         assertNull("There sould be no current transaction associated.", tm.getTransaction());
     }
@@ -266,7 +266,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
         // don't wait for ages, has to be set before TX is begun
         tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
 
-        XaTransaction muleTx = new XaTransaction(tm);
+        XaTransaction muleTx = new XaTransaction(muleContext);
         assertFalse(muleTx.isBegun());
         assertEquals(Status.STATUS_NO_TRANSACTION, muleTx.getStatus());
         muleTx.begin();

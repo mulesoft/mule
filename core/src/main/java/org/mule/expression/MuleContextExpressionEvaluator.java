@@ -9,12 +9,12 @@
  */
 package org.mule.expression;
 
-import org.mule.MuleServer;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.config.i18n.CoreMessages;
 
@@ -32,9 +32,16 @@ import org.mule.config.i18n.CoreMessages;
  * <li>homeDir - Mule's home directory</li>
  * </ul>
  */
-public class MuleContextExpressionEvaluator implements ExpressionEvaluator
+public class MuleContextExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
 {
     public static final String NAME = "context";
+
+    protected MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 
     /**
      * Extracts a single property from the message
@@ -85,14 +92,7 @@ public class MuleContextExpressionEvaluator implements ExpressionEvaluator
 
     protected MuleContext getMuleContext()
     {
-        if(MuleServer.getMuleContext()==null)
-        {
-             throw new MuleRuntimeException(CoreMessages.objectIsNull("MuleContext"));
-        }
-        else
-        {
-            return MuleServer.getMuleContext();
-        }
+        return muleContext;
     }
 
     protected MuleEventContext getEventContext()

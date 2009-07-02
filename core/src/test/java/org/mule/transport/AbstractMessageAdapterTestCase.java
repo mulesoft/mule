@@ -12,7 +12,7 @@ package org.mule.transport;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.tck.AbstractMuleTestCase;
@@ -46,7 +46,7 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
     {
         Object message = getValidMessage();
         MessageAdapter adapter = createAdapter(message);
-        MuleMessage muleMessage = new DefaultMuleMessage(adapter);
+        MuleMessage muleMessage = new DefaultMuleMessage(adapter, muleContext);
 
         doTestMessageEqualsPayload(message, adapter.getPayload());
 
@@ -88,7 +88,7 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
 
     public abstract Object getValidMessage() throws Exception;
 
-    public abstract MessageAdapter createAdapter(Object payload) throws MessagingException;
+    public abstract MessageAdapter createAdapter(Object payload) throws MuleException;
 
     final static class InvalidMessage
     {

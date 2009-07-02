@@ -29,7 +29,7 @@ public class JdbcMessagePropertiesCopyingTestCase extends AbstractJdbcFunctional
     {
         MuleClient client = new MuleClient();
         
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         // provide a valid type header so the JDBC query actually returns something
         message.setProperty("type", Integer.valueOf(1));
         message.setProperty(PROPERTY_KEY, PROPERTY_VALUE);

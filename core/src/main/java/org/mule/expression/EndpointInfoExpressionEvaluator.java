@@ -10,8 +10,9 @@
 
 package org.mule.expression;
 
-import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.AbstractEndpointBuilder;
@@ -25,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class EndpointInfoExpressionEvaluator implements ExpressionEvaluator
+public class EndpointInfoExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
 {
     public static final String NAME = "endpoint";
 
@@ -33,6 +34,13 @@ public class EndpointInfoExpressionEvaluator implements ExpressionEvaluator
      * logger used by this class
      */
     protected transient final Log logger = LogFactory.getLog(EndpointInfoExpressionEvaluator.class);
+
+    protected MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 
     public Object evaluate(String expression, MuleMessage message)
     {
@@ -49,7 +57,7 @@ public class EndpointInfoExpressionEvaluator implements ExpressionEvaluator
             throw new IllegalArgumentException(CoreMessages.expressionMalformed(expression, getName()).getMessage());
         }
 
-        AbstractEndpointBuilder eb = (AbstractEndpointBuilder)MuleServer.getMuleContext().getRegistry().lookupEndpointBuilder(endpointName);
+        AbstractEndpointBuilder eb = (AbstractEndpointBuilder)muleContext.getRegistry().lookupEndpointBuilder(endpointName);
         if(eb!=null)
         {
 

@@ -21,7 +21,6 @@ import org.mule.transport.DefaultMessageAdapter;
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -87,7 +86,7 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
 
         BigInputStream stream = new BigInputStream(size, MESSAGES);
         DefaultMessageAdapter adapter = new DefaultMessageAdapter(stream);
-        client.dispatch(endpoint, new DefaultMuleMessage(adapter));
+        client.dispatch(endpoint, new DefaultMuleMessage(adapter, muleContext));
 
         // if we assume 1MB/sec then we need at least...
         long pause = Math.max(size / ONE_MB, 60 * 10) + 10;

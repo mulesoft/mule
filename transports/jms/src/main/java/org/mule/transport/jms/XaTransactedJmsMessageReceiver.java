@@ -272,7 +272,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         }
 
         MessageAdapter adapter = connector.getMessageAdapter(message);
-        routeMessage(new DefaultMuleMessage(adapter, (Map) null));
+        routeMessage(new DefaultMuleMessage(adapter, (Map)null, connector.getMuleContext()));
         return null;
     }
 

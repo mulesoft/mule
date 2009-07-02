@@ -10,7 +10,7 @@
 
 package org.mule.transaction;
 
-import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
@@ -27,7 +27,12 @@ public abstract class AbstractTransaction implements Transaction
 
     protected final transient Log logger = LogFactory.getLog(getClass());
 
-    /*
+    protected MuleContext muleContext;
+
+    protected AbstractTransaction(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }/*
      * (non-Javadoc)
      * 
      * @see org.mule.api.Transaction#isRollbackOnly()
@@ -155,7 +160,7 @@ public abstract class AbstractTransaction implements Transaction
     protected void fireNotification(TransactionNotification notification)
     {
         // TODO profile this piece of code
-        MuleServer.getMuleContext().fireNotification(notification);
+        muleContext.fireNotification(notification);
     }
 
     public boolean isXA()

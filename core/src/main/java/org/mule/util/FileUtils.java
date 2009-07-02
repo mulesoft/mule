@@ -10,7 +10,6 @@
 
 package org.mule.util;
 
-import org.mule.MuleServer;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
 
@@ -49,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
 public class FileUtils extends org.apache.commons.io.FileUtils
 {
     private static final Log logger = LogFactory.getLog(FileUtils.class);
-    public static final String DEFAULT_ENCODING = "UTF-8";
+    public static String DEFAULT_ENCODING = "UTF-8";
     
     public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException
     {
@@ -451,8 +450,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         }
         else
         {
-            extractFileResources(normalizeFilePath(url,
-                                                   MuleServer.getMuleContext().getConfiguration().getDefaultEncoding()),
+            extractFileResources(normalizeFilePath(url, DEFAULT_ENCODING),
                                                    outputDir, resourceName, keepParentDirectory);
         }
     }

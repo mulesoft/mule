@@ -11,6 +11,7 @@
 package org.mule.transport.vm;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -87,7 +88,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     public void onMessage(MuleMessage message) throws MuleException
     {
         // Rewrite the message to treat it as a new message
-        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message);
+        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
 
         /*
          * TODO review: onEvent can only be called by the VMMessageDispatcher - why is
@@ -103,25 +104,25 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     public Object onCall(MuleMessage message, boolean synchronous) throws MuleException
     {
         // Rewrite the message to treat it as a new message
-        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message);
+        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
         return routeMessage(newMessage, synchronous);
     }
 
     /**
      * It's impossible to process all messages in the receive transaction
      */
-    protected List getMessages() throws Exception
+    protected List<MuleMessage> getMessages() throws Exception
     {
         if (isReceiveMessagesInTransaction())
         {
-            MuleMessage message = getFirstMessage();
+            MuleEvent message = getFirstMessage();
             if (message == null)
             {
                 return null;
             }
             
-            List messages = new ArrayList(1);
-            messages.add(message);
+            List<MuleMessage> messages = new ArrayList<MuleMessage>(1);
+            messages.add(message.getMessage());
             return messages;
         }
         else
@@ -130,14 +131,14 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
     
-    protected List getFirstMessages() throws Exception
+    protected List<MuleMessage> getFirstMessages() throws Exception
     {
         // The queue from which to pull events
         QueueSession qs = connector.getQueueSession();
         Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
 
         // The list of retrieved messages that will be returned
-        List messages = new LinkedList();
+        List<MuleMessage> messages = new LinkedList<MuleMessage>();
 
         /*
          * Determine how many messages to batch in this poll: we need to drain the queue quickly, but not by
@@ -150,20 +151,20 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         int batchSize = Math.max(1, Math.min(queue.size(), ((maxThreads / 2) - 1)));
 
         // try to get the first event off the queue
-        MuleMessage message = (MuleMessage) queue.poll(connector.getQueueTimeout());
+        MuleEvent message = (MuleEvent) queue.poll(connector.getQueueTimeout());
 
         if (message != null)
         {
             // keep first dequeued event
-            messages.add(message);
+            messages.add(message.getMessage());
 
             // keep batching if more events are available
             for (int i = 0; i < batchSize && message != null; i++)
             {
-                message = (MuleMessage) queue.poll(0);
+                message = (MuleEvent)queue.poll(0);
                 if (message != null)
                 {
-                    messages.add(message);
+                    messages.add(message.getMessage());
                 }
             }
         }
@@ -172,13 +173,13 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         return messages;
     }
     
-    protected MuleMessage getFirstMessage() throws Exception
+    protected MuleEvent getFirstMessage() throws Exception
     {
         // The queue from which to pull events
         QueueSession qs = connector.getQueueSession();
         Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
         // try to get the first event off the queue
-        return (MuleMessage) queue.poll(connector.getQueueTimeout());
+        return (MuleEvent) queue.poll(connector.getQueueTimeout());
     }
 
     protected void processMessage(Object msg) throws Exception
@@ -186,7 +187,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         MuleMessage message = (MuleMessage) msg;
 
         // Rewrite the message to treat it as a new message
-        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message);
+        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
         routeMessage(newMessage);
     }
 

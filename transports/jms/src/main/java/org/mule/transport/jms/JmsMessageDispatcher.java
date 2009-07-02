@@ -19,10 +19,8 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transaction.Transaction;
-import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transaction.TransactionCollection;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageDispatcher;
@@ -259,7 +257,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     {
                         MessageAdapter adapter = connector.getMessageAdapter(result);
                         return new DefaultMuleMessage(JmsMessageUtils.toObject(result, connector.getSpecification(), endpoint.getEncoding()),
-                                adapter);
+                                adapter, connector.getMuleContext());
                     }
                 }
                 else
@@ -281,7 +279,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     {
                         MessageAdapter adapter = connector.getMessageAdapter(result);
                         return new DefaultMuleMessage(
-                                JmsMessageUtils.toObject(result, connector.getSpecification(), endpoint.getEncoding()), adapter);
+                                JmsMessageUtils.toObject(result, connector.getSpecification(),
+                                        endpoint.getEncoding()), adapter, connector.getMuleContext());
                     }
                 }
             }

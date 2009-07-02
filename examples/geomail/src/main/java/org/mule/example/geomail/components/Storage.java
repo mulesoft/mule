@@ -9,12 +9,12 @@
  */
 package org.mule.example.geomail.components;
 
-import org.mule.example.geomail.dao.SenderDao;
-import org.mule.example.geomail.dao.Sender;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.Callable;
+import org.mule.example.geomail.dao.Sender;
+import org.mule.example.geomail.dao.SenderDao;
 
 import java.util.Iterator;
 
@@ -65,7 +65,7 @@ public class Storage implements Callable
             log.warn("Sender '" + sender + "' successfully added to the Database.");
         }
 
-        MuleMessage resultMessage = new DefaultMuleMessage(sender);
+        MuleMessage resultMessage = new DefaultMuleMessage(sender, context.getMuleContext());
         resultMessage.setCorrelationGroupSize(message.getCorrelationGroupSize());
         resultMessage.setCorrelationId(message.getCorrelationId());
         resultMessage.setCorrelationSequence(message.getCorrelationSequence());

@@ -28,7 +28,7 @@ public class TestAggregator extends ResponseCorrelationAggregator
     @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
-        return new CollectionCorrelatorCallback()
+        return new CollectionCorrelatorCallback(muleContext)
         {
             public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
             {
@@ -48,7 +48,7 @@ public class TestAggregator extends ResponseCorrelationAggregator
                 }
 
                 logger.debug("event payload is: " + buffer.toString());
-                return new DefaultMuleMessage(buffer.toString());
+                return new DefaultMuleMessage(buffer.toString(), muleContext);
             }
         };
     }

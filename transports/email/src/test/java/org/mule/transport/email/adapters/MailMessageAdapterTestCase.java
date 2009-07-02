@@ -10,7 +10,7 @@
 
 package org.mule.transport.email.adapters;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
@@ -32,7 +32,7 @@ public class MailMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, "pop3", null);
     }
 
-    public MessageAdapter createAdapter(Object payload) throws MessagingException
+    public MessageAdapter createAdapter(Object payload) throws MuleException
     {
         return new MailMessageAdapter(payload);
     }

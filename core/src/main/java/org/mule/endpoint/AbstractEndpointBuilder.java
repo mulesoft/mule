@@ -10,7 +10,6 @@
 
 package org.mule.endpoint;
 
-import org.mule.RegistryContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
@@ -38,7 +37,6 @@ import org.mule.transport.AbstractConnector;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
-import org.mule.util.CharSetUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapCombiner;
 import org.mule.util.ObjectNameHelper;
@@ -134,7 +132,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         {
             throw new MuleRuntimeException(CoreMessages.objectIsNull("uriBuilder"));
         }
-
+        uriBuilder.setMuleContext(muleContext);
         EndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
 
@@ -169,7 +167,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         {
             throw new MuleRuntimeException(CoreMessages.objectIsNull("uriBuilder"));
         }
-
+        uriBuilder.setMuleContext(muleContext);
+        
         EndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
 
@@ -251,7 +250,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected String getName(EndpointURI endpointURI)
     {
-        return name != null ? name : ObjectNameHelper.getEndpointName(endpointURI);
+        return name != null ? name : new ObjectNameHelper(muleContext).getEndpointName(endpointURI);
     }
 
     protected Map getProperties()
@@ -261,6 +260,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         // properties from url come first
         if (null != uriBuilder)
         {
+            uriBuilder.setMuleContext(muleContext);            
             // properties from the URI itself
             maps.addLast(uriBuilder.getEndpoint().getParams());
         }
@@ -294,14 +294,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected String getDefaultEndpointEncoding(Connector connector)
     {
-        if (muleContext != null)
-        {
-            return muleContext.getConfiguration().getDefaultEncoding();
-        }
-        else
-        {
-            return CharSetUtils.defaultCharsetName();
-        }
+        return muleContext.getConfiguration().getDefaultEncoding();
     }
 
     protected Filter getFilter(Connector connector)
@@ -458,7 +451,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         try
         {
-            return TransformerUtils.getTransformers(transformers);
+            return TransformerUtils.getTransformers(transformers, muleContext);
         }
         catch (DefaultMuleException e)
         {
@@ -484,7 +477,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     private TransportServiceDescriptor getNonNullServiceDescriptor(String scheme, Properties overrides)
         throws ServiceException
     {
-        TransportServiceDescriptor sd = (TransportServiceDescriptor) RegistryContext.getRegistry()
+        TransportServiceDescriptor sd = (TransportServiceDescriptor) muleContext.getRegistry()
             .lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, scheme, overrides);
         if (null != sd)
         {
@@ -513,10 +506,11 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             }
             else
             {
-                connector = TransportFactory.getConnectorByProtocol(scheme);
+                TransportFactory factory = new TransportFactory(muleContext);
+                connector = factory.getConnectorByProtocol(scheme);
                 if (connector == null)
                 {
-                    connector = TransportFactory.createConnector(endpointURI, muleContext);
+                    connector = factory.createConnector(endpointURI, muleContext);
                     muleContext.getRegistry().registerConnector(connector);
                 }
             }

@@ -175,13 +175,13 @@ public class FileMessageRequester extends AbstractMessageRequester
                 if (!connector.isStreaming())
                 {
                     moveOrDelete(result, destinationFile);
-                    return new DefaultMuleMessage(msgAdapter);
+                    return new DefaultMuleMessage(msgAdapter, connector.getMuleContext());
                 }
                 else
                 {
                     // If we are streaming no need to move/delete now, that will be
                     // done when stream is closed
-                    return new DefaultMuleMessage(msgAdapter);
+                    return new DefaultMuleMessage(msgAdapter, connector.getMuleContext());
                 }
             }
         }

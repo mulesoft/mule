@@ -53,6 +53,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         w3cDocumentInput = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
                 new InputSource(new StringReader(xmlStringInput)));
         simpleFilter = new JXPathFilter();
+        simpleFilter.setMuleContext(muleContext);
 
         // Read Namespace Xml file
         is = currentClassLoader.getResourceAsStream("cdcatalogNS.xml");
@@ -68,15 +69,16 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         namespaces.put("nsone", "http://one.org");
         namespaces.put("nstwo", "http://two.org");
         nsAwareFilter.setNamespaces(namespaces);
+        nsAwareFilter.setMuleContext(muleContext);
     }
 
     public void testBogusExpression() throws Exception
     {
         try
         {
-            JXPathFilter myFilter = new JXPathFilter();
+            JXPathFilter myFilter = createObject(JXPathFilter.class);
             myFilter.setPattern("foo/bar/");
-            myFilter.accept(new DefaultMuleMessage(xmlStringInput));
+            myFilter.accept(new DefaultMuleMessage(xmlStringInput, muleContext));
             fail("Invalid XPath should have thrown an exception");
         }
         //Now we have Jaxen on the class path we get a Jaxen exception, but this is an unchecked exception
@@ -90,38 +92,38 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
     {
         simpleFilter.setPattern("catalog/cd[3]/title");
         simpleFilter.setExpectedValue("Greatest Hits");
-        assertTrue(simpleFilter.accept(new DefaultMuleMessage(xmlData)));
+        assertTrue(simpleFilter.accept(new DefaultMuleMessage(xmlData, muleContext)));
     }
 
     private void doTestBooleanFilter1(Object xmlData) throws Exception
     {
         simpleFilter.setPattern("(catalog/cd[3]/title) ='Greatest Hits'");
-        assertTrue(simpleFilter.accept(new DefaultMuleMessage(xmlData)));
+        assertTrue(simpleFilter.accept(new DefaultMuleMessage(xmlData, muleContext)));
     }
 
     private void doTestBooleanFilter2(Object xmlData) throws Exception
     {
         simpleFilter.setPattern("count(catalog/cd) = 26");
-        assertTrue(simpleFilter.accept(new DefaultMuleMessage(xmlData)));
+        assertTrue(simpleFilter.accept(new DefaultMuleMessage(xmlData, muleContext)));
     }
 
     private void doTestExpectedValueFilterNS(Object xmlData) throws Exception
     {
         nsAwareFilter.setPattern("nsone:catalog/nstwo:cd[3]/title");
         nsAwareFilter.setExpectedValue("Greatest Hits");
-        assertTrue(nsAwareFilter.accept(new DefaultMuleMessage(xmlData)));
+        assertTrue(nsAwareFilter.accept(new DefaultMuleMessage(xmlData, muleContext)));
     }
 
     private void doTestBooleanFilter1NS(Object xmlData) throws Exception
     {
         nsAwareFilter.setPattern("(nsone:catalog/nstwo:cd[3]/title) ='Greatest Hits'");
-        assertTrue(nsAwareFilter.accept(new DefaultMuleMessage(xmlData)));
+        assertTrue(nsAwareFilter.accept(new DefaultMuleMessage(xmlData, muleContext)));
     }
 
     private void doTestBooleanFilter2NS(Object xmlData) throws Exception
     {
         nsAwareFilter.setPattern("count(nsone:catalog/nstwo:cd) = 26");
-        assertTrue(nsAwareFilter.accept(new DefaultMuleMessage(xmlData)));
+        assertTrue(nsAwareFilter.accept(new DefaultMuleMessage(xmlData, muleContext)));
     }
 
     public void testFilterOnObject() throws Exception
@@ -131,7 +133,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         d.setContent("hello");
 
         simpleFilter.setPattern("id=10 and content='hello'");
-        assertTrue(simpleFilter.accept(new DefaultMuleMessage(d)));
+        assertTrue(simpleFilter.accept(new DefaultMuleMessage(d, muleContext)));
     }
 
     public void testExpectedValueFilterXmlString() throws Exception
@@ -244,7 +246,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
             // TODO Not working for XMLStreamReader
             if (!(msg instanceof XMLStreamReader))
             {
-                assertTrue("Test failed for message type: " + msg.getClass(), simpleFilter.accept(new DefaultMuleMessage(msg)));
+                assertTrue("Test failed for message type: " + msg.getClass(), simpleFilter.accept(new DefaultMuleMessage(msg, muleContext)));
             }
         }
     }

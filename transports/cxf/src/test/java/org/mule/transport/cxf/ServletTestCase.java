@@ -11,6 +11,7 @@
 package org.mule.transport.cxf;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
@@ -18,6 +19,9 @@ import org.mule.transport.servlet.MuleReceiverServlet;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
@@ -47,6 +51,14 @@ public class ServletTestCase extends FunctionalTestCase
         
         Context c = new Context(httpServer, path, Context.SESSIONS);
         c.addServlet(new ServletHolder(new MuleReceiverServlet()), "/services/*");
+        c.addEventListener(new ServletContextListener() {
+            public void contextInitialized(ServletContextEvent sce)
+            {
+                sce.getServletContext().setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
+            }
+
+            public void contextDestroyed(ServletContextEvent sce) { }
+        });
         
         httpServer.start();
     }

@@ -40,7 +40,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
 
     public Transformer getTransformer() throws Exception
     {
-        Transformer trans = new DomDocumentToXml();
+        Transformer trans = createObject(DomDocumentToXml.class);
         trans.setReturnClass(String.class);
 
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
@@ -54,7 +54,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
 
     public Transformer getRoundTripTransformer() throws Exception
     {
-        XmlToDomDocument trans =  new XmlToDomDocument(); // encoding is not interesting
+        XmlToDomDocument trans = createObject(XmlToDomDocument.class); // encoding is not interesting
         trans.setReturnClass( org.w3c.dom.Document.class);
         return trans;
     }

@@ -178,7 +178,7 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         assertTrue(es.indexOf("events=1") != -1);
         assertTrue(es.endsWith("[" + e.getMessage().getUniqueId() + "]}"));
 
-        MuleEvent e2 = new DefaultMuleEvent(new DefaultMuleMessage("foo2"), e);
+        MuleEvent e2 = new DefaultMuleEvent(new DefaultMuleMessage("foo2", muleContext), e);
         eg.addEvent(e2);
         es = eg.toString();
         assertTrue(es.indexOf("events=2") != -1);

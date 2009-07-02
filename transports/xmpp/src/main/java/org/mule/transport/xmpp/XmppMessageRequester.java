@@ -102,7 +102,7 @@ public class XmppMessageRequester extends AbstractMessageRequester
         }
         if (message != null)
         {
-            return new DefaultMuleMessage(connector.getMessageAdapter(message));
+            return new DefaultMuleMessage(connector.getMessageAdapter(message), connector.getMuleContext());
         }
         else
         {

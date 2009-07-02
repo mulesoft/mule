@@ -9,6 +9,7 @@
  */
 package org.mule.api.routing;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 
 import java.util.List;
@@ -19,5 +20,5 @@ import java.util.List;
  */
 public interface RouterResultsHandler
 {
-    MuleMessage aggregateResults(List /*<MuleMessage>*/ results, MuleMessage orginalMessage);
+    MuleMessage aggregateResults(List<MuleMessage> results, MuleMessage orginalMessage, MuleContext muleContext);
 }

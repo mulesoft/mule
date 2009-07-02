@@ -26,7 +26,7 @@ public class XaTransactionFactory implements TransactionFactory
     {
         try
         {
-            XaTransaction xat = new XaTransaction(muleContext.getTransactionManager());
+            XaTransaction xat = new XaTransaction(muleContext);
             xat.begin();
             return xat;
         }

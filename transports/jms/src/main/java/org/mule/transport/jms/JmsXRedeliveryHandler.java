@@ -10,7 +10,8 @@
 
 package org.mule.transport.jms;
 
-import org.mule.api.MessagingException;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.jms.i18n.JmsMessages;
@@ -54,7 +55,7 @@ public class JmsXRedeliveryHandler implements RedeliveryHandler
      * be handled by the connector Exception Handler.
      * 
      */
-    public void handleRedelivery(Message message) throws JMSException, MessagingException
+    public void handleRedelivery(Message message) throws JMSException, MuleException
     {
         if (connector.getMaxRedelivery() <= 0)
         {
@@ -88,10 +89,11 @@ public class JmsXRedeliveryHandler implements RedeliveryHandler
             logger.debug(MessageFormat.format(
                     "Message with id: {0} has been redelivered {1} times, which exceeds the maxRedelivery setting " +
                     "of {2} on the connector {3}", messageId, redeliveryCount, connector.getMaxRedelivery(), connector.getName()));
+
             JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
             throw new MessageRedeliveredException(
                 JmsMessages.tooManyRedeliveries(messageId, String.valueOf(redeliveryCount),
-                                                connector.getMaxRedelivery(), connector.getName()), adapter);
+                                                connector.getMaxRedelivery(), connector.getName()), new DefaultMuleMessage(adapter, connector.getMuleContext()));
 
         }
         else

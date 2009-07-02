@@ -91,6 +91,8 @@ public class RemoteDispatcherAgent extends AbstractAgent
         {
             wireFormat = new SerializedMuleMessageWireFormat();
         }
+        wireFormat.setMuleContext(muleContext);
+
         
         //Register the Remote Dispatcher Notification support
         muleContext.getNotificationManager().addInterfaceToType(

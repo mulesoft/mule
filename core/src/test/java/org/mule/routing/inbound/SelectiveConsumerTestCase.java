@@ -43,8 +43,8 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         Service testService = getTestService("test", Apple.class);
 
-        InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
-        SelectiveConsumer router = new SelectiveConsumer();
+        InboundRouterCollection messageRouter = createObject(DefaultInboundRouterCollection.class);
+        SelectiveConsumer router = createObject(SelectiveConsumer.class);
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
@@ -52,7 +52,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         router.setFilter(filter);
 
         assertEquals(filter, router.getFilter());
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
 
         ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider");
         MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
@@ -74,7 +74,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
 
         session.expectAndReturn("getService", testService);
         session.expectAndReturn("toString", "");
-        message = new DefaultMuleMessage(new Exception());
+        message = new DefaultMuleMessage(new Exception(), muleContext);
 
         event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
         assertTrue(!router.isMatch(event));
@@ -88,8 +88,9 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         Service testService = getTestService("test", Apple.class);
 
-        InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
-        SelectiveConsumer router = new SelectiveConsumer();
+        InboundRouterCollection messageRouter = createObject(DefaultInboundRouterCollection.class);
+        SelectiveConsumer router = createObject(SelectiveConsumer.class);
+
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
@@ -97,7 +98,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         router.setFilter(filter);
 
         assertEquals(filter, router.getFilter());
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
 
         ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider", CollectionUtils.singletonList(new ObjectToByteArray()));
         MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
@@ -119,7 +120,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
 
         session.expectAndReturn("getService", testService);
         session.expectAndReturn("toString", "");
-        message = new DefaultMuleMessage("Hello String");
+        message = new DefaultMuleMessage("Hello String", muleContext);
 
         event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
         router.setTransformFirst(false);
@@ -134,8 +135,9 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
     {
         Service testService = getTestService("test", Apple.class);
 
-        InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
-        SelectiveConsumer router = new TestSelectiveConsumer("test");
+        InboundRouterCollection messageRouter = createObject(DefaultInboundRouterCollection.class);
+        SelectiveConsumer router = createObject(TestSelectiveConsumer.class, "test");
+
         router.setFilter(new PayloadTypeFilter(String.class));
         router.setTransformFirst(true);
         messageRouter.addRouter(router);
@@ -143,7 +145,8 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         // NOTE: The second router is invoked with the same message instance as the
         // preceding router and has already been transformed (transformFirst was set
         // on previous router).  See comments on MULE-4240.
-        SelectiveConsumer router2 = new TestSelectiveConsumer("test TRANSFORMED");
+        SelectiveConsumer router2 = createObject(TestSelectiveConsumer.class, "test TRANSFORMED");
+
         messageRouter.addRouter(router2);
 
         testService.setInboundRouter(messageRouter);
@@ -156,7 +159,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
 
     }
 
-    private static class TestSelectiveConsumer extends SelectiveConsumer
+    protected static class TestSelectiveConsumer extends SelectiveConsumer
     {
         private String expect;
 

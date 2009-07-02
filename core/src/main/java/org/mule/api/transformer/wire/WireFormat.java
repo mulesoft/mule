@@ -11,12 +11,13 @@
 package org.mule.api.transformer.wire;
 
 import org.mule.api.MuleException;
+import org.mule.api.context.MuleContextAware;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
 
-public interface WireFormat
+public interface WireFormat extends MuleContextAware
 {
     Object read(InputStream is) throws MuleException;
 

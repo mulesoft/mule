@@ -10,8 +10,10 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,6 +21,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * <code>XmlToObject</code> converts xml created by the ObjectToXml transformer in to a
@@ -47,29 +52,32 @@ public class XmlToObject extends AbstractXStreamTransformer
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Object src = message.getPayload();
+        Object result;
         if (src instanceof byte[])
         {
             try
             {
                 Reader xml = new InputStreamReader(new ByteArrayInputStream((byte[]) src), outputEncoding);
-                return getXStream().fromXML(xml);
+                result = getXStream().fromXML(xml);
+
+
             }
-            catch (UnsupportedEncodingException uee)
+            catch (UnsupportedEncodingException e)
             {
-                throw new TransformerException(this, uee);
+                throw new TransformerException(this, e);
             }
         }
-        else if(src instanceof InputStream)
+        else if (src instanceof InputStream)
         {
             InputStream input = (InputStream) src;
             try
             {
                 Reader xml = new InputStreamReader(input, outputEncoding);
-                return getXStream().fromXML(xml);
+                result = getXStream().fromXML(xml);
             }
-            catch (UnsupportedEncodingException uee)
+            catch (Exception e)
             {
-                throw new TransformerException(this, uee);
+                throw new TransformerException(this, e);
             }
             finally
             {
@@ -85,11 +93,61 @@ public class XmlToObject extends AbstractXStreamTransformer
         }
         else if (src instanceof String)
         {
-            return getXStream().fromXML(src.toString());
+            result = getXStream().fromXML(src.toString());
         }
         else
         {
-            return getXStream().fromXML((String) domTransformer.transform(src));
+            result = getXStream().fromXML((String) domTransformer.transform(src));
+        }
+
+        try
+        {
+            postDeserialisationInit(result);
+            return result;
+        }
+        catch (Exception e)
+        {
+            throw new TransformerException(this, e);
+        }
+    }
+
+    protected void postDeserialisationInit(final Object object) throws Exception
+    {
+        if (object instanceof DeserializationPostInitialisable)
+        {
+            try
+            {
+                final Method m = object.getClass().getDeclaredMethod("initAfterDeserialisation", MuleContext.class);
+
+                Object o = AccessController.doPrivileged(new PrivilegedAction()
+                {
+                    public Object run()
+                    {
+                        try
+                        {
+                            m.setAccessible(true);
+                            m.invoke(object, muleContext);
+                            return null;
+                        }
+                        catch (Exception e)
+                        {
+                            return e;
+                        }
+
+                    }
+                });
+                if (o != null)
+                {
+                    throw (Exception) o;
+                }
+
+            }
+            catch (NoSuchMethodException e)
+            {
+                throw new IllegalArgumentException("Object " + object.getClass() + " implements " +
+                        DeserializationPostInitialisable.class + " but does not have a method " +
+                        "private void initAfterDeserialisation(MuleContext) defined", e);
+            }
         }
     }
 

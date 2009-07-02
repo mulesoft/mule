@@ -10,7 +10,7 @@
 
 package org.mule.transport.multicast;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.transport.udp.UdpMessageAdapter;
 
 /**
@@ -24,7 +24,7 @@ public class MulticastMessageAdapter extends UdpMessageAdapter
      */
     private static final long serialVersionUID = 4515594269344311534L;
 
-    public MulticastMessageAdapter(Object message) throws MessagingException
+    public MulticastMessageAdapter(Object message) throws MuleException
     {
         super(message);
     }

@@ -130,7 +130,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             doPost(context, response);
         }
         response.getWriter().close();
-        return new DefaultMuleMessage(response);
+        return new DefaultMuleMessage(response, context.getMuleContext());
     }
 
     public void initialise() throws InitialisationException
@@ -159,7 +159,7 @@ public class AxisServiceComponent implements Initialisable, Callable
                                 + "://" + context.getEndpointURI().getHost() + ":"
                                 + context.getEndpointURI().getPort();
                 uri += context.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, "");
-                endpointUri = new MuleEndpointURI(uri);
+                endpointUri = new MuleEndpointURI(uri, context.getMuleContext());
                 endpointUri.initialise();
             }
 
@@ -813,7 +813,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         if (homeDir == null)
         {
-            //TODO fix homeDir = RegistryContext.getConfiguration().getWorkingDirectory() + DEFAULT_AXIS_HOME;
+            //TODO fix homeDir = muleContext.getConfiguration().getWorkingDirectory() + DEFAULT_AXIS_HOME;
             homeDir = DEFAULT_AXIS_HOME;
         }
         return homeDir;

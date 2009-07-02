@@ -9,11 +9,10 @@
  */
 package org.mule.transformers.xml.xquery;
 
-import org.mule.util.IOUtils;
-import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.api.transformer.Transformer;
-import org.mule.RequestContext;
 import org.mule.module.xml.transformer.XQueryTransformer;
+import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.util.IOUtils;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
@@ -41,6 +40,7 @@ public class InlineXQueryTransformerTestCase extends AbstractTransformerTestCase
                 "    return <cd-title>{data($cd/title)}</cd-title>\n" +
                 "} </cd-listings>");
         transformer.setReturnClass(String.class);
+        transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;
     }

@@ -17,8 +17,8 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
 
     public void testEquality() throws Exception
     {
-        MuleEndpointURI u1 = new MuleEndpointURI("test://mule:secret@jabber.org:6666/ross@jabber.org");
-        MuleEndpointURI u2 = new MuleEndpointURI("test://mule:secret@jabber.org:6666/ross@jabber.org");
+        MuleEndpointURI u1 = new MuleEndpointURI("test://mule:secret@jabber.org:6666/ross@jabber.org", muleContext);
+        MuleEndpointURI u2 = new MuleEndpointURI("test://mule:secret@jabber.org:6666/ross@jabber.org", muleContext);
 
         assertEquals(u1, u2);
         assertEquals(u2, u1);

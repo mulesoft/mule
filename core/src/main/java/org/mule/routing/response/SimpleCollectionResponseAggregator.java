@@ -22,6 +22,6 @@ public class SimpleCollectionResponseAggregator extends ResponseCorrelationAggre
 {
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
-        return new CollectionCorrelatorCallback();
+        return new CollectionCorrelatorCallback(muleContext);
     }
 }

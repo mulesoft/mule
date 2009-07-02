@@ -25,7 +25,7 @@ public class ConnectorService implements ConnectorServiceMBean
     public ConnectorService(final Connector connector)
     {
         this.connector = connector;
-        name = ObjectNameHelper.getConnectorName(connector);
+        name = new ObjectNameHelper(connector.getMuleContext()).getConnectorName(connector);
     }
 
     public boolean isStarted()

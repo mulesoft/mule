@@ -11,7 +11,7 @@
 package org.mule.transport.udp;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
 
@@ -28,7 +28,7 @@ public class UdpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         return new DatagramPacket(TEST_MESSAGE.getBytes(), TEST_MESSAGE.length());
     }
 
-    public MessageAdapter createAdapter(Object payload) throws MessagingException
+    public MessageAdapter createAdapter(Object payload) throws MuleException
     {
         return new UdpMessageAdapter(payload);
     }
@@ -37,7 +37,7 @@ public class UdpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     {
         Object message = getValidMessage();
         MessageAdapter adapter = createAdapter(message);
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(adapter);
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(adapter, muleContext);
         assertEquals(new String(((DatagramPacket)message).getData()), muleMessage.getPayloadAsString());
         byte[] bytes = muleMessage.getPayloadAsBytes();
         assertNotNull(bytes);
@@ -61,7 +61,7 @@ public class UdpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     public void testSerialization() throws Exception
     {
         MessageAdapter messageAdapter = createAdapter(getValidMessage());
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter);
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter, muleContext);
 
         byte[] serializedMessage = SerializationUtils.serialize(muleMessage);
 

@@ -42,7 +42,7 @@ public class MessageChunkingAggregator extends AbstractEventAggregator
 
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
-        return new CollectionCorrelatorCallback()
+        return new CollectionCorrelatorCallback(muleContext)
         {
             /**
              * This method is invoked if the shouldAggregate method is called and returns
@@ -77,12 +77,12 @@ public class MessageChunkingAggregator extends AbstractEventAggregator
                     try
                     {
                         message = new DefaultMuleMessage(SerializationUtils.deserialize(baos.toByteArray()),
-                                firstEvent.getMessage());
+                                firstEvent.getMessage(), muleContext);
 
                     }
                     catch (SerializationException e)
                     {
-                        message = new DefaultMuleMessage(baos.toByteArray(), firstEvent.getMessage());
+                        message = new DefaultMuleMessage(baos.toByteArray(), firstEvent.getMessage(), muleContext);
                     }
 
                     message.setCorrelationGroupSize(-1);

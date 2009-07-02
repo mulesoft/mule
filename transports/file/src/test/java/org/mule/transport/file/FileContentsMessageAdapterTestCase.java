@@ -11,7 +11,7 @@
 package org.mule.transport.file;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
 import org.mule.util.FileUtils;
@@ -48,7 +48,7 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
         return validMessage;
     }
 
-    public MessageAdapter createAdapter(Object payload) throws MessagingException
+    public MessageAdapter createAdapter(Object payload) throws MuleException
     {
         if (payload.equals(validMessage))
         {
@@ -75,7 +75,7 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
     public void testSerialization() throws Exception
     {
         MessageAdapter messageAdapter = createAdapter(messageFile);        
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter);
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter, muleContext);
 
         byte[] serializedMessage = SerializationUtils.serialize(muleMessage);
 

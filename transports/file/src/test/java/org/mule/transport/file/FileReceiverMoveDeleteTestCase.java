@@ -196,7 +196,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
                 transformer = new FileMessageAdaptorAssertingTransformer(FileContentsMessageAdapter.class, byte[].class);
             }
         }
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(url), muleContext);
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext), muleContext);
         endpointBuilder.addTransformer(transformer);
         if (filePayload)
         {

@@ -19,7 +19,7 @@ public class EjbEndpointTestCase extends AbstractMuleTestCase
 {
     public void testHostPortUrl() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("ejb://localhost:1099");
+        EndpointURI url = new MuleEndpointURI("ejb://localhost:1099", muleContext);
         url.initialise();
         assertEquals("ejb", url.getScheme());
         assertEquals("ejb://localhost:1099", url.getAddress());
@@ -32,7 +32,7 @@ public class EjbEndpointTestCase extends AbstractMuleTestCase
 
     public void testQueryParams1() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("ejb://localhost:1099/BeeShirtsejbServer?method=testMethod");
+        EndpointURI url = new MuleEndpointURI("ejb://localhost:1099/BeeShirtsejbServer?method=testMethod", muleContext);
         url.initialise();
         assertEquals("ejb", url.getScheme());
         assertEquals("ejb://localhost:1099", url.getAddress());
@@ -48,7 +48,7 @@ public class EjbEndpointTestCase extends AbstractMuleTestCase
     public void testQueryParams2() throws Exception
     {
         EndpointURI url = new MuleEndpointURI(
-            "ejb://localhost:1099/BeeShirtsejbServer?method=testMethod&endpointName=ejbProvider&blankParam=");
+            "ejb://localhost:1099/BeeShirtsejbServer?method=testMethod&endpointName=ejbProvider&blankParam=", muleContext);
         url.initialise();
         assertEquals("ejb", url.getScheme());
         assertEquals("ejb://localhost:1099", url.getAddress());

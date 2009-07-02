@@ -73,7 +73,7 @@ public class MuleInvoker implements Invoker
                 messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m);
             }
             
-            DefaultMuleMessage muleReq = new DefaultMuleMessage(messageAdapter);
+            DefaultMuleMessage muleReq = new DefaultMuleMessage(messageAdapter, receiver.getConnector().getMuleContext());
             
             if (bop != null)
             {

@@ -357,7 +357,7 @@ public class JmxAgent extends AbstractAgent
             rawName = ((Service) iterator.next()).getName();
             final String name = jmxSupport.escape(rawName);
             ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.Service,name=" + name);
-            ServiceServiceMBean serviceMBean = new ServiceService(rawName);
+            ServiceServiceMBean serviceMBean = new ServiceService(rawName, muleContext);
             logger.debug("Registering service with name: " + on);
             mBeanServer.registerMBean(serviceMBean, on);
         }

@@ -138,7 +138,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
             {
                 return null;
             }
-            return new DefaultMuleMessage(connector.getMessageAdapter(result), event.getMessage());
+            return new DefaultMuleMessage(connector.getMessageAdapter(result), event.getMessage(), connector.getMuleContext());
         }
         else
         {

@@ -36,7 +36,6 @@ import java.nio.channels.FileLock;
 import java.util.Comparator;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-
 import org.apache.commons.collections.comparators.ReverseComparator;
 
 /**
@@ -242,7 +241,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             // If we are streaming no need to move/delete now, that will be done when
             // stream is closed
-            this.routeMessage(new DefaultMuleMessage(msgAdapter), endpoint.isSynchronous());
+            this.routeMessage(new DefaultMuleMessage(msgAdapter, connector.getMuleContext()), endpoint.isSynchronous());
         }
     }
 
@@ -279,7 +278,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             }
 
             // finally deliver the file message
-            this.routeMessage(new DefaultMuleMessage(msgAdapter), endpoint.isSynchronous());
+            this.routeMessage(new DefaultMuleMessage(msgAdapter, connector.getMuleContext()), endpoint.isSynchronous());
 
             // at this point msgAdapter either points to the old sourceFile
             // or the new destinationFile.
@@ -313,7 +312,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
             // wrap exception & handle it
             Exception ex = new RoutingException(FileMessages.exceptionWhileProcessing(sourceFile.getName(),
-                (fileWasRolledBack ? "successful" : "unsuccessful")), new DefaultMuleMessage(msgAdapter), endpoint, e);
+                (fileWasRolledBack ? "successful" : "unsuccessful")), new DefaultMuleMessage(msgAdapter, connector.getMuleContext()), endpoint, e);
             this.handleException(ex);
         }
     }

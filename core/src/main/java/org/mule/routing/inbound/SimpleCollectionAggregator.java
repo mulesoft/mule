@@ -21,6 +21,6 @@ public class SimpleCollectionAggregator extends AbstractEventAggregator
 {
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
-        return new CollectionCorrelatorCallback();
+        return new CollectionCorrelatorCallback(muleContext);
     }
 }

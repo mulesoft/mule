@@ -27,7 +27,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testNullPayloadUsingAsync() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage reply = client.send("http://localhost:8990", new DefaultMuleMessage("test"));
+        MuleMessage reply = client.send("http://localhost:8990", new DefaultMuleMessage("test", muleContext));
 
         //TODO RM: What should really be returned when doing an async request?
         assertNotNull(reply.getPayload());
@@ -38,7 +38,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testPayloadIsNotEmptyNoRemoteSynch() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage reply = client.send("http://localhost:8999", new DefaultMuleMessage("test"));
+        MuleMessage reply = client.send("http://localhost:8999", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
         assertEquals("test", reply.getPayloadAsString());
@@ -47,7 +47,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testPayloadIsNotEmptyWithRemoteSynch() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage reply = client.send("http://localhost:8989", new DefaultMuleMessage("test"));
+        MuleMessage reply = client.send("http://localhost:8989", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
         assertEquals("test", reply.getPayloadAsString());

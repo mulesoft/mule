@@ -11,6 +11,7 @@
 package org.mule.transport.servlet.jetty;
 
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
@@ -25,9 +26,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.xml.XmlConfiguration;
 
@@ -80,11 +84,17 @@ public class JettyHttpConnector extends AbstractConnector
             setServletClass((useContinuations ? JettyContinuationsReceiverServlet.class :
                     JettyReceiverServlet.class));
         }
-        
-        ServletHandler handler = new ServletHandler();
-        holder = handler.addServletWithMapping(getServletClass(), "/*");
-        
-        httpServer.addHandler(handler);
+
+        Context root = new Context(httpServer,"/", Context.SESSIONS);
+        holder = root.addServlet(getServletClass(), "/*");
+        root.addEventListener(new ServletContextListener() {
+            public void contextInitialized(ServletContextEvent sce)
+            {
+                sce.getServletContext().setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
+            }
+
+            public void contextDestroyed(ServletContextEvent sce) { }
+        });
         
         if (configFile != null)
         {
@@ -271,7 +281,7 @@ public class JettyHttpConnector extends AbstractConnector
     {
         if (isUseContinuations())
         {
-            return new JettyContinuationsReplyToHandler(getDefaultResponseTransformers());
+            return new JettyContinuationsReplyToHandler(getDefaultResponseTransformers(), muleContext);
         }
         return super.getReplyToHandler();
     }

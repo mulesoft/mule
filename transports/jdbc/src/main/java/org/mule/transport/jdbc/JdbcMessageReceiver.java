@@ -113,7 +113,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         {
             con = this.connector.getConnection();
             MessageAdapter msgAdapter = this.connector.getMessageAdapter(message);
-            MuleMessage muleMessage = new DefaultMuleMessage(msgAdapter);
+            MuleMessage muleMessage = new DefaultMuleMessage(msgAdapter, connector.getMuleContext());
             if (this.ackStmt != null)
             {
                 if (aggregateResult)
@@ -125,7 +125,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                     for (int i = 0; i <  rows.size(); i++)
                     {
                         record = (HashMap) rows.get(i);
-                        paramValuesArray[i] = connector.getParams(endpoint, this.ackParams, new DefaultMuleMessage(record), this.endpoint.getEndpointURI().getAddress());
+                        paramValuesArray[i] = connector.getParams(endpoint, this.ackParams, new DefaultMuleMessage(record, connector.getMuleContext()), this.endpoint.getEndpointURI().getAddress());
                     }
                     if (logger.isDebugEnabled())
                     {

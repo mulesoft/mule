@@ -161,7 +161,7 @@ public class HttpServerConnection
             {
                 return null;
             }
-            return new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(this.in, encoding), this.in);
+            return new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(this.in, encoding), this.in, encoding);
         }
         catch (IOException e)
         {

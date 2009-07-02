@@ -42,6 +42,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleTestCase
         XQueryTransformer transformer = new XQueryTransformer();
         transformer.setReturnClass(String.class);
         transformer.setXqueryFile("cd-catalog.xquery");
+        transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;
     }

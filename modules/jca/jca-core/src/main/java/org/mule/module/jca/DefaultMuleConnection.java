@@ -65,7 +65,7 @@ public class DefaultMuleConnection implements MuleConnection
      */
     public void dispatch(String url, Object payload, Map messageProperties) throws MuleException
     {
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
+        MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
         MuleEvent event = getEvent(message, url, false);
         try
         {
@@ -98,7 +98,7 @@ public class DefaultMuleConnection implements MuleConnection
      */
     public MuleMessage send(String url, Object payload, Map messageProperties) throws MuleException
     {
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
+        MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
         MuleEvent event = getEvent(message, url, true);
 
         MuleMessage response;

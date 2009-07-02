@@ -27,7 +27,6 @@
 
 package org.mule.work;
 
-import org.mule.MuleServer;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
@@ -47,7 +46,6 @@ import javax.resource.spi.work.WorkListener;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -103,13 +101,12 @@ public class MuleWorkManager implements WorkManager
 
         this.threadingProfile = profile;
         this.name = name;
+        //URGENT TODO
+        gracefulShutdownTimeout = 5000; //config.getShutdownTimeout();
     }
 
     public synchronized void start() throws MuleException
     {
-        // TODO Set this value in constructor using MuleContext reference rather than
-        // from here using muleContext static
-        gracefulShutdownTimeout = MuleServer.getMuleContext().getConfiguration().getShutdownTimeout();
         
         if (workExecutorService == null)
         {

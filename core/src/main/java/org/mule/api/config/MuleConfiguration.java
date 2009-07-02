@@ -16,11 +16,6 @@ package org.mule.api.config;
  */
 public interface MuleConfiguration
 {
-    /**
-     * The prefix for any Mule-specific properties set in the system properties
-     */
-    String SYSTEM_PROPERTY_PREFIX = "mule.";
-
     boolean isDefaultSynchronousEndpoints();
 
     int getDefaultResponseTimeout();

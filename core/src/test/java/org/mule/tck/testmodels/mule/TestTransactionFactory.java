@@ -28,7 +28,7 @@ public class TestTransactionFactory implements TransactionFactory
 
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
-        return new TestTransaction();
+        return new TestTransaction(muleContext);
     }
 
     public boolean isTransacted()

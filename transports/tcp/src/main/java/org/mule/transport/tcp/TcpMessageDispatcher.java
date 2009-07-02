@@ -75,7 +75,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                         return (MuleMessage) result;
                     }
                     
-                    return new DefaultMuleMessage(connector.getMessageAdapter(result));
+                    return new DefaultMuleMessage(connector.getMessageAdapter(result), connector.getMuleContext());
                 }
                 catch (SocketTimeoutException e)
                 {

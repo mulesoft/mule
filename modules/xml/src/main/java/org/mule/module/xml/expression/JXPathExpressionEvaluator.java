@@ -72,7 +72,7 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator
             try
             {
                 //no support for namespaces
-                doc = XMLUtils.toDocument(payload);
+                doc = XMLUtils.toDocument(payload, muleContext);
 
             }
             catch (Exception e)

@@ -11,7 +11,6 @@
 package org.mule.transformers.simple;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.RegistryContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.expression.transformers.BeanBuilderTransformer;
@@ -36,7 +35,7 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
 
     public void testTransformerConfig() throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) RegistryContext.getRegistry().lookupTransformer("testTransformer");
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer");
         assertNotNull(transformer);
         assertNotNull(transformer.getArguments());
         assertEquals(2, transformer.getArguments().size());
@@ -54,7 +53,7 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
 
     public void testBeanBuilderTransformerConfig() throws Exception
     {
-        BeanBuilderTransformer transformer = (BeanBuilderTransformer) RegistryContext.getRegistry().lookupTransformer("testTransformer3");
+        BeanBuilderTransformer transformer = (BeanBuilderTransformer) muleContext.getRegistry().lookupTransformer("testTransformer3");
         assertNotNull(transformer);
         assertNotNull(transformer.getArguments());
         assertEquals(3, transformer.getArguments().size());
@@ -74,12 +73,12 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
 
     public void testExecutionWithCorrectMessage() throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) RegistryContext.getRegistry().lookupTransformer("testTransformer");
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer");
         Properties props = new Properties();
         props.setProperty("foo", "moo");
         props.setProperty("bar", "mar");
 
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props);
+        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props, muleContext);
 
         Object result = transformer.transform(message);
         assertNotNull(result);
@@ -96,11 +95,11 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
 
     public void testExecutionWithPartialMissingOptionalParams() throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) RegistryContext.getRegistry().lookupTransformer("testTransformer");
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer");
         Properties props = new Properties();
         props.setProperty("foo", "moo");
 
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props);
+        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props, muleContext);
 
         Object result = transformer.transform(message);
         assertNotNull(result);
@@ -117,10 +116,10 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
 
     public void testExecutionWithAllMissingOptionalParams() throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) RegistryContext.getRegistry().lookupTransformer("testTransformer");
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer");
         Properties props = new Properties();
 
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props);
+        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props, muleContext);
 
         Object result = transformer.transform(message);
         assertNotNull(result);
@@ -133,12 +132,12 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
 
     public void testTransformerConfigWithSingleArgument() throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) RegistryContext.getRegistry().lookupTransformer("testTransformer2");
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer2");
         Properties props = new Properties();
         props.setProperty("foo", "moo");
         props.setProperty("bar", "mar");
 
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props);
+        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props, muleContext);
 
         Object result = transformer.transform(message);
         assertNotNull(result);
@@ -151,11 +150,11 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
 
     public void testExecutionWithInCorrectMessage() throws Exception
     {
-        ExpressionTransformer transformer = (ExpressionTransformer) RegistryContext.getRegistry().lookupTransformer("testTransformer2");
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer2");
         Properties props = new Properties();
         props.setProperty("foo", "moo");
 
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props);
+        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props, muleContext);
 
         try
         {

@@ -9,18 +9,15 @@
  */
 package org.mule.transformers.xml.xquery;
 
-import org.mule.util.IOUtils;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.Transformer;
-import org.mule.transformer.AbstractTransformerTestCase;
-import org.mule.RequestContext;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.transformer.Transformer;
 import org.mule.module.xml.transformer.XQueryTransformer;
+import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.util.IOUtils;
 
-import java.util.Properties;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
@@ -75,7 +72,7 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
         Map props = new HashMap(2);
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
-        return new DefaultMuleMessage(srcData, props);
+        return new DefaultMuleMessage(srcData, props, muleContext);
     }
 
     public Object getResultData()

@@ -46,7 +46,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");
-        dispatcher.setWireFormat(new XStreamWireFormat());
+        dispatcher.setWireFormat(createObject(XStreamWireFormat.class));
 
         try
         {
@@ -68,7 +68,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");
-        dispatcher.setWireFormat(new XStreamWireFormat());
+        dispatcher.setWireFormat(createObject(XStreamWireFormat.class));
 
         try
         {

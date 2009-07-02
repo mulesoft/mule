@@ -62,10 +62,13 @@ public class FutureMessageResult extends FutureTask
     // @GuardedBy(this)
     private List transformers;
 
-    public FutureMessageResult(Callable callable)
+    protected MuleContext muleContext;
+
+    public FutureMessageResult(Callable callable, MuleContext muleContext)
     {
         super(callable);
         this.executor = DefaultExecutor;
+        this.muleContext = muleContext;
     }
 
     /**
@@ -123,7 +126,7 @@ public class FutureMessageResult extends FutureTask
             }
             else
             {
-                result = new DefaultMuleMessage(obj);
+                result = new DefaultMuleMessage(obj, muleContext);
             }
 
             synchronized (this)

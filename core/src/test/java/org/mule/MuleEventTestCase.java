@@ -188,8 +188,9 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
         Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
         assertNotNull(serialized);
-
-        MuleEvent deserialized = (MuleEvent) new ByteArrayToObject().transform(serialized);
+        ByteArrayToObject trans = new ByteArrayToObject();
+        trans.setMuleContext(muleContext);
+        MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
         
         // Assert that deserialized event is not null and has muleContext
         assertNotNull(deserialized);
@@ -231,12 +232,14 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         muleContext.dispose();
         muleContext = createMuleContext();
         muleContext.start();
+        ByteArrayToObject trans = new ByteArrayToObject();
+        trans.setMuleContext(muleContext);
 
         // Recreate and register artifacts (this would happen if using any kind of static config e.g. XML)
         createAndRegisterTransformersEndpointBuilderService();
 
         //Deserialize
-        MuleEvent deserialized = (MuleEvent) new ByteArrayToObject().transform(serialized);
+        MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
 
         // Assert that deserialized event is not null and has muleContext
         assertNotNull(deserialized);
@@ -284,12 +287,14 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         String password = "rulez";
         String url = "test://" + username + ":" + password + "@localhost";
         ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test", url);
+        ByteArrayToObject trans = new ByteArrayToObject();
+        trans.setMuleContext(muleContext);
 
         MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
         Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
         assertNotNull(serialized);
 
-        MuleEvent deserialized = (MuleEvent) new ByteArrayToObject().transform(serialized);
+        MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
         assertNotNull(deserialized);
         
         Credentials credentials = deserialized.getCredentials();

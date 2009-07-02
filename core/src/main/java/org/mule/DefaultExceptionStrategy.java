@@ -55,7 +55,7 @@ public class DefaultExceptionStrategy extends AbstractExceptionListener
         else
         {
             logger.info("There is no current event available, routing Null message with the exception");
-            handleMessagingException(new DefaultMuleMessage(NullPayload.getInstance()), t);
+            handleMessagingException(new DefaultMuleMessage(NullPayload.getInstance(), muleContext), t);
         }
     }
 

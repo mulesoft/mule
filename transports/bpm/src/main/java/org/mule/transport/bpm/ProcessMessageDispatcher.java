@@ -49,7 +49,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
 
         if (process != null)
         {
-            MuleMessage msg = new DefaultMuleMessage(process);
+            MuleMessage msg = new DefaultMuleMessage(process, connector.getMuleContext());
             msg.setProperty(ProcessConnector.PROPERTY_PROCESS_ID, connector.getBpms().getId(process));
             return msg;
         }

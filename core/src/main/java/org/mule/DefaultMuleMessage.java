@@ -11,6 +11,8 @@
 package org.mule;
 
 import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
@@ -26,6 +28,7 @@ import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.MessageAdapterSerialization;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
+import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +43,6 @@ import java.util.Set;
 import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,7 +51,7 @@ import org.apache.commons.logging.LogFactory;
  * associated with the payload.
  */
 
-public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
+public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
 {
     /** Serial version */
     private static final long serialVersionUID = 1541720810851984842L;
@@ -59,9 +61,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
     private transient MessageAdapter originalAdapter = null;
     private transient List<Integer> appliedTransformerHashCodes = new CopyOnWriteArrayList();
     private transient byte[] cache;
+    protected transient MuleContext muleContext;
     
     private static final List<Class> consumableClasses = new ArrayList<Class>();
-    
+
     static
     {
         try
@@ -87,13 +90,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         consumableClasses.add(OutputHandler.class);
     }
 
-    public DefaultMuleMessage(Object message)
+    public DefaultMuleMessage(Object message, MuleContext muleContext)
     {
-        this(message, (Map) null);
+        this(message, (Map)null, muleContext);
     }
 
-    public DefaultMuleMessage(Object message, Map properties)
+    public DefaultMuleMessage(Object message, Map properties, MuleContext muleContext)
     {
+        if(muleContext==null)
+        {
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("muleContext").getMessage());
+        }
+        this.muleContext = muleContext;
         //Explicitly check for MuleMessage as a safeguard since MuleMessage is instance of MessageAdapter
         if (message instanceof MuleMessage)
         {
@@ -112,8 +120,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
     }
 
 
-    public DefaultMuleMessage(Object message, MessageAdapter previous)
+    public DefaultMuleMessage(Object message, MessageAdapter previous, MuleContext muleContext)
     {
+        if(muleContext==null)
+        {
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("muleContext").getMessage());
+        }
+        this.muleContext = muleContext;
         if (message instanceof MessageAdapter)
         {
             adapter = (MessageAdapter) message;
@@ -146,12 +159,21 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         resetAccessControl();
     }
 
+    protected DefaultMuleMessage(DefaultMuleMessage message)
+    {
+        this(message.getPayload(), message.getAdapter(), message.getMuleContext());
+    }
+
     /** {@inheritDoc} */
     public Object getPayload(Class outputType) throws TransformerException
     {
         return getPayload(outputType, getEncoding());
     }
 
+    MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
     /**
      * Will attempt to obtain the payload of this message with the desired Class type. This will
      * try and resolve a trnsformr that can do this transformation. If a transformer cannot be found
@@ -165,7 +187,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
      * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
      *                              payload
      */
-    // TODO this encoding param is never used?
     protected Object getPayload(Class outputType, String encoding) throws TransformerException
     {
         //Handle null by ignoring the request
@@ -188,10 +209,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
             return getPayload();
         }
         //Grab a list of transformers that batch out input/output requirements
-        // List transformers = RegistryContext.getRegistry().lookupTransformers(inputCls, outputType);
+        // List transformers = muleContext.getRegistry().lookupTransformers(inputCls, outputType);
 
         //The transformer to execute on this message
-        Transformer transformer = MuleServer.getMuleContext().getRegistry().lookupTransformer(
+        Transformer transformer = muleContext.getRegistry().lookupTransformer(
             inputCls, outputType);
 
         //no transformers found
@@ -199,11 +220,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         {
             throw new TransformerException(CoreMessages.noTransformerFoundForMessage(inputCls, outputType));
         }
+        // Pass in the adapter itself
+        Object result = transformer.transform(this, encoding);
 
-        // Pass in the adapter itself, so we respect the encoding
-        Object result = transformer.transform(this);
-
-        //TODO Unless we disallow Object.class as a valid return type we need to do this extra check
+        // Unless we disallow Object.class as a valid return type we need to do this extra check
         if (!outputType.isAssignableFrom(result.getClass()))
         {
             throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(outputType.getName(), result.getClass()));
@@ -292,14 +312,14 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         adapter.setProperty(key, value);
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc}  */
     public final String getPayloadAsString() throws Exception
     {
         assertAccess(READ);
         return getPayloadAsString(getEncoding());
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc}  */
     public byte[] getPayloadAsBytes() throws Exception
     {
         assertAccess(READ);
@@ -308,7 +328,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
             return cache;
         }
         byte[] result = (byte[]) getPayload(byte[].class);
-        if (MuleServer.getMuleContext().getConfiguration().isCacheMessageAsBytes())
+        if (muleContext.getConfiguration().isCacheMessageAsBytes())
         {
             cache = result;
         }
@@ -323,8 +343,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         {
             return new String(cache, encoding);
         }
-        String result = (String) getPayload(String.class);
-        if (MuleServer.getMuleContext().getConfiguration().isCacheMessageAsBytes())
+        String result = (String) getPayload(String.class, encoding);
+        if (muleContext.getConfiguration().isCacheMessageAsBytes())
         {
             cache = result.getBytes(encoding);
         }
@@ -626,7 +646,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
                 {
                     Object result = transformer.transform(this);
 
-                    if (originalAdapter == null && MuleServer.getMuleContext().getConfiguration().isCacheMessageOriginalPayload())
+                    if (originalAdapter == null && muleContext.getConfiguration().isCacheMessageOriginalPayload())
                     {
                         originalAdapter = adapter;
                     }
@@ -670,7 +690,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         if (adapter instanceof ThreadSafeAccess)
         {
             logger.debug("new copy of message for " + Thread.currentThread());
-            return new DefaultMuleMessage(((ThreadSafeAccess) adapter).newThreadCopy(), this);
+            return new DefaultMuleMessage(((ThreadSafeAccess) adapter).newThreadCopy(), this, muleContext);
         }
         else
         {
@@ -819,4 +839,31 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
         // TODO implement me
     }
 
+    public static MuleMessage copy(MuleMessage message)
+    {
+        if(message instanceof DefaultMuleMessage)
+        {
+            return new DefaultMuleMessage((DefaultMuleMessage)message);
+        }
+        else
+        {
+            //Very unlikely to happen unless a user des something odd
+            throw new IllegalArgumentException("In order to clone a message it must be assignable from: " + DefaultMuleMessage.class.getName());
+        }
+    }
+
+    /**
+     * Invoked after deserialization. This is called when the marker interface {@link org.mule.util.store.DeserializationPostInitialisable}
+     * is used. This will get invoked after the object has been deserialized passing in the current mulecontext when using
+     * either {@link org.mule.transformer.wire.SerializationWireFormat}, {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat}, or
+     * the {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
+     *
+     * @param muleContext the current muleContext instance
+     * @throws MuleException if there is an error initializing
+     */
+    @SuppressWarnings("unused")
+    void initAfterDeserialisation(MuleContext muleContext) throws MuleException
+    {
+        this.muleContext = muleContext;
+    }
 }

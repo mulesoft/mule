@@ -283,7 +283,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
                 // important that we pull event from request context here as it may
                 // have been modified
                 // (necessary to avoid scribbling between threads)
-                result = new DefaultMuleMessage(NullPayload.getInstance(), RequestContext.getEvent().getMessage());
+                result = new DefaultMuleMessage(NullPayload.getInstance(), RequestContext.getEvent().getMessage(), muleContext);
             }
             ExceptionPayload exceptionPayload = result.getExceptionPayload();
             if (exceptionPayload == null)

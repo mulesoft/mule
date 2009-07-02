@@ -10,6 +10,7 @@
 
 package org.mule.transport.cxf;
 
+import org.mule.api.config.MuleProperties;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.servlet.MuleReceiverServlet;
 
@@ -17,12 +18,15 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
 
 public class WsdlCallTestCase extends FunctionalTestCase
 {
@@ -35,15 +39,19 @@ public class WsdlCallTestCase extends FunctionalTestCase
     {
         super.doSetUp();
         
-        httpServer = new Server();
-        SelectChannelConnector conn = new SelectChannelConnector();
-        conn.setPort(HTTP_PORT);
-        httpServer.addConnector(conn);
+        httpServer = new Server(HTTP_PORT);
 
-        ServletHandler handler = new ServletHandler();
-        handler.addServletWithMapping(MuleReceiverServlet.class, "/services/*");
-        httpServer.addHandler(handler);
-        
+        Context c = new Context(httpServer, "/", Context.SESSIONS);
+        c.addServlet(new ServletHolder(new MuleReceiverServlet()), "/services/*");
+        c.addEventListener(new ServletContextListener() {
+            public void contextInitialized(ServletContextEvent sce)
+            {
+                sce.getServletContext().setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
+            }
+
+            public void contextDestroyed(ServletContextEvent sce) { }
+        });
+
         httpServer.start();
     }
 

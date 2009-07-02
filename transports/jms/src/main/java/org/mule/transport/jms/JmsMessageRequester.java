@@ -140,7 +140,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
 
                 message = connector.preProcessMessage(message, session);
 
-                return new DefaultMuleMessage(connector.getMessageAdapter(message));
+                return new DefaultMuleMessage(connector.getMessageAdapter(message), connector.getMuleContext());
             }
             catch (Exception e)
             {

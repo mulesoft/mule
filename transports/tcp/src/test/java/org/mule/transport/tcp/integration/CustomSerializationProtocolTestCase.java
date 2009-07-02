@@ -29,7 +29,7 @@ public class CustomSerializationProtocolTestCase extends FunctionalTestCase
 
         for (int i = 0; i < messages; i++)
         {
-            client.dispatch("vm://in", new DefaultMuleMessage(message));
+            client.dispatch("vm://in", new DefaultMuleMessage(message, muleContext));
         }
 
         for (int i = 0; i < messages; i++)

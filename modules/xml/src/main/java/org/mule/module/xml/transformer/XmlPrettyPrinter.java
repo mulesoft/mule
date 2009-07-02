@@ -43,7 +43,7 @@ public class XmlPrettyPrinter extends AbstractTransformer
     {
         try
         {
-            Document document = XMLUtils.toDocument(src);
+            Document document = XMLUtils.toDocument(src, muleContext);
             if (document != null)
             {
                 ByteArrayOutputStream resultStream = new ByteArrayOutputStream();

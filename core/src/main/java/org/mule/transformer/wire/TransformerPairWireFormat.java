@@ -10,8 +10,9 @@
 
 package org.mule.transformer.wire;
 
-import org.mule.api.MuleException;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.wire.WireFormat;
@@ -27,7 +28,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO
+ * A pairing of an outbound transformer and an inbound transformer that can be used to serialize and deserialize data.
+ * THis is used when marshalling requests over the wire. IN Mule the MuleClient RemoteDispatcher uses wire formats to
+ * communicate with the server.
  */
 public class TransformerPairWireFormat implements WireFormat
 {
@@ -40,6 +43,14 @@ public class TransformerPairWireFormat implements WireFormat
     protected Transformer inboundTransformer;
     protected Transformer outboundTransformer;
     protected Class transferObjectClass;
+    protected MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+        inboundTransformer.setMuleContext(muleContext);
+        outboundTransformer.setMuleContext(muleContext);
+    }
 
     public Object read(InputStream in) throws MuleException
     {

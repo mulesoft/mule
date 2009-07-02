@@ -10,20 +10,23 @@
 
 package org.mule.module.xml.filters;
 
-import com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl;
-import junit.framework.TestCase;
 import org.mule.DefaultMuleMessage;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.mule.tck.AbstractMuleTestCase;
 
-import javax.xml.parsers.DocumentBuilderFactory;
+import com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl;
+
 import java.io.InputStream;
 import java.util.HashMap;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  * @author Ryan Heaton
  */
-public class XPathFilterTestCase extends TestCase
+public class XPathFilterTestCase extends AbstractMuleTestCase
 {
 
     /**
@@ -32,7 +35,7 @@ public class XPathFilterTestCase extends TestCase
     public void testAcceptMessage() throws Exception
     {
         final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        DefaultMuleMessage message = new DefaultMuleMessage(null);
+        DefaultMuleMessage message = new DefaultMuleMessage(null, muleContext);
         XPathFilter filter = new XPathFilter()
         {
             @Override

@@ -18,15 +18,15 @@ import org.mule.config.i18n.Message;
  */
 public class CorrelationTimeoutException  extends MessagingException
 {
-    public CorrelationTimeoutException(Message message, Object payload)
-    {
-        super(message, payload);
-    }
-
-    public CorrelationTimeoutException(Message message, Object payload, Throwable cause)
-    {
-        super(message, payload, cause);
-    }
+//    public CorrelationTimeoutException(Message message, Object payload)
+//    {
+//        super(message, payload);
+//    }
+//
+//    public CorrelationTimeoutException(Message message, Object payload, Throwable cause)
+//    {
+//        super(message, payload, cause);
+//    }
 
     public CorrelationTimeoutException(Message message, MuleMessage muleMessage)
     {

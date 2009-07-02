@@ -28,6 +28,7 @@ public interface QueuePersistenceStrategy
         String getQueue();
     }
 
+
     /**
      * Stores an object and returns its generated id.
      * 

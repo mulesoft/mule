@@ -10,7 +10,7 @@
 
 package org.mule.module.management.mbean;
 
-import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.service.Service;
@@ -47,8 +47,11 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
 
     private ServiceStatistics statistics;
 
-    public ServiceService(String name)
+    private MuleContext muleContext;
+
+    public ServiceService(String name, MuleContext muleContext)
     {
+        this.muleContext = muleContext;        
         this.name = name;
         this.statistics = getComponent().getStatistics();
 
@@ -186,7 +189,7 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
 
     private AbstractService getComponent()
     {
-        return (AbstractService)MuleServer.getMuleContext().getRegistry().lookupService(getName());
+        return (AbstractService)muleContext.getRegistry().lookupService(getName());
     }
 
     // ///// Service stats impl /////////

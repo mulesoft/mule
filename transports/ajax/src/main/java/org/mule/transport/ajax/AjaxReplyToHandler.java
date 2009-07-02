@@ -16,11 +16,10 @@ import org.mule.api.transformer.Transformer;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.ajax.container.AjaxServletConnector;
 
-import dojox.cometd.Channel;
-import dojox.cometd.Client;
-
 import java.util.List;
 
+import dojox.cometd.Channel;
+import dojox.cometd.Client;
 import org.mortbay.cometd.AbstractBayeux;
 
 /**
@@ -32,7 +31,7 @@ public class AjaxReplyToHandler extends DefaultReplyToHandler
     private AjaxServletConnector connector;
     public AjaxReplyToHandler(List<Transformer> transformers, AjaxServletConnector connector)
     {
-        super(transformers);
+        super(transformers, connector.getMuleContext());
         this.connector = connector;
     }
 

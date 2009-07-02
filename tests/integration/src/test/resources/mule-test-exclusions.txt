@@ -74,3 +74,5 @@ org.mule.security.MultiuserSecurityTestCase
 #No Jira, temporary exclusion because it passes locally but not on the build server
 org.mule.test.transformers.XQueryFunctionalTestCase
 
+org.mule.test.integration.work.GracefulShutdownTimeoutTestCase
+

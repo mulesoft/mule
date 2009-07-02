@@ -11,7 +11,9 @@
 package org.mule.transport.servlet;
 
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.config.ExceptionHelper;
@@ -21,7 +23,6 @@ import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 
 import java.io.IOException;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
@@ -59,6 +60,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     protected long timeout = DEFAULT_GET_TIMEOUT;
     protected boolean feedback = true;
     protected String defaultContentType = HttpConstants.DEFAULT_CONTENT_TYPE;
+    protected MuleContext muleContext;
 
     private MuleMessageToHttpResponse responseTransformer = new MuleMessageToHttpResponse();
 
@@ -115,6 +117,11 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         catch (InitialisationException e)
         {
             throw new ServletException(e);
+        }
+        muleContext = (MuleContext)getServletContext().getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
+        if(muleContext==null)
+        {
+            throw new ServletException("Property " + MuleProperties.MULE_CONTEXT_PROPERTY + " not set on ServletContext");
         }
         doInit();
     }

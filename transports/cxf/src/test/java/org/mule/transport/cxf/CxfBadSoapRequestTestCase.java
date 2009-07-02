@@ -42,7 +42,7 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
                              + "</soap:Body>" + "</soap:Envelope>";
 
         MuleMessage reply = client.send("http://localhost:63381/services/TestComponent", new DefaultMuleMessage(
-            soapRequest));
+            soapRequest, muleContext));
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

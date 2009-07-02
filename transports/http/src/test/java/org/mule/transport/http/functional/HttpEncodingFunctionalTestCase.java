@@ -35,9 +35,10 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         MuleMessage reply = client.send("clientEndpoint", TEST_MESSAGE, messageProperties);
         assertNotNull(reply);
         assertEquals("200", reply.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
-        assertEquals(TEST_MESSAGE + " Received", reply.getPayloadAsString());
         assertEquals("text/baz;charset=UTF-16BE", reply.getProperty(HttpConstants.HEADER_CONTENT_TYPE).toString());
         assertEquals("UTF-16BE", reply.getEncoding());
+        assertEquals(TEST_MESSAGE + " Received", reply.getPayloadAsString());
+
     }
 
     protected String getSendEncoding()

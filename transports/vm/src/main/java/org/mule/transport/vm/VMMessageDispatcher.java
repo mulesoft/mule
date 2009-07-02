@@ -53,7 +53,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         {
             QueueSession session = connector.getQueueSession();
             Queue queue = session.getQueue(endpointUri.getAddress());
-            queue.put(event.getMessage());
+            queue.put(event);
         }
         else
         {

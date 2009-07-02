@@ -50,14 +50,14 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
 
     public Transformer getTransformer() throws Exception
     {
-        XmlToDomDocument trans = new XmlToDomDocument();
+        XmlToDomDocument trans = createObject(XmlToDomDocument.class);
         trans.setReturnClass(org.w3c.dom.Document.class);
         return trans;
     }
 
     public Transformer getRoundTripTransformer() throws Exception
     {
-        DomDocumentToXml trans = new DomDocumentToXml();
+        DomDocumentToXml trans = createObject(DomDocumentToXml.class);
         trans.setReturnClass(String.class);
         return trans;
     }

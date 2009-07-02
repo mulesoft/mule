@@ -10,7 +10,7 @@
 
 package org.mule.transport.jms;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.MessageTypeNotSupportedException;
@@ -43,7 +43,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter implements Message
     private String jmsSpec;
     private Message jmsMessage;
 
-    public JmsMessageAdapter(Object message) throws MessagingException
+    public JmsMessageAdapter(Object message) throws MuleException
     {
         super();
         this.setMessage(message);
@@ -115,7 +115,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter implements Message
      * 
      * @param message the message received by the Mule endpoint in it's raw form.
      */
-    private void setMessage(Object message) throws MessagingException
+    private void setMessage(Object message) throws MuleException
     {
         Map props = new HashMap();
         if (message instanceof Message)

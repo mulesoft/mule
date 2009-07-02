@@ -19,7 +19,7 @@ public class FileEndpointTestCase extends AbstractMuleTestCase
 
     private EndpointURI newMuleEndpointURI(String text) throws Exception
     {
-        MuleEndpointURI uri = new MuleEndpointURI(text);
+        MuleEndpointURI uri = new MuleEndpointURI(text, muleContext);
         uri.initialise();
         return uri;
     }

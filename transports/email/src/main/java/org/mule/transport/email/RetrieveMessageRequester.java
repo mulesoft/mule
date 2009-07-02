@@ -152,7 +152,7 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
                     // so we don't get the same message again
                     flagMessage(folder, message);
 
-                    return new DefaultMuleMessage(castConnector().getMessageAdapter(message));
+                    return new DefaultMuleMessage(castConnector().getMessageAdapter(message), connector.getMuleContext());
                 }
                 else if (count == -1)
                 {

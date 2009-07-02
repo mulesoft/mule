@@ -11,8 +11,8 @@
 package org.mule.transport;
 
 import org.mule.DefaultExceptionStrategy;
+import org.mule.DefaultMuleMessage;
 import org.mule.MuleSessionHandler;
-import org.mule.RegistryContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -94,7 +94,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -1387,7 +1386,7 @@ public abstract class AbstractConnector
      */
     public ReplyToHandler getReplyToHandler()
     {
-        return new DefaultReplyToHandler(getDefaultResponseTransformers());
+        return new DefaultReplyToHandler(getDefaultResponseTransformers(), muleContext);
     }
 
     /**
@@ -2148,7 +2147,7 @@ public abstract class AbstractConnector
 
         org.mule.util.BeanUtils.populateWithoutFail(this, props, true);
 
-        setName(ObjectNameHelper.getConnectorName(this));
+        setName(new ObjectNameHelper(muleContext).getConnectorName(this));
         //initialise();
     }
 
@@ -2165,7 +2164,7 @@ public abstract class AbstractConnector
         try
         {
             serviceDescriptor = (TransportServiceDescriptor)
-                RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
+                muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
             if (serviceDescriptor == null)
             {
                 throw new ServiceException(CoreMessages.noServiceTransportDescriptor(getProtocol()));
@@ -2271,7 +2270,7 @@ public abstract class AbstractConnector
      *             supported
      * @see org.mule.api.transport.MessageAdapter
      */
-    public MessageAdapter getMessageAdapter(Object message) throws MessagingException
+    public MessageAdapter getMessageAdapter(Object message) throws MuleException
     {
         try
         {
@@ -2280,7 +2279,7 @@ public abstract class AbstractConnector
         catch (TransportServiceException e)
         {
             throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"),
-                message, e);
+                new DefaultMuleMessage(message, muleContext), e);
         }
     }
     
@@ -2294,7 +2293,7 @@ public abstract class AbstractConnector
         catch (TransportServiceException tse)
         {
             throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"),
-                message, tse);
+                new DefaultMuleMessage(message, muleContext), tse);
         }
     }
     

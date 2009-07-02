@@ -10,7 +10,7 @@
 
 package org.mule.transport.file;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.config.i18n.CoreMessages;
@@ -33,7 +33,7 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
 
     private byte[] contents = null;
 
-    public FileContentsMessageAdapter(Object message) throws MessagingException
+    public FileContentsMessageAdapter(Object message) throws MuleException
     {
         super(message);
         this.getPayload();

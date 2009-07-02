@@ -10,7 +10,7 @@
 
 package org.mule.transport.jms;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
 
@@ -22,7 +22,7 @@ import org.apache.commons.collections.IteratorUtils;
 
 public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {  
-    public MessageAdapter createAdapter(Object payload) throws MessagingException
+    public MessageAdapter createAdapter(Object payload) throws MuleException
     {
         return new JmsMessageAdapter(payload);
     }

@@ -9,19 +9,18 @@
  */
 package org.mule.test.integration.client;
 
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
-import org.mule.module.xml.transformer.wire.XStreamWireFormat;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.wire.WireFormat;
+import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.wire.SerializationWireFormat;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
 
 public class RemoteDispatcherSerializationTestCase extends AbstractMuleTestCase
 {
@@ -31,7 +30,7 @@ public class RemoteDispatcherSerializationTestCase extends AbstractMuleTestCase
         props.put("key1", "value1");
         Apple apple = new Apple();
         apple.wash();
-        RemoteDispatcherNotification n = new RemoteDispatcherNotification(new DefaultMuleMessage(apple, props), RemoteDispatcherNotification.ACTION_SEND, "vm://foo");
+        RemoteDispatcherNotification n = new RemoteDispatcherNotification(new DefaultMuleMessage(apple, props, muleContext), RemoteDispatcherNotification.ACTION_SEND, "vm://foo");
         n.setProperty("foo", "bar");
         return n;
     }

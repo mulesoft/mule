@@ -322,14 +322,14 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return (Service) registry.lookupObject(name);
     }
 
-    public Collection/*<Service>*/ lookupServices()
+    public Collection<Service> lookupServices()
     {
         return lookupObjects(Service.class);
     }
 
-    public Collection/*<Service>*/ lookupServices(String model)
+    public Collection<Service> lookupServices(String model)
     {
-        Collection/*<Service>*/ services = lookupServices();
+        Collection<Service> services = lookupServices();
         List modelServices = new ArrayList();
         Iterator it = services.iterator();
         Service service;
@@ -464,7 +464,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         {
             throw new ServiceException(CoreMessages.failedToLoad(type + " " + name));
         }
-        return ServiceDescriptorFactory.create(type, name, props, overrides, registry, null);
+        return ServiceDescriptorFactory.create(type, name, props, overrides, this, null);
     }
 
     public void registerAgent(Agent agent) throws MuleException

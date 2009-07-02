@@ -11,6 +11,7 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
@@ -20,9 +21,12 @@ import java.beans.ExceptionListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
 
 public class AxisServletWithSecurityTestCase extends FunctionalTestCase
 {
@@ -38,16 +42,19 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        httpServer = new Server();
-        SelectChannelConnector conn = new SelectChannelConnector();
-        conn.setPort(HTTP_PORT);
-        httpServer.addConnector(conn);
+        httpServer = new Server(HTTP_PORT);
 
-        ServletHandler handler = new ServletHandler();
-        handler.addServletWithMapping(MuleReceiverServlet.class, "/services/*");
-        
-        httpServer.addHandler(handler);
-        
+        Context c = new Context(httpServer, "/", Context.SESSIONS);
+        c.addServlet(new ServletHolder(new MuleReceiverServlet()), "/services/*");
+        c.addEventListener(new ServletContextListener() {
+            public void contextInitialized(ServletContextEvent sce)
+            {
+                sce.getServletContext().setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
+            }
+
+            public void contextDestroyed(ServletContextEvent sce) { }
+        });
+
         httpServer.start();
     }
 

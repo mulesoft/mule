@@ -24,6 +24,7 @@ public class VMTransaction extends AbstractSingleResourceTransaction
 
     public VMTransaction(MuleContext muleContext) throws TransactionException
     {
+        super(muleContext);
         QueueManager qm = muleContext.getQueueManager();
         QueueSession qs = qm.getQueueSession();
         bindResource(qm, qs);

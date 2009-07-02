@@ -37,7 +37,7 @@ public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
         byte[] fileContents = IOUtils.toByteArray(is);
 
         MuleClient client = new MuleClient();
-        MuleMessage result = client.send("http://localhost:8085", new DefaultMuleMessage(fileContents));
+        MuleMessage result = client.send("http://localhost:8085", new DefaultMuleMessage(fileContents, muleContext));
 
         XsltTransformer trans = new XsltTransformer();
         trans.setXslFile(NAME_STYLESHEET);

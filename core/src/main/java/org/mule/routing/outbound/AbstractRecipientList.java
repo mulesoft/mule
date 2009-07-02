@@ -11,7 +11,6 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.MuleServer;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -78,7 +77,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             // Make a copy of the message. Question is do we do a proper clone? in
             // which case there
             // would potentially be multiple messages with the same id...
-            request = new DefaultMuleMessage(message.getPayload(), message);
+            request = new DefaultMuleMessage(message.getPayload(), message, muleContext);
             endpoint = getRecipientEndpoint(request, recipient);
 
             boolean sync = (this.synchronous==null ? endpoint.isSynchronous() : this.synchronous.booleanValue());
@@ -99,7 +98,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             }
         }
 
-        return resultsHandler.aggregateResults(results, message);
+        return resultsHandler.aggregateResults(results, message, muleContext);
     }
 
     protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws RoutingException
@@ -143,7 +142,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
         if (null != endpoint)
         {
-            MuleServer.getMuleContext().getLifecycleManager().applyCompletedPhases(endpoint);
+            muleContext.getLifecycleManager().applyCompletedPhases(endpoint);
         }
         return endpoint;
     }

@@ -41,6 +41,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         ListMessageSplitter router = new ListMessageSplitter();
         router.setFilter(null);
         router.addEndpoint(endpoint);
+        router.setMuleContext(muleContext);
 
         List payload = new ArrayList();
         payload.add("one");
@@ -48,7 +49,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         payload.add("three");
         payload.add("four");
 
-        MuleMessage message = new DefaultMuleMessage(payload);
+        MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         MuleMessage result = router.route(message, session);
         assertNotNull(result);
@@ -70,6 +71,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
 
 
         ListMessageSplitter asyncSplitter = new ListMessageSplitter();
+        asyncSplitter.setMuleContext(muleContext);
         asyncSplitter.setDisableRoundRobin(true);
         asyncSplitter.setFilter(new PayloadTypeFilter(List.class));
         asyncSplitter.addEndpoint(endpoint1);
@@ -77,6 +79,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         asyncSplitter.addEndpoint(endpoint3);
 
         ListMessageSplitter syncSplitter = new ListMessageSplitter();
+        syncSplitter.setMuleContext(muleContext);
         syncSplitter.setDisableRoundRobin(true);
         syncSplitter.setFilter(new PayloadTypeFilter(List.class));
         syncSplitter.addEndpoint(endpoint4);
@@ -88,7 +91,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         payload.add(new Apple());
         payload.add(new Orange());
         payload.add(new String());
-        MuleMessage message = new DefaultMuleMessage(payload);
+        MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(asyncSplitter.isMatch(message));
         session.expectAndReturn("getService", getTestService());
@@ -102,7 +105,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         asyncSplitter.route(message, (MuleSession) session.proxy());
         session.verify();
 
-        message = new DefaultMuleMessage(payload);
+        message = new DefaultMuleMessage(payload, muleContext);
 
         session.expectAndReturn("getService", getTestService());
         session.expectAndReturn("getService", getTestService());

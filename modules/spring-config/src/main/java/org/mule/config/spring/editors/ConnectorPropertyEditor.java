@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.editors;
 
-import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 
@@ -23,10 +23,17 @@ import java.beans.PropertyEditorSupport;
  */
 public class ConnectorPropertyEditor extends PropertyEditorSupport
 {
+    private MuleContext muleContext;
+
+    public ConnectorPropertyEditor(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
+
     public void setAsText(String text)
     {
 
-        Connector connector = RegistryContext.getRegistry().lookupConnector(text);
+        Connector connector = muleContext.getRegistry().lookupConnector(text);
 
         if (connector == null)
         {

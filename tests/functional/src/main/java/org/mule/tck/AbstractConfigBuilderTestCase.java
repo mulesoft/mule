@@ -265,7 +265,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testPoolingConfig()
     {
 //        //TODO RM* test config
-//        PoolingProfile pp = RegistryContext.getConfiguration().getPoolingProfile();
+//        PoolingProfile pp = muleContext.getConfiguration().getPoolingProfile();
 //        assertEquals(10, pp.getMaxActive());
 //        assertEquals(5, pp.getMaxIdle());
 //        assertEquals(10001, pp.getMaxWait());
@@ -288,7 +288,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
 //        // test config
 //        //TODO RM*
-//        QueueProfile qp = RegistryContext.getConfiguration().getQueueProfile();
+//        QueueProfile qp = muleContext.getConfiguration().getQueueProfile();
 //        assertEquals(100, qp.getMaxOutstandingMessages());
 //        assertTrue(qp.isPersistent());
 

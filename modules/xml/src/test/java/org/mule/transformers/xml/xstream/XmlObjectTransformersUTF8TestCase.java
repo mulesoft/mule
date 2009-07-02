@@ -35,7 +35,7 @@ public class XmlObjectTransformersUTF8TestCase extends AbstractTransformerTestCa
 
     public Transformer getTransformer() throws Exception
     {
-        return new XmlToObject();
+        return createObject(XmlToObject.class);
     }
 
     public Transformer getRoundTripTransformer() throws Exception

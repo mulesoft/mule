@@ -79,7 +79,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
                 logger.debug("Uri after parsing is: " + uri);
             }
 
-            EndpointURI newUri = new MuleEndpointURI(uri);
+            EndpointURI newUri = new MuleEndpointURI(uri, muleContext);
 
             if (!newUri.getScheme().equalsIgnoreCase(ep.getEndpointURI().getScheme()))
             {
@@ -87,7 +87,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
                     ep.getEndpointURI().getScheme(), newUri.getScheme()), message, ep);
             }
 
-            ep = new DynamicURIOutboundEndpoint(ep, new MuleEndpointURI(uri));
+            ep = new DynamicURIOutboundEndpoint(ep, new MuleEndpointURI(uri, muleContext));
 
             if (ep.isSynchronous())
             {

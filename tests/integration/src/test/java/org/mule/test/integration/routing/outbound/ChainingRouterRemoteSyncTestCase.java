@@ -28,7 +28,7 @@ public class ChainingRouterRemoteSyncTestCase extends FunctionalTestCase
     {
 
         MuleClient muleClient = new MuleClient();
-        MuleMessage result = muleClient.send("vm://in", new DefaultMuleMessage("test"));
+        MuleMessage result = muleClient.send("vm://in", new DefaultMuleMessage("test", muleContext));
 
         assertNull("Shouldn't have any exceptions", result.getExceptionPayload());
         assertEquals("test [REMOTESYNC RESPONSE] [REMOTESYNC RESPONSE 2]", result.getPayloadAsString());

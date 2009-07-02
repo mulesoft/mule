@@ -24,7 +24,7 @@ public class WebServiceWrapperWithCxfTestCase extends FunctionalTestCase
     public void testWsCall() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage result = client.send("vm://testin", new DefaultMuleMessage(testString));
+        MuleMessage result = client.send("vm://testin", new DefaultMuleMessage(testString, muleContext));
         assertNotNull(result.getPayload());
         assertEquals("Payload", testString, result.getPayloadAsString());
     }

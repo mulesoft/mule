@@ -9,7 +9,6 @@
  */
 package org.mule.config.spring.processors;
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.config.PropertyFactory;
 import org.mule.api.context.MuleContextAware;
@@ -84,7 +83,7 @@ public class PropertyPlaceholderProcessor extends PropertyPlaceholderConfigurer 
             Object oval = super.get(key);
             if (oval == null)
             {
-                oval = RegistryContext.getRegistry().lookupObject(key);
+                oval = muleContext.getRegistry().lookupObject(key);
             }
             String sval = (oval instanceof String) ? (String)oval : null;
             return ((sval == null) && (defaults != null)) ? defaults.getProperty(key) : sval;

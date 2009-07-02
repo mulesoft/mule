@@ -58,13 +58,15 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
             }
         };
 
+        router.setMuleContext(muleContext);
+
         List endpoints = new ArrayList();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         endpoints.add(endpoint3);
         router.setEndpoints(endpoints);
 
-        MuleMessage message = new DefaultMuleMessage("test,mule,message");
+        MuleMessage message = new DefaultMuleMessage("test,mule,message", muleContext);
 
         assertTrue(router.isMatch(message));
         session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint1)));
@@ -80,7 +82,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         router.getEndpoints().clear();
         router.setEndpoints(endpoints);
 
-        message = new DefaultMuleMessage("test,mule,message");
+        message = new DefaultMuleMessage("test,mule,message", muleContext);
 
         session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint4)), message);
         session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint5)), message);

@@ -11,6 +11,7 @@
 package org.mule.transport.quartz;
 
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.ConnectorException;
 import org.mule.config.i18n.CoreMessages;
@@ -72,10 +73,11 @@ public class QuartzConnector extends AbstractConnector
                     quartzScheduler = StdSchedulerFactory.getDefaultScheduler();
                 }
             }
+            quartzScheduler.getContext().put(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);            
         }
         catch (Exception e)
         {
-            throw new InitialisationException(CoreMessages.initialisationFailure("Quartz provider"), e, this);
+            throw new InitialisationException(CoreMessages.initialisationFailure("Quartz conntector"), e, this);
         }
     }
 

@@ -60,7 +60,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         props.put("apple", "red");
         props.put(EndpointSelector.DEFAULT_SELECTOR_EXPRESSION, "dest3");
         props.put("banana", "yellow");
-        MuleMessage message = new DefaultMuleMessage("test event", props);
+        MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
 
         assertTrue(router.isMatch(message));
         session.expect("dispatchEvent", C.eq(message, dest3));
@@ -79,7 +79,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         props.put("apple", "red");
         props.put("wayOut", "dest2");
         props.put("banana", "yellow");
-        MuleMessage message = new DefaultMuleMessage("test event", props);
+        MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
 
         assertTrue(router.isMatch(message));
         session.expect("dispatchEvent", C.eq(message, dest2));
@@ -96,7 +96,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         {
             // this test used to fail at the router; it now fails earlier when the message is
             // constructed.  i don't think this is a problem.
-            MuleMessage message = new DefaultMuleMessage("test event", props);
+            MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
             router.route(message, (MuleSession) session.proxy());
             fail("Router should have thrown an exception if endpoint was not found.");
         }
@@ -109,7 +109,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     public void testSelectEndpointNoMatchUseDefault() throws Exception
     {
         Map props = new HashMap();
-        MuleMessage message = new DefaultMuleMessage("test event", props);
+        MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
         router.setDefaultEndpointName("dest3");
 
         assertTrue(router.isMatch(message));
@@ -120,7 +120,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
     public void testSelectEndpointNoPropertySet() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
 
         try
         {

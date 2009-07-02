@@ -9,13 +9,16 @@
  */
 package org.mule.example.notifications;
 
-import org.mule.security.AbstractEndpointSecurityFilter;
 import org.mule.api.MuleEvent;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.*;
+import org.mule.api.security.CryptoFailureException;
+import org.mule.api.security.EncryptionStrategyNotFoundException;
 import org.mule.api.security.SecurityException;
+import org.mule.api.security.SecurityProviderNotFoundException;
+import org.mule.api.security.UnauthorisedException;
+import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.security.AbstractEndpointSecurityFilter;
 
 import java.util.Map;
 

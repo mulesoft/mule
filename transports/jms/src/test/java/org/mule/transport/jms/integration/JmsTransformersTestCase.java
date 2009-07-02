@@ -21,10 +21,9 @@ import org.mule.util.compression.GZipCompression;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.HashMap;
 
 import javax.jms.BytesMessage;
 import javax.jms.MapMessage;
@@ -32,7 +31,6 @@ import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
-import javax.jms.Message;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Test;
@@ -81,12 +79,13 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         ObjectMessage oMsg = session.createObjectMessage();
         File f = FileUtils.newFile("/some/random/path");
         oMsg.setObject(f);
-        AbstractJmsTransformer trans = new JMSMessageToObject();
+        AbstractJmsTransformer trans = createObject(JMSMessageToObject.class);
         Object result = trans.transform(oMsg);
         assertTrue("Transformed object should be a File", result.getClass().equals(File.class));
 
         AbstractJmsTransformer trans2 = new SessionEnabledObjectToJMSMessage(session);
         trans2.setReturnClass(ObjectMessage.class);
+        initialiseObject(trans2);
         Object result2 = trans2.transform(f);
         assertTrue("Transformed object should be an object message", result2 instanceof ObjectMessage);
     }
@@ -100,12 +99,13 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         TextMessage tMsg = session.createTextMessage();
         tMsg.setText(text);
 
-        AbstractJmsTransformer trans = new JMSMessageToObject();
+        AbstractJmsTransformer trans = createObject(JMSMessageToObject.class);
         Object result = trans.transform(tMsg);
         assertTrue("Transformed object should be a string", text.equals(result.toString()));
 
         AbstractJmsTransformer trans2 = new SessionEnabledObjectToJMSMessage(session);
         trans2.setReturnClass(TextMessage.class);
+        initialiseObject(trans2);
         Object result2 = trans2.transform(text);
         assertTrue("Transformed object should be a TextMessage", result2 instanceof TextMessage);
     }
@@ -122,11 +122,12 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
         AbstractJmsTransformer trans = new SessionEnabledObjectToJMSMessage(session);
         trans.setReturnClass(MapMessage.class);
+        initialiseObject(trans);
         Object result2 = trans.transform(p);
         assertTrue("Transformed object should be a MapMessage", result2 instanceof MapMessage);
 
         MapMessage mMsg = (MapMessage) result2;
-        AbstractJmsTransformer trans2 = new JMSMessageToObject();
+        AbstractJmsTransformer trans2 = createObject(JMSMessageToObject.class);
         trans2.setReturnClass(Map.class);
         Object result = trans2.transform(mMsg);
         assertTrue("Transformed object should be a Map", result instanceof Map);
@@ -151,11 +152,12 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
         AbstractJmsTransformer trans = new SessionEnabledObjectToJMSMessage(session);
         trans.setReturnClass(ObjectMessage.class);
+        initialiseObject(trans);
         Object result2 = trans.transform(p);
         assertTrue("Transformed object should be a ObjectMessage", result2 instanceof ObjectMessage);
 
         ObjectMessage oMsg = (ObjectMessage) result2;
-        AbstractJmsTransformer trans2 = new JMSMessageToObject();
+        AbstractJmsTransformer trans2 = createObject(JMSMessageToObject.class);
         trans2.setReturnClass(Map.class);
         Object result = trans2.transform(oMsg);
         assertTrue("Transformed object should be a Map", result instanceof Map);
@@ -175,11 +177,12 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
         AbstractJmsTransformer trans = new SessionEnabledObjectToJMSMessage(session);
         trans.setReturnClass(BytesMessage.class);
+        initialiseObject(trans);
         String text = "This is a test BytesMessage";
         Object result2 = trans.transform(text.getBytes());
         assertTrue("Transformed object should be a BytesMessage", result2 instanceof BytesMessage);
 
-        AbstractJmsTransformer trans2 = new JMSMessageToObject();
+        AbstractJmsTransformer trans2 = createObject(JMSMessageToObject.class);
         trans2.setReturnClass(byte[].class);
         BytesMessage bMsg = (BytesMessage) result2;
         Object result = trans2.transform(bMsg);
@@ -207,7 +210,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         message.writeDouble(d);
         message.reset();
 
-        AbstractJmsTransformer trans = new JMSMessageToObject();
+        AbstractJmsTransformer trans = createObject(JMSMessageToObject.class);
         Object transformedObject = trans.transform(message);
         assertTrue("Transformed object should be a List", transformedObject instanceof List);
 
@@ -250,6 +253,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         // now create a BytesMessage from the compressed byte[]
         AbstractJmsTransformer trans = new SessionEnabledObjectToJMSMessage(session);
         trans.setReturnClass(BytesMessage.class);
+        initialiseObject(trans);
         Object result2 = trans.transform(compressedBytes);
         assertTrue("Transformed object should be a Bytes message", result2 instanceof BytesMessage);
 
@@ -266,7 +270,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
         // now test the other way around: getting the byte[] from a manually created
         // BytesMessage
-        AbstractJmsTransformer trans2 = new JMSMessageToObject();
+        AbstractJmsTransformer trans2 = createObject(JMSMessageToObject.class);
         trans2.setReturnClass(byte[].class);
         BytesMessage bMsg = session.createBytesMessage();
         bMsg.writeBytes(compressedBytes);

@@ -42,7 +42,7 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase
 
     public void testSingeResult() throws Exception
     {
-        final JXPathExtractor extractor = new JXPathExtractor();
+        final JXPathExtractor extractor = createObject(JXPathExtractor.class);
         final String expression = "/root/node";
         extractor.setExpression(expression);
         // just make code coverage tools happy
@@ -55,7 +55,7 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase
 
     public void testMultipleResults() throws Exception
     {
-        JXPathExtractor extractor = new JXPathExtractor();
+        JXPathExtractor extractor = createObject(JXPathExtractor.class);
         extractor.setExpression("/root/node");
         extractor.setSingleResult(false);
         final Object objResult = extractor.transform(TEST_XML_MULTI_RESULTS);
@@ -69,7 +69,7 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase
 
     public void testMultipleResultsAsNode() throws Exception
     {
-        JXPathExtractor extractor = new JXPathExtractor();
+        JXPathExtractor extractor = createObject(JXPathExtractor.class);
         extractor.setExpression("/root/node");
         extractor.setSingleResult(false);
         extractor.setOutputType(JXPathExtractor.OUTPUT_TYPE_NODE);
@@ -86,7 +86,7 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase
      */
     public void testMultipleResultsNested() throws Exception
     {
-        JXPathExtractor extractor = new JXPathExtractor();
+        JXPathExtractor extractor = createObject(JXPathExtractor.class);
         extractor.setExpression("/root/node[*]/*/text()");
         extractor.setSingleResult(false);
         final Object objResult = extractor.transform(TEST_XML_MULTI_NESTED_RESULTS);

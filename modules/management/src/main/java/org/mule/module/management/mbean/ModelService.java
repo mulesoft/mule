@@ -59,7 +59,7 @@ public class ModelService implements ModelServiceMBean
 //
 //    public void unregisterComponent(String name) throws MuleException
 //    {
-//        RegistryContext.getRegistry().unregisterService(name);
+//        muleContext.getRegistry().unregisterService(name);
 //        //model.unregisterComponent(model.getDescriptor(name));
 //    }
 //
@@ -70,7 +70,7 @@ public class ModelService implements ModelServiceMBean
 //
 //    public UMODescriptor getComponentDescriptor(String name)
 //    {
-//        return RegistryContext.getRegistry().lookupService(name);
+//        return muleContext.getRegistry().lookupService(name);
 //
 //        //return model.getDescriptor(name);
 //    }

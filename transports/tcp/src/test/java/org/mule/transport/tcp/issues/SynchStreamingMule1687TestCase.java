@@ -33,7 +33,7 @@ public class SynchStreamingMule1687TestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         MuleMessage message = client.send("tcp://localhost:65432",
-            new DefaultMuleMessage(new DefaultMessageAdapter(new ByteArrayInputStream(TEST_MESSAGE.getBytes()))));
+            new DefaultMuleMessage(new DefaultMessageAdapter(new ByteArrayInputStream(TEST_MESSAGE.getBytes())), muleContext));
         assertNotNull(message);
 
         Object payload = message.getPayload();

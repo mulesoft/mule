@@ -25,7 +25,7 @@ import org.apache.axis.client.Transport;
 public class MuleTransport extends Transport
 {
 
-    private static Map transports = null;
+    private static Map<String, Class> transports = null;
 
     public MuleTransport()
     {
@@ -39,7 +39,7 @@ public class MuleTransport extends Transport
 
     private static void initTransports()
     {
-        transports = new HashMap();
+        transports = new HashMap<String, Class>();
         transports.put("http", HTTP.class);
         transports.put("https", HTTPS.class);
         transports.put("servlet", SERVLET.class);
@@ -73,7 +73,7 @@ public class MuleTransport extends Transport
             throw new DefaultMuleException(
                 CoreMessages.schemeNotCompatibleWithConnector(protocol, AxisConnector.class));
         }
-        return (Class)transports.get(protocol);
+        return transports.get(protocol);
     }
 
     public static boolean isTransportSupported(String protocol)

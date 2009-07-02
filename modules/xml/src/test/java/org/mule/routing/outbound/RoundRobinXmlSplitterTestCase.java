@@ -58,6 +58,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         asyncXmlSplitter = new XmlMessageSplitter();
         asyncXmlSplitter.setValidateSchema(true);
         asyncXmlSplitter.setExternalSchemaLocation("purchase-order.xsd");
+        asyncXmlSplitter.setMuleContext(muleContext);
 
         // The xml document declares a default namespace, thus
         // we need to workaround it by specifying it both in
@@ -72,6 +73,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
 
         // setup sync splitter
         syncXmlSplitter = new XmlMessageSplitter();
+        syncXmlSplitter.setMuleContext(muleContext);
         syncXmlSplitter.setValidateSchema(true);
         syncXmlSplitter.setExternalSchemaLocation("purchase-order.xsd");
         syncXmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
@@ -106,7 +108,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getService", getTestService());
 
-        MuleMessage message = new DefaultMuleMessage(payload);
+        MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(asyncXmlSplitter.isMatch(message));
         final RoundRobinXmlSplitterTestCase.ItemNodeConstraint itemNodeConstraint = new RoundRobinXmlSplitterTestCase.ItemNodeConstraint();
@@ -117,7 +119,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         asyncXmlSplitter.route(message, (MuleSession) session.proxy());
         session.verify();
 
-        message = new DefaultMuleMessage(payload);
+        message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(syncXmlSplitter.isMatch(message));
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint4)), message);
@@ -140,10 +142,10 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         XmlMessageSplitter splitter = new XmlMessageSplitter();
         splitter.setValidateSchema(true);
         splitter.setExternalSchemaLocation(invalidSchemaLocation);
-
+        splitter.setMuleContext(muleContext);
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
 
-        MuleMessage message = new DefaultMuleMessage(payload);
+        MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(splitter.isMatch(message));
         try
@@ -166,8 +168,8 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         session.matchAndReturn("getService", getTestService());
 
         XmlMessageSplitter splitter = new XmlMessageSplitter();
-
-        MuleMessage message = new DefaultMuleMessage("This is not XML.");
+        splitter.setMuleContext(muleContext);      
+        MuleMessage message = new DefaultMuleMessage("This is not XML.", muleContext);
 
         try
         {

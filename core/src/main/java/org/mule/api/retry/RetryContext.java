@@ -10,6 +10,7 @@
 
 package org.mule.api.retry;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 
 import java.util.Map;
@@ -40,6 +41,8 @@ public interface RetryContext
     void addReturnMessage(MuleMessage result);
 
     String getDescription();
+
+    MuleContext getMuleContext();
 
     /**
      * The most recent failure which prevented the context from validating the connection. Note that the method may

@@ -10,16 +10,17 @@
 
 package org.mule.test.spring;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
+import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
-import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.MuleMessage;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.outbound.AbstractOutboundRouter;
@@ -27,10 +28,9 @@ import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.DefaultMuleMessage;
 
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,7 +81,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         Map props = new HashMap();
         props.put("id", "myID123");
         props.put("correlation", "myCorrelationID456");
-        MuleMessage msg = new DefaultMuleMessage("foo", props);
+        MuleMessage msg = new DefaultMuleMessage("foo", props, muleContext);
         assertEquals("myID123",mapping.getMessageId(msg));
         assertEquals("myCorrelationID456",mapping.getCorrelationId(msg));
     }

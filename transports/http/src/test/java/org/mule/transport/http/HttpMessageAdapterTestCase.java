@@ -10,7 +10,7 @@
 
 package org.mule.transport.http;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
 
@@ -24,7 +24,7 @@ public class HttpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         return message;
     }
 
-    public MessageAdapter createAdapter(Object payload) throws MessagingException
+    public MessageAdapter createAdapter(Object payload) throws MuleException
     {
         return new HttpMessageAdapter(payload);
     }

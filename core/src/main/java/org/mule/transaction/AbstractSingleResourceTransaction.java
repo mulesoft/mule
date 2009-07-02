@@ -10,6 +10,7 @@
 
 package org.mule.transaction;
 
+import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 
@@ -60,6 +61,11 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
         }
 
         txStatusMappings = Collections.unmodifiableMap(txStatusMappings);
+    }
+
+    protected AbstractSingleResourceTransaction(MuleContext muleContext)
+    {
+        super(muleContext);
     }
 
     public void begin() throws TransactionException

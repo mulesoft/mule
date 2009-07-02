@@ -44,7 +44,7 @@ public class XmlPrettyPrinterTransformerTestCase extends AbstractTransformerTest
 
     public Transformer getTransformer() throws Exception
     {
-        return new XmlPrettyPrinter();
+        return createObject(XmlPrettyPrinter.class);
     }
 
     public void testOutputOptions()

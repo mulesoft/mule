@@ -32,7 +32,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        message = new DefaultMuleMessage("test");
+        message = new DefaultMuleMessage("test", muleContext);
 
         try
         {

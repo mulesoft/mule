@@ -26,7 +26,7 @@ public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
          * verifies that it gets received.
          */
         MuleClient myClient;
-        DefaultMuleMessage myMessage = new DefaultMuleMessage("Mule is the best!");
+        DefaultMuleMessage myMessage = new DefaultMuleMessage("Mule is the best!", muleContext);
         MuleMessage response = null;
 
         try
@@ -53,7 +53,7 @@ public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
          * verifies that it does not get received.
          */
         MuleClient myClient;
-        DefaultMuleMessage myMessage = new DefaultMuleMessage(new Object());
+        DefaultMuleMessage myMessage = new DefaultMuleMessage(new Object(), muleContext);
         MuleMessage response = null;
 
         try

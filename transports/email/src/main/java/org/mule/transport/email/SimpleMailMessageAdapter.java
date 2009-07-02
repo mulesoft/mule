@@ -10,7 +10,8 @@
 
 package org.mule.transport.email;
 
-import org.mule.api.MessagingException;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.config.i18n.CoreMessages;
@@ -60,7 +61,7 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
     private Part message;
     private byte[] cache = null;
 
-    public SimpleMailMessageAdapter(Object object) throws MessagingException
+    public SimpleMailMessageAdapter(Object object) throws MuleException
     {
         Message message = assertMessageType(object);
 
@@ -71,7 +72,7 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
         }
         catch (Exception e)
         {
-            throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"), e);
+            throw new DefaultMuleException(CoreMessages.failedToCreate("Message Adapter"), e);
         }
     }
 

@@ -22,7 +22,7 @@ public class FunctionExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
     public void testFunctions() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(new Apple());
+        MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
         FunctionExpressionEvaluator extractor = new FunctionExpressionEvaluator();
         Object o = extractor.evaluate("uuid", message);
         assertNotNull(o);
@@ -63,7 +63,7 @@ public class FunctionExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testFunctionsFromExtractorManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(new Apple());
+        MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
         Object o = muleContext.getExpressionManager().evaluate("function:uuid", message);
         assertNotNull(o);
         o = muleContext.getExpressionManager().evaluate("function:now", message);

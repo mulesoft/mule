@@ -21,7 +21,7 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
 {
     public void testManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test", (Map) null);
+        MuleMessage message = new DefaultMuleMessage("test", (Map) null, muleContext);
         Object o = muleContext.getExpressionManager().evaluate("function:uuid", message);
         assertNotNull(o);
         o = muleContext.getExpressionManager().evaluate("function:now", message);
@@ -73,7 +73,7 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
 
     public void testParsing()
     {
-        MuleMessage msg = new DefaultMuleMessage("test", Collections.emptyMap());
+        MuleMessage msg = new DefaultMuleMessage("test", Collections.emptyMap(), muleContext);
         msg.setProperty("user", "vasya");
         msg.setProperty("password", "pupkin");
         msg.setProperty("host", "example.com");

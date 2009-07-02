@@ -33,7 +33,7 @@ public class DispatchTestCase extends FunctionalTestCase
         }
         
         client.send("http://localhost:63081/services/Echo", 
-            new DefaultMuleMessage(new ByteArrayInputStream(buf)));
+            new DefaultMuleMessage(new ByteArrayInputStream(buf), muleContext));
 
         for (int t = 0; t < 10; t++)
         {
@@ -48,7 +48,7 @@ public class DispatchTestCase extends FunctionalTestCase
                         for (int i = 0; i < 20; i++) 
                         {
                                 client.dispatch("http://localhost:63081/services/Echo", 
-                                    new DefaultMuleMessage(buf),
+                                    new DefaultMuleMessage(buf, muleContext),
                                     props);
                             
                         }

@@ -33,7 +33,8 @@ public class ExceptionRollbackTestCase extends AbstractMuleTestCase
         strategy.setCommitTxFilter(new WildcardFilter("java.io.*"));
         strategy.setRollbackTxFilter(new WildcardFilter("org.mule.*, javax.*"));
 
-        tx = new TestTransaction();
+        initialiseObject(strategy);
+        tx = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(tx);
     }
 

@@ -10,7 +10,6 @@
 
 package org.mule.transport.file;
 
-import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -528,7 +527,7 @@ public class FileConnector extends AbstractConnector
         this.streaming = streaming;
     }
 
-    public MessageAdapter getMessageAdapter(Object message) throws MessagingException
+    public MessageAdapter getMessageAdapter(Object message) throws MuleException
     {
         if (isStreaming())
         {

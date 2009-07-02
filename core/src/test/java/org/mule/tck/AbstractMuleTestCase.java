@@ -16,12 +16,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
@@ -778,5 +778,53 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     protected boolean isGracefulShutdown()
     {
         return false;
+    }
+
+    /**
+     * Create an object of instance <code>clazz</code>. It will then register the object with the registry so that any
+     * dependencies are injected and then the object will be initialised.
+     * Note that if the object needs to be configured with additional state that cannot be passed into the constructor you should
+     * create an instance first set any additional data on the object then call {@link #initialiseObject(Object)}.
+     *
+     * @param clazz the class to create an instance of.
+     * @param <T> Object of this type will be returned
+     * @return an initialised instance of <code>class</code>
+     * @throws Exception if there is a problem creating or initializing the object
+     */
+    protected <T extends Object> T createObject(Class<T> clazz) throws Exception
+    {
+        return createObject(clazz, ClassUtils.NO_ARGS);
+    }
+
+    /**
+     * Create an object of instance <code>clazz</code>. It will then register the object with the registry so that any
+     * dependencies are injected and then the object will be initialised.
+     * Note that if the object needs to be configured with additional state that cannot be passed into the constructor you should
+     * create an instance first set any additional data on the object then call {@link #initialiseObject(Object)}.
+     *
+     * @param clazz the class to create an instance of.
+     * @param args constructor parameters
+     * @param <T> Object of this type will be returned
+     * @return an initialised instance of <code>class</code>
+     * @throws Exception if there is a problem creating or initializing the object
+     */
+    protected <T extends Object> T createObject(Class<T> clazz, Object... args) throws Exception
+    {
+        if(args==null) args = ClassUtils.NO_ARGS;
+        Object o = ClassUtils.instanciateClass(clazz, args);
+        muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
+        return (T)o;
+    }
+
+    /**
+     * A convenience method that will register an object in the registry using its hashcode as the key.  This will cause the object
+     * to have any objects injected and lifecycle methods called.  Note that the object lifecycle will be called to the same current
+     * lifecycle as the MuleContext
+     * @param o the object to register and initialise it
+     * @throws RegistrationException
+     */
+    protected void initialiseObject(Object o) throws RegistrationException
+    {
+        muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
     }
 }

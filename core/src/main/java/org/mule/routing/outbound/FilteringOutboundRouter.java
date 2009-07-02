@@ -184,7 +184,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 
             try
             {
-                EndpointURI newUri = new MuleEndpointURI(newUriString);
+                EndpointURI newUri = new MuleEndpointURI(newUriString, muleContext);
                 if (!newUri.getScheme().equalsIgnoreCase(ep.getEndpointURI().getScheme()))
                 {
                     throw new CouldNotRouteOutboundMessageException(CoreMessages.schemeCannotChangeForRouter(

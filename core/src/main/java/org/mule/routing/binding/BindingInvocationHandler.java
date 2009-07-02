@@ -12,6 +12,7 @@ package org.mule.routing.binding;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -26,7 +27,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,7 +39,8 @@ public class BindingInvocationHandler implements InvocationHandler
 
     protected Map<String, InterfaceBinding> routers = null;
 
-    @SuppressWarnings("unchecked")
+    protected MuleContext muleContext;
+
     public BindingInvocationHandler(InterfaceBinding router)
     {
         routers = new ConcurrentHashMap();
@@ -63,6 +64,7 @@ public class BindingInvocationHandler implements InvocationHandler
         {
             routers.put(router.getMethod(), router);
         }
+        muleContext = router.getEndpoint().getConnector().getMuleContext();
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
@@ -75,15 +77,15 @@ public class BindingInvocationHandler implements InvocationHandler
         MuleMessage message;
         if (args == null)
         {
-            message = new DefaultMuleMessage(NullPayload.getInstance());
+            message = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
         }
         else if (args.length == 1)
         {
-            message = new DefaultMuleMessage(args[0]);
+            message = new DefaultMuleMessage(args[0], muleContext);
         }
         else
         {
-            message = new DefaultMuleMessage(args);
+            message = new DefaultMuleMessage(args, muleContext);
         }
 
         // Some transports such as Axis, RMI and EJB can use the method information

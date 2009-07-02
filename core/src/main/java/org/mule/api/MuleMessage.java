@@ -80,7 +80,7 @@ public interface MuleMessage extends MessageAdapter
      * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
      * payload
      */
-    Object getPayload(Class outputType) throws TransformerException;
+    <T extends Object>T getPayload(Class<T> outputType) throws TransformerException;
 
     /**
      * Converts the message implementation into a String representation
@@ -98,6 +98,7 @@ public interface MuleMessage extends MessageAdapter
      *
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
+     *
      */
     String getPayloadAsString() throws Exception;
 
@@ -106,6 +107,7 @@ public interface MuleMessage extends MessageAdapter
      *
      * @return byte array of the message
      * @throws Exception Implemetation may throw an endpoint specific exception
+     *
      */
     byte[] getPayloadAsBytes() throws Exception;
 

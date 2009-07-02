@@ -51,7 +51,7 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
         //Get parameter values from message
         MuleMessage message = event.getMessage();
         Object[] paramValues = connector.getParams(endpoint, paramNames, new DefaultMuleMessage(
-            event.transformMessage(), message), endpoint.getEndpointURI().getAddress());
+            event.transformMessage(), message, event.getMuleContext()), endpoint.getEndpointURI().getAddress());
 
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         Connection con = null;

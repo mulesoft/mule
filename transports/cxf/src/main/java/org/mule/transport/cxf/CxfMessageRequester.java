@@ -86,11 +86,11 @@ public class CxfMessageRequester extends AbstractMessageRequester
 
         if (response != null && response.length == 1)
         {
-            return new DefaultMuleMessage(response[0]);
+            return new DefaultMuleMessage(response[0], connector.getMuleContext());
         }
         else
         {
-            return new DefaultMuleMessage(response);
+            return new DefaultMuleMessage(response, connector.getMuleContext());
         }
     }
 

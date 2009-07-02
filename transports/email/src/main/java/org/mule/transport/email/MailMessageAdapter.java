@@ -10,7 +10,7 @@
 
 package org.mule.transport.email;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.transport.AbstractMessageAdapter;
 
 import java.util.Enumeration;
@@ -37,7 +37,7 @@ public class MailMessageAdapter extends SimpleMailMessageAdapter
     private static final long serialVersionUID = -6013198455030918360L;
     public static final String ATTACHMENT_HEADERS_PROPERTY_POSTFIX = "Headers";
 
-    public MailMessageAdapter(Object object) throws MessagingException
+    public MailMessageAdapter(Object object) throws MuleException
     {
         super(object);
     }

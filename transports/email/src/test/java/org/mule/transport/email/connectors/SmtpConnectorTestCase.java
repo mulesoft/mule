@@ -22,8 +22,8 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
-import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.SmtpConnector;
 
@@ -94,7 +94,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         ((OutboundPassThroughRouter) service.getOutboundRouter().getRouters().get(0)).addEndpoint(endpoint);
         //muleContext.getRegistry().registerComponent(service);
 
-        MuleMessage message = new DefaultMuleMessage(MESSAGE);
+        MuleMessage message = new DefaultMuleMessage(MESSAGE, muleContext);
         message.setStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);
         MuleSession session = getTestSession(getTestService("apple", Apple.class), muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, true, new ResponseOutputStream(System.out));

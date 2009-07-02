@@ -15,8 +15,8 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.InboundRouter;
-import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.MessageInfoMapping;
+import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -64,7 +64,7 @@ public class SelectiveConsumer extends AbstractRouter implements InboundRouter
             try
             {
                 Object payload = event.transformMessage();
-                message = new DefaultMuleMessage(payload, message);
+                message = new DefaultMuleMessage(payload, message, muleContext);
             }
             catch (TransformerException e)
             {

@@ -144,7 +144,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        MuleMessage message = new DefaultMuleMessage(payload);
+        MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(asyncXmlSplitter.isMatch(message));
         final ItemNodeConstraint itemNodeConstraint = new ItemNodeConstraint();
@@ -155,7 +155,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         asyncXmlSplitter.route(message, (MuleSession) session.proxy());
         session.verify();
 
-        message = new DefaultMuleMessage(payload);
+        message = new DefaultMuleMessage(payload, muleContext);
 
         session.expectAndReturn("getService", getTestService());
         session.expectAndReturn("getService", getTestService());
@@ -181,7 +181,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
 
-        MuleMessage message = new DefaultMuleMessage(payload);
+        MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(splitter.isMatch(message));
         try
@@ -204,7 +204,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         XmlMessageSplitter splitter = new XmlMessageSplitter();
 
-        MuleMessage message = new DefaultMuleMessage(new Exception());
+        MuleMessage message = new DefaultMuleMessage(new Exception(), muleContext);
 
         try
         {
@@ -225,7 +225,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         XmlMessageSplitter splitter = new XmlMessageSplitter();
 
-        MuleMessage message = new DefaultMuleMessage("This is not XML.");
+        MuleMessage message = new DefaultMuleMessage("This is not XML.", muleContext);
 
         try
         {

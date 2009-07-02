@@ -10,9 +10,6 @@
 
 package org.mule.module.xml.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -24,6 +21,8 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -154,7 +153,7 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
         Document dom4jDoc;
         try
         {
-            dom4jDoc = XMLUtils.toDocument(obj);
+            dom4jDoc = XMLUtils.toDocument(obj, muleContext);
         }
         catch (Exception e)
         {

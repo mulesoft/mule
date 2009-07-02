@@ -36,7 +36,7 @@ public class EventObjectTransformer extends AbstractEventTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        return new DefaultMuleMessage(((EventObject)src).getSource());
+        return new DefaultMuleMessage(((EventObject)src).getSource(), muleContext);
     }
 
 }

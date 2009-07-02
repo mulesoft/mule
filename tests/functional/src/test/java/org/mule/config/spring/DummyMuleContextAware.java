@@ -47,6 +47,11 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
         return false;
     }
 
+    public Object transform(Object src, String encoding) throws TransformerException
+    {
+        return null; 
+    }
+
     public Object transform(Object src) throws TransformerException
     {
         return null;

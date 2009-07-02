@@ -104,7 +104,7 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
         for (Iterator iterator = payloads.iterator(); iterator.hasNext();)
         {
             Object payload = iterator.next();
-            MuleMessage part = new DefaultMuleMessage(payload, props);
+            MuleMessage part = new DefaultMuleMessage(payload, props, muleContext);
             boolean matchFound = false;
             OutboundEndpoint endpoint;
             // If there is no filter assume that the endpoint can accept the

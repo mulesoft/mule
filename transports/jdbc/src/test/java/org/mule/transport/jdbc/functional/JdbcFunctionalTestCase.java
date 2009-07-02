@@ -50,7 +50,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient();
-        client.send("jdbc://writeTest?type=2", new DefaultMuleMessage(DEFAULT_MESSAGE));
+        client.send("jdbc://writeTest?type=2", new DefaultMuleMessage(DEFAULT_MESSAGE, muleContext));
 
         QueryRunner qr = jdbcConnector.getQueryRunner();
         Object[] obj2 = 
@@ -65,7 +65,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
         MuleClient client = new MuleClient();
         Map map = new HashMap();
         map.put("data", DEFAULT_MESSAGE);
-        client.send("jdbc://writeMap?type=2", new DefaultMuleMessage(map));
+        client.send("jdbc://writeMap?type=2", new DefaultMuleMessage(map, muleContext));
 
         QueryRunner qr = jdbcConnector.getQueryRunner();
         Object[] obj2 = 

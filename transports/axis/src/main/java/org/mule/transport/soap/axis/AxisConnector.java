@@ -646,7 +646,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
                     for (Iterator iterator = servletServices.iterator(); iterator.hasNext();)
                     {
                         SOAPService service = (SOAPService) iterator.next();
-                        ServletConnector servletConnector = (ServletConnector) TransportFactory.getConnectorByProtocol("servlet");
+                        ServletConnector servletConnector = (ServletConnector) new TransportFactory(muleContext).getConnectorByProtocol("servlet");
                         String url = servletConnector.getServletUrl();
                         if (url != null)
                         {

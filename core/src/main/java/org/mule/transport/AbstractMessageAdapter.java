@@ -11,9 +11,7 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.MuleServer;
 import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
@@ -22,7 +20,6 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.UniqueIdNotSupportedException;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.CharSetUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
@@ -39,7 +36,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -516,15 +512,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
         }
         else
         {
-            MuleContext muleContext = MuleServer.getMuleContext();
-            if (muleContext != null)
-            {
-                return muleContext.getConfiguration().getDefaultEncoding();
-            }
-            else
-            {
-                return CharSetUtils.defaultCharsetName();
-            }
+            return System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
         }
     }
 

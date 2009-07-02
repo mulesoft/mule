@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.StartException;
 import org.mule.api.lifecycle.StopException;
 import org.mule.api.service.Service;
@@ -53,12 +52,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
     /** determines whether Multiple receivers are created to improve throughput */
     protected boolean useMultipleReceivers = true;
 
-    /**
-     * @param connector
-     * @param service
-     * @param endpoint
-     * @throws InitialisationException
-     */
+    
     public TransactedSingleResourceJmsMessageReceiver(Connector connector,
                                                       Service service,
                                                       InboundEndpoint endpoint) throws CreateException
@@ -267,7 +261,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                             }
 
                             MessageAdapter adapter = connector.getMessageAdapter(message);
-                            routeMessage(new DefaultMuleMessage(adapter));
+                            routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext()));
                             return null;
                         }
                     };
@@ -276,7 +270,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                 else
                 {
                     MessageAdapter adapter = connector.getMessageAdapter(message);
-                    routeMessage(new DefaultMuleMessage(adapter));
+                    routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext()));
                 }
 
             }

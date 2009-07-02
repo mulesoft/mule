@@ -28,7 +28,7 @@ public class JdbcTransactionFactory implements TransactionFactory
      */
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
-        JdbcTransaction tx = new JdbcTransaction();
+        JdbcTransaction tx = new JdbcTransaction(muleContext);
         tx.begin();
         return tx;
     }

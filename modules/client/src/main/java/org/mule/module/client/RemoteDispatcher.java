@@ -10,23 +10,14 @@
 
 package org.mule.module.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.Map;
-
-import org.apache.commons.lang.SerializationUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
-import org.mule.MuleServer;
 import org.mule.MuleSessionHandler;
 import org.mule.NullSessionHandler;
-import org.mule.RegistryContext;
 import org.mule.RequestContext;
 import org.mule.api.FutureMessageResult;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -51,8 +42,16 @@ import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.Map;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>RemoteDispatcher</code> is used to make and receive requests to a remote
@@ -74,6 +73,7 @@ public class RemoteDispatcher implements Disposable
     private OutboundEndpoint asyncServerEndpoint;
     private OutboundEndpoint syncServerEndpoint;
     private Credentials credentials = null;
+    private MuleContext muleContext;
 
     /**
      * an ExecutorService for async messages (optional)
@@ -85,20 +85,21 @@ public class RemoteDispatcher implements Disposable
      */
     private WireFormat wireFormat;
 
-    protected RemoteDispatcher(String endpoint, Credentials credentials) throws MuleException
+    protected RemoteDispatcher(String endpoint, Credentials credentials, MuleContext muleContext) throws MuleException
     {
-        this(endpoint);
+        this(endpoint, muleContext);
         this.credentials = credentials;
     }
 
-    protected RemoteDispatcher(String endpoint) throws MuleException
+    protected RemoteDispatcher(String endpoint, MuleContext muleContext) throws MuleException
     {
-        EndpointFactory endpointFactory = RegistryContext.getRegistry().lookupEndpointFactory();
+        this.muleContext = muleContext;
+        EndpointFactory endpointFactory = muleContext.getRegistry().lookupEndpointFactory();
         asyncServerEndpoint = endpointFactory.getOutboundEndpoint(endpoint);
 
         EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpoint);
         endpointBuilder.setSynchronous(true);
-        syncServerEndpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        syncServerEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             endpointBuilder);
 
         wireFormat = requestWireFormat();
@@ -106,9 +107,9 @@ public class RemoteDispatcher implements Disposable
 
     protected WireFormat requestWireFormat() throws MuleException
     {
-        MuleMessage msg = new DefaultMuleMessage(ServerHandshake.SERVER_HANDSHAKE_PROPERTY);
+        MuleMessage msg = new DefaultMuleMessage(ServerHandshake.SERVER_HANDSHAKE_PROPERTY, muleContext);
         MuleMessage result = syncServerEndpoint.send(new DefaultMuleEvent(msg, syncServerEndpoint,
-                new DefaultMuleSession(msg, new NullSessionHandler(), MuleServer.getMuleContext()), true));
+                new DefaultMuleSession(msg, new NullSessionHandler(), muleContext), true));
 
         if(result==null)
         {
@@ -131,6 +132,7 @@ public class RemoteDispatcher implements Disposable
             WireFormat wf = (WireFormat)ClassUtils.instanciateClass(handshake.getWireFormatClass(),
                     ClassUtils.NO_ARGS, getClass());
 
+            wf.setMuleContext(muleContext);
             return wf;
         }
         catch (Exception e)
@@ -211,7 +213,7 @@ public class RemoteDispatcher implements Disposable
             }
         };
 
-        FutureMessageResult result = new FutureMessageResult(callable);
+        FutureMessageResult result = new FutureMessageResult(callable, muleContext);
 
         if (asyncExecutor != null)
         {
@@ -220,7 +222,7 @@ public class RemoteDispatcher implements Disposable
 
         if (transformers != null)
         {
-            result.setTransformers(TransformerUtils.getTransformers(transformers));
+            result.setTransformers(TransformerUtils.getTransformers(transformers, muleContext));
         }
 
         result.execute();
@@ -236,7 +238,7 @@ public class RemoteDispatcher implements Disposable
     public MuleMessage sendRemote(String endpoint, Object payload, Map messageProperties) throws MuleException
     {
         return doToRemote(endpoint, payload, messageProperties, true, 
-            MuleServer.getMuleContext().getConfiguration().getDefaultResponseTimeout());
+            muleContext.getConfiguration().getDefaultResponseTimeout());
     }
 
     public void dispatchRemote(String endpoint, Object payload, Map messageProperties) throws MuleException
@@ -256,7 +258,7 @@ public class RemoteDispatcher implements Disposable
             }
         };
 
-        FutureMessageResult result = new FutureMessageResult(callable);
+        FutureMessageResult result = new FutureMessageResult(callable, muleContext);
 
         if (asyncExecutor != null)
         {
@@ -286,7 +288,7 @@ public class RemoteDispatcher implements Disposable
             }
         };
 
-        FutureMessageResult result = new FutureMessageResult(callable);
+        FutureMessageResult result = new FutureMessageResult(callable, muleContext);
 
         if (asyncExecutor != null)
         {
@@ -302,13 +304,13 @@ public class RemoteDispatcher implements Disposable
                                              Map messageProperties,
                                              boolean synchronous) throws MuleException
     {
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
+        MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
         message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, synchronous);
         setCredentials(message);
         RemoteDispatcherNotification action = new RemoteDispatcherNotification(message, RemoteDispatcherNotification.ACTION_INVOKE,
             "mule://" + component);
         return dispatchAction(action, synchronous, 
-            MuleServer.getMuleContext().getConfiguration().getDefaultResponseTimeout());
+            muleContext.getConfiguration().getDefaultResponseTimeout());
     }
 
     protected MuleMessage doToRemote(String endpoint,
@@ -317,7 +319,7 @@ public class RemoteDispatcher implements Disposable
                                     boolean synchronous,
                                     int timeout) throws MuleException
     {
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
+        MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
         message.setProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, String.valueOf(synchronous));
         setCredentials(message);
         RemoteDispatcherNotification action = new RemoteDispatcherNotification(message, (synchronous
@@ -338,7 +340,7 @@ public class RemoteDispatcher implements Disposable
         {
             serverEndpoint = asyncServerEndpoint;
         }
-        MuleMessage serializeMessage = new DefaultMuleMessage(action);
+        MuleMessage serializeMessage = new DefaultMuleMessage(action, muleContext);
         
         updateContext(serializeMessage, serverEndpoint, synchronous);
 
@@ -350,16 +352,16 @@ public class RemoteDispatcher implements Disposable
 
         if (message == null)
         {
-            message = new DefaultMuleMessage(payload);
+            message = new DefaultMuleMessage(payload, muleContext);
         }
         else
         {
-            message = new DefaultMuleMessage(payload, message);
+            message = new DefaultMuleMessage(payload, message, muleContext);
         }
 
         message.addProperties(action.getProperties());
         MuleSession session = new DefaultMuleSession(message,
-            ((AbstractConnector)serverEndpoint.getConnector()).getSessionHandler(), MuleServer.getMuleContext());
+            ((AbstractConnector)serverEndpoint.getConnector()).getSessionHandler(), muleContext);
 
         MuleEvent event = new DefaultMuleEvent(message, serverEndpoint, session, true);
         event.setTimeout(timeout);
@@ -452,6 +454,6 @@ public class RemoteDispatcher implements Disposable
     {
 
         RequestContext.setEvent(new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(message,
-            new MuleSessionHandler(), MuleServer.getMuleContext()), synchronous));
+            new MuleSessionHandler(), muleContext), synchronous));
     }
 }

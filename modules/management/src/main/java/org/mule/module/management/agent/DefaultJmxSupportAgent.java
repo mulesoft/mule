@@ -11,7 +11,6 @@
 package org.mule.module.management.agent;
 
 import org.mule.AbstractAgent;
-import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.InitialisationException;
@@ -112,29 +111,29 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             Agent agent = createRmiAgent();
             if (!isAgentRegistered(agent))
             {
-                RegistryContext.getRegistry().registerAgent(agent);
+                muleContext.getRegistry().registerAgent(agent);
             }
             agent = createJmxAgent();
             if (!isAgentRegistered(agent))
             {
-                RegistryContext.getRegistry().registerAgent(agent);
+                muleContext.getRegistry().registerAgent(agent);
             }
             agent = createLog4jAgent();
             if (!isAgentRegistered(agent))
             {
-                RegistryContext.getRegistry().registerAgent(agent);
+                muleContext.getRegistry().registerAgent(agent);
             }
             agent = createJmxNotificationAgent();
             if (!isAgentRegistered(agent))
             {
-                RegistryContext.getRegistry().registerAgent(agent);
+                muleContext.getRegistry().registerAgent(agent);
             }
             if (loadJdmkAgent)
             {
                 agent = createJdmkAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    RegistryContext.getRegistry().registerAgent(agent);
+                    muleContext.getRegistry().registerAgent(agent);
                 }
             }
 
@@ -143,7 +142,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 agent = createMx4jAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    RegistryContext.getRegistry().registerAgent(agent);
+                    muleContext.getRegistry().registerAgent(agent);
                 }
             }
 
@@ -152,7 +151,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 agent = createProfilerAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    RegistryContext.getRegistry().registerAgent(agent);
+                    muleContext.getRegistry().registerAgent(agent);
                 }
             }
 

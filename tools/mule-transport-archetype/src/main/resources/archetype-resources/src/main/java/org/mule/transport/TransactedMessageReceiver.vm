@@ -11,6 +11,7 @@
 package org.mule.transport.${ModuleNameLower};
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
@@ -38,7 +39,7 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
         super(connector, service, endpoint);
     }
 
-    protected List getMessages() throws Exception
+    protected List<MuleMessage> getMessages() throws Exception
     {
         /* IMPLEMENTATION NOTE: You can just return a single message in a list
            or return a batch of messages to be processed. It's always
@@ -60,7 +61,7 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
         // Here is how to pass the message to Mule.  Most MessageReceivers
         // will need to do nothing more than this
         MessageAdapter adapter = connector.getMessageAdapter(message);
-        routeMessage(new DefaultMuleMessage(adapter), endpoint.isSynchronous());
+        routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext()), endpoint.isSynchronous());
     }
 
     public void doConnect() throws ConnectException

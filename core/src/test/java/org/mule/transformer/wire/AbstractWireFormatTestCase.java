@@ -29,7 +29,7 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleTestCase
         // Create message to send over wire
         Properties messageProerties = new Properties();
         messageProerties.put("key1", "val1");
-        MuleMessage inMessage = new DefaultMuleMessage("testMessage", messageProerties);
+        MuleMessage inMessage = new DefaultMuleMessage("testMessage", messageProerties, muleContext);
 
         Object outMessage = readWrite(inMessage);
 

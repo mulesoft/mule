@@ -41,14 +41,14 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test2", null, filter, null);
         assertNotNull(endpoint2);
 
-        MulticastingRouter router = new MulticastingRouter();
+        MulticastingRouter router = createObject(MulticastingRouter.class);
 
         List endpoints = new ArrayList();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         router.setEndpoints(endpoints);
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
         assertTrue(router.isMatch(message));
 
@@ -70,7 +70,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?synchronous=true");
         assertNotNull(endpoint2);
 
-        MulticastingRouter router = new MulticastingRouter();
+        MulticastingRouter router = createObject(MulticastingRouter.class);
         RegExFilter filter = new RegExFilter("(.*) Message");
         router.setFilter(filter);
         List endpoints = new ArrayList();
@@ -80,7 +80,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
         assertTrue(router.isMatch(message));
 
@@ -104,15 +104,15 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?synchronous=false");
         assertNotNull(endpoint2);
 
-        MulticastingRouter router = new MulticastingRouter();
-
+        MulticastingRouter router = createObject(MulticastingRouter.class);
+        
         List endpoints = new ArrayList();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         router.setEndpoints(endpoints);
 
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
         assertTrue(router.isMatch(message));
 

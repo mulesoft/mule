@@ -125,7 +125,7 @@ public class UdpMessageRequester extends AbstractMessageRequester
         {
             return null;
         }
-        return new DefaultMuleMessage(connector.getMessageAdapter(result), (Map)null);
+        return new DefaultMuleMessage(connector.getMessageAdapter(result), (Map)null, connector.getMuleContext());
     }
 
     protected void doDispose()

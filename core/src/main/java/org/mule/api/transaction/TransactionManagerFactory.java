@@ -10,6 +10,8 @@
 
 package org.mule.api.transaction;
 
+import org.mule.api.config.MuleConfiguration;
+
 import javax.transaction.TransactionManager;
 
 /**
@@ -24,6 +26,7 @@ public interface TransactionManagerFactory
      * 
      * @return the transaction manager to use
      * @throws Exception if the transaction manager cannot be located or created
+     * @param config Mule configuration parameters
      */
-    TransactionManager create() throws Exception;
+    TransactionManager create(MuleConfiguration config) throws Exception;
 }

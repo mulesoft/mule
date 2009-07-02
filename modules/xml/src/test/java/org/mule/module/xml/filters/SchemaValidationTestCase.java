@@ -26,8 +26,8 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
         filter.setSchemaLocations("schema1.xsd");
         filter.initialise();
         
-        assertTrue(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream("/validation1.xml"))));
-        assertFalse(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream("/validation2.xml"))));
+        assertTrue(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream("/validation1.xml"), muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream("/validation2.xml"), muleContext)));
     }
 
 }

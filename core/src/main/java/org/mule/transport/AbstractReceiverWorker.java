@@ -10,7 +10,6 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -72,7 +71,7 @@ public abstract class AbstractReceiverWorker implements Work
     {
         //  MuleContext is used down the line for
         // getTransactionManager() (XaTransactionFactory) and getQueueManager() (VMTransaction)
-        MuleContext muleContext = receiver.getConnector().getMuleContext();
+        final MuleContext muleContext = receiver.getConnector().getMuleContext();
         TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
                                                          endpoint.getConnector().getExceptionListener(),
                                                          muleContext);
@@ -108,7 +107,7 @@ public abstract class AbstractReceiverWorker implements Work
                             adapter = endpoint.getConnector().getMessageAdapter(o);
                         }
 
-                        DefaultMuleMessage muleMessage = new DefaultMuleMessage(adapter);
+                        DefaultMuleMessage muleMessage = new DefaultMuleMessage(adapter, muleContext);
                         preRouteMuleMessage(muleMessage);
                         MuleMessage result = receiver.routeMessage(muleMessage, tx,  tx != null || endpoint.isSynchronous(), out);
                         if (result != null)

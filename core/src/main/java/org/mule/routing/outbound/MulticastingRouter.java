@@ -70,7 +70,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
                             message);
                     }
                     
-                    MuleMessage clonedMessage = new DefaultMuleMessage(message.getPayload(), message);
+                    MuleMessage clonedMessage = new DefaultMuleMessage(message.getPayload(), message, muleContext);
                     if (endpoint.isSynchronous())
                     {
                         results.add(send(session, clonedMessage, endpoint));
@@ -86,6 +86,6 @@ public class MulticastingRouter extends FilteringOutboundRouter
         {
             throw new CouldNotRouteOutboundMessageException(message, (ImmutableEndpoint) endpoints.get(0), e);
         }
-        return resultsHandler.aggregateResults(results, message);
+        return resultsHandler.aggregateResults(results, message, muleContext);
     }
 }

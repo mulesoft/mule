@@ -486,7 +486,7 @@ public class MuleServer implements Runnable
         MuleServer.startupPropertiesFile = startupPropertiesFile;
     }
 
-    public static MuleContext getMuleContext()
+    public MuleContext getMuleContext()
     {
         return muleContext;
     }

@@ -11,6 +11,7 @@
 package org.mule.transaction.lookup;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
@@ -44,8 +45,9 @@ public class WebsphereTransactionManagerLookupFactory implements TransactionMana
     /**
      * This constructor retrieves the WebSphere TransactionManager factory class, so
      * we can get access to the JTA TransactionManager.
+     * @param config
      */
-    public TransactionManager create()
+    public TransactionManager create(MuleConfiguration config)
     {
         Class clazz;
         TransactionManager transactionManager;

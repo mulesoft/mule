@@ -58,7 +58,7 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
                 Object propertyValue = message.getProperty(propertyKey);
                 if (propertyKey.equalsIgnoreCase("packet.port"))
                 {
-                    newUri = new MuleEndpointURI("udp://localhost:" + ((Integer) propertyValue).intValue());
+                    newUri = new MuleEndpointURI("udp://localhost:" + ((Integer) propertyValue).intValue(), muleContext);
                     if (logger.isDebugEnabled())
                     {
                         logger.info("Uri after parsing is: " + newUri.getAddress());

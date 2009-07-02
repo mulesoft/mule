@@ -22,7 +22,7 @@ public class AbstractEndpointURIBuilderTestCase extends AbstractMuleTestCase
     public void testGetPropertiesForURI() throws MalformedEndpointException, URISyntaxException
     {
         UrlEndpointURIBuilder endpointURIBuilder = new UrlEndpointURIBuilder();
-        endpointURIBuilder.build(new URI("ftp://test%25user:test@192.168.1.12:21"));
+        endpointURIBuilder.build(new URI("ftp://test%25user:test@192.168.1.12:21"), muleContext);
         assertEquals("test%user:test", endpointURIBuilder.userInfo);
     }
 }

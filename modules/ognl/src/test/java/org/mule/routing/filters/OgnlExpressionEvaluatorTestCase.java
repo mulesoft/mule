@@ -26,7 +26,7 @@ public class OgnlExpressionEvaluatorTestCase extends AbstractMuleTestCase
         Banana banana = new Banana();
         banana.bite();
         FruitBowl payload = new FruitBowl(apple, banana);
-        DefaultMuleMessage msg = new DefaultMuleMessage(payload);
+        DefaultMuleMessage msg = new DefaultMuleMessage(payload, muleContext);
         OgnlExpressionEvaluator e = new OgnlExpressionEvaluator();
         Object value = e.evaluate("apple.washed", msg);
         assertNotNull(value);

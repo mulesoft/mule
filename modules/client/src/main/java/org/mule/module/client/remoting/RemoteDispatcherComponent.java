@@ -13,7 +13,6 @@ package org.mule.module.client.remoting;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
-import org.mule.MuleServer;
 import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -46,6 +45,7 @@ import org.mule.transport.NullPayload;
 import org.mule.util.MapUtils;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,6 +80,8 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
     protected int synchronousEventTimeout = 5000;
 
+    protected MuleContext muleContext;
+
     public void initialise() throws InitialisationException
     {
         if (wireFormat == null)
@@ -90,6 +92,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
     public Object onCall(MuleEventContext context) throws Exception
     {
+        muleContext = context.getMuleContext();
         if(context.transformMessageToString().equals(ServerHandshake.SERVER_HANDSHAKE_PROPERTY))
         {
             return doHandshake(context);
@@ -100,6 +103,15 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
         ByteArrayInputStream in = new ByteArrayInputStream(context.transformMessageToBytes());
         RemoteDispatcherNotification action = (RemoteDispatcherNotification) ((MuleMessage)wireFormat.read(in)).getPayload();
 
+        // because we serialized a message inside a message, we need to inject the the muleContext ourselves
+        //TODO review the serialization format for RemoteDispatching
+        if(action.getMessage()!=null)
+        {
+            Method m = action.getMessage().getClass().getDeclaredMethod("initAfterDeserialisation", MuleContext.class);
+            m.setAccessible(true);
+            m.invoke(action.getMessage(), muleContext);
+        }
+        
         if (RemoteDispatcherNotification.ACTION_INVOKE == action.getAction())
         {
             result = invokeAction(action, context);
@@ -145,15 +157,15 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
         if (destComponent != null)
         {
             MuleSession session = 
-                new DefaultMuleSession(context.getMuleContext().getRegistry().lookupService(destComponent), context.getMuleContext());
+                new DefaultMuleSession(muleContext.getRegistry().lookupService(destComponent), muleContext);
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type
-            MuleContext managementContext = MuleServer.getMuleContext();
-            EndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint(), managementContext);
+
+            EndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint(), muleContext);
             // TODO - is this correct? it stops any other transformer from being set
             builder.setTransformers(new LinkedList());
-            ImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+            ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             MuleEvent event = new DefaultMuleEvent(action.getMessage(), ep, context.getSession(), context.isSynchronous());
             event = RequestContext.setEvent(event);
 
@@ -259,13 +271,13 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
                                                     WireFormat wireFormat,
                                                     String encoding,
                                                     int eventTimeout,
-                                                    MuleContext managementContext) throws MuleException
+                                                    MuleContext muleContext) throws MuleException
     {
         try
         {
             Service service = new SedaService();
             service.setName(MANAGER_COMPONENT_NAME);
-            service.setModel(managementContext.getRegistry().lookupSystemModel());
+            service.setModel(muleContext.getRegistry().lookupSystemModel());
 
             Map props = new HashMap();
             props.put("wireFormat", wireFormat);
@@ -274,7 +286,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             service.setComponent(new SimpleCallableJavaComponent(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props)));
 
 
-            service.setMuleContext(managementContext);
+            service.setMuleContext(muleContext);
             service.getInboundRouter().addEndpoint(endpoint);
 
             return service;
@@ -299,7 +311,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
         logger.error("Failed to process admin request: " + e.getMessage(), e);
         if (result == null)
         {
-            result = new DefaultMuleMessage(NullPayload.getInstance(), (Map) null);
+            result = new DefaultMuleMessage(NullPayload.getInstance(), (Map) null, muleContext);
         }
         result.setExceptionPayload(new DefaultExceptionPayload(e));
         try

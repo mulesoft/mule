@@ -10,7 +10,7 @@
 
 package org.mule.transaction;
 
-import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -44,9 +44,10 @@ public class XaTransaction extends AbstractTransaction
 
     private TransactionManager txManager;
 
-    public XaTransaction(TransactionManager txManager)
+    public XaTransaction(MuleContext context)
     {
-        this.txManager = txManager;
+        super(context);
+        this.txManager = context.getTransactionManager();
     }
     
     protected void doBegin() throws TransactionException
@@ -290,7 +291,7 @@ public class XaTransaction extends AbstractTransaction
     // moved here from connection wrapper
     public boolean enlistResource(XAResource resource) throws TransactionException
     {
-        TransactionManager txManager = MuleServer.getMuleContext().getTransactionManager();
+        TransactionManager txManager = muleContext.getTransactionManager();
         try
         {
             Transaction jtaTransaction = txManager.getTransaction();
@@ -312,7 +313,7 @@ public class XaTransaction extends AbstractTransaction
 
     public boolean delistResource(XAResource resource, int tmflag) throws TransactionException
     {
-        TransactionManager txManager = MuleServer.getMuleContext().getTransactionManager();
+        TransactionManager txManager = muleContext.getTransactionManager();
         try
         {
             Transaction jtaTransaction = txManager.getTransaction();
@@ -346,7 +347,7 @@ public class XaTransaction extends AbstractTransaction
 
     public void resume() throws TransactionException
     {
-        TransactionManager txManager = MuleServer.getMuleContext().getTransactionManager();
+        TransactionManager txManager = muleContext.getTransactionManager();
 
         if (txManager == null)
         {
@@ -369,7 +370,7 @@ public class XaTransaction extends AbstractTransaction
 
     public Transaction suspend() throws TransactionException
     {
-        TransactionManager txManager = MuleServer.getMuleContext().getTransactionManager();
+        TransactionManager txManager = muleContext.getTransactionManager();
 
         if (txManager == null)
         {

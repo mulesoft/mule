@@ -10,6 +10,7 @@
 
 package org.mule.transport.jdbc;
 
+import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
@@ -28,9 +29,9 @@ import javax.sql.DataSource;
 public class JdbcTransaction extends AbstractSingleResourceTransaction
 {
 
-    public JdbcTransaction()
+    public JdbcTransaction(MuleContext muleContext)
     {
-        super();
+        super(muleContext);
     }
 
     public void bindResource(Object key, Object resource) throws TransactionException

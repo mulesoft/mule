@@ -10,13 +10,11 @@
 
 package org.mule.endpoint;
 
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.MalformedEndpointException;
-import org.mule.api.MuleContext;
 import org.mule.util.PropertiesUtils;
-import org.mule.RegistryContext;
-import org.mule.MuleServer;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -38,10 +36,10 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
     protected String userInfo;
     private URI uri;
 
-    public EndpointURI build(URI uri) throws MalformedEndpointException
+    public EndpointURI build(URI uri, MuleContext muleContext) throws MalformedEndpointException
     {
         this.uri = uri;
-        Properties props = getPropertiesForURI(uri);
+        Properties props = getPropertiesForURI(uri, muleContext);
         String replaceAddress = null;
         //If the address has been set as a parameter on the URI, then we must ensure that that value is used
         //for the address. We still call the setEndpoint() method so that other information on the URI
@@ -58,7 +56,7 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
         }
 
         EndpointURI ep = new MuleEndpointURI(address, endpointName, connectorName, transformers,
-            responseTransformers, props, this.uri, userInfo);
+            responseTransformers, props, this.uri, userInfo, muleContext);
         address = null;
         endpointName = null;
         connectorName = null;
@@ -75,7 +73,7 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
 
     protected abstract void setEndpoint(URI uri, Properties props) throws MalformedEndpointException;
 
-    protected Properties getPropertiesForURI(URI uri) throws MalformedEndpointException
+    protected Properties getPropertiesForURI(URI uri, MuleContext muleContext) throws MalformedEndpointException
     {
         Properties properties = PropertiesUtils.getPropertiesFromQueryString(uri.getQuery());
 
@@ -89,7 +87,7 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
         if (endpoint != null)
         {
             this.address = endpoint;
-            address = decode(address, uri);
+            address = decode(address, uri, muleContext);
         }
 
         String cnnName = (String) properties.get(EndpointURI.PROPERTY_CONNECTOR_NAME);
@@ -112,11 +110,10 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
         return properties;
     }
 
-    private String decode(String string, URI uri) throws MalformedEndpointException
+    private String decode(String string, URI uri, MuleContext context) throws MalformedEndpointException
     {
         try
         {
-            MuleContext context = MuleServer.getMuleContext();
             String encoding = "UTF-8";
             if(context!=null)
             {

@@ -25,9 +25,9 @@ public class ThreadSafeAccessTestCase extends AbstractThreadSafeAccessTestCase
 
     public void testMessage() throws InterruptedException
     {
-        basicPattern(new DefaultMuleMessage(new Object(), (Map)null));
-        newCopy(new DefaultMuleMessage(new Object(), (Map)null));
-        resetAccessControl(new DefaultMuleMessage(new Object(), (Map)null));
+        basicPattern(new DefaultMuleMessage(new Object(), (Map)null, muleContext));
+        newCopy(new DefaultMuleMessage(new Object(), (Map)null, muleContext));
+        resetAccessControl(new DefaultMuleMessage(new Object(), (Map)null, muleContext));
     }
 
     public void testAdapter() throws InterruptedException

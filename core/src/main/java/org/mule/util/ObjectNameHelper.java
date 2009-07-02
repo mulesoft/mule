@@ -10,7 +10,7 @@
 
 package org.mule.util;
 
-import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.transport.Connector;
 
@@ -25,13 +25,15 @@ public final class ObjectNameHelper
     public static final String CONNECTOR_PREFIX = "connector";
     public static final String ENDPOINT_PREFIX = "endpoint";
 
-    /** Do not instanciate. */
-    protected ObjectNameHelper ()
+    private MuleContext muleContext;
+
+
+    public ObjectNameHelper(MuleContext muleContext)
     {
-        // no-op
+        this.muleContext = muleContext;
     }
 
-    public static String getEndpointName(final EndpointURI endpointUri)
+    public String getEndpointName(final EndpointURI endpointUri)
     {
             String address = endpointUri.getAddress();
             if (StringUtils.isBlank(address))
@@ -47,7 +49,7 @@ public final class ObjectNameHelper
             return ensureUniqueEndpoint(name);
     }
 
-    protected static String ensureUniqueEndpoint(String name)
+    protected String ensureUniqueEndpoint(String name)
     {
         int i = 0;
         String tempName = name;
@@ -56,7 +58,7 @@ public final class ObjectNameHelper
         // We can't check local edpoints right now but the chances of conflict are
         // very small and will be
         // reported during JMX object registration
-        while (RegistryContext.getRegistry().lookupObject(tempName) != null)
+        while (muleContext.getRegistry().lookupObject(tempName) != null)
         {
             i++;
             tempName = name + SEPARATOR + i;
@@ -64,7 +66,7 @@ public final class ObjectNameHelper
         return tempName;
     }
 
-    protected static String ensureUniqueConnector(String name)
+    protected String ensureUniqueConnector(String name)
     {
         int i = 0;
         String tempName = name;
@@ -75,7 +77,7 @@ public final class ObjectNameHelper
         // reported during JMX object registration
         try
         {
-            while (RegistryContext.getRegistry().lookupConnector(tempName) != null)
+            while (muleContext.getRegistry().lookupConnector(tempName) != null)
             {
                 i++;
                 tempName = name + SEPARATOR + i;
@@ -88,7 +90,7 @@ public final class ObjectNameHelper
         return tempName;
     }
 
-    public static String getConnectorName(Connector connector)
+    public String getConnectorName(Connector connector)
     {
         if (connector.getName() != null && connector.getName().indexOf('#') == -1)
         {
@@ -103,7 +105,7 @@ public final class ObjectNameHelper
         }
     }
 
-    public static String replaceObjectNameChars(String name)
+    public String replaceObjectNameChars(String name)
     {
         String value = name.replaceAll("//", SEPARATOR);
         value = value.replaceAll("\\p{Punct}", SEPARATOR);

@@ -29,7 +29,7 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
     public void testCXF() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage reply = client.send("vm://cxf.in", new DefaultMuleMessage("Testing String"));
+        MuleMessage reply = client.send("vm://cxf.in", new DefaultMuleMessage("Testing String", muleContext));
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

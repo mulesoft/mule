@@ -10,6 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.config.MuleConfiguration;
 import org.mule.transaction.lookup.GenericTransactionManagerLookupFactory;
 
 import java.lang.reflect.InvocationHandler;
@@ -23,7 +24,7 @@ import javax.transaction.TransactionManager;
  */
 public class TestTransactionManagerFactory extends GenericTransactionManagerLookupFactory
 {
-    public TransactionManager create() throws Exception
+    public TransactionManager create(MuleConfiguration config) throws Exception
     {
         return (TransactionManager) Proxy.newProxyInstance(getClass().getClassLoader(),
                                                            new Class[] {TransactionManager.class},

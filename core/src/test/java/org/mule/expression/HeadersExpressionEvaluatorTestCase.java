@@ -34,7 +34,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testSingleHeader() throws Exception
     {
         MessageHeaderExpressionEvaluator eval = new MessageHeaderExpressionEvaluator();
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = eval.evaluate("foo", message);
         assertNotNull(result);
@@ -63,7 +63,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
 
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = eval.evaluate("foo, baz", message);
         assertNotNull(result);
@@ -102,7 +102,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testListHeaders() throws Exception
     {
         MessageHeadersListExpressionEvaluator eval = new MessageHeadersListExpressionEvaluator();
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = eval.evaluate("foo, baz", message);
         assertNotNull(result);
@@ -138,7 +138,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testSingleHeaderUsingManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = muleContext.getExpressionManager().evaluate("#[header:foo]", message);
         assertNotNull(result);
@@ -162,7 +162,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testMapHeadersUsingManager() throws Exception
     {
 
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = muleContext.getExpressionManager().evaluate("#[headers:foo, baz]", message);
         assertNotNull(result);
@@ -190,7 +190,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testListHeadersUsingManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = muleContext.getExpressionManager().evaluate("#[headers-list:foo, baz]", message);
         assertNotNull(result);

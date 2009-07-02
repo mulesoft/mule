@@ -160,7 +160,7 @@ public final class MuleTestUtils
     {
         Map props = new HashMap();
         props.put("name", name);
-        props.put("endpointURI", new MuleEndpointURI("test://test"));
+        props.put("endpointURI", new MuleEndpointURI("test://test", context));
         props.put("connector", "testConnector");
         // need to build endpoint this way to avoid depenency to any endpoint jars
         AbstractConnector connector = (AbstractConnector) ClassUtils.loadClass(
@@ -297,7 +297,7 @@ public final class MuleTestUtils
     public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint, MuleContext context) throws Exception
     {
         MuleSession session = getTestSession(service, context);
-        return new DefaultMuleEvent(new DefaultMuleMessage(data, new HashMap()), endpoint, session, true);
+        return new DefaultMuleEvent(new DefaultMuleMessage(data, new HashMap(), context), endpoint, session, true);
     }
 
     public static MuleEventContext getTestEventContext(Object data, MuleContext context) throws Exception

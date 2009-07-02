@@ -12,7 +12,6 @@ package org.mule.transport.email;
 
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.email.ImapConnector;
 
 public class EmailEndpointsTestCase extends AbstractMuleTestCase
 {
@@ -21,7 +20,7 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
     
     public void testPop3Url() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI("pop3://username:password@pop3.lotsofmail.org");
+        MuleEndpointURI endpointUri = new MuleEndpointURI("pop3://username:password@pop3.lotsofmail.org", muleContext);
         endpointUri.initialise();
         assertEquals("pop3", endpointUri.getScheme());
         assertEquals("username@lotsofmail.org", endpointUri.getAddress());
@@ -35,7 +34,7 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
 
     public void testSmtpUrl() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://username:password@smtp.lotsofmail.org");
+        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://username:password@smtp.lotsofmail.org", muleContext);
         endpointUri.initialise();
         assertEquals("smtp", endpointUri.getScheme());
         assertEquals("username@lotsofmail.org", endpointUri.getAddress());
@@ -49,7 +48,7 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
 
     public void testSmtpUrlWithPort() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://user:password@hostname:" + PORT);
+        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://user:password@hostname:" + PORT, muleContext);
         endpointUri.initialise();
         assertEquals("smtp", endpointUri.getScheme());
         assertEquals("user@hostname:" + PORT, endpointUri.getAddress());
@@ -64,7 +63,7 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
     public void testImapUrlWithFolder() throws Exception
     {
         MuleEndpointURI endpointUri = new MuleEndpointURI(
-            "imap://username:password@imap.lotsofmail.org/MyMail");
+            "imap://username:password@imap.lotsofmail.org/MyMail", muleContext);
         endpointUri.initialise();
         assertEquals(ImapConnector.IMAP, endpointUri.getScheme());
         assertEquals("username@lotsofmail.org", endpointUri.getAddress());
@@ -82,7 +81,7 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
     {
         MuleEndpointURI endpointUri = new MuleEndpointURI(
             "smtp://test%40lotsofmail.org:password@smtpout.secureserver.net:" + PORT +
-            "?address=test@lotsofmail.org&ccAddresses=donkey@lotsofmail.org");
+            "?address=test@lotsofmail.org&ccAddresses=donkey@lotsofmail.org", muleContext);
         endpointUri.initialise();
         assertEquals("smtp", endpointUri.getScheme());
         assertEquals("test@lotsofmail.org", endpointUri.getAddress());
@@ -108,7 +107,7 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
     {
         MuleEndpointURI endpointUri = new MuleEndpointURI(
             "smtp://test%40lotsofmail.org:password@smtpout.secureserver.net:" + PORT +
-            "?ccAddresses=donkey@lotsofmail.org");
+            "?ccAddresses=donkey@lotsofmail.org", muleContext);
         endpointUri.initialise();
         assertEquals("smtp", endpointUri.getScheme());
         assertEquals("test@lotsofmail.org", endpointUri.getAddress());
@@ -133,7 +132,7 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
     public void testSmtpWithoutCredentials() throws Exception
     {
         MuleEndpointURI endpointUri = new MuleEndpointURI(
-            "smtp://smtpout.secureserver.net:" + PORT + "?address=test@lotsofmail.org");
+            "smtp://smtpout.secureserver.net:" + PORT + "?address=test@lotsofmail.org", muleContext);
         endpointUri.initialise();
         assertEquals("smtp", endpointUri.getScheme());
         assertEquals("test@lotsofmail.org", endpointUri.getAddress());
@@ -151,7 +150,7 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
      */
     public void testWithAddressOverrideOnly() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://?address=test@lotsofmail.org");
+        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://?address=test@lotsofmail.org", muleContext);
         endpointUri.initialise();
         assertEquals("smtp", endpointUri.getScheme());
         assertEquals("test@lotsofmail.org", endpointUri.getAddress());

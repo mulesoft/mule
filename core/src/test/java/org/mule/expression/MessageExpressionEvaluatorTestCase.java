@@ -19,7 +19,7 @@ public class MessageExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testUsingEvaluatorDirectly() throws Exception
     {
         MessageExpressionEvaluator eval = new MessageExpressionEvaluator();
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         message.setCorrelationId(message.getUniqueId());
         message.setCorrelationSequence(1);
         message.setCorrelationGroupSize(2);
@@ -64,7 +64,7 @@ public class MessageExpressionEvaluatorTestCase extends AbstractMuleTestCase
      */
     public void testUsingManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         message.setCorrelationId(message.getUniqueId());
         message.setCorrelationSequence(1);
         message.setCorrelationGroupSize(2);

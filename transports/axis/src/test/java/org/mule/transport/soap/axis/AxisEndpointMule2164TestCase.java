@@ -21,7 +21,7 @@ public class AxisEndpointMule2164TestCase extends AbstractMuleTestCase
     {
 
         // Create MuleEndpointURI and test values
-        MuleEndpointURI endpointUri = new MuleEndpointURI("axis:http://localhost:8080?param=1");
+        MuleEndpointURI endpointUri = new MuleEndpointURI("axis:http://localhost:8080?param=1", muleContext);
         endpointUri.initialise();
         assertEquals("http", endpointUri.getScheme());
         assertEquals("axis", endpointUri.getSchemeMetaInfo());
@@ -42,7 +42,7 @@ public class AxisEndpointMule2164TestCase extends AbstractMuleTestCase
     {
 
         // Create MuleEndpointURI and test values
-        MuleEndpointURI endpointUri = new MuleEndpointURI("axis:jms://myComponent");
+        MuleEndpointURI endpointUri = new MuleEndpointURI("axis:jms://myComponent", muleContext);
         assertEquals("jms", endpointUri.getScheme());
         assertEquals("axis", endpointUri.getSchemeMetaInfo());
         assertEquals("axis:jms", endpointUri.getFullScheme());

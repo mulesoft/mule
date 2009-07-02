@@ -10,9 +10,6 @@
 
 package org.mule.transport.servlet.jetty;
 
-import org.mule.MuleServer;
-import org.mule.RegistryContext;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -25,7 +22,6 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.servlet.ServletConnector;
-import org.mule.transport.servlet.i18n.ServletMessages;
 import org.mule.util.StringUtils;
 
 /**
@@ -46,17 +42,16 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         {
             // We need to have a Servlet Connector pointing to our servlet so the Servlets can
             // find the listeners for incoming requests
-            ServletConnector scon = (ServletConnector) TransportFactory.getConnectorByProtocol("servlet");
+            ServletConnector scon = (ServletConnector) new TransportFactory(connector.getMuleContext()).getConnectorByProtocol("servlet");
             if (scon == null)
             {
                 scon = new ServletConnector();
                 scon.setName(JETTY_SERVLET_CONNECTOR_NAME);
                 scon.setServletUrl(endpoint.getEndpointURI().getAddress());
-                MuleContext muleContext = MuleServer.getMuleContext();
-                scon.setMuleContext(muleContext);
+                scon.setMuleContext(connector.getMuleContext());
                 try
                 {
-                    muleContext.getRegistry().registerConnector(scon);
+                    connector.getMuleContext().getRegistry().registerConnector(scon);
                 }
                 catch (MuleException e)
                 {

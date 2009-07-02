@@ -27,7 +27,7 @@ public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransacti
 
     protected void doSetUp() throws Exception
     {
-        txManager = new JBossArjunaTransactionManagerFactory().create();
+        txManager = new JBossArjunaTransactionManagerFactory().create(muleContext.getConfiguration());
         super.doSetUp();
         muleContext.setTransactionManager(txManager);
     }

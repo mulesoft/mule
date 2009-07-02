@@ -12,31 +12,19 @@ package org.mule.transport.soap.axis;
 
 import org.mule.tck.providers.soap.AbstractSoapFunctionalTestCase;
 import org.mule.transport.servlet.MuleReceiverServlet;
-
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.servlet.ServletHandler;
+import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
 public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 {
     public static final int HTTP_PORT = 62088;
 
-    private Server httpServer;
+    private EmbeddedJettyServer httpServer;
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        httpServer = new Server();
-        SelectChannelConnector conn = new SelectChannelConnector();
-        conn.setPort(HTTP_PORT);
-        httpServer.addConnector(conn);
-
-        ServletHandler handler = new ServletHandler();
-        handler.addServletWithMapping(MuleReceiverServlet.class, "/services/*");
-        
-        httpServer.addHandler(handler);
-        
+        httpServer = new EmbeddedJettyServer(HTTP_PORT, "/services/*", new MuleReceiverServlet(), muleContext);
         httpServer.start();
     }
 

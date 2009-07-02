@@ -9,8 +9,9 @@
  */
 package org.mule.lifecycle;
 
-import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.registry.Registry;
@@ -45,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @see org.mule.api.lifecycle.LifecyclePhase
  */
-public class DefaultLifecyclePhase implements LifecyclePhase
+public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
 {
     protected transient final Log logger = LogFactory.getLog(DefaultLifecyclePhase.class);
     private Class lifecycleClass;
@@ -55,6 +56,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase
     private String name;
     private String oppositeLifecyclePhase;
     private Set supportedPhases;
+    private MuleContext muleContext;
 
     public DefaultLifecyclePhase(String name, Class lifecycleClass, String oppositeLifecyclePhase)
     {
@@ -63,6 +65,11 @@ public class DefaultLifecyclePhase implements LifecyclePhase
         //DefaultLifecyclePhase interface only has one method
         lifecycleMethod = lifecycleClass.getMethods()[0];
         this.oppositeLifecyclePhase = oppositeLifecyclePhase;
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
     // TODO currentPhase is never used in the method, drop it?
@@ -110,7 +117,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase
                 });
             }
             
-            lo.firePreNotification(MuleServer.getMuleContext());
+            lo.firePreNotification(muleContext);
 
             for (Iterator target = targets.iterator(); target.hasNext();)
             {
@@ -131,7 +138,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase
                 }
             }
             
-            lo.firePostNotification(MuleServer.getMuleContext());
+            lo.firePostNotification(muleContext);
         }
     }
 

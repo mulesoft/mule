@@ -50,7 +50,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     {
         Object data = event.transformMessage();
         // Wrap the transformed message before passing it to the filename parser
-        MuleMessage message = new DefaultMuleMessage(data, event.getMessage());
+        MuleMessage message = new DefaultMuleMessage(data, event.getMessage(), event.getMuleContext());
 
         FileOutputStream fos = (FileOutputStream) connector.getOutputStream(event.getEndpoint(), message);
         try

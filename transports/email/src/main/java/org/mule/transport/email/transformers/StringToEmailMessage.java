@@ -10,7 +10,6 @@
 
 package org.mule.transport.email.transformers;
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -92,7 +91,7 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
                 {
                     public Object match(String token)
                     {
-                        return RegistryContext.getRegistry().lookupObject(token);
+                        return muleContext.getRegistry().lookupObject(token);
                     }
                 }, otherHeaders));
 

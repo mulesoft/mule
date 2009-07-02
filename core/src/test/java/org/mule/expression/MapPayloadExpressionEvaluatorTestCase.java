@@ -35,7 +35,7 @@ public class MapPayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testExpressions() throws Exception
     {
         MapPayloadExpressionEvaluator eval = new MapPayloadExpressionEvaluator();
-        MuleMessage message = new DefaultMuleMessage(props, (Map) null);
+        MuleMessage message = new DefaultMuleMessage(props, (Map) null, muleContext);
 
         // direct match
         Object result = eval.evaluate("foo", message);

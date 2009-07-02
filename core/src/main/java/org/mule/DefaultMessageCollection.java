@@ -9,6 +9,7 @@
  */
 package org.mule;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
@@ -29,28 +30,29 @@ import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
  *  Note that the {@link #getPayload()} for this message will return a {@link java.util.List} of payload objects for
  * each of the Mule messages stored in this collection.
  *
- * Calling {@link #getPayload(Class)} will attempt to transform all payloads and return a {@link java.util.List}.
+ * Calling {@link org.mule.api.MuleMessage#getPayload(Class)} will attempt to transform all payloads and return a {@link java.util.List}.
  *
- * The methods {@link #getPayloadAsString()} and {@link #getPayloadAsBytes()} are unsupported, instead users should
- * call {@link #getPayload(Class)} and pass in the return type <code>byte[].class</code> or <code>String.class</code>.
+ * The methods {@link org.mule.api.MuleMessage#getPayloadAsString()} and {@link org.mule.api.MuleMessage#getPayloadAsBytes()} are unsupported, instead users should
+ * call {@link org.mule.api.MuleMessage#getPayload(Class)} and pass in the return type <code>byte[].class</code> or <code>String.class</code>.
  */
 public class DefaultMessageCollection extends DefaultMuleMessage implements MuleMessageCollection
 {
     private List messageList = new CopyOnWriteArrayList();
 
-    public DefaultMessageCollection()
+    public DefaultMessageCollection(MuleContext muleContext)
     {
         //This will be a collection of payloads
-        super(new CopyOnWriteArrayList());
+        super(new CopyOnWriteArrayList(), muleContext);
     }
 
     /**
      * Performs a shallow copy
      * @param msg
+     * @param muleContext
      */
-    public DefaultMessageCollection(DefaultMessageCollection msg)
+    public DefaultMessageCollection(DefaultMessageCollection msg, MuleContext muleContext)
     {
-        this();
+        this(muleContext);
         for (int i = 0; i < msg.getMessagesAsArray().length; i++)
         {
             addMessage(msg.getMessagesAsArray()[i]);
@@ -133,7 +135,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     }
 
     /**
-     * Applies the {@link #getPayload(Class)} call to every message in the collection and returns a
+     * Applies the {@link org.mule.api.MuleMessage#getPayload(Class)} call to every message in the collection and returns a
      * {@link java.util.List} of results.
      *
      * {@inheritDoc}
@@ -179,6 +181,6 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
      */
     public ThreadSafeAccess newThreadCopy()
     {
-        return new DefaultMessageCollection(this);
+        return new DefaultMessageCollection(this, muleContext);
     }
 }

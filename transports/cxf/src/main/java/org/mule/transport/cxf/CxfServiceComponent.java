@@ -177,7 +177,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
             msg = out.toString();
         }
 
-        MuleMessage result = new DefaultMuleMessage(msg);
+        MuleMessage result = new DefaultMuleMessage(msg, eventContext.getMuleContext());
         result.setProperty(HttpConstants.HEADER_CONTENT_TYPE, ct);
 
         return result;
@@ -272,7 +272,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
                 }
                 
             };
-            DefaultMuleMessage muleResMsg = new DefaultMuleMessage(outputHandler);
+            DefaultMuleMessage muleResMsg = new DefaultMuleMessage(outputHandler, ctx.getMuleContext());
             
             ExchangeImpl exchange = new ExchangeImpl();
             exchange.setInMessage(m);

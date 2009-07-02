@@ -61,6 +61,9 @@ public class VMConnector extends AbstractConnector
             {
                 queueManager = getMuleContext().getQueueManager();
             }
+            //the queue manager stores MulEvent objects by default. When using VM there is no nned to store
+            //the event detais
+            //queueManager.getPersistenceStrategy().setWireFormat(new SerializedMuleMessageWireFormat());
             if (queueProfile == null)
             {
                 //create a default QueueProfile
@@ -108,7 +111,7 @@ public class VMConnector extends AbstractConnector
         return serviceDescriptor.createMessageReceiver(this, service, endpoint);
     }
 
-    public MessageAdapter getMessageAdapter(Object message) throws MessagingException
+    public MessageAdapter getMessageAdapter(Object message) throws MuleException
     {
         if (message == null)
         {

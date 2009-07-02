@@ -9,7 +9,6 @@
  */
 package org.mule.registry;
 
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
@@ -200,7 +199,7 @@ public class TransientRegistry extends AbstractRegistry
         logger.debug("registering object");
         if (!MuleRegistry.LIFECYCLE_BYPASS_FLAG.equals(metadata))
         {
-            if (MuleServer.getMuleContext().isInitialised() || MuleServer.getMuleContext().isInitialising())
+            if (context.isInitialised() || context.isInitialising())
             {
                 logger.debug("applying processors");
                 object = applyProcessors(object);

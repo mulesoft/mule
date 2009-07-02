@@ -24,7 +24,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerCollection(new Transformer[]{ validTransformer });
         message.applyTransformers(Collections.singletonList(messageTransformer));
 
@@ -38,7 +38,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerCollection(
             new Transformer[]{ validTransformer, validTransformer });
         message.applyTransformers(Collections.singletonList(messageTransformer));
@@ -53,7 +53,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerCollection(
             new Transformer[]{ validTransformer, validTransformer, validTransformer });
         message.applyTransformers(Collections.singletonList(messageTransformer));
@@ -72,7 +72,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerCollection(new Transformer[]{invalidTransformer, validTransformer});
         message.applyTransformers(Collections.singletonList(messageTransformer));
 
@@ -90,7 +90,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerCollection(new Transformer[]{invalidTransformer, validTransformer});
         
         try
@@ -113,7 +113,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerCollection(new Transformer[]{validTransformer, invalidTransformer});
         message.applyTransformers(Collections.singletonList(messageTransformer));
 
@@ -131,7 +131,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerCollection(new Transformer[]{validTransformer, invalidTransformer});
         
         try

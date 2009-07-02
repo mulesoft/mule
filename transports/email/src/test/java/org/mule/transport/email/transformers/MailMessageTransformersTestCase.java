@@ -11,13 +11,11 @@
 package org.mule.transport.email.transformers;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.lifecycle.AlreadyInitialisedException;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.AbstractTransformerTestCase;
-import org.mule.transport.email.transformers.EmailMessageToString;
-import org.mule.transport.email.transformers.StringToEmailMessage;
 
 import java.util.Properties;
 
@@ -32,12 +30,12 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
 
     public Transformer getTransformer() throws Exception
     {
-        return new EmailMessageToString();
+        return createObject(EmailMessageToString.class);
     }
 
     public Transformer getRoundTripTransformer() throws Exception
     {
-        StringToEmailMessage trans = new StringToEmailMessage();
+        StringToEmailMessage trans = createObject(StringToEmailMessage.class);
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "smtp://a:a@a.com");
 

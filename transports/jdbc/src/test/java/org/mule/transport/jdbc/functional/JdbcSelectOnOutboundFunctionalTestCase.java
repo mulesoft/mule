@@ -35,7 +35,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunction
     {
         MuleClient client = new MuleClient();
         MyMessage payload = new MyMessage(2);
-        MuleMessage reply = client.send("vm://terra", new DefaultMuleMessage(payload));
+        MuleMessage reply = client.send("vm://terra", new DefaultMuleMessage(payload, muleContext));
         assertNotNull(reply.getPayload());
         assertTrue(reply.getPayload() instanceof List);
         List resultList = (List)reply.getPayload();

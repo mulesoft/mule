@@ -11,7 +11,7 @@
 package org.mule.transport.file;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
@@ -49,7 +49,7 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         return message;
     }
 
-    public MessageAdapter createAdapter(Object payload) throws MessagingException
+    public MessageAdapter createAdapter(Object payload) throws MuleException
     {
         return new FileMessageAdapter(payload);
     }
@@ -59,7 +59,7 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         Object msg = new ReceiverFileInputStream((File) getValidMessage(), false, null);
 
         MessageAdapter adapter = createAdapter(msg);
-        MuleMessage muleMessage = new DefaultMuleMessage(adapter);
+        MuleMessage muleMessage = new DefaultMuleMessage(adapter, muleContext);
 
         doTestMessageEqualsPayload(msg, adapter.getPayload());
 
@@ -103,7 +103,7 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     public void testSerializationWithFile() throws Exception
     {
         MessageAdapter messageAdapter = createAdapter(getValidMessage());
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter);
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter, muleContext);
         serializeMessage(muleMessage);
     }
 
@@ -113,7 +113,7 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         {
             InputStream inputStream = new ReceiverFileInputStream(message, false, message);
             MessageAdapter messageAdapter = createAdapter(inputStream);
-            DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter);
+            DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter, muleContext);
 
             serializeMessage(muleMessage);
             fail("serializing a ReceiverFileInputStream is not expected to work");

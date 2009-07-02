@@ -10,12 +10,17 @@
 
 package org.mule.transformer.simple;
 
+import org.mule.api.MuleContext;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.apache.commons.lang.SerializationUtils;
 
@@ -26,7 +31,9 @@ import org.apache.commons.lang.SerializationUtils;
 public class ByteArrayToSerializable extends AbstractTransformer implements DiscoverableTransformer
 {
 
-    /** Give core transformers a slighty higher priority */
+    /**
+     * Give core transformers a slighty higher priority
+     */
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
     public ByteArrayToSerializable()
@@ -39,14 +46,52 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
     {
         try
         {
+            final Object result;
             if (src instanceof byte[])
             {
-                return SerializationUtils.deserialize((byte[]) src);
+                result = SerializationUtils.deserialize((byte[]) src);
             }
             else
             {
-                return SerializationUtils.deserialize((InputStream) src);
+                result = SerializationUtils.deserialize((InputStream) src);
             }
+            if (result instanceof DeserializationPostInitialisable)
+            {
+                try
+                {
+                    final Method m = result.getClass().getDeclaredMethod("initAfterDeserialisation", MuleContext.class);
+
+                    Object o = AccessController.doPrivileged(new PrivilegedAction()
+                    {
+                        public Object run()
+                        {
+                            try
+                            {
+                                m.setAccessible(true);
+                                m.invoke(result, muleContext);
+                                return null;
+                            }
+                            catch (Exception e)
+                            {
+                                return e;
+                            }
+
+                        }
+                    });
+                    if(o!=null)
+                    {
+                        throw (Exception)o;
+                    }
+
+                }
+                catch (NoSuchMethodException e)
+                {
+                    throw new IllegalArgumentException("Object " + result.getClass() + " implements " +
+                            DeserializationPostInitialisable.class + " but does not have a method " +
+                            "private void initAfterDeserialisation(MuleContext) defined", e);
+                }
+            }
+            return result;
         }
         catch (Exception e)
         {

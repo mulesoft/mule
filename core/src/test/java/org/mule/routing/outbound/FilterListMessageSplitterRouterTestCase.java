@@ -39,7 +39,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2", null, new PayloadTypeFilter(Orange.class), null);
         OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
 
-        ListMessageSplitter router = new ListMessageSplitter();
+        ListMessageSplitter router = createObject(ListMessageSplitter.class);
         router.setFilter(new PayloadTypeFilter(List.class));
         router.addEndpoint(endpoint1);
         router.addEndpoint(endpoint2);
@@ -50,7 +50,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         payload.add(new Apple());
         payload.add(new Orange());
         payload.add(new String());
-        MuleMessage message = new DefaultMuleMessage(payload);
+        MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(router.isMatch(message));
         session.expect("dispatchEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)));
@@ -63,13 +63,13 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1?synchronous=true", null, new PayloadTypeFilter(Apple.class), null);
         endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2?synchronous=true", null, new PayloadTypeFilter(Orange.class), null);
         endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3?synchronous=true");
-        router = new ListMessageSplitter();
+        router = createObject(ListMessageSplitter.class);
         router.setFilter(new PayloadTypeFilter(List.class));
         router.addEndpoint(endpoint1);
         router.addEndpoint(endpoint2);
         router.addEndpoint(endpoint3);
 
-        message = new DefaultMuleMessage(payload);
+        message = new DefaultMuleMessage(payload, muleContext);
 
         session.expectAndReturn("sendEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)),
                 message);

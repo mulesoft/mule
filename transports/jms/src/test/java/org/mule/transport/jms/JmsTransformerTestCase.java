@@ -10,13 +10,12 @@
 
 package org.mule.transport.jms;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
-import org.mule.transport.jms.JmsMessageAdapter;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 
 import com.mockobjects.constraint.Constraint;
@@ -69,7 +68,7 @@ public class JmsTransformerTestCase extends AbstractMuleTestCase
         mockMessage.expect("setObjectProperty", setPropertyMatcher);
 
         Message mockTextMessage = (Message)mockMessage.proxy();
-        MuleMessage msg = new DefaultMuleMessage(new JmsMessageAdapter(mockTextMessage));
+        MuleMessage msg = new DefaultMuleMessage(new JmsMessageAdapter(mockTextMessage), muleContext);
 
         // Now we set a custom "JMS-like" property on the MuleMessage
         msg.setProperty("JMS_CUSTOM_PROPERTY", "customValue");
@@ -83,7 +82,7 @@ public class JmsTransformerTestCase extends AbstractMuleTestCase
         // The transformer we are going to use is ObjectToJMSMessage, which will
         // return the same (but mockingly modified!) JMS message that is used as
         // input.
-        ObjectToJMSMessage transformer = new ObjectToJMSMessage();
+        ObjectToJMSMessage transformer = createObject(ObjectToJMSMessage.class);
         Message transformed = (Message)transformer.transform(msg.getPayload());
 
         // Finally we can assert that the setProperty done to the MuleMessage actually

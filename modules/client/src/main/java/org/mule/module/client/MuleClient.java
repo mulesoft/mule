@@ -10,10 +10,10 @@
 
 package org.mule.module.client;
 
+import org.mule.DefaultMuleContext;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
-import org.mule.MuleServer;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -102,7 +102,7 @@ public class MuleClient implements Disposable
     /**
      * The local MuleContext instance.
      */
-    private MuleContext muleContext;
+    private static MuleContext muleContext;
 
     private List dispatchers = new ArrayList();
 
@@ -126,6 +126,8 @@ public class MuleClient implements Disposable
 
     public MuleClient(boolean startContext) throws MuleException
     {
+        //TODO URGENT This is the last refernece to a static instance of MuleContext
+        muleContext = DefaultMuleContext.getContext();        
         init(startContext);
     }
 
@@ -160,6 +162,8 @@ public class MuleClient implements Disposable
      */
     public MuleClient(String user, String password) throws MuleException
     {
+        //TODO URGENT This is the last refernece to a static instance of MuleContext        
+        muleContext = DefaultMuleContext.getContext();
         init(/* startManager */true);
         this.user = new MuleCredentials(user, password.toCharArray());
     }
@@ -208,6 +212,11 @@ public class MuleClient implements Disposable
         this.user = new MuleCredentials(user, password.toCharArray());
     }
 
+    public static void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
+    }
+
     /**
      * Initialises a default {@link MuleContext} for use by the client.
      * 
@@ -216,13 +225,6 @@ public class MuleClient implements Disposable
      */
     private void init(boolean startManager) throws MuleException
     {
-        // if we are creating a server for this client then set client mode
-        // this will disable Admin connections by default;
-        // If there is no local muleContext present create a default muleContext
-        if (muleContext == null)
-        {
-            muleContext = MuleServer.getMuleContext();
-        }
         if (muleContext == null)
         {
             logger.info("No existing ManagementContext found, creating a new Mule instance");
@@ -259,7 +261,7 @@ public class MuleClient implements Disposable
      */
     public void dispatch(String url, Object payload, Map messageProperties) throws MuleException
     {
-        dispatch(url, new DefaultMuleMessage(payload, messageProperties));
+        dispatch(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
     }
 
     /**
@@ -305,7 +307,7 @@ public class MuleClient implements Disposable
     public MuleMessage sendDirect(String component, String transformers, Object payload, Map messageProperties)
         throws MuleException
     {
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
+        MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
         return sendDirect(component, transformers, message);
     }
 
@@ -332,7 +334,7 @@ public class MuleClient implements Disposable
         List trans = null;
         if (transformers != null)
         {
-            trans = TransformerUtils.getTransformers(transformers);
+            trans = TransformerUtils.getTransformers(transformers, muleContext);
         }
 
         if (!muleContext.getConfiguration().isDefaultSynchronousEndpoints())
@@ -375,7 +377,7 @@ public class MuleClient implements Disposable
      */
     public void dispatchDirect(String component, Object payload, Map messageProperties) throws MuleException
     {
-        dispatchDirect(component, new DefaultMuleMessage(payload, messageProperties));
+        dispatchDirect(component, new DefaultMuleMessage(payload, messageProperties, muleContext));
     }
 
     /**
@@ -457,7 +459,7 @@ public class MuleClient implements Disposable
                                          final Map messageProperties,
                                          final int timeout) throws MuleException
     {
-        return sendAsync(url, new DefaultMuleMessage(payload, messageProperties), timeout);
+        return sendAsync(url, new DefaultMuleMessage(payload, messageProperties, muleContext), timeout);
     }
 
     /**
@@ -482,7 +484,7 @@ public class MuleClient implements Disposable
             }
         };
 
-        FutureMessageResult result = new FutureMessageResult(call);
+        FutureMessageResult result = new FutureMessageResult(call, muleContext);
 
         if (muleContext.getWorkManager() != null)
         {
@@ -514,7 +516,7 @@ public class MuleClient implements Disposable
                                                final Object payload,
                                                final Map messageProperties) throws MuleException
     {
-        return sendDirectAsync(component, transformers, new DefaultMuleMessage(payload, messageProperties));
+        return sendDirectAsync(component, transformers, new DefaultMuleMessage(payload, messageProperties, muleContext));
     }
 
     /**
@@ -544,7 +546,7 @@ public class MuleClient implements Disposable
             }
         };
 
-        FutureMessageResult result = new FutureMessageResult(call);
+        FutureMessageResult result = new FutureMessageResult(call, muleContext);
 
         if (muleContext.getWorkManager() != null)
         {
@@ -553,7 +555,7 @@ public class MuleClient implements Disposable
 
         if (StringUtils.isNotBlank(transformers))
         {
-            result.setTransformers(TransformerUtils.getTransformers(transformers));
+            result.setTransformers(TransformerUtils.getTransformers(transformers, muleContext));
         }
 
         result.execute();
@@ -622,7 +624,7 @@ public class MuleClient implements Disposable
         {
             messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
         }
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
+        MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
         return send(url, message, timeout);
     }
 
@@ -649,7 +651,7 @@ public class MuleClient implements Disposable
             MuleMessage msg = event.getSession().sendEvent(event);
             if (msg == null)
             {
-                msg = new DefaultMuleMessage(NullPayload.getInstance());
+                msg = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
             }
             return msg;
         }
@@ -708,7 +710,7 @@ public class MuleClient implements Disposable
      */
     public MuleMessage request(String url, String transformers, long timeout) throws MuleException
     {
-        return request(url, TransformerUtils.getTransformers(transformers), timeout);
+        return request(url, TransformerUtils.getTransformers(transformers, muleContext), timeout);
     }
 
     /**
@@ -867,7 +869,7 @@ public class MuleClient implements Disposable
             messageProperties = new HashMap();
         }
         messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
+        MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
         MuleEvent event = getEvent(message, url, true);
         try
         {
@@ -986,7 +988,7 @@ public class MuleClient implements Disposable
 
     public RemoteDispatcher getRemoteDispatcher(String serverEndpoint) throws MuleException
     {
-        RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint);
+        RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint, muleContext);
         rd.setExecutor(muleContext.getWorkManager());
         dispatchers.add(rd);
         return rd;
@@ -996,7 +998,7 @@ public class MuleClient implements Disposable
         throws MuleException
     {
         RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint, new MuleCredentials(user,
-            password.toCharArray()));
+            password.toCharArray()), muleContext);
         rd.setExecutor(muleContext.getWorkManager());
         dispatchers.add(rd);
         return rd;

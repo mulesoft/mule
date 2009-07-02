@@ -9,8 +9,9 @@
  */
 package org.mule.transport.ajax.container;
 
-import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.transport.ajax.i18n.AjaxMessages;
 import org.mule.transport.service.TransportFactory;
 
@@ -35,16 +36,21 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
     public void init() throws ServletException
     {
         super.init();
+        MuleContext muleContext = (MuleContext)getServletContext().getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
+        if(muleContext==null)
+        {
+            throw new ServletException("Property " + MuleProperties.MULE_CONTEXT_PROPERTY + " not set on ServletContext");
+        }
         String servletConnectorName = getServletConfig().getInitParameter(AJAX_CONNECTOR_NAME_PROPERTY);
         if (servletConnectorName == null)
         {
-            connector = (AjaxServletConnector) TransportFactory.getConnectorByProtocol(getConnectorProtocol());
+            connector = (AjaxServletConnector) new TransportFactory(muleContext).getConnectorByProtocol(getConnectorProtocol());
             if (connector == null)
             {
                 connector = new AjaxServletConnector();
                 try
                 {
-                    RegistryContext.getRegistry().registerConnector(connector);
+                    muleContext.getRegistry().registerConnector(connector);
                 }
                 catch (MuleException e)
                 {
@@ -54,7 +60,7 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
         }
         else
         {
-            connector = (AjaxServletConnector) RegistryContext.getRegistry().lookupConnector(servletConnectorName);
+            connector = (AjaxServletConnector) muleContext.getRegistry().lookupConnector(servletConnectorName);
             if (connector == null)
             {
                 throw new ServletException(AjaxMessages.noAjaxConnectorWithName(servletConnectorName, AJAX_CONNECTOR_NAME_PROPERTY).toString());

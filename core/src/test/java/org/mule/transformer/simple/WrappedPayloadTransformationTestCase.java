@@ -19,7 +19,7 @@ public class WrappedPayloadTransformationTestCase extends HexStringByteArrayTran
     // extra test for MULE-1274: transforming Mule Messages with regular payload
     public void testPayloadWrappedInMuleMessage() throws TransformerException
     {
-        Object wrappedPayload = new DefaultMuleMessage(this.getResultData());
+        Object wrappedPayload = new DefaultMuleMessage(this.getResultData(), muleContext);
         assertEquals(this.getTestData(), this.getRoundTripTransformer().transform(wrappedPayload));
     }
 

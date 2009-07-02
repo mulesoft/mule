@@ -61,10 +61,10 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver
             MessageAdapter adapter = getConnector().getMessageAdapter(data);
 
             Object replyTo = adapter.getReplyTo();
-            MuleMessage message = AjaxMessageReceiver.this.routeMessage(new DefaultMuleMessage(adapter));
+            MuleMessage message = AjaxMessageReceiver.this.routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext()));
             //If a replyTo channel is set the client is expecting a response.
             //Mule does not invoke the replyTo handler if an error occurs, but in this case we want it to.
-            if((message!=null || message.getExceptionPayload()!=null) && replyTo!=null)
+            if((message!=null && message.getExceptionPayload()==null) && replyTo!=null)
             {
                 ((AbstractConnector)getConnector()).getReplyToHandler().processReplyTo(RequestContext.getEvent(), message, replyTo);
             }

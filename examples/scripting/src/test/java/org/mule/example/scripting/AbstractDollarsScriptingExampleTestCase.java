@@ -27,7 +27,7 @@ public abstract class AbstractDollarsScriptingExampleTestCase extends AbstractSc
         
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
-        assertEquals("[4 quarters, 1 dimes, 1 nickels, 3 pennies]", reply.getPayloadAsString()); 
+        assertEquals("[4 quarters, 1 dimes, 1 nickels, 3 pennies]", reply.getPayloadAsString());
     }
 
     public void testAccumulator() throws Exception
@@ -39,6 +39,6 @@ public abstract class AbstractDollarsScriptingExampleTestCase extends AbstractSc
         
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
-        assertEquals("[4 quarters, 1 dimes, 1 nickels, 3 pennies]", reply.getPayloadAsString()); 
+        assertEquals("[4 quarters, 1 dimes, 1 nickels, 3 pennies]", reply.getPayloadAsString());
     }
 }

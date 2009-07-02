@@ -10,7 +10,6 @@
 
 package org.mule.api.registry;
 
-import org.mule.MuleServer;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.DefaultModelServiceDescriptor;
@@ -45,7 +44,7 @@ public class ServiceDescriptorFactory
     /**
      * Factory method to create a new service descriptor.
      */
-    public static ServiceDescriptor create(String type, String name, Properties props, Properties overrides, Registry registry, ClassLoader classLoader) throws ServiceException
+    public static ServiceDescriptor create(String type, String name, Properties props, Properties overrides, MuleRegistry registry, ClassLoader classLoader) throws ServiceException
     {       
         if (overrides != null)
         {
@@ -54,7 +53,7 @@ public class ServiceDescriptorFactory
 
         String serviceFinderClass = (String) props.remove(MuleProperties.SERVICE_FINDER);
         
-        ServiceDescriptor sd = null;
+        ServiceDescriptor sd;
         if (type.equals(TRANSPORT_SERVICE_TYPE))
         {
             try
@@ -93,7 +92,7 @@ public class ServiceDescriptorFactory
             if (realService != null)
             {
                 // Recursively look up the service descriptor for the real service.
-                return MuleServer.getMuleContext().getRegistry().lookupServiceDescriptor(
+                return registry.lookupServiceDescriptor(
                     ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, realService, overrides);
             }
             else

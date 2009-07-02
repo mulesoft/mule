@@ -10,6 +10,8 @@
 
 package org.mule.retry.policies;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
@@ -31,20 +33,29 @@ import org.apache.commons.logging.LogFactory;
  * Base class for RetryPolicyTemplate implementations.  Uses ConnectNotifier as RetryNotifier
  * by default.
  */
-public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate
+public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, MuleContextAware
 {
     protected RetryNotifier notifier = new ConnectNotifier();
     
     /** This data will be made available to the RetryPolicy via the RetryContext. */
     private Map metaInfo;
-    
+
+    private MuleContext muleContext;
+
     protected transient final Log logger = LogFactory.getLog(getClass());
-    
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
     public RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception
     {
         PolicyStatus status = null;
         RetryPolicy policy = createRetryInstance();
         DefaultRetryContext context = new DefaultRetryContext(callback.getWorkDescription());
+        context.setMuleContext(muleContext);
+
         if (metaInfo != null)
         {
             context.setMetaInfo(metaInfo);

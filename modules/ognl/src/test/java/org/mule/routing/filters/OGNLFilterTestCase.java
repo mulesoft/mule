@@ -55,13 +55,13 @@ public class OGNLFilterTestCase extends FunctionalTestCase
 
     public void testNoExpressionEmptyMessage()
     {
-        MuleMessage message = new DefaultMuleMessage(null);
+        MuleMessage message = new DefaultMuleMessage(null, muleContext);
         assertFalse(filter.accept(message));
     }
 
     public void testNoExpressionValidMessage()
     {
-        MuleMessage message = new DefaultMuleMessage("foo");
+        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
         assertFalse(filter.accept(message));
     }
 
@@ -89,7 +89,7 @@ public class OGNLFilterTestCase extends FunctionalTestCase
 
             Dummy payload = new Dummy();
             payload.setContent(SECOND_MESSAGE);
-            client.dispatch(DEFAULT_INPUT_QUEUE, new DefaultMuleMessage(payload));
+            client.dispatch(DEFAULT_INPUT_QUEUE, new DefaultMuleMessage(payload, muleContext));
             message = client.request(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
             assertNotNull(message);
             assertNotNull(message.getPayload());
@@ -122,7 +122,7 @@ public class OGNLFilterTestCase extends FunctionalTestCase
 
             Dummy payload = new Dummy();
             payload.setContent(SECOND_MESSAGE);
-            client.dispatch("vm://in2", new DefaultMuleMessage(payload));
+            client.dispatch("vm://in2", new DefaultMuleMessage(payload, muleContext));
             message = client.request("vm://out2", TIMEOUT);
             assertNotNull(message);
             assertNotNull(message.getPayload());

@@ -94,7 +94,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
     private class DummyEvent implements MuleEvent, ThreadSafeAccess
     {
 
-        private MuleMessage message = new DefaultMuleMessage(null);
+        private MuleMessage message = new DefaultMuleMessage(null, muleContext);
 
         public MuleMessage getMessage()
         {

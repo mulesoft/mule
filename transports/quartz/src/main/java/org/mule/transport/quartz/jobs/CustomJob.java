@@ -10,7 +10,8 @@
 
 package org.mule.transport.quartz.jobs;
 
-import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.i18n.QuartzMessages;
 
@@ -18,6 +19,7 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SchedulerException;
 
 /**
  * Extracts the Job object to invoke from the context. The Job itself can be
@@ -32,6 +34,15 @@ public class CustomJob implements Job
 {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
+        MuleContext muleContext;
+        try
+        {
+            muleContext = (MuleContext)jobExecutionContext.getScheduler().getContext().get(MuleProperties.MULE_CONTEXT_PROPERTY);
+        }
+        catch (SchedulerException e)
+        {
+            throw new JobExecutionException("Failed to retrieve Mulecontext from the Scheduler Context: " + e.getMessage(), e);
+        }
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         Object tempJob = jobDataMap.get(QuartzConnector.PROPERTY_JOB_OBJECT);
         if (tempJob == null)
@@ -43,7 +54,7 @@ public class CustomJob implements Job
             }
             else
             {
-                tempJob = RegistryContext.getRegistry().lookupObject((String) tempJob);
+                tempJob = muleContext.getRegistry().lookupObject((String) tempJob);
                 if(tempJob==null)
                 {
                     throw new JobExecutionException("Job not found: " + tempJob);

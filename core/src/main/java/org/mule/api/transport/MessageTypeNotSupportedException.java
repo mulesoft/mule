@@ -10,7 +10,7 @@
 
 package org.mule.api.transport;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.config.i18n.CoreMessages;
 
 /**
@@ -19,7 +19,7 @@ import org.mule.config.i18n.CoreMessages;
  * type for that message or adapter.
  */
 
-public class MessageTypeNotSupportedException extends MessagingException
+public class MessageTypeNotSupportedException extends MuleException
 {
     /**
      * Serial version
@@ -30,15 +30,13 @@ public class MessageTypeNotSupportedException extends MessagingException
     {
         super(CoreMessages.messageNotSupportedByAdapter(
             (message != null ? message.getClass().getName() : "null"),
-            (adapterClass != null ? adapterClass.getName() : "null class")), 
-            message);
+            (adapterClass != null ? adapterClass.getName() : "null class")));
     }
 
     public MessageTypeNotSupportedException(Object message, Class adapterClass, Throwable cause)
     {
         super(CoreMessages.messageNotSupportedByAdapter(
             (message != null ? message.getClass().getName() : "null"), 
-            (adapterClass != null ? adapterClass.getName() : "null class")), 
-            message, cause);
+            (adapterClass != null ? adapterClass.getName() : "null class")), cause);
     }
 }

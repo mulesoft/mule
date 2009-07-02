@@ -58,7 +58,7 @@ public class TcpMessageRequester extends AbstractMessageRequester
             {
                 return null;
             }
-            return new DefaultMuleMessage(connector.getMessageAdapter(result));
+            return new DefaultMuleMessage(connector.getMessageAdapter(result), connector.getMuleContext());
         }
         catch (SocketTimeoutException e)
         {

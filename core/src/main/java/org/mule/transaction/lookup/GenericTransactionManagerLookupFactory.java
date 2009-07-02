@@ -10,6 +10,7 @@
 
 package org.mule.transaction.lookup;
 
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transaction.TransactionManagerFactory;
@@ -86,8 +87,9 @@ public class GenericTransactionManagerLookupFactory implements TransactionManage
         this.context = context;
     }
 
-    /** @see org.mule.api.transaction.TransactionManagerFactory#create() */
-    public TransactionManager create() throws Exception
+    /** @see org.mule.api.transaction.TransactionManagerFactory#create(MuleConfiguration)
+     * @param config */
+    public TransactionManager create(MuleConfiguration config) throws Exception
     {
         // implementing the Initilisable interface does not call it??
         initialise();

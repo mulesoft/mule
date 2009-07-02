@@ -31,8 +31,7 @@ public class JsonDynaBeanCollectionsTestCase extends AbstractMuleTestCase
 
 
         TestBean testBean = new TestBean("json", 23, 2.2, "function(i){ return i; }");
-        ObjectToJson transformer = new ObjectToJson();
-        transformer.initialise();
+        ObjectToJson transformer = createObject(ObjectToJson.class);
         String transformed = (String) transformer.transform(testBean);
 
         TestBean testBean2 = (TestBean) JsonUtils.getObjectFromJsonString(transformed, transformer.getJsonConfig(), TestBean.class);
@@ -45,8 +44,7 @@ public class JsonDynaBeanCollectionsTestCase extends AbstractMuleTestCase
     public void testTransformStringArray() throws Exception
     {
         String[] list = new String[]{"foo", "bar"};
-        ObjectToJson trans1 = new ObjectToJson();
-        trans1.initialise();
+        ObjectToJson trans1 = createObject(ObjectToJson.class);
         String transformed = (String) trans1.transform(list);
 
         JsonToObject trans2 = new JsonToObject();
@@ -64,13 +62,12 @@ public class JsonDynaBeanCollectionsTestCase extends AbstractMuleTestCase
     public void testTransformObjectArray() throws Exception
     {
         Orange[] oranges = new Orange[]{new Orange(6, 2.3, "smallish"), new Orange(10, 6.2, "massive")};
-        ObjectToJson trans1 = new ObjectToJson();
-        trans1.initialise();
+        ObjectToJson trans1 = createObject(ObjectToJson.class);
         String transformed = (String) trans1.transform(oranges);
 
         JsonToObject trans2 = new JsonToObject();
         trans2.setReturnClass(Orange[].class);
-        trans2.initialise();
+        initialiseObject(trans2);
 
         Orange[] oranges2 = (Orange[]) JsonUtils.getObjectFromJsonString(transformed, trans2.getJsonConfig(), trans2.getReturnClass());
 
@@ -94,14 +91,12 @@ public class JsonDynaBeanCollectionsTestCase extends AbstractMuleTestCase
         list.add(apple);
         list.add(orange);
 
-        ObjectToJson trans1 = new ObjectToJson();
-        trans1.initialise();
+        ObjectToJson trans1 = createObject(ObjectToJson.class);
         String transformed = (String) trans1.transform(list);
 
         JsonToObject trans2 = new JsonToObject();
         trans2.setReturnClass(ArrayList.class);
-        trans2.initialise();
-
+        initialiseObject(trans2);
         List list2 = (List) JsonUtils.getObjectFromJsonString(transformed, trans2.getJsonConfig(), trans2.getReturnClass());
 
         assertNotNull(list2);
@@ -120,14 +115,12 @@ public class JsonDynaBeanCollectionsTestCase extends AbstractMuleTestCase
         Set set = new HashSet();
         set.add("foo");
         set.add("bar");
-        ObjectToJson trans1 = new ObjectToJson();
-        trans1.initialise();
+        ObjectToJson trans1 = createObject(ObjectToJson.class);
         String transformed = (String) trans1.transform(set);
 
         JsonToObject trans2 = new JsonToObject();
         trans2.setReturnClass(HashSet.class);
-        trans2.initialise();
-
+        initialiseObject(trans2);
         Set set2 = (Set) JsonUtils.getObjectFromJsonString(transformed, trans2.getJsonConfig(), trans2.getReturnClass());
 
         assertNotNull(set);

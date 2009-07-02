@@ -9,6 +9,8 @@
  */
 package org.mule.config.spring.editors;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.URIBuilder;
 
@@ -18,11 +20,18 @@ import org.springframework.beans.PropertyEditorRegistry;
 /**
  * The preferred way to configure property editors in Spring 2/3 is to implement a registrar
  */
-public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar
+public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, MuleContextAware
 {
+    private MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
+    }
+
     public void registerCustomEditors(PropertyEditorRegistry registry)
     {
-        registry.registerCustomEditor(Connector.class, new ConnectorPropertyEditor());
-        registry.registerCustomEditor(URIBuilder.class, new URIBuilderPropertyEditor());
+        registry.registerCustomEditor(Connector.class, new ConnectorPropertyEditor(muleContext));
+        registry.registerCustomEditor(URIBuilder.class, new URIBuilderPropertyEditor(muleContext));
     }
 }

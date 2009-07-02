@@ -138,7 +138,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
                     logger.debug("MessageAdapter is a: " + adapter.getClass().getName());
                 }
 
-                MuleMessage returnMessage = routeMessage(new DefaultMuleMessage(adapter), endpoint.isSynchronous());
+                MuleMessage returnMessage = routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext()), endpoint.isSynchronous());
 
                 if (returnMessage != null && packet instanceof Message)
                 {

@@ -49,7 +49,7 @@ public class MuleTransactionConfig implements TransactionConfig
     
     public MuleTransactionConfig()
     {
-        // todo timeout = RegistryContext.getConfiguration().getDefaultTransactionTimeout();
+        // todo timeout = muleContext.getConfiguration().getDefaultTransactionTimeout();
     }
 
     public TransactionFactory getFactory()

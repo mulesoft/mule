@@ -26,7 +26,7 @@ import org.apache.commons.lang.SerializationUtils;
 public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
 
-    public MessageAdapter createAdapter(Object payload) throws MessageTypeNotSupportedException
+    public MessageAdapter createAdapter(Object payload) throws MuleException
     {
         if (payload instanceof MuleMessage)
         {
@@ -40,7 +40,7 @@ public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 
     public Object getValidMessage() throws MuleException
     {
-        return new DefaultMuleMessage(TEST_MESSAGE);
+        return new DefaultMuleMessage(TEST_MESSAGE, muleContext);
     }
 
     public Object getInvalidMessage()

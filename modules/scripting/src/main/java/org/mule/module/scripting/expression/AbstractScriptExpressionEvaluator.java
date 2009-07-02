@@ -9,8 +9,10 @@
  */
 package org.mule.module.scripting.expression;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -29,9 +31,16 @@ import javax.script.ScriptException;
  * If a POJO is passed in it is accessible from the 'payload' namespace.  If a {@link MuleMessage} instance is used then
  * it is accessible from the message' namespace and the 'payload' namespace is also available.
  */
-public abstract class AbstractScriptExpressionEvaluator implements ExpressionEvaluator, Disposable
+public abstract class AbstractScriptExpressionEvaluator implements ExpressionEvaluator, Disposable, MuleContextAware
 {
     protected Map cache = new WeakHashMap(8);
+
+    protected MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 
     /**
      * Extracts a single property from the message
@@ -71,7 +80,7 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
         Scriptable script = (Scriptable)cache.get(expression);
         if(script==null)
         {
-            script = new Scriptable();
+            script = new Scriptable(muleContext);
             script.setScriptEngineName(getName());
             script.setScriptText(expression);
             try

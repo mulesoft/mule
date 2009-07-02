@@ -31,7 +31,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
 
     public void testAddressForProtocol()
     {
-        URIBuilder uri = new URIBuilder();
+        URIBuilder uri = new URIBuilder(muleContext);
         uri.setProtocol("foo");
         uri.setAddress("foo://bar");
         assertEquals("foo://bar", uri.toString());
@@ -39,7 +39,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
 
     public void testAddressForMeta()
     {
-        URIBuilder uri = new URIBuilder();
+        URIBuilder uri = new URIBuilder(muleContext);
         uri.setMeta("foo");
         uri.setAddress("baz://bar");
         assertEquals("foo:baz://bar", uri.toString());
@@ -47,7 +47,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
 
     public void testQueriesWithAddress()
     {
-        URIBuilder uri = new URIBuilder();
+        URIBuilder uri = new URIBuilder(muleContext);
         uri.setAddress("foo://bar");
         uri.setQueryMap(queries);
         assertEquals("foo://bar?aname=avalue&bname=bvalue", uri.toString());
@@ -55,7 +55,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
 
     public void testLiteralQueries()
     {
-        URIBuilder uri = new URIBuilder();
+        URIBuilder uri = new URIBuilder(muleContext);
         uri.setAddress("foo://bar?cname=cvalue");
         uri.setQueryMap(queries);
         assertEquals("foo://bar?cname=cvalue&aname=avalue&bname=bvalue", uri.toString());
@@ -63,11 +63,11 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
 
     public void testFromString()
     {
-        URIBuilder uri = new URIBuilder("test://bar");
+        URIBuilder uri = new URIBuilder("test://bar", muleContext);
         EndpointURI endpointURI = uri.getEndpoint();
         assertEquals("test://bar", endpointURI.getUri().toString());
         assertEquals("test", endpointURI.getSchemeMetaInfo());
-        uri = new URIBuilder("meta:test://bar");
+        uri = new URIBuilder("meta:test://bar", muleContext);
         endpointURI = uri.getEndpoint();
         assertEquals("test://bar", endpointURI.getUri().toString());
         assertEquals("meta", endpointURI.getSchemeMetaInfo());

@@ -15,6 +15,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
@@ -86,6 +87,8 @@ public class DefaultMuleContext implements MuleContext
 
     private ExpressionManager expressionManager;
 
+    private static MuleContext staticInsntace;
+
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager, 
                               WorkListener workListener, 
@@ -93,12 +96,22 @@ public class DefaultMuleContext implements MuleContext
                               ServerNotificationManager notificationManager)
     {
         this.config = config;
+        ((MuleContextAware)config).setMuleContext(this);
         this.workManager = workManager;
         this.workListener = workListener;
         this.lifecycleManager = lifecycleManager;
         this.notificationManager = notificationManager;
+        this.notificationManager.setMuleContext(this);
         //there is no point having this object configurable
         this.expressionManager = new DefaultExpressionManager();
+
+        //TODO URGENT remove - currently used by the MuleClient only
+        staticInsntace = this;
+    }
+
+    public static MuleContext getContext()
+    {
+        return staticInsntace;
     }
 
     protected RegistryBroker createRegistryBroker()
@@ -246,6 +259,7 @@ public class DefaultMuleContext implements MuleContext
             logger.info(splashScreen.toString());
         }
 
+        staticInsntace = null;
         // SplashScreen holds static variables which need to be cleared in case we restart the server.
         SplashScreen.dispose();
     }
@@ -457,6 +471,7 @@ public class DefaultMuleContext implements MuleContext
      */
     public MuleConfiguration getConfiguration()
     {
+
         return config;
         //return (MuleConfiguration) getRegistry().lookupObject(MuleProperties.OBJECT_MULE_CONFIGURATION);
     }
@@ -495,7 +510,7 @@ public class DefaultMuleContext implements MuleContext
             {
                 try
                 {
-                    transactionManager = (((TransactionManagerFactory) temp.iterator().next()).create());
+                    transactionManager = (((TransactionManagerFactory) temp.iterator().next()).create(config));
                 }
                 catch (Exception e)
                 {

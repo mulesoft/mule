@@ -121,7 +121,7 @@ public class MuleActivationSpec implements ActivationSpec, Serializable
     {
         try
         {
-            this.endpointURI = new MuleEndpointURI(endpoint);
+            this.endpointURI = new MuleEndpointURI(endpoint, resourceAdapter.muleContext);
         }
         catch (EndpointException e)
         {

@@ -10,7 +10,11 @@
 
 package org.mule.transport.ajax;
 
+import org.mule.api.config.MuleProperties;
 import org.mule.transport.ajax.container.MuleAjaxServlet;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
@@ -26,8 +30,17 @@ public class AjaxContainerFunctionalTestCase extends AjaxFunctionalTestCase
         super.doSetUp();
 
         httpServer = new Server(58883);
-        Context context = new Context(httpServer, "/", Context.SESSIONS);
-        context.addServlet(new ServletHolder(new MuleAjaxServlet()), "/cometd/*");
+
+        Context c = new Context(httpServer, "/", Context.SESSIONS);
+        c.addServlet(new ServletHolder(new MuleAjaxServlet()), "/cometd/*");
+        c.addEventListener(new ServletContextListener() {
+            public void contextInitialized(ServletContextEvent sce)
+            {
+                sce.getServletContext().setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
+            }
+
+            public void contextDestroyed(ServletContextEvent sce) { }
+        });
 
         httpServer.start();
     }

@@ -11,18 +11,10 @@
 package org.mule.test.integration.routing.outbound;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
-import org.mule.api.MuleException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-import java.util.List;
-
 import org.custommonkey.xmlunit.XMLUnit;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Node;
 
 public class ExpressionSplitterXPathWithFiltersTestCase extends FunctionalTestCase
 {

@@ -89,7 +89,7 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
                     buffer = new byte[len];
                     System.arraycopy(data, pos, buffer, 0, buffer.length);
                     pos += len;
-                    part = new DefaultMuleMessage(buffer, message);
+                    part = new DefaultMuleMessage(buffer, message, muleContext);
                     part.setCorrelationId(message.getUniqueId());
                     part.setCorrelationGroupSize(parts);
                     part.setCorrelationSequence(count);

@@ -9,11 +9,11 @@
  */
 package org.mule.transformers.simple;
 
+import org.mule.api.transformer.Transformer;
+import org.mule.tck.testmodels.fruit.GrapeFruit;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.transformer.simple.BeanToMap;
 import org.mule.transformer.simple.MapToBean;
-import org.mule.api.transformer.Transformer;
-import org.mule.tck.testmodels.fruit.GrapeFruit;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,13 +22,15 @@ public class MapBeanTransformersTestCase extends AbstractTransformerTestCase
 {
     public Transformer getTransformer() throws Exception
     {
-        return new BeanToMap();
+        return createObject(BeanToMap.class);
     }
 
     public Transformer getRoundTripTransformer() throws Exception
     {
         MapToBean trans = new MapToBean();
         trans.setReturnClass(GrapeFruit.class);
+        trans.setMuleContext(muleContext);
+        trans.initialise();
         return trans;
     }
 

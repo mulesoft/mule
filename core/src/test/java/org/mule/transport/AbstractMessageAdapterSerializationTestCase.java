@@ -25,7 +25,7 @@ public abstract class AbstractMessageAdapterSerializationTestCase extends Abstra
     public void testMessageAdapterSerialization() throws Exception
     {
         MessageAdapter messageAdapter = createAndCheckMessageAdapter();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter);
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter, muleContext);
 
         byte[] serializedMessage = SerializationUtils.serialize(muleMessage);
         

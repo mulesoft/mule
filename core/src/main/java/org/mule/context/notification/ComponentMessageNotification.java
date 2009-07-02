@@ -10,7 +10,6 @@
 
 package org.mule.context.notification;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.Component;
 import org.mule.api.context.notification.ServerNotification;

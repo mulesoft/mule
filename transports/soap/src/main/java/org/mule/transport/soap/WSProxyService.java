@@ -11,7 +11,6 @@
 package org.mule.transport.soap;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -134,7 +133,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
                 eventContext.setStopFurtherProcessing(true);
                 return wsdlFileContents;
             }
-            MuleContext muleContext = MuleServer.getMuleContext();
+            MuleContext muleContext = eventContext.getMuleContext();
             InboundEndpoint webServiceEndpoint = muleContext.getRegistry()
                 .lookupEndpointFactory()
                 .getInboundEndpoint(this.wsdlEndpoint);
@@ -153,7 +152,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
                 wsdlString = wsdlString.replaceAll("localhost", InetAddress.getLocalHost().getHostName());
             }
             
-            DefaultMuleMessage modifiedWsdl = new DefaultMuleMessage(wsdlString);
+            DefaultMuleMessage modifiedWsdl = new DefaultMuleMessage(wsdlString, muleContext);
             logger.debug("WSDL retrieved successfully");
 
             // the processing is stopped so that the result is not passed through the

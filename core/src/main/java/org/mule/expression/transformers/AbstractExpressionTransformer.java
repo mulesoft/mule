@@ -9,8 +9,6 @@
  */
 package org.mule.expression.transformers;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -38,10 +36,9 @@ import java.util.List;
  * This transformer provides a very powerful way to pull different bits of information from the
  * message and pass them to the service.
  */
-public abstract class AbstractExpressionTransformer extends AbstractMessageAwareTransformer implements MuleContextAware
+public abstract class AbstractExpressionTransformer extends AbstractMessageAwareTransformer
 {
     protected List<ExpressionArgument> arguments;
-    protected static MuleContext muleContext;
 
     public AbstractExpressionTransformer()
     {
@@ -49,11 +46,6 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageAware
         registerSourceType(Object.class);
         setReturnClass(Object.class);
         arguments = new ArrayList<ExpressionArgument>(4);
-    }
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
     }
 
     public void addArgument(ExpressionArgument argument)

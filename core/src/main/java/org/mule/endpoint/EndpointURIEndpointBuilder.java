@@ -62,7 +62,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
      */
     public EndpointURIEndpointBuilder(String address, MuleContext muleContext)
     {
-        this(new URIBuilder(address), muleContext);
+        this(new URIBuilder(address, muleContext), muleContext);
     }
 
     /**

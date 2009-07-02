@@ -10,6 +10,7 @@
 
 package org.mule.transport.vm;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -65,31 +66,31 @@ public class VMMessageRequester extends AbstractMessageRequester
             }
             else
             {
-                MuleMessage message = null;
+                MuleEvent event = null;
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Waiting for a message on " + endpoint.getEndpointURI().getAddress());
                 }
                 try
                 {
-                    message = (MuleMessage) queue.poll(timeout);
+                    event = (MuleEvent) queue.poll(timeout);
                 }
                 catch (InterruptedException e)
                 {
                     logger.error("Failed to receive message from queue: " + endpoint.getEndpointURI());
                 }
-                if (message != null)
+                if (event != null)
                 {
                     //The message will contain old thread information, we need to reset it
-                    if(message instanceof ThreadSafeAccess)
+                    if(event.getMessage() instanceof ThreadSafeAccess)
                     {
-                        ((ThreadSafeAccess)message).resetAccessControl();
+                        ((ThreadSafeAccess) event.getMessage()).resetAccessControl();
                     }
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Message received: " + message);
+                        logger.debug("Message received: " + event);
                     }
-                    return message;
+                    return event.getMessage();
                 }
                 else
                 {

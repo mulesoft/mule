@@ -27,7 +27,7 @@ public class ComplexExpressionParsingTestCase extends AbstractMuleTestCase
     {
         muleContext.getExpressionManager().registerEvaluator(new GroovyExpressionEvaluator());
 
-        MuleMessage msg = new DefaultMuleMessage(Arrays.asList(0, "test"));
+        MuleMessage msg = new DefaultMuleMessage(Arrays.asList(0, "test"), muleContext);
         String result = muleContext.getExpressionManager().parse("#[groovy:payload[0]] - #[groovy:payload[1].toUpperCase()]",
                                                                  msg);
 

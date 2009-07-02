@@ -10,7 +10,6 @@
 
 package org.mule.tck.functional;
 
-import org.mule.MuleServer;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
@@ -240,12 +239,6 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
         if (isEnableNotifications())
         {
-            MuleContext muleContext = context.getMuleContext();
-            if (muleContext == null)
-            {
-                logger.warn("No MuleContext available from MuleEventContext");
-                muleContext = MuleServer.getMuleContext();
-            }
             muleContext.fireNotification(
                     new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
         }

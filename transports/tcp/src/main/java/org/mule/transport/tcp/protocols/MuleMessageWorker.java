@@ -12,10 +12,14 @@ package org.mule.transport.tcp.protocols;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
+import org.mule.api.MuleException;
+import org.mule.api.transformer.wire.WireFormat;
+import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
-import org.apache.commons.lang.SerializationUtils;
+import java.io.InputStream;
 
 /**
  * Helper class for Mule message handling so that we can apply the same logic across all
@@ -23,30 +27,54 @@ import org.apache.commons.lang.SerializationUtils;
  */
 class MuleMessageWorker
 {
+    private static WireFormat wireFormat = new SerializedMuleMessageWireFormat();
 
     private MuleMessageWorker()
     {
         // no-op
+
     }
 
     public static byte[] doWrite() throws IOException
     {
+        //TODO fix the api here so there is no need to use the RequestContext
         DefaultMuleMessage msg = (DefaultMuleMessage) RequestContext.getEvent().getMessage();
-        return SerializationUtils.serialize(msg);
+        wireFormat.setMuleContext(RequestContext.getEvent().getMuleContext());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try
+        {
+            wireFormat.write(baos, msg, msg.getEncoding());
+        }
+        catch (MuleException e)
+        {
+            throw new IOException(e.getDetailedMessage());
+        }
+        return baos.toByteArray();
     }
 
     public static Object doRead(Object message) throws IOException
     {
-        byte[] tmp = (byte[]) message;
-
-        if (tmp == null)
+        if(message==null) return null;
+        
+        InputStream in;
+        if(message instanceof byte[])
         {
-            return null;
+            in = new ByteArrayInputStream((byte[])message);
         }
         else
         {
-            return SerializationUtils.deserialize(tmp);
+            in = (InputStream)message;
         }
+
+        try
+        {
+            return wireFormat.read(in);
+        }
+        catch (MuleException e)
+        {
+            throw new IOException(e.getDetailedMessage());
+        }
+
     }
 
 }

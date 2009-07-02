@@ -60,7 +60,7 @@ public class CorrelationEventResequencer extends AbstractEventAggregator
 
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
-        return new ResequenceCorrelatorCallback(getEventComparator());
+        return new ResequenceCorrelatorCallback(getEventComparator(), muleContext);
     }
 
     @Override

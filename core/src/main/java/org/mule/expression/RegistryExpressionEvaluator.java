@@ -91,7 +91,7 @@ public class RegistryExpressionEvaluator implements ExpressionEvaluator, MuleCon
                 property = "endpointBuilder.endpoint." + property;
             }
             
-            Object p = muleContext.getExpressionManager().evaluate("#[bean:" + property + "]", new DefaultMuleMessage(o));
+            Object p = muleContext.getExpressionManager().evaluate("#[bean:" + property + "]", new DefaultMuleMessage(o, muleContext));
             if (p == null && propertyRequired)
             {
                 throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(NAME, name + "." + property));

@@ -9,24 +9,15 @@
  */
 package org.mule.module.xml.transformer;
 
-import org.mule.transformer.AbstractMessageAwareTransformer;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.IOUtils;
-import org.mule.module.xml.util.LocalURIResolver;
-import org.mule.module.xml.util.XMLUtils;
 import org.mule.module.xml.i18n.XmlMessages;
-
-import com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl;
-import com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl;
+import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -38,10 +29,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.URIResolver;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
 
+import net.sf.saxon.Configuration;
 import net.sf.saxon.javax.xml.xquery.XQCommonHandler;
 import net.sf.saxon.javax.xml.xquery.XQConnection;
 import net.sf.saxon.javax.xml.xquery.XQDataSource;
@@ -51,28 +40,21 @@ import net.sf.saxon.javax.xml.xquery.XQItemType;
 import net.sf.saxon.javax.xml.xquery.XQPreparedExpression;
 import net.sf.saxon.javax.xml.xquery.XQResultSequence;
 import net.sf.saxon.xqj.SaxonXQDataSource;
-import net.sf.saxon.Configuration;
-import net.sf.saxon.dom.DocumentOverNodeInfo;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.dom4j.DocumentException;
-import org.dom4j.dom.DOMDocumentFactory;
-import org.dom4j.dom.DOMDocument;
-
-import org.dom4j.io.DocumentSource;
 import org.dom4j.io.DOMWriter;
+import org.dom4j.io.DocumentSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.xml.sax.InputSource;
 
 /**
  * The XQuery Module gives users the ability to perform XQuery transformations on XML messages in Mule
  */
-public class XQueryTransformer extends AbstractXmlTransformer implements Disposable, MuleContextAware
+public class XQueryTransformer extends AbstractXmlTransformer implements Disposable
 {
     public static final String SOURCE_DOCUMENT_NAMESPACE = "document";
 
@@ -84,8 +66,6 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
     private static final int MAX_ACTIVE_TRANSFORMERS = MAX_IDLE_TRANSFORMERS;
 
     protected final GenericObjectPool transformerPool;
-
-    private MuleContext muleContext;
 
     private volatile String xqueryFile;
     private volatile String xquery;
@@ -110,12 +90,6 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         registerSourceType(Element.class);
         registerSourceType(InputStream.class);
         setReturnClass(Element.class);
-
-    }
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
     }
 
     /**

@@ -76,7 +76,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);
         assertEquals(null, ep.getSecurityFilter());
         assertTrue(ep.getConnector() instanceof TestConnector);
-        assertEquals(ObjectNameHelper.getEndpointName(ep.getEndpointURI()), ep.getName());
+        assertEquals(new ObjectNameHelper(muleContext).getEndpointName(ep.getEndpointURI()), ep.getName());
         assertFalse(ep.isDeleteUnacceptedMessages());
         assertEquals(muleContext.getConfiguration().getDefaultEncoding(), ep.getEncoding());
         assertEquals(null, ep.getFilter());

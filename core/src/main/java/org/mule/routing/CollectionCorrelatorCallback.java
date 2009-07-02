@@ -10,6 +10,7 @@
 package org.mule.routing;
 
 import org.mule.DefaultMessageCollection;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
@@ -30,6 +31,13 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
      */
     protected transient final Log logger = LogFactory.getLog(CollectionCorrelatorCallback.class);
 
+    protected MuleContext muleContext;
+
+    public CollectionCorrelatorCallback(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
+
     /**
      * This method is invoked if the shouldAggregate method is called and returns
      * true. Once this method returns an aggregated message, the event group is
@@ -44,7 +52,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
      */
     public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
     {
-        MuleMessageCollection message = new DefaultMessageCollection();
+        MuleMessageCollection message = new DefaultMessageCollection(muleContext);
         message.addMessages(events.toArray());
         return message;
     }

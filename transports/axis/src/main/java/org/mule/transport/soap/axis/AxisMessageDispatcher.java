@@ -11,6 +11,7 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -129,6 +130,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // the axis.one.way property is set
         call.setProperty("axis.one.way", Boolean.TRUE);
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
+        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, connector.getMuleContext());
         call.invoke(args);
     }
 
@@ -145,7 +147,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
         else
         {
-            MuleMessage resultMessage = new DefaultMuleMessage(result, event.getMessage());
+            MuleMessage resultMessage = new DefaultMuleMessage(result, event.getMessage(), event.getMuleContext());
             setMessageContextProperties(resultMessage, call.getMessageContext());
             return resultMessage;
         }
@@ -169,6 +171,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // set Mule event here so that handlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint());
+        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, connector.getMuleContext());
 
         setCustomProperties(event, call);
         call.setTimeout(new Integer(event.getTimeout()));
@@ -457,7 +460,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected static MuleMessage createMessage(Object result, Call call)
+    protected static MuleMessage createMessage(Object result, Call call, MuleContext muleContext)
     {
         if (result == null)
         {
@@ -474,7 +477,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         props.put("soap.message", call.getMessageContext().getMessage());
         call.clearHeaders();
         call.clearOperation();
-        return new DefaultMuleMessage(result, props);
+        return new DefaultMuleMessage(result, props, muleContext);
     }
 
     public String parseSoapAction(String soapAction, QName method, MuleEvent event)

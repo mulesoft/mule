@@ -10,16 +10,17 @@
 
 package org.mule.module.scripting.component;
 
-import org.mule.MuleServer;
 import org.mule.DefaultMuleEventContext;
-import org.mule.transport.NullPayload;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.transport.NullPayload;
 import org.mule.util.CollectionUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -47,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
  * A JSR 223 Script service. Allows any JSR 223 compliant script engines such as
  * JavaScript, Groovy or Rhino to be embedded as Mule components.
  */
-public class Scriptable implements Initialisable
+public class Scriptable implements Initialisable, MuleContextAware
 {
     /** The actual body of the script */
     private String scriptText;
@@ -70,9 +71,27 @@ public class Scriptable implements Initialisable
     
     private ScriptEngine scriptEngine;
     private ScriptEngineManager scriptEngineManager;
+
+    private MuleContext muleContext;
     
     protected transient Log logger = LogFactory.getLog(getClass());
-    
+
+    public Scriptable()
+    {
+        //For Stpring
+    }
+
+    public Scriptable(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
+
+    //For Spring
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
     public void initialise() throws InitialisationException
     {
         scriptEngineManager = new ScriptEngineManager();
@@ -161,7 +180,7 @@ public class Scriptable implements Initialisable
         //A place holder for a retuen result if the script doesn't return a result.
         //The script can overwrite this binding
         bindings.put("result", NullPayload.getInstance());
-        bindings.put("muleContext", MuleServer.getMuleContext());
+        bindings.put("muleContext", muleContext);
     }
 
     public void populateBindings(Bindings bindings, Object payload)

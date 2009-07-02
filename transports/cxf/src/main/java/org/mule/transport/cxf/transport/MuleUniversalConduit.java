@@ -10,13 +10,9 @@
 
 package org.mule.transport.cxf.transport;
 
-import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
-import org.mule.MuleServer;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -25,6 +21,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
+import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.MuleRegistry;
@@ -62,6 +59,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
+import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -285,7 +283,7 @@ public class MuleUniversalConduit extends AbstractConduit
         OutboundEndpoint ep = protocolEndpoints.get(uri);
         if (ep != null) return ep;
         
-        MuleContext muleContext = MuleServer.getMuleContext();
+        MuleContext muleContext = connector.getMuleContext();
         MuleRegistry registry = muleContext.getRegistry();
 
         // Someone is using a JAX-WS client directly and not going through MuleClient
@@ -390,7 +388,7 @@ public class MuleUniversalConduit extends AbstractConduit
             session = eventContext.getSession();
         }
 
-        MuleMessage message = new DefaultMuleMessage(sa);
+        MuleMessage message = new DefaultMuleMessage(sa, connector.getMuleContext());
         if (session == null)
         {
             session = new DefaultMuleSession(message, connector.getSessionHandler(), connector.getMuleContext());

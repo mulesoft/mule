@@ -27,7 +27,7 @@ public class RegistryExpressionEvaluatorTestCase extends FunctionalTestCase
     public void testSimpleRegistryLookup() throws Exception
     {
 
-        MuleMessage message = new DefaultMuleMessage(new Apple());
+        MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
         RegistryExpressionEvaluator eval = new RegistryExpressionEvaluator();
         eval.setMuleContext(muleContext);
         Object o = eval.evaluate("bowlToBasket", message);
@@ -42,7 +42,7 @@ public class RegistryExpressionEvaluatorTestCase extends FunctionalTestCase
 
     public void testRegistryLookupWithProperties() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(new Apple());
+        MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
         RegistryExpressionEvaluator eval = new RegistryExpressionEvaluator();
         eval.setMuleContext(muleContext);
         Object o = eval.evaluate("bowlToBasket.returnClass", message);
@@ -75,7 +75,7 @@ public class RegistryExpressionEvaluatorTestCase extends FunctionalTestCase
     public void testGlobalEndpointRegistryLookupWithProperties() throws Exception
     {
 
-        MuleMessage message = new DefaultMuleMessage(new Apple());
+        MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
         RegistryExpressionEvaluator eval = new RegistryExpressionEvaluator();
         eval.setMuleContext(muleContext);
         Object o = eval.evaluate("myendpoint.toString", message);

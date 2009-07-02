@@ -122,7 +122,7 @@ public class FtpMessageRequester extends AbstractMessageRequester
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
 
-            MuleMessage reply = new DefaultMuleMessage(connector.getMessageAdapter(baos.toByteArray()));
+            MuleMessage reply = new DefaultMuleMessage(connector.getMessageAdapter(baos.toByteArray()),  connector.getMuleContext());
             reply.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
             reply.setProperty(FileConnector.PROPERTY_FILE_SIZE, new Long(file.getSize()));
             return reply;

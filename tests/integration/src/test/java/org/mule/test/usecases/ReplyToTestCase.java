@@ -33,7 +33,7 @@ public class ReplyToTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         
-        MuleMessage msg = new DefaultMuleMessage("testing");
+        MuleMessage msg = new DefaultMuleMessage("testing", muleContext);
         msg.setReplyTo("ReplyTo");
         
         // Send asynchronous request
@@ -54,7 +54,7 @@ public class ReplyToTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         
-        MuleMessage msg = new DefaultMuleMessage("testing");
+        MuleMessage msg = new DefaultMuleMessage("testing", muleContext);
         msg.setReplyTo("ReplyTo");
         
         // Send asynchronous request
@@ -75,7 +75,7 @@ public class ReplyToTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         
-        MuleMessage msg = new DefaultMuleMessage("testing");
+        MuleMessage msg = new DefaultMuleMessage("testing", muleContext);
         msg.setReplyTo("ReplyTo");
         
         // Send asynchronous request

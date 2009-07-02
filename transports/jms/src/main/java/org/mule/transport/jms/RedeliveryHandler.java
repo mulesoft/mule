@@ -10,7 +10,7 @@
 
 package org.mule.transport.jms;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -38,14 +38,13 @@ public interface RedeliveryHandler
      * {@link MessageRedeliveredException} to indicate that the message should be
      * handled by the connector's exception handler.
      * 
-     * @param message
+     * @param message the redelivered message
      * @throws JMSException if properties cannot be read from the JMSMessage
      * @throws MessageRedeliveredException should be thrown if the message should be
      *             handled by the connection exception handler
-     * @throws MessagingException if there is a problem reading or proessing the
+     * @throws MuleException if there is a problem reading or proessing the
      *             message
      */
-    public void handleRedelivery(Message message)
-        throws JMSException, MessageRedeliveredException, MessagingException;
+    public void handleRedelivery(Message message) throws JMSException, MuleException;
 
 }

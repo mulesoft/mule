@@ -186,7 +186,7 @@ public abstract class AbstractComponent implements Component, Interceptor, MuleC
         }
         else
         {
-            return new DefaultMuleMessage(NullPayload.getInstance());
+            return new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
         }
     }
 

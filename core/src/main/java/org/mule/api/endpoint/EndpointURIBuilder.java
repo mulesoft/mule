@@ -11,6 +11,8 @@
 package org.mule.api.endpoint;
 
 
+import org.mule.api.MuleContext;
+
 import java.net.URI;
 
 /**
@@ -20,5 +22,5 @@ import java.net.URI;
 
 public interface EndpointURIBuilder
 {
-    EndpointURI build(URI uri) throws MalformedEndpointException;
+    EndpointURI build(URI uri, MuleContext muleContext) throws MalformedEndpointException;
 }

@@ -28,7 +28,7 @@ public class CustomExpressionEvaluatorTestCase extends AbstractMuleTestCase
         muleContext.getExpressionManager().registerEvaluator(new FooExpressionEvaluator());
 
         Object result = muleContext.getExpressionManager().evaluate("#[foo:abc]",
-            new DefaultMuleMessage("test", (Map) null));
+            new DefaultMuleMessage("test", (Map) null, muleContext));
         assertNotNull(result);
         assertEquals("Wrong evaluation result", "testabc", result);
     }

@@ -14,6 +14,7 @@ import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleConfiguration;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
@@ -80,53 +81,53 @@ public class MuleConfigurationTestCase extends TestCase
     /** Test for MULE-3092 */
     public void testConfigureWithSystemProperties() throws Exception
     {
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "encoding", "UTF-16");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous", "true");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "systemModelType", "direct");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "timeout.synchronous", "30000");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "timeout.transaction", "60000");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "remoteSync", "true");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "workingDirectory", workingDirectory);
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "clientMode", "true");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "encoding", "UTF-16");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous", "true");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "systemModelType", "direct");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.synchronous", "30000");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.transaction", "60000");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "remoteSync", "true");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "workingDirectory", workingDirectory);
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clientMode", "true");
         
         // this is just to make the test work for now. Since the initialization of the threadsafe
         // check behaviour in ThreadSafeAccess.AccessControl has already happened at this point in
         // time (we touched ThreadSafeAccess.AccessControl in setUp) setting the system property 
         // won't have any effect here
-        // System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages", "true");
+        // System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages", "true");
         ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(false);
         
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "serverId", "MY_SERVER");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "clusterId", "MY_CLUSTER");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "domainId", "MY_DOMAIN");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes", "false");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal", "false");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "streaming.enable", "false");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "message.assertAccess", "false");
-        System.setProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap", "false");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId", "MY_SERVER");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clusterId", "MY_CLUSTER");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId", "MY_DOMAIN");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes", "false");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal", "false");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable", "false");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.assertAccess", "false");
+        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap", "false");
         
         muleContext = new DefaultMuleContextFactory().createMuleContext();
         muleContext.start();
 
         verifyConfiguration();
 
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "encoding");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "systemModelType");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "timeout.synchronous");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "timeout.transaction");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "remoteSync");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "workingDirectory");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "clientMode");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "serverId");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "clusterId");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "domainId");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "streaming.enable");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "message.assertAccess");
-        System.clearProperty(MuleConfiguration.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "encoding");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "systemModelType");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.synchronous");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.transaction");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "remoteSync");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "workingDirectory");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clientMode");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clusterId");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.assertAccess");
+        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
     }
 
     /** Test for MULE-3110 */

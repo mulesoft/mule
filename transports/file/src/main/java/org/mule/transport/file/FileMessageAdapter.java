@@ -11,6 +11,7 @@
 package org.mule.transport.file;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMessageAdapter;
@@ -33,7 +34,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
     protected File file = null;
     protected InputStream fileInputStream;
 
-    public FileMessageAdapter(Object message) throws MessagingException
+    public FileMessageAdapter(Object message) throws MuleException
     {
         super();
 

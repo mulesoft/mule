@@ -20,7 +20,7 @@ public class RmiEndpointTestCase extends AbstractMuleTestCase
 
     public void testHostPortUrl() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("rmi://localhost:1099");
+        EndpointURI url = new MuleEndpointURI("rmi://localhost:1099", muleContext);
         url.initialise();
         assertEquals("rmi", url.getScheme());
         assertEquals("rmi://localhost:1099", url.getAddress());
@@ -33,7 +33,7 @@ public class RmiEndpointTestCase extends AbstractMuleTestCase
 
     public void testQueryParams1() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("rmi://localhost:1099/BeeShirtsRmiServer?method=testMethod");
+        EndpointURI url = new MuleEndpointURI("rmi://localhost:1099/BeeShirtsRmiServer?method=testMethod", muleContext);
         url.initialise();
         assertEquals("rmi", url.getScheme());
         assertEquals("rmi://localhost:1099", url.getAddress());
@@ -49,7 +49,7 @@ public class RmiEndpointTestCase extends AbstractMuleTestCase
     public void testQueryParams2() throws Exception
     {
         EndpointURI url = new MuleEndpointURI(
-            "rmi://localhost:1099/BeeShirtsRmiServer?method=testMethod&endpointName=rmiProvider&blankParam=");
+            "rmi://localhost:1099/BeeShirtsRmiServer?method=testMethod&endpointName=rmiProvider&blankParam=", muleContext);
         url.initialise();
         assertEquals("rmi", url.getScheme());
         assertEquals("rmi://localhost:1099", url.getAddress());

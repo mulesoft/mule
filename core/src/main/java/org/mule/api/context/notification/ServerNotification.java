@@ -10,10 +10,10 @@
 
 package org.mule.api.context.notification;
 
-import org.mule.MuleServer;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
 
@@ -26,7 +26,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
  * <code>ServerNotification</code> is an event triggered by something happening
  * in the Server itself such as the server starting or a service being registered.
  */
-public abstract class ServerNotification extends EventObject
+public abstract class ServerNotification extends EventObject implements MuleContextAware
 {
 
     public static final int NO_ACTION_ID = Integer.MIN_VALUE;
@@ -76,6 +76,8 @@ public abstract class ServerNotification extends EventObject
      */
     protected String resourceIdentifier = null;
 
+    protected transient MuleContext muleContext;
+
     public ServerNotification(Object message, int action)
     {
         this(message, action, null);
@@ -86,12 +88,13 @@ public abstract class ServerNotification extends EventObject
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
         this.resourceIdentifier = resourceIdentifier;
-
-        MuleContext mc = (message instanceof MuleContext ? (MuleContext)message : MuleServer.getMuleContext());
-
-        serverId = generateId(mc);
-
         timestamp = System.currentTimeMillis();
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
+        serverId = generateId(context);
     }
 
     protected static String generateId(MuleContext context)
@@ -106,7 +109,7 @@ public abstract class ServerNotification extends EventObject
         }
         synchronized (message)
         {
-            return new DefaultMuleMessage(message.getPayload(), message);
+            return DefaultMuleMessage.copy(message);
         }
     }
 

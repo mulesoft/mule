@@ -9,10 +9,9 @@
  */
 package org.mule.expression;
 
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.DefaultMuleMessage;
-import org.mule.transport.NullPayload;
+import org.mule.api.expression.ExpressionEvaluator;
+import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.HashMap;
 
@@ -57,7 +56,7 @@ public class ExpressionParsingTestCase extends AbstractMuleTestCase
 
         assertEquals(
                 "12:10 - comment", "12:10 - $3 vs $3 shinogi 41+51.t must be #1140ob",
-                muleContext.getExpressionManager().parse(template, new DefaultMuleMessage(map)));
+                muleContext.getExpressionManager().parse(template, new DefaultMuleMessage(map, muleContext)));
     }
 }
 

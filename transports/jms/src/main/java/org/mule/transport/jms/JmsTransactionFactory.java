@@ -30,7 +30,7 @@ public class JmsTransactionFactory implements TransactionFactory
      */
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
-        JmsTransaction tx = new JmsTransaction();
+        JmsTransaction tx = new JmsTransaction(muleContext);
         tx.begin();
         return tx;
     }

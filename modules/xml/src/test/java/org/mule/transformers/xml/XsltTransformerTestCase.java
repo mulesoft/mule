@@ -10,9 +10,7 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.RequestContext;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
@@ -20,7 +18,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
@@ -71,7 +68,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         Map props = new HashMap();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
-        return new DefaultMuleMessage(srcData, props);
+        return new DefaultMuleMessage(srcData, props, muleContext);
     }
 
     public Object getResultData()
@@ -234,7 +231,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         // init transformer
         transformer.initialise();
 
-        MuleMessage message = new DefaultMuleMessage(xml);
+        MuleMessage message = new DefaultMuleMessage(xml, muleContext);
         message.setProperty("myproperty", param);
         // do transformation
         String transformerResult = (String) transformer.transform(message);

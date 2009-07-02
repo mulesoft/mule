@@ -10,9 +10,7 @@
 
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
@@ -93,7 +91,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * </pre>
  */
 
-public class XsltTransformer extends AbstractXmlTransformer implements MuleContextAware
+public class XsltTransformer extends AbstractXmlTransformer
 {
     // keep at least 1 XSLT Transformer ready by default
     private static final int MIN_IDLE_TRANSFORMERS = 1;
@@ -111,7 +109,6 @@ public class XsltTransformer extends AbstractXmlTransformer implements MuleConte
     private volatile String xslFile;
     private volatile String xslt;
     private volatile Map contextProperties;
-    private MuleContext muleContext;
 
     private URIResolver uriResolver;
 
@@ -135,11 +132,6 @@ public class XsltTransformer extends AbstractXmlTransformer implements MuleConte
         {
             throw new InitialisationException(te, this);
         }
-    }
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
     }
 
     /**

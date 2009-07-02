@@ -10,7 +10,8 @@
 
 package org.mule.context.notification;
 
-import org.mule.MuleServer;
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
@@ -62,7 +63,7 @@ import org.apache.commons.logging.LogFactory;
  * <li>Enquiring whether an event is enabled returns true if any subclass is enabled.</li>
  * </ul>
  */
-public class ServerNotificationManager implements Work, Disposable, ServerNotificationHandler
+public class ServerNotificationManager implements Work, Disposable, ServerNotificationHandler, MuleContextAware
 {
 
     public static final String NULL_SUBSCRIPTION = "NULL";
@@ -71,10 +72,16 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     private Configuration configuration = new Configuration();
     private AtomicBoolean disposed = new AtomicBoolean(false);
     private BlockingDeque eventQueue = new LinkedBlockingDeque();
+    private MuleContext muleContext;
 
     public boolean isNotificationDynamic()
     {
         return dynamic;
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
     }
 
     public void setNotificationDynamic(boolean dynamic)
@@ -161,6 +168,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     {
         if (!disposed.get())
         {
+            notification.setMuleContext(muleContext);
             if (notification instanceof BlockingServerEvent)
             {
                 notifyListeners(notification);
@@ -230,7 +238,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
             try
             {
                 ServerNotification notification = (ServerNotification) eventQueue.poll(
-                    MuleServer.getMuleContext().getConfiguration().getDefaultQueueTimeout(),
+                    muleContext.getConfiguration().getDefaultQueueTimeout(),
                     TimeUnit.MILLISECONDS);
                 if (notification != null)
                 {

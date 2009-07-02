@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.routing.RoutingException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
@@ -37,7 +36,8 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         List recipients = new ArrayList();
         recipients.add("test://recipient1");
         recipients.add("test://recipient2");
-        StaticRecipientList router = new StaticRecipientList();
+        StaticRecipientList router = createObject(StaticRecipientList.class);
+
         router.setRecipients(recipients);
 
         List endpoints = new ArrayList();
@@ -47,7 +47,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(2, router.getRecipients().size());
 
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         assertTrue(router.isMatch(message));
         // note this router clones endpoints so that the endpointUri can be
         // changed
@@ -73,7 +73,8 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
             List recipients = new ArrayList();
             recipients.add("test://recipient1?synchronous=true");
             recipients.add("test://recipient2?synchronous=true");
-            StaticRecipientList router = new StaticRecipientList();
+            StaticRecipientList router = createObject(StaticRecipientList.class);
+
             router.setRecipients(recipients);
 
             List endpoints = new ArrayList();
@@ -83,7 +84,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
             assertEquals(2, router.getRecipients().size());
 
-            MuleMessage message = new DefaultMuleMessage("test event");
+            MuleMessage message = new DefaultMuleMessage("test event", muleContext);
             assertTrue(router.isMatch(message));
             // note this router clones endpoints so that the endpointUri can be
             // changed
@@ -91,7 +92,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
             // The static recipient list router duplicates the message for each endpoint
             // so we can't
             // check for equality on the arguments passed to the dispatch / send methods
-            message = new DefaultMuleMessage("test event");
+            message = new DefaultMuleMessage("test event", muleContext);
             router.getRecipients().add("test://recipient3?synchronous=true");
             session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)),
                 message);
@@ -116,7 +117,8 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         List recipients = new ArrayList();
         recipients.add("malformed-endpointUri-recipient1");
-        StaticRecipientList router = new StaticRecipientList();
+        StaticRecipientList router = createObject(StaticRecipientList.class);
+
         router.setRecipients(recipients);
 
         List endpoints = new ArrayList();
@@ -125,14 +127,14 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(1, router.getRecipients().size());
 
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         assertTrue(router.isMatch(message));
         try
         {
             router.route(message, (MuleSession)session.proxy());
             fail("Should not allow malformed endpointUri");
         }
-        catch (RoutingException e)
+        catch (Exception e)
         {
             // ignore
         }

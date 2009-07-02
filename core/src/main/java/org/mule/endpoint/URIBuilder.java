@@ -10,6 +10,7 @@
 
 package org.mule.endpoint;
 
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.util.ClassUtils;
@@ -77,21 +78,29 @@ public class URIBuilder
     private Integer port;
     private String path;
     private Map queryMap;
+    private MuleContext muleContext;
 
     private AtomicReference cache = new AtomicReference();
 
     public URIBuilder()
     {
-        // default
+        //default for spring. Must call setMulecontext().
+    }
+
+    public URIBuilder(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
     }
 
     public URIBuilder(EndpointURI endpointURI)
     {
+        this(endpointURI.getMuleContext());
         cache.set(endpointURI);
     }
 
-    public URIBuilder(String address)
+    public URIBuilder(String address, MuleContext muleContext)
     {
+        this(muleContext);
         // separate meta from address, if necessary
         int dots = address.indexOf(DOTS);
         int dotsSlashes = address.indexOf(DOTS_SLASHES);
@@ -101,6 +110,16 @@ public class URIBuilder
             address = address.substring(dots+1);
         }
         this.address = address;
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
+
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
     }
 
     public void setUser(String user)
@@ -169,7 +188,7 @@ public class URIBuilder
         {
             try
             {
-                EndpointURI endpointUri = new MuleEndpointURI(getConstructor());
+                EndpointURI endpointUri = new MuleEndpointURI(getConstructor(), muleContext);
                 cache.compareAndSet(null, endpointUri);
             }
             catch (EndpointException e)

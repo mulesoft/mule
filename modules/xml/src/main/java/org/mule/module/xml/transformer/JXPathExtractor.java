@@ -11,7 +11,6 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
@@ -40,7 +39,7 @@ import org.dom4j.XPath;
  * {@link List} of values will be returned. Note the property is currently ignored
  * for non-String/XML payloads.
  */
-public class JXPathExtractor extends AbstractTransformer implements MuleContextAware
+public class JXPathExtractor extends AbstractTransformer
 {
     public static final String OUTPUT_TYPE_NODE = "NODE";
 
@@ -56,7 +55,6 @@ public class JXPathExtractor extends AbstractTransformer implements MuleContextA
 
     private volatile boolean singleResult = true;
 
-    private MuleContext muleContext;
     private NamespaceManager namespaceManager;
 
     public void setMuleContext(MuleContext context)
@@ -64,7 +62,7 @@ public class JXPathExtractor extends AbstractTransformer implements MuleContextA
         this.muleContext = context;
         try
         {
-            namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
+            namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
         }
         catch (RegistrationException e)
         {

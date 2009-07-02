@@ -49,7 +49,8 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
     public void testTransform() throws Exception
     {
-        Object result = this.getTransformer().transform(getTestData());
+        Transformer trans = this.getTransformer();
+        Object result = trans.transform(getTestData());
         assertNotNull(result);
 
         Object expectedResult = this.getResultData();
@@ -89,7 +90,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         {
             Transformer trans = this.getTransformer();
             Transformer trans2 = this.getRoundTripTransformer();
-            MuleMessage message = new DefaultMuleMessage(getTestData());
+            MuleMessage message = new DefaultMuleMessage(getTestData(), muleContext);
             message.applyTransformers(Arrays.asList( new Transformer[]{trans, trans2}));
             Object result = message.getPayload();
             this.compareRoundtripResults(this.getTestData(), result);

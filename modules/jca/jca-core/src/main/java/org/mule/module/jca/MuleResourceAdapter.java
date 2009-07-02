@@ -68,7 +68,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     public MuleResourceAdapter()
     {
         // TODO Make this work for OSGi
-        //RegistryContext.getOrCreateRegistry();
+        //muleContext.getOrCreateRegistry();
     }
 
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException
@@ -294,7 +294,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         throws MuleException
     {
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(
-            muleActivationSpec.getEndpoint()), muleContext);
+            muleActivationSpec.getEndpoint(), muleContext), muleContext);
 
         // Use asynchronous endpoint as we need to dispatch to service
         // rather than send.

@@ -80,7 +80,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         }
         else
         {
-            message = new DefaultMuleMessage(connector.getMessageAdapter(payload));
+            message = new DefaultMuleMessage(connector.getMessageAdapter(payload), connector.getMuleContext());
         }
         message.addProperties(messageProperties);
 

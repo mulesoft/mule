@@ -136,7 +136,7 @@ public class EndpointSelector extends FilteringOutboundRouter
                 throw new CouldNotRouteOutboundMessageException(message, ep, e);
             }
         }
-        return resultsHandler.aggregateResults(results, message);
+        return resultsHandler.aggregateResults(results, message, muleContext);
     }
 
     protected OutboundEndpoint lookupEndpoint(String endpointName) throws MuleException

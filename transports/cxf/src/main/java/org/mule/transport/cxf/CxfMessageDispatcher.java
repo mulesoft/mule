@@ -243,12 +243,12 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         {
             if (response.length == 1)
             {
-                result = new DefaultMuleMessage(response[0], transportResponse);
+                result = new DefaultMuleMessage(response[0], transportResponse, connector.getMuleContext());
             }
         }
         else
         {
-            result = new DefaultMuleMessage(response, transportResponse);
+            result = new DefaultMuleMessage(response, transportResponse, connector.getMuleContext());
         }
 
         return result;

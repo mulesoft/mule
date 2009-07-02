@@ -11,8 +11,6 @@
 package org.mule.transport.servlet;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.MuleServer;
-import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -80,7 +78,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
                 MessageReceiver receiver = getReceiverForURI(httpServletRequest);
                 httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
                 MuleMessage message = new DefaultMuleMessage(receiver.getEndpoint().getConnector().getMessageAdapter(
-                    httpServletRequest));
+                    httpServletRequest), muleContext);
                 MuleMessage returnMessage = receiver.routeMessage(message, true);
                 writeResponse(httpServletResponse, returnMessage);
             }
@@ -99,7 +97,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             MessageReceiver receiver = getReceiverForURI(httpServletRequest);
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
             MuleMessage message = new DefaultMuleMessage(receiver.getEndpoint().getConnector()
-                .getMessageAdapter(httpServletRequest));
+                .getMessageAdapter(httpServletRequest), muleContext);
             MuleMessage returnMessage = receiver.routeMessage(message, true);
             writeResponse(httpServletResponse, returnMessage);
 
@@ -118,8 +116,8 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             MessageReceiver receiver = getReceiverForURI(httpServletRequest);
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
             MuleMessage message = new DefaultMuleMessage(receiver.getEndpoint().getConnector()
-                .getMessageAdapter(httpServletRequest));
-            receiver.routeMessage(message, MuleServer.getMuleContext().getConfiguration().isDefaultSynchronousEndpoints());
+                .getMessageAdapter(httpServletRequest), muleContext);
+            receiver.routeMessage(message, muleContext.getConfiguration().isDefaultSynchronousEndpoints());
 
             httpServletResponse.setStatus(HttpServletResponse.SC_CREATED);
             if (feedback)
@@ -185,7 +183,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             }
         }
 
-        InboundEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointName);
+        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointName);
         if (endpoint == null)
         {
             // if we dont find an endpoint for the given name, lets check the

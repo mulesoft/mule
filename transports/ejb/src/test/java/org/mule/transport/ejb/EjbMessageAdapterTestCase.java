@@ -11,7 +11,7 @@
 package org.mule.transport.ejb;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
 
@@ -25,7 +25,7 @@ public class EjbMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         return "Hello".getBytes();
     }
 
-    public MessageAdapter createAdapter(Object payload) throws MessagingException
+    public MessageAdapter createAdapter(Object payload) throws MuleException
     {
         return new EjbMessageAdapter(payload);
     }
@@ -39,7 +39,7 @@ public class EjbMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     public void testSerialization() throws Exception
     {
         MessageAdapter messageAdapter = createAdapter(TEST_MESSAGE);
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter);
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(messageAdapter, muleContext);
         
         byte[] serializedMessage = SerializationUtils.serialize(muleMessage);
 

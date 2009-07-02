@@ -23,20 +23,18 @@ import java.util.Properties;
 public class XStreamWireFormatTestCase extends AbstractMuleMessageWireFormatTestCase
 {
 
-    protected WireFormat getWireFormat() throws IllegalAccessException, InstantiationException, ClassNotFoundException
+    protected WireFormat getWireFormat() throws Exception
     {
-        return new XStreamWireFormat();
+        return createObject(XStreamWireFormat.class);
     }
 
-    public void testGetDefaultInboundTransformer()
-        throws IllegalAccessException, InstantiationException, ClassNotFoundException
+    public void testGetDefaultInboundTransformer() throws Exception
     {
         assertEquals(XmlToObject.class, ((XStreamWireFormat) getWireFormat()).getInboundTransformer().getClass());
 
     }
 
-    public void testGetDefaultOutboundTransformer()
-        throws IllegalAccessException, InstantiationException, ClassNotFoundException
+    public void testGetDefaultOutboundTransformer() throws Exception
     {
         assertEquals(ObjectToXml.class, ((XStreamWireFormat) getWireFormat()).getOutboundTransformer().getClass());
     }

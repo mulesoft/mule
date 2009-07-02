@@ -32,9 +32,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class SplashScreen
 {
-    protected List header = new ArrayList();
-    protected List body = new ArrayList();
-    protected List footer = new ArrayList();
+    protected List<String> header = new ArrayList<String>();
+    protected List<String> body = new ArrayList<String>();
+    protected List<String> footer = new ArrayList<String>();
     
     private static Log logger = LogFactory.getLog(SplashScreen.class);
     
@@ -105,7 +105,7 @@ public abstract class SplashScreen
     
     public String toString()
     {
-        List boilerPlate = new ArrayList(header);
+        List<String> boilerPlate = new ArrayList<String>(header);
         boilerPlate.addAll(body);
         boilerPlate.addAll(footer);
         return StringMessageUtils.getBoilerPlate(boilerPlate, '*', 70);

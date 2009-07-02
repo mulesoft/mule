@@ -44,7 +44,7 @@ public abstract class AbstractAxisOverJMSWithTransactionsTestCase extends Functi
 
     public void testTransactionsOverAxis() throws Exception{
         MuleClient client = new MuleClient();
-        client.dispatch("axis:jms://TestComponent?method=echo", new DefaultMuleMessage("test"));
+        client.dispatch("axis:jms://TestComponent?method=echo", new DefaultMuleMessage("test", muleContext));
         MuleMessage message = client.request("jms://testout", 5000);
         assertNotNull(message.getPayload());
         assertTrue(message.getPayloadAsString().equals("test"));

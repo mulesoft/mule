@@ -9,6 +9,7 @@
  */
 package org.mule.config.spring.editors;
 
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.endpoint.MuleEndpointURI;
 
@@ -20,12 +21,18 @@ import java.beans.PropertyEditorSupport;
  */
 public class EndpointURIPropertyEditor extends PropertyEditorSupport
 {
+    private MuleContext muleContext;
+
+    public EndpointURIPropertyEditor(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
 
     public void setAsText(String text)
     {
         try
         {
-            setValue(new MuleEndpointURI(text));
+            setValue(new MuleEndpointURI(text, muleContext));
         }
         catch (EndpointException e)
         {

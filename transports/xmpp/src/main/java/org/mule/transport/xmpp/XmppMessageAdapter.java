@@ -10,7 +10,7 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMessageAdapter;
@@ -37,7 +37,7 @@ public class XmppMessageAdapter extends AbstractMessageAdapter implements Messag
 
     private final Packet message;
 
-    public XmppMessageAdapter(Object message) throws MessagingException
+    public XmppMessageAdapter(Object message) throws MuleException
     {
         if (message instanceof Packet)
         {

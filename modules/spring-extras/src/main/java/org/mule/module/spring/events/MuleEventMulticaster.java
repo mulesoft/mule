@@ -481,7 +481,7 @@ public class MuleEventMulticaster
                 // }
 
                 DefaultMuleMessage message = new DefaultMuleMessage(applicationEvent.getSource(),
-                    applicationEvent.getProperties());
+                    applicationEvent.getProperties(), muleContext);
                 // has dispatch been triggered using beanFactory.publish()
                 // without a current event
                 if (applicationEvent.getMuleEventContext() != null)
@@ -499,7 +499,7 @@ public class MuleEventMulticaster
                     if (endpoint.getTransformers() != null)
                     {
                         message = new DefaultMuleMessage(applicationEvent.getSource(),
-                            applicationEvent.getProperties());
+                            applicationEvent.getProperties(), muleContext);
                         message.applyTransformers(endpoint.getTransformers());
                     }
                     endpoint.dispatch(new DefaultMuleEvent(message, endpoint, session, false));
@@ -591,7 +591,7 @@ public class MuleEventMulticaster
     {
         if (endpoint.startsWith("soap") || endpoint.startsWith("axis") || endpoint.startsWith("cxf"))
         {
-            EndpointURI ep = new MuleEndpointURI(endpoint);
+            EndpointURI ep = new MuleEndpointURI(endpoint, muleContext);
 
             // get the service name from the URI path
             String serviceName = null;

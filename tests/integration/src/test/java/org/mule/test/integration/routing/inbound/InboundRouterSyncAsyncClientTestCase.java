@@ -26,7 +26,7 @@ public class InboundRouterSyncAsyncClientTestCase extends FunctionalTestCase
     public void testSync() throws Exception
     {
         MuleClient client = new MuleClient();
-        DefaultMuleMessage message = new DefaultMuleMessage("testSync");
+        DefaultMuleMessage message = new DefaultMuleMessage("testSync", muleContext);
         message.setProperty("messageType", "sync");
         MuleMessage result = client.send("vm://singleSyncAsyncEntry", message);
         assertEquals("testSync OK", result.getPayload());
@@ -35,7 +35,7 @@ public class InboundRouterSyncAsyncClientTestCase extends FunctionalTestCase
     public void testAsync() throws Exception
     {
         MuleClient client = new MuleClient();
-        DefaultMuleMessage messsage = new DefaultMuleMessage("testAsync");
+        DefaultMuleMessage messsage = new DefaultMuleMessage("testAsync", muleContext);
         messsage.setProperty("messageType", "async");
         client.dispatch("vm://singleSyncAsyncEntry", messsage);
 

@@ -10,7 +10,9 @@
 
 package org.mule.retry;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.retry.RetryContext;
 
 import java.util.Collections;
@@ -21,7 +23,7 @@ import java.util.Map;
  * The RetryContext is used to store any data which carries over from
  * attempt to attempt such as response messages.
  */
-public class DefaultRetryContext implements RetryContext
+public class DefaultRetryContext implements RetryContext, MuleContextAware
 {
 
     private MuleMessage[] returnMessages;
@@ -29,6 +31,7 @@ public class DefaultRetryContext implements RetryContext
     private String description;
     private Throwable lastFailure;
     private boolean failed = false;
+    private MuleContext muleContext;
 
     public DefaultRetryContext()
     {
@@ -38,6 +41,16 @@ public class DefaultRetryContext implements RetryContext
     public DefaultRetryContext(String description)
     {
         this.description = description;
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
     }
 
     public Map getMetaInfo()

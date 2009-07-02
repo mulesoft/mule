@@ -198,7 +198,7 @@ public class RestServiceWrapper extends AbstractComponent
         event.getMessage().setProperty(HTTP_METHOD, httpMethod);
 
         result = RequestContext.getEventContext().sendEvent(
-                new DefaultMuleMessage(requestBody, event.getMessage()), tempUrl);
+                new DefaultMuleMessage(requestBody, event.getMessage(), muleContext), tempUrl);
         if (isErrorPayload(result))
         {
             handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), result),

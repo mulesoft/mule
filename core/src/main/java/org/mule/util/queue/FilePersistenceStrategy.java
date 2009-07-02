@@ -11,7 +11,10 @@
 package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.transformer.wire.WireFormat;
+import org.mule.transformer.wire.SerializationWireFormat;
 import org.mule.util.FileUtils;
 import org.mule.util.UUID;
 import org.mule.util.file.DeleteException;
@@ -21,8 +24,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,14 +43,24 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
 
     protected MuleContext muleContext;
 
-    public FilePersistenceStrategy()
+    private WireFormat serializer;
+
+    public FilePersistenceStrategy(WireFormat serializer)
     {
         super();
+        this.serializer = serializer;
+    }
+
+    public FilePersistenceStrategy()
+    {
+        this(new SerializationWireFormat());
     }
 
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+
+        serializer.setMuleContext(muleContext);
     }
 
     protected String getId(Object obj)
@@ -65,9 +76,14 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         {
             throw new IOException("Failed to create directory: " + file.getAbsolutePath());
         }
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
-        oos.writeObject(obj);
-        oos.close();
+        try
+        {
+            serializer.write(new FileOutputStream(file), obj, muleContext.getConfiguration().getDefaultEncoding());
+        }
+        catch (MuleException e)
+        {
+            throw new IOException(e.getDetailedMessage());
+        }
         return id;
     }
 
@@ -90,22 +106,14 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
     public Object load(String queue, Object id) throws IOException
     {
         File file = FileUtils.newFile(store, queue + File.separator + id + EXTENSION);
-        ObjectInputStream ois = null;
         try
         {
-            ois = new ObjectInputStream(new FileInputStream(file));
-            return ois.readObject();
+            Object o = serializer.read(new FileInputStream(file));
+            return o;
         }
-        catch (ClassNotFoundException e)
+        catch (MuleException e)
         {
-            throw (IOException) new IOException("Error loading persistent object").initCause(e);
-        }
-        finally
-        {
-            if (ois != null)
-            {
-                ois.close();
-            }
+            throw new IOException(e.getDetailedMessage());
         }
     }
 

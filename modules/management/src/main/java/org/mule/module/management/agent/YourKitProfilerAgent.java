@@ -10,11 +10,10 @@
 
 package org.mule.module.management.agent;
 
-import org.mule.MuleServer;
-import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.management.i18n.ManagementMessages;
@@ -37,7 +36,7 @@ import javax.management.ObjectName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class YourKitProfilerAgent implements Agent
+public class YourKitProfilerAgent implements Agent, MuleContextAware
 {
     /**
      * MBean name to register under.
@@ -55,6 +54,13 @@ public class YourKitProfilerAgent implements Agent
      * Logger used by this class
      */
     protected static final Log logger = LogFactory.getLog(YourKitProfilerAgent.class);
+
+    protected MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
+    }
 
     /*
     * (non-Javadoc)
@@ -110,7 +116,6 @@ public class YourKitProfilerAgent implements Agent
         {
             mBeanServer = (MBeanServer) servers.get(0);
 
-            MuleContext muleContext = MuleServer.getMuleContext();
             profilerName = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":" + PROFILER_OBJECT_NAME);
 
             // unregister existing YourKit MBean first if required
@@ -147,7 +152,7 @@ public class YourKitProfilerAgent implements Agent
         try
         {
             // remove the agent from the list, it's not functional
-            RegistryContext.getRegistry().unregisterAgent(this.getName());
+            muleContext.getRegistry().unregisterAgent(this.getName());
         }
         catch (MuleException e)
         {

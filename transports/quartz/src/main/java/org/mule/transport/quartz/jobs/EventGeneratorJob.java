@@ -11,7 +11,8 @@
 package org.mule.transport.quartz.jobs;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.NullPayload;
@@ -25,6 +26,7 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SchedulerException;
 
 /**
  * Will generate a new event based o the scheduled time. The payload of the event is
@@ -43,6 +45,16 @@ public class EventGeneratorJob implements Job
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
+        MuleContext muleContext;
+        try
+        {
+            muleContext = (MuleContext)jobExecutionContext.getScheduler().getContext().get(MuleProperties.MULE_CONTEXT_PROPERTY);
+        }
+        catch (SchedulerException e)
+        {
+            throw new JobExecutionException("Failed to retrieve Mulecontext from the Scheduler Context: " + e.getMessage(), e);
+        }
+
         JobDataMap map = jobExecutionContext.getJobDetail().getJobDataMap();
 
         String receiverKey = (String)map.get(QuartzMessageReceiver.QUARTZ_RECEIVER_PROPERTY);
@@ -53,7 +65,7 @@ public class EventGeneratorJob implements Job
         if (connectorName == null)
             throw new JobExecutionException(QuartzMessages.connectorNotInJobDataMap().getMessage());
 
-        AbstractConnector connector = (AbstractConnector) RegistryContext.getRegistry().lookupConnector(connectorName);
+        AbstractConnector connector = (AbstractConnector) muleContext.getRegistry().lookupConnector(connectorName);
         if (connector == null)
             throw new JobExecutionException(QuartzMessages.noConnectorFound(connectorName).getMessage());
 
@@ -78,7 +90,7 @@ public class EventGeneratorJob implements Job
                 }
                 else
                 {
-                    payload = RegistryContext.getRegistry().lookupObject(ref);
+                    payload = muleContext.getRegistry().lookupObject(ref);
                 }
 
                 if (payload==null)
@@ -87,7 +99,7 @@ public class EventGeneratorJob implements Job
                     payload = NullPayload.getInstance();
                 }
             }
-            receiver.routeMessage(new DefaultMuleMessage(receiver.getConnector().getMessageAdapter(payload)));
+            receiver.routeMessage(new DefaultMuleMessage(receiver.getConnector().getMessageAdapter(payload), muleContext));
         }
         catch (Exception e)
         {

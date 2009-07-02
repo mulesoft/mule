@@ -11,12 +11,12 @@
 package org.mule.transport.http.functional;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.util.StringUtils;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
+import org.mule.util.StringUtils;
 
 public class ETagComponent implements org.mule.api.lifecycle.Callable
 {
@@ -31,7 +31,7 @@ public class ETagComponent implements org.mule.api.lifecycle.Callable
         {
            DefaultMessageAdapter res = new DefaultMessageAdapter(StringUtils.EMPTY);
            res.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 304);
-           msg = new DefaultMuleMessage(res);
+           msg = new DefaultMuleMessage(res, eventContext.getMuleContext());
         }
         
         msg.setProperty(HttpConstants.HEADER_ETAG, ETAG_VALUE);

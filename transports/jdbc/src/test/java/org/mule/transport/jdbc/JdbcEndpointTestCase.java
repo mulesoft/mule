@@ -19,7 +19,7 @@ public class JdbcEndpointTestCase extends AbstractMuleTestCase
 
     public void testWithoutEndpointName() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("jdbc:/?sql=SELECT * FROM TABLE");
+        EndpointURI url = new MuleEndpointURI("jdbc:/?sql=SELECT * FROM TABLE", muleContext);
         url.initialise();
         assertEquals("jdbc", url.getScheme());
         assertEquals("", url.getAddress());
@@ -31,7 +31,7 @@ public class JdbcEndpointTestCase extends AbstractMuleTestCase
 
     public void testWithoutEndpointName2() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("jdbc://?sql=SELECT * FROM TABLE");
+        EndpointURI url = new MuleEndpointURI("jdbc://?sql=SELECT * FROM TABLE", muleContext);
         url.initialise();
         assertEquals("jdbc", url.getScheme());
         assertEquals("jdbc", url.getAddress());
@@ -43,7 +43,7 @@ public class JdbcEndpointTestCase extends AbstractMuleTestCase
 
     public void testWithEndpointName() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("jdbc://history/writeTests?type=2");
+        EndpointURI url = new MuleEndpointURI("jdbc://history/writeTests?type=2", muleContext);
         url.initialise();
         assertEquals("jdbc", url.getScheme());
         assertEquals("writeTests", url.getAddress());

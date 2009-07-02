@@ -35,7 +35,7 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
                 "</soap:Body>" +
             "</soap:Envelope>";
         
-        client.dispatch("jms://TestComponent", new DefaultMuleMessage(req));
+        client.dispatch("jms://TestComponent", new DefaultMuleMessage(req, muleContext));
         MuleMessage message = client.request("jms://testout", 10000);
         assertNotNull(message.getPayload());
         assertTrue(message.getPayloadAsString().indexOf("return>hello") != -1);
@@ -44,7 +44,7 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
     public void testCxfClientOverJMS() throws Exception
     {
         MuleClient client = new MuleClient();
-        client.dispatch("clientEndpoint", new DefaultMuleMessage("hello"));
+        client.dispatch("clientEndpoint", new DefaultMuleMessage("hello", muleContext));
         MuleMessage message = client.request("jms://testout", 10000);
         assertNotNull(message.getPayload());
         assertTrue(message.getPayloadAsString().equals("hello"));

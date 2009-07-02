@@ -11,6 +11,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
@@ -77,7 +78,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
                 (TestSecurityListener) muleContext.getRegistry().lookupObject("securityListener");
         assertNotNull(adminListener);
         assertFalse(adminListener.isCalled());
-        manager.fireNotification(new TestSecurityEvent());
+        manager.fireNotification(new TestSecurityEvent(muleContext));
         Thread.sleep(1000); // asynch events
         assertTrue(listener2.isCalled());
         assertFalse(adminListener.isCalled());
@@ -157,10 +158,10 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
     protected static class TestSecurityEvent extends SecurityNotification
     {
 
-        public TestSecurityEvent()
+        public TestSecurityEvent(MuleContext muleContext)
         {
             super(new UnauthorisedException(CoreMessages.createStaticMessage("dummy"),
-                    new DefaultMuleMessage(NullPayload.getInstance())), 0);
+                    new DefaultMuleMessage(NullPayload.getInstance(), muleContext)), 0);
         }
 
     }

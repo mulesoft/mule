@@ -10,9 +10,6 @@
 
 package org.mule.routing.inbound;
 
-import java.util.Map;
-
-import org.apache.commons.collections.map.HashedMap;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
@@ -30,6 +27,10 @@ import org.mule.tck.testmodels.fruit.Apple;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
+
+import java.util.Map;
+
+import org.apache.commons.collections.map.HashedMap;
 
 public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 {
@@ -88,7 +89,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
 
         ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider");
         MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
@@ -107,7 +108,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         messageRouter.route(event);
 
         session.verify();
-        message = new DefaultMuleMessage("test event");
+        message = new DefaultMuleMessage("test event", muleContext);
         event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), true);
 
         session.expectAndReturn("sendEvent", C.eq(event), message);

@@ -20,7 +20,7 @@ public class CxfSoapEndpointTestCase extends AbstractMuleTestCase
     public void testEndpoint() throws Exception
     {
         String url = "cxf:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
-        EndpointURI endpointUri = new MuleEndpointURI(url);
+        EndpointURI endpointUri = new MuleEndpointURI(url, muleContext);
         endpointUri.initialise();
 
         assertEquals("cxf", endpointUri.getSchemeMetaInfo());
@@ -31,7 +31,7 @@ public class CxfSoapEndpointTestCase extends AbstractMuleTestCase
         assertEquals(3, endpointUri.getParams().size());
 
         url = "cxf:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
-        endpointUri = new MuleEndpointURI(url);
+        endpointUri = new MuleEndpointURI(url, muleContext);
         endpointUri.initialise();
 
         assertEquals("cxf", endpointUri.getSchemeMetaInfo());
@@ -44,7 +44,7 @@ public class CxfSoapEndpointTestCase extends AbstractMuleTestCase
     public void testEndpointWithUserInfo() throws Exception
     {
         String url = "cxf:http://admin:pwd@www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
-        EndpointURI endpointUri = new MuleEndpointURI(url);
+        EndpointURI endpointUri = new MuleEndpointURI(url, muleContext);
         endpointUri.initialise();
 
         assertEquals("cxf", endpointUri.getSchemeMetaInfo());
@@ -61,7 +61,7 @@ public class CxfSoapEndpointTestCase extends AbstractMuleTestCase
     public void testEndpointFinder() throws Exception
     {
         String url = "soap:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
-        EndpointURI endpointUri = new MuleEndpointURI(url);
+        EndpointURI endpointUri = new MuleEndpointURI(url, muleContext);
         endpointUri.initialise();
 
         assertEquals("soap", endpointUri.getSchemeMetaInfo());

@@ -10,6 +10,7 @@
 
 package org.mule.transport.${ModuleNameLower};
 
+import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 
@@ -23,6 +24,11 @@ public class ${ModuleName}Transaction extends AbstractSingleResourceTransaction
 {
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
+
+    public ${ModuleName}Transaction(MuleContext muleContext)
+    {
+        super(muleContext);
+    }
 
     public void bindResource(Object key, Object resource) throws TransactionException
     {

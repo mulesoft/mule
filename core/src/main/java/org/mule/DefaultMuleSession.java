@@ -29,10 +29,12 @@ import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.UUID;
+import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  * Mule Services.
  */
 
-public final class DefaultMuleSession implements MuleSession
+public final class DefaultMuleSession implements MuleSession, DeserializationPostInitialisable
 {
     /**
      * Serial version
@@ -74,7 +76,9 @@ public final class DefaultMuleSession implements MuleSession
     private Map properties = null;
 
     private transient MuleContext muleContext;
-    
+
+    private transient Map serializedData;
+
     public DefaultMuleSession(Service service, MuleContext muleContext)
     {
         this.muleContext = muleContext;
@@ -84,13 +88,13 @@ public final class DefaultMuleSession implements MuleSession
     }
 
     public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, Service service, MuleContext muleContext)
-        throws MuleException
+            throws MuleException
     {
         this(message, requestSessionHandler, muleContext);
         if (service == null)
         {
             throw new IllegalArgumentException(
-                CoreMessages.propertiesNotSet("service").toString());
+                    CoreMessages.propertiesNotSet("service").toString());
         }
         this.service = service;
     }
@@ -98,17 +102,17 @@ public final class DefaultMuleSession implements MuleSession
     public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, MuleContext muleContext) throws MuleException
     {
         this.muleContext = muleContext;
-        
+
         if (requestSessionHandler == null)
         {
             throw new IllegalArgumentException(
-                CoreMessages.propertiesNotSet("requestSessionHandler").toString());
+                    CoreMessages.propertiesNotSet("requestSessionHandler").toString());
         }
 
         if (message == null)
         {
             throw new IllegalArgumentException(
-                CoreMessages.propertiesNotSet("message").toString());
+                    CoreMessages.propertiesNotSet("message").toString());
         }
 
         properties = new HashMap();
@@ -120,7 +124,7 @@ public final class DefaultMuleSession implements MuleSession
             if (logger.isDebugEnabled())
             {
                 logger.debug("There is no session id on the request using key: "
-                             + requestSessionHandler.getSessionIDKey() + ". Generating new session id: " + id);
+                        + requestSessionHandler.getSessionIDKey() + ". Generating new session id: " + id);
             }
         }
         else if (logger.isDebugEnabled())
@@ -140,16 +144,16 @@ public final class DefaultMuleSession implements MuleSession
         if (router == null)
         {
             throw new EndpointNotFoundException(
-                CoreMessages.noOutboundRouterSetOn(service.getName()));
+                    CoreMessages.noOutboundRouterSetOn(service.getName()));
         }
         router.route(message, this);
     }
 
     public void dispatchEvent(MuleMessage message, String endpointName) throws MuleException
     {
-        dispatchEvent(message,  muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName));
+        dispatchEvent(message, muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName));
     }
- 
+
     public void dispatchEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
         if (endpoint == null)
@@ -185,7 +189,7 @@ public final class DefaultMuleSession implements MuleSession
         if (router == null)
         {
             throw new EndpointNotFoundException(
-                CoreMessages.noOutboundRouterSetOn(service.getName()));
+                    CoreMessages.noOutboundRouterSetOn(service.getName()));
         }
         MuleMessage result = router.route(message, this);
         if (result != null)
@@ -248,7 +252,7 @@ public final class DefaultMuleSession implements MuleSession
                 if (connector instanceof AbstractConnector)
                 {
                     ((AbstractConnector) connector).getSessionHandler().storeSessionInfoToMessage(this,
-                        event.getMessage());
+                            event.getMessage());
                 }
                 else
                 {
@@ -269,7 +273,7 @@ public final class DefaultMuleSession implements MuleSession
             if (logger.isDebugEnabled())
             {
                 logger.debug("dispatching event to service: " + service.getName()
-                             + ", event is: " + event);
+                        + ", event is: " + event);
             }
             service.dispatchEvent(event);
             processResponse(event.getMessage());
@@ -277,7 +281,7 @@ public final class DefaultMuleSession implements MuleSession
         else
         {
             throw new DispatchException(CoreMessages.noComponentForEndpoint(), event.getMessage(),
-                event.getEndpoint());
+                    event.getEndpoint());
         }
     }
 
@@ -315,7 +319,7 @@ public final class DefaultMuleSession implements MuleSession
                 if (connector instanceof AbstractConnector)
                 {
                     ((AbstractConnector) connector).getSessionHandler().storeSessionInfoToMessage(this,
-                        event.getMessage());
+                            event.getMessage());
                 }
                 else
                 {
@@ -349,7 +353,7 @@ public final class DefaultMuleSession implements MuleSession
             if (logger.isDebugEnabled())
             {
                 logger.debug("sending event to service: " + service.getName()
-                             + " event is: " + event);
+                        + " event is: " + event);
             }
             return service.sendEvent(event);
 
@@ -357,7 +361,7 @@ public final class DefaultMuleSession implements MuleSession
         else
         {
             throw new DispatchException(CoreMessages.noComponentForEndpoint(), event.getMessage(),
-                event.getEndpoint());
+                    event.getEndpoint());
         }
     }
 
@@ -426,19 +430,19 @@ public final class DefaultMuleSession implements MuleSession
     }
 
     public MuleEvent createOutboundEvent(MuleMessage message,
-                                        OutboundEndpoint endpoint,
-                                        MuleEvent previousEvent) throws MuleException
+                                         OutboundEndpoint endpoint,
+                                         MuleEvent previousEvent) throws MuleException
     {
         if (endpoint == null)
         {
             throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), message,
-                endpoint);
+                    endpoint);
         }
 
         if (logger.isDebugEnabled())
         {
             logger.debug("Creating event with data: " + message.getPayload().getClass().getName()
-                         + ", for endpoint: " + endpoint);
+                    + ", for endpoint: " + endpoint);
         }
 
         try
@@ -457,7 +461,7 @@ public final class DefaultMuleSession implements MuleSession
         catch (Exception e)
         {
             throw new DispatchException(
-                CoreMessages.failedToCreate("MuleEvent"), message, endpoint, e);
+                    CoreMessages.failedToCreate("MuleEvent"), message, endpoint, e);
         }
     }
 
@@ -477,9 +481,9 @@ public final class DefaultMuleSession implements MuleSession
     /**
      * The security context for this session. If not null outbound, inbound and/or
      * method invocations will be authenticated using this context
-     * 
+     *
      * @param context the context for this session or null if the request is not
-     *            secure.
+     *                secure.
      */
     public void setSecurityContext(SecurityContext context)
     {
@@ -489,7 +493,7 @@ public final class DefaultMuleSession implements MuleSession
     /**
      * The security context for this session. If not null outbound, inbound and/or
      * method invocations will be authenticated using this context
-     * 
+     *
      * @return the context for this session or null if the request is not secure.
      */
     public SecurityContext getSecurityContext()
@@ -500,8 +504,8 @@ public final class DefaultMuleSession implements MuleSession
     /**
      * Will set a session level property. These will either be stored and retrieved
      * using the underlying transport mechanism of stored using a default mechanism
-     * 
-     * @param key the key for the object data being stored on the session
+     *
+     * @param key   the key for the object data being stored on the session
      * @param value the value of the session data
      */
     public void setProperty(Object key, Object value)
@@ -511,7 +515,7 @@ public final class DefaultMuleSession implements MuleSession
 
     /**
      * Will retrieve a session level property.
-     * 
+     *
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
@@ -522,7 +526,7 @@ public final class DefaultMuleSession implements MuleSession
 
     /**
      * Will retrieve a session level property and remove it from the session
-     * 
+     *
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
@@ -534,7 +538,7 @@ public final class DefaultMuleSession implements MuleSession
     /**
      * Returns an iterater of property keys for the session properties on this
      * session
-     * 
+     *
      * @return an iterater of property keys for the session properties on this
      *         session
      */
@@ -542,19 +546,54 @@ public final class DefaultMuleSession implements MuleSession
     {
         return properties.keySet().iterator();
     }
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException
     {
         out.defaultWriteObject();
-        out.writeObject(getService().getName());
+        //Can be null if service call originates from MuleClient
+        if(getService()!=null)
+        {
+            out.writeObject(getService().getName());
+        }
+
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         in.defaultReadObject();
-        String serviceName = (String) in.readObject();
-        service = RegistryContext.getRegistry().lookupService(serviceName);
-        muleContext = MuleServer.getMuleContext();
+        serializedData = new HashMap();
+
+        try
+        {
+            //Optional
+            serializedData.put("serviceName", in.readObject());
+        }
+        catch (OptionalDataException e)
+        {
+            //ignore
+        }
+
     }
 
+    /**
+     * Invoked after deserialization. This is called when the marker interface {@link org.mule.util.store.DeserializationPostInitialisable}
+     * is used. This will get invoked after the object has been deserialized passing in the current mulecontext when using
+     * either {@link org.mule.transformer.wire.SerializationWireFormat}, {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat}, or
+     * the {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
+     *
+     * @param muleContext the current muleContext instance
+     * @throws MuleException if there is an error initializing
+     */
+    @SuppressWarnings("unused")
+    void initAfterDeserialisation(MuleContext muleContext) throws MuleException
+    {
+        String serviceName = (String) serializedData.get("serviceName");
+        //Can be null if service call originates from MuleClient
+        if(serviceName!=null)
+        {
+            service = muleContext.getRegistry().lookupService(serviceName);
+        }
+        serializedData.clear();
+        serializedData = null;
+    }
 }

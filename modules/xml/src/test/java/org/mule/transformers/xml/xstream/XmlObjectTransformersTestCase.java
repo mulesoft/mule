@@ -11,7 +11,6 @@
 package org.mule.transformers.xml.xstream;
 
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -35,14 +34,14 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
 
     public Transformer getTransformer() throws Exception
     {
-        ObjectToXml trans =  new ObjectToXml();
+        ObjectToXml trans =  createObject(ObjectToXml.class);
         trans.setAliases(aliases);
         return trans;
     }
 
     public Transformer getRoundTripTransformer() throws Exception
     {
-        XmlToObject trans = new XmlToObject();
+        XmlToObject trans = createObject(XmlToObject.class);
         trans.setAliases(aliases);
         return trans;
     }
@@ -58,9 +57,9 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
                + "  <washed>true</washed>\n" + "</apple>";
     }
     
-    public void testStreaming() throws TransformerException
+    public void testStreaming() throws Exception
     {
-        XmlToObject transformer = new XmlToObject();
+        XmlToObject transformer = createObject(XmlToObject.class);
         transformer.setAliases(aliases);
         
         String input = (String) this.getResultData();

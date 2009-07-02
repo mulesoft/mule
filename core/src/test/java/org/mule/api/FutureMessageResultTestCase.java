@@ -10,7 +10,6 @@
 
 package org.mule.api;
 
-import org.mule.api.FutureMessageResult;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -43,7 +42,7 @@ public class FutureMessageResultTestCase extends AbstractMuleTestCase
     {
         try
         {
-            new FutureMessageResult(null);
+            new FutureMessageResult(null, muleContext);
             fail();
         }
         catch (NullPointerException npe)
@@ -53,7 +52,7 @@ public class FutureMessageResultTestCase extends AbstractMuleTestCase
 
         try
         {
-            FutureMessageResult f = new FutureMessageResult(Dummy);
+            FutureMessageResult f = new FutureMessageResult(Dummy, muleContext);
             f.setExecutor(null);
             fail();
         }
@@ -75,7 +74,7 @@ public class FutureMessageResultTestCase extends AbstractMuleTestCase
             }
         };
 
-        FutureMessageResult f = new FutureMessageResult(c);
+        FutureMessageResult f = new FutureMessageResult(c, muleContext);
         f.execute();
 
         assertNull(f.getMessage());
@@ -87,7 +86,7 @@ public class FutureMessageResultTestCase extends AbstractMuleTestCase
         ExecutorService e = Executors.newCachedThreadPool();
         e.shutdown();
 
-        FutureMessageResult f = new FutureMessageResult(Dummy);
+        FutureMessageResult f = new FutureMessageResult(Dummy, muleContext);
         f.setExecutor(e);
 
         try
@@ -115,7 +114,7 @@ public class FutureMessageResultTestCase extends AbstractMuleTestCase
             }
         };
 
-        FutureMessageResult f = new FutureMessageResult(c);
+        FutureMessageResult f = new FutureMessageResult(c, muleContext);
         f.execute();
 
         try

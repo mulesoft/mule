@@ -10,7 +10,8 @@
 
 package org.mule.transport.${ModuleNameLower};
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
+import org.mule.api.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMessageAdapter;
 
 /**
@@ -30,7 +31,7 @@ public class ${ModuleName}MessageAdapter extends AbstractMessageAdapter
         it is recommended that you pass the stream object into the MessageAdapter as the payload.
         This will ensure that Mule will use streaming where possible. */
     
-    public ${ModuleName}MessageAdapter(Object message) throws MessagingException
+    public ${ModuleName}MessageAdapter(Object message) throws MuleException
     {
         /* IMPLEMENTATION NOTE: The constructor should determine that the
            message is of the correct type or throw an exception i.e.
@@ -41,18 +42,6 @@ public class ${ModuleName}MessageAdapter extends AbstractMessageAdapter
             throw new MessageTypeNotSupportedException(message, getClass());
         }
         */
-    }
-
-    public String getPayloadAsString(String encoding) throws Exception
-    {
-        // TODO return the string representation of the wrapped message
-        throw new UnsupportedOperationException("getPayloadAsString");
-    }
-
-    public byte[] getPayloadAsBytes() throws Exception
-    {
-        // TODO return the byte[] representation of the wrapped message
-        throw new UnsupportedOperationException("getPayloadAsBytes");
     }
 
     public Object getPayload()

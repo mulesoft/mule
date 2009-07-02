@@ -10,15 +10,11 @@
 
 package org.mule.api;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
-
-import java.util.Map;
 
 /**
  * <code>MessagingException</code> is a general message exception thrown when
@@ -48,34 +44,6 @@ public class MessagingException extends MuleException
     {
         super(cause);
         this.muleMessage = muleMessage;
-        setMessage(generateMessage(message));
-    }
-
-    public MessagingException(Message message, Object payload)
-    {
-        super();
-        if (payload == null)
-        {
-            this.muleMessage = RequestContext.getEventContext().getMessage();
-        }
-        else
-        {
-            this.muleMessage = new DefaultMuleMessage(payload, (Map) null);
-        }
-        setMessage(generateMessage(message));
-    }
-
-    public MessagingException(Message message, Object payload, Throwable cause)
-    {
-        super(cause);
-        if (payload == null)
-        {
-            this.muleMessage = RequestContext.getEventContext().getMessage();
-        }
-        else
-        {
-            this.muleMessage = new DefaultMuleMessage(payload, (Map) null);
-        }
         setMessage(generateMessage(message));
     }
 

@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
@@ -30,6 +31,11 @@ import javax.jms.Session;
 public class JmsClientAcknowledgeTransaction extends AbstractSingleResourceTransaction
 {
     private volatile Message message;
+
+    public JmsClientAcknowledgeTransaction(MuleContext muleContext)
+    {
+        super(muleContext);
+    }
 
     public void setMessage(Message message)
     {

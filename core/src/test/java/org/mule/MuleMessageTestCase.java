@@ -30,7 +30,7 @@ public class MuleMessageTestCase extends AbstractMuleTestCase
         Map props = new HashMap();
         props.put("inbound-foo", "foo");
         DefaultMessageAdapter adapter = new DefaultMessageAdapter(TEST_MESSAGE, props, null);
-        MuleMessage message =  new DefaultMuleMessage(adapter);
+        MuleMessage message =  new DefaultMuleMessage(adapter, muleContext);
 
         try
         {
@@ -95,12 +95,12 @@ public class MuleMessageTestCase extends AbstractMuleTestCase
     {
         Apple payload = new Apple();
         //Ensure that the MuleMessage is unwrapped correctly
-        DefaultMuleMessage message = new DefaultMuleMessage(new DefaultMuleMessage(payload));
+        DefaultMuleMessage message = new DefaultMuleMessage(new DefaultMuleMessage(payload, muleContext), muleContext);
         assertEquals(message.getPayload(), payload);
 
         DefaultMessageAdapter adapter = new DefaultMessageAdapter(payload);
 
-        message = new DefaultMuleMessage(adapter, new HashMap());
+        message = new DefaultMuleMessage(adapter, new HashMap(), muleContext);
         assertEquals(message.getPayload(), payload);
     }
 }

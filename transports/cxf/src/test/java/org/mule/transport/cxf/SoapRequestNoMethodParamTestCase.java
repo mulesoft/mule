@@ -25,7 +25,7 @@ public class SoapRequestNoMethodParamTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         MuleMessage msg = client.send("http://localhost:63381/services/TestComponent",
-            new DefaultMuleMessage(request));
+            new DefaultMuleMessage(request, muleContext));
 
         assertNotNull(msg);
         assertNotNull(msg.getPayload());

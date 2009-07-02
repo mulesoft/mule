@@ -119,7 +119,7 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
             if (null != result)
             {
                 final Object payload = connector.getMessageAdapter(result).getPayload();
-                routeMessage(new DefaultMuleMessage(payload), endpoint.isSynchronous());
+                routeMessage(new DefaultMuleMessage(payload, connector.getMuleContext()), endpoint.isSynchronous());
             }
         }
         catch (Exception e)

@@ -13,11 +13,9 @@ package org.mule.transport.http;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
-import org.mule.MuleServer;
 import org.mule.NullSessionHandler;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -50,7 +48,6 @@ import java.util.Map;
 import javax.resource.spi.work.Work;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
@@ -133,7 +130,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             String encoding = endpoint.getEncoding();
             if (encoding == null)
             {
-                encoding = MuleServer.getMuleContext().getConfiguration().getDefaultEncoding();
+                encoding = connector.getMuleContext().getConfiguration().getDefaultEncoding();
             }
 
             conn = new HttpServerConnection(socket, encoding, (HttpConnector) connector);
@@ -244,7 +241,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             // TODO Mule 2.0 generic way to set stream message adapter
             MessageAdapter adapter = buildStandardAdapter(request, headers);
 
-            MuleMessage message = new DefaultMuleMessage(adapter);
+            MuleMessage message = new DefaultMuleMessage(adapter, connector.getMuleContext());
 
             String path = (String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
             int i = path.indexOf('?');
@@ -346,7 +343,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         
         protected HttpResponse doOtherValid(RequestLine requestLine, String method) throws MuleException
         {
-            MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());
+            MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
             MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(message, new NullSessionHandler(), connector.getMuleContext()), true);
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
@@ -357,7 +354,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
         protected HttpResponse doBad(RequestLine requestLine) throws MuleException
         {
-            MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());
+            MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
             MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(message, new NullSessionHandler(), connector.getMuleContext()), true);
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
@@ -367,7 +364,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
 
         protected MessageAdapter buildStandardAdapter(final HttpRequest request,
-                                                         final Map headers) throws MessagingException, TransformerException, IOException
+                                                         final Map headers) throws MuleException, TransformerException, IOException
         {
             final RequestLine requestLine = request.getRequestLine();
 
@@ -399,7 +396,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 {
                     HttpResponse expected = new HttpResponse();
                     expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
-                    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected), endpoint,
+                    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected, connector.getMuleContext()), endpoint,
                             new DefaultMuleSession(service, connector.getMuleContext()), true);
                     RequestContext.setEvent(event);
                     conn.writeResponse(transformResponse(expected));
@@ -421,7 +418,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
             response.setBody(HttpMessages.cannotBindToAddress(failedPath).toString());
-            RequestContext.setEvent(new DefaultMuleEvent(new DefaultMuleMessage(response), endpoint,
+            RequestContext.setEvent(new DefaultMuleEvent(new DefaultMuleMessage(response, connector.getMuleContext()), endpoint,
                     new DefaultMuleSession(service, connector.getMuleContext()), true));
             // The DefaultResponseTransformer will set the necessary headers
             return transformResponse(response);
@@ -558,7 +555,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
         else
         {
-            message = new DefaultMuleMessage(response);
+            message = new DefaultMuleMessage(response, connector.getMuleContext());
         }
         //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
         //class

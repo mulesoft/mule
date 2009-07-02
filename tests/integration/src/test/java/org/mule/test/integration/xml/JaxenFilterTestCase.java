@@ -28,7 +28,7 @@ public class JaxenFilterTestCase extends FunctionalTestCase
         
         assertNotNull(po);
         
-        MuleMessage msg = new DefaultMuleMessage(po);
+        MuleMessage msg = new DefaultMuleMessage(po, muleContext);
         MuleMessage res = client.send("vm://in", msg);
         
         Object payload = res.getPayload();

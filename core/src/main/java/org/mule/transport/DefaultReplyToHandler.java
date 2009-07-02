@@ -11,7 +11,7 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -45,10 +45,12 @@ public class DefaultReplyToHandler implements ReplyToHandler
 
     private volatile List transformers;
     private final Map<String, ImmutableEndpoint> endpointCache = new HashMap<String, ImmutableEndpoint>();
+    protected MuleContext muleContext;
 
-    public DefaultReplyToHandler(List transformers)
+    public DefaultReplyToHandler(List transformers, MuleContext muleContext)
     {
         this.transformers = transformers;
+        this.muleContext = muleContext;
     }
 
     public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
@@ -94,7 +96,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         OutboundEndpoint endpoint = (OutboundEndpoint) endpointCache.get(endpointUri);
         if (endpoint == null)
         {
-            EndpointFactory endpointFactory = RegistryContext.getRegistry().lookupEndpointFactory();
+            EndpointFactory endpointFactory = muleContext.getRegistry().lookupEndpointFactory();
             EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpointUri);
             if (transformers == null)
             {

@@ -10,7 +10,6 @@
 
 package org.mule.transport.service;
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -22,10 +21,10 @@ import org.mule.transport.AbstractConnector;
 import org.mule.util.BeanUtils;
 import org.mule.util.ObjectNameHelper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,6 +43,13 @@ public class TransportFactory
      */
     protected static final Log logger = LogFactory.getLog(TransportFactory.class);
 
+    protected MuleContext muleContext;
+
+    public TransportFactory(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
+
     /**
      * Creates an uninitialied connector from the provided MuleEndpointURI. The
      * scheme is used to determine what kind of connector to create. Any params set
@@ -57,7 +63,7 @@ public class TransportFactory
      * @return a new Connector
      * @throws TransportFactoryException
      */
-    public static Connector createConnector(EndpointURI url, MuleContext muleContext) throws TransportFactoryException
+    public Connector createConnector(EndpointURI url, MuleContext muleContext) throws TransportFactoryException
     {
 
         try
@@ -87,14 +93,14 @@ public class TransportFactory
                     CoreMessages.objectNotSetInService("Connector", scheme));
             }
 
-            connector.setName(ObjectNameHelper.getConnectorName(connector));
+            connector.setName(new ObjectNameHelper(muleContext).getConnectorName(connector));
 
             // TODO Do we still need to support this for 2.x?
             // set any manager default properties for the connector
             // these are set on the Manager with a protocol i.e.
             // jms.specification=1.1
 //            Map props = new HashMap();
-//            PropertiesUtils.getPropertiesWithPrefix(RegistryContext.getRegistry().lookupProperties(),
+//            PropertiesUtils.getPropertiesWithPrefix(muleContext.getRegistry().lookupProperties(),
 //                connector.getProtocol().toLowerCase(), props);
 //            if (props.size() > 0)
 //            {
@@ -111,7 +117,7 @@ public class TransportFactory
         }
     }
 
-    public static Connector getOrCreateConnectorByProtocol(ImmutableEndpoint endpoint, MuleContext muleContext)
+    public Connector getOrCreateConnectorByProtocol(ImmutableEndpoint endpoint, MuleContext muleContext)
         throws TransportFactoryException
     {
         return getOrCreateConnectorByProtocol(endpoint.getEndpointURI(), muleContext);
@@ -120,14 +126,14 @@ public class TransportFactory
     /**
      * Returns an initialized connector.
      */
-    public static Connector getOrCreateConnectorByProtocol(EndpointURI uri, MuleContext muleContext)
+    public Connector getOrCreateConnectorByProtocol(EndpointURI uri, MuleContext muleContext)
         throws TransportFactoryException
     {
         String connectorName = uri.getConnectorName();
         if (null != connectorName)
         {
             // TODO this lookup fails currently on Mule 2.x! MuleAdminAgentTestCase
-            Connector connector = RegistryContext.getRegistry().lookupConnector(connectorName);
+            Connector connector = muleContext.getRegistry().lookupConnector(connectorName);
             if (connector != null)
             {
                 return connector;
@@ -152,11 +158,11 @@ public class TransportFactory
         return connector;
     }
 
-    public static Connector getConnectorByProtocol(String protocol)
+    public Connector getConnectorByProtocol(String protocol)
     {
         Connector connector;
         List<Connector> results = new ArrayList<Connector>();
-        Collection connectors = RegistryContext.getRegistry().lookupObjects(Connector.class);
+        Collection connectors = muleContext.getRegistry().lookupObjects(Connector.class);
         for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
         {
             connector = (Connector)iterator.next();

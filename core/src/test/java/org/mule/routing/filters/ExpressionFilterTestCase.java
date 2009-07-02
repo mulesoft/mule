@@ -25,7 +25,7 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
     {
         ExpressionFilter filter = new ExpressionFilter("header", "foo=bar");
         filter.setMuleContext(muleContext);
-        MuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
         assertTrue(!filter.accept(message));
         message.setProperty("foo", "bar");
         assertTrue(filter.accept(message));
@@ -36,7 +36,7 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         ExpressionFilter filter = new ExpressionFilter("header", "foo!=bar");
         filter.setMuleContext(muleContext);
 
-        MuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue(filter.accept(message));
         message.setProperty("foo", "bar");
@@ -50,7 +50,7 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         ExpressionFilter filter = new ExpressionFilter("header", "foo!=null");
         filter.setMuleContext(muleContext);
 
-        MuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue(!filter.accept(message));
         message.removeProperty("foo");
@@ -83,11 +83,11 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
 
         assertNotNull(filter.getExpression());
 
-        assertTrue(filter.accept(new DefaultMuleMessage("The quick brown fox")));
-        assertTrue(filter.accept(new DefaultMuleMessage("The quick ")));
+        assertTrue(filter.accept(new DefaultMuleMessage("The quick brown fox", muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage("The quick ", muleContext)));
 
-        assertTrue(!filter.accept(new DefaultMuleMessage("The quickbrown fox")));
-        assertTrue(!filter.accept(new DefaultMuleMessage("he quick brown fox")));
+        assertTrue(!filter.accept(new DefaultMuleMessage("The quickbrown fox", muleContext)));
+        assertTrue(!filter.accept(new DefaultMuleMessage("he quick brown fox", muleContext)));
     }
 
     public void testExceptionTypeFilter()
@@ -95,7 +95,7 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         ExpressionFilter filter = new ExpressionFilter("exception-type:java.lang.Exception");
         filter.setMuleContext(muleContext);
 
-        MuleMessage m = new DefaultMuleMessage("test");
+        MuleMessage m = new DefaultMuleMessage("test", muleContext);
         assertTrue(!filter.accept(m));
         m.setExceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test")));
         assertTrue(filter.accept(m));
@@ -111,12 +111,12 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         ExpressionFilter filter = new ExpressionFilter("payload-type:org.mule.tck.testmodels.fruit.Apple");
         filter.setMuleContext(muleContext);
 
-        assertTrue(filter.accept(new DefaultMuleMessage(new Apple())));
-        assertTrue(!filter.accept(new DefaultMuleMessage("test")));
+        assertTrue(filter.accept(new DefaultMuleMessage(new Apple(), muleContext)));
+        assertTrue(!filter.accept(new DefaultMuleMessage("test", muleContext)));
 
         filter = new ExpressionFilter("payload-type:java.lang.String");
-        assertTrue(filter.accept(new DefaultMuleMessage("test")));
-        assertTrue(!filter.accept(new DefaultMuleMessage(new Exception("test"))));
+        assertTrue(filter.accept(new DefaultMuleMessage("test", muleContext)));
+        assertTrue(!filter.accept(new DefaultMuleMessage(new Exception("test"), muleContext)));
     }
 
     public void testWildcardFilterMultiplePatterns()
@@ -124,9 +124,9 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         ExpressionFilter filter = new ExpressionFilter("wildcard:* brown*, The*");
         filter.setMuleContext(muleContext);
 
-        assertTrue(filter.accept(new DefaultMuleMessage("The quick brown fox")));
-        assertTrue(filter.accept(new DefaultMuleMessage(" brown fox")));
-        assertTrue(filter.accept(new DefaultMuleMessage("The quickbrown fox")));
+        assertTrue(filter.accept(new DefaultMuleMessage("The quick brown fox", muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage(" brown fox", muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage("The quickbrown fox", muleContext)));
     }
 
     public void testTrueString()
@@ -136,9 +136,9 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
 
         filter.setNullReturnsTrue(true);
 
-        assertTrue(filter.accept(new DefaultMuleMessage("true")));
-        assertTrue(filter.accept(new DefaultMuleMessage("TRUE")));
-        assertTrue(filter.accept(new DefaultMuleMessage("tRuE")));
+        assertTrue(filter.accept(new DefaultMuleMessage("true", muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage("TRUE", muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage("tRuE", muleContext)));
     }
 
     public void testFalseString()
@@ -148,9 +148,9 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
 
         filter.setNullReturnsTrue(false);
 
-        assertFalse(filter.accept(new DefaultMuleMessage("false")));
-        assertFalse(filter.accept(new DefaultMuleMessage("FALSE")));
-        assertFalse(filter.accept(new DefaultMuleMessage("faLSe")));
+        assertFalse(filter.accept(new DefaultMuleMessage("false", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("FALSE", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("faLSe", muleContext)));
     }
 
     public void testOtherString()
@@ -160,8 +160,8 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         
         filter.setNullReturnsTrue(false);
 
-        assertFalse(filter.accept(new DefaultMuleMessage("otherTrueString")));
-        assertFalse(filter.accept(new DefaultMuleMessage("otherFalseString")));
-        assertFalse(filter.accept(new DefaultMuleMessage("!trueFALSE")));
+        assertFalse(filter.accept(new DefaultMuleMessage("otherTrueString", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("otherFalseString", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("!trueFALSE", muleContext)));
     }
 }

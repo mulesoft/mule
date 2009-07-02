@@ -46,8 +46,7 @@ public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
     public void testGracefulShutdownTimeout() throws Exception
     {
         final Latch latch = new Latch();
-        org.mule.api.service.Service service = (Service) muleContext.getRegistry().lookupService(
-            "TestService");
+        Service service = muleContext.getRegistry().lookupService("TestService");
         FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(service);
         testComponent.setEventCallback(new EventCallback()
         {

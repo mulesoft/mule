@@ -10,7 +10,6 @@
 
 package org.mule.config.spring.parsers.endpoint;
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -21,7 +20,7 @@ public abstract class AbstractEndpointTestCase extends FunctionalTestCase
 
     public ImmutableEndpoint doTest(String name) throws MuleException
     {
-        ImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(name);
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(name);
         assertNotNull(endpoint);
         EndpointURI uri = endpoint.getEndpointURI();
         assertNotNull(uri);

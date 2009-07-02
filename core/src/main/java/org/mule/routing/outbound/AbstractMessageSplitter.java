@@ -56,7 +56,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
             }
             else
             {
-                sendMessage = new org.mule.DefaultMuleMessage(part.getPart(), props);
+                sendMessage = new org.mule.DefaultMuleMessage(part.getPart(), props, muleContext);
             }
 
             try
@@ -98,7 +98,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
             }
         }
 
-        return resultsHandler.aggregateResults(results, message);
+        return resultsHandler.aggregateResults(results, message, muleContext);
     }
 
 

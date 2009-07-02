@@ -45,7 +45,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleTestCase
         _resp = new HttpResponse();
         _resp.setStatusLine(new HttpVersion(1, 1), 200);
         _resp.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE));
-        _resp.setBody(new DefaultMuleMessage(_body));
+        _resp.setBody(new DefaultMuleMessage(_body, muleContext));
     }
 
     /**

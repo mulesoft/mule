@@ -10,10 +10,11 @@
 
 package org.mule.transport.quartz.jobs;
 
-import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.AbstractMessageReceiver;
@@ -27,6 +28,7 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SchedulerException;
 
 /**
  * Will receive on an endpoint and dispatch it to the component set via the Receiver information.
@@ -40,8 +42,17 @@ public class EndpointPollingJob implements Job
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
-        JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
+        MuleContext muleContext;
+        try
+        {
+            muleContext = (MuleContext)jobExecutionContext.getScheduler().getContext().get(MuleProperties.MULE_CONTEXT_PROPERTY);
+        }
+        catch (SchedulerException e)
+        {
+            throw new JobExecutionException("Failed to retrieve Mulecontext from the Scheduler Context: " + e.getMessage(), e);
+        }
 
+        JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
 
         String receiverKey = (String) jobDataMap.get(QuartzMessageReceiver.QUARTZ_RECEIVER_PROPERTY);
         if (receiverKey == null)
@@ -55,7 +66,7 @@ public class EndpointPollingJob implements Job
             throw new JobExecutionException(QuartzMessages.connectorNotInJobDataMap().getMessage());
         }
 
-        QuartzConnector connector = (QuartzConnector) RegistryContext.getRegistry().lookupConnector(connectorName);
+        QuartzConnector connector = (QuartzConnector) muleContext.getRegistry().lookupConnector(connectorName);
         if (connector == null)
         {
             throw new JobExecutionException(QuartzMessages.noConnectorFound(connectorName).getMessage());

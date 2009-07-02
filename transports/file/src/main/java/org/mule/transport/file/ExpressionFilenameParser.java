@@ -84,7 +84,7 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
         {
             public Object match(String token)
             {
-                return muleContext.getExpressionManager().evaluate(token, new DefaultMuleMessage(adapter));
+                return muleContext.getExpressionManager().evaluate(token, new DefaultMuleMessage(adapter, muleContext));
             }
         }, expression);
     }

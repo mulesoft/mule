@@ -197,7 +197,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage sendEvent(Object message) throws MuleException
     {
-        return sendEvent(new DefaultMuleMessage(message, event.getMessage()));
+        return sendEvent(new DefaultMuleMessage(message, event.getMessage(), event.getMuleContext()));
     }
 
     /**
@@ -277,14 +277,14 @@ public class DefaultMuleEventContext implements MuleEventContext
         {
             public Object call() throws Exception
             {
-                MuleMessage muleMessage = new DefaultMuleMessage(message, event.getMessage());
+                MuleMessage muleMessage = new DefaultMuleMessage(message, event.getMessage(), event.getMuleContext());
                 muleMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
                 muleMessage.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(muleMessage);
             }
         };
 
-        FutureMessageResult result = new FutureMessageResult(callable);
+        FutureMessageResult result = new FutureMessageResult(callable, event.getMuleContext());
         // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
@@ -319,7 +319,7 @@ public class DefaultMuleEventContext implements MuleEventContext
             }
         };
 
-        FutureMessageResult result = new FutureMessageResult(callable);
+        FutureMessageResult result = new FutureMessageResult(callable, event.getMuleContext());
         // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
@@ -356,7 +356,7 @@ public class DefaultMuleEventContext implements MuleEventContext
             }
         };
 
-        FutureMessageResult result = new FutureMessageResult(callable);
+        FutureMessageResult result = new FutureMessageResult(callable, event.getMuleContext());
         // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
@@ -395,7 +395,7 @@ public class DefaultMuleEventContext implements MuleEventContext
             }
         };
 
-        FutureMessageResult result = new FutureMessageResult(callable);
+        FutureMessageResult result = new FutureMessageResult(callable, event.getMuleContext());
         // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
@@ -430,7 +430,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public void dispatchEvent(Object message) throws MuleException
     {
-        session.dispatchEvent(new DefaultMuleMessage(message, event.getMessage()));
+        session.dispatchEvent(new DefaultMuleMessage(message, event.getMessage(), event.getMuleContext()));
     }
 
     /**

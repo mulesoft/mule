@@ -30,7 +30,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
 
     public void testAddressForProtocol()
     {
-        URIBuilder uri = new URIBuilder();
+        URIBuilder uri = new URIBuilder(muleContext);
         uri.setProtocol("foo");
         uri.setAddress("foo://bar");
         assertEquals("foo://bar", uri.toString());
@@ -38,7 +38,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
 
     public void testAddressForMeta()
     {
-        URIBuilder uri = new URIBuilder();
+        URIBuilder uri = new URIBuilder(muleContext);
         uri.setMeta("foo");
         uri.setAddress("baz://bar");
         assertEquals("foo:baz://bar", uri.toString());
@@ -46,7 +46,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
 
     public void testQueriesWithAddress()
     {
-        URIBuilder uri = new URIBuilder();
+        URIBuilder uri = new URIBuilder(muleContext);
         uri.setAddress("foo://bar");
         uri.setQueryMap(queries);
         assertEquals("foo://bar?aname=avalue&bname=bvalue", uri.toString());
@@ -56,11 +56,11 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
     // and we keep parameter ordering as in original url
     public void testLiteralQueries()
     {
-        URIBuilder uri1 = new URIBuilder();
+        URIBuilder uri1 = new URIBuilder(muleContext);
         uri1.setAddress("foo://bar?cname=cvalue&aname=anothervalue");
         uri1.setQueryMap(queries);
         assertEquals("foo://bar?cname=cvalue&aname=avalue&bname=bvalue", uri1.toString());
-        URIBuilder uri2 = new URIBuilder();
+        URIBuilder uri2 = new URIBuilder(muleContext);
         uri2.setQueryMap(queries);
         uri2.setAddress("foo://bar?cname=cvalue&aname=anothervalue");
         assertEquals("foo://bar?cname=cvalue&aname=avalue&bname=bvalue", uri2.toString());
@@ -68,7 +68,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
 
     public void testNullQueries()
     {
-        URIBuilder uri1 = new URIBuilder();
+        URIBuilder uri1 = new URIBuilder(muleContext);
         uri1.setAddress("foo://bar?cname&aname");
         uri1.setQueryMap(queries);
         assertEquals("foo://bar?cname&aname=avalue&bname=bvalue", uri1.toString());
@@ -76,11 +76,11 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
 
     public void testFromString()
     {
-        URIBuilder uri = new URIBuilder("test://bar");
+        URIBuilder uri = new URIBuilder("test://bar", muleContext);
         EndpointURI endpointURI = uri.getEndpoint();
         assertEquals("test://bar", endpointURI.getUri().toString());
         assertEquals("test", endpointURI.getSchemeMetaInfo());
-        uri = new URIBuilder("meta:test://bar");
+        uri = new URIBuilder("meta:test://bar", muleContext);
         endpointURI = uri.getEndpoint();
         assertEquals("test://bar", endpointURI.getUri().toString());
         assertEquals("meta", endpointURI.getSchemeMetaInfo());

@@ -27,7 +27,7 @@ public abstract class AbstractPoundsScriptingExampleTestCase extends AbstractScr
         
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
-        assertEquals("[1 two_pounds, 1 pounds, 1 fifty_pence, 1 twenty_pence, 1 ten_pence, 1 five_pence, 1 two_pence, 1 pennies]", reply.getPayloadAsString()); 
+        assertEquals("[1 two_pounds, 1 pounds, 1 fifty_pence, 1 twenty_pence, 1 ten_pence, 1 five_pence, 1 two_pence, 1 pennies]", reply.getPayloadAsString());
     }
 
     public void testAccumulator() throws Exception
@@ -39,6 +39,6 @@ public abstract class AbstractPoundsScriptingExampleTestCase extends AbstractScr
         
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
-        assertEquals("[1 two_pounds, 1 pounds, 1 fifty_pence, 1 twenty_pence, 1 ten_pence, 1 five_pence, 1 two_pence, 1 pennies]", reply.getPayloadAsString()); 
+        assertEquals("[1 two_pounds, 1 pounds, 1 fifty_pence, 1 twenty_pence, 1 ten_pence, 1 five_pence, 1 two_pence, 1 pennies]", reply.getPayloadAsString());
     }
 }

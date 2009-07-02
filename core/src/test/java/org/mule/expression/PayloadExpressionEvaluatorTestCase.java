@@ -25,7 +25,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testSimple() throws Exception
     {
         MessagePayloadExpressionEvaluator eval = new MessagePayloadExpressionEvaluator();
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
 
         //no expression
         Object result = eval.evaluate(null, message);
@@ -44,7 +44,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
      */
     public void testSimpleUsingManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
 
         assertFalse(muleContext.getExpressionManager().isValidExpression("${payload:}"));
         assertTrue(muleContext.getExpressionManager().isValidExpression("#[payload:]"));
@@ -60,7 +60,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testWithTransform() throws Exception
     {
         MessagePayloadExpressionEvaluator eval = new MessagePayloadExpressionEvaluator();
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
 
         //i.e. ${payload:byte[]}
         Object result = eval.evaluate("byte[]", message);
@@ -70,7 +70,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         ByteArrayInputStream bais = new ByteArrayInputStream("test2".getBytes());
         //i.e. ${payload:java.lang.String}
-        result = eval.evaluate("java.lang.String", new DefaultMuleMessage(bais));
+        result = eval.evaluate("java.lang.String", new DefaultMuleMessage(bais, muleContext));
         assertNotNull(result);
         assertEquals("test2", result);
     }
@@ -78,7 +78,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testWithMoreComplexTransform() throws Exception
     {
         MessagePayloadExpressionEvaluator eval = new MessagePayloadExpressionEvaluator();
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()));
+        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), muleContext);
 
         //Lets register our transformer so Mule can find it
         muleContext.getRegistry().registerTransformer(new FruitBowlToFruitBasket());

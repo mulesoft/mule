@@ -9,6 +9,7 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 
@@ -22,6 +23,11 @@ public class TestTransaction extends AbstractSingleResourceTransaction
 {
     private AtomicBoolean committed = new AtomicBoolean(false);
     private AtomicBoolean rolledBack = new AtomicBoolean(false);
+
+    public TestTransaction(MuleContext muleContext)
+    {
+        super(muleContext);
+    }
 
     /**
      * Really begin the transaction. Note that resources are enlisted yet.

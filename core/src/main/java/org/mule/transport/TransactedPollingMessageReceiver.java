@@ -11,6 +11,7 @@
 package org.mule.transport;
 
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -196,7 +197,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     }
 
-    protected abstract List getMessages() throws Exception;
+    protected abstract List<MuleMessage> getMessages() throws Exception;
 
     protected abstract void processMessage(Object message) throws Exception;
 

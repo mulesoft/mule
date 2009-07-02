@@ -68,7 +68,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
 
         assertTrue(router.isMatch(message));
 
@@ -111,7 +111,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
 
         // only one send should be called and succeed, the others should not be
         // called
@@ -149,7 +149,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
 
         assertTrue(router.isMatch(message));
 
@@ -171,7 +171,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         assertNull("Async call should've returned null.", result);
         mockSession.verify();
 
-        message = new DefaultMuleMessage("test event");
+        message = new DefaultMuleMessage("test event", muleContext);
 
     }
 
@@ -191,8 +191,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         router.addEndpoint(endpoint1);
         router.addEndpoint(endpoint2);
 
-        MuleMessage message = new DefaultMuleMessage("test event");
-        MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
+        MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event", muleContext);
 
         assertTrue(router.isMatch(message));
 
@@ -226,8 +226,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         router.addEndpoint(endpoint1);
         router.addEndpoint(endpoint2);
 
-        MuleMessage message = new DefaultMuleMessage("test event");
-        MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
+        MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event", muleContext);
 
         assertTrue(router.isMatch(message));
 
@@ -260,14 +260,14 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         router.addEndpoint(endpoint1);
         router.addEndpoint(endpoint2);
 
-        MuleMessage message = new DefaultMuleMessage("test event");
-        MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event");
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
+        MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event", muleContext);
 
         assertTrue(router.isMatch(message));
 
         // remote endpoint failed and set an exception payload on the returned
         // message
-        MuleMessage exPayloadMessage = new DefaultMuleMessage("there was a failure");
+        MuleMessage exPayloadMessage = new DefaultMuleMessage("there was a failure", muleContext);
         exPayloadMessage.setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
 
         final MuleSession session = (MuleSession)mockSession.proxy();

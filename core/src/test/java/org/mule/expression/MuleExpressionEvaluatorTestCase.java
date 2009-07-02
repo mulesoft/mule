@@ -56,7 +56,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     protected MuleMessage createMessageWithAttachments()
     {
-        MuleMessage attahcmentsMessage = new DefaultMuleMessage("test");
+        MuleMessage attahcmentsMessage = new DefaultMuleMessage("test", muleContext);
 
         try
         {
@@ -333,7 +333,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
         eval.setMuleContext(muleContext);
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = eval.evaluate("message.header(foo)", message);
         assertNotNull(result);
@@ -358,7 +358,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
         eval.setMuleContext(muleContext);
 
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = eval.evaluate("message.headers(foo, baz)", message);
         assertNotNull(result);
@@ -392,7 +392,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
         eval.setMuleContext(muleContext);
         
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = eval.evaluate("message.headers-list(foo, baz)", message);
         assertNotNull(result);
@@ -426,7 +426,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
         eval.setMuleContext(muleContext);
 
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = eval.evaluate("message.headers(*)", message);
         assertNotNull(result);
@@ -441,7 +441,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testGettingAllHeadersUsingManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = muleContext.getExpressionManager().evaluate("#[mule:message.headers(*)]", message);
         assertNotNull(result);
@@ -456,7 +456,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testSingleHeaderUsingManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = muleContext.getExpressionManager().evaluate("#[mule:message.header(foo)]", message);
         assertNotNull(result);
@@ -479,7 +479,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testMapHeadersUsingManager() throws Exception
     {
 
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = muleContext.getExpressionManager().evaluate("#[mule:message.headers(foo, baz)]", message);
         assertNotNull(result);
@@ -510,7 +510,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testListHeadersUsingManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test", props);
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
         Object result = muleContext.getExpressionManager().evaluate("#[mule:message.headers-list(foo, baz)]", message);
         assertNotNull(result);
@@ -541,7 +541,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testContextExpressions() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         MuleExpressionEvaluator extractor = new MuleExpressionEvaluator();
         extractor.setMuleContext(muleContext);
 
@@ -579,7 +579,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testContextExpressionsFromExtractorManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         Object o = muleContext.getExpressionManager().evaluate("mule:context.serviceName", message);
         assertEquals("apple", o);
 
@@ -616,7 +616,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         RequestContext.clear();
 
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         MuleExpressionEvaluator extractor = new MuleExpressionEvaluator();
         extractor.setMuleContext(muleContext);
 
@@ -639,7 +639,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
         eval.setMuleContext(muleContext);
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         message.setCorrelationId(message.getUniqueId());
         message.setCorrelationSequence(1);
         message.setCorrelationGroupSize(2);
@@ -684,7 +684,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
      */
     public void testMessagePropertiesUsingManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         message.setCorrelationId(message.getUniqueId());
         message.setCorrelationSequence(1);
         message.setCorrelationGroupSize(2);
@@ -731,7 +731,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
      */
     public void testMessagePayloadWithNullsUsingManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
 
         assertFalse(muleContext.getExpressionManager().isValidExpression("${payload:}"));
         assertTrue(muleContext.getExpressionManager().isValidExpression("#[mule:message.payload]"));
@@ -748,7 +748,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
         eval.setMuleContext(muleContext);
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
 
         //i.e. ${payload:byte[]}
         Object result = eval.evaluate("message.payload(byte[])", message);
@@ -758,14 +758,14 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         ByteArrayInputStream bais = new ByteArrayInputStream("test2".getBytes());
         //i.e. ${payload:java.lang.String}
-        result = eval.evaluate("message.payload(java.lang.String)", new DefaultMuleMessage(bais));
+        result = eval.evaluate("message.payload(java.lang.String)", new DefaultMuleMessage(bais, muleContext));
         assertNotNull(result);
         assertEquals("test2", result);
     }
 
     public void testMessagePayloadWithTransformUsingManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
 
         //i.e. ${payload:byte[]}
         Object result = muleContext.getExpressionManager().evaluate("#[mule:message.payload(byte[])]", message);
@@ -775,7 +775,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         ByteArrayInputStream bais = new ByteArrayInputStream("test2".getBytes());
         //i.e. ${payload:java.lang.String}
-        result = muleContext.getExpressionManager().evaluate("#[mule:message.payload(java.lang.String)]", new DefaultMuleMessage(bais));
+        result = muleContext.getExpressionManager().evaluate("#[mule:message.payload(java.lang.String)]", new DefaultMuleMessage(bais, muleContext));
         assertNotNull(result);
         assertEquals("test2", result);
     }
@@ -784,7 +784,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
         eval.setMuleContext(muleContext);
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()));
+        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), muleContext);
 
         //Lets register our transformer so Mule can find it
         muleContext.getRegistry().registerTransformer(new FruitBowlToFruitBasket());
@@ -801,7 +801,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testMessagePayloadWithMoreComplexTransformUsingManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()));
+        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), muleContext);
 
         //Lets register our transformer so Mule can find it
         muleContext.getRegistry().registerTransformer(new FruitBowlToFruitBasket());
@@ -823,7 +823,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         map.put("boo", "bar");
         map.put("zoo", "zar");
 
-        MuleMessage message = new DefaultMuleMessage(map);
+        MuleMessage message = new DefaultMuleMessage(map, muleContext);
 
         assertTrue(muleContext.getExpressionManager().isValidExpression("#[mule:message.map-payload(foo)]"));
 
@@ -872,7 +872,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         trans.setName("bowlToBasket");
         muleContext.getRegistry().registerTransformer(trans);
 
-        MuleMessage message = new DefaultMuleMessage(new Apple());
+        MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
         RegistryExpressionEvaluator eval = new RegistryExpressionEvaluator();
         eval.setMuleContext(muleContext);
         Object o = eval.evaluate("bowlToBasket", message);
@@ -901,7 +901,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         trans.setName("bowlToBasket");
         muleContext.getRegistry().registerTransformer(trans);
 
-        MuleMessage message = new DefaultMuleMessage(new Apple());
+        MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
         Object o = muleContext.getExpressionManager().evaluate("#[mule:registry.bowlToBasket]", message);
         assertNotNull(o);
         assertTrue(o instanceof Transformer);

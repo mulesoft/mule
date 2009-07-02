@@ -20,25 +20,25 @@ public class PayloadTypeFilterTestCase extends AbstractMuleTestCase
     {
         PayloadTypeFilter filter = new PayloadTypeFilter();
         assertNull(filter.getExpectedType());
-        assertFalse(filter.accept(new DefaultMuleMessage("test")));
+        assertFalse(filter.accept(new DefaultMuleMessage("test", muleContext)));
 
         filter.setExpectedType(String.class);
-        assertTrue(filter.accept(new DefaultMuleMessage("test")));
+        assertTrue(filter.accept(new DefaultMuleMessage("test", muleContext)));
 
         filter.setExpectedType(null);
-        assertFalse(filter.accept(new DefaultMuleMessage("test")));
+        assertFalse(filter.accept(new DefaultMuleMessage("test", muleContext)));
     }
 
     public void testPayloadTypeFilter()
     {
         PayloadTypeFilter filter = new PayloadTypeFilter(Exception.class);
         assertNotNull(filter.getExpectedType());
-        assertTrue(filter.accept(new DefaultMuleMessage(new Exception("test"))));
-        assertTrue(!filter.accept(new DefaultMuleMessage("test")));
+        assertTrue(filter.accept(new DefaultMuleMessage(new Exception("test"), muleContext)));
+        assertTrue(!filter.accept(new DefaultMuleMessage("test", muleContext)));
 
         filter.setExpectedType(String.class);
-        assertTrue(filter.accept(new DefaultMuleMessage("test")));
-        assertTrue(!filter.accept(new DefaultMuleMessage(new Exception("test"))));
+        assertTrue(filter.accept(new DefaultMuleMessage("test", muleContext)));
+        assertTrue(!filter.accept(new DefaultMuleMessage(new Exception("test"), muleContext)));
     }
 
 }

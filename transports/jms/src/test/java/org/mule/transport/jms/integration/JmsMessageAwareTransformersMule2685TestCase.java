@@ -66,7 +66,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
     {
         RequestContext.setEvent(getTestEvent("test"));
 
-        MuleMessage message = new DefaultMuleMessage("This is a test TextMessage");
+        MuleMessage message = new DefaultMuleMessage("This is a test TextMessage", muleContext);
 
         SetTestRecipientsTransformer trans = new SetTestRecipientsTransformer();
         MuleMessage result1 = (MuleMessage) trans.transform(message);

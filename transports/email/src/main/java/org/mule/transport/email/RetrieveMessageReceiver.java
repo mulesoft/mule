@@ -11,7 +11,6 @@
 package org.mule.transport.email;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.MuleServer;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -87,7 +86,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
         if (StringUtils.isEmpty(backupFolder))
         {
             this.backupFolder =
-                    MuleServer.getMuleContext().getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
+                    connector.getMuleContext().getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
         }
 
         if (backupFolder != null && !this.backupFolder.endsWith(File.separator))
@@ -129,7 +128,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
                     {
                         MimeMessage mimeMessage = new MimeMessage((MimeMessage) messages[i]);
                         storeMessage(mimeMessage);
-                        message = new DefaultMuleMessage(castConnector().getMessageAdapter(mimeMessage));
+                        message = new DefaultMuleMessage(castConnector().getMessageAdapter(mimeMessage), connector.getMuleContext());
 
                         if (castConnector().isDeleteReadMessages())
                         {

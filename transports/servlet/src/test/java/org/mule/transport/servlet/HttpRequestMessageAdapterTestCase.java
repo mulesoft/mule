@@ -10,7 +10,7 @@
 
 package org.mule.transport.servlet;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
 
@@ -43,7 +43,7 @@ public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTes
         assertTrue(payload instanceof InputStream);
     }
 
-    public MessageAdapter createAdapter(Object payload) throws MessagingException
+    public MessageAdapter createAdapter(Object payload) throws MuleException
     {
         return new HttpRequestMessageAdapter(payload);
     }

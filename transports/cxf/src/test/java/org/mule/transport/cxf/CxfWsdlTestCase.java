@@ -36,7 +36,7 @@ public class CxfWsdlTestCase extends AbstractMuleTestCase
     {
         MuleClient client = new MuleClient();
 
-        MuleMessage message = new DefaultMuleMessage("test1");
+        MuleMessage message = new DefaultMuleMessage("test1", muleContext);
         MuleMessage reply = client.send(TEST_URL, message);
         assertNotNull(reply);
 
@@ -60,7 +60,7 @@ public class CxfWsdlTestCase extends AbstractMuleTestCase
         OutboundEndpoint endpoint = 
             muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
 
-        MuleMessage message = new DefaultMuleMessage("test1");
+        MuleMessage message = new DefaultMuleMessage("test1", muleContext);
         MuleSession session = new DefaultMuleSession(message,
             ((AbstractConnector) endpoint.getConnector()).getSessionHandler(), muleContext);
         MuleEvent event = new DefaultMuleEvent(message, endpoint, session, true);

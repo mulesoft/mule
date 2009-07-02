@@ -58,8 +58,8 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         endpoint.expectAndReturn("isSynchronous", false);
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
+        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
+        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expect("dispatch", C.isA(DefaultMuleEvent.class));
 
         strategy.catchMessage(event.getMessage(), null);
@@ -117,8 +117,8 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
+        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
+        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expect("send", new Constraint()
         {
             public boolean eval(Object arg0)
@@ -183,17 +183,17 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         MuleSession session = getTestSession(getTestService(), muleContext);
 
-        messageRouter.route(new DefaultMuleMessage("hello"), session);
+        messageRouter.route(new DefaultMuleMessage("hello", muleContext), session);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(0, count2[0]);
 
-        messageRouter.route(new DefaultMuleMessage(new StringBuffer()), session);
+        messageRouter.route(new DefaultMuleMessage(new StringBuffer(), muleContext), session);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(1, count2[0]);
 
-        messageRouter.route(new DefaultMuleMessage(new Exception()), session);
+        messageRouter.route(new DefaultMuleMessage(new Exception(), muleContext), session);
         assertEquals(1, catchAllCount[0]);
         assertEquals(1, count1[0]);
         assertEquals(1, count2[0]);

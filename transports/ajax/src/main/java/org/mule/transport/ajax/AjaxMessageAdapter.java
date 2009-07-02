@@ -11,10 +11,10 @@
 package org.mule.transport.ajax;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.PropertyScope;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultMuleMessageDTO;
 import org.mule.module.json.filters.IsJsonFilter;
 import org.mule.module.json.transformers.JsonToObject;
@@ -44,19 +44,19 @@ public class AjaxMessageAdapter extends AbstractMessageAdapter
 
     protected Object payload;
 
-    public AjaxMessageAdapter(Object message) throws MessagingException
+    public AjaxMessageAdapter(Object message) throws MuleException
     {
         super();
         init(message);
     }
 
-    public AjaxMessageAdapter(Object message, MessageAdapter template) throws MessagingException
+    public AjaxMessageAdapter(Object message, MessageAdapter template) throws MuleException
     {
         super(template);
         init(message);
     }
 
-    protected void init(Object message) throws MessagingException
+    protected void init(Object message) throws MessagingException, TransformerException
     {
         if (message instanceof Map)
         {
@@ -68,14 +68,7 @@ public class AjaxMessageAdapter extends AbstractMessageAdapter
                 {
                     transformer = new JsonToObject();
                     transformer.setReturnClass(Map.class);
-                    try
-                    {
-                        this.payload = transformer.transform(p);
-                    }
-                    catch (TransformerException e)
-                    {
-                        throw new MessagingException(CoreMessages.transformFailed(message.getClass().getName(), Map.class.getName()), message, e);
-                    }
+                    this.payload = transformer.transform(p);
                 }
                 else
                 {
@@ -101,14 +94,7 @@ public class AjaxMessageAdapter extends AbstractMessageAdapter
             transformer = new JsonToObject();
             transformer.setReturnClass(DefaultMuleMessageDTO.class);
             DefaultMuleMessageDTO dto = null;
-            try
-            {
-                dto = (DefaultMuleMessageDTO) transformer.transform(message);
-            }
-            catch (TransformerException e)
-            {
-                throw new MessagingException(CoreMessages.transformFailed(message.getClass().getName(), DefaultMuleMessageDTO.class.getName()), message, e);
-            }
+            dto = (DefaultMuleMessageDTO) transformer.transform(message);
             payload = dto.getPayload();
             dto.addPropertiesTo(this);
             }
@@ -116,14 +102,7 @@ public class AjaxMessageAdapter extends AbstractMessageAdapter
             {
                 transformer = new JsonToObject();
                 transformer.setReturnClass(Map.class);
-                try
-                {
-                    payload = transformer.transform(message);
-                }
-                catch (TransformerException e)
-                {
-                    throw new MessagingException(CoreMessages.transformFailed(message.getClass().getName(), DefaultMuleMessageDTO.class.getName()), message, e);
-                }
+                payload = transformer.transform(message);
             }
         }
         else

@@ -22,7 +22,7 @@ public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleTestC
 {
     protected ThreadSafeAccess dummyEvent() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null);
+        MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null, muleContext);
         return new DefaultMuleEvent(message,
                 MuleTestUtils.getTestInboundEndpoint("test", muleContext),
                 new DefaultMuleSession(new DirectService(), muleContext), false);

@@ -26,7 +26,7 @@ public class BankQuotesResponseAggregator extends ResponseCorrelationAggregator
     @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
-        return new CollectionCorrelatorCallback()
+        return new CollectionCorrelatorCallback(muleContext)
         {
 
             public MuleMessage aggregateEvents(EventGroup events) throws AggregationException

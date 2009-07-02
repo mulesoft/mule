@@ -10,13 +10,15 @@
 
 package org.mule.api.transformer;
 
+import org.mule.api.context.MuleContextAware;
+
 import java.util.List;
 
 /**
  * <code>Transformer</code> can be chained together to covert message payloads
  * from one object type to another.
  */
-public interface Transformer extends BaseTransformer
+public interface Transformer extends BaseTransformer, MuleContextAware
 {
 
     /**
@@ -54,6 +56,18 @@ public interface Transformer extends BaseTransformer
      *                              expected returnClass isn't the same as the transformed data
      */
     Object transform(Object src) throws TransformerException;
+
+    /**
+     * Thransforms the supplied data and returns the result
+     *
+     * @param src the data to transform
+     * @param encoding the encoding to use by this transformer.  many transformations will not need encoding unless
+     * dealing with text so you only need to use this method if yo wish to customize the encoding
+     * @return the transformed data
+     * @throws TransformerException if a error occurs transforming the data or if the
+     *                              expected returnClass isn't the same as the transformed data
+     */
+    Object transform(Object src, String encoding) throws TransformerException;
 
     /**
      * Sets the expected return type for the transformed data. If the transformed

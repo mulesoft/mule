@@ -10,6 +10,7 @@
 
 package org.mule.module.spring.transaction;
 
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transaction.TransactionManagerFactory;
 
 import javax.transaction.TransactionManager;
@@ -27,7 +28,7 @@ public class SpringTransactionManagerFactory implements TransactionManagerFactor
         this.transactionManager = transactionManager;
     }
 
-    synchronized public TransactionManager create() throws Exception
+    synchronized public TransactionManager create(MuleConfiguration config) throws Exception
     {
         return transactionManager;
     }

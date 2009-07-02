@@ -10,8 +10,8 @@
 
 package org.mule.transformer;
 
-import org.mule.RegistryContext;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
@@ -136,10 +136,11 @@ public class TransformerUtils
      * Builds a list of Transformers.
      *
      * @param names - a list of transformers separated by commans
+     * @param muleContext
      * @return a list (possibly empty) of transformers or
      * @throws org.mule.api.DefaultMuleException
      */
-    public static List getTransformers(String names) throws DefaultMuleException
+    public static List getTransformers(String names, MuleContext muleContext) throws DefaultMuleException
     {
         if (null != names)
         {
@@ -148,7 +149,7 @@ public class TransformerUtils
             while (st.hasMoreTokens())
             {
                 String key = st.nextToken().trim();
-                Transformer transformer = RegistryContext.getRegistry().lookupTransformer(key);
+                Transformer transformer = muleContext.getRegistry().lookupTransformer(key);
 
                 if (transformer == null)
                 {

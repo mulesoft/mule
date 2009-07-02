@@ -30,7 +30,7 @@ public class VMAttachmentsTestCase extends FunctionalTestCase
 
     public void testAttachments() throws Exception
     {
-        DefaultMuleMessage msg = new DefaultMuleMessage("Mmm... attachments!");
+        DefaultMuleMessage msg = new DefaultMuleMessage("Mmm... attachments!", muleContext);
         FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/"
                                                         + getConfigResources()).getAbsoluteFile());
         msg.addAttachment("test-attachment", new DataHandler(ds));

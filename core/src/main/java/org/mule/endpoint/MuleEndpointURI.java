@@ -10,7 +10,7 @@
 
 package org.mule.endpoint;
 
-import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.EndpointURIBuilder;
@@ -70,6 +70,7 @@ public class MuleEndpointURI implements EndpointURI
     private String userInfo;
     private String schemeMetaInfo;
     private String resourceInfo;
+    private transient MuleContext muleContext;
 
     MuleEndpointURI(String address,
                     String endpointName,
@@ -78,10 +79,10 @@ public class MuleEndpointURI implements EndpointURI
                     String responseTransformers,
                     Properties properties,
                     URI uri,
-                    String userInfo)
+                    String userInfo, MuleContext muleContext)
     {
         this(address, endpointName, connectorName, transformers, responseTransformers, 
-            properties, uri);
+            properties, uri, muleContext);
         if (userInfo != null)
         {
             this.userInfo = userInfo;
@@ -94,7 +95,7 @@ public class MuleEndpointURI implements EndpointURI
                            String transformers,
                            String responseTransformers,
                            Properties properties,
-                           URI uri)
+                           URI uri, MuleContext muleContext)
     {
         this.address = address;
         this.endpointName = endpointName;
@@ -104,6 +105,7 @@ public class MuleEndpointURI implements EndpointURI
         this.params = properties;
         this.uri = uri;
         this.userInfo = uri.getUserInfo();
+        this.muleContext = muleContext;
         if (properties != null)
         {
             resourceInfo = (String) properties.remove("resourceInfo");
@@ -125,7 +127,7 @@ public class MuleEndpointURI implements EndpointURI
      * Creates but does not initialize the endpoint URI.  It is up to the caller
      * to call initialise() at some point.
      */
-    public MuleEndpointURI(String uri) throws EndpointException
+    public MuleEndpointURI(String uri, MuleContext muleContext) throws EndpointException
     {
         uri = uri.trim().replaceAll(" ", "%20");
         //Allow Expressions to be embedded
@@ -136,6 +138,8 @@ public class MuleEndpointURI implements EndpointURI
         {
             throw new MalformedEndpointException(uri);
         }
+        this.muleContext = muleContext;
+
         try
         {
             schemeMetaInfo = retrieveSchemeMetaInfo(uri);
@@ -159,13 +163,13 @@ public class MuleEndpointURI implements EndpointURI
         {
             String scheme = (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
             TransportServiceDescriptor sd;
-            sd = (TransportServiceDescriptor)RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, scheme, null);
+            sd = (TransportServiceDescriptor)muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, scheme, null);
             if (sd == null)
             {
                 throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
             }
             EndpointURIBuilder builder = sd.createEndpointBuilder();
-            EndpointURI built = builder.build(this.uri);
+            EndpointURI built = builder.build(this.uri, muleContext);
             initialise(built);
         }
         catch (Exception e)
@@ -432,6 +436,11 @@ public class MuleEndpointURI implements EndpointURI
             }
         }
         return null;
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
     }
 
     public boolean equals(Object o)

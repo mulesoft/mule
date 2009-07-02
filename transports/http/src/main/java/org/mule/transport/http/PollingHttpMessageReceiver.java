@@ -89,7 +89,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 
     public void poll() throws Exception
     {
-        MuleMessage req = new DefaultMuleMessage(new DefaultMessageAdapter(""));
+        MuleMessage req = new DefaultMuleMessage(new DefaultMessageAdapter(""), connector.getMuleContext());
         if (etag != null && checkEtag)
         {
             Map customHeaders = Collections.singletonMap(HttpConstants.HEADER_IF_NONE_MATCH, etag);

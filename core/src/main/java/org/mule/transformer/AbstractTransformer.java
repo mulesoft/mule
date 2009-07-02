@@ -10,7 +10,9 @@
 
 package org.mule.transformer;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
@@ -19,7 +21,6 @@ import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
-import org.mule.util.FileUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
@@ -30,7 +31,6 @@ import java.util.List;
 import javax.xml.transform.stream.StreamSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -42,6 +42,8 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractTransformer implements Transformer
 {
     protected static final int DEFAULT_TRUNCATE_LENGTH = 200;
+
+    protected MuleContext muleContext;
 
     protected final Log logger = LogFactory.getLog(getClass());
 
@@ -57,7 +59,9 @@ public abstract class AbstractTransformer implements Transformer
      */
     protected String name = null;
 
-    /** The endpoint that this transformer instance is configured on */
+    /**
+     * The endpoint that this transformer instance is configured on
+     */
     protected ImmutableEndpoint endpoint = null;
 
     /**
@@ -72,7 +76,9 @@ public abstract class AbstractTransformer implements Transformer
      */
     private boolean ignoreBadInput = false;
 
-    /** default constructor required for discovery */
+    /**
+     * default constructor required for discovery
+     */
     public AbstractTransformer()
     {
         super();
@@ -117,7 +123,9 @@ public abstract class AbstractTransformer implements Transformer
         sourceTypes.remove(aClass);
     }
 
-    /** @return transformer name */
+    /**
+     * @return transformer name
+     */
     public String getName()
     {
         if (name == null)
@@ -127,7 +135,9 @@ public abstract class AbstractTransformer implements Transformer
         return name;
     }
 
-    /** @param string  */
+    /**
+     * @param string
+     */
     public void setName(String string)
     {
         if (string == null)
@@ -192,21 +202,18 @@ public abstract class AbstractTransformer implements Transformer
         return false;
     }
 
-    /**
-     * Transforms the object.
-     *
-     * @param src The source object to transform.
-     * @return The transformed object
-     */
     public final Object transform(Object src) throws TransformerException
     {
-        String encoding = null;
+        return transform(src, getEncoding(src));
+    }
 
+    public Object transform(Object src, String encoding) throws TransformerException
+    {
         Object payload = src;
         MessageAdapter adapter;
         if (src instanceof MessageAdapter)
         {
-            encoding = ((MessageAdapter) src).getEncoding();
+
             adapter = (MessageAdapter) src;
             if ((!isSourceTypeSupported(MessageAdapter.class, true)
                     && !isSourceTypeSupported(MuleMessage.class, true)
@@ -216,15 +223,6 @@ public abstract class AbstractTransformer implements Transformer
                 src = ((MessageAdapter) src).getPayload();
                 payload = adapter.getPayload();
             }
-        }
-
-        if (encoding == null && endpoint != null)
-        {
-            encoding = endpoint.getEncoding();
-        }
-        else if (encoding == null)
-        {
-            encoding = FileUtils.DEFAULT_ENCODING;
         }
 
         Class srcCls = src.getClass();
@@ -266,6 +264,25 @@ public abstract class AbstractTransformer implements Transformer
 
         result = checkReturnClass(result);
         return result;
+    }
+
+    protected String getEncoding(Object src)
+    {
+        String encoding = null;
+        if (src instanceof MessageAdapter)
+        {
+            encoding = ((MessageAdapter) src).getEncoding();
+        }
+
+        if (encoding == null && endpoint != null)
+        {
+            encoding = endpoint.getEncoding();
+        }
+        else if (encoding == null)
+        {
+            encoding = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+        }
+        return encoding;
     }
 
     protected boolean isConsumed(Class srcCls)
@@ -351,4 +368,8 @@ public abstract class AbstractTransformer implements Transformer
         return false;
     }
 
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 }

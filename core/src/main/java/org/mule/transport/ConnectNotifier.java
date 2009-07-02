@@ -10,7 +10,7 @@
 
 package org.mule.transport;
 
-import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryNotifier;
 import org.mule.config.ExceptionHelper;
@@ -36,12 +36,12 @@ public class ConnectNotifier implements RetryNotifier
             logger.debug("Successfully connected to " + context.getDescription());
         }
 
-        fireConnectNotification(ConnectionNotification.CONNECTION_CONNECTED, context.getDescription());
+        fireConnectNotification(ConnectionNotification.CONNECTION_CONNECTED, context.getDescription(), context.getMuleContext());
     }
 
     public void onFailure(RetryContext context, Throwable e)
     {
-        fireConnectNotification(ConnectionNotification.CONNECTION_FAILED, context.getDescription());
+        fireConnectNotification(ConnectionNotification.CONNECTION_FAILED, context.getDescription(), context.getMuleContext());
 
         if (logger.isErrorEnabled())
         {
@@ -53,9 +53,8 @@ public class ConnectNotifier implements RetryNotifier
         }
     }
 
-    protected void fireConnectNotification(int action, String description)
+    protected void fireConnectNotification(int action, String description, MuleContext context)
     {
-        // TODO Make this class MuleContextAware
-        MuleServer.getMuleContext().fireNotification(new ConnectionNotification(null, description, action));
+        context.fireNotification(new ConnectionNotification(null, description, action));
     }
 }

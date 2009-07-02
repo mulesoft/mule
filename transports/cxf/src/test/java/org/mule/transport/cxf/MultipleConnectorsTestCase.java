@@ -26,14 +26,14 @@ public class MultipleConnectorsTestCase extends FunctionalTestCase
     public void testCxfConnector1() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage reply = client.send("cxf1", new DefaultMuleMessage("mule"));
+        MuleMessage reply = client.send("cxf1", new DefaultMuleMessage("mule", muleContext));
         assertEquals("Received: mule", reply.getPayloadAsString());
     }
 
     public void testCxfConnector2() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage reply = client.send("cxf2", new DefaultMuleMessage("mule"));
+        MuleMessage reply = client.send("cxf2", new DefaultMuleMessage("mule", muleContext));
         assertEquals("Received: mule", reply.getPayloadAsString());
     }
 

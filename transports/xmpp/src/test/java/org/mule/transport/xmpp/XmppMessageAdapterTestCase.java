@@ -10,7 +10,7 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
 
@@ -20,7 +20,7 @@ public class XmppMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
 
     @Override
-    public MessageAdapter createAdapter(Object payload) throws MessagingException
+    public MessageAdapter createAdapter(Object payload) throws MuleException
     {
         return new XmppMessageAdapter(payload);
     }

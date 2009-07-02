@@ -10,7 +10,6 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -89,7 +88,7 @@ public class TestConnector extends AbstractConnector
         disposeCount++;
     }
 
-    public MessageAdapter getMessageAdapter(Object message) throws MessagingException
+    public MessageAdapter getMessageAdapter(Object message) throws MuleException
     {
         return new DummyMessageAdapter(message);
     }

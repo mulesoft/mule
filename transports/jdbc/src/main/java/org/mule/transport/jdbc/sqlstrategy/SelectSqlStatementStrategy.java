@@ -119,7 +119,8 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
             //Execute ack statement
             if (ackStmt != null)
             {
-                Object[] params = connector.getParams(endpoint, ackParams, new DefaultMuleMessage(result, (Map)null), ackStmt);
+                Object[] params = connector.getParams(endpoint, ackParams,
+                        new DefaultMuleMessage(result, (Map)null, connector.getMuleContext()), ackStmt);
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(params));
@@ -141,7 +142,7 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
             {
                 msgAdapter = connector.getMessageAdapter(result);
             }
-            MuleMessage message = new DefaultMuleMessage(msgAdapter);
+            MuleMessage message = new DefaultMuleMessage(msgAdapter, connector.getMuleContext());
             
             //Close or return connection if not in a transaction
             if (tx == null)

@@ -25,7 +25,7 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
         Banana banana = new Banana();
         banana.bite();
         FruitBowl payload = new FruitBowl(apple, banana);
-        DefaultMuleMessage msg = new DefaultMuleMessage(payload);
+        DefaultMuleMessage msg = new DefaultMuleMessage(payload, muleContext);
         GroovyExpressionEvaluator e = new GroovyExpressionEvaluator();
         Object value = e.evaluate("payload.apple.washed", msg);
         assertNotNull(value);

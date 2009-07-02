@@ -10,7 +10,6 @@
 
 package org.mule.util;
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.config.MuleManifest;
@@ -87,7 +86,7 @@ public class ServerStartupSplashScreen extends SplashScreen
             footer.add(" ");
         }
         //List agents
-        Collection agents = RegistryContext.getRegistry().lookupObjects(Agent.class);
+        Collection agents = context.getRegistry().lookupObjects(Agent.class);
         if (agents.size() == 0)
         {
             footer.add(CoreMessages.agentsRunning().getMessage() + " "

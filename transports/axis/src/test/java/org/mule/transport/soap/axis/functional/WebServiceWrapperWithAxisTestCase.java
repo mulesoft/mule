@@ -25,7 +25,7 @@ public class WebServiceWrapperWithAxisTestCase extends FunctionalTestCase
     public void testWsCall() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage result = client.send("vm://testin?connector=VMConnector", new DefaultMuleMessage(testString));
+        MuleMessage result = client.send("vm://testin?connector=VMConnector", new DefaultMuleMessage(testString, muleContext));
         assertNotNull(result.getPayload());
         assertEquals("Payload", "Received: "+ testString, result.getPayloadAsString());
     }

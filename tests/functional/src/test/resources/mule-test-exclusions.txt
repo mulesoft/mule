@@ -11,5 +11,5 @@ org.mule.test.firewall.FirewallTestCase
 ##########################################################################
 # The following tests will fail if run off-line
 ##########################################################################
-#org.mule.config.spring.RejectOldConfigTestCase
-#org.mule.test.spring.SchemaValidationMule2225TestCase
+org.mule.config.spring.RejectOldConfigTestCase
+org.mule.test.spring.SchemaValidationMule2225TestCase

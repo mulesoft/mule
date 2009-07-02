@@ -12,6 +12,7 @@ package org.mule.module.jca;
 
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -132,7 +133,7 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
                 {
                     Message message = JcaMessages.cannotAllocateManagedInstance();
                     logger.error(message);
-                    service.getExceptionListener().exceptionThrown(new MessagingException(message, e));
+                    service.getExceptionListener().exceptionThrown(new DefaultMuleException(message, e));
                 }
                 else if (e instanceof MessagingException)
                 {
@@ -142,7 +143,7 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
                 else
                 {
                     service.getExceptionListener().exceptionThrown(
-                        new MessagingException(CoreMessages.eventProcessingFailedFor(service.getName()), e));
+                        new DefaultMuleException(CoreMessages.eventProcessingFailedFor(service.getName()), e));
                 }
             }
         }

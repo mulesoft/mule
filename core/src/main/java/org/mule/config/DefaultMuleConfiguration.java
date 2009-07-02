@@ -10,10 +10,10 @@
 
 package org.mule.config;
 
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.FatalException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
@@ -37,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
  * Configuration info. which can be set when creating the MuleContext but becomes
  * immutable after starting the MuleContext.
  */
-public class DefaultMuleConfiguration implements MuleConfiguration 
+public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware
 {
     private boolean synchronous = false;
 
@@ -102,6 +102,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration
     
     protected transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
 
+    private MuleContext muleContext;
+
     public DefaultMuleConfiguration()  
     {
         // Apply any settings which come from the JVM system properties.
@@ -141,6 +143,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration
         }
     }
 
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
     /**
      * Apply any settings which come from the JVM system properties.
      */
@@ -148,73 +155,77 @@ public class DefaultMuleConfiguration implements MuleConfiguration
     {
         String p;
         
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "encoding");
+        p = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
         if (p != null)
         {
             encoding = p;
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous");
+        else
+        {
+            System.setProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, encoding);
+        }
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous");
         if (p != null)
         {
             synchronous = BooleanUtils.toBoolean(p);
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "systemModelType");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "systemModelType");
         if (p != null)
         {
             systemModelType = p;
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "timeout.synchronous");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.synchronous");
         if (p != null)
         {
             responseTimeout = NumberUtils.toInt(p);
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "timeout.transaction");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.transaction");
         if (p != null)
         {
             defaultTransactionTimeout = NumberUtils.toInt(p);
         }
 
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "workingDirectory");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "workingDirectory");
         if (p != null)
         {
             workingDirectory = p;
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "clientMode");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clientMode");
         if (p != null)
         {
             clientMode = BooleanUtils.toBoolean(p);
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "serverId");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId");
         if (p != null)
         {
             id = p;
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "clusterId");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clusterId");
         if (p != null)
         {
             clusterId = p;
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "domainId");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId");
         if (p != null)
         {
             domainId = p;
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "message.cacheBytes");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes");
         if (p != null)
         {
             cacheMessageAsBytes = BooleanUtils.toBoolean(p);
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal");
         if (p != null)
         {
             cacheMessageOriginalPayload = BooleanUtils.toBoolean(p);
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "streaming.enable");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable");
         if (p != null)
         {
             enableStreaming = BooleanUtils.toBoolean(p);
         }
-        p = System.getProperty(SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
         if (p != null)
         {
             autoWrapMessageAwareTransform = BooleanUtils.toBoolean(p);
@@ -449,8 +460,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration
 
     protected boolean verifyContextNotInitialized()
     {
-        MuleContext context = MuleServer.getMuleContext();
-        if (context != null && context.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME))
+        if (muleContext != null && muleContext.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME))
         {
             logger.warn("Cannot modify MuleConfiguration once the MuleContext has been initialized.  Modification will be ignored.");
             return false;
@@ -463,8 +473,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration
     
     protected boolean verifyContextNotStarted()
     {
-        MuleContext context = MuleServer.getMuleContext();
-        if (context != null && context.getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME))
+        if (muleContext != null && muleContext.getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME))
         {
             logger.warn("Cannot modify MuleConfiguration once the MuleContext has been started.  Modification will be ignored.");
             return false;

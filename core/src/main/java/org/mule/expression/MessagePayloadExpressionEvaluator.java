@@ -10,8 +10,10 @@
 
 package org.mule.expression;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -40,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator
+public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
 {
     public static final String NAME = "payload";
     public static final String BYTE_ARRAY = "byte[]";
@@ -49,6 +51,13 @@ public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator
      * logger used by this class
      */
     protected transient final Log logger = LogFactory.getLog(MessagePayloadExpressionEvaluator.class);
+
+    protected MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 
     public Object evaluate(String expression, MuleMessage message)
     {

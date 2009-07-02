@@ -10,7 +10,8 @@
 
 package org.mule.transport.jms;
 
-import org.mule.api.MessagingException;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleException;
 import org.mule.transport.jms.i18n.JmsMessages;
 
 import java.text.MessageFormat;
@@ -63,7 +64,7 @@ public class CountingRedeliveryHandler implements RedeliveryHandler
      * be handled by the connector Exception Handler.
      * 
      */
-    public void handleRedelivery(Message message) throws JMSException, MessagingException
+    public void handleRedelivery(Message message) throws JMSException, MuleException
     {
         if (connector.getMaxRedelivery() <= 0)
         {
@@ -104,9 +105,10 @@ public class CountingRedeliveryHandler implements RedeliveryHandler
                         "of {2} on the connector {3}", id, redeliveryCount, connector.getMaxRedelivery(), connector.getName()));
             }
             JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
+
             throw new MessageRedeliveredException(
                     JmsMessages.tooManyRedeliveries(id, "" + redeliveryCount, connector.getMaxRedelivery(),
-                                                    connector.getName()), adapter);
+                            connector.getName()), new DefaultMuleMessage(adapter, connector.getMuleContext()));
 
         }
         else

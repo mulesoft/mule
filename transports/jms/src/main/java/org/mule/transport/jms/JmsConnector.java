@@ -10,7 +10,6 @@
 
 package org.mule.transport.jms;
 
-import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.notification.ConnectionNotificationListener;
@@ -527,7 +526,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
     }
 
-    public MessageAdapter getMessageAdapter(Object message) throws MessagingException
+    public MessageAdapter getMessageAdapter(Object message) throws MuleException
     {
         JmsMessageAdapter adapter = (JmsMessageAdapter) super.getMessageAdapter(message);
         adapter.setSpecification(this.getSpecification());

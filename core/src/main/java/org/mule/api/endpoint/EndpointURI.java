@@ -10,6 +10,7 @@
 
 package org.mule.api.endpoint;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.Initialisable;
 
 import java.io.Serializable;
@@ -88,4 +89,6 @@ public interface EndpointURI extends Serializable, Initialisable
     String getUser();
 
     String getPassword();
+
+    MuleContext getMuleContext();
 }

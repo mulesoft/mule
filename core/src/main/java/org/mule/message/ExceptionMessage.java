@@ -15,9 +15,9 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
-import java.io.Serializable;
 
 /**
  * <code>ExceptionMessage</code> is used by the DefaultServiceExceptionStrategy
@@ -32,7 +32,7 @@ public class ExceptionMessage extends BaseMessageDTO
 
     private Throwable exception;
     private String componentName;
-    private EndpointURI endpointUri;
+    private String endpointUri;
     private Date timeStamp;
 
     public ExceptionMessage(Object message,
@@ -44,7 +44,7 @@ public class ExceptionMessage extends BaseMessageDTO
         this.exception = exception;
         timeStamp = new Date();
         this.componentName = componentName;
-        this.endpointUri = endpointUri;
+        this.endpointUri = endpointUri.toString();
 
         MuleEventContext ctx = RequestContext.getEventContext();
         if (ctx != null)
@@ -75,7 +75,7 @@ public class ExceptionMessage extends BaseMessageDTO
         return componentName;
     }
 
-    public EndpointURI getEndpoint()
+    public String getEndpoint()
     {
         return endpointUri;
     }

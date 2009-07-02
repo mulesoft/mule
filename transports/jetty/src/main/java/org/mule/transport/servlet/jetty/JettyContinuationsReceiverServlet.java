@@ -36,7 +36,7 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
         {
             MessageReceiver receiver = getReceiverForURI(request);
 
-            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request));
+            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request), muleContext);
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
             //Need to remove this if set, we'll be returning a result but we need to make the request async
             requestMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);

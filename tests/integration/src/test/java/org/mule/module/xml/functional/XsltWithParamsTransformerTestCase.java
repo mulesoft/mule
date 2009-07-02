@@ -10,9 +10,7 @@
 
 package org.mule.module.xml.functional;
 
-import org.mule.RequestContext;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.FunctionalTestCase;
@@ -31,7 +29,7 @@ public class XsltWithParamsTransformerTestCase extends FunctionalTestCase
     {
         Transformer trans = muleContext.getRegistry().lookupTransformer("test1");
         assertNotNull(trans);
-        MuleMessage message = new DefaultMuleMessage("<testing/>");
+        MuleMessage message = new DefaultMuleMessage("<testing/>", muleContext);
         message.setProperty("Welcome", "hello");
         Object result = trans.transform(message);
         assertNotNull(result);

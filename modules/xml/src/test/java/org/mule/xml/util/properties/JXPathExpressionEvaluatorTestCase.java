@@ -25,7 +25,7 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
         Apple apple = new Apple();
         apple.wash();
         FruitBowl payload = new FruitBowl(apple, new Banana());
-        DefaultMuleMessage msg = new DefaultMuleMessage(payload);
+        DefaultMuleMessage msg = new DefaultMuleMessage(payload, muleContext);
 
         JXPathExpressionEvaluator e = new JXPathExpressionEvaluator();
         Object value = e.evaluate("apple/washed", msg);

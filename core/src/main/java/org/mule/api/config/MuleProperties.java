@@ -126,4 +126,11 @@ public class MuleProperties
     * default value is 'false'.
     */
     public static final String SYNCHRONOUS_PROPERTY = "synchronous";
+
+    /**
+     * The prefix for any Mule-specific properties set in the system properties
+     */
+    public static final String SYSTEM_PROPERTY_PREFIX = "mule.";
+    public static final String MULE_CONTEXT_PROPERTY= SYSTEM_PROPERTY_PREFIX + "context";
+    public static final String MULE_ENCODING_SYSTEM_PROPERTY= SYSTEM_PROPERTY_PREFIX + "encoding";
 }

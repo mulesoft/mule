@@ -12,8 +12,6 @@ package org.mule.transport.soap.axis.extensions;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.MuleServer;
-import org.mule.RegistryContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -68,10 +66,18 @@ public class UniversalSender extends BasicHandler
 
     protected Map endpointsCache = new HashMap();
 
+    protected MuleContext muleContext;
+
+
     public void invoke(MessageContext msgContext) throws AxisFault
     {
         boolean sync = true;
         Call call = (Call)msgContext.getProperty("call_object");
+        muleContext = (MuleContext)call.getProperty(MuleProperties.MULE_CONTEXT_PROPERTY);
+        if(muleContext==null)
+        {
+            throw new IllegalArgumentException("Property org.mule.MuleContext not set on Axis MessageContext");
+        }
         if (call == null)
         {
             throw new IllegalStateException(
@@ -203,7 +209,7 @@ public class UniversalSender extends BasicHandler
                 
                 props.put(HttpConstants.HEADER_CONTENT_TYPE, contentType);
             }
-            MuleMessage message = new DefaultMuleMessage(payload, props);
+            MuleMessage message = new DefaultMuleMessage(payload, props, muleContext);
             MuleSession session = RequestContext.getEventContext().getSession();
 
             logger.info("Making Axis soap request on: " + uri);
@@ -214,7 +220,6 @@ public class UniversalSender extends BasicHandler
 
             if (sync)
             {
-                MuleContext muleContext = MuleServer.getMuleContext();
                 EndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, muleContext);
                 builder.setSynchronous(true);
                 OutboundEndpoint syncEndpoint = muleContext.getRegistry()
@@ -260,9 +265,9 @@ public class UniversalSender extends BasicHandler
 
     protected OutboundEndpoint lookupEndpoint(String uri) throws MuleException
     {
-        Service axis = RegistryContext.getRegistry().lookupService(AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
-        EndpointURI endpoint = new MuleEndpointURI(uri);
-        MuleContext muleContext = MuleServer.getMuleContext(); 
+        Service axis = muleContext.getRegistry().lookupService(AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
+        EndpointURI endpoint = new MuleEndpointURI(uri, muleContext);
+
         OutboundEndpoint ep;
 
         if (axis != null)

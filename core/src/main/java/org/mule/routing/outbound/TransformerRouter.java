@@ -35,7 +35,7 @@ public class TransformerRouter extends AbstractOutboundRouter
             try
             {
                 Object payload = transformer.transform(message.getPayload());
-                message = new DefaultMuleMessage(payload, message);
+                message = new DefaultMuleMessage(payload, message, muleContext);
             }
             catch (TransformerException e)
             {

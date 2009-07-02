@@ -11,8 +11,6 @@
 package org.mule.transport.http;
 
 
-import org.mule.util.FileUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -35,8 +33,9 @@ public class HttpRequest
     private RequestLine requestLine = null;
     private HeaderGroup headers = new HeaderGroup();
     private InputStream entity = null;
+    private String defaultEncoding;
 
-    public HttpRequest(final RequestLine requestLine, final Header[] headers, final InputStream content)
+    public HttpRequest(final RequestLine requestLine, final Header[] headers, final InputStream content, String defaultEncoding)
         throws IOException
     {
         super();
@@ -44,6 +43,7 @@ public class HttpRequest
         {
             throw new IllegalArgumentException("Request line may not be null");
         }
+        this.defaultEncoding = defaultEncoding;
         this.requestLine = requestLine;
         if (headers != null)
         {
@@ -79,9 +79,9 @@ public class HttpRequest
         }
     }
 
-    public HttpRequest(final RequestLine requestLine, final Header[] headers) throws IOException
+    public HttpRequest(final RequestLine requestLine, final Header[] headers, String defaultEncoding) throws IOException
     {
-        this(requestLine, headers, null);
+        this(requestLine, headers, null, defaultEncoding);
     }
 
     public RequestLine getRequestLine()
@@ -185,8 +185,7 @@ public class HttpRequest
         }
         else
         {
-            //TODO return RegistryContext.getConfiguration().getDefaultEncoding();
-            return FileUtils.DEFAULT_ENCODING;
+            return defaultEncoding;
         }
     }
 

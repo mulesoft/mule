@@ -29,7 +29,7 @@ public class JmsClientAcknowledgeTransactionFactory implements TransactionFactor
      */
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
-        JmsClientAcknowledgeTransaction tx = new JmsClientAcknowledgeTransaction();
+        JmsClientAcknowledgeTransaction tx = new JmsClientAcknowledgeTransaction(muleContext);
         tx.begin();
         return tx;
     }

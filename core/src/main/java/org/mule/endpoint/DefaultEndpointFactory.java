@@ -10,7 +10,6 @@
 
 package org.mule.endpoint;
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -67,7 +66,7 @@ public class DefaultEndpointFactory implements EndpointFactory
         logger.debug("Looking up EndpointBuilder with name:" + endpointName + " in registry");
         // TODO DF: Do some simple parsing of endpointName to not lookup endpoint builder if endpointName is
         // obviously a uri and not a substituted name ??
-        EndpointBuilder endpointBuilder = RegistryContext.getRegistry().lookupEndpointBuilder(endpointName);
+        EndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointBuilder(endpointName);
         if (endpointBuilder != null)
         {
             logger.debug("EndpointBuilder with name:" + endpointName + " FOUND");

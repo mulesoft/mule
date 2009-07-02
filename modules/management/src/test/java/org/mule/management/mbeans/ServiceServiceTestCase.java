@@ -43,7 +43,7 @@ public class ServiceServiceTestCase extends AbstractMuleJmxTestCase
         muleContext.getRegistry().registerService(service);
         muleContext.start();
 
-        final ServiceService jmxService = new ServiceService("TEST_SERVICE");
+        final ServiceService jmxService = new ServiceService("TEST_SERVICE", muleContext);
         final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_SERVICE");
         mBeanServer.registerMBean(jmxService, name);
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(domainOriginal + ":*"), null);

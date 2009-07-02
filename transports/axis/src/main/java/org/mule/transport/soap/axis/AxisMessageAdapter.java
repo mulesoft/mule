@@ -10,9 +10,10 @@
 
 package org.mule.transport.soap.axis;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.soap.MuleSoapHeaders;
@@ -41,10 +42,10 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
     private static final long serialVersionUID = -923205879581370143L;
 
     private final Object payload;
-    private final SOAPMessage soapMessage;
+    private SOAPMessage soapMessage;
     private Transformer trans = new SerializableToByteArray();
 
-    public AxisMessageAdapter(Object message) throws MessagingException
+    public AxisMessageAdapter(Object message) throws MuleException
     {
         this.payload = message;
         try
@@ -98,7 +99,7 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
         }
         catch (SOAPException e)
         {
-            throw new MessagingException(SoapMessages.failedToProcessSoapHeaders(), message, e);
+            throw new MessageTypeNotSupportedException(SoapMessages.failedToProcessSoapHeaders(), message.getClass(), e);
         }
     }
 

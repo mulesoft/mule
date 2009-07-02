@@ -67,7 +67,7 @@ public class Mail implements Callable
         Map properties = new HashMap();
         properties.put("from.email.address", from);
 
-        MuleMessage result = new DefaultMuleMessage(list, properties);
+        MuleMessage result = new DefaultMuleMessage(list, properties, eventContext.getMuleContext());
 
         return result;
     }

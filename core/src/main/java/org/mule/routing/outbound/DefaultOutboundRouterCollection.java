@@ -62,7 +62,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                         .getClass()
                         .getName()), message);
                 }
-                outboundRouterMessage = new DefaultMuleMessage(message.getPayload(), message);
+                outboundRouterMessage = new DefaultMuleMessage(message.getPayload(), message, muleContext);
             }
             else
             {

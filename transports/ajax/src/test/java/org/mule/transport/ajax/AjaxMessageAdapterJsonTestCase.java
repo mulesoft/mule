@@ -9,10 +9,9 @@
  */
 package org.mule.transport.ajax;
 
-import org.mule.transport.AbstractMessageAdapterTestCase;
+import org.mule.api.MuleException;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.api.MessagingException;
-
+import org.mule.transport.AbstractMessageAdapterTestCase;
 
 import java.util.Map;
 
@@ -23,7 +22,7 @@ public class AjaxMessageAdapterJsonTestCase extends AbstractMessageAdapterTestCa
         return "{'value1' : 'foo', 'value2' : 'bar'}";
     }
 
-    public MessageAdapter createAdapter(Object payload) throws MessagingException
+    public MessageAdapter createAdapter(Object payload) throws MuleException
     {
         return new AjaxMessageAdapter(payload);
     }

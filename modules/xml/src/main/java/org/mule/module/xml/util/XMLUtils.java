@@ -11,6 +11,7 @@
 package org.mule.module.xml.util;
 
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.transport.OutputHandler;
 import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
@@ -100,9 +101,9 @@ public class XMLUtils extends org.mule.util.XMLUtils
         }
     }
 
-    public static org.dom4j.Document toDocument(Object obj) throws Exception
+    public static org.dom4j.Document toDocument(Object obj, MuleContext muleContext) throws Exception
     {
-        return toDocument(obj, null);
+        return toDocument(obj, null, muleContext);
     }
     
     /**
@@ -110,7 +111,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
      * @return null if object cannot be converted
      * @throws DocumentException if an error occurs while parsing
      */
-    public static org.dom4j.Document toDocument(Object obj, String externalSchemaLocation) throws Exception
+    public static org.dom4j.Document toDocument(Object obj, String externalSchemaLocation, MuleContext muleContext) throws Exception
     {
         org.dom4j.io.SAXReader reader = new org.dom4j.io.SAXReader();
         if (externalSchemaLocation != null)
@@ -132,7 +133,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
             // Need this one to map schemaLocation to a physical location
             reader.setProperty(JAXP_PROPERTIES_SCHEMA_SOURCE, xsdAsStream);
         }
-        
+
+
         if (obj instanceof org.dom4j.Document)
         {
             return (org.dom4j.Document) obj;
@@ -150,6 +152,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
         {                
             // TODO Find a more direct way to do this
             XmlToDomDocument tr = new XmlToDomDocument();
+            tr.setMuleContext(muleContext);
             tr.setReturnClass(org.dom4j.Document.class);
             return (org.dom4j.Document) tr.transform(obj);
         }

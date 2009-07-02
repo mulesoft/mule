@@ -101,7 +101,8 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
         }
         else
         {
-            return new DefaultMuleMessage(connector.getMessageAdapter(result).getPayload(), Collections.EMPTY_MAP);
+            return new DefaultMuleMessage(connector.getMessageAdapter(result).getPayload(), Collections.EMPTY_MAP,
+                    connector.getMuleContext());
         }
     }
 

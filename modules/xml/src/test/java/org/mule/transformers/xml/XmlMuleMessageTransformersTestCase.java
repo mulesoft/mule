@@ -36,7 +36,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractXmlTransformerTe
         props.put("object", new Apple());
         props.put("number", new Integer(1));
         props.put("string", "hello");
-        testObject = new DefaultMuleMessage("test", props);
+        testObject = new DefaultMuleMessage("test", props, muleContext);
         testObject.setEncoding("UTF-8");
   
         RequestContext.setEvent(new DefaultMuleEvent(testObject, getTestOutboundEndpoint("test"), MuleTestUtils
@@ -51,14 +51,14 @@ public class XmlMuleMessageTransformersTestCase extends AbstractXmlTransformerTe
 
     public Transformer getTransformer() throws Exception
     {
-        ObjectToXml t = new ObjectToXml();
+        ObjectToXml t = createObject(ObjectToXml.class);
         t.setAcceptMuleMessage(true);
         return t;
     }
 
     public Transformer getRoundTripTransformer() throws Exception
     {
-        return new XmlToObject();
+        return createObject(XmlToObject.class);
     }
 
     public Object getTestData()

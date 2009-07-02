@@ -193,6 +193,6 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
     {
         MessageAdapter adapter = connector.getMessageAdapter(message);
 
-        return (routeMessage(new DefaultMuleMessage(adapter)));
+        return (routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext())));
     }
 }

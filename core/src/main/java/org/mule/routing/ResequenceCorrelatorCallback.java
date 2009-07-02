@@ -10,6 +10,7 @@
 package org.mule.routing;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.routing.inbound.EventGroup;
@@ -34,10 +35,13 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
     protected transient final Log logger = LogFactory.getLog(ResequenceCorrelatorCallback.class);
 
     protected Comparator eventComparator;
+    protected MuleContext muleContext;
 
-    public ResequenceCorrelatorCallback(Comparator eventComparator)
+    public ResequenceCorrelatorCallback(Comparator eventComparator, MuleContext muleContext)
     {
+        super(muleContext);
         this.eventComparator = eventComparator;
+        this.muleContext = muleContext;
     }
 
     /**
@@ -65,7 +69,7 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
             Arrays.sort(results, eventComparator);
         }
         //This is a bit of a hack since we wrap the the collection of events in a Mule Message to pass back
-        return new DefaultMuleMessage(results);
+        return new DefaultMuleMessage(results, muleContext);
     }
 
 }

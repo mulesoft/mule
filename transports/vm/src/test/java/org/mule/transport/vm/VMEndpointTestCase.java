@@ -13,13 +13,12 @@ package org.mule.transport.vm;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.vm.VMConnector;
 
 public class VMEndpointTestCase extends AbstractMuleTestCase
 {
     public void testUrlWithProvider() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("vm://some.queue?endpointName=vmProvider");
+        EndpointURI url = new MuleEndpointURI("vm://some.queue?endpointName=vmProvider", muleContext);
         url.initialise();
         assertEquals(VMConnector.VM, url.getScheme());
         assertEquals("some.queue", url.getAddress());
@@ -30,7 +29,7 @@ public class VMEndpointTestCase extends AbstractMuleTestCase
 
     public void testVMQUri() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("vmq://some.queue");
+        EndpointURI url = new MuleEndpointURI("vmq://some.queue", muleContext);
         url.initialise();
         assertEquals(VMQueueConnector.PROTOCOL, url.getScheme());
         assertEquals("some.queue", url.getAddress());

@@ -35,6 +35,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     private Service testService;
     private MuleEvent testEvent;
     private static MuleMessage originalMessage;
+    private TestOutboundRouterCollection outboundRouter;
 
     @Override
     protected void doSetUp() throws Exception
@@ -43,16 +44,20 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         testEvent = getTestInboundEvent("TEST_MESSAGE");
         testService = getTestService();
         testService.setComponent(new PassThroughComponent());
-        testService.setOutboundRouter(new TestOutboundRouterCollection());
+        outboundRouter = new TestOutboundRouterCollection();
+        testService.setOutboundRouter(outboundRouter);
     }
 
     /**
      * If there is just one outbound router we don't need to do any copying at all
      * regardless of if matchAll is true or not or if the router mutates the message
      * in isMatch or not . The outbound phase already has a new message copy.
+     * @throws Exception if the test fails!
      */
     public void testSingleDoesNotRequireCopyRouterMatchAllFalse() throws Exception
     {
+        //muleContext not available until after doSetUp, which seems odd
+        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.start();
@@ -69,9 +74,14 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * If there is just one outbound router we don't need to do any copying at all
      * regardless of if matchAll is true or not or if the router mutates the message
      * in isMatch or not . The outbound phase already has a new message copy.
+     * @throws Exception if the test fails!
      */
     public void testSingleDoesNotRequireCopyRouterMatchAllTrue() throws Exception
     {
+
+        MuleEvent testEvent = getTestInboundEvent("TEST_MESSAGE");
+        //muleContext not available until after doSetUp, which seems odd
+        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.start();
@@ -88,9 +98,12 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * If there is just one outbound router we don't need to do any copying at all
      * regardless of if matchAll is true or not or if the router mutates the message
      * in isMatch or not . The outbound phase already has a new message copy.
+     * @throws Exception if the test fails!
      */
     public void testSingleRequiresCopyRouterMatchAllFalse() throws Exception
     {
+        //muleContext not available until after doSetUp, which seems odd
+        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
         testService.start();
@@ -107,9 +120,12 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * If there is just one outbound router we don't need to do any copying at all
      * regardless of if matchAll is true or not or if the router mutates the message
      * in isMatch or not . The outbound phase already has a new message copy.
+     * @throws Exception if the test fails!
      */
     public void testSingleRequiresCopyRouterMatchAllTrue() throws Exception
     {
+        //muleContext not available until after doSetUp, which seems odd
+        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
         testService.start();
@@ -128,9 +144,12 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * If there are multiple outbound routers but matchAll is false then we only need
      * to copy message if the router might mutate it in isMatch, if not then no need
      * to copy.
+     * @throws Exception if the test fails!
      */
     public void testMultipleDoesNotRequireCopyRouterMatchAllFalse() throws Exception
     {
+        //muleContext not available until after doSetUp, which seems odd
+        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
@@ -149,9 +168,14 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * If there are multiple outbound routers and matchAll is true then we need a new
      * message copy for all but the *last* router independent of whether the routers
      * may mutate the message in isMatch or not. See MULE- 4352.
+     * @throws Exception if the test fails!
      */
     public void testMultipleDoesNotRequireCopyRouterMatchAllTrue() throws Exception
     {
+
+        MuleEvent testEvent = getTestInboundEvent("TEST_MESSAGE");
+        //muleContext not available until after doSetUp, which seems odd
+        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
@@ -170,9 +194,12 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * If there are multiple outbound routers and matchAll is false then we need a
      * new message copy for all but the *last* router that may mutate the message in
      * isMatch.
+     * @throws Exception if the test fails!
      */
     public void testMultipleRequiresCopyRouterMatchAllFalse() throws Exception
     {
+        //muleContext not available until after doSetUp, which seems odd
+        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
@@ -191,9 +218,12 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * If there are multiple outbound routers and matchAll is true then we need a new
      * message copy for all but the *last* router independent of whether the routers
      * may mutate the message in isMatch or not. See MULE- 4352.
+     * @throws Exception if the test fails!
      */
     public void testMultipleRequiresCopyRouterMatchAllTrue() throws Exception
     {
+        //muleContext not available until after doSetUp, which seems odd
+        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
@@ -212,9 +242,12 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
     /**
      * If matchAll is true then we need a new message copy for each and every router except the last one.
+     * @throws Exception if the test fails!
      */
     public void testMultipleMixMatchAllTrue() throws Exception
     {
+        //muleContext not available until after doSetUp, which seems odd
+        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
@@ -237,9 +270,12 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     /**
      * If matchAll is false then we need a new message copy for each router that may
      * mutate the message in isMatch unless it is the last router.
+     * @throws Exception if the test fails!
      */
     public void testMultipleMixMatchAllFalse() throws Exception
     {
+        //muleContext not available until after doSetUp, which seems odd
+        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
@@ -264,9 +300,12 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * If the message is a stream and message copying is required due to any of the
      * scenarios tested above then an exception should be thrown as the stream
      * payload cannot be copied.
+     * @throws Exception if the test fails!
      */
     public void testStreamPayload() throws Exception
     {
+        //muleContext not available until after doSetUp, which seems odd
+        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
@@ -297,7 +336,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         @Override
         public List getEndpoints()
         {
-            List list = new ArrayList<OutboundEndpoint>();
+            List<OutboundEndpoint> list = new ArrayList<OutboundEndpoint>();
             try
             {
                 list.add(getTestOutboundEndpoint("out", "test://out"));
@@ -345,7 +384,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         @Override
         public List getEndpoints()
         {
-            List list = new ArrayList<OutboundEndpoint>();
+            List<OutboundEndpoint> list = new ArrayList<OutboundEndpoint>();
             try
             {
                 list.add(getTestOutboundEndpoint("out", "test://out"));
@@ -383,6 +422,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
     private class TestOutboundRouterCollection extends DefaultOutboundRouterCollection
     {
+
         @Override
         public MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException
         {

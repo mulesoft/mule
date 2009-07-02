@@ -43,7 +43,7 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
         {
             tempUrl = address;
         }
-        MuleMessage message = new DefaultMuleMessage(event.transformMessage());
+        MuleMessage message = new DefaultMuleMessage(event.transformMessage(), muleContext);
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("cxf:" + tempUrl, muleContext);
         if (wsdlPort != null)

@@ -10,7 +10,6 @@
 
 package org.mule.util;
 
-import org.mule.MuleServer;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.transport.PropertyScope;
@@ -178,7 +177,7 @@ public final class StringMessageUtils
     {
         try
         {
-            return string.getBytes(MuleServer.getMuleContext().getConfiguration().getDefaultEncoding());
+            return string.getBytes(FileUtils.DEFAULT_ENCODING);
         }
         catch (UnsupportedEncodingException e)
         {

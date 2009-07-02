@@ -357,7 +357,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 logger.debug("Http response is: " + status);
             }
 
-            MuleMessage m = new DefaultMuleMessage(adapter);
+            MuleMessage m = new DefaultMuleMessage(adapter, connector.getMuleContext());
 
             m.setExceptionPayload(ep);
             return m;

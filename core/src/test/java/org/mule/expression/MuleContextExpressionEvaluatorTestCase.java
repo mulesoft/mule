@@ -30,8 +30,9 @@ public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testExpressions() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         MuleContextExpressionEvaluator extractor = new MuleContextExpressionEvaluator();
+        extractor.setMuleContext(muleContext);
 
         Object o = extractor.evaluate("serviceName", message);
         assertEquals("apple", o);
@@ -67,7 +68,7 @@ public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testExpressionsFromExtractorManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         Object o = muleContext.getExpressionManager().evaluate("context:serviceName", message);
         assertEquals("apple", o);
 
@@ -104,8 +105,9 @@ public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         RequestContext.clear();
         
-        MuleMessage message = new DefaultMuleMessage("test");
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         MuleContextExpressionEvaluator extractor = new MuleContextExpressionEvaluator();
+        extractor.setMuleContext(muleContext);
 
         Object o = extractor.evaluate("serverId", message);
         assertNotNull(o);

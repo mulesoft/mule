@@ -11,7 +11,6 @@
 package org.mule.transformers.simple;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.RegistryContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
@@ -36,7 +35,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         t.setAddProperties(add);
         t.setMuleContext(muleContext);
 
-        MuleMessage msg = new DefaultMuleMessage("message", (Map) null);
+        MuleMessage msg = new DefaultMuleMessage("message", (Map) null, muleContext);
         msg.setProperty("addedProperty", "originalValue");
         MuleEventContext ctx = getTestEventContext(msg);
         // context clones message
@@ -60,7 +59,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         t.setOverwrite(false);
         t.setMuleContext(muleContext);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null, muleContext);
         msg.setProperty("addedProperty", "originalValue");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
@@ -79,7 +78,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         t.setAddProperties(add);
         t.setMuleContext(muleContext);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null, muleContext);
         msg.setProperty("public-house", "Bar");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
@@ -98,7 +97,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         t.setRenameProperties(add);
         t.setMuleContext(muleContext);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null, muleContext);
         msg.setProperty("Foo", "Bar");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
@@ -115,7 +114,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         t.setDeleteProperties(Collections.singletonList("badProperty"));
         t.setMuleContext(muleContext);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null);
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null, muleContext);
         msg.setProperty("badProperty", "badValue");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
@@ -127,7 +126,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
 
     public void testTransformerConfig() throws Exception
     {
-        MessagePropertiesTransformer transformer = (MessagePropertiesTransformer) RegistryContext.getRegistry().lookupTransformer("testTransformer");
+        MessagePropertiesTransformer transformer = (MessagePropertiesTransformer) muleContext.getRegistry().lookupTransformer("testTransformer");
         transformer.setMuleContext(muleContext);
         assertNotNull(transformer);
         assertNotNull(transformer.getAddProperties());

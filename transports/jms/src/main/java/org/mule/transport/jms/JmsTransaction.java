@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
@@ -27,6 +28,11 @@ import javax.jms.Session;
  */
 public class JmsTransaction extends AbstractSingleResourceTransaction
 {
+
+    public JmsTransaction(MuleContext muleContext)
+    {
+        super(muleContext);
+    }
 
     public void bindResource(Object key, Object resource) throws TransactionException
     {

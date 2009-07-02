@@ -127,8 +127,10 @@ public class AxisMessageRequester extends AbstractMessageRequester
 
         call.setOperationName(method);
         call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, endpoint);
+        call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, connector.getMuleContext());
+
         Object result = call.invoke(method, args);
-        return AxisMessageDispatcher.createMessage(result, call);
+        return AxisMessageDispatcher.createMessage(result, call, connector.getMuleContext());
     }
 
     public MuleMessage request(String endpoint, Object[] args) throws Exception
@@ -142,13 +144,13 @@ public class AxisMessageRequester extends AbstractMessageRequester
         {
             endpoint = "axis:" + endpoint;
         }
-        EndpointURI ep = new MuleEndpointURI(endpoint);
+        EndpointURI ep = new MuleEndpointURI(endpoint, connector.getMuleContext());
         String method = (String)ep.getParams().remove(MuleProperties.MULE_METHOD_PROPERTY);
         call.setOperationName(method);
 
         call.setOperationName(method);
         Object result = call.invoke(method, args);
-        return AxisMessageDispatcher.createMessage(result, call);
+        return AxisMessageDispatcher.createMessage(result, call, connector.getMuleContext());
     }
 
     public MuleMessage request(String endpoint, SOAPEnvelope envelope) throws Exception
@@ -158,7 +160,7 @@ public class AxisMessageRequester extends AbstractMessageRequester
         call.setSOAPActionURI(endpoint);
         call.setTargetEndpointAddress(endpoint);
         Object result = call.invoke(new Message(envelope));
-        return AxisMessageDispatcher.createMessage(result, call);
+        return AxisMessageDispatcher.createMessage(result, call, connector.getMuleContext());
     }
 
 }

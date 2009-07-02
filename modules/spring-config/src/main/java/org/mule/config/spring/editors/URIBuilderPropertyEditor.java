@@ -9,6 +9,7 @@
  */
 package org.mule.config.spring.editors;
 
+import org.mule.api.MuleContext;
 import org.mule.endpoint.URIBuilder;
 
 import java.beans.PropertyEditorSupport;
@@ -19,10 +20,16 @@ import java.beans.PropertyEditorSupport;
  */
 public class URIBuilderPropertyEditor extends PropertyEditorSupport
 {
+    private MuleContext muleContext;
+
+    public URIBuilderPropertyEditor(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
 
     public void setAsText(String text)
     {
-        setValue(new URIBuilder(text));
+        setValue(new URIBuilder(text, muleContext));
     }
 
 }

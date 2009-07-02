@@ -12,7 +12,6 @@ package org.mule.module.scripting.builders;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.config.ConfigResource;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.config.builders.i18n.BuildersMessages;
@@ -25,7 +24,9 @@ public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBui
 {
     public static final String SCRIPT_ENGINE_NAME_PROPERTY = "org.mule.script.engine";
 
-    private Scriptable scriptComponent = new Scriptable();
+    private Scriptable scriptComponent;
+
+    private String scriptEngineName;
 
     protected MuleContext muleContext = null;
 
@@ -47,7 +48,7 @@ public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBui
             // we can guess engine by file extension
             logger.warn(BuildersMessages.systemPropertyNotSet(SCRIPT_ENGINE_NAME_PROPERTY).getMessage());
         }
-        scriptComponent.setScriptEngineName(scriptEngineName);
+        this.scriptEngineName = scriptEngineName;
     }
 
     public ScriptConfigurationBuilder(String scriptEngineName, String[] configResources) throws MuleException
@@ -58,12 +59,15 @@ public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBui
             // we can guess engine by file extension
             logger.warn(BuildersMessages.systemPropertyNotSet(SCRIPT_ENGINE_NAME_PROPERTY).getMessage());
         }
-        scriptComponent.setScriptEngineName(scriptEngineName);
+        this.scriptEngineName = scriptEngineName;
     }
 
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
         this.muleContext = muleContext;
+
+        scriptComponent = new Scriptable(muleContext);
+        scriptComponent.setScriptEngineName(scriptEngineName);
             
         for (int i = 0; i < configResources.length; i++)
         {

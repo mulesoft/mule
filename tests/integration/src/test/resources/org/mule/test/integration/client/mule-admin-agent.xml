@@ -10,7 +10,7 @@
 
     <client:remote-dispatcher-agent>
         <client:remote-endpoint address="test://12345"/>
-        <client:custom-wire-format class="org.mule.transformer.wire.TransformerPairWireFormat"/>
+        <client:custom-wire-format class="org.mule.transformer.wire.SerializedMuleMessageWireFormat"/>
     </client:remote-dispatcher-agent>
    
 </mule>

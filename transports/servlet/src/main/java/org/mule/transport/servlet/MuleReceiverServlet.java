@@ -11,7 +11,6 @@
 package org.mule.transport.servlet;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointException;
@@ -35,7 +34,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,14 +59,14 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         String servletConnectorName = getServletConfig().getInitParameter(SERVLET_CONNECTOR_NAME_PROPERTY);
         if (servletConnectorName == null)
         {
-            connector = (ServletConnector) TransportFactory.getConnectorByProtocol("servlet");
+            connector = (ServletConnector) new TransportFactory(muleContext).getConnectorByProtocol("servlet");
             if (connector == null)
             {
                 connector = new ServletConnector();
                 connector.setName("_generatedServletConnector");
                 try
                 {
-                    RegistryContext.getRegistry().registerConnector(connector);
+                    muleContext.getRegistry().registerConnector(connector);
                 }
                 catch (MuleException e)
                 {
@@ -78,7 +76,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
         else
         {
-            connector = (ServletConnector) RegistryContext.getRegistry().lookupConnector(servletConnectorName);
+            connector = (ServletConnector) muleContext.getRegistry().lookupConnector(servletConnectorName);
             if (connector == null)
             {
                 throw new ServletException(ServletMessages.noServletConnectorFound(servletConnectorName).toString());
@@ -215,7 +213,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         MessageReceiver receiver = getReceiverForURI(request);
         
-        MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request));
+        MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request), muleContext);
         requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
         
         setupRequestMessage(request, requestMessage, receiver);
@@ -354,7 +352,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         
         // Tell the dynamic endpoint about our new URL
         //Note we don't use the servlet: prefix since we need to be dealing with the raw endpoint here
-        EndpointURI epURI = new MuleEndpointURI(getRequestUrl(httpServletRequest));
+        EndpointURI epURI = new MuleEndpointURI(getRequestUrl(httpServletRequest), muleContext);
         
         try
         {

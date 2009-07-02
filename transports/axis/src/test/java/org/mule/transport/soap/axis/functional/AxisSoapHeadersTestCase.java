@@ -51,7 +51,7 @@ public class AxisSoapHeadersTestCase extends FunctionalTestCase
                             +
 
                             "<soapenv:Body><echo soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><value0 xsi:type=\"soapenc:string\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\">Test Message</value0></echo></soapenv:Body>"
-                            + "</soapenv:Envelope>");
+                            + "</soapenv:Envelope>", muleContext);
 
         MuleMessage reply = client.send("http://localhost:62181/services/component", soapRequest, properties);
 

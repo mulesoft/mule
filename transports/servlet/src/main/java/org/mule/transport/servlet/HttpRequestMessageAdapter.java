@@ -11,6 +11,7 @@
 package org.mule.transport.servlet;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.MessageTypeNotSupportedException;
@@ -50,7 +51,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
 
     private String characterEncoding;
     
-    public HttpRequestMessageAdapter(Object message) throws MessagingException
+    public HttpRequestMessageAdapter(Object message) throws MuleException
     {
         if (message instanceof HttpServletRequest)
         {
