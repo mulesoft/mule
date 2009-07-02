@@ -9,17 +9,17 @@
  */
 package org.mule.transport.cxf;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.http.HttpConnector;
+
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.http.HttpConnector;
 
 
 public class HttpSecurityTestCase extends FunctionalTestCase 
@@ -68,7 +68,7 @@ public class HttpSecurityTestCase extends FunctionalTestCase
     {
     	MuleClient client = new MuleClient();
     	
-    	MuleMessage result = client.send("cxfOutbound", new DefaultMuleMessage("Hello"));
+    	MuleMessage result = client.send("cxfOutbound", "Hello", null);
     	
     	assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
