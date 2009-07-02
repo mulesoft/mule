@@ -9,7 +9,6 @@
  */
 package org.mule.management.support;
 
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.config.DefaultMuleConfiguration;
@@ -28,7 +27,6 @@ public class JmxMissingIdTestCase extends TestCase
     {
         super.tearDown();
         muleContext = null;
-        MuleServer.setMuleContext(null);
     }
 
     public void testContextIdAndJmxAgentIsOk() throws Exception

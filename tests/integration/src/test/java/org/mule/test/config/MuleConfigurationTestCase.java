@@ -10,7 +10,6 @@
 
 package org.mule.test.config;
 
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleConfiguration;
@@ -42,7 +41,6 @@ public class MuleConfigurationTestCase extends TestCase
     protected void tearDown() throws Exception
     {
         muleContext = null;
-        MuleServer.setMuleContext(null);
         ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(failOnMessageScribbling);
     } 
     

@@ -46,6 +46,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         testService.setComponent(new PassThroughComponent());
         outboundRouter = new TestOutboundRouterCollection();
         testService.setOutboundRouter(outboundRouter);
+        outboundRouter.setMuleContext(muleContext);
     }
 
     /**
@@ -56,8 +57,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      */
     public void testSingleDoesNotRequireCopyRouterMatchAllFalse() throws Exception
     {
-        //muleContext not available until after doSetUp, which seems odd
-        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.start();
@@ -80,8 +79,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     {
 
         MuleEvent testEvent = getTestInboundEvent("TEST_MESSAGE");
-        //muleContext not available until after doSetUp, which seems odd
-        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.start();
@@ -102,8 +99,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      */
     public void testSingleRequiresCopyRouterMatchAllFalse() throws Exception
     {
-        //muleContext not available until after doSetUp, which seems odd
-        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
         testService.start();
@@ -124,8 +119,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      */
     public void testSingleRequiresCopyRouterMatchAllTrue() throws Exception
     {
-        //muleContext not available until after doSetUp, which seems odd
-        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
         testService.start();
@@ -148,8 +141,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      */
     public void testMultipleDoesNotRequireCopyRouterMatchAllFalse() throws Exception
     {
-        //muleContext not available until after doSetUp, which seems odd
-        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
@@ -174,8 +165,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     {
 
         MuleEvent testEvent = getTestInboundEvent("TEST_MESSAGE");
-        //muleContext not available until after doSetUp, which seems odd
-        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
@@ -198,8 +187,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      */
     public void testMultipleRequiresCopyRouterMatchAllFalse() throws Exception
     {
-        //muleContext not available until after doSetUp, which seems odd
-        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
@@ -222,8 +209,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      */
     public void testMultipleRequiresCopyRouterMatchAllTrue() throws Exception
     {
-        //muleContext not available until after doSetUp, which seems odd
-        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
@@ -246,8 +231,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      */
     public void testMultipleMixMatchAllTrue() throws Exception
     {
-        //muleContext not available until after doSetUp, which seems odd
-        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
@@ -274,8 +257,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      */
     public void testMultipleMixMatchAllFalse() throws Exception
     {
-        //muleContext not available until after doSetUp, which seems odd
-        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(false);
         testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
@@ -304,8 +285,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      */
     public void testStreamPayload() throws Exception
     {
-        //muleContext not available until after doSetUp, which seems odd
-        outboundRouter.setMuleContext(muleContext);
         testService.getOutboundRouter().setMatchAll(true);
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
         testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));

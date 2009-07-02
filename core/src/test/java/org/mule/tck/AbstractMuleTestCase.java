@@ -10,7 +10,6 @@
 
 package org.mule.tck;
 
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -521,7 +520,6 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         finally
         {
             muleContext = null;
-            MuleServer.setMuleContext(null);
         }
     }
 

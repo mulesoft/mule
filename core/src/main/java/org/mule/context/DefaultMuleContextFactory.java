@@ -181,7 +181,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     {
         // Create muleContext instance and set it in MuleServer
         MuleContext muleContext = buildMuleContext(muleContextBuilder);
-        MuleServer.setMuleContext(muleContext);
 
         // Initialiase MuleContext
         muleContext.initialise();

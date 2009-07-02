@@ -491,11 +491,6 @@ public class MuleServer implements Runnable
         return muleContext;
     }
 
-    public static void setMuleContext(MuleContext muleContext)
-    {
-        MuleServer.muleContext = muleContext;
-    }
-
     /**
      * This class is installed only for MuleServer running as commandline app. A
      * clean Mule shutdown can be achieved by disposing the
