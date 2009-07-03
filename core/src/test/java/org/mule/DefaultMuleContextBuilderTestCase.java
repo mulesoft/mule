@@ -93,7 +93,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
     {
         public MyWorkManager(ThreadingProfile profile, String name)
         {
-            super(profile, name, muleContext.getConfiguration().getShutdownTimeout());
+            super(profile, name, 5000);
         }
     }
 
