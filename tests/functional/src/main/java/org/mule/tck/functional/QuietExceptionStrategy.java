@@ -45,4 +45,10 @@ public class QuietExceptionStrategy extends AbstractExceptionListener
         logger.debug("Ignoring", e);
     }
 
+    @Override
+    protected void logException(Throwable t)
+    {
+        logger.debug("Ignoring", t);
+    }
+
 }
