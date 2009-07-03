@@ -29,6 +29,7 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
@@ -45,6 +46,7 @@ import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -348,11 +350,10 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     {
         try
         {
-            return message.getPayloadAsString();
+            return message.getPayload(String.class);
         }
-        catch (Exception e)
+        catch (TransformerException e)
         {
-            logException(e);
             logger.info("Failed to read message payload as string, using raw payload");
             return message.getPayload();
         }
