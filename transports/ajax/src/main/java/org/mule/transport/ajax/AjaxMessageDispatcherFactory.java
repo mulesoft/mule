@@ -9,12 +9,12 @@
  */
 package org.mule.transport.ajax;
 
-import org.mule.transport.AbstractMessageDispatcherFactory;
-import org.mule.transport.ajax.embedded.AjaxConnector;
-import org.mule.transport.ajax.container.AjaxServletConnector;
-import org.mule.api.transport.MessageDispatcher;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.transport.MessageDispatcher;
+import org.mule.transport.AbstractMessageDispatcherFactory;
+import org.mule.transport.ajax.container.AjaxServletConnector;
+import org.mule.transport.ajax.embedded.AjaxConnector;
 
 import org.mortbay.cometd.AbstractBayeux;
 
@@ -41,7 +41,24 @@ public class AjaxMessageDispatcherFactory extends AbstractMessageDispatcherFacto
             AbstractBayeux b = ((AjaxServletConnector)endpoint.getConnector()).getBayeux();
             if(b==null)
             {
-                throw new IllegalArgumentException("Bayeux is null: " + endpoint.getConnector());
+                long start = System.currentTimeMillis();
+                //Not the correct use for response time out but if fine for this purpose
+                long timeout = start + endpoint.getResponseTimeout();
+                while(start < timeout)
+                {
+                    try
+                    {
+                        Thread.sleep(1000);
+                        b = ((AjaxServletConnector)endpoint.getConnector()).getBayeux();
+                        if(b!=null) break;
+                    }
+                    catch (InterruptedException e)
+                    {
+                        //ignore
+                    }
+                }
+                throw new IllegalArgumentException("Bayeux is null: " + endpoint.getConnector() + ". Waited for " +
+                        endpoint.getResponseTimeout() + " for object to become availble, this usually caused if the servlet container takes a long time to start up");
             }
             dispatcher.setBayeux(b);
         }
