@@ -62,8 +62,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected URIBuilder uriBuilder;
     protected Connector connector;
-    protected List transformers;
-    protected List responseTransformers;
+    protected List<Transformer> transformers;
+    protected List<Transformer> responseTransformers;
     protected String name;
     protected Map properties = new HashMap();
     protected TransactionConfig transactionConfig;
@@ -534,27 +534,36 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     public void setConnector(Connector connector)
     {
+        connector.setMuleContext(muleContext);
         this.connector = connector;
-
     }
 
     public void addTransformer(Transformer transformer)
     {
         if (transformers == null)
         {
-            transformers = new LinkedList();
+            transformers = new LinkedList<Transformer>();
         }
+        transformer.setMuleContext(muleContext);
         transformers.add(transformer);
     }
 
-    public void setTransformers(List transformers)
+    public void setTransformers(List<Transformer> transformers)
     {
+        for (Transformer transformer : transformers)
+        {
+            transformer.setMuleContext(muleContext);
+        }
         this.transformers = transformers;
     }
 
-    public void setResponseTransformers(List responseTransformers)
+    public void setResponseTransformers(List<Transformer> transformers)
     {
-        this.responseTransformers = responseTransformers;
+        for (Transformer transformer : transformers)
+        {
+            transformer.setMuleContext(muleContext);
+        }
+        this.responseTransformers = transformers;
     }
 
     public void setName(String name)

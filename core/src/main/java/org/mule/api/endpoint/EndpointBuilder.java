@@ -52,9 +52,9 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     void addTransformer(Transformer transformer);
 
-    void setTransformers(List transformers);
+    void setTransformers(List<Transformer> transformers);
 
-    void setResponseTransformers(List responseTransformer);
+    void setResponseTransformers(List<Transformer> responseTransformer);
 
     void setName(String name);
 
