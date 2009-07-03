@@ -10,7 +10,10 @@
 package org.mule.module.guice;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.registry.RegistrationException;
+import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.util.ClassUtils;
 
 import com.google.inject.AbstractModule;
@@ -87,5 +90,12 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
     protected void initialiseObject(Object o) throws RegistrationException
     {
         muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
+    }
+
+    protected EndpointBuilder createEndpointBuilder(String uri) throws MuleException
+    {
+        DefaultEndpointFactory endpointFactory = new DefaultEndpointFactory();
+        endpointFactory.setMuleContext(muleContext);
+        return endpointFactory.getEndpointBuilder(uri);
     }
 }
