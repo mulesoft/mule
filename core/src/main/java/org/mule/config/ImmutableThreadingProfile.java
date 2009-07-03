@@ -165,9 +165,9 @@ public class ImmutableThreadingProfile implements ThreadingProfile
         throw new UnsupportedOperationException(getClass().getName());
     }
 
-    public WorkManager createWorkManager(String name)
+    public WorkManager createWorkManager(String name, int shutdownTimeout)
     {
-        return workManagerFactory.createWorkManager(this, name);
+        return workManagerFactory.createWorkManager(this, name, shutdownTimeout);
     }
 
     public ThreadPoolExecutor createPool()
@@ -203,9 +203,9 @@ public class ImmutableThreadingProfile implements ThreadingProfile
     public static class DefaultWorkManagerFactory implements WorkManagerFactory
     {
 
-        public WorkManager createWorkManager(ThreadingProfile profile, String name)
+        public WorkManager createWorkManager(ThreadingProfile profile, String name, int shutdownTimeout)
         {
-            return new MuleWorkManager(profile, name);
+            return new MuleWorkManager(profile, name, shutdownTimeout);
         }
 
     }

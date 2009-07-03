@@ -106,7 +106,6 @@ public class SedaService extends AbstractService implements Work, WorkListener
     {
         if (threadingProfile == null)
         {
-            // TODO MULE-2102 This should be configured in the default template.
             threadingProfile = muleContext.getDefaultServiceThreadingProfile();
         }
         // Create thread pool
@@ -114,17 +113,16 @@ public class SedaService extends AbstractService implements Work, WorkListener
         // work item that is running continuously and polling the SEDA queue.)
         ChainedThreadingProfile threadingProfile = new ChainedThreadingProfile(this.threadingProfile);
         threadingProfile.setMaxThreadsActive(threadingProfile.getMaxThreadsActive() + 1);
-        workManager = threadingProfile.createWorkManager(getName());
+        //TODO it would be nicer if the shutdown value was encapsulated in the Threading profile, but it is more difficult than it seems
+        workManager = threadingProfile.createWorkManager(getName(), muleContext.getConfiguration().getShutdownTimeout());
 
         if (queueProfile == null)
         {
-            // TODO MULE-2102 This should be configured in the default template.
             queueProfile = ((SedaModel) model).getQueueProfile();
         }
         
         if (queueTimeout == null)
         {
-            // TODO MULE-2102 This should be configured in the default template.
             setQueueTimeout(((SedaModel) model).getQueueTimeout());
         }
         

@@ -18,7 +18,6 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 /**
@@ -160,7 +159,7 @@ public interface ThreadingProfile
 
     void setWorkManagerFactory(WorkManagerFactory workManagerFactory);
 
-    WorkManager createWorkManager(String name);
+    WorkManager createWorkManager(String name, int shutdownTimeout);
 
     ThreadPoolExecutor createPool();
 
@@ -172,7 +171,7 @@ public interface ThreadingProfile
 
     interface WorkManagerFactory
     {
-        WorkManager createWorkManager(ThreadingProfile profile, String name);
+        WorkManager createWorkManager(ThreadingProfile profile, String name, int shutdownTimeout);
     }
 
 }

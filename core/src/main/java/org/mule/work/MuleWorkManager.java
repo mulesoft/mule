@@ -90,7 +90,7 @@ public class MuleWorkManager implements WorkManager
     private final WorkExecutor startWorkExecutor = new StartWorkExecutor();
     private final WorkExecutor syncWorkExecutor = new SyncWorkExecutor();
 
-    public MuleWorkManager(ThreadingProfile profile, String name)
+    public MuleWorkManager(ThreadingProfile profile, String name, int shutdownTimeout)
     {
         super();
 
@@ -101,8 +101,7 @@ public class MuleWorkManager implements WorkManager
 
         this.threadingProfile = profile;
         this.name = name;
-        //URGENT TODO
-        gracefulShutdownTimeout = 5000; //config.getShutdownTimeout();
+        gracefulShutdownTimeout = shutdownTimeout;
     }
 
     public synchronized void start() throws MuleException

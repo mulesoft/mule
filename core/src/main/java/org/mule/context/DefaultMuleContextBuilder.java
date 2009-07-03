@@ -151,7 +151,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
         else
         {
-            return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, "MuleServer");
+            return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, "MuleServer", getMuleConfiguration().getShutdownTimeout());
         }
     }
 

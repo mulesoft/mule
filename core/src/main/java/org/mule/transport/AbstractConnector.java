@@ -511,7 +511,6 @@ public abstract class AbstractConnector
         // we do not need to stop the work managers because they do no harm (will just be idle)
         // and will be reused on restart without problems.
 
-        //TODO RM* THis shouldn't be here this.initialised.set(false);
         // started=false already issued above right after doStop()
         if (logger.isInfoEnabled())
         {
@@ -620,7 +619,7 @@ public abstract class AbstractConnector
         if (receiverWorkManager.get() == null)
         {
             WorkManager newWorkManager = this.getReceiverThreadingProfile().createWorkManager(
-                getName() + ".receiver");
+                getName() + ".receiver", muleContext.getConfiguration().getShutdownTimeout());
 
             if (receiverWorkManager.compareAndSet(null, newWorkManager))
             {
@@ -630,7 +629,7 @@ public abstract class AbstractConnector
         if (dispatcherWorkManager.get() == null)
         {
             WorkManager newWorkManager = this.getDispatcherThreadingProfile().createWorkManager(
-                getName() + ".dispatcher");
+                getName() + ".dispatcher", muleContext.getConfiguration().getShutdownTimeout());
 
             if (dispatcherWorkManager.compareAndSet(null, newWorkManager))
             {
@@ -640,7 +639,7 @@ public abstract class AbstractConnector
         if (requesterWorkManager.get() == null)
         {
             WorkManager newWorkManager = this.getRequesterThreadingProfile().createWorkManager(
-                getName() + ".requester");
+                getName() + ".requester", muleContext.getConfiguration().getShutdownTimeout());
 
             if (requesterWorkManager.compareAndSet(null, newWorkManager))
             {

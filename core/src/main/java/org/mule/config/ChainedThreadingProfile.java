@@ -179,9 +179,9 @@ public class ChainedThreadingProfile implements ThreadingProfile
         this.workManagerFactory = workManagerFactory;
     }
 
-    public WorkManager createWorkManager(String name)
+    public WorkManager createWorkManager(String name, int shutdownTimeout)
     {
-        return workManagerFactory.createWorkManager(this, name);
+        return workManagerFactory.createWorkManager(this, name, shutdownTimeout);
     }
 
     public ThreadPoolExecutor createPool()
