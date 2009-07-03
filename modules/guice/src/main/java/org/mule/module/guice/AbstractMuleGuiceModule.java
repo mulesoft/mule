@@ -92,6 +92,14 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
         muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
     }
 
+    /**
+     * Creates an {@link org.mule.api.endpoint.EndpointBuilder} instance for the endpoint uri.  The builder can be used to add
+     * further configuration options and then used to create either {@link org.mule.api.endpoint.OutboundEndpoint} or
+     * {@link org.mule.api.endpoint.InboundEndpoint} instances.
+     * @param uri the address URI for the endpoint
+     * @return and EndpointBuilder instance that can be used to create endpoints
+     * @throws MuleException if the builder cannt be created for any reason
+     */
     protected EndpointBuilder createEndpointBuilder(String uri) throws MuleException
     {
         DefaultEndpointFactory endpointFactory = new DefaultEndpointFactory();
