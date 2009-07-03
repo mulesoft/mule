@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,6 +42,7 @@ public class BindingInvocationHandler implements InvocationHandler
 
     protected MuleContext muleContext;
 
+    @SuppressWarnings("unchecked")
     public BindingInvocationHandler(InterfaceBinding router)
     {
         routers = new ConcurrentHashMap();
@@ -74,19 +76,7 @@ public class BindingInvocationHandler implements InvocationHandler
             return toString();
         }
 
-        MuleMessage message;
-        if (args == null)
-        {
-            message = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
-        }
-        else if (args.length == 1)
-        {
-            message = new DefaultMuleMessage(args[0], muleContext);
-        }
-        else
-        {
-            message = new DefaultMuleMessage(args, muleContext);
-        }
+        MuleMessage message = createMuleMessage(args);
 
         // Some transports such as Axis, RMI and EJB can use the method information
         message.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method.getName(), PropertyScope.INVOCATION);
@@ -102,31 +92,76 @@ public class BindingInvocationHandler implements InvocationHandler
             throw new IllegalArgumentException(CoreMessages.cannotFindBindingForMethod(method.getName()).toString());
         }
 
-        MuleMessage reply;
         MuleEvent currentEvent = RequestContext.getEvent();
-        reply = router.route(message, currentEvent.getSession());
+        MuleMessage reply = router.route(message, currentEvent.getSession());
 
         if (reply != null)
         {
             if (reply.getExceptionPayload() != null)
             {
-                throw reply.getExceptionPayload().getException();
+                throw findDeclaredMethodException(method, reply.getExceptionPayload().getException());
             }
             else
             {
-                if (MuleMessage.class.isAssignableFrom(method.getReturnType()))
-                {
-                    return reply;
-                }
-                else
-                {
-                    return reply.getPayload();
-                }
+                return determineReply(reply, method);
             }
         }
         else
         {
             return null;
+        }
+    }
+    
+    private MuleMessage createMuleMessage(Object[] args)
+    {
+        if (args == null)
+        {
+            return new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+        }
+        else if (args.length == 1)
+        {
+            return new DefaultMuleMessage(args[0], muleContext);
+        }
+        else
+        {
+            return new DefaultMuleMessage(args, muleContext);
+        }
+    }
+
+    /**
+     * Return the causing exception instead of the general "container" exception (typically 
+     * UndeclaredThrowableException) if the cause is known and the type matches one of the
+     * exceptions declared in the given method's "throws" clause.
+     */
+    private Throwable findDeclaredMethodException(Method method, Throwable throwable) throws Throwable 
+    {       
+        Throwable cause = throwable.getCause();
+        if (cause != null)
+        {
+            // Try to find a matching exception type from the method's "throws" clause, and if so
+            // return that exception.
+            Class[] exceptions = method.getExceptionTypes();         
+            for (int i = 0; i < exceptions.length; i++)
+            {
+                if (cause.getClass().equals(exceptions[i]))
+                {
+                    return cause; 
+                }                       
+            }   
+        }
+        
+        return throwable;
+    }
+    
+    private Object determineReply(MuleMessage reply, Method bindingMethod)
+    {
+        if (MuleMessage.class.isAssignableFrom(bindingMethod.getReturnType()))
+        {
+            return reply;
+        }
+        else
+        {
+            return reply.getPayload();
         }
     }
     
