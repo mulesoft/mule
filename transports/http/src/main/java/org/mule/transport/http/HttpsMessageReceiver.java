@@ -10,11 +10,13 @@
 
 package org.mule.transport.http;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.transport.http.i18n.HttpMessages;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -25,6 +27,9 @@ import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocket;
 import javax.resource.spi.work.Work;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class HttpsMessageReceiver extends HttpMessageReceiver
 {
@@ -41,11 +46,11 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
         return new HttpsWorker(socket);
     }
 
-
     private class HttpsWorker extends HttpWorker implements HandshakeCompletedListener
     {
         private Certificate[] peerCertificateChain;
         private Certificate[] localCertificateChain;
+        private final CountDownLatch latch = new CountDownLatch(1);
 
         public HttpsWorker(Socket socket) throws IOException
         {
@@ -53,9 +58,25 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
             ((SSLSocket) socket).addHandshakeCompletedListener(this);
         }
 
-        protected void preRouteMessage(MuleMessage message)
+        @Override
+        protected void preRouteMessage(MuleMessage message) throws MessagingException
         {
-            super.preRouteMessage(message);
+            try
+            {
+                long timeout = ((HttpsConnector) getConnector()).getSslHandshakeTimeout();
+                boolean handshakeComplete = latch.await(timeout, TimeUnit.MILLISECONDS);
+                if (!handshakeComplete)
+                {
+                    throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(), message);
+                }
+            }
+            catch (InterruptedException e)
+            {
+                throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(),
+                    message, e);
+            }                   
+        	
+        	super.preRouteMessage(message);
             
             if (peerCertificateChain != null)
             {
@@ -69,18 +90,23 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
 
         public void handshakeCompleted(HandshakeCompletedEvent event)
         {
-            localCertificateChain = event.getLocalCertificates();
-            try
-            {
-                peerCertificateChain = event.getPeerCertificates();
-            }
-            catch (SSLPeerUnverifiedException e)
-            {
-                logger.debug("Cannot get peer certificate chain: "+ e.getMessage());
-            }
+			try
+			{
+	            localCertificateChain = event.getLocalCertificates();
+	            try
+	            {
+	                peerCertificateChain = event.getPeerCertificates();
+	            }
+	            catch (SSLPeerUnverifiedException e)
+	            {
+	                logger.debug("Cannot get peer certificate chain: "+ e.getMessage());
+	            }
+			}
+			finally
+			{
+	            latch.countDown();
+			}
         }
-
     }
-
 
 }

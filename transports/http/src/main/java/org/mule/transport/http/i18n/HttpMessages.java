@@ -85,6 +85,11 @@ public class HttpMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 19);
     }
+    
+    public static Message sslHandshakeDidNotComplete()
+    {
+        return factory.createMessage(BUNDLE_PATH, 20);
+    }
 }
 
 

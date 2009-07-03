@@ -16,6 +16,7 @@ import org.mule.DefaultMuleSession;
 import org.mule.NullSessionHandler;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -48,6 +49,7 @@ import java.util.Map;
 import javax.resource.spi.work.Work;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
@@ -475,7 +477,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             return headers;
         }
 
-        protected void preRouteMessage(MuleMessage message)
+        protected void preRouteMessage(MuleMessage message) throws MessagingException
         {
             message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, remoteClientAddress);
         }

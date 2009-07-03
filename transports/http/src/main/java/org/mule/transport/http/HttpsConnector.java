@@ -43,6 +43,11 @@ public class HttpsConnector extends HttpConnector
     public static final String LOCAL_CERTIFICATES = "LOCAL_CERTIFICATES";
 
     private TlsConfiguration tls = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+    
+    /**
+     * Timeout for establishing the SSL connection with the client.
+     */
+    private long sslHandshakeTimeout = 30000;
 
     public HttpsConnector()
     {
@@ -60,6 +65,7 @@ public class HttpsConnector extends HttpConnector
         return serverSocket;
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         try
@@ -73,6 +79,7 @@ public class HttpsConnector extends HttpConnector
         super.doInitialise();
     }
 
+    @Override
     public String getProtocol()
     {
         return HTTPS;
@@ -271,6 +278,16 @@ public class HttpsConnector extends HttpConnector
     public void setTrustStoreType(String trustStoreType)
     {
         tls.setTrustStoreType(trustStoreType);
+    }
+
+    public long getSslHandshakeTimeout()
+    {
+        return sslHandshakeTimeout;
+    }
+
+    public void setSslHandshakeTimeout(long sslHandshakeTimeout)
+    {
+        this.sslHandshakeTimeout = sslHandshakeTimeout;
     }
 
 }
