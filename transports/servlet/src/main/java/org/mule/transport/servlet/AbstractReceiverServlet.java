@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractReceiverServlet extends HttpServlet
 {
-    
+
     /**
      * logger used by this class
      */
@@ -48,7 +48,9 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     public static final String FEEDBACK_PROPERTY = "org.mule.servlet.feedback";
     public static final String DEFAULT_CONTENT_TYPE_PROPERTY = "org.mule.servlet.default.content.type";
 
-    /** The name of the servlet connector to use with this Servlet */
+    /**
+     * The name of the servlet connector to use with this Servlet
+     */
     public static final String SERVLET_CONNECTOR_NAME_PROPERTY = "org.mule.servlet.connector.name";
 
     public static final String PAYLOAD_PARAMETER_NAME = "org.mule.servlet.payload.param";
@@ -110,6 +112,8 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             logger.info("Using payload param name: " + payloadParameterName);
         }
 
+        muleContext = setupMuleContext();
+        responseTransformer.setMuleContext(muleContext);
         try
         {
             responseTransformer.initialise();
@@ -118,12 +122,17 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         {
             throw new ServletException(e);
         }
-        muleContext = (MuleContext)getServletContext().getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
-        if(muleContext==null)
+        doInit();
+    }
+
+    protected MuleContext setupMuleContext() throws ServletException
+    {
+        MuleContext muleContext = (MuleContext) getServletContext().getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
+        if (muleContext == null)
         {
             throw new ServletException("Property " + MuleProperties.MULE_CONTEXT_PROPERTY + " not set on ServletContext");
         }
-        doInit();
+        return muleContext;
     }
 
     protected void doInit() throws ServletException
@@ -147,17 +156,17 @@ public abstract class AbstractReceiverServlet extends HttpServlet
 
             if (message.getPayload() instanceof HttpResponse)
             {
-                httpResponse = (HttpResponse)message.getPayload();
+                httpResponse = (HttpResponse) message.getPayload();
 
             }
             else
             {
                 httpResponse = (HttpResponse) responseTransformer.transform(message);
             }
-            
+
             // Map the HttpResponse to the ServletResponse
             Header contentTypeHeader = httpResponse.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
-            
+
             String contentType;
             if (contentTypeHeader != null && contentTypeHeader.getValue() != null)
             {
@@ -171,16 +180,16 @@ public abstract class AbstractReceiverServlet extends HttpServlet
             {
                 contentType = defaultContentType;
             }
-            
+
             servletResponse.setContentType(contentType);
-            
+
             servletResponse = setHttpHeadersOnServletResponse(httpResponse, servletResponse);
-            
+
             if (!servletResponse.isCommitted())
             {
                 servletResponse.setStatus(httpResponse.getStatusCode());
             }
-            
+
             if (httpResponse.hasBody())
             {
                 OutputHandler outputHandler = httpResponse.getBody();
@@ -200,7 +209,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
         }
         return servletResponse;
     }
-    
+
     protected void handleException(Throwable exception, String message, HttpServletResponse response)
     {
         logger.error("message: " + exception.getMessage(), exception);
