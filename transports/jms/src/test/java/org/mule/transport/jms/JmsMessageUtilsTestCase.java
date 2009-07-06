@@ -11,31 +11,35 @@
 package org.mule.transport.jms;
 
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.BananaFactory;
+import org.mule.tck.testmodels.fruit.Orange;
 
 import com.mockobjects.constraint.IsInstanceOf;
+import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
+import java.io.NotSerializableException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.io.NotSerializableException;
 
 import javax.jms.BytesMessage;
 import javax.jms.ConnectionFactory;
+import javax.jms.MapMessage;
+import javax.jms.Message;
 import javax.jms.MessageFormatException;
+import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
-import javax.jms.Message;
-import javax.jms.MapMessage;
-import javax.jms.ObjectMessage;
-import javax.jms.JMSException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.iterators.IteratorEnumeration;
 
 public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
 {
@@ -229,4 +233,27 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
             }
         }
     }
+    
+    public void testMapMessageWithNullValue() throws Exception
+    {
+        String[] keys = new String[] { "key", "null" };
+        Iterator<String> keyIterator = IteratorUtils.arrayIterator(keys);
+        Enumeration<String> keyEnumeration = new IteratorEnumeration(keyIterator);
+        
+        Mock mockMessage = new Mock(MapMessage.class);
+        mockMessage.expectAndReturn("getMapNames", keyEnumeration);
+        mockMessage.expectAndReturn("getObject", C.eq("key"), "value");
+        mockMessage.expectAndReturn("getObject", C.eq("null"), null);
+        MapMessage message = (MapMessage) mockMessage.proxy();
+        
+        Object result = JmsMessageUtils.toObject(message, JmsConstants.JMS_SPECIFICATION_11, ENCODING);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        Map map = (Map) result;
+        assertEquals("value", map.get("key"));
+        assertNull(map.get("null"));
+
+        mockMessage.verify();
+    }
+
 }
