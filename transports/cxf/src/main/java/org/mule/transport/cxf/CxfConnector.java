@@ -18,6 +18,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.config.spring.SpringRegistry;
@@ -32,13 +33,13 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -81,6 +82,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         registerSupportedProtocol("vm");
     }
     
+    @Override
     public boolean supportsProtocol(String protocol)
     {
         // we can listen on any protocol
@@ -201,7 +203,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         // TODO MULE-2228 Simplify this API
         SedaService service = new SedaService();
         service.setMuleContext(muleContext);
-        service.setName(CXF_SERVICE_COMPONENT_NAME + server.getEndpoint().getService().getName() + service.hashCode());
+        service.setName(CXF_SERVICE_COMPONENT_NAME + server.getEndpoint().getService().getName().getLocalPart() + service.hashCode());
         service.setModel(muleContext.getRegistry().lookupSystemModel());
 
         CxfServiceComponent svcComponent = new CxfServiceComponent(this, (CxfMessageReceiver) receiver);
@@ -245,8 +247,8 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         if (cxfReceiver.isApplyTransformersToProtocol())
         {
             transformerEndpoint = protocolEndpointBuilder; 
-            receiverEndpointBuilder.setTransformers(Collections.emptyList());
-            receiverEndpointBuilder.setResponseTransformers(Collections.emptyList());
+            receiverEndpointBuilder.setTransformers(Collections.<Transformer>emptyList());
+            receiverEndpointBuilder.setResponseTransformers(Collections.<Transformer>emptyList());
         }
         else
         {  
@@ -323,7 +325,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
     @Override
     protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
-        if (service.getName().startsWith("_cxfServiceComponent"))
+        if (service.getName().startsWith(CXF_SERVICE_COMPONENT_NAME))
         {
             return service.getName();
         }
@@ -360,6 +362,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         }
     }
     
+    @Override
     public boolean isSyncEnabled(String protocol)
     {
         protocol = protocol.toLowerCase();
