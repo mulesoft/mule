@@ -35,12 +35,12 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeCompletedListener
 {
 
-    // we must wait for handshake to complete before sending message, as the callback
-    // sets important properties.  the wait period is arbitrary, but the two threads
+    // We must wait for handshake to complete before sending message, as the callback
+    // sets important properties. The wait period is arbitrary, but the two threads
     // are approximately synchronized (handshake completes before/at same time as
     // message is received) so value should not be critical
     private CountDownLatch handshakeComplete = new CountDownLatch(1);
-    private static final long HANDSHAKE_WAIT = 30000L;
+    
     private Certificate[] peerCertificateChain;
     private Certificate[] localCertificateChain;
 
@@ -57,11 +57,13 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
 
     private void preRoute(DefaultMuleMessage message) throws Exception
     {
-        handshakeComplete.await(HANDSHAKE_WAIT, TimeUnit.MILLISECONDS);
-        if (0 != handshakeComplete.getCount())
+        long sslHandshakeTimeout = ((SslConnector) getConnector()).getSslHandshakeTimeout();
+        boolean rc = handshakeComplete.await(sslHandshakeTimeout, TimeUnit.MILLISECONDS);
+        if (rc == false)
         {
             throw new IllegalStateException("Handshake did not complete");
         }
+
         if (peerCertificateChain != null)
         {
             message.setProperty(SslConnector.PEER_CERTIFICATES, peerCertificateChain);
