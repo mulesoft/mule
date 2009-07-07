@@ -13,8 +13,10 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.registry.AbstractRegistry;
 
+import com.google.inject.Binding;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
+import com.google.inject.TypeLiteral;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,8 +25,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The internal Mule interface for retreiving objects from a Guice injector.  This registry is read-only.  The lifecycle of objects will be
+ * The internal Mule interface for retreiving objects from a Guice injector.  This registry is read-only since all
+ * objects should be configured by {@link com.google.inject.Module} objects.  The lifecycle of objects will be
  * managed by Mule since Guice does not provide lifecycle support.
+ *
+ * To create modules extend the {@link org.mule.module.guice.AbstractMuleGuiceModule} since it provides hooks and helpers for
+ * working with Mule configuration.  Any modules independent of Mule can just extend the Guice {@link com.google.inject.AbstractModule}
+ * as normal.
+ *
+ * Mule will discover modules on the classpath, if you need to configure a module before passing it to the Guice injector you
+ * need to implement a {@link org.mule.module.guice.GuiceModuleFactory} for your module.
+ *
+ * @see org.mule.module.guice.AbstractMuleGuiceModule
+ * @see org.mule.module.guice.GuiceModuleFactory
  */
 public class GuiceRegistry extends AbstractRegistry
 {
@@ -57,18 +70,21 @@ public class GuiceRegistry extends AbstractRegistry
         return null;
     }
 
-    public <T> T lookupObject(Class<T> clazz)
-    {
-        return injector.getInstance(clazz);
-    }
-
     public <T> Collection lookupObjects(Class<T> type)
     {
         try
         {
-            List<T> list = new ArrayList<T>(1);
-            list.add(injector.getInstance(type));
-            return list;
+            List<Binding<T>> bindings = injector.findBindingsByType(TypeLiteral.get(type));
+            if(bindings!=null && bindings.size()>0)
+            {
+                List<T> list = new ArrayList<T>(bindings.size());
+                for (Binding<T> binding : bindings)
+                {
+                    list.add(binding.getProvider().get());
+                }
+                return list;
+            }
+            return Collections.EMPTY_LIST;
         }
         catch (ConfigurationException e)
         {

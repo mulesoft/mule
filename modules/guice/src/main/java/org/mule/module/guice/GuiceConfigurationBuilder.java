@@ -12,6 +12,7 @@ package org.mule.module.guice;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
@@ -93,11 +94,12 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
         {
             ClasspathScanner scanner = new ClasspathScanner(classLoader, new String[]{basepath});
             Set<Class> classes = scanner.scanFor(Module.class);
+            Set<Class> factories = scanner.scanFor(GuiceModuleFactory.class);
 
             //TODO add the ability to do excludes
             classes.remove(AbstractMuleGuiceModule.class);
 
-            if (classes.size() == 0)
+            if (classes.size() == 0 && factories.size() == 0)
             {
                 try
                 {
@@ -108,15 +110,21 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
                     basepath = (basepath.equals("") ? "/" : basepath);
                 }
                 //lets just log a noticable exception as a warning since the Guice build can compliment other configuration builders
-                logger.warn(new ConfigurationException(CoreMessages.createStaticMessage("There are no Guice module objects on the classpath under: " + basepath)));
+                logger.warn(new ConfigurationException(CoreMessages.createStaticMessage("There are no Guice modules or module factories on the classpath under: " + basepath)));
+                return;
             }
 
-            modules = new Module[classes.size()];
+            modules = new Module[classes.size() + factories.size()];
             int i = 0;
-            for (Class module : classes)
+            for (Class moduleClass : classes)
             {
-                Module m = (Module) ClassUtils.instanciateClass(module, ClassUtils.NO_ARGS);
-                modules[i++] = m;
+                Module module = (Module) ClassUtils.instanciateClass(moduleClass, ClassUtils.NO_ARGS);
+                modules[i++] = module;
+            }
+            for (Class factoryClass : factories)
+            {
+                GuiceModuleFactory factory = (GuiceModuleFactory) ClassUtils.instanciateClass(factoryClass, ClassUtils.NO_ARGS);
+                modules[i++] = factory.createModule();
             }
         }
 
@@ -146,7 +154,6 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
             {
                 Connector c = (Connector) injector.getInstance(key);
                 c.setName(new ObjectNameHelper(muleContext).getConnectorName(c));
-                c.setMuleContext(muleContext);
                 muleContext.getRegistry().registerConnector(c);
             }
             else if (Agent.class.isAssignableFrom(key.getTypeLiteral().getRawType()))
@@ -154,9 +161,13 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
                 Agent a = (Agent) injector.getInstance(key);
                 muleContext.getRegistry().registerAgent(a);
             }
+            else if (Transformer.class.isAssignableFrom(key.getTypeLiteral().getRawType()))
+            {
+                Transformer t = (Transformer) injector.getInstance(key);
+                muleContext.getRegistry().registerTransformer(t);
+            }
             //TODO EndpointBuilders
             //TODO Security Providers
-            //Note transformers will automatically be available since they are created in the Guice container
 
         }
         registry.initialise();

@@ -20,7 +20,7 @@ import com.google.inject.Provides;
  */
 public class ConfigServiceModule extends AbstractMuleGuiceModule
 {
-    protected void configure()
+    protected void doConfigure()
     {
         //Our auto transform service component
         this.bind(AutoTransformServiceInterface.class).to(DefaultAutoTransformService.class);
