@@ -13,9 +13,9 @@ package org.mule.context.notification;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -65,7 +65,8 @@ class Policy
                                 knownEventsSuper.put(event, Boolean.TRUE);
                                 if (!eventToSenders.containsKey(event))
                                 {
-                                    eventToSenders.put(event, new HashSet<Sender>());
+                                    // use a collection with predictable iteration order
+                                    eventToSenders.put(event, new ArrayList<Sender>());
                                 }
                                 eventToSenders.get(event).add(new Sender(pair));
                             }
