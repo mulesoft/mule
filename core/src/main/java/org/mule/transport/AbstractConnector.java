@@ -1484,8 +1484,8 @@ public abstract class AbstractConnector
             logger.debug("Connecting: " + this);
         }
             
-        retryPolicyTemplate.execute(
-            new RetryCallback()
+
+            RetryCallback callback = new RetryCallback()
             {
                 public void doWork(RetryContext context) throws Exception
                 {
@@ -1560,9 +1560,9 @@ public abstract class AbstractConnector
                 {
                     return getConnectionDescription();
                 }
-            }, 
-            muleContext.getWorkManager()
-        );
+            };
+
+        retryPolicyTemplate.execute(callback, muleContext.getWorkManager());
     }
 
     /**

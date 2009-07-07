@@ -25,8 +25,8 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertNotNull(validTransformer);
         
         DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
-        Transformer messageTransformer = new TransformerCollection(new Transformer[]{ validTransformer });
-        message.applyTransformers(Collections.singletonList(messageTransformer));
+        Transformer messageTransformer = new TransformerChain(validTransformer);
+        message.applyTransformers(messageTransformer);
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -39,8 +39,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertNotNull(validTransformer);
         
         DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
-        Transformer messageTransformer = new TransformerCollection(
-            new Transformer[]{ validTransformer, validTransformer });
+        Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer);
         message.applyTransformers(Collections.singletonList(messageTransformer));
 
         Object transformedMessage = message.getPayload();
@@ -54,9 +53,8 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertNotNull(validTransformer);
         
         DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
-        Transformer messageTransformer = new TransformerCollection(
-            new Transformer[]{ validTransformer, validTransformer, validTransformer });
-        message.applyTransformers(Collections.singletonList(messageTransformer));
+        Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer, validTransformer);
+        message.applyTransformers(messageTransformer);
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -73,8 +71,8 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertNotNull(validTransformer);
         
         DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
-        Transformer messageTransformer = new TransformerCollection(new Transformer[]{invalidTransformer, validTransformer});
-        message.applyTransformers(Collections.singletonList(messageTransformer));
+        Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
+        message.applyTransformers(messageTransformer);
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -91,11 +89,11 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertNotNull(validTransformer);
         
         DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
-        Transformer messageTransformer = new TransformerCollection(new Transformer[]{invalidTransformer, validTransformer});
+        Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
         
         try
         {
-            message.applyTransformers(Collections.singletonList(messageTransformer));
+            message.applyTransformers(messageTransformer);
             fail("Transformer chain is expected to fail because of invalid transformer within chain.");
         }
         catch (TransformerException tfe)
@@ -114,8 +112,8 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertNotNull(validTransformer);
         
         DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
-        Transformer messageTransformer = new TransformerCollection(new Transformer[]{validTransformer, invalidTransformer});
-        message.applyTransformers(Collections.singletonList(messageTransformer));
+        Transformer messageTransformer = new TransformerChain(validTransformer, invalidTransformer);
+        message.applyTransformers(messageTransformer);
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -132,11 +130,11 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertNotNull(validTransformer);
         
         DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
-        Transformer messageTransformer = new TransformerCollection(new Transformer[]{validTransformer, invalidTransformer});
+        Transformer messageTransformer = new TransformerChain(validTransformer, invalidTransformer);
         
         try
         {
-            message.applyTransformers(Collections.singletonList(messageTransformer));
+            message.applyTransformers(messageTransformer);
             fail("Transformer chain is expected to fail because of invalid transformer within chain.");
         }
         catch (TransformerException tfe)

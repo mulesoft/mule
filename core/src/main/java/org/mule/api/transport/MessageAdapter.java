@@ -30,7 +30,7 @@ public interface MessageAdapter extends Serializable
      * 
      * @param properties the properties add to this message
      */
-    void addProperties(Map properties);
+    void addProperties(Map<String, Object> properties);
 
     /**
      * Adds a map of properties to be associated with this message
@@ -38,7 +38,7 @@ public interface MessageAdapter extends Serializable
      * @param properties the properties add to this message
      * @param scope the scope in which the proeprties should be added
      */
-    void addProperties(Map properties, PropertyScope scope);
+    void addProperties(Map<String, Object> properties, PropertyScope scope);
 
     /**
      * Removes all properties on this message
@@ -81,14 +81,14 @@ public interface MessageAdapter extends Serializable
     /**
      * @return all property keys on this message
      */
-    Set getPropertyNames();
+    Set<String> getPropertyNames();
 
     /**
      * Gets all property names in a given scope
      * @param scope the scope of property names
      * @return all property keys on this message
      */
-    Set getPropertyNames(PropertyScope scope);
+    Set<String> getPropertyNames(PropertyScope scope);
 
     /**
      * @return the current message
@@ -335,7 +335,7 @@ public interface MessageAdapter extends Serializable
      * @return a set of the names of the attachments on this message. If there are no attachments an empty set will be
      * returned.
      */
-    Set getAttachmentNames();
+    Set<String> getAttachmentNames();
 
     /**
      * Gets the encoding for the current message. For potocols that send encoding

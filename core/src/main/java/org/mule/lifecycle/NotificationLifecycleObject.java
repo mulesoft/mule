@@ -46,7 +46,7 @@ public class NotificationLifecycleObject extends LifecycleObject
 
         if (!ServerNotification.class.isAssignableFrom(notificationClass))
         {
-            throw new IllegalArgumentException("Notification class must be of type: " + ServerNotification.class.getName());
+            throw new ClassCastException("Notification class must be of type: " + ServerNotification.class.getName());
         }
 
         ctor = ClassUtils.getConstructor(notificationClass, new Class[]{Object.class, String.class});

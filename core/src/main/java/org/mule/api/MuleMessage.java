@@ -10,6 +10,7 @@
 
 package org.mule.api;
 
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 
@@ -44,7 +45,17 @@ public interface MuleMessage extends MessageAdapter
      * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
      * are incompatible with the message payload
      */
-    void applyTransformers(List transformers) throws TransformerException;
+    void applyTransformers(List<Transformer> transformers) throws TransformerException;
+
+    /**
+     * Will apply a list of transformers to the payload of the message. This *Will* change the payload of the
+     * message. This method provides the only way to alter the paylaod of this message without recreating a
+     * copy of the message
+     * @param transformers the transformers to apply to the message payload
+     * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
+     * are incompatible with the message payload
+     */
+    void applyTransformers(Transformer... transformers) throws TransformerException;
 
     /**
      * Will apply a list of transformers to the payload of the message. This *Will* change the payload of the
@@ -58,7 +69,7 @@ public interface MuleMessage extends MessageAdapter
      * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
      * are incompatible with the message payload
      */
-    void applyTransformers(List transformers, Class outputType) throws TransformerException;
+    void applyTransformers(List<Transformer> transformers, Class outputType) throws TransformerException;
 
     /**
      * Update the message payload. This is typically only called if the

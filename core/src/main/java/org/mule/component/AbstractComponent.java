@@ -28,6 +28,7 @@ import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceException;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -180,8 +181,8 @@ public abstract class AbstractComponent implements Component, Interceptor, MuleC
         else if (result != null)
         {
             event.getMessage().applyTransformers(
-                Collections.singletonList(new TransformerTemplate(
-                    new TransformerTemplate.OverwitePayloadCallback(result))));
+                    Collections.<Transformer>singletonList(new TransformerTemplate(
+                        new TransformerTemplate.OverwitePayloadCallback(result))));
             return event.getMessage();
         }
         else

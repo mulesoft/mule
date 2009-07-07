@@ -36,7 +36,7 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      *
      * @return an unmodifiable list of Source types registered on this transformer
      */
-    List getSourceTypes();
+    List<Class> getSourceTypes();
 
     /**
      * Does this transformer allow null input?

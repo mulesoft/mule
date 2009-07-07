@@ -36,6 +36,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -352,13 +353,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     /** {@inheritDoc} */
-    public Set getPropertyNames()
+    public Set<String> getPropertyNames()
     {
         return adapter.getPropertyNames();
     }
 
     /** {@inheritDoc} */
-    public Set getPropertyNames(PropertyScope scope)
+    public Set<String> getPropertyNames(PropertyScope scope)
     {
         return adapter.getPropertyNames(scope);
     }
@@ -514,7 +515,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     /** {@inheritDoc} */
-    public Set getAttachmentNames()
+    public Set<String> getAttachmentNames()
     {
         return adapter.getAttachmentNames();
     }
@@ -545,13 +546,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
 
     /** {@inheritDoc} */
-    public void addProperties(Map properties)
+    public void addProperties(Map<String, Object> properties)
     {
         adapter.addProperties(properties);
     }
 
     /** {@inheritDoc} */
-    public void addProperties(Map properties, PropertyScope scope)
+    public void addProperties(Map<String, Object> properties, PropertyScope scope)
     {
         adapter.addProperties(properties, scope);
     }
@@ -596,12 +597,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     /** {@inheritDoc} */
-    public void applyTransformers(List transformers) throws TransformerException
+    public void applyTransformers(List<Transformer> transformers) throws TransformerException
     {
         applyTransformers(transformers, null);
     }
 
-    public void applyTransformers(List transformers, Class outputType) throws TransformerException
+    /** {@inheritDoc} */
+    public void applyTransformers(Transformer... transformers) throws TransformerException
+    {
+        applyTransformers(Arrays.asList(transformers), null);
+    }
+
+    public void applyTransformers(List<Transformer> transformers, Class outputType) throws TransformerException
     {
         if (!transformers.isEmpty() && !appliedTransformerHashCodes.contains(transformers.hashCode()))
         {

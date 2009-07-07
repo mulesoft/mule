@@ -32,8 +32,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.util.StringUtils;
 
-import java.util.Arrays;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -206,7 +204,7 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
             }
         });
 
-        message.applyTransformers(Arrays.asList(trans));
+        message.applyTransformers(trans);
     }
 
     protected abstract void authenticateInbound(MuleEvent event)

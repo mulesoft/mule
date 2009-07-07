@@ -34,7 +34,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.TransformerCollection;
+import org.mule.transformer.TransformerChain;
 import org.mule.transformer.TransformerWeighting;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
@@ -186,7 +186,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
             result = getNearestTransformerMatch(trans, inputType, outputType);
             if (result != null)
             {
-                result = new TransformerCollection(new Transformer[]{result, secondPass});
+                result = new TransformerChain(new Transformer[]{result, secondPass});
             }
         }
 

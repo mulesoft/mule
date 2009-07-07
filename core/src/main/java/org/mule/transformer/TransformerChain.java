@@ -9,35 +9,44 @@
  */
 package org.mule.transformer;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
-/** TODO */
-public class TransformerCollection extends AbstractMessageAwareTransformer
+/** 
+ *  A referencable chain of transformers that can be used as a single transformer
+ * */
+public class TransformerChain extends AbstractMessageAwareTransformer
 {
-    private List transformers;
+    private List<Transformer> transformers;
 
-    public TransformerCollection(List transformers)
+    public TransformerChain(Transformer... transformers)
     {
-        if (transformers.size() < 1)
-        {
-            throw new IllegalArgumentException("You must set at least one transformer");
-        }
-        this.transformers = transformers;
-    }
-
-    public TransformerCollection(Transformer[] transformers)
-    {
+        super();
         if (transformers.length < 1)
         {
             throw new IllegalArgumentException("You must set at least one transformer");
         }
-        this.transformers = Arrays.asList(transformers);
+        this.transformers = new LinkedList<Transformer>(Arrays.asList(transformers));
+    }
+    
+    public TransformerChain(String name, Transformer... transformers)
+    {
+        super();
+        this.name = name;
+        if (transformers.length < 1)
+        {
+            throw new IllegalArgumentException("You must set at least one transformer");
+        }
+        this.transformers = new LinkedList<Transformer>(Arrays.asList(transformers));
     }
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
@@ -65,6 +74,35 @@ public class TransformerCollection extends AbstractMessageAwareTransformer
         else
         {
             return result.getPayload();
+        }
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        for (Transformer transformer : transformers)
+        {
+            transformer.initialise();
+        }
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        super.setMuleContext(muleContext);
+        for (Transformer transformer : transformers)
+        {
+            transformer.setMuleContext(muleContext);
+        }
+    }
+
+    @Override
+    public void setEndpoint(ImmutableEndpoint endpoint)
+    {
+        super.setEndpoint(endpoint);
+        for (Transformer transformer : transformers)
+        {
+            transformer.setEndpoint(endpoint);
         }
     }
 }

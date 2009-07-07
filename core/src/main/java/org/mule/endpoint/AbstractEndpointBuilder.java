@@ -141,7 +141,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         if (connector != null && endpointURI != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
         {
             throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
-                connector.getProtocol(), endpointURI).getMessage());
+                    connector.getProtocol(), endpointURI).getMessage());
         }
 
         List transformers = getInboundTransformers(connector, endpointURI);
@@ -150,10 +150,10 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         boolean synchronous = getSynchronous(connector, endpointURI);
 
         return new DefaultInboundEndpoint(connector, endpointURI, transformers, responseTransformers,
-            getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
-            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
+                getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
+                getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
                 getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
-            name, muleContext, getRetryPolicyTemplate(connector));
+                name, muleContext, getRetryPolicyTemplate(connector));
     }
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
@@ -168,7 +168,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             throw new MuleRuntimeException(CoreMessages.objectIsNull("uriBuilder"));
         }
         uriBuilder.setMuleContext(muleContext);
-        
+
         EndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
 
@@ -177,7 +177,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         if (connector != null && endpointURI != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
         {
             throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
-                connector.getProtocol(), endpointURI).getMessage());
+                    connector.getProtocol(), endpointURI).getMessage());
         }
 
         List transformers = getOutboundTransformers(connector, endpointURI);
@@ -186,17 +186,17 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         boolean synchronous = getSynchronous(connector, endpointURI);
 
         return new DefaultOutboundEndpoint(connector, endpointURI, transformers, responseTransformers,
-            getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
-            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
-            getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
-            name, muleContext, getRetryPolicyTemplate(connector));
+                getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
+                getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
+                getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
+                name, muleContext, getRetryPolicyTemplate(connector));
 
     }
 
     protected boolean getSynchronous(Connector connector, EndpointURI endpointURI)
     {
         return synchronous != null ? synchronous.booleanValue() : getDefaultSynchronous(connector,
-            endpointURI.getScheme());
+                endpointURI.getScheme());
     }
 
     protected boolean getDefaultSynchronous(Connector connector, String protocol)
@@ -260,7 +260,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         // properties from url come first
         if (null != uriBuilder)
         {
-            uriBuilder.setMuleContext(muleContext);            
+            uriBuilder.setMuleContext(muleContext);
             // properties from the URI itself
             maps.addLast(uriBuilder.getEndpoint().getParams());
         }
@@ -277,8 +277,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected boolean getDeleteUnacceptedMessages(Connector connector)
     {
         return deleteUnacceptedMessages != null
-                                               ? deleteUnacceptedMessages.booleanValue()
-                                               : getDefaultDeleteUnacceptedMessages(connector);
+                ? deleteUnacceptedMessages.booleanValue()
+                : getDefaultDeleteUnacceptedMessages(connector);
 
     }
 
@@ -331,7 +331,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     }
 
     protected List getInboundTransformers(Connector connector, EndpointURI endpointURI)
-        throws TransportFactoryException
+            throws TransportFactoryException
     {
         // #1 Transformers set on builder
         if (transformers != null)
@@ -355,7 +355,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         try
         {
             return TransformerUtils.getDefaultInboundTransformers(getNonNullServiceDescriptor(uriBuilder.getEndpoint()
-                .getSchemeMetaInfo(), getOverrides(connector)));
+                    .getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -364,7 +364,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     }
 
     protected List getOutboundTransformers(Connector connector, EndpointURI endpointURI)
-        throws TransportFactoryException
+            throws TransportFactoryException
     {
         // #1 Transformers set on builder
         if (transformers != null)
@@ -388,7 +388,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         try
         {
             return TransformerUtils.getDefaultOutboundTransformers(getNonNullServiceDescriptor(uriBuilder.getEndpoint()
-                .getSchemeMetaInfo(), getOverrides(connector)));
+                    .getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -397,7 +397,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     }
 
     protected List getInboundEndpointResponseTransformers(Connector connector, EndpointURI endpointURI)
-        throws TransportFactoryException
+            throws TransportFactoryException
     {
         // #1 Transformers set on builder
         if (responseTransformers != null)
@@ -417,7 +417,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     }
 
     protected List getOutboundEndpointResponseTransformers(Connector connector, EndpointURI endpointURI)
-        throws TransportFactoryException
+            throws TransportFactoryException
     {
         // #1 Transformers set on builder
         if (responseTransformers != null)
@@ -439,7 +439,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         try
         {
             return TransformerUtils.getDefaultResponseTransformers(getNonNullServiceDescriptor(uriBuilder.getEndpoint()
-                .getSchemeMetaInfo(), getOverrides(connector)));
+                    .getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -475,10 +475,10 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     }
 
     private TransportServiceDescriptor getNonNullServiceDescriptor(String scheme, Properties overrides)
-        throws ServiceException
+            throws ServiceException
     {
         TransportServiceDescriptor sd = (TransportServiceDescriptor) muleContext.getRegistry()
-            .lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, scheme, overrides);
+                .lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, scheme, overrides);
         if (null != sd)
         {
             return sd;
@@ -501,7 +501,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 if (connector == null)
                 {
                     throw new TransportFactoryException(CoreMessages.objectNotRegistered("Connector",
-                        uriBuilder.getEndpoint().getConnectorName()));
+                            uriBuilder.getEndpoint().getConnectorName()));
                 }
             }
             else
@@ -543,7 +543,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         {
             transformers = new LinkedList<Transformer>();
         }
-        transformer.setMuleContext(muleContext);
         transformers.add(transformer);
     }
 
@@ -576,8 +575,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     /**
      * Sets a property on the endpoint
-     * 
-     * @param key the property key
+     *
+     * @param key   the property key
      * @param value the value of the property
      */
     public void setProperty(Object key, Object value)
@@ -671,27 +670,33 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector, deleteUnacceptedMessages,
-            encoding, uriBuilder, filter, initialState, name, properties, responseTimeout,
-            responseTransformers, securityFilter, synchronous, transactionConfig, transformers});
+                encoding, uriBuilder, filter, initialState, name, properties, responseTimeout,
+                responseTransformers, securityFilter, synchronous, transactionConfig, transformers});
     }
 
     // TODO Equals() and hashCode() only needed for tests, move to tests
     public boolean equals(Object obj)
     {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
 
         final AbstractEndpointBuilder other = (AbstractEndpointBuilder) obj;
         return equal(retryPolicyTemplate, other.retryPolicyTemplate) && equal(connector, other.connector)
-               && equal(createConnector, other.createConnector)
-               && equal(deleteUnacceptedMessages, other.deleteUnacceptedMessages) && equal(encoding, other.encoding)
-               && equal(uriBuilder, other.uriBuilder) && equal(filter, other.filter)
-               && equal(initialState, other.initialState) && equal(name, other.name)
-               && equal(properties, other.properties)
-               && equal(responseTimeout, other.responseTimeout)
-               && equal(responseTransformers, other.responseTransformers)
-               && equal(securityFilter, other.securityFilter) && equal(synchronous, other.synchronous)
-               && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
+                && equal(createConnector, other.createConnector)
+                && equal(deleteUnacceptedMessages, other.deleteUnacceptedMessages) && equal(encoding, other.encoding)
+                && equal(uriBuilder, other.uriBuilder) && equal(filter, other.filter)
+                && equal(initialState, other.initialState) && equal(name, other.name)
+                && equal(properties, other.properties)
+                && equal(responseTimeout, other.responseTimeout)
+                && equal(responseTransformers, other.responseTransformers)
+                && equal(securityFilter, other.securityFilter) && equal(synchronous, other.synchronous)
+                && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
     }
 
     protected static boolean equal(Object a, Object b)

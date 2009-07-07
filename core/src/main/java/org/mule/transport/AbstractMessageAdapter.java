@@ -166,7 +166,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     }
 
     /** {@inheritDoc} */
-    public void addProperties(Map props)
+    public void addProperties(Map<String, Object> props)
     {
         addProperties(props, properties.getDefaultScope());
         assertAccess(WRITE);
@@ -184,7 +184,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     }
 
     /** {@inheritDoc} */
-    public void addProperties(Map props, PropertyScope scope)
+    public void addProperties(Map<String, Object> props, PropertyScope scope)
     {
         assertAccess(WRITE);
         if (props != null)
@@ -234,14 +234,14 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     }
 
     /** {@inheritDoc} */
-    public Set getPropertyNames()
+    public Set<String> getPropertyNames()
     {
         assertAccess(READ);
         return properties.getPropertyNames();
     }
 
     /** {@inheritDoc} */
-    public Set getPropertyNames(PropertyScope scope)
+    public Set<String> getPropertyNames(PropertyScope scope)
     {
         assertAccess(READ);
         return properties.getScopedProperties(scope).keySet();
@@ -494,7 +494,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     }
 
     /** {@inheritDoc} */
-    public Set getAttachmentNames()
+    public Set<String> getAttachmentNames()
     {
         assertAccess(READ);
         return Collections.unmodifiableSet(attachments.keySet());

@@ -68,7 +68,7 @@ public abstract class AbstractTransformer implements Transformer
      * A list of supported Class types that the source payload passed into this
      * transformer
      */
-    protected final List sourceTypes = new CopyOnWriteArrayList();
+    protected final List<Class> sourceTypes = new CopyOnWriteArrayList();
 
     /**
      * Determines whether the transformer will throw an exception if the message
@@ -334,7 +334,7 @@ public abstract class AbstractTransformer implements Transformer
         return name;
     }
 
-    public List getSourceTypes()
+    public List<Class> getSourceTypes()
     {
         return Collections.unmodifiableList(sourceTypes);
     }
