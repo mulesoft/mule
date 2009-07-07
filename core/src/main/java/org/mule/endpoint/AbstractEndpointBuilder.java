@@ -549,19 +549,26 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     }
 
     public void setTransformers(List<Transformer> transformers)
-    {
-        for (Transformer transformer : transformers)
+    {        
+        if (transformers != null)
         {
-            transformer.setMuleContext(muleContext);
+            for (Transformer transformer : transformers)
+            {
+                transformer.setMuleContext(muleContext);
+            }
         }
+        
         this.transformers = transformers;
     }
 
     public void setResponseTransformers(List<Transformer> transformers)
     {
-        for (Transformer transformer : transformers)
+        if (transformers != null)
         {
-            transformer.setMuleContext(muleContext);
+            for (Transformer transformer : transformers)
+            {
+                transformer.setMuleContext(muleContext);
+            }
         }
         this.responseTransformers = transformers;
     }
