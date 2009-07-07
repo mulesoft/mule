@@ -32,7 +32,7 @@ class Policy
 {
 
     // map from event to set of senders
-    private Map eventToSenders = new HashMap();
+    private Map<Class<? extends ServerNotification>, Collection<Sender>> eventToSenders = new HashMap<Class<? extends ServerNotification>, Collection<Sender>>();
 
     // these are cumulative - set values should never change, they are just a cache of known info
     // they are co and contra-variant wrt to exact event type (see code below).
@@ -41,37 +41,33 @@ class Policy
 
     /**
      * For each listener, we check each interface and see what events can be delivered.
-     *
-     * @param interfaceToEvents
-     * @param listenerSubscriptionPairs
-     * @param disabledInterfaces
-     * @param disabledEvents
      */
-    Policy(Map interfaceToEvents, Set listenerSubscriptionPairs, Set disabledInterfaces, Set disabledEvents)
+    Policy(Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToEvents, 
+        Set<ListenerSubscriptionPair> listenerSubscriptionPairs, 
+        Set<Class<? extends ServerNotificationListener>> disabledInterfaces, 
+        Set<Class<? extends ServerNotification>> disabledEvents)
     {
-        for (Iterator pairs = listenerSubscriptionPairs.iterator(); pairs.hasNext();)
+        for (ListenerSubscriptionPair pair : listenerSubscriptionPairs)
         {
-            ListenerSubscriptionPair pair = (ListenerSubscriptionPair) pairs.next();
             ServerNotificationListener listener = pair.getListener();
-            for (Iterator interfaces = interfaceToEvents.keySet().iterator(); interfaces.hasNext();)
+            for (Class<? extends ServerNotificationListener> iface : interfaceToEvents.keySet())
             {
-                Class iface = (Class) interfaces.next();
                 if (notASubclassOfAnyClassInSet(disabledInterfaces, iface))
                 {
                     if (iface.isAssignableFrom(listener.getClass()))
                     {
-                        for (Iterator events = ((Collection) interfaceToEvents.get(iface)).iterator(); events.hasNext();)
+                        Set<Class<? extends ServerNotification>> events = interfaceToEvents.get(iface);
+                        for (Class<? extends ServerNotification> event : events)
                         {
-                            Class event = (Class) events.next();
                             if (notASubclassOfAnyClassInSet(disabledEvents, event))
                             {
                                 knownEventsExact.put(event, Boolean.TRUE);
                                 knownEventsSuper.put(event, Boolean.TRUE);
                                 if (!eventToSenders.containsKey(event))
                                 {
-                                    eventToSenders.put(event, new HashSet());
+                                    eventToSenders.put(event, new HashSet<Sender>());
                                 }
-                                ((Collection) eventToSenders.get(event)).add(new Sender(pair));
+                                eventToSenders.get(event).add(new Sender(pair));
                             }
                         }
                     }
@@ -80,7 +76,7 @@ class Policy
         }
     }
 
-    protected static boolean notASubclassOfAnyClassInSet(Set set, Class clazz)
+    protected static boolean notASubclassOfAnyClassInSet(Set set,  Class clazz)
     {
         for (Iterator iterator = set.iterator(); iterator.hasNext();)
         {
@@ -116,9 +112,8 @@ class Policy
                     || ((Boolean) knownEventsExact.get(notfnClass)).booleanValue())
             {
                 boolean found = false;
-                for (Iterator events = eventToSenders.keySet().iterator(); events.hasNext();)
+                for (Class<? extends ServerNotification> event : eventToSenders.keySet())
                 {
-                    Class event = (Class) events.next();
                     if (event.isAssignableFrom(notfnClass))
                     {
                         found = true;
