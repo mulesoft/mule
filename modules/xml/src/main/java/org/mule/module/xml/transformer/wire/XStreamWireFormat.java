@@ -15,8 +15,8 @@ import org.mule.module.xml.transformer.XStreamFactory;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.transformer.wire.TransformerPairWireFormat;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Serializes objects using XStream. This is equivelent of using the ObjectToXml and
@@ -29,7 +29,7 @@ public class XStreamWireFormat extends TransformerPairWireFormat
         this(XStreamFactory.XSTREAM_XPP_DRIVER, null, null);
     }
 
-    public XStreamWireFormat(String driverClassName, Map aliases, List converters)
+    public XStreamWireFormat(String driverClassName, Map aliases, Set converters)
         throws IllegalAccessException, InstantiationException, ClassNotFoundException
     {
         XmlToObject in = new XmlToObject();

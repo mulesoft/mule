@@ -16,11 +16,12 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.Converter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
@@ -33,8 +34,8 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
 {
     private final AtomicReference/* XStream */xstream = new AtomicReference();
     private volatile String driverClass = XStreamFactory.XSTREAM_XPP_DRIVER;
-    private volatile Map<String, Class> aliases = null;
-    private volatile List<Class> converters = null;
+    private volatile Map<String, Class> aliases = new HashMap<String, Class>();
+    private volatile Set<Class <? extends Converter>> converters = new HashSet<Class <? extends Converter>>();
 
     public final XStream getXStream() throws TransformerException
     {
@@ -71,7 +72,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
         
         if (converters != null)
         {
-            clone.setConverters(new ArrayList<Class>(converters));
+            clone.setConverters(new HashSet<Class <? extends Converter>>(converters));
         }
 
         return clone;
@@ -89,7 +90,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
         this.xstream.set(null);
     }
 
-    public Map getAliases()
+    public Map<String, Class> getAliases()
     {
         return aliases;
     }
@@ -101,12 +102,12 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
         this.xstream.set(null);
     }
 
-    public List<Class> getConverters()
+    public Set<Class <? extends Converter>> getConverters()
     {
         return converters;
     }
 
-    public void setConverters(List<Class> converters)
+    public void setConverters(Set<Class <? extends Converter>> converters)
     {
         this.converters = converters;
         // force XStream instance update
@@ -126,5 +127,25 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
         {
             throw new InitialisationException(e, this);
         }
+    }
+
+    public void addAlias(String alias, Class aClass)
+    {
+        aliases.put(alias, aClass);
+    }
+
+    public Class removeAlias(String alias)
+    {
+        return aliases.remove(alias);
+    }
+
+    public void addConverter(Class<? extends Converter> converterClass)
+    {
+        converters.add(converterClass);
+    }
+
+    public boolean removeAlias(Class<? extends Converter> converterClass)
+    {
+        return converters.remove(converterClass);
     }
 }

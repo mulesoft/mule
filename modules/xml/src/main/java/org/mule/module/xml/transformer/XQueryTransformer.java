@@ -92,6 +92,12 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         setReturnClass(Element.class);
     }
 
+    public XQueryTransformer(String xqueryFile)
+    {
+        this();
+        this.xqueryFile = xqueryFile;
+    }
+
     /**
      *
      */

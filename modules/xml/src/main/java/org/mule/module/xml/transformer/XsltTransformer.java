@@ -11,7 +11,6 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -25,6 +24,7 @@ import org.mule.util.StringUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -99,13 +99,14 @@ public class XsltTransformer extends AbstractXmlTransformer
     private static final int MAX_IDLE_TRANSFORMERS = 32;
     // MAX_IDLE is also the total limit
     private static final int MAX_ACTIVE_TRANSFORMERS = MAX_IDLE_TRANSFORMERS;
-    // Prefix to use in a parameter to specify it is an expression that must be evaluated
-    private static final String PARAM_EXTRACTOR_TOKEN = ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+
+    //Saxon shipped with Mule
+    public static final String PREFERRED_TRANSFORMER_FACTORY = "net.sf.saxon.TransformerFactoryImpl";
 
     protected final GenericObjectPool transformerPool;
 
     /** Default to Saxon */
-    private volatile String xslTransformerFactoryClassName = "net.sf.saxon.TransformerFactoryImpl";
+    private volatile String xslTransformerFactoryClassName = PREFERRED_TRANSFORMER_FACTORY;
     private volatile String xslFile;
     private volatile String xslt;
     private volatile Map contextProperties;
@@ -120,6 +121,13 @@ public class XsltTransformer extends AbstractXmlTransformer
         transformerPool.setMaxIdle(MAX_IDLE_TRANSFORMERS);
         transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
         uriResolver = new LocalURIResolver();
+        contextProperties = new HashMap();
+    }
+
+    public XsltTransformer(String xslFile)
+    {
+        this();
+        this.xslFile = xslFile;
     }
 
     public void initialise() throws InitialisationException
@@ -348,8 +356,15 @@ public class XsltTransformer extends AbstractXmlTransformer
             String factoryClassName = XsltTransformer.this.getXslTransformerFactory();
             TransformerFactory factory;
 
+            if(PREFERRED_TRANSFORMER_FACTORY.equals(factoryClassName) && !ClassUtils.isClassOnPath(factoryClassName, getClass()))
+            {
+                logger.warn("Preferred Transfomer Factory " + PREFERRED_TRANSFORMER_FACTORY + " not on classpath and no default is set, defaulting to JDK");
+                factoryClassName = null;
+            }
+
             if (StringUtils.isNotEmpty(factoryClassName))
             {
+
                 factory = (TransformerFactory) ClassUtils.instanciateClass(factoryClassName,
                         ClassUtils.NO_ARGS, this.getClass());
             }

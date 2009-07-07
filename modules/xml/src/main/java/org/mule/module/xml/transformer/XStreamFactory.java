@@ -19,8 +19,8 @@ import com.thoughtworks.xstream.converters.collections.MapConverter;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.mapper.Mapper;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +46,7 @@ public class XStreamFactory
         this(XSTREAM_XPP_DRIVER, null, null);
     }
 
-    public XStreamFactory(String driverClassName, Map<String, Class> aliases, List<Class> converters)
+    public XStreamFactory(String driverClassName, Map<String, Class> aliases, Set<Class <? extends Converter>> converters)
         throws ClassNotFoundException, InstantiationException, IllegalAccessException
     {
         Class driverClass = ClassUtils.loadClass(driverClassName, this.getClass());
@@ -72,7 +72,7 @@ public class XStreamFactory
         }
     }
 
-    private void registerConverters(List<Class> converters) throws InstantiationException, IllegalAccessException
+    private void registerConverters(Set<Class <? extends Converter>> converters) throws InstantiationException, IllegalAccessException
     {
         if (converters != null)
         {
