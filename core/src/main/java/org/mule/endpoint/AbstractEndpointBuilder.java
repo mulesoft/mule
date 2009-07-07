@@ -534,7 +534,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     public void setConnector(Connector connector)
     {
-        connector.setMuleContext(muleContext);
         this.connector = connector;
     }
 
