@@ -59,8 +59,6 @@ public class XmlToObject extends AbstractXStreamTransformer
             {
                 Reader xml = new InputStreamReader(new ByteArrayInputStream((byte[]) src), outputEncoding);
                 result = getXStream().fromXML(xml);
-
-
             }
             catch (UnsupportedEncodingException e)
             {
@@ -119,7 +117,7 @@ public class XmlToObject extends AbstractXStreamTransformer
             {
                 final Method m = object.getClass().getDeclaredMethod("initAfterDeserialisation", MuleContext.class);
 
-                Object o = AccessController.doPrivileged(new PrivilegedAction()
+                Object o = AccessController.doPrivileged(new PrivilegedAction<Object>()
                 {
                     public Object run()
                     {

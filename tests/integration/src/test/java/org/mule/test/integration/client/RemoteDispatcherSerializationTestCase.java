@@ -26,24 +26,32 @@ public class RemoteDispatcherSerializationTestCase extends AbstractMuleTestCase
 {
     protected RemoteDispatcherNotification getNotification()
     {
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("key1", "value1");
+        
         Apple apple = new Apple();
         apple.wash();
-        RemoteDispatcherNotification n = new RemoteDispatcherNotification(new DefaultMuleMessage(apple, props, muleContext), RemoteDispatcherNotification.ACTION_SEND, "vm://foo");
-        n.setProperty("foo", "bar");
-        return n;
+        
+        MuleMessage message = new DefaultMuleMessage(apple, props, muleContext);
+        RemoteDispatcherNotification notification = new RemoteDispatcherNotification(message,
+            RemoteDispatcherNotification.ACTION_SEND, "vm://foo");
+        notification.setProperty("foo", "bar");
+        return notification;
     }
+    
     public void testNotificationJavaSerialization() throws Exception
     {
         doTestNotificationSerialization(new SerializationWireFormat());
     }
 
+    // TODO MULE-3118
 //    public void testNotificationXmlSerialization() throws Exception
 //    {
-//        XStreamWireFormat wf = new XStreamWireFormat();
-//        wf.setTransferObjectClass(RemoteDispatcherNotification.class);
-//        doTestNotificationSerialization(wf);
+//        XStreamWireFormat wireFormat = new XStreamWireFormat();
+//        wireFormat.setMuleContext(muleContext);
+//        wireFormat.setTransferObjectClass(RemoteDispatcherNotification.class);
+//        
+//        doTestNotificationSerialization(wireFormat);
 //    }
 
     public void doTestNotificationSerialization(WireFormat wf) throws Exception
@@ -51,7 +59,6 @@ public class RemoteDispatcherSerializationTestCase extends AbstractMuleTestCase
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         wf.write(baos, getNotification(), "UTF-8");
 
-        System.out.println(new String(baos.toByteArray()));
         Object result = wf.read(new ByteArrayInputStream(baos.toByteArray()));
 
         assertNotNull(result);

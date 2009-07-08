@@ -32,7 +32,6 @@ public class ActiveMQMessageAdapterSerializationTestCase extends AbstractMessage
         jmsMessage.setText(PAYLOAD);
         jmsMessage.setStringProperty(KEY, VALUE);
         
-        
         MessageAdapter messageAdapter = new JmsMessageAdapter(jmsMessage);
         messageAdapter.setProperty(STRING_PROPERTY_KEY, STRING_PROPERTY_VALUE);
         

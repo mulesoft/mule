@@ -61,7 +61,7 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
                 {
                     final Method m = result.getClass().getDeclaredMethod("initAfterDeserialisation", MuleContext.class);
 
-                    Object o = AccessController.doPrivileged(new PrivilegedAction()
+                    Object o = AccessController.doPrivileged(new PrivilegedAction<Object>()
                     {
                         public Object run()
                         {
@@ -78,9 +78,9 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
 
                         }
                     });
-                    if(o!=null)
+                    if (o != null)
                     {
-                        throw (Exception)o;
+                        throw (Exception) o;
                     }
 
                 }

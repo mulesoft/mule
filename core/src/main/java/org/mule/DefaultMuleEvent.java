@@ -98,7 +98,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     protected String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
 
-    private transient Map serializedData = null;
+    private transient Map<String, Object> serializedData = null;
 
     /**
      * Properties cache that only reads properties once from the inbound message and
@@ -605,9 +605,9 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         // write transformer names if necessary
         if (endpoint.getTransformers().size() > 0)
         {
-            for (Iterator transIterator = endpoint.getTransformers().iterator(); transIterator.hasNext();)
+            for (Transformer transformer : endpoint.getTransformers())
             {
-                out.writeObject(((Transformer) transIterator.next()).getName());
+                out.writeObject(transformer.getName());
             }
         }
     }
@@ -615,49 +615,51 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException, MuleException
     {
         in.defaultReadObject();
-        serializedData = new HashMap();
+        serializedData = new HashMap<String, Object>();
         serializedData.put("endpointHashcode", in.readInt());
         serializedData.put("isInboundEndpoint", in.readBoolean());
         serializedData.put("endpointBuilderName", in.readObject());
         serializedData.put("endpointUri", in.readObject());
         int count = in.readInt();
 
-        List<String> trans = new LinkedList<String>();
+        List<String> transformerNames = new LinkedList<String>();
         if (count > 0)
         {
             while (--count > 0)
             {
-                trans.add((String) in.readObject());
+                transformerNames.add((String) in.readObject());
             }
         }
-        serializedData.put("transformers", trans);
+        serializedData.put("transformers", transformerNames);
     }
 
     /**
-     * Invoked after deserialization. This is called when the marker interface {@link org.mule.util.store.DeserializationPostInitialisable}
-     * is used. This will get invoked after the object has been deserialized passing in the current mulecontext when using
-     * either {@link org.mule.transformer.wire.SerializationWireFormat}, {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat}, or
-     * the {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
+     * Invoked after deserialization. This is called when the marker interface 
+     * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked 
+     * after the object has been deserialized passing in the current MuleContext when using either 
+     * {@link org.mule.transformer.wire.SerializationWireFormat}, 
+     * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat} or the 
+     * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
      *
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "unchecked"})
     private void initAfterDeserialisation(MuleContext muleContext) throws MuleException
     {
-        if(session instanceof DefaultMuleSession)
+        if (session instanceof DefaultMuleSession)
         {
-            ((DefaultMuleSession)session).initAfterDeserialisation(muleContext);
+            ((DefaultMuleSession) session).initAfterDeserialisation(muleContext);
         }
-        if(message instanceof DefaultMuleMessage)
+        if (message instanceof DefaultMuleMessage)
         {
-            ((DefaultMuleMessage)message).initAfterDeserialisation(muleContext);
+            ((DefaultMuleMessage) message).initAfterDeserialisation(muleContext);
         }
         int endpointHashcode = (Integer) serializedData.get("endpointHashcode");
         boolean isInboundEndpoint = (Boolean) serializedData.get("isInboundEndpoint");
         String endpointBuilderName = (String) serializedData.get("endpointBuilderName");
         String endpointUri = (String) serializedData.get("endpointUri");
-        LinkedList<String> transformerNames = (LinkedList<String>) serializedData.get("transformers");
+        List<String> transformerNames = (List<String>) serializedData.get("transformers");
 
         // 1) First attempt to get same endpoint instance from registry using
         // hashcode, this will work if registry hasn't been disposed.
@@ -669,7 +671,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         {
             // 2) If endpoint references it's builder and this is available then use
             // the builder to recreate the endpoint
-            if (endpointBuilderName != null
+            if ((endpointBuilderName != null)
                     && muleContext.getRegistry().lookupEndpointBuilder(endpointBuilderName) != null)
             {
                 if (isInboundEndpoint)
@@ -689,7 +691,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                 List<Transformer> transformers = new LinkedList<Transformer>();
                 for (String name : transformerNames)
                 {
-
                     Transformer next = muleContext.getRegistry().lookupTransformer(name);
                     if (next == null)
                     {
@@ -717,7 +718,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                 }
             }
         }
-        serializedData.clear();
+        
         serializedData = null;
     }
 

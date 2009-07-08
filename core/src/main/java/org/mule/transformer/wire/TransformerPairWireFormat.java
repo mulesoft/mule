@@ -79,7 +79,6 @@ public class TransformerPairWireFormat implements WireFormat
 
     public void write(OutputStream out, Object o, String encoding) throws MuleException
     {
-
         if (outboundTransformer == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("outboundTransformer").getMessage());

@@ -777,7 +777,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     private void marshalMessageAdapterProperties(ObjectOutputStream out) throws IOException
     {
-        Set propertyNames = adapter.getPropertyNames();
+        Set<String> propertyNames = adapter.getPropertyNames();
         out.writeInt(propertyNames.size());
         for (Object property : propertyNames)
         {
@@ -790,7 +790,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private void marshalMessageAdapterAttachments(ObjectOutputStream out)
     {
         // TODO Auto-generated method stub
-        
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -861,10 +860,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     /**
-     * Invoked after deserialization. This is called when the marker interface {@link org.mule.util.store.DeserializationPostInitialisable}
-     * is used. This will get invoked after the object has been deserialized passing in the current mulecontext when using
-     * either {@link org.mule.transformer.wire.SerializationWireFormat}, {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat}, or
-     * the {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
+     * Invoked after deserialization. This is called when the marker interface 
+     * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked 
+     * after the object has been deserialized passing in the current mulecontext when using either 
+     * {@link org.mule.transformer.wire.SerializationWireFormat}, 
+     * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat} or the 
+     * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
      *
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing
@@ -873,4 +874,5 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         this.muleContext = muleContext;
     }
+
 }

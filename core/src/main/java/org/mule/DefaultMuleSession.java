@@ -77,7 +77,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
 
     private transient MuleContext muleContext;
 
-    private transient Map serializedData;
+    private transient Map<String, Object> serializedData = null;
 
     public DefaultMuleSession(Service service, MuleContext muleContext)
     {
@@ -551,17 +551,16 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     {
         out.defaultWriteObject();
         //Can be null if service call originates from MuleClient
-        if(getService()!=null)
+        if (getService() != null)
         {
             out.writeObject(getService().getName());
         }
-
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         in.defaultReadObject();
-        serializedData = new HashMap();
+        serializedData = new HashMap<String, Object>();
 
         try
         {
@@ -572,14 +571,15 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         {
             //ignore
         }
-
     }
 
     /**
-     * Invoked after deserialization. This is called when the marker interface {@link org.mule.util.store.DeserializationPostInitialisable}
-     * is used. This will get invoked after the object has been deserialized passing in the current mulecontext when using
-     * either {@link org.mule.transformer.wire.SerializationWireFormat}, {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat}, or
-     * the {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
+     * Invoked after deserialization. This is called when the marker interface 
+     * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked 
+     * after the object has been deserialized passing in the current mulecontext when using either 
+     * {@link org.mule.transformer.wire.SerializationWireFormat}, 
+     * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat}, or the 
+     * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
      *
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing
@@ -588,11 +588,11 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     {
         String serviceName = (String) serializedData.get("serviceName");
         //Can be null if service call originates from MuleClient
-        if(serviceName!=null)
+        if (serviceName != null)
         {
             service = muleContext.getRegistry().lookupService(serviceName);
         }
-        serializedData.clear();
         serializedData = null;
     }
+    
 }

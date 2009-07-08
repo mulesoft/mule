@@ -31,7 +31,6 @@ public class XStreamWireFormatTestCase extends AbstractMuleMessageWireFormatTest
     public void testGetDefaultInboundTransformer() throws Exception
     {
         assertEquals(XmlToObject.class, ((XStreamWireFormat) getWireFormat()).getInboundTransformer().getClass());
-
     }
 
     public void testGetDefaultOutboundTransformer() throws Exception
@@ -39,6 +38,7 @@ public class XStreamWireFormatTestCase extends AbstractMuleMessageWireFormatTest
         assertEquals(ObjectToXml.class, ((XStreamWireFormat) getWireFormat()).getOutboundTransformer().getClass());
     }
 
+    @Override
     public void testWriteReadPayload() throws Exception
     {
         // Create orange to send over the wire

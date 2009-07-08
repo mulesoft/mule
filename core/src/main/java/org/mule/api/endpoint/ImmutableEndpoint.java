@@ -15,6 +15,7 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 
 import java.io.Serializable;
@@ -86,14 +87,14 @@ public interface ImmutableEndpoint extends Serializable
      *
      * @return the transformers to use when receiving or sending data
      */
-    List getTransformers();
+    List<Transformer> getTransformers();
 
     /**
      * The transformers used when a response is returned from invoking this endpoint.
      * If an endpoint has no response transformers an empty list is returned.
      * @return the transformer to use when receiving the response data
      */
-    List getResponseTransformers();
+    List<Transformer> getResponseTransformers();
 
     /**
      * Returns any properties set on this endpoint
