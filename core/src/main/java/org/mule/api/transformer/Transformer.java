@@ -45,6 +45,14 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      */
     boolean isAcceptNull();
 
+    /**
+     * By default, Mule will throw an exception if a transformer is invoked with a source object that is not compatible
+     * with the transformer. Since transformers are often chained, it is useful to be able to ignore a transformer in the
+     * chain and move to the next one.
+     *
+     * @return true if the transformer can be ignorred if the currnet source type is not supported, false if an exception
+     * should be throw due to an incompatible source type being passed in.
+     */
     boolean isIgnoreBadInput();
 
     /**
@@ -78,7 +86,13 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      */
     void setReturnClass(Class theClass);
 
-    /** @return the exceptedreturn type */
+    /**
+     * Specifies the Java type of the result after this transformer has been executed. Mule will use this to validate
+     * the return type but also allow users to perform automatic transformations based on the source type of the object
+     * to transform and this return type.
+     *
+     * @return the excepted return type from this transformer
+     */
     Class getReturnClass();
 
 }
