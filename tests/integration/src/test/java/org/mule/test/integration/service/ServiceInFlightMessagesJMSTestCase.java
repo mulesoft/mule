@@ -29,7 +29,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesTestCase
 {
 
-    private final int timeout = getTimeoutSecs() * 1000 / 20;
+    private final int timeout = getTestTimeoutSecs() * 1000 / 20;
 
     protected String getConfigResources()
     {

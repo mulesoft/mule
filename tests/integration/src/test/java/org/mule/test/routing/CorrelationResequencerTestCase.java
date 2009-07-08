@@ -19,7 +19,7 @@ import java.util.Arrays;
 public class CorrelationResequencerTestCase extends FunctionalTestCase
 {
 
-    private int timeout = getTimeoutSecs() / 20 * 1000;
+    private int timeout = getTestTimeoutSecs() / 20 * 1000;
 
     protected String getConfigResources()
     {

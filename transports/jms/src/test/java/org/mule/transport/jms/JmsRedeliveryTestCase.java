@@ -25,7 +25,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class JmsRedeliveryTestCase extends FunctionalTestCase
 {
-    private final int timeout = getTimeoutSecs() * 1000 / 4;
+    private final int timeout = getTestTimeoutSecs() * 1000 / 4;
     private static final String DESTINATION = "jms://in";
 
     protected String getConfigResources()

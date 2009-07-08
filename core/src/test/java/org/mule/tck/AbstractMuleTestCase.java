@@ -53,9 +53,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -95,7 +97,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     // A Map of test case extension objects. JUnit creates a new TestCase instance for
     // every method, so we need to record metainfo outside the test.
-    private static final Map testInfos = Collections.synchronizedMap(new HashMap());
+    private static final Map<String, TestInfo> testInfos = Collections.synchronizedMap(new HashMap<String, TestInfo>());
 
     // A logger that should be suitable for most test cases.
     protected final transient Log logger = LogFactory.getLog(this.getClass());
@@ -154,25 +156,29 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     protected Latch callbackCalled;
 
     /**
+     * Timeout used for the test watchdog
+     */
+    private int testTimeoutSecs = DEFAULT_MULE_TEST_TIMEOUT_SECS;
+    
+    /**
      * When a test case depends on a 3rd-party resource such as a public web service,
      * it may be desirable to not fail the test upon timeout but rather to simply log 
      * a warning.
      */
     private boolean failOnTimeout = true;
 
-    private int timeoutSecs = DEFAULT_MULE_TEST_TIMEOUT_SECS;
-
     public AbstractMuleTestCase()
     {
         super();
 
-        TestInfo info = (TestInfo) testInfos.get(getClass().getName());
+        TestInfo info = getTestInfo();
         if (info == null)
         {
             info = this.createTestInfo();
             testInfos.put(getClass().getName(), info);
         }
-        this.registerTestMethod();
+        registerTestMethod();
+        initTestTimeoutSecs();
     }
 
     protected void registerTestMethod()
@@ -183,6 +189,30 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         }
     }
 
+    protected void initTestTimeoutSecs()
+    {
+        String timeoutString = System.getProperty(PROPERTY_MULE_TEST_TIMEOUT, null);
+        if (timeoutString == null)
+        {
+            // unix style: MULE_TEST_TIMEOUTSECS
+            String variableName = PROPERTY_MULE_TEST_TIMEOUT.toUpperCase().replace(".", "_");
+            timeoutString = System.getenv(variableName);
+        }
+        
+        if (timeoutString != null)
+        {
+            try
+            {
+                testTimeoutSecs = Integer.parseInt(timeoutString);
+            }
+            catch (NumberFormatException nfe)
+            {
+                // the default still applies
+            }
+        }
+    }
+
+    @Override
     public void setName(String name)
     {
         super.setName(name);
@@ -196,7 +226,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     protected TestInfo getTestInfo()
     {
-        return (TestInfo) testInfos.get(this.getClass().getName());
+        return testInfos.get(this.getClass().getName());
     }
 
     private void clearInfo()
@@ -204,6 +234,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         testInfos.remove(this.getClass().getName());
     }
 
+    @Override
     public String getName()
     {
         if (verbose && super.getName() != null)
@@ -213,6 +244,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return super.getName();
     }
 
+    @Override
     public void run(TestResult result)
     {
         if (this.isExcluded())
@@ -242,6 +274,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      * <p/>
      * Subclasses can override <code>isDisabledInThisEnvironment</code> to skip a single test.
      */
+    @Override
     public void runBare() throws Throwable
     {
         // getName will return the name of the method being run. Use the real JUnit implementation,
@@ -307,25 +340,15 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         getTestInfo().setDisposeManagerPerSuite(val);
     }
-
-    public int getTimeoutSecs()
+    
+    public int getTestTimeoutSecs()
     {
-        return timeoutSecs;
+        return testTimeoutSecs;
     }
 
     protected TestCaseWatchdog createWatchdog()
     {
-
-        try
-        {
-            timeoutSecs = Integer.parseInt(System.getProperty(PROPERTY_MULE_TEST_TIMEOUT, "" + DEFAULT_MULE_TEST_TIMEOUT_SECS));
-        }
-        catch (NumberFormatException e)
-        {
-            // if something went wrong
-            timeoutSecs = DEFAULT_MULE_TEST_TIMEOUT_SECS;
-        }
-        return new TestCaseWatchdog(timeoutSecs, TimeUnit.SECONDS, this);
+        return new TestCaseWatchdog(testTimeoutSecs, TimeUnit.SECONDS, this);
     }
 
     public void handleTimeout(long timeout, TimeUnit unit)
@@ -349,6 +372,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      *
      * @see #doSetUp()
      */
+    @Override
     protected final void setUp() throws Exception
     {
         // start a watchdog thread
@@ -403,7 +427,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         else
         {
             MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-            List builders = new ArrayList();
+            List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
             builders.add(new SimpleConfigurationBuilder(getStartUpProperties()));
             builders.add(getBuilder());
             MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
@@ -465,6 +489,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      *
      * @see #doTearDown()
      */
+    @Override
     protected final void tearDown() throws Exception
     {
         try
@@ -745,6 +770,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             return excluded;
         }
 
+        @Override
         public synchronized String toString()
         {
             StringBuffer buf = new StringBuffer();
@@ -806,6 +832,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      * @return an initialised instance of <code>class</code>
      * @throws Exception if there is a problem creating or initializing the object
      */
+    @SuppressWarnings("unchecked")
     protected <T extends Object> T createObject(Class<T> clazz, Object... args) throws Exception
     {
         if(args==null) args = ClassUtils.NO_ARGS;
@@ -825,4 +852,5 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
     }
+
 }

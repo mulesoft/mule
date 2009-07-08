@@ -19,7 +19,7 @@ public class VmXaTransactionsPersistentQueueTestCase extends FunctionalTestCase
 
     private static final String TEST_MESSAGE = "TEST_MESSAGE";
 
-    private final long timeout = getTimeoutSecs() * 1000 / 30;
+    private final long timeout = getTestTimeoutSecs() * 1000 / 30;
 
     protected String getConfigResources()
     {
