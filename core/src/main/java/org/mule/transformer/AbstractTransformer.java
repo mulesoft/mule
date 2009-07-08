@@ -31,6 +31,7 @@ import java.util.List;
 import javax.xml.transform.stream.StreamSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -185,7 +186,7 @@ public abstract class AbstractTransformer implements Transformer
 
         for (int i = 0; i < numTypes; i++)
         {
-            Class anotherClass = (Class) sourceTypes.get(i);
+            Class anotherClass = sourceTypes.get(i);
             if (exactMatch)
             {
                 if (anotherClass.equals(aClass))

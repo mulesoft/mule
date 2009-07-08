@@ -11,7 +11,6 @@
 package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.management.stats.RouterStatistics;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;

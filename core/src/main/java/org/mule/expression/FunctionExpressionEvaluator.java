@@ -122,11 +122,11 @@ public class FunctionExpressionEvaluator implements ExpressionEvaluator
         }
         else if (name.equalsIgnoreCase(PAYLOAD_CLASS_FUNCTION))
         {
-            return ((MuleMessage) message).getPayload().getClass().getName();
+            return message.getPayload().getClass().getName();
         }
         else if (name.equalsIgnoreCase(SHORT_PAYLOAD_CLASS_FUNCTION))
         {
-            return ClassUtils.getClassName(((MuleMessage) message).getPayload().getClass());
+            return ClassUtils.getClassName(message.getPayload().getClass());
         }
         else
         {

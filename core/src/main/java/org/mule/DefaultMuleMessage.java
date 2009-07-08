@@ -44,6 +44,7 @@ import java.util.Set;
 import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -868,7 +869,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing
      */
-    @SuppressWarnings("unused")
     void initAfterDeserialisation(MuleContext muleContext) throws MuleException
     {
         this.muleContext = muleContext;

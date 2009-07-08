@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
+
 import org.apache.commons.collections.IteratorUtils;
 
 /**
@@ -170,7 +171,7 @@ public class EventGroup implements Comparable, Serializable
                 return EMPTY_EVENTS_ARRAY;
             }
 
-            return (MuleEvent[]) events.toArray(EMPTY_EVENTS_ARRAY);
+            return events.toArray(EMPTY_EVENTS_ARRAY);
         }
     }
 

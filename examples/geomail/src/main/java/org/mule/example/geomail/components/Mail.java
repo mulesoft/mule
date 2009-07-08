@@ -24,15 +24,11 @@ import java.util.regex.Pattern;
 
 import javax.mail.Message;
 
-import org.apache.log4j.Logger;
-
 /**
  * TODO
  */
 public class Mail implements Callable
 {
-
-    private static final Logger log = Logger.getLogger(Mail.class.getName());
 
     public Object onCall(MuleEventContext eventContext) throws Exception {
 

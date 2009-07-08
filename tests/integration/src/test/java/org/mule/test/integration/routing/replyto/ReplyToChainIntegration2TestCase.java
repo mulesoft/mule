@@ -11,12 +11,8 @@
 package org.mule.test.integration.routing.replyto;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ReplyToChainIntegration2TestCase extends FunctionalTestCase
 {

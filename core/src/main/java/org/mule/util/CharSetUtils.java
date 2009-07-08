@@ -29,7 +29,7 @@ public class CharSetUtils extends org.apache.commons.lang.CharSetUtils
             {
                 Class target = Charset.class;
                 Method defaultCharset = target.getMethod("defaultCharset", ArrayUtils.EMPTY_CLASS_ARRAY);
-                Charset cs = (Charset) defaultCharset.invoke(target, (Class[]) null);
+                Charset cs = (Charset) defaultCharset.invoke(target, (Object[]) null);
                 return cs.name();
             }
         }

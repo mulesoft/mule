@@ -72,7 +72,7 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference message = new AtomicReference();
         EventCallback callback = newCallback(latch, message);
-        ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, TEST_MESSAGE.length());
+        ftc.setEventCallback(callback, TEST_MESSAGE.length());
 
         // send out to FTP server via streaming model
         client.dispatch("tcp://localhost:60196", TEST_MESSAGE, new HashMap());
@@ -89,7 +89,7 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
         CountDownLatch latch2 = new CountDownLatch(1);
         AtomicReference message2 = new AtomicReference();
         EventCallback callback2 = newCallback(latch2, message2);
-        ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback2, TEST_MESSAGE_2.length());
+        ftc.setEventCallback(callback2, TEST_MESSAGE_2.length());
 
         client.dispatch("tcp://localhost:60196", TEST_MESSAGE_2, new HashMap());
 

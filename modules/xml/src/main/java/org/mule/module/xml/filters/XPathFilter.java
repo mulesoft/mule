@@ -101,7 +101,7 @@ public class XPathFilter extends AbstractJaxpFilter
         {
             try
             {
-                namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
+                namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
             }
             catch (RegistrationException e)
             {

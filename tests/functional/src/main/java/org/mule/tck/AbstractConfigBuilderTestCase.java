@@ -166,8 +166,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(filter2);
         assertTrue(filter2 instanceof AndFilter);
         assertEquals(2,  ((AndFilter) filter2).getFilters().size());
-        Filter left = (Filter) ((AndFilter) filter2).getFilters().get(0);
-        Filter right = (Filter) ((AndFilter) filter2).getFilters().get(1);
+        Filter left = ((AndFilter) filter2).getFilters().get(0);
+        Filter right = ((AndFilter) filter2).getFilters().get(1);
         assertNotNull(left);
         assertTrue(left instanceof RegExFilter);
         assertEquals("the quick brown (.*)", ((RegExFilter) left).getPattern());

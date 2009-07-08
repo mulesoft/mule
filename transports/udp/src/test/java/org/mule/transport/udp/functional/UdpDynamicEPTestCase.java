@@ -11,7 +11,6 @@
 package org.mule.transport.udp.functional;
 
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.AbstractConnector;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

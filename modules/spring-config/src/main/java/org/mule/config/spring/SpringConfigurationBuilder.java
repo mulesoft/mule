@@ -12,7 +12,6 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
-import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.registry.Registry;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.i18n.MessageFactory;

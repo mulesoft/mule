@@ -12,7 +12,6 @@ package org.mule.api.routing;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.OutboundEndpoint;
 
 /**
  * <code>RouterCatchAllStrategy</code> is a strategy interface that allows developers to hook in custom code when

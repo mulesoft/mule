@@ -126,7 +126,7 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
 
         try
         {
-            namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
+            namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
 
             if (namespaceManager != null)
             {

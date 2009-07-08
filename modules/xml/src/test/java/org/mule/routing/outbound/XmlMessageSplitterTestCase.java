@@ -247,7 +247,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         asyncXmlSplitter.setNamespaces(null);
 
         // configure a global namespace manager
-        NamespaceManager namespaceManager = (NamespaceManager) muleContext.getRegistry().lookupObject(NamespaceManager.class);
+        NamespaceManager namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
         if (namespaceManager == null)
         {
             namespaceManager = new NamespaceManager();

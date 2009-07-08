@@ -10,17 +10,6 @@
 
 package org.mule.test.usecases.routing;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.RoutingException;
-import org.mule.api.routing.ServiceRoutingException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 
 public class InboundTransformingForwardingCatchAllStrategy extends ForwardingCatchAllStrategy

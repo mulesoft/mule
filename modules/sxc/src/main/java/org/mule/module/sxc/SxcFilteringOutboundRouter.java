@@ -62,7 +62,7 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         this.muleContext = context;
         try
         {
-            namespaceManager = (NamespaceManager)muleContext.getRegistry().lookupObject(NamespaceManager.class);
+            namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
         }
         catch (RegistrationException e)
         {

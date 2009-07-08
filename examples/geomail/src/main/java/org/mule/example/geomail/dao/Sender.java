@@ -11,7 +11,6 @@ package org.mule.example.geomail.dao;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 
 @Entity
 public class Sender {

@@ -59,8 +59,8 @@ public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
     {
         try
         {
-            String expectedString = this.normalizeString((String) expected);
-            String resultString = this.normalizeString((String) result);
+            String expectedString = this.normalizeString(expected);
+            String resultString = this.normalizeString(result);
             return XMLUnit.compareXML(expectedString, resultString).similar();
         }
         catch (Exception ex)

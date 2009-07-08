@@ -9,7 +9,6 @@
  */
 package org.mule.transport.servlet.events;
 
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.context.notification.CustomNotification;
 

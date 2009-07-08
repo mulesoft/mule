@@ -9,19 +9,15 @@
  */
 package org.mule.example.geomail.routing;
 
-import org.mule.api.routing.filter.Filter;
 import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
 import org.mule.example.geomail.dao.SenderDao;
-
-import org.apache.log4j.Logger;
 
 /**
  * TODO
  */
 public class InCacheFilter implements Filter
 {
-
-    private static final Logger log = Logger.getLogger(InCacheFilter.class.getName());
 
     private SenderDao senderDao = null;
 

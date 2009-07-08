@@ -17,8 +17,6 @@ import org.mule.transport.http.HttpMessageReceiver;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.util.StringUtils;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;

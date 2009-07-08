@@ -13,7 +13,6 @@ package org.mule.routing.filters.logic;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**

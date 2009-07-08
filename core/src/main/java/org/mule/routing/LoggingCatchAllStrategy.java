@@ -13,7 +13,6 @@ package org.mule.routing;
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 
 import org.apache.commons.logging.Log;

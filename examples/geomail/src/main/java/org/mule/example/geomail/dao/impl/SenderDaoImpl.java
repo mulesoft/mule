@@ -9,13 +9,13 @@
  */
 package org.mule.example.geomail.dao.impl;
 
-import org.mule.example.geomail.dao.SenderDao;
 import org.mule.example.geomail.dao.Sender;
+import org.mule.example.geomail.dao.SenderDao;
+
+import java.util.Collection;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import java.util.Collection;
 
 import org.springframework.transaction.annotation.Transactional;
 

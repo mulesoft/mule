@@ -10,11 +10,9 @@
 package org.mule.example.notifications;
 
 import org.mule.AbstractAgent;
-import org.mule.context.notification.CustomNotification;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.MuleException;
-import org.mule.api.MuleContext;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;

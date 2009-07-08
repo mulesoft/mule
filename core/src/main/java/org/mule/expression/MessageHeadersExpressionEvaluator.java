@@ -14,7 +14,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.filters.WildcardFilter;
 
 import java.util.HashMap;
 import java.util.Iterator;

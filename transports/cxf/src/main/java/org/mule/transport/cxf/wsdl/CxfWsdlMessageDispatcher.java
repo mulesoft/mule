@@ -99,5 +99,5 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
                 throw ex;
             }
         }
-    };
+    }
 }

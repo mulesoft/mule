@@ -176,7 +176,7 @@ public class ClientWrapper
     {
         if (value == null) return def;
         
-        return BooleanUtils.toBoolean((String)value);
+        return BooleanUtils.toBoolean(value);
     }
 
     @SuppressWarnings("unchecked")

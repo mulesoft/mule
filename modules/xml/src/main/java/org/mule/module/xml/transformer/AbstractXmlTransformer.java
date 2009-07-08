@@ -12,7 +12,6 @@ package org.mule.module.xml.transformer;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
 import java.io.InputStream;

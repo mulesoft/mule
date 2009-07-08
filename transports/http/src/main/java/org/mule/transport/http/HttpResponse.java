@@ -285,7 +285,7 @@ public class HttpResponse
         }
         else 
         {
-            setBody((OutputHandler) msg.getPayload(OutputHandler.class));
+            setBody(msg.getPayload(OutputHandler.class));
         }
     }
     

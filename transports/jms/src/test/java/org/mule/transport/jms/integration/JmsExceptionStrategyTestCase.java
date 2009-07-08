@@ -52,7 +52,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         // since the FTC threw an exception.
         assertEquals(DEFAULT_INPUT_MESSAGE, ((ExceptionMessage) payload).getPayload());
 
-        String dest = (String) output.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
+        String dest = output.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
         assertNotNull(dest);
         assertEquals(getJmsConfig().getDeadLetterEndpoint(), dest);
     }

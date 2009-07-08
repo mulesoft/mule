@@ -10,6 +10,9 @@
 
 package org.mule.transport.cxf.transport;
 
+import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
@@ -21,7 +24,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.MuleRegistry;
@@ -59,7 +61,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
-import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -314,7 +315,7 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             // Sometimes there may not actually be a body, in which case
             // we want to act appropriately. E.g. one way invocations over a proxy
-            InputStream is = (InputStream) result.getPayload(InputStream.class);
+            InputStream is = result.getPayload(InputStream.class);
             PushbackInputStream pb = new PushbackInputStream(is);
             result.setPayload(pb);
             

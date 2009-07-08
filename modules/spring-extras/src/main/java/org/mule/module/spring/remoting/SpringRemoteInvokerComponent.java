@@ -77,7 +77,7 @@ public class SpringRemoteInvokerComponent implements Initialisable, Callable
             Object service = null;
             try
             {
-                service = ClassUtils.instanciateClass(serviceClass, null);
+                service = ClassUtils.instanciateClass(serviceClass, (Object[]) null);
             }
             catch (Exception e)
             {

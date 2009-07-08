@@ -9,15 +9,12 @@
  */
 package org.mule.example.notifications;
 
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.MuleContext;
+import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.context.notification.CustomNotification;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
-import javax.servlet.ServletContext;
 
 /**
  * A simple notification that fires repeatedly to notify tha the Mule server is alive and well.

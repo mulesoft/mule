@@ -10,11 +10,10 @@
 
 package org.mule.routing;
 
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.RouterCatchAllStrategy;
-import org.mule.api.routing.RoutingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.routing.RouterCatchAllStrategy;
+import org.mule.api.routing.RoutingException;
 import org.mule.management.stats.RouterStatistics;
 
 import org.apache.commons.logging.Log;

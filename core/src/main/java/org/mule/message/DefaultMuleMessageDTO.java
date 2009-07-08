@@ -10,13 +10,10 @@
 package org.mule.message;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.DefaultMuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.DefaultMessageAdapter;
-import org.mule.util.MapUtils;
 
-import java.io.Serializable;
 import java.util.Iterator;
 
 /**

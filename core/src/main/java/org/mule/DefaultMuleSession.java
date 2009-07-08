@@ -584,7 +584,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing
      */
-    @SuppressWarnings("unused")
     void initAfterDeserialisation(MuleContext muleContext) throws MuleException
     {
         String serviceName = (String) serializedData.get("serviceName");

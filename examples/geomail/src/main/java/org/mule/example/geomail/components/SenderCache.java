@@ -9,10 +9,8 @@
  */
 package org.mule.example.geomail.components;
 
-import org.mule.example.geomail.dao.SenderDao;
 import org.mule.example.geomail.dao.Sender;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.MuleEventContext;
+import org.mule.example.geomail.dao.SenderDao;
 
 /**
  * TODO
