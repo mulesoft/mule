@@ -11,11 +11,12 @@ package org.mule.module.guice;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.NamedObject;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.registry.RegistrationException;
 import org.mule.endpoint.DefaultEndpointFactory;
-import org.mule.util.ClassUtils;
+import org.mule.module.guice.i18n.GuiceMessages;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
@@ -58,7 +59,7 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
         {
             public <I> void hear(TypeLiteral<I> iTypeLiteral, TypeEncounter<I> iTypeEncounter)
             {
-                iTypeEncounter.register(new MuleRegistryInjectionLister(muleContext));
+                iTypeEncounter.register(new MuleRegistryInjectionLister());
             }
         });
         bind(MuleContext.class).toInstance(muleContext);
@@ -66,59 +67,6 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
     }
 
     protected abstract void doConfigure();
-
-    /**
-     * Create an object of instance <code>clazz</code>. It will then register the object with the registry so that any
-     * dependencies are injected and then the object will be initialised.
-     * Note that if the object needs to be configured with additional state that cannot be passed into the constructor you should
-     * create an instance first set any additional data on the object then call {@link #initialiseObject(Object)}.
-     *
-     * @param clazz the class to create an instance of.
-     * @param <T>   Object of this type will be returned
-     * @return an initialised instance of <code>class</code>
-     * @throws Exception if there is a problem creating or initializing the object
-     */
-    protected <T extends Object> T createObject(Class<T> clazz) throws Exception
-    {
-        return createObject(clazz, ClassUtils.NO_ARGS);
-    }
-
-    /**
-     * Create an object of instance <code>clazz</code>. It will then register the object with the registry so that any
-     * dependencies are injected and then the object will be initialised.
-     * Note that if the object needs to be configured with additional state that cannot be passed into the constructor you should
-     * create an instance first set any additional data on the object then call {@link #initialiseObject(Object)}.
-     *
-     * @param clazz the class to create an instance of.
-     * @param args  constructor parameters
-     * @param <T>   Object of this type will be returned
-     * @return an initialised instance of <code>class</code>
-     * @throws Exception if there is a problem creating or initializing the object
-     */
-    protected <T extends Object> T createObject(Class<T> clazz, Object... args) throws Exception
-    {
-        if (args == null)
-        {
-            args = ClassUtils.NO_ARGS;
-        }
-        Object o = ClassUtils.instanciateClass(clazz, args);
-        muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
-        return (T) o;
-    }
-
-    /**
-     * A convenience method that will register an object in the registry using its hashcode as the key.  This will cause the object
-     * to have any objects injected and lifecycle methods called.  Note that the object lifecycle will be called to the same current
-     * lifecycle as the MuleContext
-     *
-     * @param o the object to register and initialise it
-     * @throws org.mule.api.registry.RegistrationException
-     *
-     */
-    protected void initialiseObject(Object o) throws RegistrationException
-    {
-        muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
-    }
 
     /**
      * Creates an {@link org.mule.api.endpoint.EndpointBuilder} instance for the endpoint uri.  The builder can be used to add
@@ -136,31 +84,48 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
         return endpointFactory.getEndpointBuilder(uri);
     }
 
+    /**
+     * A convenience method that will register an object in the registry using its hashcode as the key.  This will cause the object
+     * to have any objects injected and lifecycle methods called.  Note that the object lifecycle will be called to the same current
+     * lifecycle as the MuleContext
+     *
+     * @param o the object to register and initialise it
+     * @throws org.mule.api.registry.RegistrationException
+     *
+     */
+    protected void initialiseObject(Object o) throws RegistrationException
+    {
+        if (o instanceof NamedObject)
+        {
+            muleContext.getRegistry().registerObject(((NamedObject) o).getName(), o);
+        }
+        else
+        {
+            muleContext.getRegistry().registerObject(String.valueOf(o.getClass().getSimpleName() + "#" + o.hashCode()), o);
+        }
+    }
+
+    /**
+     * Used to register any objects created by Guice with the Mule registry, which means all lifecycle, callbacks and
+     * annotations will be honoured.
+     */
     private class MuleRegistryInjectionLister implements InjectionListener
     {
-        private MuleContext muleContext;
-
-        public MuleRegistryInjectionLister(MuleContext muleContext)
-        {
-            this.muleContext = muleContext;
-        }
-
         public void afterInjection(Object o)
         {
+            //We don't need or want to register this object again.
+            //Guice doesn't create it, but we bind it in the injector
+            if (o instanceof MuleContext)
+            {
+                return;
+            }
             try
             {
-                if (o instanceof NamedObject)
-                {
-                    muleContext.getRegistry().registerObject(((NamedObject) o).getName(), o);
-                }
-                else
-                {
-                    muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
-                }
+                initialiseObject(o);
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                throw new MuleRuntimeException(GuiceMessages.failedToRegisterOBjectWithMule(o.getClass()));
             }
         }
     }
