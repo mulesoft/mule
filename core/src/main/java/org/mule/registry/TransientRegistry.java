@@ -115,7 +115,6 @@ public class TransientRegistry extends AbstractRegistry
         for (Iterator iterator = objects.values().iterator(); iterator.hasNext();)
         {
             Object o = iterator.next();
-            // Is synchronization necessary here?  I don't think so
             Collection processors = lookupObjects(ObjectProcessor.class);
             for (Iterator iterator2 = processors.iterator(); iterator2.hasNext();)
             {
@@ -163,12 +162,10 @@ public class TransientRegistry extends AbstractRegistry
         // it is initialised, we end up triggering object creation.  that causes circular dependencies because
         // this may have originally been called while creating objects in spring...  so we prevent that by
         // only doing the full lookup once everything is stable.  ac.
-        Collection processors = lookupObjects(ObjectProcessor.class);
-        // Is synchronization necessary here?  I don't think so
-        for (Iterator iterator = processors.iterator(); iterator.hasNext();)
+        Collection<ObjectProcessor> processors = lookupObjects(ObjectProcessor.class);
+        for (ObjectProcessor processor : processors)
         {
-            ObjectProcessor o = (ObjectProcessor) iterator.next();
-            theObject = o.process(theObject);
+            theObject = processor.process(theObject);
         }
         return theObject;
     }
