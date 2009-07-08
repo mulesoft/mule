@@ -24,6 +24,21 @@ public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
 {
     protected ExpressionConfig config = new ExpressionConfig();
 
+    public ExpressionMessageSplitter()
+    {
+        //default
+    }
+
+    public ExpressionMessageSplitter(ExpressionConfig config)
+    {
+        this.config = config;
+        //Switch to XPath node since we want the Dom nodes not the value of the node
+        if(this.config.getEvaluator().equals("xpath"))
+        {
+            this.config.setEvaluator("xpath-node");
+        }
+    }
+
     public String getCustomEvaluator()
     {
         return config.getCustomEvaluator();
