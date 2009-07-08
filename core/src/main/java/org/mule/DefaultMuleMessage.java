@@ -44,7 +44,6 @@ import java.util.Set;
 import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -598,7 +597,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     /** {@inheritDoc} */
-    public void applyTransformers(List<Transformer> transformers) throws TransformerException
+    public void applyTransformers(List<? extends Transformer> transformers) throws TransformerException
     {
         applyTransformers(transformers, null);
     }
@@ -609,7 +608,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         applyTransformers(Arrays.asList(transformers), null);
     }
 
-    public void applyTransformers(List<Transformer> transformers, Class outputType) throws TransformerException
+    public void applyTransformers(List<? extends Transformer> transformers, Class outputType) throws TransformerException
     {
         if (!transformers.isEmpty() && !appliedTransformerHashCodes.contains(transformers.hashCode()))
         {
