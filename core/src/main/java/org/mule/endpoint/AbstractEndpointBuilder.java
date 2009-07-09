@@ -551,6 +551,15 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         this.transformers = transformers;
     }
 
+    public void addResponseTransformer(Transformer transformer)
+    {
+        if (responseTransformers == null)
+        {
+            responseTransformers = new LinkedList<Transformer>();
+        }
+        responseTransformers.add(transformer);
+    }
+
     public void setResponseTransformers(List<Transformer> transformers)
     {
         this.responseTransformers = transformers;
