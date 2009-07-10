@@ -11,6 +11,7 @@
 package org.mule.transport.rmi;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -55,11 +56,14 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
         this.connector = (RmiConnector) connector;
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     protected void doConnect() throws Exception
     {
         System.setProperty("java.security.policy", connector.getSecurityPolicy());
@@ -68,11 +72,11 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
         if (System.getSecurityManager() == null)
         {
             System.setSecurityManager(new RMISecurityManager());
-        }
+        }        
 
+        // Get methodName
         String methodName = MapUtils.getString(endpoint.getEndpointURI().getParams(),
                 MuleProperties.MULE_METHOD_PROPERTY, null);
-
         if (null == methodName)
         {
             methodName = (String) endpoint.getProperty(MuleProperties.MULE_METHOD_PROPERTY);
@@ -83,12 +87,12 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
             }
         }
 
+        // Get remoteObject
         remoteObject = connector.getRemoteObject(getEndpoint());
 
-        List args = (List) endpoint.getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAMS_LIST);
-
+        // Set methodArguments
+        List<Object> args = (List<Object>) endpoint.getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAMS_LIST);
         Class[] argTypes = new Class[]{};
-
         if (args == null)
         {
             logger.info(RmiConnector.PROPERTY_SERVICE_METHOD_PARAMS_LIST
@@ -97,13 +101,16 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
         }
         else
         {
-            argTypes = ClassUtils.getClassTypes(methodArguments);
+        	argTypes = connector.getArgTypes(endpoint.getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES), RequestContext.getEvent());
             methodArguments = new Object[args.size()];
             methodArguments = args.toArray(methodArguments);
         }
+        
+        // Set invokeMethod
         invokeMethod = remoteObject.getClass().getMethod(methodName, argTypes);
     }
 
+    @Override
     protected void doDisconnect()
     {
         invokeMethod = null;

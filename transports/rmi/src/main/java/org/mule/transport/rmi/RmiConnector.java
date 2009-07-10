@@ -18,6 +18,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
@@ -127,17 +128,11 @@ public class RmiConnector extends AbstractJndiConnector
         return RMI;
     }
 
-    /**
-     * @return Returns the securityPolicy.
-     */
     public String getSecurityPolicy()
     {
         return securityPolicy;
     }
 
-    /**
-     * @param path The securityPolicy to set.
-     */
     public void setSecurityPolicy(String path)
     {
         // verify securityPolicy existence
@@ -183,6 +178,7 @@ public class RmiConnector extends AbstractJndiConnector
         this.securityManager = securityManager;
     }
 
+    @Override
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         final Object[] args = new Object[]{new Long(pollingFrequency)};
@@ -203,7 +199,6 @@ public class RmiConnector extends AbstractJndiConnector
         throws MuleException, NoSuchMethodException, ClassNotFoundException
     {
         EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-
         String methodName = MapUtils.getString(endpointUri.getParams(), MuleProperties.MULE_METHOD_PROPERTY,
             null);
 
@@ -219,24 +214,7 @@ public class RmiConnector extends AbstractJndiConnector
             }
         }
 
-        Class[] argTypes;
-
-        // Parse method args
-        Object args = event.getMessage().getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
-        if (args instanceof List)
-        {
-            // MULE-1794 this used to take the first list entry as a string, splitting it
-            // as for String below.
-            argTypes = stringsToClasses((List) args);
-        }
-        else if (args instanceof String)
-        {
-            argTypes = stringsToClasses(Arrays.asList(((String) args).split(",")));
-        }
-        else
-        {
-            argTypes = ClassUtils.getClassTypes(event.transformMessage());
-        }
+        Class[] argTypes = getArgTypes(event.getMessage().getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES), event);
 
         try
         {
@@ -325,4 +303,26 @@ public class RmiConnector extends AbstractJndiConnector
         this.pollingFrequency = pollingFrequency;
     }
 
+    protected Class[] getArgTypes(Object args, MuleEvent fromEvent) 
+        throws ClassNotFoundException, TransformerException
+    {
+    	Class[] argTypes = null;
+    	
+        if (args instanceof List)
+        {
+            // MULE-1794 this used to take the first list entry as a string, splitting it
+            // as for String below.
+            argTypes = stringsToClasses((List) args);
+        }
+        else if (args instanceof String)
+        {
+            argTypes = stringsToClasses(Arrays.asList(((String) args).split(",")));
+        }
+        else
+        {
+            argTypes = ClassUtils.getClassTypes(fromEvent.transformMessage());
+        }
+    	
+        return argTypes;
+    }
 }
