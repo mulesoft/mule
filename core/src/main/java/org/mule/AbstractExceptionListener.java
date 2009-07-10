@@ -29,7 +29,6 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
@@ -41,6 +40,7 @@ import org.mule.transport.NullPayload;
 import org.mule.util.CollectionUtils;
 
 import java.beans.ExceptionListener;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -292,8 +292,16 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                 {
                     endpointUri = failedEndpoint.getEndpointURI();
                 }
-                ExceptionMessage msg;
-                msg = new ExceptionMessage(getErrorMessagePayload(message), t, component, endpointUri);
+                Object payload;
+                if (message.getPayload() instanceof Serializable)
+                {
+                    payload = message.getPayload(); 
+                }
+                else
+                {
+                    payload = message.getPayloadAsString();
+                }
+                ExceptionMessage msg = new ExceptionMessage(payload, t, component, endpointUri);
 
                 MuleMessage exceptionMessage;
                 if (ctx == null)
@@ -319,7 +327,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                     }
                 }
             }
-            catch (MuleException e)
+            catch (Exception e)
             {
                 logFatal(message, e);
                 closeStream(message);
@@ -343,19 +351,6 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         {
             ((StreamCloserService) muleContext.getRegistry().lookupObject(
                     MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).closeStream(message.getPayload());
-        }
-    }
-
-    protected Object getErrorMessagePayload(MuleMessage message)
-    {
-        try
-        {
-            return message.getPayload(String.class);
-        }
-        catch (TransformerException e)
-        {
-            logger.info("Failed to read message payload as string, using raw payload");
-            return message.getPayload();
         }
     }
 

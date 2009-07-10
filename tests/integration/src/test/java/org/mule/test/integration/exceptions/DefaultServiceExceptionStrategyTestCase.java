@@ -19,6 +19,9 @@ import org.mule.service.DefaultServiceExceptionStrategy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
 {
 
@@ -57,6 +60,23 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         assertExceptionMessage(out3);
         assertNotSame(out2, out3);
         assertEquals(out2.getPayload(), out3.getPayload());
+    }
+
+    public void testSerializablePayload() throws MuleException
+    {
+        Map map = new HashMap();
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+        
+        MuleClient mc = new MuleClient();
+        mc.dispatch("vm://in1", map, null);
+        MuleMessage message = mc.request("vm://out1", FunctionalTestCase.RECEIVE_TIMEOUT);
+
+        assertTrue(message.getPayload() instanceof ExceptionMessage);
+        Object payload = ((ExceptionMessage) message.getPayload()).getPayload();
+        assertTrue("payload shoud be a HashMap, but is " + payload.getClass().getName(), payload instanceof Map);
+        assertEquals("value1", ((Map) payload).get("key1"));
+        assertEquals("value2", ((Map) payload).get("key2"));
     }
 
     private void assertExceptionMessage(MuleMessage out)
