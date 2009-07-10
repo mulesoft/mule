@@ -89,7 +89,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
     public void testMultiValueParam() 
     {
         // Test from uri string
-        URIBuilder uri = new URIBuilder("test://bar?aname=avalue&aname=bvalue&aname=cvalue");
+        URIBuilder uri = new URIBuilder("test://bar?aname=avalue&aname=bvalue&aname=cvalue", muleContext);
         EndpointURI endpointURI = uri.getEndpoint();
         assertEquals("test://bar?aname=avalue&aname=bvalue&aname=cvalue", endpointURI.getUri().toString());
 
@@ -98,7 +98,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
         tq.put("aname", "zvalue");
         tq.put("dname", "dvalue");
 
-        uri = new URIBuilder("test://bar?aname=avalue&aname=bvalue&aname=cvalue");
+        uri = new URIBuilder("test://bar?aname=avalue&aname=bvalue&aname=cvalue", muleContext);
         uri.setQueryMap(tq);
         endpointURI = uri.getEndpoint();
         assertEquals("test://bar?aname=zvalue&aname=bvalue&aname=cvalue&dname=dvalue", endpointURI.getUri().toString());
