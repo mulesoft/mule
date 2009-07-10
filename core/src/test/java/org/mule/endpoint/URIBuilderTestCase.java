@@ -19,11 +19,11 @@ import java.util.Map;
 public class URIBuilderTestCase extends AbstractMuleTestCase
 {
 
-    private static final Map queries;
+    private static final Map<String, String> queries;
 
     static
     {
-        queries = new HashMap();
+        queries = new HashMap<String, String>();
         queries.put("aname", "avalue");
         queries.put("bname", "bvalue");
     }
@@ -86,4 +86,22 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
         assertEquals("meta", endpointURI.getSchemeMetaInfo());
     }
 
+    public void testMultiValueParam() 
+    {
+        // Test from uri string
+        URIBuilder uri = new URIBuilder("test://bar?aname=avalue&aname=bvalue&aname=cvalue");
+        EndpointURI endpointURI = uri.getEndpoint();
+        assertEquals("test://bar?aname=avalue&aname=bvalue&aname=cvalue", endpointURI.getUri().toString());
+
+        // Test modifying values with a map (only first should change)
+        Map<String, String> tq = new HashMap<String, String>();
+        tq.put("aname", "zvalue");
+        tq.put("dname", "dvalue");
+
+        uri = new URIBuilder("test://bar?aname=avalue&aname=bvalue&aname=cvalue");
+        uri.setQueryMap(tq);
+        endpointURI = uri.getEndpoint();
+        assertEquals("test://bar?aname=zvalue&aname=bvalue&aname=cvalue&dname=dvalue", endpointURI.getUri().toString());
+    }
+    
 }

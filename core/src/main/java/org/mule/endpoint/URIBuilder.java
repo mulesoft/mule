@@ -15,9 +15,8 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.util.ClassUtils;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -40,6 +39,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
  * TODO - check that we have sufficient control via XML (what about empty strings?)
  *
  * Not called EndpointURIBuilder because of {@link org.mule.api.endpoint.EndpointURIBuilder}
+ * 
  */
 public class URIBuilder
 {
@@ -383,41 +383,54 @@ public class URIBuilder
 
     private static class OrderedQueryParameters
     {
-
-        private Map values = new HashMap();
-        private List orderedKeys = new LinkedList();
+        private List<String> names = new ArrayList<String>();
+        private List<String> values = new ArrayList<String>();
 
         public void put(String name, String value)
         {
-            values.put(name, value);
-            orderedKeys.add(name);
+            names.add(name);
+            values.add(value);
         }
 
+        /**
+         * Replace the first instance of the given parameter. This method does not make sense under the assumption that
+         * a given parameter name can have multiple values, so here we simply preserve the existing semantics.
+         * @param map A map off the name/value pairs to add/replace in the query string 
+         */
         public void override(Map map)
         {
             if (null != map)
             {
                 // order additional parameters
-                Iterator names = new TreeMap(map).keySet().iterator();
-                while (names.hasNext())
+                Iterator mapNames = new TreeMap(map).keySet().iterator();
+                while (mapNames.hasNext())
                 {
-                    String name = (String) names.next();
-                    String value  =(String) map.get(name);
-                    if (! values.keySet().contains(name))
+                    String name = (String) mapNames.next();
+                    String value = (String) map.get(name);
+                    
+                    int pos = names.indexOf(name);
+                    if (pos >= 0)
                     {
-                        orderedKeys.add(name);
+                        // Found, so replace
+                        values.set(pos, value);
                     }
-                    values.put(name, value);
-                }
+                    else 
+                    {       
+                        // Append new value
+                        names.add(name);
+                        values.add(value);
+                    }
+                 }
             }
         }
 
         public String toString()
         {
             StringBuffer buffer = new StringBuffer();
-            Iterator keys = orderedKeys.iterator();
+
             boolean first = true;
-            while (keys.hasNext())
+
+            for (int i = 0; i < names.size(); i++)
             {
                 if (first)
                 {
@@ -428,9 +441,10 @@ public class URIBuilder
                 {
                     buffer.append(AND);
                 }
-                String key = (String)keys.next();
-                buffer.append(key);
-                String value = (String)values.get(key);
+                
+                buffer.append(names.get(i));
+                String value = values.get(i);
+ 
                 if (null != value)
                 {
                     buffer.append(EQUALS);
@@ -439,7 +453,6 @@ public class URIBuilder
             }
             return buffer.toString();
         }
-
     }
 
 }
