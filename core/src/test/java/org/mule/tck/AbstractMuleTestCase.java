@@ -53,11 +53,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -430,6 +428,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
             builders.add(new SimpleConfigurationBuilder(getStartUpProperties()));
             builders.add(getBuilder());
+            addBuilders(builders);
             MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
             configureMuleContext(contextBuilder);
             context = muleContextFactory.createMuleContext(builders, contextBuilder);
@@ -439,6 +438,13 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             }
         }
         return context;
+    }
+
+    //This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
+    //creating the MuleContext.
+    protected void addBuilders(List<ConfigurationBuilder> builders)
+    {
+        //No op
     }
 
     /**
