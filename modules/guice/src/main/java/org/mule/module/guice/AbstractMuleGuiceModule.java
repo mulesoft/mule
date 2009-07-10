@@ -63,10 +63,17 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
             }
         });
         bind(MuleContext.class).toInstance(muleContext);
-        doConfigure();
+        try
+        {
+            doConfigure();
+        }
+        catch (Exception e)
+        {
+            addError(e);
+        }
     }
 
-    protected abstract void doConfigure();
+    protected abstract void doConfigure() throws Exception;
 
     /**
      * Creates an {@link org.mule.api.endpoint.EndpointBuilder} instance for the endpoint uri.  The builder can be used to add
