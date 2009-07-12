@@ -11,6 +11,7 @@
 package org.mule.module.json.transformers;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.module.json.JsonData;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.Collection;
@@ -19,14 +20,13 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
-import org.apache.commons.beanutils.DynaBean;
 import org.apache.commons.beanutils.PropertyUtils;
 
 public class JsonToDynaBeanTestCase extends AbstractMuleTestCase
 {
 	
 	private final String json = "{name=\"json\",bool:true,int:1,double:2.2,func:function(a){ return a; },array:[1,2]}";
-	private DynaBean _bean;
+	private JsonData _bean;
 	private JSONObject jsonObject;
 
 	protected void doSetUp() throws Exception
@@ -37,9 +37,9 @@ public class JsonToDynaBeanTestCase extends AbstractMuleTestCase
 	public void testTransform() throws Exception
 	{
 		JsonToObject transformer = new JsonToObject();
-		transformer.setReturnClass(DynaBean.class);
+		transformer.setReturnClass(JsonData.class);
 
-		_bean = (DynaBean) transformer.transform(json);
+		_bean = (JsonData) transformer.transform(json);
 		assertEquals(jsonObject.get("name"), PropertyUtils.getProperty(_bean, "name"));  
 		assertEquals(jsonObject.get("bool"), PropertyUtils.getProperty(_bean, "bool"));  
 		assertEquals(jsonObject.get("int"), PropertyUtils.getProperty(_bean, "int"));  

@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.json.transformers;
+package org.mule.module.json;
 
 import java.io.Serializable;
 
@@ -22,11 +22,11 @@ import org.apache.commons.beanutils.DynaClass;
  * A wrapper for the {@link net.sf.ezmorph.bean.MorphDynaBean} object that allows for nested object keys i.e.
  * user.name will return the name property on the user object.
  */
-public class JsonDynaBean implements DynaBean, Serializable
+public class JsonData implements DynaBean, Serializable
 {
     private MorphDynaBean morphDynaBean;
 
-    public JsonDynaBean(MorphDynaBean morphDynaBean)
+    public JsonData(MorphDynaBean morphDynaBean)
     {
         this.morphDynaBean = morphDynaBean;
     }
@@ -43,7 +43,7 @@ public class JsonDynaBean implements DynaBean, Serializable
 
     public Object get(String name)
     {
-       int i = name.indexOf(".");
+       int i = name.indexOf("->");
         String key;
         if(i > 0)
         {
@@ -57,7 +57,7 @@ public class JsonDynaBean implements DynaBean, Serializable
         Object o = morphDynaBean.get(key);
         if(o instanceof MorphDynaBean && i > 0)
         {
-            return new JsonDynaBean((MorphDynaBean)o).get(name.substring(i+1));
+            return new JsonData((MorphDynaBean)o).get(name.substring(i+2));
         }
         else
         {

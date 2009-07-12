@@ -14,6 +14,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultMuleMessageDTO;
+import org.mule.module.json.JsonData;
 import org.mule.module.json.util.JsonUtils;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.util.IOUtils;
@@ -30,8 +31,6 @@ import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 import net.sf.json.JsonConfig;
-
-import org.apache.commons.beanutils.DynaBean;
 
 /**
  * A transformer that will convert a JSON encoded object graph to a java object. The object type is
@@ -115,11 +114,11 @@ public class JsonToObject extends AbstractTransformer implements DiscoverableTra
 
             if (src instanceof String)
             {
-                if (getReturnClass().equals(DynaBean.class))
+                if (getReturnClass().equals(JsonData.class))
                 {
                     JSON json = JSONSerializer.toJSON(src.toString(), getJsonConfig());
                     returnValue = JSONObject.toBean((JSONObject) json, getJsonConfig());
-                    returnValue = new JsonDynaBean((MorphDynaBean) returnValue);
+                    returnValue = new JsonData((MorphDynaBean) returnValue);
                 }
                 else
                 {
