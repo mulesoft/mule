@@ -187,15 +187,12 @@ public class MuleService implements MuleServiceMBean
     {
         if (license == null)
         {
-            try
+            loadEnterpriseLicense();
+            if (license == null)
             {
-                license = IOUtils.getResourceAsString("MULE_LICENSE.txt", getClass());
-                license = StringMessageUtils.getBoilerPlate(license, ' ', 80);
+                loadCommunityLicense();
             }
-            catch (IOException e)
-            {
-                logger.warn("Failed to load MULE_LICENSE.txt", e);
-            }
+            
             if (license == null)
             {
                 license = "Failed to load license";
@@ -203,7 +200,37 @@ public class MuleService implements MuleServiceMBean
         }
         return license;
     }
+    
+    private void loadEnterpriseLicense()
+    {        
+        try
+        {
+            loadLicense("MULE_EE_LICENSE.txt");
+        }
+        catch (IOException e)
+        {
+            // this will happen if running in a CE distribution and is not an error per se
+        }        
+    }
+    
+    private void loadCommunityLicense()
+    {
+        try
+        {
+            loadLicense("MULE_LICENSE.txt");
+        }
+        catch (IOException e)
+        {
+            logger.warn("Failed to load MULE_LICENSE.txt", e);
+        }        
+    }
 
+    private void loadLicense(String licenseFile) throws IOException
+    {
+        license = IOUtils.getResourceAsString(licenseFile, getClass());
+        license = StringMessageUtils.getBoilerPlate(license, ' ', 80);
+    }
+    
     /**
      * @deprecated use getBuildNumber() instead
      */
