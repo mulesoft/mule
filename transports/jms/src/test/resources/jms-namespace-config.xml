@@ -99,4 +99,12 @@
 
     <jms:activemq-connector name="jmsActiveMqConnector" numberOfConsumers="1"/>
     <jms:activemq-xa-connector name="jmsActiveMqConnectorXa" numberOfConsumers="1"/>
+    
+    <model>
+        <service name="testService">
+            <inbound>
+                <jms:inbound-endpoint name="inboundEndpoint" topic="myTopic" connector-ref="jmsConnectorDefaults" durableName="testCustomDurableName"/>
+            </inbound>
+        </service>
+    </model>
 </mule>

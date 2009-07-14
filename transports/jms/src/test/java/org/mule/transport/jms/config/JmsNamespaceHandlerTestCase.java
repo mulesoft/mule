@@ -9,8 +9,10 @@
  */
 package org.mule.transport.jms.config;
 
+import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.routing.filters.logic.NotFilter;
@@ -131,7 +133,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
     }
 
-    public void testEndpointConfig() throws EndpointException, InitialisationException
+    public void testEndpointConfig() throws MuleException
     {
         ImmutableEndpoint endpoint1 = muleContext.getRegistry().lookupEndpointBuilder("endpoint1").buildInboundEndpoint();
         assertNotNull(endpoint1);
@@ -149,6 +151,11 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         Filter filter3 = ((NotFilter) filter2).getFilter();
         assertNotNull(filter3);
         assertTrue(filter3 instanceof JmsPropertyFilter);
+
+        InboundEndpoint inboundEndpoint = (InboundEndpoint) muleContext.getRegistry().lookupService("testService").getInboundRouter().getEndpoints().get(0);
+        assertNotNull(inboundEndpoint);
+        assertEquals(1, inboundEndpoint.getProperties().size());
+        assertEquals("testCustomDurableName", inboundEndpoint.getProperty(JmsConstants.DURABLE_NAME_PROPERTY));
     }
 
     public void testCustomTransactions() throws EndpointException, InitialisationException

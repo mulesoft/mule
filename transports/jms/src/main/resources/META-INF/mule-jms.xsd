@@ -351,6 +351,13 @@
                 <xsd:group ref="defaultEndpointElements"/>
                 <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
                 <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attribute name="durableName" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows the name for the durable topic subscription to be specified.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
