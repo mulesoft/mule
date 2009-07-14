@@ -46,8 +46,11 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
     public AbstractJmsTransformer()
     {
         super();
+        declareInputOutputClasses();
     }
 
+    protected abstract void declareInputOutputClasses();
+    
     protected Message transformToMessage(MuleMessage message) throws TransformerException
     {
         Session session = null;

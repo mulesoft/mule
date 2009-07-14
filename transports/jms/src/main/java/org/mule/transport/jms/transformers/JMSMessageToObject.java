@@ -43,6 +43,10 @@ public class JMSMessageToObject extends AbstractJmsTransformer
     public JMSMessageToObject()
     {
         super();
+    }
+
+    protected void declareInputOutputClasses()
+    {
         registerSourceType(Message.class);
         registerSourceType(TextMessage.class);
         registerSourceType(ObjectMessage.class);
@@ -50,7 +54,7 @@ public class JMSMessageToObject extends AbstractJmsTransformer
         registerSourceType(MapMessage.class);
         registerSourceType(StreamMessage.class);
     }
-
+    
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         try

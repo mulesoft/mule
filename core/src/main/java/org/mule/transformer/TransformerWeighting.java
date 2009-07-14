@@ -58,6 +58,7 @@ public class TransformerWeighting implements Comparable
 
     }
 
+    // TODO Document this algorithm!
     protected int getWeighting(int weighting, Class src, Class dest)
     {
         int x = weighting + 1;
@@ -76,10 +77,10 @@ public class TransformerWeighting implements Comparable
                 Class aClass = src.getInterfaces()[i];
                 if (dest.equals(aClass))
                 {
-                    return x;
+                    return x + 1;
                 }
             }
-            return x + 1;
+            return x + 2;
         }
         else if (src.getSuperclass() != null)
         {

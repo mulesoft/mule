@@ -86,7 +86,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         //Weighting2 two is a better match
         assertEquals(1, weighting2.compareTo(weighting1));
 
-        assertEquals(2, weighting1.getInputWeighting());
+        assertEquals(3, weighting1.getInputWeighting());
         assertEquals(1, weighting2.getInputWeighting());
         assertEquals(0, weighting1.getOutputWeighting());
         assertEquals(0, weighting2.getOutputWeighting());
@@ -113,7 +113,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         //Weighting2 two is an exact match
         assertEquals(1, weighting2.compareTo(weighting1));
 
-        assertEquals(2, weighting1.getInputWeighting());
+        assertEquals(3, weighting1.getInputWeighting());
         assertEquals(0, weighting2.getInputWeighting());
         assertEquals(0, weighting1.getOutputWeighting());
         assertEquals(0, weighting2.getOutputWeighting());
@@ -140,7 +140,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         //Weighting2 two is not a match
         assertEquals(-1, weighting2.compareTo(weighting1));
 
-        assertEquals(2, weighting1.getInputWeighting());
+        assertEquals(3, weighting1.getInputWeighting());
         assertEquals(-1, weighting2.getInputWeighting());
         assertEquals(0, weighting1.getOutputWeighting());
         assertEquals(0, weighting2.getOutputWeighting());

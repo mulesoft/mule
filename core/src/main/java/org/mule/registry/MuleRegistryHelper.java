@@ -201,6 +201,10 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     {
         if (trans.size() > 1)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Comparing transformers for best match: input = " + input + " output = " + output + " Possible transformers = " + trans);
+            }
             TransformerWeighting weighting = null;
             for (Iterator iterator = trans.iterator(); iterator.hasNext();)
             {

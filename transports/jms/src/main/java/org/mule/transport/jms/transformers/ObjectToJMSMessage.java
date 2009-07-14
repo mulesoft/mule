@@ -35,9 +35,14 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer
 
     public ObjectToJMSMessage()
     {
-        setReturnClass(Message.class);
+        super();
     }
 
+    protected void declareInputOutputClasses()
+    {
+        setReturnClass(Message.class);
+    }
+        
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         try
