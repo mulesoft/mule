@@ -166,7 +166,7 @@ wss4j-1.5.4-osgi
 wstx-asl-3.2.6-osgi
 xapool-1.4-osgi
 xml-resolver-1.2-osgi
-XmlSchema-1.4.2
+XmlSchema-1.4.5
 xmlsec-1.4.0-osgi
 xmlunit-1.1
 xpp3_min-1.1.3.4.O-osgi
