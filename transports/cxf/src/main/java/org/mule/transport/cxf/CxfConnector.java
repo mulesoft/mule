@@ -41,6 +41,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Endpoint;
@@ -123,8 +124,24 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         dfm.registerDestinationFactory(MuleUniversalTransport.TRANSPORT_ID, transport);
 
         ConduitInitiatorManager extension = bus.getExtension(ConduitInitiatorManager.class);
+        try
+        {
+            // Force the HTTP transport to load if available, otherwise it could
+            // overwrite our namespaces later
+            extension.getConduitInitiator("http://schemas.xmlsoap.org/soap/http");
+        }
+        catch (BusException e1)
+        {
+            // If unavailable eat exception and continue
+        }
         extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/soap/", transport);
         extension.registerConduitInitiator("http://schemas.xmlsoap.org/soap/http", transport);
+        extension.registerConduitInitiator("http://schemas.xmlsoap.org/soap/http/", transport);
+        extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/soap/http", transport);
+        extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/http/", transport);
+        extension.registerConduitInitiator("http://www.w3.org/2003/05/soap/bindings/HTTP/", transport);
+        extension.registerConduitInitiator("http://cxf.apache.org/transports/http/configuration", transport);
+        extension.registerConduitInitiator("http://cxf.apache.org/bindings/xformat", transport);
         extension.registerConduitInitiator(MuleUniversalTransport.TRANSPORT_ID, transport);
         
         // Registers the listener

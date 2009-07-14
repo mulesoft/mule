@@ -5,12 +5,14 @@
        xmlns:cxf="http://www.mulesource.org/schema/mule/cxf"
        xmlns:cxf-core="http://cxf.apache.org/core"
        xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml"
-         xmlns:vm="http://www.mulesource.org/schema/mule/vm"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm"
+       xmlns:test="http://www.mulesource.org/schema/mule/test"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesource.org/schema/mule/cxf http://www.mulesource.org/schema/mule/cxf/3.0/mule-cxf.xsd
                http://www.mulesource.org/schema/mule/xml http://www.mulesource.org/schema/mule/xml/3.0/mule-xml.xsd
+               http://www.mulesource.org/schema/mule/test http://www.mulesource.org/schema/mule/test/3.0/mule-test.xsd
                http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
@@ -126,16 +128,39 @@
         <service name="serverClientProxyWithWsdl">
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:63081/services/proxyWithWsdl" 
-                  namespace="http://www.muleumo.org"
-                  serviceName="WebService"
-                  proxy="true" 
-                  wsdlLocation="localWsdl.wsdl"/>
+                    serviceName="WebService"
+                    proxy="true" 
+                    wsdlLocation="localWsdl.wsdl">
+                    <property key="namespace" value="http://www.muleumo.org"/>
+                </cxf:inbound-endpoint>
             </inbound>
+            <test:component/>
             <outbound>
                 <pass-through-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
-                        synchronous="true"/>
+                        synchronous="true">
+                    </cxf:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="serverClientProxyWithWsdl2">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/proxyWithWsdl2" 
+                    serviceName="WebService2"
+                    proxy="true" 
+                    wsdlLocation="localWsdl.wsdl">
+                    <property key="namespace" value="http://www.muleumo.org"/>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <test:component/>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
+                        proxy="true"
+                        synchronous="true">
+                    </cxf:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>

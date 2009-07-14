@@ -58,6 +58,32 @@
       <wsdl:output name="echoResponse" message="tns:echoResponse">
     </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="log2">
+      <wsdl:input name="logRequest" message="tns:logRequest">
+    </wsdl:input>
+      <wsdl:output name="logResponse" message="tns:logResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echo2">
+      <wsdl:input name="echoRequest" message="tns:echoRequest">
+    </wsdl:input>
+      <wsdl:output name="echoResponse" message="tns:echoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="WebService2PortType">
+    <wsdl:operation name="log2">
+      <wsdl:input name="logRequest" message="tns:logRequest">
+      </wsdl:input>
+      <wsdl:output name="logResponse" message="tns:logResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echo2">
+      <wsdl:input name="echoRequest" message="tns:echoRequest">
+      </wsdl:input>
+      <wsdl:output name="echoResponse" message="tns:echoResponse">
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="WebServiceHttpBinding" type="tns:WebServicePortType">
     <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -80,10 +106,41 @@
       </wsdl:output>
     </wsdl:operation>
   </wsdl:binding>
+    <wsdl:binding name="WebService2HttpCustomBinding" type="tns:WebService2PortType">
+    <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="log2">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="logRequest">
+        <wsdlsoap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="logResponse">
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echo2">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="echoRequest">
+        <wsdlsoap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="echoResponse">
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
   <wsdl:service name="WebService">
-
+    <wsdl:port name="WebServiceMulePort2" binding="tns:WebServiceHttpBinding">
+      <wsdlsoap:address location="http://localhost:6080/webServiceProxy"/>
+    </wsdl:port>
     <wsdl:port name="WebServiceMulePort" binding="tns:WebServiceHttpBinding">
       <wsdlsoap:address location="http://localhost:6070/webServiceProxy"/>
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="WebService2">
+    <wsdl:port name="WebService2MulePort2" binding="tns:WebService2HttpCustomBinding">
+      <wsdlsoap:address location="http://localhost:6080/webServiceProxy"/>
+    </wsdl:port>
+    <wsdl:port name="WebService2MulePort" binding="tns:WebService2HttpCustomBinding">
+      <wsdlsoap:address location="http://localhost:6070/webServiceProxy2"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

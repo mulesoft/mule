@@ -10,13 +10,19 @@
 
 package org.mule.transport.cxf;
 
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.http.HttpConnector;
+import org.mule.util.concurrent.Latch;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class ProxyTestCase extends FunctionalTestCase
 {
@@ -44,30 +50,50 @@ public class ProxyTestCase extends FunctionalTestCase
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
     }
 
-    public void testServerClientProxyEnvelope() throws Exception
-    {
-        String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-                     + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
-
-        MuleClient client = new MuleClient();
-        MuleMessage result = client.send("http://localhost:63081/services/envelope-proxy", msg, null);
-        String resString = result.getPayloadAsString();
-        System.out.println(resString);
-        assertTrue(resString.indexOf("<soap:Envelope") != -1);
-        assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
-    }
-
     public void testServerClientProxyWithWsdl() throws Exception
     {
+        final Latch latch = new Latch();
+        ((FunctionalTestComponent) getComponent("serverClientProxyWithWsdl")).setEventCallback(new EventCallback()
+        {
+
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                latch.countDown();
+            }
+        });
+
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient();
         MuleMessage result = client.send("http://localhost:63081/services/proxyWithWsdl", msg, null);
         String resString = result.getPayloadAsString();
+        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
     }
-    
+
+    public void testServerClientProxyWithWsdl2() throws Exception
+    {
+        final Latch latch = new Latch();
+        ((FunctionalTestComponent) getComponent("serverClientProxyWithWsdl2")).setEventCallback(new EventCallback()
+        {
+
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                latch.countDown();
+            }
+        });
+
+        String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                     + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
+
+        MuleClient client = new MuleClient();
+        MuleMessage result = client.send("http://localhost:63081/services/proxyWithWsdl2", msg, null);
+        String resString = result.getPayloadAsString();
+        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
+        assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
+    }
+
     public void testServerClientProxyWithTransform() throws Exception
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"

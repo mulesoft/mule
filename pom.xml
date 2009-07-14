@@ -105,7 +105,7 @@
         but the PGP module would need some work in order to use it -->
         <cryptixJceVersion>20050328</cryptixJceVersion>
         <cryptixVersion>20050405</cryptixVersion>
-        <cxfVersion>2.1.2</cxfVersion>
+        <cxfVersion>2.2.2</cxfVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>

@@ -31,6 +31,20 @@ public class ProxyServiceFactoryBean extends ReflectionServiceFactoryBean
 
     private static final Logger LOG = LogUtils.getLogger(ProxyServiceFactoryBean.class);
 
+    public ProxyServiceFactoryBean()
+    {
+        getServiceConfigurations().add(0, new ProxyServiceConfiguration());
+
+        List<String> ignoredClasses = new ArrayList<String>();
+        ignoredClasses.add("java.lang.Object");
+        ignoredClasses.add("java.lang.Throwable");
+        ignoredClasses.add("org.omg.CORBA_2_3.portable.ObjectImpl");
+        ignoredClasses.add("org.omg.CORBA.portable.ObjectImpl");
+        ignoredClasses.add("javax.ejb.EJBObject");
+        ignoredClasses.add("javax.rmi.CORBA.Stub");
+        setIgnoredClasses(ignoredClasses);
+    }
+    
     @Override
     protected void initializeWSDLOperations()
     {
