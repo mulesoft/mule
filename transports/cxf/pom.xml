@@ -337,7 +337,7 @@
                 <!-- This should be endorsed -->
                 <exclusion>
                     <groupId>bouncycastle</groupId>
-                    <artifactId>bcprov-jdk14</artifactId>
+                    <artifactId>bcprov-jdk15</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>xalan</groupId>
