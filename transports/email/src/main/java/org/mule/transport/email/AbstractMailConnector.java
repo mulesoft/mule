@@ -15,6 +15,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.transport.AbstractConnector;
+import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Enumeration;
@@ -167,6 +168,8 @@ public abstract class AbstractMailConnector extends AbstractConnector
 
         Properties global = System.getProperties();
         Properties local = new Properties();
+        //Allow properties to be set on the endpoint
+        PropertiesUtils.getPropertiesWithPrefix(endpoint.getProperties(), "mail.", local);
         Session session;
 
         // make sure we do not mess with authentication set via system properties

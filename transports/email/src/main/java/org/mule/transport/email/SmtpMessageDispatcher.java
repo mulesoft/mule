@@ -19,6 +19,7 @@ import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageDispatcher;
 
+import java.net.URLDecoder;
 import java.util.Calendar;
 
 import javax.mail.Message;
@@ -51,9 +52,12 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         {
             try
             {
+
                 transport = castConnector().getSessionDetails(endpoint).newTransport();
                 EndpointURI uri = endpoint.getEndpointURI();
-                transport.connect(uri.getHost(), uri.getPort(), uri.getUser(), uri.getPassword());
+                String user = (uri.getUser()!=null ? URLDecoder.decode(uri.getUser()) : null);
+                String pass = (uri.getPassword()!=null ? URLDecoder.decode(uri.getPassword()) : null);
+                transport.connect(uri.getHost(), uri.getPort(),  user, pass);
             }
             catch (Exception e)
             {
