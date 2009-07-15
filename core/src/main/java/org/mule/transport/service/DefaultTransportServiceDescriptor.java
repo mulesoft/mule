@@ -33,6 +33,7 @@ import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -388,7 +389,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("inbound", defaultInboundTransformer), e);
             }
         }
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     public List createOutboundTransformers() throws TransportFactoryException
@@ -412,7 +413,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("outbound", defaultOutboundTransformer), e);
             }
         }
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     public List createResponseTransformers() throws TransportFactoryException
@@ -436,7 +437,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("response", defaultResponseTransformer), e);
             }
         }
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     public EndpointURIBuilder createEndpointBuilder() throws TransportFactoryException
