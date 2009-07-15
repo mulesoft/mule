@@ -68,9 +68,9 @@
                 <xsd:attribute name="moveToFolder" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The remote folder to move mail to once it has been read.  IT is recommended that deleteReadMEssages is set to false when this is used.
-                            This is very useful when working with public email services such as GMail where marking messages for deletion doesn't work. instead
-                            set the moveToFolder=[GMail]/Trash.
+                            The remote folder to move mail to once it has been read.  It is recommended that @deleteReadMessages is set to false when this is used.
+                            This is very useful when working with public email services such as GMail where marking messages for deletion doesn't work. Instead
+                            set the @moveToFolder=[GMail]/Trash.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
