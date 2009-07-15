@@ -34,6 +34,11 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
     private volatile String backupFolder = null;
 
     /**
+     * Holds a remote folder name where messages should be moved to after being read
+     */
+    private volatile String moveToFolder = null;
+
+    /**
      * Should we save backups to backupFolder?
      */
     private boolean backupEnabled = false;
@@ -108,4 +113,13 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
         this.backupEnabled = backupEnabled;
     }
 
+    public String getMoveToFolder()
+    {
+        return moveToFolder;
+    }
+
+    public void setMoveToFolder(String moveToFolder)
+    {
+        this.moveToFolder = moveToFolder;
+    }
 }

@@ -52,6 +52,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
         implements MessageCountListener, Startable, Stoppable
 {
     private Folder folder = null;
+    private Folder moveToFolder = null;
     private boolean backupEnabled;
     private String backupFolder = null;
 
@@ -81,6 +82,11 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
         Store store = session.newStore();
         store.connect();
         folder = store.getFolder(castConnector().getMailboxFolder());
+        if(castConnector().getMoveToFolder()!=null)
+        {
+            moveToFolder = store.getFolder(castConnector().getMoveToFolder());
+            moveToFolder.open(Folder.READ_WRITE);
+        }
 
         // set default value if empty/null
         if (StringUtils.isEmpty(backupFolder))
@@ -124,7 +130,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
             {
                 try
                 {
-                    if (!messages[i].getFlags().contains(Flags.Flag.DELETED))
+                    if (!messages[i].getFlags().contains(Flags.Flag.DELETED) && !messages[i].getFlags().contains(Flags.Flag.SEEN))
                     {
                         MimeMessage mimeMessage = new MimeMessage((MimeMessage) messages[i]);
                         storeMessage(mimeMessage);
@@ -160,6 +166,18 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
                     }
 
                     handleException(forwarded);
+                }
+            }
+            //Lets move all messages in one go
+            if(moveToFolder !=null)
+            {
+                try
+                {
+                    folder.copyMessages(messages, moveToFolder);
+                }
+                catch (MessagingException e)
+                {
+                    handleException(e);
                 }
             }
         }
