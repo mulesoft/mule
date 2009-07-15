@@ -13,7 +13,7 @@ package org.mule.api.routing;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 
 public interface InterfaceBinding extends Router
 {
@@ -37,14 +37,14 @@ public interface InterfaceBinding extends Router
      * @see org.mule.routing.outbound.ExceptionBasedRouter
      * @see org.mule.routing.outbound.MulticastingRouter
      *
-     * * @since 2.1 the synchronous argument has been removed. Instead use the synchronous attribute of the endpoint
+     * @since 2.1 the synchronous argument has been removed. Instead use the synchronous attribute of the endpoint
      * you are dispatching to.
      */
     MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException;
 
-    void setEndpoint(OutboundEndpoint endpoint);
+    void setEndpoint(ImmutableEndpoint endpoint);
     
-    OutboundEndpoint getEndpoint();
+    ImmutableEndpoint getEndpoint();
 
     Class getInterface();
 

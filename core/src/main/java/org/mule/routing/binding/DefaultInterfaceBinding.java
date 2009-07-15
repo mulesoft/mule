@@ -14,6 +14,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.MuleSession;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.routing.OutboundRouter;
@@ -30,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultInterfaceBinding extends AbstractRouter implements InterfaceBinding
 {
 
-    private static final Log logger = LogFactory.getLog(DefaultInterfaceBinding.class);
+    protected static final Log logger = LogFactory.getLog(DefaultInterfaceBinding.class);
 
     private Class interfaceClass;
 
@@ -74,7 +75,7 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
         try
         {
             Object proxy = Proxy.newProxyInstance(getInterface().getClassLoader(), new Class[]{getInterface()},
-                new BindingInvocationHandler(this));
+                    new BindingInvocationHandler(this));
             if (logger.isDebugEnabled())
             {
                 logger.debug("Have proxy?: " + (null != proxy));
@@ -88,11 +89,18 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
         }
     }
 
-    public void setEndpoint(OutboundEndpoint e)
+    public void setEndpoint(ImmutableEndpoint e)
     {
-        outboundRouter = new OutboundPassThroughRouter();
-        outboundRouter.addEndpoint(e);
-        outboundRouter.setTransactionConfig(e.getTransactionConfig());
+        if (e instanceof OutboundEndpoint)
+        {
+            outboundRouter = new OutboundPassThroughRouter();
+            outboundRouter.addEndpoint((OutboundEndpoint) e);
+            outboundRouter.setTransactionConfig(e.getTransactionConfig());
+        }
+        else
+        {
+            throw new IllegalArgumentException("An outbound endpoint is required for Interface binding");
+        }
     }
 
     public Class getInterfaceClass()
@@ -110,7 +118,7 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
         return sb.toString();
     }
 
-    public OutboundEndpoint getEndpoint()
+    public ImmutableEndpoint getEndpoint()
     {
         if (outboundRouter != null)
         {
