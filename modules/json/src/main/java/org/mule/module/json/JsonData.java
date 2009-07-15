@@ -56,9 +56,15 @@ public class JsonData implements DynaBean, Serializable
         return entries.get(index);
     }
 
-    public int arraySize()
+    /**
+     * If the data is an array, the size of the arry is returned otherwise, 1 is returned since there is a single
+     * data element
+     *
+     * @return the size of the array data if the object is an array otherwise 1
+     */
+    public int size()
     {
-        return (entries!=null ? entries.size() : -1);
+        return (entries!=null ? entries.size() : 1);
     }
 
     public boolean isArray()
