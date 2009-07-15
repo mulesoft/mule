@@ -14,7 +14,6 @@ cglib-nodep-2.1_3-osgi
 cometd-api-0.9.20080221
 cometd-bayeux-6.1.11
 commons-beanutils-1.7.0-osgi
-commons-cli-1.0-osgi
 commons-codec-1.3-osgi
 commons-collections-3.2-osgi
 commons-dbutils-1.1-osgi

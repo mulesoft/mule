@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.api.MuleContext;
+import org.mule.module.boot.MuleServer;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.ClassUtils;
 

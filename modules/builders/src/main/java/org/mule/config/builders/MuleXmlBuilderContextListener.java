@@ -10,7 +10,6 @@
 
 package org.mule.config.builders;
 
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
@@ -21,6 +20,7 @@ import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.module.boot.MuleServer;
 import org.mule.util.StringUtils;
 
 import javax.servlet.ServletContext;

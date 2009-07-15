@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule;
+package org.mule.module.boot;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -20,12 +20,12 @@ import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.module.boot.util.CommandLineUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.SystemUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -153,7 +153,7 @@ public class MuleServer implements Runnable
 
         try
         {
-            options = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
+            options = CommandLineUtils.getCommandLineOptions(args, CLI_OPTIONS);
         }
         catch (DefaultMuleException me)
         {

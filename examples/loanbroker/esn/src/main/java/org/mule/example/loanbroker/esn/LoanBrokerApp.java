@@ -13,10 +13,10 @@ package org.mule.example.loanbroker.esn;
 import org.mule.example.loanbroker.AbstractLoanBrokerApp;
 import org.mule.example.loanbroker.LocaleMessage;
 import org.mule.example.loanbroker.messages.LoanQuote;
+import org.mule.module.boot.util.CommandLineUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
-import org.mule.util.SystemUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
         /////////////////////////////////////////
         // Command-line config
         /////////////////////////////////////////
-        Map options = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
+        Map options = CommandLineUtils.getCommandLineOptions(args, CLI_OPTIONS);
         String config = (String)options.get("config");
         if (StringUtils.isNotBlank(config))
         {

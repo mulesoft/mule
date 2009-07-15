@@ -10,6 +10,7 @@
 
 package org.mule.util;
 
+import org.mule.module.boot.util.JarUtils;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.io.File;
