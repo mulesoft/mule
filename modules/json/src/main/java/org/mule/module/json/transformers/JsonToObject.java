@@ -28,6 +28,7 @@ import java.util.Set;
 
 import net.sf.ezmorph.bean.MorphDynaBean;
 import net.sf.json.JSON;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 import net.sf.json.JsonConfig;
@@ -116,9 +117,21 @@ public class JsonToObject extends AbstractTransformer implements DiscoverableTra
             {
                 if (getReturnClass().equals(JsonData.class))
                 {
+                    getJsonConfig().setEnclosedType(getReturnClass());
                     JSON json = JSONSerializer.toJSON(src.toString(), getJsonConfig());
-                    returnValue = JSONObject.toBean((JSONObject) json, getJsonConfig());
-                    returnValue = new JsonData((MorphDynaBean) returnValue);
+                    if(json instanceof JSONArray)
+                    {
+                        getJsonConfig().setEnclosedType(List.class);
+                        getJsonConfig().setArrayMode(JsonConfig.MODE_LIST);
+                        List list = (List)JSONArray.toCollection((JSONArray)json, getJsonConfig());
+                        returnValue = new JsonData(list);
+
+                    }
+                    else
+                    {
+                        returnValue = JSONObject.toBean((JSONObject)json, getJsonConfig());
+                        returnValue = new JsonData((MorphDynaBean) returnValue);
+                    }
                 }
                 else
                 {
