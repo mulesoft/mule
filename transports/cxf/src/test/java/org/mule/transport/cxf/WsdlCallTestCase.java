@@ -10,48 +10,30 @@
 
 package org.mule.transport.cxf;
 
-import org.mule.api.config.MuleProperties;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.servlet.MuleReceiverServlet;
+import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
 
 public class WsdlCallTestCase extends FunctionalTestCase
 {
     public static final int HTTP_PORT = 63088;
 
-    private Server httpServer;
+    private EmbeddedJettyServer httpServer;
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         
-        httpServer = new Server(HTTP_PORT);
-
-        Context c = new Context(httpServer, "/", Context.SESSIONS);
-        c.addServlet(new ServletHolder(new MuleReceiverServlet()), "/services/*");
-        c.addEventListener(new ServletContextListener() {
-            public void contextInitialized(ServletContextEvent sce)
-            {
-                sce.getServletContext().setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
-            }
-
-            public void contextDestroyed(ServletContextEvent sce) { }
-        });
-
+        httpServer = new EmbeddedJettyServer(HTTP_PORT, "/", "/services/*", new MuleReceiverServlet(), muleContext);
         httpServer.start();
     }
 

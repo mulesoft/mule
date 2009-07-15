@@ -35,7 +35,7 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
     {
         super.doSetUp();
         
-        httpServer = new EmbeddedJettyServer(HTTP_PORT, "/*", new MuleReceiverServlet(), muleContext);
+        httpServer = new EmbeddedJettyServer(HTTP_PORT, "/", "/*", new MuleReceiverServlet(), muleContext);
 
         httpServer.start();
     }

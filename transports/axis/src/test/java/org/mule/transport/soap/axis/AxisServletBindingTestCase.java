@@ -24,7 +24,7 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        httpServer = new EmbeddedJettyServer(HTTP_PORT, "/services/*", new MuleReceiverServlet(), muleContext);
+        httpServer = new EmbeddedJettyServer(HTTP_PORT, "/", "/services/*", new MuleReceiverServlet(), muleContext);
         httpServer.start();
     }
 

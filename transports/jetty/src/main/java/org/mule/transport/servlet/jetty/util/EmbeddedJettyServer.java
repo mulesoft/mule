@@ -27,12 +27,12 @@ public class EmbeddedJettyServer
 {
     private Server httpServer;
 
-    public EmbeddedJettyServer(int port, String path, Servlet servlet, final MuleContext context)
+    public EmbeddedJettyServer(int port, String contextPath, String servletPath, Servlet servlet, final MuleContext context)
     {
          httpServer = new Server(port);
 
-        Context c = new Context(httpServer, "/", Context.SESSIONS);
-        c.addServlet(new ServletHolder(servlet), path);
+        Context c = new Context(httpServer, contextPath, Context.SESSIONS);
+        c.addServlet(new ServletHolder(servlet), servletPath);
         c.addEventListener(new ServletContextListener() {
             public void contextInitialized(ServletContextEvent sce)
             {
