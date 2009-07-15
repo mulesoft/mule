@@ -56,10 +56,15 @@ public class JsonData implements DynaBean, Serializable
         return entries.get(index);
     }
 
-    public boolean isArray()
+    public int arraySize()
     {
-        return entries!=null;
+        return (entries!=null ? entries.size() : -1);
     }
+
+    public boolean isArray()
+        {
+            return entries!=null;
+        }
 
     public Object get(String name)
     {
