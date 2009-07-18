@@ -18,6 +18,7 @@ import org.mule.transport.email.AbstractMailConnector;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -71,7 +72,14 @@ public class Rfc822ByteArraytoMimeMessage extends AbstractTransformer
             throw new TransformerException(this,
                     new IllegalStateException("The transformer is not associated with an email endpoint."));
         }
-        return ((AbstractMailConnector) connector).getSessionDetails(endpoint).getSession();
+        try
+        {
+            return ((AbstractMailConnector) connector).getSessionDetails(endpoint).getSession();
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new TransformerException(this, e);
+        }
     }
 
 }

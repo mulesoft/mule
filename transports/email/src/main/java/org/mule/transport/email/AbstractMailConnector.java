@@ -18,6 +18,8 @@ import org.mule.transport.AbstractConnector;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,7 +81,7 @@ public abstract class AbstractMailConnector extends AbstractConnector
         this.mailboxFolder = mailboxFolder;
     }
 
-    public synchronized SessionDetails getSessionDetails(ImmutableEndpoint endpoint)
+    public synchronized SessionDetails getSessionDetails(ImmutableEndpoint endpoint) throws UnsupportedEncodingException
     {
         SessionDetails sessionDetails = (SessionDetails) sessions.get(endpoint);
         if (null == sessionDetails)
@@ -90,7 +92,7 @@ public abstract class AbstractMailConnector extends AbstractConnector
         return sessionDetails;
     }
     
-    public URLName urlFromEndpoint(ImmutableEndpoint endpoint)
+    public URLName urlFromEndpoint(ImmutableEndpoint endpoint) throws UnsupportedEncodingException
     {
         String inbox = endpoint.getEndpointURI().getPath();
         if (inbox.length() == 0)
@@ -103,8 +105,10 @@ public abstract class AbstractMailConnector extends AbstractConnector
         }
 
         EndpointURI uri = endpoint.getEndpointURI();
-        return new URLName(uri.getScheme(), uri.getHost(), uri.getPort(), inbox,
-                uri.getUser(), uri.getPassword());
+        String user = URLDecoder.decode((uri.getUser()==null ? StringUtils.EMPTY : uri.getUser()), endpoint.getEncoding());
+        String pass = URLDecoder.decode((uri.getPassword()==null ? StringUtils.EMPTY : uri.getPassword()), endpoint.getEncoding());
+
+        return new URLName(uri.getScheme(), uri.getHost(), uri.getPort(), inbox, user, pass);
     }
     
     /**
@@ -162,7 +166,7 @@ public abstract class AbstractMailConnector extends AbstractConnector
         local.setProperty("mail." + getBaseProtocol() + ".rsetbeforequit", "true");
     }
 
-    protected SessionDetails newSession(ImmutableEndpoint endpoint)
+    protected SessionDetails newSession(ImmutableEndpoint endpoint) throws UnsupportedEncodingException
     {
         URLName url = urlFromEndpoint(endpoint);
 
