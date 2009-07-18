@@ -228,7 +228,15 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
                 {
                     logger.debug("No results, sleeping for " + sleep);
                 }
-                Thread.sleep(sleep);
+                try
+                {
+                    Thread.sleep(sleep);
+                }
+                catch (InterruptedException e)
+                {
+                    logger.warn("Thread interrupted while requesting email on: " + endpoint.getEndpointURI().toString());
+                    return null;
+                }
             }
             else
             {
