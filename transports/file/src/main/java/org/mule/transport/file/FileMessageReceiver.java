@@ -261,13 +261,15 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             if (destinationFile != null)
             {
                 // move sourceFile to new destination
-                fileWasMoved = FileUtils.moveFile(sourceFile, destinationFile);
-
-                // move didn't work - bail out (will attempt rollback)
-                if (!fileWasMoved)
+                try
                 {
-                    throw new DefaultMuleException(FileMessages.failedToMoveFile(sourceFile.getAbsolutePath(),
-                        destinationFile.getAbsolutePath()));
+                    FileUtils.moveFile(sourceFile, destinationFile);
+                }
+                catch (IOException e)
+                {
+                    // move didn't work - bail out (will attempt rollback)
+                    throw new DefaultMuleException(FileMessages.failedToMoveFile(
+                        sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()));
                 }
 
                 // create new MessageAdapter for destinationFile
@@ -307,7 +309,15 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             // only attempt rollback if file move was successful
             if (fileWasMoved)
             {
-                fileWasRolledBack = rollbackFileMove(destinationFile, sourceFile.getAbsolutePath());
+                try
+                {
+                    rollbackFileMove(destinationFile, sourceFile.getAbsolutePath());
+                    fileWasRolledBack = true;
+                }
+                catch (IOException ioException)
+                {
+                    // eat it
+                }
             }
 
             // wrap exception & handle it
@@ -416,19 +426,22 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    /** Exception tolerant roll back method */
-    protected boolean rollbackFileMove(File sourceFile, String destinationFilePath)
+    /**
+     * Exception tolerant roll back method
+     * 
+     * @throws Throwable
+     */
+    protected void rollbackFileMove(File sourceFile, String destinationFilePath) throws IOException
     {
-        boolean result = false;
         try
         {
-            result = FileUtils.moveFile(sourceFile, FileUtils.newFile(destinationFilePath));
+            FileUtils.moveFile(sourceFile, FileUtils.newFile(destinationFilePath));
         }
-        catch (Throwable t)
+        catch (IOException t)
         {
             logger.debug("rollback of file move failed: " + t.getMessage());
+            throw t;
         }
-        return result;
     }
 
     protected Comparator getComparator() throws Exception

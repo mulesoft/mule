@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.IOException;
 
 /**
  * <code>FileMessageDispatcher</code> is used to read/write files to the filesystem
@@ -194,7 +195,11 @@ public class FileMessageRequester extends AbstractMessageRequester
         if (destinationFile != null)
         {
             // move sourceFile to new destination
-            if (!FileUtils.moveFile(sourceFile, destinationFile))
+            try
+            {
+                FileUtils.moveFile(sourceFile, destinationFile);
+            }
+            catch (IOException e)
             {
                 throw new DefaultMuleException(FileMessages.failedToMoveFile(sourceFile.getAbsolutePath(),
                     destinationFile.getAbsolutePath()));

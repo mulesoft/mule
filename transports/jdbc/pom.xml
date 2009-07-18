@@ -31,7 +31,7 @@
         <dependency>
             <groupId>commons-dbutils</groupId>
             <artifactId>commons-dbutils</artifactId>
-            <version>${commonsDbUtilsVersion}-osgi</version>
+            <version>${commonsDbUtilsVersion}</version>
         </dependency>
         <dependency>
             <groupId>com.experlog</groupId>

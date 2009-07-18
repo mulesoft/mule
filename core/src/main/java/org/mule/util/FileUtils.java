@@ -29,6 +29,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
@@ -732,43 +733,6 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         return isRenamed;
     }
     
-    /** Try to move a file by renaming with backup attempt by copying/deleting via NIO */
-    public static boolean moveFile(File sourceFile, File destinationFile)
-    {
-        // try fast file-system-level move/rename first
-        boolean success = sourceFile.renameTo(destinationFile);
-
-        if (!success)
-        {
-            // try again using NIO copy
-            FileInputStream fis = null;
-            FileOutputStream fos = null;
-            try
-            {
-                fis = new FileInputStream(sourceFile);
-                fos = new FileOutputStream(destinationFile);
-                FileChannel srcChannel = fis.getChannel();
-                FileChannel dstChannel = fos.getChannel();
-                dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
-                srcChannel.close();
-                dstChannel.close();
-                success = sourceFile.delete();
-            }
-            catch (IOException ioex)
-            {
-                // grr!
-                success = false;
-            }
-            finally
-            {
-                IOUtils.closeQuietly(fis);
-                IOUtils.closeQuietly(fos);
-            }
-        }
-
-        return success;
-    }
-
     /**
      * Copy in file to out file
      * 
@@ -813,6 +777,128 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (FileNotFoundException e)
         {
             throw e;
+        }
+    }
+    
+    // Override the following methods to use a new version of doCopyFile(File
+    // srcFile, File destFile, boolean preserveFileDate) that uses nio to copy file
+
+    /**
+     * Copies a file to a new location.
+     * <p>
+     * This method copies the contents of the specified source file to the specified
+     * destination file. The directory holding the destination file is created if it
+     * does not exist. If the destination file exists, then this method will
+     * overwrite it.
+     * 
+     * @param srcFile an existing file to copy, must not be <code>null</code>
+     * @param destFile the new file, must not be <code>null</code>
+     * @param preserveFileDate true if the file date of the copy should be the same
+     *            as the original
+     * @throws NullPointerException if source or destination is <code>null</code>
+     * @throws IOException if source or destination is invalid
+     * @throws IOException if an IO error occurs during copying
+     * @see #copyFileToDirectory(File, File, boolean)
+     */
+    public static void copyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException
+    {
+        if (srcFile == null)
+        {
+            throw new NullPointerException("Source must not be null");
+        }
+        if (destFile == null)
+        {
+            throw new NullPointerException("Destination must not be null");
+        }
+        if (srcFile.exists() == false)
+        {
+            throw new FileNotFoundException("Source '" + srcFile + "' does not exist");
+        }
+        if (srcFile.isDirectory())
+        {
+            throw new IOException("Source '" + srcFile + "' exists but is a directory");
+        }
+        if (srcFile.getCanonicalPath().equals(destFile.getCanonicalPath()))
+        {
+            throw new IOException("Source '" + srcFile + "' and destination '" + destFile + "' are the same");
+        }
+        if (destFile.getParentFile() != null && destFile.getParentFile().exists() == false)
+        {
+            if (destFile.getParentFile().mkdirs() == false)
+            {
+                throw new IOException("Destination '" + destFile + "' directory cannot be created");
+            }
+        }
+        if (destFile.exists() && destFile.canWrite() == false)
+        {
+            throw new IOException("Destination '" + destFile + "' exists but is read-only");
+        }
+        doCopyFile(srcFile, destFile, preserveFileDate);
+    }
+
+    /**
+     * Internal copy file method.
+     * 
+     * @param srcFile the validated source file, must not be <code>null</code>
+     * @param destFile the validated destination file, must not be <code>null</code>
+     * @param preserveFileDate whether to preserve the file date
+     * @throws IOException if an error occurs
+     */
+    private static void doCopyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException
+    {
+        if (destFile.exists() && destFile.isDirectory())
+        {
+            throw new IOException("Destination '" + destFile + "' exists but is a directory");
+        }
+
+        FileChannel input = new FileInputStream(srcFile).getChannel();
+        try
+        {
+            FileChannel output = new FileOutputStream(destFile).getChannel();
+            try
+            {
+                output.transferFrom(input, 0, input.size());
+            }
+            finally
+            {
+                closeQuietly(output);
+            }
+        }
+        finally
+        {
+            closeQuietly(input);
+        }
+
+        if (srcFile.length() != destFile.length())
+        {
+            throw new IOException("Failed to copy full contents from '" + srcFile + "' to '" + destFile + "'");
+        }
+        if (preserveFileDate)
+        {
+            destFile.setLastModified(srcFile.lastModified());
+        }
+    }
+
+    /**
+     * Unconditionally close a <code>Channel</code>.
+     * <p>
+     * Equivalent to {@link Channel#close()}, except any exceptions will be ignored.
+     * This is typically used in finally blocks.
+     * 
+     * @param channel the Channel to close, may be null or already closed
+     */
+    public static void closeQuietly(Channel channel)
+    {
+        try
+        {
+            if (channel != null)
+            {
+                channel.close();
+            }
+        }
+        catch (IOException ioe)
+        {
+            // ignore
         }
     }
 }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <!-- Version -->
@@ -87,19 +87,19 @@
         <backportUtilConcurrentVersion>3.1</backportUtilConcurrentVersion>
         <bshVersion>2.0b4</bshVersion>
         <cglibVersion>2.1_3</cglibVersion>
-        <commonsBeanUtilsVersion>1.7.0</commonsBeanUtilsVersion>
-        <commonsCliVersion>1.0</commonsCliVersion>
+        <commonsBeanUtilsVersion>1.8.0</commonsBeanUtilsVersion>
+        <commonsCliVersion>1.2</commonsCliVersion>
         <commonsCodecVersion>1.3</commonsCodecVersion>
-        <commonsCollectionsVersion>3.2</commonsCollectionsVersion>
-        <commonsDbUtilsVersion>1.1</commonsDbUtilsVersion>
+        <commonsCollectionsVersion>3.2.1</commonsCollectionsVersion>
+        <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
         <commonsDiscoveryVersion>0.4</commonsDiscoveryVersion>
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
-        <commonsIoVersion>1.3.1</commonsIoVersion>
+        <commonsIoVersion>1.4</commonsIoVersion>
         <commonsJxpathVersion>1.3</commonsJxpathVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
         <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
         <commonsNetVersion>1.4.1</commonsNetVersion>
-        <commonsPoolVersion>1.4</commonsPoolVersion>
+        <commonsPoolVersion>1.5.2</commonsPoolVersion>
         <!-- TODO There is a more modern version of cryptix available: 
         http://mirrors.ibiblio.org/pub/mirrors/maven2/cryptix/cryptix/3.2.0/cryptix-3.2.0.jar
         but the PGP module would need some work in order to use it -->
@@ -167,7 +167,7 @@
         <wss4jVersion>1.5.4</wss4jVersion>
         <xstreamVersion>1.2.2</xstreamVersion>
         <yourKitVersion>8.0.1</yourKitVersion>
-        <xaPoolVersion>1.4</xaPoolVersion>
+        <xaPoolVersion>1.5.0</xaPoolVersion>
     </properties>
 
     <!-- Declare all dependencies that are used in more than one module here. -->
@@ -433,7 +433,7 @@
                 <!-- OSGi-ready -->
                 <groupId>commons-pool</groupId>
                 <artifactId>commons-pool</artifactId>
-                <version>1.4</version>
+                <version>${commonsPoolVersion}</version>
             </dependency>
             
             
@@ -763,7 +763,7 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>${commonsBeanUtilsVersion}-osgi</version>
+            <version>${commonsBeanUtilsVersion}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-logging</artifactId>
@@ -774,7 +774,7 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>${commonsCollectionsVersion}-osgi</version>
+            <version>${commonsCollectionsVersion}</version>
         </dependency>
          <dependency>
             <groupId>commons-codec</groupId>
@@ -790,7 +790,7 @@
          <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>${commonsIoVersion}-osgi</version>
+            <version>${commonsIoVersion}</version>
         </dependency>
          <dependency>
             <groupId>commons-httpclient</groupId>
@@ -806,12 +806,12 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>${commonsLangVersion}-osgi</version>
+            <version>${commonsLangVersion}</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>${commonsCliVersion}-osgi</version>
+            <version>${commonsCliVersion}</version>
                 <exclusions>
                     <!-- we like slf4j -->
                     <exclusion>
