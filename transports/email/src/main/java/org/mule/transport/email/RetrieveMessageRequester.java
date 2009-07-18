@@ -190,23 +190,26 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
                 if (count > 0)
                 {
                     Message message = getNextMessage(folder);
-                    // so we don't get the same message again
-                    flagMessage(folder, message);
-
-                    if (moveToFolder != null)
+                    if (message != null)
                     {
-                        Message newMessage = message;
-                        //If we're using IMAP we need to cache the message contents so the message is accessible after the
-                        //folder is closed
-                        if(message instanceof IMAPMessage)
+                        // so we don't get the same message again
+                        flagMessage(folder, message);
+
+                        if (moveToFolder != null)
                         {
-                            //We need to copy and cache so that the message cna be moved
-                            newMessage = new MimeMessage((IMAPMessage)message);
+                            Message newMessage = message;
+                            //If we're using IMAP we need to cache the message contents so the message is accessible after the
+                            //folder is closed
+                            if (message instanceof IMAPMessage)
+                            {
+                                //We need to copy and cache so that the message cna be moved
+                                newMessage = new MimeMessage((IMAPMessage) message);
+                            }
+                            folder.copyMessages(new Message[]{message}, moveToFolder);
+                            message = newMessage;
                         }
-                        folder.copyMessages(new Message[]{message}, moveToFolder);
-                        message = newMessage;
+                        return new DefaultMuleMessage(castConnector().getMessageAdapter(message), connector.getMuleContext());
                     }
-                    return new DefaultMuleMessage(castConnector().getMessageAdapter(message), connector.getMuleContext());
                 }
                 else if (count == -1)
                 {
@@ -260,14 +263,15 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
 
     protected Message getNextMessage(Folder folder) throws MessagingException
     {
-        if(getMessageCount(folder) > 0)
+        if (getMessageCount(folder) > 0)
         {
-            return folder.getMessage(1);
+            Message message = folder.getMessage(1);
+            if (!message.isExpunged())
+            {
+                return message;
+            }
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     protected int getMessageCount(Folder folder) throws MessagingException
