@@ -510,7 +510,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 connector = factory.getConnectorByProtocol(scheme);
                 if (connector == null)
                 {
-                    connector = factory.createConnector(endpointURI, muleContext);
+                    connector = factory.createConnector(endpointURI);
                     muleContext.getRegistry().registerConnector(connector);
                 }
             }

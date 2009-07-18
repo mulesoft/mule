@@ -11,12 +11,14 @@
 package org.mule.transport.service;
 
 import org.mule.api.MuleContext;
+import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.endpoint.MuleEndpointURI;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.BeanUtils;
 import org.mule.util.ObjectNameHelper;
@@ -63,7 +65,7 @@ public class TransportFactory
      * @return a new Connector
      * @throws TransportFactoryException
      */
-    public Connector createConnector(EndpointURI url, MuleContext muleContext) throws TransportFactoryException
+    public Connector createConnector(EndpointURI url) throws TransportFactoryException
     {
 
         try
@@ -117,16 +119,28 @@ public class TransportFactory
         }
     }
 
-    public Connector getOrCreateConnectorByProtocol(ImmutableEndpoint endpoint, MuleContext muleContext)
+    public Connector createConnector(String uri) throws TransportFactoryException
+    {
+        try
+        {
+            return createConnector(new MuleEndpointURI(uri, muleContext));
+        }
+        catch (EndpointException e)
+        {
+            throw new TransportFactoryException(e);
+        }
+    }
+
+    public Connector getOrCreateConnectorByProtocol(ImmutableEndpoint endpoint)
         throws TransportFactoryException
     {
-        return getOrCreateConnectorByProtocol(endpoint.getEndpointURI(), muleContext);
+        return getOrCreateConnectorByProtocol(endpoint.getEndpointURI());
     }
 
     /**
      * Returns an initialized connector.
      */
-    public Connector getOrCreateConnectorByProtocol(EndpointURI uri, MuleContext muleContext)
+    public Connector getOrCreateConnectorByProtocol(EndpointURI uri)
         throws TransportFactoryException
     {
         String connectorName = uri.getConnectorName();
@@ -143,7 +157,7 @@ public class TransportFactory
         Connector connector = getConnectorByProtocol(uri.getFullScheme());
         if (connector == null)
         {
-            connector = createConnector(uri, muleContext);
+            connector = createConnector(uri);
             try
             {
                 BeanUtils.populate(connector, uri.getParams());
