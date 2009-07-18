@@ -37,11 +37,6 @@ public class RetrieveMessageRequesterFactory extends AbstractMessageRequesterFac
 
     public MessageRequester create(InboundEndpoint endpoint) throws MuleException
     {
-        //Do not dispose the Requestor (close the mail folder when using IMAP since the message will stil be on the server)
-        if(endpoint.getEndpointURI().getScheme().startsWith("imap"))
-        {
-            requesterPErRequest = false;
-        }
         return new RetrieveMessageRequester(endpoint);
     }
 
