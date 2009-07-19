@@ -42,7 +42,7 @@ public class XmppEndpointTestCase extends AbstractMuleTestCase
         assertEquals(6666, endpointUri.getPort());
         assertEquals("jabber.org", endpointUri.getHost());
         assertEquals("mule:secret", endpointUri.getUserInfo());
-        assertEquals("xmpp://mule:secret@jabber.org:6666/ross@jabber.org", endpointUri.toString());
+        assertEquals("xmpp://mule:****@jabber.org:6666/ross@jabber.org", endpointUri.toString());
         assertEquals(0, endpointUri.getParams().size());
         assertEquals("ross@jabber.org", endpointUri.getPath().substring(1));
     }
@@ -59,7 +59,7 @@ public class XmppEndpointTestCase extends AbstractMuleTestCase
         assertEquals(6666, endpointUri.getPort());
         assertEquals("jabber.org", endpointUri.getHost());
         assertEquals("mule:secret", endpointUri.getUserInfo());
-        assertEquals("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=true&nickname=ross",
+        assertEquals("xmpp://mule:****@jabber.org:6666/ross@jabber.org?groupChat=true&nickname=ross",
             endpointUri.toString());
         assertEquals(2, endpointUri.getParams().size());
         assertEquals("ross@jabber.org", endpointUri.getPath().substring(1));

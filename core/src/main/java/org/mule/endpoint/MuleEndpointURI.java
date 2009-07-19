@@ -365,6 +365,12 @@ public class MuleEndpointURI implements EndpointURI
 
     public String toString()
     {
+        if(StringUtils.isNotEmpty(userInfo) && userInfo.indexOf(":") > 0)
+        {
+            //Mask passwords in the logs
+            String maskinfo = userInfo.substring(0, userInfo.indexOf(":")) + ":****";
+            return uri.toASCIIString().replace(userInfo, maskinfo);
+        }
         return uri.toASCIIString();
     }
 

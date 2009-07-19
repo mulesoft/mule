@@ -14,7 +14,6 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.xmpp.XmppConnector;
 
 public abstract class AbstractNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -42,13 +41,13 @@ public abstract class AbstractNamespaceHandlerTestCase extends FunctionalTestCas
         ImmutableEndpoint simpleEndpoint = muleContext.getRegistry()
             .lookupEndpointBuilder("simpleEndpoint")
             .buildOutboundEndpoint();
-        assertEquals(protocolName + "://mule:secret@localhost:1234/recipient", simpleEndpoint.getEndpointURI()
+        assertEquals(protocolName + "://mule:****@localhost:1234/recipient", simpleEndpoint.getEndpointURI()
             .toString());
 
         ImmutableEndpoint groupChatEndpoint = muleContext.getRegistry()
             .lookupEndpointBuilder("groupChatEndpoint")
             .buildOutboundEndpoint();
-        assertEquals(protocolName + "://mule:secret@localhost:1234/recipient", groupChatEndpoint.getEndpointURI()
+        assertEquals(protocolName + "://mule:****@localhost:1234/recipient", groupChatEndpoint.getEndpointURI()
             .toString());
         assertNotNull(groupChatEndpoint.getProperty("groupChat"));
         assertTrue(groupChatEndpoint.getProperty("groupChat") instanceof String);

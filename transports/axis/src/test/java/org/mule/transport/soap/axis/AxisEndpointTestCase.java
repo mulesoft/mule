@@ -61,6 +61,8 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         assertEquals("admin:pwd", endpointUri.getUserInfo());
         assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
+        assertEquals("http://admin:****@www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
+            endpointUri.toString());
     }
 
     public void testEndpointFinder() throws Exception

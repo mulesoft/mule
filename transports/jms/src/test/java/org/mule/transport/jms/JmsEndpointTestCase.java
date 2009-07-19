@@ -91,7 +91,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("user:password", url.getUserInfo());
         assertEquals("user", url.getUser());
         assertEquals("password", url.getPassword());
-        assertEquals("jms://user:password@topic:topic1", url.toString());
+        assertEquals("jms://user:****@topic:topic1", url.toString());
     }
 
     public void testJmsTopicWithUserInfoAndProvider() throws Exception
@@ -105,7 +105,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("user:password", url.getUserInfo());
         assertEquals("user", url.getUser());
         assertEquals("password", url.getPassword());
-        assertEquals("jms://user:password@topic:topic1?endpointName=jmsProvider", url.toString());
+        assertEquals("jms://user:****@topic:topic1?endpointName=jmsProvider", url.toString());
     }
 
     public void testJmsDestWithSlashesAndUserInfoUsingAddressParam() throws Exception
@@ -117,7 +117,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("user:password", url.getUserInfo());
         assertEquals("user", url.getUser());
         assertEquals("password", url.getPassword());
-        assertEquals("jms://user:password@?address=/myQueues/myQueue", url.toString());
+        assertEquals("jms://user:****@?address=/myQueues/myQueue", url.toString());
     }
 
     public void testJmsDestWithSlashesAndUserInfo() throws Exception
@@ -129,7 +129,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("user:password", url.getUserInfo());
         assertEquals("user", url.getUser());
         assertEquals("password", url.getPassword());
-        assertEquals("jms://user:password@myQueues/myQueue", url.toString());
+        assertEquals("jms://user:****@myQueues/myQueue", url.toString());
     }
 
     public void testJmsTopicDestinationsWithAddressParam() throws Exception

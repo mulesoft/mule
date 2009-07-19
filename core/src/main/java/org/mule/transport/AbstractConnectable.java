@@ -27,7 +27,6 @@ import org.mule.util.concurrent.WaitableBoolean;
 import java.beans.ExceptionListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -351,7 +350,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         final StringBuffer sb = new StringBuffer(80);
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
-        sb.append(", endpoint=").append(endpoint.getEndpointURI().getUri());
+        sb.append(", endpoint=").append(endpoint.getEndpointURI());
         sb.append(", disposed=").append(disposed);
         sb.append('}');
         return sb.toString();

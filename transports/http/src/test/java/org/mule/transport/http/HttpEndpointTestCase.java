@@ -43,6 +43,7 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
         assertEquals("admin:pwd", endpointUri.getUserInfo());
         assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
+        assertEquals("http://admin:****@localhost:8080", endpointUri.toString());
     }
 
     public void testHostPortAndPathUrl() throws Exception
@@ -74,6 +75,8 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
         assertEquals("admin:pwd", endpointUri.getUserInfo());
         assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
+        assertEquals("http://admin:****@localhost:8080/app/path", endpointUri.toString());
+
     }
 
     public void testHostPortAndPathUrlUserInfoAndQuery() throws Exception
@@ -91,5 +94,7 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
         assertEquals("admin:pwd", endpointUri.getUserInfo());
         assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
+        assertEquals("http://admin:****@localhost:8080/app/path?$[foo]", endpointUri.toString());
+
     }
 }
