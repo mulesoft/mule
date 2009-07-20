@@ -118,6 +118,7 @@ public class ExpressionConfig
     public void setCustomEvaluator(String customEvaluator)
     {
         this.customEvaluator = StringUtils.trimToNull(customEvaluator);
+        fullExpression=null;        
     }
 
     public String getEvaluator()
@@ -128,6 +129,7 @@ public class ExpressionConfig
     public void setEvaluator(String evaluator)
     {
         this.evaluator = StringUtils.trimToNull(evaluator);
+        fullExpression=null;
     }
 
     public String getExpression()
@@ -138,5 +140,6 @@ public class ExpressionConfig
     public void setExpression(String expression)
     {
         this.expression = StringUtils.trimToEmpty(expression);
+        fullExpression=null;
     }
 }

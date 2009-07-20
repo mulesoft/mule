@@ -13,7 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.filter.Filter;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.expression.ExpressionConfig;
 import static org.mule.util.ClassUtils.equal;
 import static org.mule.util.ClassUtils.hash;
 
@@ -23,7 +23,24 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Allows boolean expressions to be executed on a message
+ * Allows boolean expressions to be executed on a message. Note that when using this filter you must be able to either specify
+ * a boolean expression when using an expression filter or use one of the standard Mule filters.  These can be defined as follows -
+ *
+ * <ul>
+ * <li>RegEx - 'regex:<pattern>': #[regex:'error' [0-9]]</li>
+ * <li>Wildcard - 'wildcard:<pattern>': #[wildcard: *foo*</li>
+ * <li>PayloadType - 'payload-type:<fully qualified class name>': #[payload:javax.jms.TextMessage]</li>
+ * <li>ExceptionType - 'exception-type:<fully qualified class name>': #[exception-type:java.io.FileNotFoundException]</li>
+ * <li>Header - 'header:<boolean expression>': #[header:foo!=null]</li>
+ * </ul>
+ *
+ * Otherwise you can use eny expression filter providing you can define a boolean expression i.e.
+ * <code>
+ * #[xpath:count(/Foo/Bar) == 0]
+ * </code>
+ *
+ * Note that it if the expression is not a boolean expression this filter will return true if the expression returns a result
+ * 
  */
 public class ExpressionFilter implements Filter, MuleContextAware
 {
@@ -32,45 +49,34 @@ public class ExpressionFilter implements Filter, MuleContextAware
      */
     protected transient final Log logger = LogFactory.getLog(ExpressionFilter.class);
 
-    private String evaluator;
-    private String expression;
-    private String customEvaluator;
+    private ExpressionConfig config;
     private String fullExpression;
     private boolean nullReturnsTrue = false;
     private MuleContext muleContext;
-
-    private static final String TRUE = "true";
 
     /** For evaluators that are not expression languages we can delegate the execution to another filter */
     private Filter delegateFilter;
 
     public ExpressionFilter(String evaluator, String customEvaluator, String expression)
     {
-        this.customEvaluator = customEvaluator;
-        this.evaluator = evaluator;
-        this.expression = expression;
+        this.config = new ExpressionConfig(expression, evaluator, customEvaluator);
     }
 
     public ExpressionFilter(String evaluator, String expression)
     {
-        this.evaluator = evaluator;
-        this.expression = expression;
+        this.config = new ExpressionConfig(expression, evaluator, null);
     }
 
     public ExpressionFilter(String expression)
     {
-        int i = expression.indexOf(":");
-        if(i < 0)
-        {
-            throw new IllegalArgumentException("Expression is invalid: " + expression);
-        }
-        this.evaluator = expression.substring(0, i);
-        this.expression = expression.substring(i+1);
+        this.config = new ExpressionConfig();
+        this.config.parse(expression);
     }
 
     public ExpressionFilter()
     {
         super();
+        this.config = new ExpressionConfig();
     }
 
     public void setMuleContext(MuleContext context)
@@ -97,7 +103,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
             return result;
         }
 
-        Object result = muleContext.getExpressionManager().evaluate(expr, message);
+        Object result = muleContext.getExpressionManager().evaluate(expr, message, false);
         if (result == null)
         {
             return nullReturnsTrue;
@@ -108,7 +114,18 @@ public class ExpressionFilter implements Filter, MuleContextAware
         }
         else if (result instanceof String)
         {
-            return ((String) result).toLowerCase().equals(TRUE);
+            if(result.toString().toLowerCase().equalsIgnoreCase("false"))
+            {
+                return false;
+            }
+            else if(result.toString().toLowerCase().equalsIgnoreCase("true"))
+            {
+                return true;
+            }
+            else
+            {
+                return !nullReturnsTrue;
+            }
         }
         else
         {
@@ -122,38 +139,24 @@ public class ExpressionFilter implements Filter, MuleContextAware
     {
         if(fullExpression==null)
         {
-            if(evaluator==null)
+            //Handle non-expression filters
+            if(config.getEvaluator().equals("header"))
             {
-                throw new IllegalArgumentException(CoreMessages.objectIsNull("evaluator").getMessage());
+                delegateFilter = new MessagePropertyFilter(config.getExpression());
             }
-            if(evaluator.equals("custom"))
+            else if(config.getEvaluator().equals("regex"))
             {
-                if(customEvaluator==null)
-                {
-                    throw new IllegalArgumentException(CoreMessages.objectIsNull("customEvaluator").getMessage());
-                }
-                else
-                {
-                    evaluator = customEvaluator;
-                }
+                delegateFilter = new RegExFilter(config.getExpression());
             }
-            if(evaluator.equals("header"))
+            else if(config.getEvaluator().equals("wildcard"))
             {
-                delegateFilter = new MessagePropertyFilter(expression);
+                delegateFilter = new WildcardFilter(config.getExpression());
             }
-            else if(evaluator.equals("regex"))
-            {
-                delegateFilter = new RegExFilter(expression);
-            }
-            else if(evaluator.equals("wildcard"))
-            {
-                delegateFilter = new WildcardFilter(expression);
-            }
-            else if(evaluator.equals("payload-type"))
+            else if(config.getEvaluator().equals("payload-type"))
             {
                 try
                 {
-                    delegateFilter = new PayloadTypeFilter(expression);
+                    delegateFilter = new PayloadTypeFilter(config.getExpression());
                 }
                 catch (ClassNotFoundException e)
                 {
@@ -162,11 +165,11 @@ public class ExpressionFilter implements Filter, MuleContextAware
                     throw iae;
                 }
             }
-            else if(evaluator.equals("exception-type"))
+            else if(config.getEvaluator().equals("exception-type"))
             {
                 try
                 {
-                    delegateFilter = new ExceptionTypeFilter(expression);
+                    delegateFilter = new ExceptionTypeFilter(config.getExpression());
                 }
                 catch (ClassNotFoundException e)
                 {
@@ -178,7 +181,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
             else
             {
                 //In the case of 'payload' the expression can be null
-                fullExpression = evaluator + ":" + (expression==null ? "" : expression);
+                fullExpression = config.getFullExpression(muleContext.getExpressionManager());
             }
         }
         return fullExpression;
@@ -186,32 +189,35 @@ public class ExpressionFilter implements Filter, MuleContextAware
 
     public String getCustomEvaluator()
     {
-        return customEvaluator;
+        return config.getCustomEvaluator();
     }
 
     public void setCustomEvaluator(String customEvaluator)
     {
-        this.customEvaluator = customEvaluator;
+        this.config.setCustomEvaluator(customEvaluator);
+        fullExpression=null;        
     }
 
     public String getEvaluator()
     {
-        return evaluator;
+        return config.getEvaluator();
     }
 
     public void setEvaluator(String evaluator)
     {
-        this.evaluator = evaluator;
+        this.config.setEvaluator(evaluator);
+        fullExpression=null;
     }
 
     public String getExpression()
     {
-        return expression;
+        return config.getExpression();
     }
 
     public void setExpression(String expression)
     {
-        this.expression = expression;
+        this.config.setExpression(expression);
+        fullExpression=null;
     }
 
     public boolean isNullReturnsTrue()
@@ -230,17 +236,13 @@ public class ExpressionFilter implements Filter, MuleContextAware
         if (obj == null || getClass() != obj.getClass()) return false;
 
         final ExpressionFilter other = (ExpressionFilter) obj;
-        return equal(customEvaluator, other.customEvaluator)
+        return equal(config, other.config)
             && equal(delegateFilter, other.delegateFilter)
-            && equal(evaluator, other.evaluator)
-            && equal(expression, other.expression)
-            && equal(fullExpression, other.fullExpression)
             && nullReturnsTrue == other.nullReturnsTrue;
     }
 
     public int hashCode()
     {
-        return hash(new Object[]{this.getClass(), customEvaluator, delegateFilter,
-            evaluator, expression, fullExpression, nullReturnsTrue});
+        return hash(new Object[]{this.getClass(), config, delegateFilter, nullReturnsTrue});
     }
 }

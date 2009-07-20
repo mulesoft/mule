@@ -17,6 +17,8 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ExpressionFilterTestCase extends AbstractMuleTestCase
 {
@@ -90,6 +92,20 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept(new DefaultMuleMessage("he quick brown fox", muleContext)));
     }
 
+    public void testRegexFilterWithAngleBrackets()
+    {
+
+        ExpressionFilter filter = new ExpressionFilter("#[regex:The number is [1-9]]");
+        filter.setMuleContext(muleContext);
+
+        assertNotNull(filter.getExpression());
+
+        assertTrue(filter.accept(new DefaultMuleMessage("The number is 4", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("Say again?", muleContext)));
+
+        assertFalse(filter.accept(new DefaultMuleMessage("The number is 0", muleContext)));
+    }
+
     public void testExceptionTypeFilter()
     {
         ExpressionFilter filter = new ExpressionFilter("exception-type:java.lang.Exception");
@@ -153,15 +169,29 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept(new DefaultMuleMessage("faLSe", muleContext)));
     }
 
-    public void testOtherString()
+    public void testExpressionFilter()
     {
-        ExpressionFilter filter = new ExpressionFilter("payload:");
+        ExpressionFilter filter = new ExpressionFilter("mule:message.header(foo*)");
         filter.setMuleContext(muleContext);
-        
+
         filter.setNullReturnsTrue(false);
 
-        assertFalse(filter.accept(new DefaultMuleMessage("otherTrueString", muleContext)));
-        assertFalse(filter.accept(new DefaultMuleMessage("otherFalseString", muleContext)));
-        assertFalse(filter.accept(new DefaultMuleMessage("!trueFALSE", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("x", muleContext)));
+        Map headers = new HashMap(1);
+        headers.put("foo", "bar");
+        assertTrue(filter.accept(new DefaultMuleMessage("x", headers, muleContext)));
+    }
+
+    public void testExpressionFilterWithFullSyntax()
+    {
+        ExpressionFilter filter = new ExpressionFilter("#[mule:message.header(foo*)]");
+        filter.setMuleContext(muleContext);
+
+        filter.setNullReturnsTrue(false);
+
+        assertFalse(filter.accept(new DefaultMuleMessage("x", muleContext)));
+        Map headers = new HashMap(1);
+        headers.put("foo", "bar");
+        assertTrue(filter.accept(new DefaultMuleMessage("x", headers, muleContext)));
     }
 }
