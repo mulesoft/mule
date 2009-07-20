@@ -30,6 +30,7 @@ public class JsonData implements DynaBean, Serializable
 {
     private MorphDynaBean morphDynaBean;
     private List entries;
+    private boolean strict = true;
 
     public JsonData(List entries)
     {
@@ -107,7 +108,7 @@ public class JsonData implements DynaBean, Serializable
         }
         if(isArray() && !objectName.startsWith("["))
         {
-            throw new MorphException("Object is an array, but a nae of the object is given: " + objectName);      
+            throw new MorphException("Object is an array, but a name of the object is given: " + objectName);
         }
 
         Object o;
