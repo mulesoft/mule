@@ -97,7 +97,8 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             this.reuseSession = false;
         }
 
-        // User may override reuse strategy if necessary
+        // User may override reuse strategy if necessary. This is available for legacy reasons, 
+        // but this approach is not recommended and should never be set when using XA.
         this.reuseConsumer = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseConsumer",
             this.reuseConsumer);
         this.reuseSession = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseSession",
