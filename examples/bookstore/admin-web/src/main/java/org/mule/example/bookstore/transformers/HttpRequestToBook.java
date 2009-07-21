@@ -13,7 +13,9 @@ package org.mule.example.bookstore.transformers;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.example.bookstore.Book;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.api.MuleMessage;
+import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transport.servlet.HttpRequestMessageAdapter;
 import org.mule.util.StringUtils;
 
 import java.util.Map;
@@ -23,20 +25,21 @@ import java.util.Map;
  * The request parameters are always strings (they come from the HTML form), 
  * so we need to parse and convert them to their appropriate types.
  */
-public class ParameterMapToBook extends AbstractTransformer
+public class HttpRequestToBook extends AbstractMessageAwareTransformer
 {
-    public ParameterMapToBook()
+    public HttpRequestToBook()
     {
         super();
-        registerSourceType(Map.class);
+        registerSourceType(Object.class);
         setReturnClass(Book.class);
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        Map <String, String> parameters = (Map <String, String>) src;
-        
+        HttpRequestMessageAdapter messageAdapter = (HttpRequestMessageAdapter) message.getAdapter();
+        Map <String, String> parameters = messageAdapter.getRequestParameters();
+
         String author = parameters.get("author");
         String title = parameters.get("title");
         String price = parameters.get("price");

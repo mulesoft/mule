@@ -50,6 +50,8 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
     private String contentType;
 
     private String characterEncoding;
+
+	private final Map <String, String> requestParameters;
     
     public HttpRequestMessageAdapter(Object message) throws MuleException
     {
@@ -63,6 +65,17 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
 
             contentType = request.getContentType();
             characterEncoding = request.getCharacterEncoding();
+
+            Enumeration<String> paramNames = request.getParameterNames();            
+            requestParameters = new HashMap();
+            if (paramNames != null)
+            {
+                while (paramNames.hasMoreElements())
+                {
+                    String paramName = paramNames.nextElement();            
+                    requestParameters.put(paramName, request.getParameterValues(paramName)[0]);
+                }
+            }
             
             Map<Object, Object> headers = new HashMap<Object, Object>();
             
@@ -133,6 +146,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         payloadHolder = template.payloadHolder;
         contentType = template.contentType;
         characterEncoding = template.characterEncoding;
+        requestParameters = template.requestParameters;
     }
 
     protected void setContentEncoding(HttpServletRequest request)
@@ -248,6 +262,11 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
     public String[] getParameterValues(String paramName)
     {
         throw new UnsupportedOperationException("getParameterValues");
+    }
+
+    public Map<String, String> getRequestParameters()
+    {
+        return requestParameters;
     }
 
     @Override

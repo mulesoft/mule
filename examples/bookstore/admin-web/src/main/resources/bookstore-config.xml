@@ -39,10 +39,8 @@
                     <!-- Administration interface -->
                     <inbound-endpoint address="servlet://catalog">                                      
                         <transformers>                                  
-                            <!-- Extract parameters from HTTP Request -->
-                            <servlet:http-request-to-parameter-map />
                             <!-- Convert request parameters to Book object -->
-                            <custom-transformer class="org.mule.example.bookstore.transformers.ParameterMapToBook"/>
+                            <custom-transformer class="org.mule.example.bookstore.transformers.HttpRequestToBook"/>
                         </transformers>
                         <response-transformers>
                             <!-- Format response to be a nice HTML page -->

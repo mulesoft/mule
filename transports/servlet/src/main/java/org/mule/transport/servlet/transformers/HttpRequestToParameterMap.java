@@ -15,8 +15,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transport.servlet.HttpRequestMessageAdapter;
 
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,15 +32,6 @@ public class HttpRequestToParameterMap extends AbstractMessageAwareTransformer
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         HttpRequestMessageAdapter messageAdapter = (HttpRequestMessageAdapter) message.getAdapter();
-        Enumeration<String> paramNames = messageAdapter.getParameterNames();
-        
-        Map <String, String> parameters = new HashMap();
-        String paramName;
-        while (paramNames.hasMoreElements())
-        {
-            paramName = paramNames.nextElement();            
-            parameters.put(paramName, messageAdapter.getParameterValues(paramName)[0]);
-        }
-        return parameters;
+        return messageAdapter.getRequestParameters();
     }
 }
