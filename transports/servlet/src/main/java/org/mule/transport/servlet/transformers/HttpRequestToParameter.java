@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Properties;
 
 public class HttpRequestToParameter extends AbstractMessageAwareTransformer
 {
@@ -38,16 +39,25 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
         String payloadParam = messageAdapter.getStringProperty(
             AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME, 
             AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME);
-
+        
         String payload = messageAdapter.getStringProperty(payloadParam, null);
-        if (null == payload)
+        if (payload == null)
         {
-            if (isText(messageAdapter.getContentType()))
+            // Plain text
+            if (messageAdapter.getContentType() == null || messageAdapter.getContentType().startsWith("text/"))
             {
                 try
                 {
                     InputStream is = (InputStream) message.getPayload();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, messageAdapter.getCharacterEncoding()));
+                    BufferedReader reader;
+                    if (messageAdapter.getCharacterEncoding() != null)
+                    {
+                        reader = new BufferedReader(new InputStreamReader(is, messageAdapter.getCharacterEncoding()));
+                    }
+                    else
+                    {
+                        reader = new BufferedReader(new InputStreamReader(is));
+                    }
                     StringBuffer buffer = new StringBuffer(8192);
                     String line = reader.readLine();
                     while (line != null)
@@ -63,18 +73,35 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
                     throw new TransformerException(this, e);
                 }
             }
+            
+            // HTTP Form
+            else if (messageAdapter.getContentType().equals("application/x-www-form-urlencoded"))
+            {
+                InputStream is = (InputStream) message.getPayload();
+                Properties props = new Properties();
+                try
+                {
+                    props.load(is);
+                }
+                catch (IOException e)
+                {
+                    throw new TransformerException(this, e);
+                }
+                finally
+                {
+                    try
+                    {
+                        is.close();
+                    }
+                    catch (IOException e2)
+                    {
+                        throw new TransformerException(this, e2);
+                    }
+                }
+                return props.get(payloadParam);
+            }
         }
 
         return payload;
     }
-
-    protected boolean isText(String contentType)
-    {
-        if (contentType == null)
-        {
-            return true;
-        }
-        return (contentType.startsWith("text/"));
-    }
-
 }
