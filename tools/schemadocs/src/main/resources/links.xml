@@ -136,8 +136,11 @@
     <link><item>cxf:connector</item><page>CXF+Transport</page></link>
     <link><item>cxf:inbound-endpoint</item><page>CXF+Transport</page></link>
     <link><item>cxf:outbound-endpoint</item><page>CXF+Transport</page></link>
-    <link><item>cxf:endpoint</item><page>Cxf+Transport</page></link>
-    <link><item>cxf:features</item><page>Cxf+Transport</page></link>
+    <link><item>cxf:endpoint</item><page>CXF+Transport</page></link>
+    <link><item>cxf:features</item><page>CXF+Transport</page></link>
+    <link><item>wsdl-cxf:inbound-endpoint</item><page>CXF+Transport</page></link>
+    <link><item>wsdl-cxf:outbound-endpoint</item><page>CXF+Transport</page></link>
+    <link><item>wsdl-cxf:endpoint</item><page>CXF+Transport</page></link>
 
     <link><item>ejb:connector</item><page>EJB+Transport</page></link>
     <link><item>ejb:inbound-endpoint</item><page>EJB+Transport</page></link>
@@ -322,22 +325,6 @@
     <link><item>vm:inbound-endpoint</item><page>VM+Transport</page></link>
     <link><item>vm:outbound-endpoint</item><page>VM+Transport</page></link>
     <link><item>vm:endpoint</item><page>VM+Transport</page></link>
-
-    <link><item>wsdl-xfire:inbound-endpoint</item><page>WSDL-XFire+Transport</page></link>
-    <link><item>wsdl-xfire:outbound-endpoint</item><page>WSDL-XFire+Transport</page></link>
-    <link><item>wsdl-xfire:endpoint</item><page>WSDL-XFire+Transport</page></link>
-
-    <link><item>xfire:connector</item><page>XFire+Transport</page></link>
-    <link><item>xfire:client-in-handler</item><page>XFire+Transport</page></link>
-    <link><item>xfire:client-out-handler</item><page>XFire+Transport</page></link>
-    <link><item>xfire:client-service</item><page>XFire+Transport</page></link>
-    <link><item>xfire:server-in-handler</item><page>XFire+Transport</page></link>
-    <link><item>xfire:server-out-handler</item><page>XFire+Transport</page></link>
-    <link><item>xfire:inbound-endpoint</item><page>XFire+Transport</page></link>
-    <link><item>xfire:outbound-endpoint</item><page>XFire+Transport</page></link>
-    <link><item>xfire:endpoint</item><page>XFire+Transport</page></link>
-    <link><item>xfire:soap-11-transport</item><page>XFire+Transport</page></link>
-    <link><item>xfire:complex-type</item><page>XFire+Transport</page></link>
 
     <link><item>xmpp:connector</item><page>XMPP+Transport</page></link>
     <link><item>xmpp:inbound-endpoint</item><page>XMPP+Transport</page></link>
