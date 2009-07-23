@@ -19,7 +19,9 @@
                     <quartz:event-generator-job/>
                 </quartz:inbound-endpoint>
             </inbound>
-            <component class="org.mule.example.gpswalker.CityStroller"/>
+            <component>
+                <singleton-object class="org.mule.example.gpswalker.CityStroller"/>
+            </component>
             <outbound>
                 <pass-through-router>
                     <ajax:servlet-outbound-endpoint path="/services/gps">

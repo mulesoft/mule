@@ -13,6 +13,7 @@ package org.mule.config.builders;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
@@ -84,7 +85,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
         try
         {
             muleContext = createMuleContext(config, context);
-            context.setAttribute(WebappMuleXmlConfigurationBuilder.MULE_CONTEXT_ATTRIBUTE, muleContext);
+            context.setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
             muleContext.start();
         }
         catch (MuleException ex)

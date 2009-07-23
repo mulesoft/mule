@@ -9,6 +9,8 @@
  */
 package org.mule.example.gpswalker;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Generates a random walk around a city
  */
@@ -20,26 +22,27 @@ public class CityStroller
     public static final GpsCoord VALLETTA = new GpsCoord(35.898504f, 14.514313f);
 
 
-    private GpsCoord currentCoord = SAN_FRANCISCO;
-    private boolean firstTime = true;
+    private volatile GpsCoord currentCoord = SAN_FRANCISCO;
+    private AtomicBoolean firstTime = new AtomicBoolean(true);
 
-    //could use a better algorithm here or real test dats for better results
+    //could use a better algorithm here or real test data for better results
     public GpsCoord generateNextCoord()
     {
-        if(firstTime)
+        if (firstTime.get())
         {
-            firstTime = false;
-            return currentCoord;
+            firstTime.set(false);
         }
+        else
+        {
+            double dist = Math.random() * 0.002;
+            double angle = Math.random() * Math.PI;
 
-        double dist = Math.random() * 0.002;
-        double angle = Math.random() * Math.PI;
 
+            float lat = currentCoord.getLatitude() + (float) (dist * Math.sin(angle));
+            float lng = currentCoord.getLongitude() + (float) (dist * Math.cos(angle));
 
-        float lat = currentCoord.getLatitude() + (float) (dist * Math.sin(angle));
-        float lng = currentCoord.getLongitude() + (float) (dist * Math.sin(angle));
-
-        currentCoord = new GpsCoord(lat, lng);
+            currentCoord = new GpsCoord(lat, lng);
+        }
         return currentCoord;
     }
 
@@ -51,6 +54,6 @@ public class CityStroller
     public void setCurrentCoord(GpsCoord currentCoord)
     {
         this.currentCoord = currentCoord;
-        firstTime = true;
+        firstTime.set(false);
     }
 }
