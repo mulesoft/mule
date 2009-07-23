@@ -34,7 +34,7 @@ public class BeanToMap extends AbstractTransformer implements DiscoverableTransf
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
-        Map result = BeanUtils.describe(src);
+        Map result = BeanUtils.describeBean(src);
         return result;
     }
 

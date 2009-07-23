@@ -30,4 +30,13 @@ public class GpsCoord {
 		return longitude;
 	}
 
+    public void setLatitude(float latitude)
+    {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(float longitude)
+    {
+        this.longitude = longitude;
+    }
 }
