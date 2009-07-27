@@ -55,7 +55,7 @@ public class ResourceLoaderServletTestCase extends AbstractMuleTestCase
     {
         MuleClient client = new MuleClient();
 
-        MuleMessage m = client.request("http://localhost:8881/mule-resource/web/js/mule.js", 3000);
+        MuleMessage m = client.request("http://localhost:8881/mule-resource/js/mule.js", 3000);
         assertFalse(m.getPayload() instanceof NullPayload);
     }
 }

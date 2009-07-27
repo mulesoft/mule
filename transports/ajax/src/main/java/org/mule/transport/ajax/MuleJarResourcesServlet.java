@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class MuleJarResourcesServlet extends HttpServlet
 {
-    public static final String DEFAULT_BASE_PATH = "META-INF";
+    public static final String DEFAULT_BASE_PATH = "";
 
     public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 
@@ -36,6 +36,7 @@ public class MuleJarResourcesServlet extends HttpServlet
     {
         String file = getBasepath() + req.getPathInfo();
 
+        if(file.startsWith("/")) file = file.substring(1);
         InputStream in = IOUtils.getResourceAsStream(file, getClass(), false, false);
         if (in == null)
         {

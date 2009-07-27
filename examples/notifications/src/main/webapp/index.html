@@ -6,8 +6,11 @@
 
     <link rel="stylesheet" href="notifications.css"/>
 
-    <script type="text/javascript" src="http://o.aolcdn.com/dojo/1.3.0/dojo/dojo.xd.js"></script>
-    <script type="text/javascript" src="mule-resource/web/js/mule.js"></script>
+    <!-- stripped down version of dojo that just includes the peices necessary for cometd -->
+    <script type="text/javascript" src="mule-resource/js/dojo/dojo.js"></script>
+    <script type="text/javascript" src="mule-resource/js/dojox/cometd.js.uncompressed.js"></script>
+    <script type="text/javascript" src="mule-resource/js/mule.js"></script>
+
     <script type="text/javascript">
         dojo.require("dojox.cometd");
         dojo.require("dojox.cometd.timestamp");
