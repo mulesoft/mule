@@ -31,7 +31,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
     //This is slow
     public void testInterfaceScanClasspathAndJars() throws Exception
     {
-        ClasspathScanner s = new ClasspathScanner(new String[]{"org"});
+        ClasspathScanner s = new ClasspathScanner("org");
         Set<Class> set = s.scanFor(Fruit.class);
 
         assertTrue(set.contains(Apple.class));
@@ -46,7 +46,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
     //This will be a lot more efficient
     public void testInterfaceScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
-        ClasspathScanner s = new ClasspathScanner(new String[]{"org/mule"});
+        ClasspathScanner s = new ClasspathScanner("org/mule");
         Set<Class> set = s.scanFor(Fruit.class);
 
         assertTrue(set.contains(Apple.class));
@@ -62,7 +62,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
 
     public void testImplementationScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
-        ClasspathScanner s = new ClasspathScanner(new String[]{"org/mule"});
+        ClasspathScanner s = new ClasspathScanner("org/mule");
         Set<Class> set = s.scanFor(Orange.class);
 
         assertFalse(set.contains(Apple.class));
@@ -75,7 +75,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
 
     public void testAnnotationMetaScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
-        ClasspathScanner s = new ClasspathScanner(new String[]{"org/mule/util"});
+        ClasspathScanner s = new ClasspathScanner("org/mule/util");
         Set<Class> set = s.scanFor(Meta.class);
 
         assertEquals(3, set.size());
@@ -86,7 +86,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
 
     public void testAnnotationScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
-        ClasspathScanner s = new ClasspathScanner(new String[]{"org/mule"});
+        ClasspathScanner s = new ClasspathScanner("org/mule");
         Set<Class> set = s.scanFor(Marker.class);
 
         assertTrue(set.contains(SampleBeanWithAnnotations.class));
