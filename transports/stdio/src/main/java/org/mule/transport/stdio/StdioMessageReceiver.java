@@ -134,20 +134,13 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                     }
                 }
 
-                // remove any trailing CR/LF
-                String finalMessageString;
-                int noCRLFLength = fullBuffer.length() - SystemUtils.LINE_SEPARATOR.length();
-                if (fullBuffer.indexOf(SystemUtils.LINE_SEPARATOR, noCRLFLength) != -1)
-                {
-                    finalMessageString = fullBuffer.substring(0, noCRLFLength);
+                // Each line is a separate message
+                String[] lines = fullBuffer.toString().split(SystemUtils.LINE_SEPARATOR);
+                for (int i = 0; i < lines.length; ++i)
+                {                
+                    routeMessage(new DefaultMuleMessage(connector.getMessageAdapter(lines[i]), connector.getMuleContext()), 
+                                 endpoint.isSynchronous());
                 }
-                else
-                {
-                    finalMessageString = fullBuffer.toString();
-                }
-
-                MuleMessage message = new DefaultMuleMessage(connector.getMessageAdapter(finalMessageString), connector.getMuleContext());
-                routeMessage(message, endpoint.isSynchronous());
             }
 
             doConnect();
