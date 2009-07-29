@@ -58,13 +58,6 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         if (message instanceof HttpServletRequest)
         {
             HttpServletRequest request = (HttpServletRequest) message;
-            
-            setPayload(request);
-            setContentEncoding((HttpServletRequest) message);
-            setupUniqueId(request);
-
-            contentType = request.getContentType();
-            characterEncoding = request.getCharacterEncoding();
 
             Enumeration<String> paramNames = request.getParameterNames();            
             requestParameters = new HashMap();
@@ -76,7 +69,14 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
                     requestParameters.put(paramName, request.getParameterValues(paramName)[0]);
                 }
             }
-            
+                        
+            setPayload(request);
+            setContentEncoding((HttpServletRequest) message);
+            setupUniqueId(request);
+
+            contentType = request.getContentType();
+            characterEncoding = request.getCharacterEncoding();
+
             Map<Object, Object> headers = new HashMap<Object, Object>();
             
             final Map parameterMap = request.getParameterMap();
