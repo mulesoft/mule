@@ -8,23 +8,18 @@
 
     <!-- stripped down version of dojo that just includes the peices necessary for cometd -->
     <script type="text/javascript" src="mule-resource/js/dojo/dojo.js"></script>
-    <script type="text/javascript" src="mule-resource/js/dojox/cometd.js.uncompressed.js"></script>
     <script type="text/javascript" src="mule-resource/js/mule.js"></script>
 
     <script type="text/javascript">
-        dojo.require("dojox.cometd");
-        dojo.require("dojox.cometd.timestamp");
 
         function init()
         {
             mule.subscribe("/mule/notifications", notif);
-//            mule.subscribe("/services/response", rpcEchoResponse);
         }
 
         function dispose()
         {
             mule.unsubscribe("/mule/notifications", notif);
-//            mule.unsubscribe("/services/response", rpcEchoResponse);
         }
 
         function notif(message)
@@ -63,15 +58,10 @@
         function rpcEchoResponse(message) {
             document.getElementById("response").innerHTML = "<b>Response:&nbsp;</b>" + message.data + "\n";
         }
-
-        dojo.addOnLoad(init);
-        dojo.addOnUnload(dispose);
-
-
     </script>
 </head>
 
-<body>
+<body onload="init()" onunload="dispose()">
 
 <h1>Mule Notifications</h1>
 

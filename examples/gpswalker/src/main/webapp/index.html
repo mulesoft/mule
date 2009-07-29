@@ -5,7 +5,6 @@
     <title>Mule AJAX Example</title>
     <!-- stripped down version of dojo that just includes the peices necessary for cometd -->
     <script type="text/javascript" src="mule-resource/js/dojo/dojo.js"></script>
-    <script type="text/javascript" src="mule-resource/js/dojox/cometd.js.uncompressed.js"></script>
     <script type="text/javascript" src="mule-resource/js/mule.js"></script>
 
     <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA_9P3leoajNRw866Ba34-tBTwM0brOpm-All5BF6PoaKBxRWWERQBp4nDkS9za5_7YtEoet0y1AdBIw"
@@ -51,12 +50,10 @@
             map.setCenter(latLng);
         }
     }
-    dojo.addOnLoad(init);
-    dojo.addOnUnload(dispose);
+
 </script>
 
-</head>
-<body>
+<body onload="init()" onunload="dispose()">
 <h2>Mule GPS Walker</h2>
 
 <div id="map" style="width: 800px; height: 400px"></div>
