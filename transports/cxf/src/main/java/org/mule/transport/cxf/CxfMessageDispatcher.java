@@ -68,20 +68,23 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
 
     And the map method to operation
      */
+    @Override
     protected void doConnect() throws Exception
     {
         wrapper = new ClientWrapper(connector.getCxfBus(), endpoint);
     }
 
+    @Override
     protected void doDisconnect() throws Exception
-    {
-    }
-
-    protected void doDispose()
     {
         // nothing to do
     }
 
+    @Override
+    protected void doDispose()
+    {
+        // nothing to do
+    }
 
     protected Object[] getArgs(MuleEvent event) throws TransformerException
     {
@@ -218,11 +221,13 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         return buildResponseMessage(muleRes, response);
     }
 
-	private Map<String, Object> getInovcationProperties(MuleEvent event) {
+	private Map<String, Object> getInovcationProperties(MuleEvent event) 
+	{
 		Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_EVENT_PROPERTY, event); 
         EndpointURI uri = endpoint.getEndpointURI();
-        if (uri.getUser() != null) {
+        if (uri.getUser() != null) 
+        {
         	props.put(BindingProvider.USERNAME_PROPERTY, uri.getUser());
         	props.put(BindingProvider.PASSWORD_PROPERTY, uri.getPassword());
         }
@@ -253,6 +258,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
 
         return result;
     }
+    
     protected void doDispatch(MuleEvent event) throws Exception
     {
         doSend(event);
