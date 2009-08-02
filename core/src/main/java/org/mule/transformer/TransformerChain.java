@@ -87,7 +87,7 @@ public class TransformerChain extends AbstractMessageAwareTransformer
     }
 
     @Override
-    public void setMuleContext(MuleContext context)
+    public void setMuleContext(MuleContext muleContext)
     {
         super.setMuleContext(muleContext);
         for (Transformer transformer : transformers)
