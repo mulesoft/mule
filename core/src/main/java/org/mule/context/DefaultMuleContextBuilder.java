@@ -47,6 +47,7 @@ import org.mule.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.lifecycle.phases.MuleContextStartPhase;
 import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.util.ClassUtils;
+import org.mule.util.SplashScreen;
 import org.mule.work.DefaultWorkListener;
 import org.mule.work.MuleWorkManager;
 
@@ -75,17 +76,22 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     protected ServerNotificationManager notificationManager;
 
+    protected SplashScreen startupScreen;
+
+    protected SplashScreen shutdownScreen;
+
     /**
      * {@inheritDoc}
      */
     public MuleContext buildMuleContext()
     {
         logger.debug("Building new DefaultMuleContext instance with MuleContextBuilder: " + this);
-        MuleContext muleContext = new DefaultMuleContext(getMuleConfiguration(),
+        DefaultMuleContext muleContext = new DefaultMuleContext(getMuleConfiguration(),
                                                          getWorkManager(),
                                                          getWorkListener(),
                                                          getLifecycleManager(),
                                                          getNotificationManager());
+        muleContext.setSplash(startupScreen, shutdownScreen);
         return muleContext;
     }
 
@@ -197,6 +203,26 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
                 TransactionNotification.class);
             return notificationManager;
         }
+    }
+
+    public SplashScreen getStartupScreen()
+    {
+        return startupScreen;
+    }
+
+    public void setStartupScreen(SplashScreen startupScreen)
+    {
+        this.startupScreen = startupScreen;
+    }
+
+    public SplashScreen getShutdownScreen()
+    {
+        return shutdownScreen;
+    }
+
+    public void setShutdownScreen(SplashScreen shutdownScreen)
+    {
+        this.shutdownScreen = shutdownScreen;
     }
 
     public String toString()

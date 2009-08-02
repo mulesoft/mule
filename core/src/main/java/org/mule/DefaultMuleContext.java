@@ -89,6 +89,9 @@ public class DefaultMuleContext implements MuleContext
 
     private static MuleContext staticInsntace;
 
+    private SplashScreen startupScreen;
+    private SplashScreen shutdownScreen;
+
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager, 
                               WorkListener workListener, 
@@ -122,6 +125,30 @@ public class DefaultMuleContext implements MuleContext
     protected MuleRegistry createRegistryHelper(Registry registry)
     {
         return new MuleRegistryHelper(registry);
+    }
+
+    public void setSplash(SplashScreen startup, SplashScreen shutdown)
+    {
+        if(isInitialised()) return;
+        startupScreen = startup;
+        shutdownScreen = shutdown;
+    }
+
+    protected void initSplashScreens()
+    {
+        if(startupScreen ==null)
+        {
+            startupScreen = SplashScreen.getInstance(ServerStartupSplashScreen.class);
+        }
+
+        if(shutdownScreen ==null)
+        {
+            shutdownScreen = SplashScreen.getInstance(ServerShutdownSplashScreen.class);
+        }
+        startupScreen.setHeader(this);
+        startupScreen.setFooter(this);
+        shutdownScreen.setHeader(this);
+        shutdownScreen.setFooter(this);
     }
     
     public synchronized void initialise() throws InitialisationException
