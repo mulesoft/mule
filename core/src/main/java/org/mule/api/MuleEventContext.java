@@ -124,7 +124,7 @@ public interface MuleEventContext
     /**
      * Mark the current transaction (if any) for rollback
      * 
-     * @throws TransactionException
+     * @throws TransactionException if operation failed
      */
     void markTransactionForRollback() throws TransactionException;
 
