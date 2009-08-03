@@ -30,6 +30,7 @@ public class XmlPrettyPrinter extends AbstractTransformer
         super();
         this.registerSourceType(String.class);
         this.registerSourceType(org.dom4j.Document.class);
+        this.registerSourceType(org.w3c.dom.Document.class);
         this.setReturnClass(String.class);
     }
 
