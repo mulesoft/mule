@@ -44,6 +44,7 @@ import java.util.Set;
 import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,11 +61,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     private transient MessageAdapter adapter;
     private transient MessageAdapter originalAdapter = null;
-    private transient List<Integer> appliedTransformerHashCodes = new CopyOnWriteArrayList();
+    private transient List<Integer> appliedTransformerHashCodes;
     private transient byte[] cache;
     protected transient MuleContext muleContext;
     
-    private static final List<Class> consumableClasses = new ArrayList<Class>();
+    private static final List<Class<?>> consumableClasses = new ArrayList<Class<?>>();
 
     static
     {
@@ -98,12 +99,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     public DefaultMuleMessage(Object message, Map properties, MuleContext muleContext)
     {
-        if(muleContext==null)
+        if (muleContext == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("muleContext").getMessage());
         }
         this.muleContext = muleContext;
-        //Explicitly check for MuleMessage as a safeguard since MuleMessage is instance of MessageAdapter
+        
+        initAppliedTransformerHashCodes();
+        
+        // Explicitly check for MuleMessage as a safeguard since MuleMessage is instance of MessageAdapter
         if (message instanceof MuleMessage)
         {
             adapter = ((MuleMessage) message).getAdapter();
@@ -123,11 +127,14 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     public DefaultMuleMessage(Object message, MessageAdapter previous, MuleContext muleContext)
     {
-        if(muleContext==null)
+        if (muleContext == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("muleContext").getMessage());
         }
         this.muleContext = muleContext;
+        
+        initAppliedTransformerHashCodes();
+        
         if (message instanceof MessageAdapter)
         {
             adapter = (MessageAdapter) message;
@@ -163,6 +170,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     protected DefaultMuleMessage(DefaultMuleMessage message)
     {
         this(message.getPayload(), message.getAdapter(), message.getMuleContext());
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void initAppliedTransformerHashCodes()
+    {
+        appliedTransformerHashCodes = new CopyOnWriteArrayList();
     }
 
     /** {@inheritDoc} */
@@ -253,14 +266,14 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return InputStream.class.isAssignableFrom(inputCls) || isConsumedFromAdditional(inputCls);
     }
 
-    private boolean isConsumedFromAdditional(Class inputCls)
+    private boolean isConsumedFromAdditional(Class<?> inputCls)
     {
         if (consumableClasses.isEmpty())
         {
             return false;
         }
 
-        for (Class c : consumableClasses)
+        for (Class<?> c : consumableClasses)
         {
             if (c.isAssignableFrom(inputCls))
             {
@@ -293,7 +306,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         adapter.setProperty(key, value, scope);
     }
-
 
     /** {@inheritDoc} */
     public Object getProperty(String key)
@@ -490,7 +502,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         adapter.setExceptionPayload(exceptionPayload);
     }
 
-    /** {@inheritDoc} */
+    @Override
     public String toString()
     {
         return adapter.toString();
@@ -543,7 +555,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         adapter.setStringProperty(name, value);
     }
-
 
     /** {@inheritDoc} */
     public void addProperties(Map<String, Object> properties)

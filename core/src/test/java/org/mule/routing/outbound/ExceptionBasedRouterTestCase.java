@@ -60,7 +60,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         RegExFilter filter = new RegExFilter("(.*) event");
         router.setFilter(filter);
-        List endpoints = new ArrayList();
+        List<ImmutableEndpoint> endpoints = new ArrayList<ImmutableEndpoint>();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         endpoints.add(endpoint3);
@@ -103,7 +103,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         RegExFilter filter = new RegExFilter("(.*) event");
         router.setFilter(filter);
-        List endpoints = new ArrayList();
+        List<ImmutableEndpoint> endpoints = new ArrayList<ImmutableEndpoint>();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         endpoints.add(endpoint3);
@@ -142,7 +142,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         RegExFilter filter = new RegExFilter("(.*) event");
         router.setFilter(filter);
-        List endpoints = new ArrayList();
+        List<ImmutableEndpoint> endpoints = new ArrayList<ImmutableEndpoint>();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         router.setEndpoints(endpoints);
