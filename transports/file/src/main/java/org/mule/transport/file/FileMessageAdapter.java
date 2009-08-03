@@ -83,21 +83,16 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         setProperty(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
     }
 
+    @Override
     public String getUniqueId()
     {
         return file.getAbsolutePath();
     }
 
+    @Override
     public ThreadSafeAccess newThreadCopy()
     {
         return new FileMessageAdapter(this);
     }
 
-    /*
-    private void writeObject(ObjectOutputStream out) throws IOException
-    {
-        out.defaultWriteObject();
-    }
-    */
-    
 }
