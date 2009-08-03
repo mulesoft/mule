@@ -129,22 +129,27 @@ public class DefaultMuleContext implements MuleContext
 
     public void setSplash(SplashScreen startup, SplashScreen shutdown)
     {
-        if(isInitialised()) return;
+        if (isInitialised()) 
+        {
+            return;
+        }
+        
         startupScreen = startup;
         shutdownScreen = shutdown;
     }
 
     protected void initSplashScreens()
     {
-        if(startupScreen ==null)
+        if (startupScreen == null)
         {
             startupScreen = SplashScreen.getInstance(ServerStartupSplashScreen.class);
         }
 
-        if(shutdownScreen ==null)
+        if (shutdownScreen == null)
         {
             shutdownScreen = SplashScreen.getInstance(ServerShutdownSplashScreen.class);
         }
+        
         startupScreen.setHeader(this);
         startupScreen.setFooter(this);
         shutdownScreen.setHeader(this);
