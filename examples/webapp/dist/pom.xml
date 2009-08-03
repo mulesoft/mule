@@ -178,6 +178,17 @@
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-cxf</artifactId>
+            <version>${muleVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.ws.security</groupId>
+                    <artifactId>wss4j.osgi</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency> 
     </dependencies>
 
     <repositories>
