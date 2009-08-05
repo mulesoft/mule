@@ -91,6 +91,10 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
 
         try
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Rolling back transaction: " + getId());
+            }
             ((Session)resource).rollback();
         }
         catch (JMSException e)
