@@ -62,58 +62,55 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
         OutboundEndpoint endpoint = null;
         boolean success = false;
 
-        synchronized (endpoints)
+        for (int i = 0; i < endpointsCount; i++)
         {
-            for (int i = 0; i < endpointsCount; i++)
+            // apply endpoint URI templates if any
+            endpoint = getEndpoint(i, message);
+            boolean lastEndpoint = (i == endpointsCount - 1);
+
+            if (!lastEndpoint)
             {
-                // apply endpoint URI templates if any
-                endpoint = getEndpoint(i, message);
-                boolean lastEndpoint = (i == endpointsCount - 1);
+                logger.info("Sync mode will be forced for " + endpoint.getEndpointURI()
+                            + ", as there are more endpoints available.");
+            }
 
-                if (!lastEndpoint)
+            if (!lastEndpoint || endpoint.isSynchronous())
+            {
+                try
                 {
-                    logger.info("Sync mode will be forced for " + endpoint.getEndpointURI()
-                                + ", as there are more endpoints available.");
-                }
-
-                if (!lastEndpoint || endpoint.isSynchronous())
-                {
-                    try
+                    result = send(session, message, endpoint);
+                    if (!exceptionPayloadAvailable(result))
                     {
-                        result = send(session, message, endpoint);
-                        if (!exceptionPayloadAvailable(result))
+                        if (logger.isDebugEnabled())
                         {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug("Successful invocation detected, stopping further processing.");
-                            }
-                            success = true;
-                            break;
+                            logger.debug("Successful invocation detected, stopping further processing.");
                         }
-                    }
-                    catch (MuleException e)
-                    {
-                        if(logger.isWarnEnabled())
-                        {
-                            Throwable t = ExceptionHelper.getRootException(e);
-                            logger.warn("Failed to send to endpoint: " + endpoint.getEndpointURI().toString()
-                                    + ". Error was: " + t + ". Trying next endpoint", t);
-                        }
-                    }
-                }
-                else
-                {
-                    try
-                    {
-                        dispatch(session, message, endpoint);
                         success = true;
                         break;
                     }
-                    catch (MuleException e)
+                }
+                catch (MuleException e)
+                {
+                    if(logger.isWarnEnabled())
                     {
-                        logger.info("Failed to dispatch to endpoint: " + endpoint.getEndpointURI().toString()
-                                    + ". Error was: " + e.getMessage() + ". Trying next endpoint");
+                        Throwable t = ExceptionHelper.getRootException(e);
+                        logger.warn("Failed to send to endpoint: " + endpoint.getEndpointURI().toString()
+                                + ". Error was: " + t + ". Trying next endpoint", t);
                     }
+                }
+            }
+            else
+            {
+                try
+                {
+                    dispatch(session, message, endpoint);
+                    success = true;
+                    break;
+                }
+                catch (MuleException e)
+                {
+                    logger.info("Failed to dispatch to endpoint: " + endpoint.getEndpointURI().toString()
+                                + ". Error was: " + e.getMessage() + ". Trying next endpoint");
                 }
             }
         }
