@@ -40,7 +40,7 @@ public class SQLExceptionReader implements ExceptionReader
         return cause;
     }
 
-    public Class getExceptionType()
+    public Class<?> getExceptionType()
     {
         return SQLException.class;
     }
@@ -51,10 +51,11 @@ public class SQLExceptionReader implements ExceptionReader
      * @param t the exception to extract the information from
      * @return a map of the non-stanard information stored on the exception
      */
-    public Map getInfo(Throwable t)
+    public Map<?, ?> getInfo(Throwable t)
     {
         SQLException e = (SQLException) t;
-        Map info = new HashMap();
+        
+        Map<String, Object> info = new HashMap<String, Object>();
         if (e.getErrorCode() != 0)
         {
             info.put("SQL Code", String.valueOf(e.getErrorCode()));

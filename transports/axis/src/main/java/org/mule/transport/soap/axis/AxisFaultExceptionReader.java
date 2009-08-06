@@ -13,7 +13,6 @@ package org.mule.transport.soap.axis;
 import org.mule.api.config.ExceptionReader;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.axis.AxisFault;
@@ -28,12 +27,11 @@ public class AxisFaultExceptionReader implements ExceptionReader
     public String getMessage(Throwable t)
     {
         AxisFault e = (AxisFault)t;
-        Map props = getInfo(e);
+        Map<?, ?> props = getInfo(e);
         StringBuffer msg = new StringBuffer(64);
         msg.append("(");
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
+        for (Map.Entry<?, ?> entry : props.entrySet())
         {
-            Map.Entry entry = (Map.Entry)iterator.next();
             msg.append(entry.getKey()).append(": ").append(entry.getValue()).append(", ");
         }
         msg.append(")");
@@ -51,7 +49,7 @@ public class AxisFaultExceptionReader implements ExceptionReader
         return cause;
     }
 
-    public Class getExceptionType()
+    public Class<?> getExceptionType()
     {
         return AxisFault.class;
     }
@@ -61,10 +59,10 @@ public class AxisFaultExceptionReader implements ExceptionReader
      * 
      * @return a map of the non-stanard information stored on the exception
      */
-    public Map getInfo(Throwable t)
+    public Map<?, ?> getInfo(Throwable t)
     {
         AxisFault e = (AxisFault)t;
-        Map info = new HashMap();
+        Map<String, Object> info = new HashMap<String, Object>();
         info.put("Fault", e.getFaultString());
         info.put("Fault Code", e.getFaultCode().toString());
         info.put("Fault Actor", e.getFaultActor());

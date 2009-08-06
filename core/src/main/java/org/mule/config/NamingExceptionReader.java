@@ -36,7 +36,7 @@ public class NamingExceptionReader implements ExceptionReader
         return (t instanceof NamingException ? ((NamingException) t).getCause() : null);
     }
 
-    public Class getExceptionType()
+    public Class<?> getExceptionType()
     {
         return NamingException.class;
     }
@@ -47,17 +47,19 @@ public class NamingExceptionReader implements ExceptionReader
      * @param t the exception to extract the information from
      * @return a map of the non-stanard information stored on the exception
      */
-    public Map getInfo(Throwable t)
+    public Map<?, ?> getInfo(Throwable t)
     {
         if (t instanceof NamingException)
         {
             NamingException e = (NamingException) t;
-            Map info = new HashMap();
+            
+            Map<String, Object> info = new HashMap<String, Object>();
             final Name remainingName = e.getRemainingName();
             final Name resolvedName = e.getResolvedName();
-            info.put("Remaining Name", remainingName == null
-                            ? MISSING_NAME_DISPLAY_VALUE : remainingName.toString());
-            info.put("Resolved Name", resolvedName == null ? MISSING_NAME_DISPLAY_VALUE : resolvedName.toString());
+            info.put("Remaining Name", remainingName == null ?
+                    MISSING_NAME_DISPLAY_VALUE : remainingName.toString());
+            info.put("Resolved Name", resolvedName == null ? 
+                MISSING_NAME_DISPLAY_VALUE : resolvedName.toString());
             return info;
         }
         else

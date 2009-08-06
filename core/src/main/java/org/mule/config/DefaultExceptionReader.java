@@ -22,7 +22,7 @@ import java.util.Map;
 public final class DefaultExceptionReader implements ExceptionReader
 {
 
-    private Map info = new HashMap();
+    private Map<?, ?> info = new HashMap<Object, Object>();
 
     public String getMessage(Throwable t)
     {
@@ -34,7 +34,7 @@ public final class DefaultExceptionReader implements ExceptionReader
         return t.getCause();
     }
 
-    public Class getExceptionType()
+    public Class<?> getExceptionType()
     {
         return Throwable.class;
     }
@@ -44,7 +44,7 @@ public final class DefaultExceptionReader implements ExceptionReader
      * 
      * @return a map of the non-stanard information stored on the exception
      */
-    public Map getInfo(Throwable t)
+    public Map<?, ?> getInfo(Throwable t)
     {
         return info;
     }

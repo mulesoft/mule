@@ -32,7 +32,7 @@ public final class MuleExceptionReader implements ExceptionReader
         return t.getCause();
     }
 
-    public Class getExceptionType()
+    public Class<?> getExceptionType()
     {
         return MuleException.class;
     }
@@ -42,7 +42,7 @@ public final class MuleExceptionReader implements ExceptionReader
      * 
      * @return a map of the non-stanard information stored on the exception
      */
-    public Map getInfo(Throwable t)
+    public Map<?, ?> getInfo(Throwable t)
     {
         return (t instanceof MuleException ? ((MuleException) t).getInfo() : Collections.EMPTY_MAP);
     }

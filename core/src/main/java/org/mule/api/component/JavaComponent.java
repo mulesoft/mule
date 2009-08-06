@@ -67,7 +67,7 @@ public interface JavaComponent extends Component
 
     ObjectFactory getObjectFactory();
 
-    Class getObjectType();
+    Class<?> getObjectType();
 
     /**
      * Returns the factory used create life-cycle adaptors that are used to wrap

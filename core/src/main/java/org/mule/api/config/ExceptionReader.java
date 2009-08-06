@@ -25,7 +25,7 @@ public interface ExceptionReader
 
     Throwable getCause(Throwable t);
 
-    Class getExceptionType();
+    Class<?> getExceptionType();
 
     /**
      * Returns a map of the non-stanard information stored on the exception
@@ -33,6 +33,6 @@ public interface ExceptionReader
      * @param t the exception to extract the information from
      * @return a map of the non-stanard information stored on the exception
      */
-    Map getInfo(Throwable t);
+    Map<?, ?> getInfo(Throwable t);
 
 }

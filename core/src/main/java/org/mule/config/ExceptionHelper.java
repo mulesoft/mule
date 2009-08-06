@@ -78,7 +78,7 @@ public final class ExceptionHelper
     /**
      * A list of the exception readers to use for different types of exceptions
      */
-    private static List exceptionReaders = new ArrayList();
+    private static List<ExceptionReader> exceptionReaders = new ArrayList<ExceptionReader>();
 
     /**
      * The default ExceptionReader which will be used for most types of exceptions
@@ -476,9 +476,8 @@ public final class ExceptionHelper
      */
     public static ExceptionReader getExceptionReader(Throwable t)
     {
-        for (Iterator iterator = exceptionReaders.iterator(); iterator.hasNext();)
+        for (ExceptionReader exceptionReader : exceptionReaders)
         {
-            ExceptionReader exceptionReader = (ExceptionReader)iterator.next();
             if (exceptionReader.getExceptionType().isInstance(t))
             {
                 return exceptionReader;

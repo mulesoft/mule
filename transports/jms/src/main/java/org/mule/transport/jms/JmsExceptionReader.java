@@ -41,7 +41,7 @@ public class JmsExceptionReader implements ExceptionReader
         return cause;
     }
 
-    public Class getExceptionType()
+    public Class<?> getExceptionType()
     {
         return JMSException.class;
     }
@@ -51,10 +51,10 @@ public class JmsExceptionReader implements ExceptionReader
      * 
      * @return a map of the non-stanard information stored on the exception
      */
-    public Map getInfo(Throwable t)
+    public Map<?, ?> getInfo(Throwable t)
     {
         JMSException e = (JMSException)t;
-        Map info = new HashMap();
+        Map<String, Object> info = new HashMap<String, Object>();
         info.put("JMS Code", e.getErrorCode());
         return info;
     }
