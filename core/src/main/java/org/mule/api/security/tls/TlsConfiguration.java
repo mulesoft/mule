@@ -72,7 +72,7 @@ import org.apache.commons.logging.LogFactory;
  * <p/>
  * <p>For setting System properties (and reading them) use {@link TlsPropertiesMapper}.  This
  * can take a "namespace" which can then be used by {@link TlsPropertiesSocketFactory} to
- * construct an appropriate socket factory.  This approach (storing to proeprties and then
+ * construct an appropriate socket factory.  This approach (storing to properties and then
  * retrieving that information later in a socket factory) lets us pass TLS/SSL configuration
  * into libraries that are configured by specifying on the socket factory class.</p>
  * <p/>
@@ -225,7 +225,7 @@ public final class TlsConfiguration
             if (null == is)
             {
                 throw new FileNotFoundException(
-                        CoreMessages.cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
+                    CoreMessages.cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
             }
             tempKeyStore.load(is, keyStorePassword.toCharArray());
         }
@@ -303,7 +303,6 @@ public final class TlsConfiguration
         }
     }
 
-
     public SSLSocketFactory getSocketFactory() throws NoSuchAlgorithmException, KeyManagementException
     {
         return getSslContext().getSocketFactory();
@@ -327,7 +326,6 @@ public final class TlsConfiguration
         context.init(keyManagers, trustManagers, null);
         return context;
     }
-
 
     public String getSslType()
     {

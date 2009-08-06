@@ -24,10 +24,12 @@ import org.mule.transport.ssl.SslSocketFactory;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
+import java.security.GeneralSecurityException;
 import java.security.Provider;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 /**
@@ -290,4 +292,9 @@ public class HttpsConnector extends HttpConnector
         this.sslHandshakeTimeout = sslHandshakeTimeout;
     }
 
+    public SSLSocketFactory getSslSocketFactory() throws GeneralSecurityException
+    {
+        return tls.getSocketFactory();
+    }
+    
 }
