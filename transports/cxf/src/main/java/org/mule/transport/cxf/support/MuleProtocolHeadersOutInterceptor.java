@@ -38,12 +38,13 @@ public class MuleProtocolHeadersOutInterceptor
     public void handleMessage(Message message) throws Fault
     {
         MessageAdapter muleMsg = (MessageAdapter) message.getExchange().get(CxfConstants.MULE_MESSAGE);
-
+        
         if (muleMsg == null)
         {
             return;
         }
         extractAndSet(message, muleMsg, Message.CONTENT_TYPE, HttpConstants.HEADER_CONTENT_TYPE);
+        extractAndSet(message, muleMsg, Message.RESPONSE_CODE, HttpConnector.HTTP_STATUS_PROPERTY);
 
         String method = (String) message.get(Message.HTTP_REQUEST_METHOD);
         if (method == null) method = HttpConstants.METHOD_POST;
@@ -70,10 +71,10 @@ public class MuleProtocolHeadersOutInterceptor
 
     private void extractAndSet(Message message, MessageAdapter muleMsg, String cxfHeader, String muleHeader)
     {
-        String ct = (String) message.get(cxfHeader);
-        if (ct != null)
+        Object val = message.get(cxfHeader);
+        if (val != null)
         {
-            muleMsg.setProperty(muleHeader, ct);
+            muleMsg.setProperty(muleHeader, val);
         }
     }
 

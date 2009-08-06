@@ -38,6 +38,7 @@ import org.mule.transport.cxf.CxfConnector;
 import org.mule.transport.cxf.CxfConstants;
 import org.mule.transport.cxf.support.DelegatingOutputStream;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
+import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.io.ByteArrayOutputStream;
@@ -232,6 +233,7 @@ public class MuleUniversalConduit extends AbstractConduit
 
             MessageAdapter req = (MessageAdapter) m.getExchange().get(CxfConstants.MULE_MESSAGE);
             req.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, uri, PropertyScope.INVOCATION);
+            req.setProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
             
             MuleMessage result = sendStream(req, protocolEndpoint, m.getExchange());
 

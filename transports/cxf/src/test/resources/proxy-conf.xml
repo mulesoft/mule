@@ -58,6 +58,19 @@
             </outbound>
         </service>
         
+        <service name="greeter-proxy">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/greeter-proxy" proxy="true"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/greeter"
+                        proxy="true"
+                        synchronous="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
         <service name="greeter">
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:63081/services/greeter"/>

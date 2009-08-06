@@ -293,6 +293,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
                 {
                     ExceptionPayload exceptionPayload = new DefaultExceptionPayload(new Exception(""));
                     ctx.getMessage().setExceptionPayload(exceptionPayload);
+                    muleResMsg.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
                 }
             }
             
