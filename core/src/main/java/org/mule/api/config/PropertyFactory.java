@@ -26,5 +26,5 @@ public interface PropertyFactory
      *         matches the 'name' attribute on the <factory-property> element.
      * @throws Exception
      */
-    Object create(Map properties) throws Exception;
+    Object create(Map<?, ?> properties) throws Exception;
 }

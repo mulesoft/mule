@@ -25,7 +25,7 @@ public class HostNameFactory implements PropertyFactory
 {
     protected static final Log logger = LogFactory.getLog(HostNameFactory.class);
 
-    public Object create(Map props) throws Exception
+    public Object create(Map<?, ?> props) throws Exception
     {
         // we could use getCanonicalHostName here.  however, on machines behind
         // NAT firewalls it seems that is often the NAT address, which corresponds

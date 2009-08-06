@@ -14,7 +14,6 @@ import org.mule.api.config.PropertyFactory;
 import org.mule.jndi.MuleInitialContextFactory;
 
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -27,22 +26,23 @@ public class SimpleEjbContextFactory implements PropertyFactory
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
-    public Object create(Map properties) throws Exception
+    public Object create(Map<?, ?> properties) throws Exception
     {
-        Hashtable env = new Hashtable();
+        Hashtable<String, Object> env = new Hashtable<String, Object>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
+        
         InitialContext context = new InitialContext(env);
-        Iterator keys = properties.keySet().iterator();
-        while (keys.hasNext())
+        for (Map.Entry<?, ?> entry : properties.entrySet())
         {
-            Object key = keys.next();
+            Object key = entry.getKey();
             if (key instanceof String)
             {
-                Object value = properties.get(key);
+                Object value = entry.getValue();
                 logger.debug("Binding " + key + " to " + value);
                 context.bind((String) key, value);
             }
         }
+        
         return context;
     }
 
