@@ -36,8 +36,9 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.AssertionFailedError;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractServiceTestCase
 {
@@ -81,8 +82,8 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
 
         // Replace queueManager instance with mock via registry as it cannot be set
         // once muleContext is initialized.
-        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER,
-            (QueueManager) mockTransactionalQueueManager.proxy());
+        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, 
+            mockTransactionalQueueManager.proxy());
 
         SedaService service = new SedaService();
         service.setMuleContext(muleContext);

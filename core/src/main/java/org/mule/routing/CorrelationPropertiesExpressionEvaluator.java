@@ -31,7 +31,7 @@ public class CorrelationPropertiesExpressionEvaluator extends MessageHeaderExpre
         MessageAdapter msg = null;
         if (message instanceof MessageAdapter)
         {
-            msg = (MessageAdapter) message;
+            msg = message;
         }
         if (msg != null)
         {

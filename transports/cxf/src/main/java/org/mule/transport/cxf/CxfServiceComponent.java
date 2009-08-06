@@ -333,7 +333,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         }
         else if (payload instanceof XMLStreamReader)
         {
-            m.setContent(XMLStreamReader.class, (XMLStreamReader) payload);
+            m.setContent(XMLStreamReader.class, payload);
         }
         else if (payload instanceof Document)
         {

@@ -37,7 +37,7 @@ import org.jaxen.XPath;
  */
 public abstract class AbstractXPathExpressionEvaluator implements ExpressionEvaluator, Disposable, MuleContextAware
 {
-    private Map cache = new WeakHashMap(8);
+    private Map<String, XPath> cache = new WeakHashMap<String, XPath>(8);
 
     private MuleContext muleContext;
     private NamespaceManager namespaceManager;
@@ -73,7 +73,7 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
                 addNamespaces(namespaceManager, xpath);
             }
 
-            List result = xpath.selectNodes(payload);
+            List<?> result = xpath.selectNodes(payload);
             result = extractResultsFromNodes(result);
             if(result.size()==1)
             {
@@ -96,9 +96,9 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
 
     protected void addNamespaces(NamespaceManager manager, XPath xpath)
     {
-        for (Iterator iterator = manager.getNamespaces().entrySet().iterator(); iterator.hasNext();)
+        for (Iterator<?> iterator = manager.getNamespaces().entrySet().iterator(); iterator.hasNext();)
         {
-            Map.Entry entry = (Map.Entry)iterator.next();
+            Map.Entry<?, ?> entry = (Map.Entry<?, ?>)iterator.next();
             try
             {
                 xpath.addNamespace(entry.getKey().toString(), entry.getValue().toString());
@@ -118,7 +118,7 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
 
     protected XPath getXPath(String expression, Object object) throws JaxenException
     {
-        XPath xpath = (XPath)cache.get(expression + getClass().getName());
+        XPath xpath = cache.get(expression + getClass().getName());
         if(xpath==null)
         {
             xpath = createXPath(expression, object);
@@ -129,16 +129,15 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
 
     protected abstract XPath createXPath(String expression, Object object) throws JaxenException;
 
-    protected List extractResultsFromNodes(List results)
+    protected List<?> extractResultsFromNodes(List<?> results)
     {
-        if(results==null)
+        if (results == null)
         {
             return null;
         }
-        List newResults = new ArrayList(results.size());
-        for (Iterator iterator = results.iterator(); iterator.hasNext();)
+        List<Object> newResults = new ArrayList<Object>(results.size());
+        for (Object o : results)
         {
-            Object o = iterator.next();
             newResults.add(extractResultFromNode(o));
         }
         return newResults;

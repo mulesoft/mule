@@ -174,7 +174,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         {
             if (result instanceof MuleMessage)
             {
-                return (MuleMessage) result;
+                return result;
             }
             else
             {
