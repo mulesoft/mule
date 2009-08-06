@@ -9,11 +9,11 @@
                http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd">
 
 
-    <vm:connector name="Connector1" queueEvents="true">
+    <vm:connector name="Connector1">
         <vm:queueProfile persistent="true" maxOutstandingMessages="100000"/>
     </vm:connector>
 
-    <vm:connector name="Connector2" queueEvents="true">
+    <vm:connector name="Connector2">
         <vm:queueProfile persistent="true" maxOutstandingMessages="100000"/>
     </vm:connector>
 

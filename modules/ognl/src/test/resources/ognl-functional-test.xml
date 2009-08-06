@@ -11,17 +11,15 @@
        http://www.mulesource.org/schema/mule/ognl http://www.mulesource.org/schema/mule/ognl/3.0/mule-ognl.xsd
 ">
 
-    <vm:connector name="VMConnector" queueEvents="true"/>
-
     <model name="OGNL Functional TestCase">
 
         <service name="OGNLServiceWrapper1">
             <inbound>
-                <inbound-endpoint address="vm://in" connector-ref="VMConnector"/>
+                <inbound-endpoint address="vm://in"/>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="vm://out" connector-ref="VMConnector"/>
+                    <outbound-endpoint address="vm://out"/>
                     <ognl:filter>
                         <ognl:expression><![CDATA[ equals("foo") || content.endsWith("bar") ]]></ognl:expression>
                     </ognl:filter>
@@ -31,11 +29,11 @@
 
         <service name="OGNLServiceWrapper2">
             <inbound>
-                <inbound-endpoint address="vm://in2" connector-ref="VMConnector"/>
+                <inbound-endpoint address="vm://in2"/>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="vm://out2" connector-ref="VMConnector"/>
+                    <outbound-endpoint address="vm://out2"/>
                     <expression-filter evaluator="ognl" expression="equals('foo') || content.endsWith('bar')"/>
                 </filtering-router>
             </outbound>

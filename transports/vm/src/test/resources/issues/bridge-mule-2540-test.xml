@@ -10,7 +10,7 @@
 
     <!-- similar to persistent-vmqueue-test.xml, but using bridge service -->
 
-    <vm:connector name="VMQueue" queueEvents="true">
+    <vm:connector name="VMQueue">
         <vm:queueProfile persistent="true" maxOutstandingMessages="10"/>
     </vm:connector>
 

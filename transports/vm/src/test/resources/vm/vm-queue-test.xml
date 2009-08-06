@@ -8,16 +8,13 @@
                http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <vm:connector name="vm-normal" queueEvents="false"/>
-    <vm:connector name="vm-queue" queueEvents="true"/>
-
-    <vm:endpoint name="queue" path="foo" connector-ref="vm-queue"/>
-    <vm:endpoint name="entry" path="entry" connector-ref="vm-normal"/>
+    <vm:endpoint name="queue" path="foo"/>
+    <vm:endpoint name="entry" path="entry"/>
 
     <model name="main">
         <service name="testService">
             <inbound>
-                <vm:inbound-endpoint path="entry" connector-ref="vm-normal"/>
+                <vm:inbound-endpoint path="entry"/>
             </inbound>
             <test:component appendString=" Received"/>
             <outbound>

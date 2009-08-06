@@ -15,7 +15,6 @@
 
 <description>JMX Statistics Test</description>
 
-    <vm:connector name="asynchVm" queueEvents="true"/>
 
     <management:jmx-default-config/>
 
@@ -23,7 +22,7 @@
 
         <service name="statisticsTestService">
             <inbound>
-                <vm:inbound-endpoint path="in" connector-ref="asynchVm"/>
+                <vm:inbound-endpoint path="in"/>
             </inbound>
 
             <test:component>
@@ -32,7 +31,7 @@
 
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out" connector-ref="asynchVm"/>
+                    <vm:outbound-endpoint path="out"/>
                 </pass-through-router>
             </outbound>
         </service>

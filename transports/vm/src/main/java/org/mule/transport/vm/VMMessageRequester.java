@@ -46,11 +46,6 @@ public class VMMessageRequester extends AbstractMessageRequester
      */
     protected MuleMessage doRequest(long timeout) throws Exception
     {
-        if (!connector.isQueueEvents())
-        {
-            throw new UnsupportedOperationException("Receive requested on VM Connector, but queueEvents is false");
-        }
-
         try
         {
             QueueSession queueSession = connector.getQueueSession();
@@ -115,12 +110,9 @@ public class VMMessageRequester extends AbstractMessageRequester
 
     protected void doConnect() throws Exception
     {
-        if (connector.isQueueEvents())
-        {
-            // use the default queue profile to configure this queue.
-            connector.getQueueProfile().configureQueue(
-                    endpoint.getEndpointURI().getAddress(), connector.getQueueManager());
-        }
+        // use the default queue profile to configure this queue.
+        connector.getQueueProfile().configureQueue(endpoint.getEndpointURI().getAddress(),
+            connector.getQueueManager());
     }
 
     protected void doDisconnect() throws Exception

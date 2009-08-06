@@ -46,17 +46,10 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="queueEvents" type="mule:substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Determines whether queues should be set up for listeners on the connector. If set to false, the connector simply forwards messsages to components via the Mule server. If it is set to true, the queues are configured using the queuing profile.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="queueTimeout" type="xsd:positiveInteger">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The timeout setting for the queue.
+                            The timeout setting for the queue used for asynchronous endpoints
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

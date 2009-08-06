@@ -43,7 +43,6 @@ public class VMConnector extends AbstractConnector
 {
 
     public static final String VM = "vm";
-    private boolean queueEvents = false;
     private QueueProfile queueProfile;
     private Integer queueTimeout;
     /** The queue manager to use for vm queues only */
@@ -55,26 +54,19 @@ public class VMConnector extends AbstractConnector
         {
             queueTimeout = muleContext.getConfiguration().getDefaultQueueTimeout();
         }
-        if (queueEvents)
+        if (queueManager == null)
         {
-            if (queueManager == null)
+            queueManager = getMuleContext().getQueueManager();
+        }
+        if (queueProfile == null)
+        {
+            // create a default QueueProfile
+            queueProfile = new QueueProfile();
+            if (logger.isDebugEnabled())
             {
-                queueManager = getMuleContext().getQueueManager();
-            }
-            //the queue manager stores MulEvent objects by default. When using VM there is no nned to store
-            //the event detais
-            //queueManager.getPersistenceStrategy().setWireFormat(new SerializedMuleMessageWireFormat());
-            if (queueProfile == null)
-            {
-                //create a default QueueProfile
-                queueProfile = new QueueProfile();
-                if(logger.isDebugEnabled())
-                {
-                    logger.debug("created default QueueProfile for VM connector: " + queueProfile);
-                }
+                logger.debug("created default QueueProfile for VM connector: " + queueProfile);
             }
         }
-
     }
 
     protected void doDispose()
@@ -104,7 +96,7 @@ public class VMConnector extends AbstractConnector
 
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
-        if (queueEvents)
+        if (!endpoint.isSynchronous())
         {
             queueProfile.configureQueue(endpoint.getEndpointURI().getAddress(), queueManager);
         }
@@ -134,16 +126,6 @@ public class VMConnector extends AbstractConnector
     public String getProtocol()
     {
         return "VM";
-    }
-
-    public boolean isQueueEvents()
-    {
-        return queueEvents;
-    }
-
-    public void setQueueEvents(boolean queueEvents)
-    {
-        this.queueEvents = queueEvents;
     }
 
     public QueueProfile getQueueProfile()

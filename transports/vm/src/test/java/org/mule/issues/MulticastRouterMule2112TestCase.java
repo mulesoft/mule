@@ -59,7 +59,7 @@ public class MulticastRouterMule2112TestCase  extends FunctionalTestCase
 
         MuleClient client = new MuleClient();
         DefaultMuleMessage request = new DefaultMuleMessage("payload", muleContext);
-        client.dispatch("vm://inbound", request);
+        client.send("vm://inbound", request);
         Thread.sleep(1000);
 
         assertTrue("First callback never fired", hop1made.get());

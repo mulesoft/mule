@@ -57,12 +57,12 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 
     public void testNoNameLocalTransformer() throws Exception
     {
-        doTestTransformed("vm://no-name-local-transformer?connector=queue");
+        doTestTransformed("vm://no-name-local-transformer");
     }
 
     public void testLocalNameLocalTransformer() throws Exception
     {
-        doTestTransformed("vm://local-name-local-transformer?connector=queue");
+        doTestTransformed("vm://local-name-local-transformer");
     }
 
     protected void doTestTransformed(String endpoint) throws Exception

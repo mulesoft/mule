@@ -41,43 +41,17 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     protected void doDispatch(final MuleEvent event) throws Exception
     {
         EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-        //Apply any outbound transformers on this event before we dispatch
+        // Apply any outbound transformers on this event before we dispatch
         event.transformMessage();
 
         if (endpointUri == null)
         {
-            throw new DispatchException(
-                    CoreMessages.objectIsNull("Endpoint"), event.getMessage(), event.getEndpoint());
+            throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event.getMessage(),
+                event.getEndpoint());
         }
-        if (connector.isQueueEvents())
-        {
-            QueueSession session = connector.getQueueSession();
-            Queue queue = session.getQueue(endpointUri.getAddress());
-            queue.put(event);
-        }
-        else
-        {
-            final VMMessageReceiver receiver = connector.getReceiver(event.getEndpoint().getEndpointURI());
-            if (receiver == null)
-            {
-                logger.warn("No receiver for endpointUri: " + event.getEndpoint().getEndpointURI());
-                return;
-            }
-            MuleMessage message = event.getMessage(); 
-            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
-            TransactionTemplate tt = new TransactionTemplate(receiver.getEndpoint().getTransactionConfig(), 
-                connector.getExceptionListener(), event.getMuleContext());
-
-            TransactionCallback cb = new TransactionCallback()
-            {
-                public Object doInTransaction() throws Exception
-                {
-                    receiver.onMessage(event.getMessage());
-                    return null;
-                }
-            };
-            tt.execute(cb);
-        }
+        QueueSession session = connector.getQueueSession();
+        Queue queue = session.getQueue(endpointUri.getAddress());
+        queue.put(event);
         if (logger.isDebugEnabled())
         {
             logger.debug("dispatched MuleEvent on endpointUri: " + endpointUri);
@@ -89,27 +63,12 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         MuleMessage retMessage;
         EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         final VMMessageReceiver receiver = connector.getReceiver(endpointUri);
-        //Apply any outbound transformers on this event before we dispatch
+        // Apply any outbound transformers on this event before we dispatch
         event.transformMessage();
         if (receiver == null)
         {
-            if (connector.isQueueEvents())
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Writing to queue as there is no receiver on connector: "
-                            + connector.getName() + ", for endpointUri: "
-                            + event.getEndpoint().getEndpointURI());
-                }
-                doDispatch(event);
-                return null;
-            }
-            else
-            {
-                throw new NoReceiverForEndpointException(
-                        VMMessages.noReceiverForEndpoint(connector.getName(),
-                                event.getEndpoint().getEndpointURI()));
-            }
+            throw new NoReceiverForEndpointException(VMMessages.noReceiverForEndpoint(connector.getName(),
+                event.getEndpoint().getEndpointURI()));
         }
 
         MuleMessage message = event.getMessage(); 
@@ -141,7 +100,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect() throws Exception
     {
-        if (connector.isQueueEvents())
+        if (!endpoint.isSynchronous())
         {
             // use the default queue profile to configure this queue.
             connector.getQueueProfile().configureQueue(

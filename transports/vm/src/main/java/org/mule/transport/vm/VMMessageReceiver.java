@@ -54,7 +54,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     @Override
     protected void schedule() throws RejectedExecutionException, NullPointerException, IllegalArgumentException
     {
-        if (connector.isQueueEvents())
+        if (!endpoint.isSynchronous())
         {
             super.schedule();
         }
@@ -67,7 +67,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
     protected void doConnect() throws Exception
     {
-        if (connector.isQueueEvents())
+        if (!endpoint.isSynchronous())
         {
             // Ensure we can create a vm queue
             QueueSession queueSession = connector.getQueueSession();

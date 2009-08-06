@@ -34,10 +34,9 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnectorDefaults");
         assertNotNull(c);
         
-        assertFalse(c.isQueueEvents());
         assertEquals(muleContext.getConfiguration().getDefaultQueueTimeout(), c.getQueueTimeout());
         QueueProfile queueProfile = c.getQueueProfile();
-        assertNull(queueProfile);
+        assertNotNull(queueProfile);
         
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
@@ -48,7 +47,6 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnector1");
         assertNotNull(c);
         
-        assertTrue(c.isQueueEvents());
         assertEquals(muleContext.getConfiguration().getDefaultQueueTimeout(), c.getQueueTimeout());
         QueueProfile queueProfile = c.getQueueProfile();
         assertNotNull(queueProfile);
@@ -63,7 +61,6 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
         VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnector2");
         assertNotNull(c);
         
-        assertTrue(c.isQueueEvents());
         assertEquals(5000, c.getQueueTimeout());
         QueueProfile queueProfile = c.getQueueProfile();
         assertNotNull(queueProfile);

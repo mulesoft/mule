@@ -27,40 +27,20 @@ public class VmTransactionTestCase extends FunctionalTestCase
         return "vm/vm-transaction.xml";
     }
 
-    public void testDispatchWithQueueEvent() throws Exception
+    public void testDispatch() throws Exception
     {
         serviceComponentAck = false;
         MuleClient client = new MuleClient();
-        client.dispatch("vm://dispatchInQueue?connector=vmQueue", "TEST", null);
-        MuleMessage message = client.request("vm://out?connector=vmQueue", 10000);
+        client.dispatch("vm://dispatchIn", "TEST", null);
+        MuleMessage message = client.request("vm://out", 10000);
         assertNotNull("Message", message);
-        assertTrue("Service component acknowledgement", serviceComponentAck);
     }
 
-    public void testDispatchWithoutQueueEvent() throws Exception
+    public void testSend() throws Exception
     {
         serviceComponentAck = false;
         MuleClient client = new MuleClient();
-        client.dispatch("vm://dispatchInNoQueue?connector=vmNoQueue", "TEST", null);
-        MuleMessage message = client.request("vm://out?connector=vmQueue", 10000);
-        assertNotNull("Message", message);
-        assertTrue("Service component acknowledgement", serviceComponentAck);
-    }
-
-    public void testSendWithQueueEvent() throws Exception
-    {
-        serviceComponentAck = false;
-        MuleClient client = new MuleClient();
-        MuleMessage message = client.send("vm://sendRequestInQueue?connector=vmQueue", "TEST", null);
-        assertNotNull("Message", message);
-        assertTrue("Service component acknowledgement", serviceComponentAck);
-    }
-
-    public void testSendWithoutQueueEvent() throws Exception
-    {
-        serviceComponentAck = false;
-        MuleClient client = new MuleClient();
-        MuleMessage message = client.send("vm://sendRequestInNoQueue?connector=vmNoQueue", "TEST", null);
+        MuleMessage message = client.send("vm://sendRequestIn", "TEST", null);
         assertNotNull("Message", message);
         assertTrue("Service component acknowledgement", serviceComponentAck);
     }

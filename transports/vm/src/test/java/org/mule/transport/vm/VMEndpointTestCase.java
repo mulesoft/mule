@@ -27,14 +27,4 @@ public class VMEndpointTestCase extends AbstractMuleTestCase
         assertEquals(1, url.getParams().size());
     }
 
-    public void testVMQUri() throws Exception
-    {
-        EndpointURI url = new MuleEndpointURI("vmq://some.queue", muleContext);
-        url.initialise();
-        assertEquals(VMQueueConnector.PROTOCOL, url.getScheme());
-        assertEquals("some.queue", url.getAddress());
-        assertNull(url.getEndpointName());
-        assertEquals("vmq://some.queue", url.toString());
-        assertEquals(0, url.getParams().size());
-    }
 }

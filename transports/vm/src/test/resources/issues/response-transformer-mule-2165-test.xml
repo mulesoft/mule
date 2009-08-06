@@ -14,7 +14,7 @@
                 outboundTransformer="org.mule.transformer.simple.OutboundAppendTransformer"/>
     </vm:connector>
 
-    <vm:connector name="queue" queueEvents="true"/>
+    <vm:connector name="queue"/>
 
     <custom-transformer name="response" class="org.mule.transformer.simple.StringAppendTransformer">
         <spring:property name="message" value=" response"/>

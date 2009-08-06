@@ -8,14 +8,14 @@
                http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <vm:endpoint name="inbound" path="inbound"/>
-    <vm:endpoint name="endpointHop1" path="hop1"/>
-    <vm:endpoint name="endpointHop2" path="hop2"/>
+    <vm:endpoint name="inbound" path="inbound" synchronous="true"/>
+    <vm:endpoint name="endpointHop1" path="hop1" synchronous="true"/>
+    <vm:endpoint name="endpointHop2" path="hop2" synchronous="true"/>
 
     <model name="main">
         <custom-service name="multicastComponent" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
-                <vm:inbound-endpoint ref="inbound" synchronous="true"/>
+                <vm:inbound-endpoint ref="inbound"/>
             </inbound>
             
             <outbound>

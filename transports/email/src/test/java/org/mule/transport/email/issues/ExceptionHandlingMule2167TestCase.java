@@ -28,8 +28,8 @@ public class ExceptionHandlingMule2167TestCase extends FunctionalTestCase
     public void testDefaultConfig() throws Exception
     {
         MuleClient client = new MuleClient();
-        client.dispatch("vm://in-default?connector=defaultVm", MESSAGE, null);
-        MuleMessage message = client.request("vm://out-default?connector=queue", WAIT_MS);
+        client.dispatch("vm://in-default", MESSAGE, null);
+        MuleMessage message = client.request("vm://out-default", WAIT_MS);
         assertNotNull("null message", message);
         assertNotNull("null payload", message.getPayload());
         assertEquals(MESSAGE, message.getPayloadAsString());

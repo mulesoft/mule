@@ -66,7 +66,7 @@ public class VMQueueTestCase extends FunctionalTestCase
         Iterator people = polos.iterator();
         while (people.hasNext())
         {
-            client.dispatch("vm://entry?connector=vm-normal", people.next(), null);
+            client.dispatch("vm://entry", people.next(), null);
         }
 
         for (int i = 0; i < 3; ++i)

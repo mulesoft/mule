@@ -14,7 +14,7 @@
     
     <jboss-transaction-manager/>
     
-    <vm:connector name="vm" queueEvents="true" numberOfConcurrentTransactedReceivers="1"/>
+    <vm:connector name="vm" numberOfConcurrentTransactedReceivers="1"/>
 
     <model name="main">
         <service name="test">

@@ -12,20 +12,16 @@
        http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
        http://www.mulesource.org/schema/mule/pop3 http://www.mulesource.org/schema/mule/pop3/3.0/mule-pop3.xsd">
 
-    <vm:connector name="defaultVm"/>
-    <vm:connector name="queue" queueEvents="true"/>
-    <smtp:connector name="smtp"/>
-
     <model name="main">
         <service name="default config">
             <inbound>
-                <vm:inbound-endpoint path="in-default" connector-ref="defaultVm"/>
+                <vm:inbound-endpoint path="in-default" synchronous="true"/>
             </inbound>
             <outbound>
                 <exception-based-router>
                     <!-- this doesn't exist -->
-                    <smtp:outbound-endpoint user="error" host="localhost" port="65040" connector-ref="smtp"/>
-                    <vm:outbound-endpoint path="out-default" connector-ref="queue"/>
+                    <smtp:outbound-endpoint user="error" host="localhost" port="65040"/>
+                    <vm:outbound-endpoint path="out-default"/>
                 </exception-based-router>
             </outbound>
         </service>

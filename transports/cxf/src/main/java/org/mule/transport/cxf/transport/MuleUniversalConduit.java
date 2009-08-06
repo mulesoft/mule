@@ -428,7 +428,15 @@ public class MuleUniversalConduit extends AbstractConduit
             event.transformMessage();
         }
         
-        MuleMessage msg = ep.send(event);
+        MuleMessage msg = null;
+        if (ep.isSynchronous())
+        {
+            msg = ep.send(event);
+        }
+        else
+        {
+            ep.dispatch(event);
+        }
         
         // We need to grab this back in the CxfMessageDispatcher again.
         Holder<MuleMessage> holder = (Holder<MuleMessage>) exchange.get("holder");

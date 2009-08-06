@@ -8,11 +8,8 @@
                http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <vm:connector name="default" queueEvents="false"/>
-    <vm:connector name="queue" queueEvents="true"/>
-
-    <vm:endpoint name="dispatch" path="bridge" connector-ref="default"/>
-    <vm:endpoint name="receive" path="result" connector-ref="queue"/>
+    <vm:endpoint name="dispatch" path="bridge" />
+    <vm:endpoint name="receive" path="result" />
 
     <model name="scribblingTestModel">
 
@@ -24,14 +21,14 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="responder"
-                                          synchronous="true" connector-ref="default"/>
+                                          synchronous="true" />
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="responder">
             <inbound>
-                <vm:inbound-endpoint path="responder" synchronous="false" connector-ref="default"/>
+                <vm:inbound-endpoint path="responder" synchronous="false" />
             </inbound>
             <test:component appendString=" Received"/>
         </service>

@@ -11,8 +11,6 @@
        http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
         http://www.mulesource.org/schema/mule/xml http://www.mulesource.org/schema/mule/xml/3.0/mule-xml.xsd">
     
-    <vm:connector name="vm.connector" queueEvents="true"/>
-    
     <cxf:endpoint 
         name="payloadTransformerClient" 
         address="vm://in"
@@ -38,7 +36,7 @@
     <model name="TestCxfModel">
         <service name="echoService">
             <inbound>
-                <inbound-endpoint address="cxf:vm://service" synchronous="true"/>
+                <inbound-endpoint address="cxf:vm://service"/>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent" />
         </service>

@@ -26,8 +26,6 @@
             <mule:password-encryption-strategy name="PBE" password="mule"/>
         </mule:security-manager>
 
-        <vm:connector name="vmQueue" queueEvents="true"/>
-
         <mule:model name="test">
             <mule:service name="echoUMO">
                 <mule:inbound>
