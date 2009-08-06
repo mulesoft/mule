@@ -16,8 +16,6 @@ import org.mule.tck.FunctionalTestCase;
 
 import java.util.Iterator;
 
-import org.springframework.security.AuthenticationManager;
-
 public class SpringSecurityNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
@@ -56,7 +54,6 @@ public class SpringSecurityNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(provider instanceof SpringProviderAdapter);
         SpringProviderAdapter adapter = (SpringProviderAdapter) provider;
         assertNotNull(adapter.getDelegate());
-        assertTrue(adapter.getDelegate() instanceof AuthenticationManager);
     }
 
 }

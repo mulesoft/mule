@@ -13,12 +13,11 @@ package org.mule.transport.file;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.DefaultMessageAdapter;
-import org.mule.transport.file.FileConnector;
-import org.mule.transport.file.SimpleFilenameParser;
 
 /**
  * Test the syntax of the SimpleFilename parser
  */
+@SuppressWarnings("deprecation")
 public class SimpleFilenameParserTestCase extends AbstractMuleTestCase
 {
     private SimpleFilenameParser parser;
