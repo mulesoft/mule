@@ -16,5 +16,5 @@ package org.mule.api.context.notification;
  */
 public interface ComponentMessageNotificationListener extends MessageNotificationListener
 {
-
+    // no extra methods
 }

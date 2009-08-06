@@ -18,6 +18,7 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
+
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 /**
@@ -82,7 +83,7 @@ public interface ThreadingProfile
     int DEFAULT_POOL_EXHAUST_ACTION = WHEN_EXHAUSTED_RUN;
 
     // map pool exhaustion strings to their respective values
-    Map POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
+    Map<?, ?> POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
     {
         private static final long serialVersionUID = 1L;
 

@@ -66,16 +66,16 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     /**
      * {@inheritDoc}
      */
-    public MuleContext createMuleContext(List configurationBuilders, MuleContextBuilder muleContextBuilder)
-        throws InitialisationException, ConfigurationException
+    public MuleContext createMuleContext(List<ConfigurationBuilder> configurationBuilders, 
+        MuleContextBuilder muleContextBuilder) throws InitialisationException, ConfigurationException
     {
         // Create MuleContext
         MuleContext muleContext = doCreateMuleContext(muleContextBuilder);
 
         // Configure
-        for (int i = 0; i < configurationBuilders.size(); i++)
+        for (ConfigurationBuilder configBuilder : configurationBuilders)
         {
-            ((ConfigurationBuilder) configurationBuilders.get(i)).configure(muleContext);
+            configBuilder.configure(muleContext);
         }
 
         return muleContext;

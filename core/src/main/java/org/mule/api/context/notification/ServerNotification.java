@@ -64,7 +64,11 @@ public abstract class ServerNotification extends EventObject implements MuleCont
     protected long timestamp;
 
     protected int action = NULL_ACTION;
+
+    @SuppressWarnings("unchecked")
     private static Map actionIdToName = new ConcurrentHashMap();
+    
+    @SuppressWarnings("unchecked")
     private static Map actionNameToId = new ConcurrentHashMap();
 
     /**
@@ -160,6 +164,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
     }
 
 
+    @SuppressWarnings("unchecked")
     protected static synchronized void registerAction(String name, int i)
     {
         String lowerCaseName = name.toLowerCase();
