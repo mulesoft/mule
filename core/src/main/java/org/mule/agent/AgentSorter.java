@@ -71,13 +71,13 @@ public class AgentSorter
         return sortedAgents;
     }
     
-    private static boolean dependentAgentsPresent(List dependentClasses, Collection allRegisteredAgents, 
-        List sortedAgents)
+    private static boolean dependentAgentsPresent(List<Class<Agent>> dependentClasses, 
+        Collection<Agent> allRegisteredAgents,  List<Agent> sortedAgents)
     {
-        Iterator dependencyIterator = dependentClasses.iterator();
+        Iterator<Class<Agent>> dependencyIterator = dependentClasses.iterator();
         while (dependencyIterator.hasNext())
         {
-            Class dependentClass = (Class) dependencyIterator.next();
+            Class<Agent> dependentClass = dependencyIterator.next();
             
             if (!classExistsInCollection(dependentClass, allRegisteredAgents))
             {
@@ -93,16 +93,16 @@ public class AgentSorter
         return true;
     }
     
-    private static boolean classExistsInCollection(Class clazz, Collection collection)
+    private static boolean classExistsInCollection(Class<Agent> clazz, Collection<Agent> collection)
     {
         return CollectionUtils.exists(collection, new ClassEqualityPredicate(clazz));
     }
     
     private static class ClassEqualityPredicate implements Predicate
     {
-        private Class requiredClass;
+        private Class<Agent> requiredClass;
 
-        public ClassEqualityPredicate(Class requiredClass)
+        public ClassEqualityPredicate(Class<Agent> requiredClass)
         {
             super();
             this.requiredClass = requiredClass;

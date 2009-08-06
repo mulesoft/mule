@@ -36,5 +36,5 @@ public interface Agent extends Lifecycle, NamedObject
      *          started before it can start itself. The implementation of this class may never
      *          return <code>null</code>.
      */
-    List/*<Class<? extends Agent>>*/ getDependentAgents();
+    List<Class<Agent>> getDependentAgents();
 }

@@ -28,7 +28,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.context.notification.NotificationException;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -60,8 +59,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     private boolean ignoreEndpointMessageNotifications = false;
     private boolean ignoreComponentMessageNotifications = false;
 
-    private Set listeners = new HashSet();
-
+    private Set<ServerNotificationListener> listeners = new HashSet<ServerNotificationListener>();
 
     protected AbstractNotificationLoggerAgent(String name)
     {
@@ -90,9 +88,8 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 
     public void unregistered()
     {
-        for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
+        for (ServerNotificationListener listener : listeners)
         {
-            ServerNotificationListener listener = (ServerNotificationListener) iterator.next();
             muleContext.unregisterListener(listener);
         }
     }

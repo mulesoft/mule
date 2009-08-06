@@ -39,7 +39,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
 
     private OutboundEndpoint endpoint = null;
     private MuleSession session;
-    private List ignoredNotifications = new ArrayList();
+    private List<Integer> ignoredNotifications = new ArrayList<Integer>();
 
 
     public EndpointNotificationLoggerAgent()
@@ -65,7 +65,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                 throw new InitialisationException(CoreMessages.propertiesNotSet("endpoint"), this);
             }
             // Create a session for sending notifications
-            session = new DefaultMuleSession(new DefaultMuleMessage(NullPayload.getInstance(), (Map) null, muleContext), new NullSessionHandler(), muleContext);
+            session = new DefaultMuleSession(new DefaultMuleMessage(NullPayload.getInstance(), (Map<?, ?>) null, muleContext), new NullSessionHandler(), muleContext);
         }
         catch (Exception e)
         {
@@ -90,7 +90,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                 // is being used for notifications then ignore.
                 return;
             }
-            MuleMessage msg = new DefaultMuleMessage(e, (Map) null, muleContext);
+            MuleMessage msg = new DefaultMuleMessage(e, (Map<?, ?>) null, muleContext);
             try
             {
                 //TODO: Filters should really be applied by the endpoint
