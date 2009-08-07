@@ -12,7 +12,7 @@
        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesource.org/schema/mule/ajax http://www.mulesource.org/schema/mule/ajax/3.0/mule-ajax.xsd">
 
-    <vm:connector name="vm" queueEvents="true"/>
+    <vm:connector name="vm"/>
 
     <ajax:servlet-connector name="ajaxConnector" servletUrl="http://localhost:58883"/>
 

@@ -14,7 +14,7 @@
 
     <http:polling-connector name="PollingHttpConnector" pollingFrequency="2000"/>
 
-    <vm:connector name="vmQueue" queueEvents="true"/>
+    <vm:connector name="vmQueue"/>
 
     <!--
         This uses the polling HTTP connector every 30 seconds

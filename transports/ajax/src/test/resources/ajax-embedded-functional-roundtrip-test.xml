@@ -12,7 +12,7 @@
        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesource.org/schema/mule/ajax http://www.mulesource.org/schema/mule/ajax/3.0/mule-ajax.xsd">
 
-    <vm:connector name="vm" queueEvents="true"/>
+    <vm:connector name="vm"/>
 
     <ajax:endpoint name="endpoint1" address="http://0.0.0.0:58080/service/test"/>
     <ajax:endpoint name="endpoint2" address="http://0.0.0.0:58080/service/test2"/>
