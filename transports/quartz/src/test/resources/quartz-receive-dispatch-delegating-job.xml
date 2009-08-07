@@ -12,7 +12,7 @@
        http://www.mulesource.org/schema/mule/test http://www.mulesource.org/schema/mule/test/3.0/mule-test.xsd
        http://www.mulesource.org/schema/mule/quartz http://www.mulesource.org/schema/mule/quartz/3.0/mule-quartz.xsd">
 
-    <vm:connector name="vmQueueConnector" queueEvents="true"/>
+    <vm:connector name="vmQueueConnector"/>
 
     <quartz:endpoint name="schedulerEndpoint1" jobName="myService1" repeatInterval="1000">
         <quartz:custom-job-from-message evaluator="header" expression="jobConfig"/>

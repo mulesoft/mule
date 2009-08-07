@@ -14,7 +14,7 @@
         <default-threading-profile threadWaitTimeout="60000" threadTTL="60000"/>
     </configuration>
 
-    <vm:connector name="vm-queue" queueEvents="true"/>
+    <vm:connector name="vm-queue"/>
 
     <!-- MULE-2109 -->
     <!-- mule:endpoint name="serverEndpoint" address="udp://null:60131"/ -->

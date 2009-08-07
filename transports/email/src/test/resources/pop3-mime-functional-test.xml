@@ -11,7 +11,7 @@
        http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd">
 
     <pop3:connector name="pop3Connector"/>
-    <vm:connector name="vmConnector" queueEvents="true"/>
+    <vm:connector name="vmConnector"/>
 
     <!-- for variety, this test uses a mime message, so blank out transformer -->
     <no-action-transformer name="noActionTransformer"/>

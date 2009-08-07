@@ -16,7 +16,7 @@
 
     <rmi:connector name="rmi" jndiContext-ref="jndiContext" securityPolicy="rmi.policy"/>
 
-    <vm:connector name="vmQueue" queueEvents="true"/>
+    <vm:connector name="vmQueue"/>
 
     <rmi:endpoint name="Sender" host="localhost" port="1099" object="SimpleMathsUMO" method="addTen"/>
     <endpoint name="Sender2" address="rmi://localhost:1099/MatchingUMO?method=reverseString"/>

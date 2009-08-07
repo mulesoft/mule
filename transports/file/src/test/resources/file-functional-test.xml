@@ -17,7 +17,7 @@
     <!-- access this from test code to set destination directory -->
     <file:connector name="receiveConnector" fileAge="500" autoDelete="true" pollingFrequency="100"/>
 
-    <vm:connector name="vmQueue" queueEvents="true"/>
+    <vm:connector name="vmQueue"/>
 
     <file:endpoint path="test" name="send" connector-ref="sendConnector"/>
     

@@ -16,7 +16,7 @@
         <imaps:tls-client path="clientKeystore" storePassword="mulepassword"/>
         <imaps:tls-trust-store path="greenmail-truststore" storePassword="password"/>
     </imaps:connector>
-    <vm:connector name="vmConnector" queueEvents="true"/>
+    <vm:connector name="vmConnector"/>
 
     <model name="test">
 

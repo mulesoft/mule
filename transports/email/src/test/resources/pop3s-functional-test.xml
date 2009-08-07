@@ -17,7 +17,7 @@
         <pop3s:tls-trust-store path="greenmail-truststore" storePassword="password"/>
     </pop3s:connector>
 
-    <vm:connector name="vmConnector" queueEvents="true"/>
+    <vm:connector name="vmConnector"/>
 
     <model name="test">
 

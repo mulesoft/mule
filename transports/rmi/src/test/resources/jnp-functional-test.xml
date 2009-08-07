@@ -16,7 +16,7 @@
 
     <jnp:connector name="jnp" jndiContext-ref="jndiContext" securityPolicy="rmi.policy"/>
 
-    <vm:connector name="vmQueue" queueEvents="true"/>
+    <vm:connector name="vmQueue"/>
 
     <endpoint name="Sender" address="jnp://localhost:1099/SimpleMathsUMO?method=addTen"/>
     <jnp:endpoint name="Sender2" host="localhost" port="1099" object="MatchingUMO" method="reverseString"/>
