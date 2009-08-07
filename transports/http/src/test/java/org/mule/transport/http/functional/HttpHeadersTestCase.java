@@ -51,6 +51,7 @@ public class HttpHeadersTestCase extends FunctionalTestCase
         assertNotNull(result.getAdapter().getProperty("X-Test"));
         assertEquals("foo", result.getAdapter().getProperty("X-Test"));
     }
+    
 }
 
 

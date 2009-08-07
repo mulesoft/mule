@@ -12,7 +12,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd">
 
-    <vm:connector name="vm" queueEvents="true"/>
+    <vm:connector name="vm"/>
 
     <http:endpoint name="clientEndpoint" host="localhost" port="60203" synchronous="true"/>
     <http:endpoint name="serverEndpoint" host="localhost" port="60203" synchronous="true"/>

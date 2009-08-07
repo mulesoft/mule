@@ -11,7 +11,7 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
-    <vm:connector name="VMQueue" queueEvents="true"/>
+    <vm:connector name="VMQueue"/>
 
     <endpoint name="in" address="${inbound.destination}">
 

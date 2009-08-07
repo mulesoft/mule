@@ -16,7 +16,7 @@
 
     <http:connector name="HttpConnector"/>
 
-    <vm:connector name="vmQueue" queueEvents="true"/>
+    <vm:connector name="vmQueue"/>
 
     <model name="http polling test model">
 
