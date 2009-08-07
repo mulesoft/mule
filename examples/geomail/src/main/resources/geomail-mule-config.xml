@@ -24,7 +24,7 @@
         <spring:import resource="classpath:components.xml"/>
     </spring:beans>
 
-    <vm:connector name="vmConnector" queueEvents="true"/>
+    <vm:connector name="vmConnector"/>
 
     <http:connector name="defaultHttpConnector"/>
 

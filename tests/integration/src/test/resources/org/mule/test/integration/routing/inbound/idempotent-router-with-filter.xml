@@ -13,7 +13,7 @@
         Antoine Borg 2008
     </description>
 
-    <vm:connector name="myVM" queueEvents="true" />
+    <vm:connector name="myVM"/>
 
     <model name="IdempotentRouterTest">
         <service name="IdempotentPlaceHolder">

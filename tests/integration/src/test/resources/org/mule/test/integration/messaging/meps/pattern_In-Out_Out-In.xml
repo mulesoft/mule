@@ -25,7 +25,7 @@
 
     <jms:activemq-connector name="amq"/>
 
-    <vm:connector name="vmConnector" queueEvents="true"/>
+    <vm:connector name="vmConnector"/>
 
     <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
 

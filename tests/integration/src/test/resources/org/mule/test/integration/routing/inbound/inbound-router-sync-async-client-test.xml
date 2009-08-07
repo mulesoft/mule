@@ -10,7 +10,7 @@
         Junit test: for MuleSupport Portal: Case 00001692
     </description>
 
-    <vm:connector name="VMQueue" queueEvents="true">
+    <vm:connector name="VMQueue">
         <vm:queueProfile persistent="true" maxOutstandingMessages="10"/>
     </vm:connector>
 

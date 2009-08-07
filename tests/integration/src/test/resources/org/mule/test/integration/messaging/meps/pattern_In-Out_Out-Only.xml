@@ -21,7 +21,7 @@
         be router via the service outbound routers.
     </description>
 
-     <vm:connector name="vmConnector" queueEvents="true"/>
+     <vm:connector name="vmConnector"/>
 
     <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
     <vm:endpoint path="test.header.received" name="receivedEndpoint" synchronous="false"/>

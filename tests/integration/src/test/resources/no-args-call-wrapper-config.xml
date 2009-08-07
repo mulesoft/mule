@@ -10,7 +10,7 @@
 
     <spring:bean name="containerDelegate" class="org.mule.tck.testmodels.fruit.Apple"/>
 
-    <vm:connector name="VMConnector" queueEvents="true"/>
+    <vm:connector name="VMConnector"/>
 
     <!-- NOTE - this test has been re-written to use entry point resolvers rather than the
          no-args component -->

@@ -11,7 +11,7 @@
     <!-- Testing with ActiveMq -->
     <jms:activemq-connector name="jmsConnector"/>
 
-    <vm:connector name="vmConnector" queueEvents="true" />
+    <vm:connector name="vmConnector"/>
 
     <model>
 

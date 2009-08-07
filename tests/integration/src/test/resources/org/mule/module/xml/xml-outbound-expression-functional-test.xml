@@ -16,7 +16,7 @@
     </mxml:namespace-manager>
 
     <vm:connector name="default"/>
-    <vm:connector name="queue" queueEvents="true"/>
+    <vm:connector name="queue"/>
 
     <endpoint name="split" address="vm://split" connector-ref="default"/>
     <vm:endpoint name="service1" path="service1" connector-ref="queue"/>

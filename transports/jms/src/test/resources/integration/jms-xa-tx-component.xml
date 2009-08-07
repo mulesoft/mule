@@ -15,7 +15,7 @@
 
     <jbossts:transaction-manager/>
     
-    <vm:connector name="vmQueue" queueEvents="true"/>
+    <vm:connector name="vmQueue"/>
 
     <vm:endpoint name="in" path="in" connector-ref="vmQueue"/>
     <vm:endpoint name="out" path="out" connector-ref="vmQueue"/>

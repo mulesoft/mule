@@ -23,7 +23,7 @@
 
     <jms:activemq-xa-connector name="jmsXAConnector" specification="1.1"/>
 
-    <vm:connector name="VMQueue" queueEvents="true"/>
+    <vm:connector name="VMQueue"/>
 
     <model name="model">
         <service name="JmsToJdbc">

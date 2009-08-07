@@ -21,7 +21,7 @@
         outbound router. If a result is returned from the component it is returned back to the calling party.
     </description>
 
-    <vm:connector name="vmConnector" queueEvents="true"/>
+    <vm:connector name="vmConnector"/>
 
     <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
     <vm:endpoint path="test.header.received" name="receivedEndpoint" synchronous="false"/>

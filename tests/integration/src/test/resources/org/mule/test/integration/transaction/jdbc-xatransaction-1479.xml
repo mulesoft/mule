@@ -28,7 +28,7 @@
             
     <jbossts:transaction-manager/>
    
-    <vm:connector name="vmConnector" queueEvents="true"/>
+    <vm:connector name="vmConnector"/>
        
     <jdbc:connector name="jdbcConnectorXA" dataSource-ref="jdbcDataSourceXA">
         <jdbc:query key="insertRecord" value="INSERT into Test (data) VALUES (#[payload])"/>

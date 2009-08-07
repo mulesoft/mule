@@ -20,7 +20,7 @@
 
     <jbossts:transaction-manager/>
 
-    <vm:connector name="vmConnector" queueEvents="true" queueTimeout="10000">
+    <vm:connector name="vmConnector" queueTimeout="10000">
         <receiver-threading-profile maxThreadsActive="1"/>
     </vm:connector>
 

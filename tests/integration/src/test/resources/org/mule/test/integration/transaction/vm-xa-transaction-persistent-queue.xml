@@ -18,7 +18,7 @@
 
     <jbossts:transaction-manager/>
 
-    <vm:connector name="vmConnector" queueEvents="true"/>
+    <vm:connector name="vmConnector"/>
 
     <model>
         <service name="VmXaTestService">

@@ -16,7 +16,7 @@
 
     <vm:connector name="default"/>
     
-    <vm:connector name="queue" queueEvents="true"/>
+    <vm:connector name="queue"/>
 
     <vm:endpoint name="in" address="vm://in" connector-ref="default"/>
 

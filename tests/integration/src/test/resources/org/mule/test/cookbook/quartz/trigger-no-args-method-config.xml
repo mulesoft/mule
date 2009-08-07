@@ -13,7 +13,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 
-    <vm:connector name="resultQueueConnector" queueEvents="true"/>
+    <vm:connector name="resultQueueConnector"/>
 
     <vm:endpoint name="resultQueue" path="results"/>
 

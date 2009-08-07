@@ -14,7 +14,7 @@
         <custom-exception-strategy class="org.mule.module.xml.functional.HideExceptions"/>
     </vm:connector>
 <!--// START SNIPPET: xml-transformers1 -->
-    <vm:connector name="queue" queueEvents="true">
+    <vm:connector name="queue">
         <custom-exception-strategy class="org.mule.module.xml.functional.HideExceptions"/>
     </vm:connector>
 

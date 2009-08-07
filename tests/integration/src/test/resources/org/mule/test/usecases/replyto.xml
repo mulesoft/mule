@@ -13,7 +13,7 @@
     <cxf:connector name="cxf" defaultFrontend="simple"/>
     
     <!-- Asynchronous VM connector (uses in-memory queues) -->
-    <vm:connector name="asyncVm" queueEvents="true"/>
+    <vm:connector name="asyncVm"/>
 
     <vm:endpoint name="ReplyTo" path="reply.to" connector-ref="asyncVm"/>
 

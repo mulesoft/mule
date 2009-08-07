@@ -18,7 +18,7 @@
 
     <vm:connector name="syncVm" />
 
-    <vm:connector name="asyncVm" queueEvents="true" />
+    <vm:connector name="asyncVm"/>
 
     <!-- We could use JMS instead of VM to make the example more realistic.
         <jms:activemq-connector name="jmsConnector" />

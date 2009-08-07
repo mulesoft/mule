@@ -18,9 +18,9 @@
     </client:remote-dispatcher-agent>
 
     <!-- this connector/provider simulates an existing endpoint on a remote server -->
-    <vm:connector name="vmRemoteQueueConnector" queueEvents="true"/>
+    <vm:connector name="vmRemoteQueueConnector"/>
 
-    <vm:connector name="vmRemoteConnector" queueEvents="false"/>
+    <vm:connector name="vmRemoteConnector"/>
 
     <endpoint address="vm://remote.queue" name="remoteVmQueue"/>
     <endpoint address="vm://remote.endpoint" name="testVmEndpoint" connector-ref="vmRemoteConnector" synchronous="true"/>

@@ -33,7 +33,7 @@
         destinations.
     </description>
 
-    <vm:connector name="vmConnector" queueEvents="true"/>
+    <vm:connector name="vmConnector"/>
 
     <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
     <vm:endpoint path="test.external.app" name="externalEndpoint" synchronous="false"/>

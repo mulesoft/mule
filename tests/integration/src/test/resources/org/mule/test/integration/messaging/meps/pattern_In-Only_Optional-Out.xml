@@ -21,7 +21,7 @@
         result.
     </description>
 
-    <vm:connector name="vmConnector" queueEvents="true"/>
+    <vm:connector name="vmConnector"/>
 
     <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="false"/>
     <vm:endpoint path="test.header.received" name="receivedEndpoint" synchronous="false"/>

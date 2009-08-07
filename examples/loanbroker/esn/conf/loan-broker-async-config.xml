@@ -18,7 +18,7 @@
     <vm:connector name="syncVm"/>
 
     <!-- Asynchronous VM connector (uses in-memory queues) -->
-    <vm:connector name="asyncVm" queueEvents="true"/>
+    <vm:connector name="asyncVm"/>
 
     <!-- only used for the async loan broker to send the lowest quote back to the customer -->
     <vm:endpoint name="CustomerResponses" path="customer.responses" connector-ref="asyncVm"/>
