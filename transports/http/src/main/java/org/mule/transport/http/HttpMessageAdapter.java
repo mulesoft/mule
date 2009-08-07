@@ -17,7 +17,6 @@ import org.mule.util.IOUtils;
 
 import java.io.InputStream;
 import java.io.NotSerializableException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,7 +24,6 @@ import java.util.Map;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HeaderElement;
 import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making the
@@ -192,12 +190,18 @@ public class HttpMessageAdapter extends AbstractMessageAdapter implements Messag
         if (message instanceof InputStream)
         {
             // message is an InputStream when the HTTP method was POST
-            return IOUtils.toByteArray((InputStream) message);
+            byte[] bytes = IOUtils.toByteArray((InputStream) message);
+            
+            // keep the bytes from the InputStream as we cannot consume it again and this 
+            // MessageAdatper must stay intact for further use
+            message = bytes;
+            
+            return bytes;
         }
-        else if (message instanceof Serializable)
+        else if (message instanceof String)
         {
             // message is a String when the HTTP method was GET
-            return SerializationUtils.serialize((Serializable) message);
+            return ((String) message).getBytes();
         }
         else
         {

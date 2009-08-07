@@ -10,7 +10,6 @@
 
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -21,9 +20,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 /**
  * <code>XmlToObject</code> converts xml created by the ObjectToXml transformer in to a
@@ -113,39 +109,7 @@ public class XmlToObject extends AbstractXStreamTransformer
     {
         if (object instanceof DeserializationPostInitialisable)
         {
-            try
-            {
-                final Method m = object.getClass().getDeclaredMethod("initAfterDeserialisation", MuleContext.class);
-
-                Object o = AccessController.doPrivileged(new PrivilegedAction<Object>()
-                {
-                    public Object run()
-                    {
-                        try
-                        {
-                            m.setAccessible(true);
-                            m.invoke(object, muleContext);
-                            return null;
-                        }
-                        catch (Exception e)
-                        {
-                            return e;
-                        }
-
-                    }
-                });
-                if (o != null)
-                {
-                    throw (Exception) o;
-                }
-
-            }
-            catch (NoSuchMethodException e)
-            {
-                throw new IllegalArgumentException("Object " + object.getClass() + " implements " +
-                        DeserializationPostInitialisable.class + " but does not have a method " +
-                        "private void initAfterDeserialisation(MuleContext) defined", e);
-            }
+            DeserializationPostInitialisable.Implementation.init(object, muleContext);
         }
     }
 

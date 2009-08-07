@@ -10,6 +10,12 @@
 
 package org.mule.util.store;
 
+import org.mule.api.MuleContext;
+
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 /**
  * A marker interface used to trigger post-deserialization initialization of an object. This works 
  * in the same way as {@link Cloneable} interface. Implementors of this interface must add the 
@@ -27,4 +33,46 @@ package org.mule.util.store;
 public interface DeserializationPostInitialisable
 {
     //private void initAfterDeserialisation(MuleContext muleContext) throws MuleException;
+    
+    public class Implementation
+    {
+        public static void init(final Object object, final MuleContext muleContext) throws Exception
+        {
+            try
+            {
+                final Method m = object.getClass().getDeclaredMethod("initAfterDeserialisation", 
+                    MuleContext.class);
+
+                Object o = AccessController.doPrivileged(new PrivilegedAction<Object>()
+                {
+                    public Object run()
+                    {
+                        try
+                        {
+                            m.setAccessible(true);
+                            m.invoke(object, muleContext);
+                            return null;
+                        }
+                        catch (Exception e)
+                        {
+                            return e;
+                        }
+
+                    }
+                });
+                
+                if (o != null)
+                {
+                    throw (Exception) o;
+                }
+
+            }
+            catch (NoSuchMethodException e)
+            {
+                throw new IllegalArgumentException("Object " + object.getClass() + " implements " +
+                        DeserializationPostInitialisable.class + " but does not have a method " +
+                        "private void initAfterDeserialisation(MuleContext) defined", e);
+            }
+        }
+    }
 }
