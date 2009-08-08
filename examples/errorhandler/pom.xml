@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-examples</artifactId>
-        <version>3.0.0-M2-20090808</version>
+        <version>3.0.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-errorhandler</artifactId>
     <name>Error Handler Example</name>
