@@ -29,11 +29,12 @@ public class QuartzReceiveAndDispatchJobTestCase extends FunctionalTestCase
         CountdownCallback count = new CountdownCallback(3);
         component.setEventCallback(count);
 
-        new MuleClient().send("vm://event.queue", "quartz test", null);
-        new MuleClient().send("vm://event.queue", "quartz test", null);
-        new MuleClient().send("vm://event.queue", "quartz test", null);
+        MuleClient client = new MuleClient();
+        client.dispatch("vm://event.queue", "quartz test", null);
+        client.dispatch("vm://event.queue", "quartz test", null);
+        client.dispatch("vm://event.queue", "quartz test", null);
 
-        new MuleClient().send("vm://quartz.scheduler", "test", null);
+        client.dispatch("vm://quartz.scheduler", "test", null);
         assertTrue(count.await(5000));
     }
 }
