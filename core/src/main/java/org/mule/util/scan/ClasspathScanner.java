@@ -24,6 +24,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -101,6 +102,7 @@ public class ClasspathScanner
     {
         Set<Class> set = new HashSet<Class>();
         String path = url.getFile().substring(5, url.getFile().indexOf("!"));
+        path = URLDecoder.decode(path);
         JarFile jar = new JarFile(path);
 
         for (Enumeration entries = jar.entries(); entries.hasMoreElements();)
@@ -147,6 +149,8 @@ public class ClasspathScanner
     {
         Set<Class> set = new HashSet<Class>();
         String urlBase = url.getFile();
+        urlBase = URLDecoder.decode(urlBase);
+
         Collection<File> files = FileUtils.listFiles(new File(urlBase), new String[]{"class"}, true);
         for (File file : files)
         {
