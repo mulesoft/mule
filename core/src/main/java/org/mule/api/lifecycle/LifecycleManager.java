@@ -22,9 +22,9 @@ import java.util.Set;
 
 public interface LifecycleManager
 {
-    Set getLifecycles();
+    Set<LifecyclePhase> getLifecycles();
 
-    void setLifecycles(Set lifecycles);
+    void setLifecycles(Set<LifecyclePhase> lifecycles);
 
     void registerLifecycle(LifecyclePhase lci);
 

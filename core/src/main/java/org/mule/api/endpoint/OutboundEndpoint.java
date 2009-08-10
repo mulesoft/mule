@@ -14,7 +14,7 @@ import org.mule.api.transport.MessageDispatching;
 
 public interface OutboundEndpoint extends ImmutableEndpoint,  MessageDispatching
 {
-
+    // no additional methods in this interface
 }
 
 

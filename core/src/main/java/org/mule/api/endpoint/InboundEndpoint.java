@@ -14,7 +14,7 @@ import org.mule.api.transport.MessageRequesting;
 
 public interface InboundEndpoint extends ImmutableEndpoint, MessageRequesting
 {
-
+    // no additional methods in this interface
 }
 
 

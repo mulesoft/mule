@@ -40,16 +40,16 @@ public class GenericLifecycleManager implements LifecycleManager
     protected Map<String, Integer> index = new HashMap<String, Integer>(6);
     protected Set completedPhases = new LinkedHashSet(6);
 
-    public Set getLifecycles()
+    @SuppressWarnings("unchecked")
+    public Set<LifecyclePhase> getLifecycles()
     {
         return lifecycles;
     }
 
-    public void setLifecycles(Set lifecycles)
+    public void setLifecycles(Set<LifecyclePhase> lifecycles)
     {
-        for (Object lifecycle : lifecycles)
+        for (LifecyclePhase phase : lifecycles)
         {
-            LifecyclePhase phase = (LifecyclePhase) lifecycle;
             registerLifecycle(phase);
         }
     }
