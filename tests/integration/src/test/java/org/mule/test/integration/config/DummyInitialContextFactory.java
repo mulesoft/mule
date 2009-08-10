@@ -61,7 +61,7 @@ public class DummyInitialContextFactory implements ObjectFactory
         // do nothing
     }
 
-    public Class getObjectClass()
+    public Class<?> getObjectClass()
     {
         throw new UnsupportedOperationException();
     }

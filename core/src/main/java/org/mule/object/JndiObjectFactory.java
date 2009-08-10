@@ -131,7 +131,7 @@ public class JndiObjectFactory implements ObjectFactory
     }
     
     /** {@inheritDoc} */
-    public Class getObjectClass()
+    public Class<?> getObjectClass()
     {
         throw new UnsupportedOperationException();
     }

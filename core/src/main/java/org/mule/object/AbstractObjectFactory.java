@@ -35,7 +35,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory
     public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";
 
     protected String objectClassName;
-    protected SoftReference<Class> objectClass = null;
+    protected SoftReference<Class<?>> objectClass = null;
     protected Map properties = null;
     protected List initialisationCallbacks = new ArrayList();
 
@@ -63,9 +63,9 @@ public abstract class AbstractObjectFactory implements ObjectFactory
         this(objectClass, null);
     }
 
-    public AbstractObjectFactory(Class objectClass, Map properties)
+    public AbstractObjectFactory(Class<?> objectClass, Map properties)
     {
-        this.objectClass = new SoftReference<Class>(objectClass);
+        this.objectClass = new SoftReference<Class<?>>(objectClass);
         this.properties = properties;
     }
 
@@ -81,7 +81,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory
         {
             try
             {
-                objectClass = new SoftReference<Class>(ClassUtils.getClass(objectClassName));
+                objectClass = new SoftReference<Class<?>>(ClassUtils.getClass(objectClassName));
             }
             catch (ClassNotFoundException e)
             {
@@ -130,14 +130,14 @@ public abstract class AbstractObjectFactory implements ObjectFactory
         }
     }
 
-    public Class getObjectClass()
+    public Class<?> getObjectClass()
     {
         return objectClass.get();
     }
 
-    public void setObjectClass(Class objectClass)
+    public void setObjectClass(Class<?> objectClass)
     {
-        this.objectClass = new SoftReference<Class>(objectClass);
+        this.objectClass = new SoftReference<Class<?>>(objectClass);
     }
 
     protected String getObjectClassName()

@@ -119,7 +119,7 @@ public class PooledJavaComponent extends AbstractJavaComponent
             return createLifeCycleAdaptor();
         }
 
-        public Class getObjectClass()
+        public Class<?> getObjectClass()
         {
             return LifecycleAdapter.class;
         }

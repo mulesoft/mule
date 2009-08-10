@@ -32,7 +32,7 @@ public interface ObjectFactory extends Initialisable, Disposable
      * an instance. This may not be logical or even possible depending on the
      * implementation.
      */
-    Class getObjectClass();
+    Class<?> getObjectClass();
     
     /**
      * Returns true if the ObjectFactory implementation always returns the same object

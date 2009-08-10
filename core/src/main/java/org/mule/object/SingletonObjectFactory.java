@@ -44,7 +44,7 @@ public class SingletonObjectFactory extends AbstractObjectFactory
         super(objectClass);
     }
 
-    public SingletonObjectFactory(Class objectClass, Map properties)
+    public SingletonObjectFactory(Class<?> objectClass, Map properties)
     {
         super(objectClass, properties);
     }
@@ -101,7 +101,7 @@ public class SingletonObjectFactory extends AbstractObjectFactory
     }
 
     @Override
-    public Class getObjectClass()
+    public Class<?> getObjectClass()
     {
         if (instance != null && instance.get() != null)
         {
@@ -113,6 +113,7 @@ public class SingletonObjectFactory extends AbstractObjectFactory
         }
     }
 
+    @Override
     public boolean isSingleton()
     {
         return true;

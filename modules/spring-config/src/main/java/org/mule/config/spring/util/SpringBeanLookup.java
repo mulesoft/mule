@@ -13,6 +13,7 @@ package org.mule.config.spring.util;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.object.AbstractObjectFactory;
+
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -52,6 +53,7 @@ public class SpringBeanLookup extends AbstractObjectFactory implements Applicati
     private ApplicationContext applicationContext;
     private String bean;
 
+    @Override
     public void initialise() throws InitialisationException
     {
         if (bean == null)
@@ -65,16 +67,19 @@ public class SpringBeanLookup extends AbstractObjectFactory implements Applicati
         }
     }
 
+    @Override
     public void dispose()
     {
         // Not implemented for Spring Beans
     }
 
-    public Class getObjectClass()
+    @Override
+    public Class<?> getObjectClass()
     {
         return applicationContext.getType(bean);
     }
 
+    @Override
     public Object getInstance() throws Exception
     {
         Object instance = applicationContext.getBean(bean);

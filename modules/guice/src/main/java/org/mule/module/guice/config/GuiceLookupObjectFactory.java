@@ -54,7 +54,8 @@ public class GuiceLookupObjectFactory extends AbstractObjectFactory implements M
         // Not implemented for Spring Beans
     }
 
-    public Class getObjectClass()
+    @SuppressWarnings("unchecked")
+    public Class<?> getObjectClass()
     {
         return injector.getInstance(classBinding).getClass();
     }

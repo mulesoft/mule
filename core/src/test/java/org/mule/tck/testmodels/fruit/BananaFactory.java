@@ -34,7 +34,7 @@ public class BananaFactory implements ObjectFactory
         return new Banana();
     }
 
-    public Class getObjectClass()
+    public Class<?> getObjectClass()
     {
         return Banana.class;
     }
