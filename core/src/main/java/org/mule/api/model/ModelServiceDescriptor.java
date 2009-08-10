@@ -25,7 +25,7 @@ public interface ModelServiceDescriptor extends ServiceDescriptor
 {
     Model createModel() throws ServiceException;
 
-    Class getModelClass() throws ServiceException;
+    Class<Model> getModelClass() throws ServiceException;
 }
 
 

@@ -37,7 +37,8 @@ public class DefaultModelServiceDescriptor extends AbstractServiceDescriptor imp
     {
         if (modelClass != null)
         {
-            try {
+            try 
+            {
                 Model model = (Model)ClassUtils.instanciateClass(modelClass, ClassUtils.NO_ARGS, getClass());
                 BeanUtils.populateWithoutFail(model, properties, false);
                 return model;
@@ -50,9 +51,11 @@ public class DefaultModelServiceDescriptor extends AbstractServiceDescriptor imp
         else return null;
     }
 
-    public Class getModelClass() throws ServiceException
+    @SuppressWarnings("unchecked")
+    public Class<Model> getModelClass() throws ServiceException
     {
-        try {
+        try 
+        {
             return ClassUtils.getClass(modelClass);
         }
         catch (ClassNotFoundException e)
