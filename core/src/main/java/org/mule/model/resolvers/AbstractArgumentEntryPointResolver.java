@@ -119,7 +119,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
         {
             if (isEnableDiscovery())
             {
-                Class[] argTypes = getMethodArgumentTypes(payload);
+                Class<?>[] argTypes = getMethodArgumentTypes(payload);
                 List methods = ClassUtils.getSatisfiableMethods(component.getClass(), argTypes,
                         isAcceptVoidMethods(), false, getIgnoredMethods(), filter);
 
@@ -154,7 +154,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
         return invokeMethod(component, method, getPayloadFromMessage(context));
     }
 
-    protected abstract Class[] getMethodArgumentTypes(Object[] payload);
+    protected abstract Class<?>[] getMethodArgumentTypes(Object[] payload);
 
     public String toString()
     {

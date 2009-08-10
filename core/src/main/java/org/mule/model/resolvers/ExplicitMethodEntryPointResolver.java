@@ -55,7 +55,7 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
         }
 
         Object[] payload = getPayloadFromMessage(context);
-        Class[] classTypes = ClassUtils.getClassTypes(payload);
+        Class<?>[] classTypes = ClassUtils.getClassTypes(payload);
         Method method = null;
         for (Iterator iterator = methods.iterator(); iterator.hasNext();)
         {

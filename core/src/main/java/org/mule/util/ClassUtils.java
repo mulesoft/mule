@@ -46,7 +46,7 @@ import java.util.Set;
 public class ClassUtils extends org.apache.commons.lang.ClassUtils
 {
     public static final Object[] NO_ARGS = new Object[]{};
-    public static final Class[] NO_ARGS_TYPE = new Class[]{};
+    public static final Class<?>[] NO_ARGS_TYPE = new Class<?>[]{};
 
     private static final Map wrapperToPrimitiveMap = new HashMap();
 
@@ -626,14 +626,14 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *               array then {@link #NO_ARGS_TYPE} is returned
      * @return an array of class types for the object
      */
-    public static Class[] getClassTypes(Object object)
+    public static Class<?>[] getClassTypes(Object object)
     {
         if (object == null)
         {
             return NO_ARGS_TYPE;
         }
 
-        Class[] types;
+        Class<?>[] types;
 
         if (object instanceof Object[])
         {

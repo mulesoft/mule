@@ -86,7 +86,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
 
         if (method == null)
         {
-            Class[] classTypes = ClassUtils.getClassTypes(payload);
+            Class<?>[] classTypes = ClassUtils.getClassTypes(payload);
 
             method = ClassUtils.getMethod(component.getClass(), methodName, classTypes);
             

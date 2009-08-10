@@ -27,13 +27,13 @@ import org.mule.util.ClassUtils;
  */
 public class ArrayEntryPointResolver extends AbstractArgumentEntryPointResolver
 {
-    @java.lang.Override
-    protected Class[] getMethodArgumentTypes(Object[] payload)
+    @Override
+    protected Class<?>[] getMethodArgumentTypes(Object[] payload)
     {
         return ClassUtils.getClassTypes(payload);
     }
 
-    @java.lang.Override
+    @Override
     protected Object[] getPayloadFromMessage(MuleEventContext context) throws TransformerException
     {
         Object temp;

@@ -306,7 +306,7 @@ public class RmiConnector extends AbstractJndiConnector
     protected Class[] getArgTypes(Object args, MuleEvent fromEvent) 
         throws ClassNotFoundException, TransformerException
     {
-    	Class[] argTypes = null;
+    	Class<?>[] argTypes = null;
     	
         if (args instanceof List)
         {

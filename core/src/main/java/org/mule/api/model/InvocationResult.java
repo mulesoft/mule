@@ -134,19 +134,19 @@ public class InvocationResult
         return errorMessage;
     }
 
-    public void setErrorTooManyMatchingMethods(Object component, Class[] argTypes, String methods, EntryPointResolver resolver)
+    public void setErrorTooManyMatchingMethods(Object component, Class<?>[] argTypes, String methods, EntryPointResolver resolver)
     {
         setErrorMessage(CoreMessages.tooManyAcceptableMethodsOnObjectUsingResolverForTypes(
                 component.getClass().getName(), argTypes, resolver).toString());
     }
 
-    public void setErrorTooManyMatchingMethods(Object component, Class[] argTypes, EntryPointResolver resolver)
+    public void setErrorTooManyMatchingMethods(Object component, Class<?>[] argTypes, EntryPointResolver resolver)
     {
         setErrorMessage(CoreMessages.tooManyAcceptableMethodsOnObjectUsingResolverForTypes(
                 component.getClass().getName(), argTypes, resolver).toString());
     }
 
-    public void setErrorNoMatchingMethods(Object component, Class[] args, EntryPointResolver resolver)
+    public void setErrorNoMatchingMethods(Object component, Class<?>[] args, EntryPointResolver resolver)
     {
         setErrorMessage(CoreMessages.noEntryPointFoundWithArgsUsingResolver(
                 component.getClass().getName(), args, resolver).toString());

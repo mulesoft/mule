@@ -208,7 +208,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     public void testClassTypesWithNullInArray()
     {
         Object[] array = new Object[]{"hello", null, "world"};
-        Class[] classTypes = ClassUtils.getClassTypes(array);
+        Class<?>[] classTypes = ClassUtils.getClassTypes(array);
         assertEquals(3, classTypes.length);
         assertEquals(String.class, classTypes[0]);
         assertEquals(null, classTypes[1]);

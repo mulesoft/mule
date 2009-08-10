@@ -123,7 +123,7 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
             return invokeMethod(component, method, payload);
         }
 
-        Class[] types = ClassUtils.getClassTypes(payload);
+        Class<?>[] types = ClassUtils.getClassTypes(payload);
 
         // do any methods on the service accept a context?
         List methods = ClassUtils.getSatisfiableMethods(component.getClass(), types,
