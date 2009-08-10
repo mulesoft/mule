@@ -18,7 +18,7 @@ import org.mule.api.registry.Registry;
  */
 public class ContainerManagedLifecyclePhase extends DefaultLifecyclePhase
 {
-    public ContainerManagedLifecyclePhase(String name, Class lifecycleClass, String oppositePhaseName)
+    public ContainerManagedLifecyclePhase(String name, Class<?> lifecycleClass, String oppositePhaseName)
     {
         super(name, lifecycleClass, oppositePhaseName);
     }

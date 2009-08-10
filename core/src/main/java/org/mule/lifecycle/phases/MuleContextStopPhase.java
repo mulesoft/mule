@@ -20,6 +20,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.DefaultLifecyclePhase;
+import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 
 import java.util.LinkedHashSet;
@@ -41,11 +42,11 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
         this(new Class[]{Registry.class, MuleContext.class});
     }
 
-    public MuleContextStopPhase(Class[] ignorredObjects)
+    public MuleContextStopPhase(Class<?>[] ignorredObjects)
     {
         super(Stoppable.PHASE_NAME, Stoppable.class, Startable.PHASE_NAME);
 
-        Set stopOrderedObjects = new LinkedHashSet();
+        Set<LifecycleObject> stopOrderedObjects = new LinkedHashSet<LifecycleObject>();
         // Stop in the opposite order to start
         stopOrderedObjects.add(new NotificationLifecycleObject(Service.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class));

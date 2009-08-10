@@ -34,23 +34,23 @@ public interface LifecyclePhase
 
     void removeOrderedLifecycleObject(LifecycleObject lco);
 
-    Set getOrderedLifecycleObjects();
+    Set<LifecycleObject> getOrderedLifecycleObjects();
 
-    void setOrderedLifecycleObjects(Set orderedLifecycleObjects);
+    void setOrderedLifecycleObjects(Set<LifecycleObject> orderedLifecycleObjects);
 
-    Class[] getIgnoredObjectTypes();
+    Class<?>[] getIgnoredObjectTypes();
 
-    void setIgnoredObjectTypes(Class[] ignorredObjectTypes);
+    void setIgnoredObjectTypes(Class<?>[] ignorredObjectTypes);
 
-    Class getLifecycleClass();
+    Class<?> getLifecycleClass();
 
-    void setLifecycleClass(Class lifecycleClass);
+    void setLifecycleClass(Class<?> lifecycleClass);
 
     String getName();
 
-    Set getSupportedPhases();
+    Set<String> getSupportedPhases();
 
-    void setSupportedPhases(Set supportedPhases);
+    void setSupportedPhases(Set<String> supportedPhases);
 
     void registerSupportedPhase(String phase);
 

@@ -43,7 +43,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
         this(new Class[]{Registry.class, MuleContext.class});
     }
 
-    public MuleContextStartPhase(Class[] ignorredObjects)
+    public MuleContextStartPhase(Class<?>[] ignorredObjects)
     {
         super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
 

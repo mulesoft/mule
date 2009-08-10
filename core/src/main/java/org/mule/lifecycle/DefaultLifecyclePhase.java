@@ -49,16 +49,16 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
 {
     protected transient final Log logger = LogFactory.getLog(DefaultLifecyclePhase.class);
-    private Class lifecycleClass;
+    private Class<?> lifecycleClass;
     private Method lifecycleMethod;
-    private Set orderedLifecycleObjects = new LinkedHashSet(6);
-    private Class[] ignorredObjectTypes;
+    private Set<LifecycleObject> orderedLifecycleObjects = new LinkedHashSet<LifecycleObject>(6);
+    private Class<?>[] ignorredObjectTypes;
     private String name;
     private String oppositeLifecyclePhase;
-    private Set supportedPhases;
+    private Set<String> supportedPhases;
     private MuleContext muleContext;
 
-    public DefaultLifecyclePhase(String name, Class lifecycleClass, String oppositeLifecyclePhase)
+    public DefaultLifecyclePhase(String name, Class<?> lifecycleClass, String oppositeLifecyclePhase)
     {
         this.name = name;
         this.lifecycleClass = lifecycleClass;
@@ -83,10 +83,8 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         // overlapping interfaces can cause duplicates
         Set duplicates = new HashSet();
 
-        for (Iterator iterator = orderedLifecycleObjects.iterator(); iterator.hasNext();)
+        for (LifecycleObject lo : orderedLifecycleObjects)
         {
-            LifecycleObject lo = (LifecycleObject) iterator.next();
-            
             // TODO Collecton -> List API refactoring
             Collection<?> targetsObj = registry.lookupObjects(lo.getType());
             List targets = new LinkedList(targetsObj);
@@ -167,7 +165,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         orderedLifecycleObjects.remove(lco);
     }
 
-    protected boolean ignoreType(Class type)
+    protected boolean ignoreType(Class<?> type)
     {
         if (ignorredObjectTypes == null)
         {
@@ -177,7 +175,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         {
             for (int i = 0; i < ignorredObjectTypes.length; i++)
             {
-                Class ignorredObjectType = ignorredObjectTypes[i];
+                Class<?> ignorredObjectType = ignorredObjectTypes[i];
                 if (ignorredObjectType.isAssignableFrom(type))
                 {
                     return true;
@@ -187,32 +185,32 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         return false;
     }
 
-    public Set getOrderedLifecycleObjects()
+    public Set<LifecycleObject> getOrderedLifecycleObjects()
     {
         return orderedLifecycleObjects;
     }
 
-    public void setOrderedLifecycleObjects(Set orderedLifecycleObjects)
+    public void setOrderedLifecycleObjects(Set<LifecycleObject> orderedLifecycleObjects)
     {
         this.orderedLifecycleObjects = orderedLifecycleObjects;
     }
 
-    public Class[] getIgnoredObjectTypes()
+    public Class<?>[] getIgnoredObjectTypes()
     {
         return ignorredObjectTypes;
     }
 
-    public void setIgnoredObjectTypes(Class[] ignorredObjectTypes)
+    public void setIgnoredObjectTypes(Class<?>[] ignorredObjectTypes)
     {
         this.ignorredObjectTypes = ignorredObjectTypes;
     }
 
-    public Class getLifecycleClass()
+    public Class<?> getLifecycleClass()
     {
         return lifecycleClass;
     }
 
-    public void setLifecycleClass(Class lifecycleClass)
+    public void setLifecycleClass(Class<?> lifecycleClass)
     {
         this.lifecycleClass = lifecycleClass;
     }
@@ -222,12 +220,12 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         return name;
     }
 
-    public Set getSupportedPhases()
+    public Set<String> getSupportedPhases()
     {
         return supportedPhases;
     }
 
-    public void setSupportedPhases(Set supportedPhases)
+    public void setSupportedPhases(Set<String> supportedPhases)
     {
         this.supportedPhases = supportedPhases;
     }
@@ -236,7 +234,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
     {
         if (supportedPhases == null)
         {
-            supportedPhases = new HashSet();
+            supportedPhases = new HashSet<String>();
         }
         supportedPhases.add(phase);
     }
