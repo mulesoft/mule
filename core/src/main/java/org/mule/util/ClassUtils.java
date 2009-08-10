@@ -281,7 +281,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * Load a class with a given name from the given classloader.
      */
     public static Class loadClass(final String className, final ClassLoader classLoader)
-    throws ClassNotFoundException
+        throws ClassNotFoundException
     {
         return classLoader.loadClass(className);
     }

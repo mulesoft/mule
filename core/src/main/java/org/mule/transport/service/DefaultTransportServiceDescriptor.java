@@ -328,6 +328,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Connector createConnector() throws TransportServiceException
     {
         Connector newConnector;
@@ -336,7 +337,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         {
             if (connector != null)
             {
-                Class connectorClass;
+                Class<Connector> connectorClass;
                 if (classLoader != null)
                 {
                     connectorClass = ClassUtils.loadClass(connector, classLoader);
@@ -345,7 +346,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 {
                     connectorClass = ClassUtils.loadClass(connector, getClass());
                 }
-                newConnector = (Connector) connectorClass.newInstance();
+                newConnector = connectorClass.newInstance();
             }
             else
             {
@@ -368,7 +369,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         return newConnector;
     }
 
-    public List createInboundTransformers() throws TransportFactoryException
+    @SuppressWarnings("unchecked")
+    public List<Transformer> createInboundTransformers() throws TransportFactoryException
     {
         if (inboundTransformer != null)
         {
@@ -389,10 +391,11 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("inbound", defaultInboundTransformer), e);
             }
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
-    public List createOutboundTransformers() throws TransportFactoryException
+    @SuppressWarnings("unchecked")
+    public List<Transformer> createOutboundTransformers() throws TransportFactoryException
     {
         if (outboundTransformer != null)
         {
@@ -413,10 +416,11 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("outbound", defaultOutboundTransformer), e);
             }
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
-    public List createResponseTransformers() throws TransportFactoryException
+    @SuppressWarnings("unchecked")
+    public List<Transformer> createResponseTransformers() throws TransportFactoryException
     {
         if (responseTransformer != null)
         {
@@ -437,7 +441,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("response", defaultResponseTransformer), e);
             }
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public EndpointURIBuilder createEndpointBuilder() throws TransportFactoryException

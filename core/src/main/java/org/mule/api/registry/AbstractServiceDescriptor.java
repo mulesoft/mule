@@ -52,7 +52,7 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor
         }
     }
 
-    protected Class removeClassProperty(String name, Properties properties) throws ClassNotFoundException
+    protected Class<?> removeClassProperty(String name, Properties properties) throws ClassNotFoundException
     {
         String clazz = removeProperty(name, properties);
         if (clazz == null)
@@ -75,10 +75,10 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor
     public static class Key
     {
         
-        private final Map overrides;
+        private final Map<?, ?> overrides;
         private final String service;
 
-        public Key(String service, Map overrides)
+        public Key(String service, Map<?, ?> overrides)
         {
             this.overrides = overrides;
             this.service = service;
