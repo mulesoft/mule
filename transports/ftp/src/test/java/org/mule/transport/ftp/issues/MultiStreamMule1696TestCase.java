@@ -53,7 +53,7 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
                 }
                 catch (Exception e)
                 {
-                    logger.error(e.getMessage(), e);
+                    fail();
                 }
             }
         };
@@ -63,11 +63,7 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
     {
         MuleClient client = new MuleClient();
 
-        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent)getComponent("testComponent");
-        assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
-
-        //assertNotNull(ftc);
-        //assertEquals(1, ftc.getNumber());
+        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) getComponent("testComponent");
 
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference message = new AtomicReference();
