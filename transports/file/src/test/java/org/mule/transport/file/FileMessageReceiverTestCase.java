@@ -34,11 +34,6 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         // file endpoint functions tests for this
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageReceiverTestCase#getMessageReceiver()
-     */
     public MessageReceiver getMessageReceiver() throws Exception
     {
         endpoint.getConnector().start();

@@ -17,10 +17,11 @@
             outputPattern="cde"
             pollingFrequency="2345"
             serialiseObjects="true"
-            streaming="false">
-        <!-- not tested as they force directory creation -->
-      <!-- readFromDirectory="efg"
-           writeToDirectory="fgh" -->
+            streaming="false"
+            readFromDirectory=".mule/readFromDirectory"
+            writeToDirectory=".mule/writeToDirectory"
+            workDirectory=".mule/workDirectory"
+            workFileNamePattern="#[UUID]">
         <file:custom-filename-parser class="org.mule.transport.file.DummyFilenameParser"/>
     </file:connector>
 

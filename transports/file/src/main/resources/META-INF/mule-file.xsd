@@ -94,6 +94,20 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="workDirectory" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            (As of Mule 2.1.4) The directory path where the file should be moved to prior to processing. The work directory must reside on the same file system as the read directory.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="workFileNamePattern" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            (As of Mule 2.1.4) The pattern to use when moving a file to a new location determined by the workDirectory property. You can use the patterns supported by the filename parser configured for this connector.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

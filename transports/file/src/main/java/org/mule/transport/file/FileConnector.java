@@ -46,8 +46,10 @@ import org.apache.commons.logging.LogFactory;
 public class FileConnector extends AbstractConnector
 {
 
-    public static final String FILE = "file";
     private static Log logger = LogFactory.getLog(FileConnector.class);
+
+    public static final String FILE = "file";
+    private static final String DEFAULT_WORK_FILENAME_PATTERN = "#[UUID].#[SYSTIME].#[ORIGINALNAME]";
 
     // These are properties that can be overridden on the Receiver by the endpoint declaration
     // inbound only
@@ -80,6 +82,10 @@ public class FileConnector extends AbstractConnector
     private String writeToDirectoryName = null;
 
     private String moveToDirectoryName = null;
+    
+    private String workDirectoryName = null;
+
+    private String workFileNamePattern = DEFAULT_WORK_FILENAME_PATTERN;
 
     private String readFromDirectoryName = null;
 
@@ -300,6 +306,35 @@ public class FileConnector extends AbstractConnector
         this.moveToDirectoryName = dir;
     }
 
+    public void setWorkDirectory(String workDirectoryName) throws IOException 
+    {
+		this.workDirectoryName = workDirectoryName;
+        if (workDirectoryName != null)
+        {
+            File workDirectory = FileUtils.openDirectory(workDirectoryName);
+            if (!workDirectory.canWrite())
+            {
+                throw new IOException(
+                        "Error on initialization, Work Directory '" + workDirectory +"' is not writeable");
+            }
+        }
+    }
+    
+	public String getWorkDirectory() 
+	{
+		return workDirectoryName;
+	}
+
+	public void setWorkFileNamePattern(String workFileNamePattern) 
+	{
+		this.workFileNamePattern = workFileNamePattern;
+	}
+
+	public String getWorkFileNamePattern() 
+	{
+		return workFileNamePattern;
+	}
+
     public boolean isOutputAppend()
     {
         return outputAppend;
@@ -350,9 +385,6 @@ public class FileConnector extends AbstractConnector
         return checkFileAge;
     }
 
-    /**
-     * @param fileAge The fileAge in milliseconds to set.
-     */
     public void setFileAge(long fileAge)
     {
         this.fileAge = fileAge;
@@ -370,10 +402,11 @@ public class FileConnector extends AbstractConnector
         if (writeToDirectoryName != null)
         {
             File writeToDirectory = FileUtils.openDirectory(writeToDirectoryName);
-            if (!(writeToDirectory.canRead()) || !writeToDirectory.canWrite())
+            if (!writeToDirectory.canWrite())
             {
                 throw new IOException(
-                        "Error on initialization, Write To directory does not exist or is not read/write");
+                        "Error on initialization, " + writeToDirectory 
+                        + " does not exist or is not writeable");
             }
         }
     }
@@ -388,12 +421,8 @@ public class FileConnector extends AbstractConnector
         this.readFromDirectoryName = dir;
         if (readFromDirectoryName != null)
         {
-            File readFromDirectory = FileUtils.openDirectory((readFromDirectoryName));
-            if (!readFromDirectory.canRead())
-            {
-                throw new IOException(
-                        "Error on initialization, read from directory does not exist or is not readable");
-            }
+            // check if the directory exists/can be read
+            FileUtils.openDirectory((readFromDirectoryName));
         }
     }
 

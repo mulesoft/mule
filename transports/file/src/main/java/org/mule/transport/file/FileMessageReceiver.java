@@ -36,6 +36,7 @@ import java.nio.channels.FileLock;
 import java.util.Comparator;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+
 import org.apache.commons.collections.comparators.ReverseComparator;
 
 /**
@@ -52,9 +53,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
     private String readDir = null;
     private String moveDir = null;
+    private String workDir = null;
     private File readDirectory = null;
     private File moveDirectory = null;
     private String moveToPattern = null;
+    private String workFileNamePattern = null;
     private FilenameFilter filenameFilter = null;
     private FileFilter fileFilter = null;
 
@@ -72,6 +75,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         this.readDir = readDir;
         this.moveDir = moveDir;
         this.moveToPattern = moveToPattern;
+        this.workDir = ((FileConnector) connector).getWorkDirectory();
+        this.workFileNamePattern = ((FileConnector) connector).getWorkFileNamePattern();
 
         if (endpoint.getFilter() instanceof FilenameFilter)
         {
@@ -141,7 +146,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 // don't process directories
                 if (file.isFile())
                 {
-                    this.processFile(file);
+                    processFile(file);
                 }
             }
         }
@@ -151,12 +156,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    public synchronized void processFile(final File sourceFile) throws MuleException
+    public synchronized void processFile(File sourceFile) throws MuleException
     {
+        FileConnector fileConnector = (FileConnector) connector;
+        
         //TODO RM*: This can be put in a Filter. Also we can add an AndFileFilter/OrFileFilter to allow users to
         //combine file filters (since we can only pass a single filter to File.listFiles, we would need to wrap
         //the current And/Or filters to extend {@link FilenameFilter}
-        boolean checkFileAge = ((FileConnector) connector).getCheckFileAge();
+        boolean checkFileAge = fileConnector.getCheckFileAge();
         if (checkFileAge)
         {
             long fileAge = ((FileConnector) connector).getFileAge();
@@ -183,7 +190,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             logger.info("Lock obtained on file: " + sourceFile.getAbsolutePath());
         }
 
-        FileConnector fc = ((FileConnector) connector);
         String sourceFileOriginalName = sourceFile.getName();
 
         // Perform some quick checks to make sure file can be processed
@@ -197,7 +203,22 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         // required to create MessageAdaptor
         DefaultMessageAdapter fileParserMsgAdaptor = new DefaultMessageAdapter(null);
         fileParserMsgAdaptor.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
-
+        
+        File workFile = null;
+        if (workDir != null && (moveDir == null || (moveDir != null && fileConnector.isStreaming())))
+        {
+            String workFileName = sourceFileOriginalName;
+            
+            workFileName = fileConnector.getFilenameParser().getFilename(fileParserMsgAdaptor,
+            		workFileNamePattern);
+            // don't use new File() directly, see MULE-1112
+            workFile = FileUtils.newFile(workDir, workFileName);
+            
+            move(sourceFile, workFile);
+            // Now the Work File is the Source file
+            sourceFile = workFile;
+        }
+        
         // set up destination file
         File destinationFile = null;
         if (moveDir != null)
@@ -215,10 +236,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         MessageAdapter msgAdapter;
         try
         {
-            if (fc.isStreaming())
+            if (fileConnector.isStreaming())
             {
-                msgAdapter = connector.getMessageAdapter(new ReceiverFileInputStream(sourceFile, fc.isAutoDelete(),
-                    destinationFile));
+                msgAdapter = connector.getMessageAdapter(new ReceiverFileInputStream(sourceFile, 
+                    fileConnector.isAutoDelete(), destinationFile));
             }
             else
             {
@@ -231,9 +252,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             logger.error("File being read disappeared!", e);
             return;
         }
+
         msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
-        if (!fc.isStreaming())
+        if (!fileConnector.isStreaming())
         {
             moveAndDelete(sourceFile, destinationFile, sourceFileOriginalName, msgAdapter);
         }
@@ -241,6 +263,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             // If we are streaming no need to move/delete now, that will be done when
             // stream is closed
+            msgAdapter.setProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
             this.routeMessage(new DefaultMuleMessage(msgAdapter, connector.getMuleContext()), endpoint.isSynchronous());
         }
     }
@@ -462,4 +485,22 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         return null;
     }
+    
+    private void move(final File sourceFile,File destinationFile) throws DefaultMuleException
+    {
+		if (destinationFile != null)
+		{
+			// move sourceFile to new destination
+	        try
+            {
+                FileUtils.moveFile(sourceFile, destinationFile);
+            }
+            catch (IOException iox)
+            {
+                throw new DefaultMuleException(FileMessages.failedToMoveFile(
+                    sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()), iox);
+            }
+		}
+    }
+    
 }

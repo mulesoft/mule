@@ -16,7 +16,9 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.file.filters.FilenameRegexFilter;
 import org.mule.transport.file.transformers.FileToByteArray;
 import org.mule.transport.file.transformers.FileToString;
+import org.mule.util.FileUtils;
 
+import java.io.File;
 import java.util.List;
 
 public class FileNamespaceHandlerTestCase extends FunctionalTestCase
@@ -24,6 +26,15 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "file-namespace-config.xml";
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        File workDir = new File(".mule");
+        assertTrue(FileUtils.deleteTree(workDir));
+        
+        super.doTearDown();
     }
 
     public void testConfig() throws Exception
@@ -36,9 +47,10 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("bcd", c.getMoveToPattern());
         assertEquals("cde", c.getOutputPattern());
         assertEquals(2345, c.getPollingFrequency());
-        // don't test these - they force directory creation
-        //assertEquals("efg", c.getReadFromDirectory());
-        //assertEquals("fgh", c.getWriteToDirectory());
+        assertEquals(".mule/readFromDirectory", c.getReadFromDirectory());
+        assertEquals(".mule/writeToDirectory", c.getWriteToDirectory());
+        assertEquals(".mule/workDirectory", c.getWorkDirectory());
+        assertEquals("#[UUID]", c.getWorkFileNamePattern());
         assertEquals(false, c.isAutoDelete());
         assertEquals(true, c.isOutputAppend());
         assertEquals(true, c.isSerialiseObjects());
