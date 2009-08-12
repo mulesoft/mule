@@ -20,6 +20,7 @@ import org.mule.util.scan.annotations.MetaAnnotationTypeFilter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
@@ -119,8 +120,12 @@ public class ClasspathScanner
                     {
                         continue;
                     }
+                    
                     URL classURL = classLoader.getResource(name);
-                    ClassReader reader = new ClassReader(classURL.openStream());
+                    InputStream classStream = classURL.openStream();
+                    ClassReader reader = new ClassReader(classStream);
+                    classStream.close();
+                    
                     ClassScanner visitor = getScanner(clazz);
                     reader.accept(visitor, 0);
                     if (visitor.isMatch())
@@ -142,6 +147,8 @@ public class ClasspathScanner
                 }
             }
         }
+        jar.close();
+        
         return set;
     }
 
@@ -156,7 +163,10 @@ public class ClasspathScanner
         {
             try
             {
-                ClassReader reader = new ClassReader(new FileInputStream(file));
+                InputStream classStream = new FileInputStream(file);
+                ClassReader reader = new ClassReader(classStream);
+                classStream.close();
+                
                 ClassScanner visitor = getScanner(clazz);
                 reader.accept(visitor, 0);
                 if (visitor.isMatch())

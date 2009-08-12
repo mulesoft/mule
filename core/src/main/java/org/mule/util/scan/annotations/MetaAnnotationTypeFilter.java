@@ -10,6 +10,7 @@
 package org.mule.util.scan.annotations;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.net.URL;
 
@@ -63,12 +64,15 @@ public class MetaAnnotationTypeFilter implements AnnotationFilter
         try
         {
             URL classUrl = getClassURL(info.getClassName());
-            if(classUrl==null)
+            if (classUrl == null)
             {
                 logger.debug("Failed to load annotation class: " + info);
                 return false;
             }
-            ClassReader r = new ClassReader(classUrl.openStream());
+            
+            InputStream classStream = classUrl.openStream();
+            ClassReader r = new ClassReader(classStream);
+            classStream.close();
           
             MetaAnnotationScanner scanner = new MetaAnnotationScanner(new AnnotationTypeFilter(annotation));
             r.accept(scanner, 0);

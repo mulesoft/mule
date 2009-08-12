@@ -10,6 +10,7 @@
 package org.mule.util.scan;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import org.objectweb.asm.ClassReader;
@@ -61,7 +62,10 @@ public class ImplementationClassScanner extends EmptyVisitor implements ClassSca
             {
                 ImplementationClassScanner scanner = new ImplementationClassScanner(implementationClass);
                 URL classURL = getClassURL(superName);
-                ClassReader r = new ClassReader(classURL.openStream());
+                InputStream classStream = classURL.openStream();
+                ClassReader r = new ClassReader(classStream);
+                classStream.close();
+                
                 r.accept(scanner, 0);
                 match = scanner.isMatch();
                 className = scanner.getClassName();

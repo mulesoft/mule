@@ -57,6 +57,7 @@ public class AnnotationsScanner extends EmptyVisitor implements ClassScanner
 
     public AnnotationsScanner()
     {
+        super();
     }
 
     public AnnotationsScanner(AnnotationFilter filter)
