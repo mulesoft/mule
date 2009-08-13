@@ -19,17 +19,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * This implementation is used when streaming and will move or delete the source file
  * when the stream is closed.
  */
 class ReceiverFileInputStream extends FileInputStream
 {
-    private static Log log = LogFactory.getLog(ReceiverFileInputStream.class);
-    
     private File currentFile;
     private boolean deleteOnClose;
     private File moveToOnClose;
@@ -50,12 +45,7 @@ class ReceiverFileInputStream extends FileInputStream
 
         if (moveToOnClose != null)
         {
-            boolean success = FileUtils.moveFile(currentFile, moveToOnClose);
-            if (success == false)
-            {
-                log.error("Could not move " + currentFile.getAbsolutePath()
-                    + " to " + moveToOnClose.getAbsolutePath());
-            }
+            FileUtils.moveFile(currentFile, moveToOnClose);
         }
         else if (deleteOnClose)
         {
@@ -79,5 +69,4 @@ class ReceiverFileInputStream extends FileInputStream
     {
         return currentFile;
     }
-
 }
