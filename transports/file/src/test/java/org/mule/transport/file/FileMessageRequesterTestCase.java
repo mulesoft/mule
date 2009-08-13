@@ -51,13 +51,13 @@ public class FileMessageRequesterTestCase extends AbstractMuleTestCase
         assertEquals(ENDPOINT_MOVE_DIR, requester.getMoveDirectory());
     }
     
-    public void testMoveToPatternFromConnector()
+    public void testMoveToPatternFromConnector() throws Exception
     {
         FileMessageRequester requester = new FileMessageRequester(createEndpoint());
         assertEquals(CONNECTOR_MOVE_TO_PATTERN, requester.getMoveToPattern());
     }
     
-    public void testMoveToPatternFromEndpoint()
+    public void testMoveToPatternFromEndpoint() throws Exception
     {
         InboundEndpoint endpoint = createEndpoint(FileConnector.PROPERTY_MOVE_TO_PATTERN,
             ENDPOINT_MOVE_TO_PATTERN);
@@ -79,8 +79,7 @@ public class FileMessageRequesterTestCase extends AbstractMuleTestCase
         }
         
         return new DefaultInboundEndpoint(connector, null, null, null, null, 
-            properties, null, null, false, null, false, false, 42, null, null, null,
-            muleContext, null);
+            properties, null, null, false, null, false, 42, null, null, null, muleContext, null);
     }
 
 }
