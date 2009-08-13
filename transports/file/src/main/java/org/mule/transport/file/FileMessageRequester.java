@@ -137,11 +137,11 @@ public class FileMessageRequester extends AbstractMessageRequester
 
                 // set up destination file
                 File destinationFile = null;
-                String movDir = connector.getMoveToDirectory();
+                String movDir = getMoveDirectory();
                 if (movDir != null)
                 {
                     String destinationFileName = sourceFileOriginalName;
-                    String moveToPattern = connector.getMoveToPattern();
+                    String moveToPattern = getMoveToPattern();
                     if (moveToPattern != null)
                     {
                         destinationFileName = connector.getFilenameParser().getFilename(
@@ -225,19 +225,42 @@ public class FileMessageRequester extends AbstractMessageRequester
 
     }
 
+    @Override
     protected void doDispose()
     {
         // no op
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // no op
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // no op
+    }
+
+    protected String getMoveDirectory()
+    {
+        String moveDirectory = (String) endpoint.getProperty(FileConnector.PROPERTY_MOVE_TO_DIRECTORY);
+        if (moveDirectory == null)
+        {
+            moveDirectory = connector.getMoveToDirectory();
+        }
+        return moveDirectory;
+    }
+
+    protected String getMoveToPattern()
+    {
+        String pattern = (String) endpoint.getProperty(FileConnector.PROPERTY_MOVE_TO_PATTERN);
+        if (pattern == null)
+        {
+            pattern = connector.getMoveToPattern();
+        }
+        return pattern;
     }
 
 }
