@@ -16,7 +16,6 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -37,11 +36,14 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         return "ftp-functional-test.xml";
     }
 
-    protected int getPort()
+    /**
+     * Used by subclasses (in EE)
+     */
+    public int getPort()
     {
         return PORT;
     }
-        
+    
     public void testSendAndRequest() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
@@ -71,7 +73,6 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
             }
         };
         
-        Map properties = new HashMap();
         MuleClient client = new MuleClient();
         assertTrue(getFtpClient().expectFileCount("/", 0, 1000));
         
@@ -83,7 +84,7 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         ftc.setEventCallback(callback);
         
         logger.debug("before dispatch");
-        client.dispatch(getMuleFtpEndpoint(), TEST_MESSAGE, properties);
+        client.dispatch(getMuleFtpEndpoint(), TEST_MESSAGE, new HashMap<Object, Object>());
         logger.debug("before retrieve");
         
         // TODO DZ: need a reliable way to check the file once it's been written to
