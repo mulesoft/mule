@@ -60,7 +60,7 @@ import org.apache.commons.lang.SerializationUtils;
 
 public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransformer implements MuleContextAware
 {
-
+    
     private MuleContext muleContext;
 
     public ObjectToHttpClientMethodRequest()
@@ -312,6 +312,20 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             // See if we have a MIME type set
             String mimeType = (String)msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND);
 
+            // Ensure that we have a cached representation of the message if we're using HTTP 1.0
+            String httpVersion = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
+            if (HttpConstants.HTTP10.equals(httpVersion))
+            {
+                try
+                {
+                    src = msg.getPayloadAsBytes();
+                }
+                catch (Exception e)
+                {
+                    throw new TransformerException(this, e);
+                }
+            }
+            
             if (src instanceof String)
             {
                 // Ensure that we strip the encoding information from the
@@ -364,8 +378,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 {
                     mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
                 }
-                postMethod.setRequestEntity(new ByteArrayRequestEntity((byte[]) src,
-                        mimeType));
+                postMethod.setRequestEntity(new ByteArrayRequestEntity((byte[]) src, mimeType));
             }
             else if (src instanceof OutputHandler)
             {

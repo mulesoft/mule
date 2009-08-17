@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesource.org/schema/mule/http"
+      xmlns:https="http://www.mulesource.org/schema/mule/https"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+          http://www.mulesource.org/schema/mule/http http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd
+          http://www.mulesource.org/schema/mule/https http://www.mulesource.org/schema/mule/https/3.0/mule-https.xsd
+          http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd">
+    
+    <model>
+        <service name="Streaming">
+            <inbound>
+                <http:inbound-endpoint address="http://localhost:60213/streaming" synchronous="true"/>
+            </inbound>
+            <component>
+                <singleton-object class="org.mule.transport.http.components.StreamingResponseComponent"/>
+            </component>
+        </service>
+     </model>
+</mule>

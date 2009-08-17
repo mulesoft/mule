@@ -381,7 +381,7 @@ public class MuleUniversalConduit extends AbstractConduit
     }
     
     protected MuleMessage sendStream(MessageAdapter sa, 
-                                     OutboundEndpoint ep,
+                                     OutboundEndpoint protocolEndpoint,
                                      Exchange exchange) throws MuleException
     {
         MuleEventContext eventContext = RequestContext.getEventContext();
@@ -414,7 +414,7 @@ public class MuleUniversalConduit extends AbstractConduit
         message.removeProperty(CxfConstants.INBOUND_OPERATION);
         message.removeProperty(CxfConstants.INBOUND_SERVICE);
         
-        MuleEvent event = new DefaultMuleEvent(message, ep, session, true);
+        MuleEvent event = new DefaultMuleEvent(message, protocolEndpoint, session, true);
         event.setTimeout(MuleEvent.TIMEOUT_NOT_SET_VALUE);
         RequestContext.setEvent(event);
 
@@ -427,15 +427,15 @@ public class MuleUniversalConduit extends AbstractConduit
             // The underlying endpoint transformers
             event.transformMessage();
         }
-        
+
         MuleMessage msg = null;
-        if (ep.isSynchronous())
+        if (muleEndpoint.isSynchronous())
         {
-            msg = ep.send(event);
+            msg = protocolEndpoint.send(event);
         }
         else
         {
-            ep.dispatch(event);
+            protocolEndpoint.dispatch(event);
         }
         
         // We need to grab this back in the CxfMessageDispatcher again.
