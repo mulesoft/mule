@@ -15,6 +15,7 @@ import org.mule.util.FileUtils;
 import org.mule.util.scan.annotations.AnnotationFilter;
 import org.mule.util.scan.annotations.AnnotationTypeFilter;
 import org.mule.util.scan.annotations.AnnotationsScanner;
+import org.mule.util.scan.annotations.ClosableClassReader;
 import org.mule.util.scan.annotations.MetaAnnotationTypeFilter;
 
 import java.io.File;
@@ -25,7 +26,6 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -103,7 +103,8 @@ public class ClasspathScanner
     {
         Set<Class> set = new HashSet<Class>();
         String path = url.getFile().substring(5, url.getFile().indexOf("!"));
-        path = URLDecoder.decode(path);
+        //We can't URLDecoder.decode(path) since some encoded chars are allowed on file uris
+        path = path.replaceAll("%20", " ");
         JarFile jar = new JarFile(path);
 
         for (Enumeration entries = jar.entries(); entries.hasMoreElements();)
@@ -115,17 +116,15 @@ public class ClasspathScanner
                 {
                     String name = entry.getName();
                     //Ignore anonymous
-                    // TODO RM what about the other anonymous classes like $2, $3 ?
-                    if (name.contains("$1"))
+                    if (name.matches("\\$[1-9]"))
                     {
                         continue;
                     }
                     
                     URL classURL = classLoader.getResource(name);
                     InputStream classStream = classURL.openStream();
-                    ClassReader reader = new ClassReader(classStream);
-                    classStream.close();
-                    
+                    ClassReader reader = new ClosableClassReader(classStream);
+
                     ClassScanner visitor = getScanner(clazz);
                     reader.accept(visitor, 0);
                     if (visitor.isMatch())
@@ -156,7 +155,8 @@ public class ClasspathScanner
     {
         Set<Class> set = new HashSet<Class>();
         String urlBase = url.getFile();
-        urlBase = URLDecoder.decode(urlBase);
+        //We can't URLDecoder.decode(path) since some encoded chars are allowed on file uris
+        urlBase = urlBase.replaceAll("%20", " ");
 
         Collection<File> files = FileUtils.listFiles(new File(urlBase), new String[]{"class"}, true);
         for (File file : files)
@@ -164,9 +164,8 @@ public class ClasspathScanner
             try
             {
                 InputStream classStream = new FileInputStream(file);
-                ClassReader reader = new ClassReader(classStream);
-                classStream.close();
-                
+                ClassReader reader = new ClosableClassReader(classStream);
+
                 ClassScanner visitor = getScanner(clazz);
                 reader.accept(visitor, 0);
                 if (visitor.isMatch())

@@ -71,8 +71,7 @@ public class MetaAnnotationTypeFilter implements AnnotationFilter
             }
             
             InputStream classStream = classUrl.openStream();
-            ClassReader r = new ClassReader(classStream);
-            classStream.close();
+            ClassReader r = new ClosableClassReader(classStream);
           
             MetaAnnotationScanner scanner = new MetaAnnotationScanner(new AnnotationTypeFilter(annotation));
             r.accept(scanner, 0);

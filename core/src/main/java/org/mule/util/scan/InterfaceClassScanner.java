@@ -9,6 +9,8 @@
  */
 package org.mule.util.scan;
 
+import org.mule.util.scan.annotations.ClosableClassReader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -95,8 +97,7 @@ public class InterfaceClassScanner extends EmptyVisitor implements ClassScanner
             URL classURL = getClassURL(name);
             
             InputStream classStream = classURL.openStream();
-            ClassReader r = new ClassReader(classStream);
-            classStream.close(); 
+            ClassReader r = new ClosableClassReader(classStream);
             
             r.accept(scanner, 0);
             return scanner;

@@ -21,7 +21,7 @@ public class AnnotationsScannerTestCase extends TestCase
 
     protected void setUp() throws IOException
     {
-        ClassReader r = new ClassReader(SampleClassWithAnnotations.class.getName());
+        ClassReader r = new ClosableClassReader(SampleClassWithAnnotations.class.getName());
         scanner = new AnnotationsScanner();
 
         r.accept(scanner, 0);

@@ -16,7 +16,7 @@ public class ClasspathAnnotationsScannerTestCase extends TestCase
 {
     public void testScanAnnotationsWithFilter() throws Exception
     {
-        ClassReader r = new ClassReader(SampleClassWithAnnotations.class.getName());
+        ClassReader r = new ClosableClassReader(SampleClassWithAnnotations.class.getName());
         AnnotationsScanner scanner = new AnnotationsScanner(new AnnotationTypeFilter(MultiMarker.class));
 
         r.accept(scanner, 0);
@@ -26,7 +26,7 @@ public class ClasspathAnnotationsScannerTestCase extends TestCase
 
     public void testScanMetaAnnotations() throws Exception
     {
-        ClassReader r = new ClassReader(SampleBeanWithAnnotations.class.getName());
+        ClassReader r = new ClosableClassReader(SampleBeanWithAnnotations.class.getName());
         AnnotationsScanner scanner = new AnnotationsScanner(new MetaAnnotationTypeFilter(Meta.class));
 
         r.accept(scanner, 0);
