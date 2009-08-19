@@ -38,7 +38,7 @@ root = options.r
 base = "http://www.mulesource.org/schema/mule/"
 if (options.e)
 {
-    base = "http://www.mulesource.com/schema/mule/"
+    base = "http://www.mulesource.org/schema/mule/ee/"
 }
 
 schemaVersion = "3.0"
