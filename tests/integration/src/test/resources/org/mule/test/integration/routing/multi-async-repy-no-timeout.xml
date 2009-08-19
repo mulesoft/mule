@@ -47,7 +47,6 @@
                 <inbound-endpoint address="vm://quoteprovider2.queue"/>
             </inbound>
             <test:component appendString=" Received"/>
-
         </service>
 
         <!-- this will cause a response timeout -->

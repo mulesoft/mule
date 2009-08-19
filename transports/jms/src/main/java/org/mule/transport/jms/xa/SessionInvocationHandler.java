@@ -98,8 +98,19 @@ public class SessionInvocationHandler implements TargetInvocationHandler
         }
         else if (XaTransaction.MuleXaObject.CLOSE_METHOD_NAME.equals(method.getName()))
         {
-            //close will be directly called on session object
-            session.close();
+            // some jms implementation need both sessions closed, some not
+            try
+            {
+                session.close();
+                xaSession.close();
+            }
+            catch (Exception ex)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Closing the session and the xaSession failed", ex);
+                }
+            }
             return null;
         }
         

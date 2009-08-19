@@ -34,7 +34,8 @@ public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
     {
         latch = new CountDownLatch(1);
 
-        muleContext.registerListener(new RoutingNotificationListener() {
+        muleContext.registerListener(new RoutingNotificationListener() 
+        {
             public void onNotification(ServerNotification notification)
             {
                 if(notification.getAction() == RoutingNotification.MISSED_ASYNC_REPLY)
