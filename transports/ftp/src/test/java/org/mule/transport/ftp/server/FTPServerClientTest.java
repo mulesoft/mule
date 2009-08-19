@@ -10,6 +10,8 @@
 
 package org.mule.transport.ftp.server;
 
+import org.mule.transport.ftp.AbstractFtpServerTestCase;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -31,16 +33,10 @@ public class FTPServerClientTest extends TestCase
     /**
      * Initialize the ftp server
      */
-    public void setUp()
+    public void setUp() throws Exception
     {
-        try
-        {
-            ftpServer = new Server(PORT);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        new File(AbstractFtpServerTestCase.FTP_SERVER_BASE_DIR).mkdirs();
+        ftpServer = new Server(PORT);
     }
     
     /**

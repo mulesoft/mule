@@ -13,8 +13,12 @@ package org.mule.transport.ftp;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.ftp.server.FTPTestClient;
 import org.mule.transport.ftp.server.Server;
+import org.mule.util.FileUtils;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Abstract FTP test class. Sets up the ftp server and starts/stops it during the
@@ -22,9 +26,12 @@ import java.io.IOException;
  */
 public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
 {
-
     public static final String TEST_MESSAGE = "Test FTP message";
+    
+    private static final String DEFAULT_FTP_HOST = "localhost";
     private static int DEFAULT_TIMEOUT = 10000;
+    public static final String FTP_SERVER_BASE_DIR = "target/ftpserver";
+    
     private int timeout;
     private int ftpPort;
     private Server server = null;
@@ -33,7 +40,7 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
      * servers by changing this value. Some tests may start/stop the ftp server so
      * you will have to implement remote start/stop as well.
      */
-    private String ftpHost = "localhost";
+    private String ftpHost;
     private FTPTestClient ftpClient = null;
     private String ftpUser = "anonymous";
     private String ftpPassword = "password";
@@ -48,15 +55,12 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
     
     public AbstractFtpServerTestCase(int port, int timeout)
     {
-        this.ftpPort = port;
-        this.timeout = timeout;
-        ftpClient = new FTPTestClient(this.ftpHost, this.ftpPort, this.ftpUser, this.ftpPassword);
+        this(DEFAULT_FTP_HOST, port, timeout);
     }
 
     public AbstractFtpServerTestCase(int port)
     {
         this(port, DEFAULT_TIMEOUT);
-        ftpClient = new FTPTestClient(this.ftpHost, this.ftpPort, this.ftpUser, this.ftpPassword);
     }
 
     protected void startServer() throws Exception
@@ -82,12 +86,16 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
+        super.doSetUp();
+
+        // make sure we start out with a clean ftp server base
+        createFtpServerBaseDir();
+
         startServer();
-        if(!ftpClient.testConnection())
+        if (!ftpClient.testConnection())
         {
             throw new IOException("could not connect to ftp server");
         }
-        ftpClient.recursiveDelete("/"); //make sure there are no files on the ftpserver when we start
     }
 
     @Override
@@ -95,6 +103,23 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
     {
         ftpClient.disconnect(); // we dont need the connection anymore for this test
         stopServer();
+
+        deleteFtpServerBaseDir();
+        
+        super.doTearDown();
+    }
+
+    private void createFtpServerBaseDir()
+    {
+        deleteFtpServerBaseDir();
+        File ftpBaseDir = new File(FTP_SERVER_BASE_DIR);
+        ftpBaseDir.mkdirs();
+    }
+
+    private void deleteFtpServerBaseDir()
+    {
+        File ftpServerBase = new File(FTP_SERVER_BASE_DIR);
+        FileUtils.deleteTree(ftpServerBase);
     }
 
     protected int getTimeout()
@@ -139,5 +164,15 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
     public String getMuleFtpEndpoint()
     {
         return "ftp://" + getFtpUser() + ":" + getFtpPassword() + "@" + getFtpHost() + ":" + getFtpPort();       
+    }
+
+    protected void createFileOnFtpServer(String fileName) throws IOException
+    {        
+        File outFile = new File(FTP_SERVER_BASE_DIR, fileName);
+        assertFalse(outFile.exists());
+        
+        Writer outWriter = new FileWriter(outFile);
+        outWriter.write(TEST_MESSAGE);
+        outWriter.close();
     }
 }

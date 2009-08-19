@@ -27,9 +27,9 @@ import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
  */
 public class Server
 {
-    private FtpServer server;
-    public static int port;
     public static final int DEFAULT_PORT = 60196; //default for most/all tests
+
+    private FtpServer server;
 
     /**
      * Initialize the ftp server on a given port
@@ -41,8 +41,6 @@ public class Server
      */
     public Server(int port) throws Exception
     {
-        this.port = port;
-
         FtpServerFactory serverFactory = new FtpServerFactory();        
         ListenerFactory factory = new ListenerFactory();                
         // set the port of the listener

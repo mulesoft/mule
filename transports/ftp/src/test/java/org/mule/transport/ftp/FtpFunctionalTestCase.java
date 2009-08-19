@@ -15,12 +15,10 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
-import java.util.HashMap;
-
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 
 public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
 {
@@ -46,46 +44,17 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
     
     public void testSendAndRequest() throws Exception
     {
-        final CountDownLatch latch = new CountDownLatch(1);
-        final AtomicReference message = new AtomicReference();
-        final AtomicInteger loopCount = new AtomicInteger(0);
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference message = new AtomicReference();
 
-        EventCallback callback = new EventCallback()
-        {
-            public synchronized void eventReceived(MuleEventContext context, Object component)
-            {
-                try
-                {
-                    logger.info("called " + loopCount.incrementAndGet() + " times");
-                    FunctionalTestComponent ftc = (FunctionalTestComponent) component;
-                    // without this we may have problems with the many repeats
-                    if (1 == latch.getCount())
-                    {
-                        String o = new String((byte[])ftc.getLastReceivedMessage());
-                        message.set(o);
-                        latch.countDown();
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        };
-        
-        MuleClient client = new MuleClient();
-        assertTrue(getFtpClient().expectFileCount("/", 0, 1000));
-        
         Object component = getComponent("testComponent");
+        assertNotNull(component);
         assertTrue("FunctionalTestComponent expected", component instanceof FunctionalTestComponent);
         FunctionalTestComponent ftc = (FunctionalTestComponent) component;
-        assertNotNull(ftc);
+        ftc.setEventCallback(new FunctionalEventCallback(latch, message));
         
-        ftc.setEventCallback(callback);
-        
-        logger.debug("before dispatch");
-        client.dispatch(getMuleFtpEndpoint(), TEST_MESSAGE, new HashMap<Object, Object>());
-        logger.debug("before retrieve");
+        MuleClient client = new MuleClient();
+        client.dispatch(getMuleFtpEndpoint(), TEST_MESSAGE, null);
         
         // TODO DZ: need a reliable way to check the file once it's been written to
         // the ftp server. Currently, once mule processes the ftp'd file, it
@@ -94,6 +63,41 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         
         latch.await(getTimeout(), TimeUnit.MILLISECONDS);
         assertEquals(TEST_MESSAGE, message.get());                
+        
+        // give Mule some time to disconnect from the FTP server
+        Thread.sleep(500);
     }
 
+    protected static class FunctionalEventCallback implements EventCallback
+    {
+        private CountDownLatch latch;
+        private AtomicReference message;
+
+        public FunctionalEventCallback(CountDownLatch latch, AtomicReference message)
+        {
+            super();
+            this.latch = latch;
+            this.message = message;
+        }
+        
+        public synchronized void eventReceived(MuleEventContext context, Object component)
+        {
+            try
+            {
+                FunctionalTestComponent ftc = (FunctionalTestComponent) component;
+                
+                // without this we may have problems with the many repeats
+                if (1 == latch.getCount())
+                {
+                    String o = new String((byte[])ftc.getLastReceivedMessage());
+                    message.set(o);
+                    latch.countDown();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
 }

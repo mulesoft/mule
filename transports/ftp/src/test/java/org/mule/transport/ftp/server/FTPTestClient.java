@@ -220,8 +220,6 @@ public class FTPTestClient
      * @param directory The remote directory to check
      * @param timeout The max time to wait
      * @return true if the file count matches before the timeout, false if not
-     * @throws InterruptedException 
-     * @throws IOException 
      */
     public boolean expectFileCount(String directory, int count, long timeout) throws InterruptedException, IOException
     {
@@ -230,7 +228,7 @@ public class FTPTestClient
         while(System.currentTimeMillis() < endTime)
         {
             logger.debug("checking file list, iteration :" + iteration);
-            if(getFileList(directory).length == count)
+            if (getFileList(directory).length == count)
             {
                 logger.debug("found expected file count : " + count);
                 return true;

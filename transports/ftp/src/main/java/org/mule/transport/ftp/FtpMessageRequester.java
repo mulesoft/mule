@@ -81,6 +81,10 @@ public class FtpMessageRequester extends AbstractMessageRequester
         {
             client = connector.createFtpClient(endpoint);
             FTPFile fileToProcess = findFileToProcess(client);
+            if (fileToProcess == null)
+            {
+                return null;
+            }
             
             String originalFileName = fileToProcess.getName();
             fileToProcess = prepareFile(client, fileToProcess);
@@ -118,18 +122,21 @@ public class FtpMessageRequester extends AbstractMessageRequester
     {
         FTPFile[] files = listFiles(client);
 
-        FilenameFilter filenameFilter = getFilenameFilter();
-        for (int i = 0; i < files.length; i++)
+        if (files != null)
         {
-            FTPFile file = files[i];
-            if (file.isFile())
+            FilenameFilter filenameFilter = getFilenameFilter();
+            for (int i = 0; i < files.length; i++)
             {
-                if (filenameFilter.accept(null, file.getName()))
+                FTPFile file = files[i];
+                if (file.isFile())
                 {
-                    if (connector.validateFile(file))
+                    if (filenameFilter.accept(null, file.getName()))
                     {
-                        // only read the first one
-                        return file;
+                        if (connector.validateFile(file))
+                        {
+                            // only read the first one
+                            return file;
+                        }
                     }
                 }
             }

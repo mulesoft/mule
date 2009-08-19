@@ -13,10 +13,6 @@ package org.mule.transport.ftp;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
-import java.io.OutputStream;
-import java.net.URL;
-
-
 public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
 {   
     private static final int PORT = 60199;
@@ -29,21 +25,15 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
     @Override
     protected String getConfigResources()
     {
-        return "ftp-functional-test.xml";
+        return "ftp-message-requester-test.xml";
     }
 
     public void testMessageRequester() throws Exception
     {
-        String url = "ftp://anonymous:email@localhost:" + PORT + "/test.txt";
-        URL ftpUrl = new URL(url);
+        createFileOnFtpServer("test.txt");
 
-        // put a file on the FTP server
-        OutputStream out = ftpUrl.openConnection().getOutputStream();
-        out.write(TEST_MESSAGE.getBytes());
-        out.close();
-        
         MuleClient client = new MuleClient();
-        MuleMessage message = client.request(url, getTimeout());
+        MuleMessage message = client.request(getMuleFtpEndpoint(), getTimeout());
         assertNotNull(message);
         assertEquals(TEST_MESSAGE, message.getPayloadAsString());
     }
