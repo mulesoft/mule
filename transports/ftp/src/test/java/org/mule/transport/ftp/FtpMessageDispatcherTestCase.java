@@ -40,7 +40,7 @@ public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
     public void testDispatch() throws Exception
     {
         MuleClient client = new MuleClient();
-        client.dispatch(getMuleFtpEndpoint(), new DefaultMuleMessage(TEST_MESSAGE));
+        client.dispatch(getMuleFtpEndpoint(), new DefaultMuleMessage(TEST_MESSAGE, muleContext));
         
         // check that the message arrived on the FTP server
         assertTrue(latch.await(getTimeout(), TimeUnit.MILLISECONDS));
@@ -52,7 +52,8 @@ public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage result = client.send(getMuleFtpEndpoint(), new DefaultMuleMessage(TEST_MESSAGE));
+        MuleMessage result = client.send(getMuleFtpEndpoint(), 
+            new DefaultMuleMessage(TEST_MESSAGE, muleContext));
         assertNotNull(result);
         
         // check that the message arrived on the FTP server

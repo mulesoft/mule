@@ -69,20 +69,14 @@
         </dependency>
         <dependency>
             <groupId>org.apache.ftpserver</groupId>
-            <artifactId>ftpserver-deprecated</artifactId>
-            <version>1.0.0-M2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ftpserver</groupId>
             <artifactId>ftpserver-core</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.ftpserver</groupId>
             <artifactId>ftplet-api</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
