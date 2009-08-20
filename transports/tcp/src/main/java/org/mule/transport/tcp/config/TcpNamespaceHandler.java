@@ -10,10 +10,10 @@
 package org.mule.transport.tcp.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.ClassOrRefDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.tcp.TcpConnector;
-import org.mule.transport.tcp.TcpProtocol;
 import org.mule.transport.tcp.protocols.DirectProtocol;
 import org.mule.transport.tcp.protocols.EOFProtocol;
 import org.mule.transport.tcp.protocols.LengthProtocol;
@@ -28,16 +28,15 @@ import org.mule.transport.tcp.protocols.XmlMessageProtocol;
 
 /**
  * Registers a Bean Definition Parser for handling <code><tcp:connector></code> elements.
- *
  */
 public class TcpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+    private static final String TCP_PROTOCOL_PROPERTY = "tcpProtocol";
 
     public void init()
     {
         registerStandardTransportEndpoints(TcpConnector.TCP, URIBuilder.SOCKET_ATTRIBUTES);
         registerConnectorDefinitionParser(TcpConnector.class);
-        registerBeanDefinitionParser("custom-protocol", new ChildDefinitionParser("tcpProtocol", null, TcpProtocol.class, true));
         registerBeanDefinitionParser("xml-protocol", new ChildDefinitionParser("tcpProtocol", XmlMessageProtocol.class));
         registerBeanDefinitionParser("xml-eof-protocol", new ChildDefinitionParser("tcpProtocol", XmlMessageEOFProtocol.class));
         registerBeanDefinitionParser("safe-protocol", new ByteOrMessageProtocolDefinitionParser(SafeProtocol.class, MuleMessageSafeProtocol.class));
@@ -45,6 +44,7 @@ public class TcpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("eof-protocol", new ByteOrMessageProtocolDefinitionParser(EOFProtocol.class, MuleMessageEOFProtocol.class));
         registerBeanDefinitionParser("direct-protocol", new ByteOrMessageProtocolDefinitionParser(DirectProtocol.class, MuleMessageDirectProtocol.class));
         registerBeanDefinitionParser("streaming-protocol", new ByteOrMessageProtocolDefinitionParser(StreamingProtocol.class, MuleMessageDirectProtocol.class));
+        registerBeanDefinitionParser("custom-protocol", new ClassOrRefDefinitionParser(TCP_PROTOCOL_PROPERTY));
     }
 
 }

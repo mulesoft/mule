@@ -20,5 +20,13 @@
     <tcp:connector name="separateTimeouts"
                    clientSoTimeout="3000"
                    serverSoTimeout="4000"/>
+                   
+    <tcp:connector name="connectorWithProtocolClass">
+        <tcp:custom-protocol class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
+    </tcp:connector>
 
+    <spring:bean name="tcpProtocol" class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
+    <tcp:connector name="connectorWithProtocolRef">
+        <tcp:custom-protocol ref="tcpProtocol"/>
+    </tcp:connector>    
 </mule>

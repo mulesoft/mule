@@ -10,6 +10,7 @@
 package org.mule.transport.jdbc.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.ClassOrRefDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
@@ -34,7 +35,7 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
         registerStandardTransportEndpoints(JdbcConnector.JDBC, ADDRESS_ATTRIBUTES).addAlias(QUERY_KEY, URIBuilder.PATH);
         registerConnectorDefinitionParser(JdbcConnector.class);
         registerBeanDefinitionParser("dataSource", new ObjectFactoryWrapper("dataSourceFactory"));
-        registerBeanDefinitionParser(ATTRIBUTE_SQL_STATEMENT_FACTORY, new SqlStatementStrategyFactoryDefinitionParser());
+        registerBeanDefinitionParser(ATTRIBUTE_SQL_STATEMENT_FACTORY, new ClassOrRefDefinitionParser(ATTRIBUTE_SQL_STATEMENT_FACTORY));
         MuleDefinitionParser connectorQuery = new ChildSingletonMapDefinitionParser("query");
         MuleDefinitionParser endpointQuery = new NestedMapDefinitionParser("properties", "queries");
         endpointQuery.addCollection("properties");

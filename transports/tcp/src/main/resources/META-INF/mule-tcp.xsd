@@ -226,10 +226,17 @@
     <xsd:complexType name="customProtocolType">
         <xsd:complexContent>
             <xsd:extension base="abstractProtocolType">
-                <xsd:attribute name="class" type="mule:substitutableClass" use="required">
+                <xsd:attribute name="class" type="mule:substitutableClass" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             A class that implements the TcpProtocol interface.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ref" type="xsd:NMTOKEN" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to a spring bean that implements the TcpProtocol interface.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
