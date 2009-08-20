@@ -15,9 +15,11 @@ import org.mule.util.IOUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
+import org.apache.ftpserver.ftplet.Ftplet;
 import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 
@@ -41,27 +43,53 @@ public class Server
      */
     public Server(int port) throws Exception
     {
+        this(port, null);
+    }
+
+    public Server(int port, Ftplet ftplet) throws Exception
+    {
         FtpServerFactory serverFactory = new FtpServerFactory();        
-        ListenerFactory factory = new ListenerFactory();                
+        
+        setupListenerFactory( serverFactory, port);                
+        setupUserManagerFactory(serverFactory);
+        setupFtplet(serverFactory, ftplet);
+        
+        server = serverFactory.createServer();
+        server.start();
+    }
+
+    private void setupListenerFactory(FtpServerFactory serverFactory, int port)
+    {
+        ListenerFactory listenerFactory = new ListenerFactory();
         // set the port of the listener
-        factory.setPort(port);
+        listenerFactory.setPort(port);
+        listenerFactory.setIdleTimeout(60000);
         // replace the default listener
-        serverFactory.addListener("default", factory.createListener());
-        factory.setIdleTimeout(60000);
-                
+        serverFactory.addListener("default", listenerFactory.createListener());
+    }
+
+    private void setupUserManagerFactory(FtpServerFactory serverFactory) throws IOException
+    {
         PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
         URL usersFile = IOUtils.getResourceAsUrl("users.properties", getClass());
-        if(usersFile == null)
+        if (usersFile == null)
         {
             throw new IOException("users.properties file not found in the classpath");
         }
-        
         userManagerFactory.setFile(new File(usersFile.getFile()));
         serverFactory.setUserManager(userManagerFactory.createUserManager());
+    }
 
-        // start the server
-        server = serverFactory.createServer();
-        server.start();
+    private void setupFtplet(FtpServerFactory serverFactory, Ftplet ftplet)
+    {
+        if (ftplet == null)
+        {
+            return;
+        }
+        
+        Map<String, Ftplet> ftplets = serverFactory.getFtplets();
+        ftplets.put("MuleFtplet", ftplet);
+        serverFactory.setFtplets(ftplets);
     }
 
     /**

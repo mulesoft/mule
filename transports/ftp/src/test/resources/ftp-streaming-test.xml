@@ -3,34 +3,16 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:ftp="http://www.mulesource.org/schema/mule/ftp"
-       xmlns:tcp="http://www.mulesource.org/schema/mule/tcp"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-               http://www.mulesource.org/schema/mule/ftp http://www.mulesource.org/schema/mule/ftp/3.0/mule-ftp.xsd
-               http://www.mulesource.org/schema/mule/tcp http://www.mulesource.org/schema/mule/tcp/3.0/mule-tcp.xsd">
+               http://www.mulesource.org/schema/mule/ftp http://www.mulesource.org/schema/mule/ftp/3.0/mule-ftp.xsd">
 
-    <ftp:connector name="ftp" pollingFrequency="2000" streaming="true" >
+    <ftp:connector name="ftp" pollingFrequency="500" streaming="true" >
         <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
     </ftp:connector>
 
-    <tcp:connector name="tcp">
-        <tcp:direct-protocol payloadOnly="true"/>
-    </tcp:connector>
-
     <model name="main">
-
-        <service name="bridge">
-            <inbound>
-                <inbound-endpoint address="tcp://localhost:60196"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <ftp:outbound-endpoint user="anonymous" password="password" host="localhost" port="60197"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-
         <service name="testComponent">
             <inbound>
                 <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:60197"/>
@@ -39,7 +21,5 @@
                 <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
             </component>
         </service>
-
     </model>
-
 </mule>

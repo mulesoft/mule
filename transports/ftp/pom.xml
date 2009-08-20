@@ -68,12 +68,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-tcp</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.ftpserver</groupId>
             <artifactId>ftpserver-deprecated</artifactId>
             <version>1.0.0-M2</version>

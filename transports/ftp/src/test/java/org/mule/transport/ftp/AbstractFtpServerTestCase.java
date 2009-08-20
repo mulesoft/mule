@@ -12,6 +12,7 @@ package org.mule.transport.ftp;
 
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.ftp.server.FTPTestClient;
+import org.mule.transport.ftp.server.MuleFtplet;
 import org.mule.transport.ftp.server.Server;
 import org.mule.util.FileUtils;
 
@@ -20,37 +21,46 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.apache.ftpserver.ftplet.Ftplet;
+
 /**
  * Abstract FTP test class. Sets up the ftp server and starts/stops it during the
  * test lifecycle.
  */
-public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
+public abstract class AbstractFtpServerTestCase extends FunctionalTestCase 
+    implements MuleFtplet.Callback
 {
     public static final String TEST_MESSAGE = "Test FTP message";
     
     private static final String DEFAULT_FTP_HOST = "localhost";
     private static int DEFAULT_TIMEOUT = 10000;
     public static final String FTP_SERVER_BASE_DIR = "target/ftpserver";
-    
-    private int timeout;
-    private int ftpPort;
-    private Server server = null;
+        
     /**
      * We only test against an embedded server, but you can test against remote
      * servers by changing this value. Some tests may start/stop the ftp server so
      * you will have to implement remote start/stop as well.
      */
     private String ftpHost;
-    private FTPTestClient ftpClient = null;
+    
+    private int ftpPort;
     private String ftpUser = "anonymous";
     private String ftpPassword = "password";
-
+    private int timeout;
+    private Server server = null;
+    private FTPTestClient ftpClient = null;
+    
+    /**
+     * Subclasses can overwrite Ftplet that will be registered when creating the server.
+     */
+    protected Ftplet ftplet = new MuleFtplet(this);
+    
     public AbstractFtpServerTestCase(String ftpHost, int port, int timeout)
     {        
         this.ftpHost = ftpHost;
         this.ftpPort = port;
         this.timeout = timeout;
-        ftpClient = new FTPTestClient(this.ftpHost, this.ftpPort, this.ftpUser, this.ftpPassword);                
+        ftpClient = new FTPTestClient(this.ftpHost, this.ftpPort, this.ftpUser, this.ftpPassword);
     }
     
     public AbstractFtpServerTestCase(int port, int timeout)
@@ -65,7 +75,7 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
 
     protected void startServer() throws Exception
     {
-        server = new Server(ftpPort);
+        server = new Server(ftpPort, ftplet);
         // this is really ugly, but the above doesn't get to waiting.
         // need to improve this as part of ftp server work
         synchronized(this)
@@ -127,31 +137,6 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
         return timeout;
     }
 
-    public void setFtpHost(String ftpHost)
-    {
-        this.ftpHost = ftpHost;
-    }
-
-    public String getFtpHost()
-    {
-        return ftpHost;
-    }
-    
-    public String getFtpUser()
-    {
-        return ftpUser;
-    }
-
-    public String getFtpPassword()
-    {
-        return ftpPassword;
-    }
-
-    public int getFtpPort()
-    {
-        return ftpPort;
-    }
-
     public FTPTestClient getFtpClient()
     {
         return ftpClient;
@@ -159,11 +144,10 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
     
     /**
      * Return the endpoint denoted by the ftp configuration
-     * @return
      */
     public String getMuleFtpEndpoint()
     {
-        return "ftp://" + getFtpUser() + ":" + getFtpPassword() + "@" + getFtpHost() + ":" + getFtpPort();       
+        return "ftp://" + ftpUser + ":" + ftpPassword + "@" + ftpHost + ":" + ftpPort;       
     }
 
     protected void createFileOnFtpServer(String fileName) throws IOException
@@ -174,5 +158,18 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
         Writer outWriter = new FileWriter(outFile);
         outWriter.write(TEST_MESSAGE);
         outWriter.close();
+    }
+
+    //
+    // callback methods from MuleFtplet
+    // 
+    public void fileUploadCompleted()
+    {
+        // subclasses can override this method
+    }
+
+    public void fileMoveCompleted()
+    {
+        // subclasses can override this method
     }
 }
