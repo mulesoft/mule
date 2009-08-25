@@ -75,11 +75,6 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         return q;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.AbstractResourceManager#getLogger()
-     */
     protected Log getLogger()
     {
         return logger;
@@ -142,41 +137,21 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.AbstractResourceManager#createTransactionContext()
-     */
     protected AbstractTransactionContext createTransactionContext(Object session)
     {
         return new QueueTransactionContext();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.AbstractResourceManager#doBegin(org.mule.transaction.xa.AbstractTransactionContext)
-     */
     protected void doBegin(AbstractTransactionContext context)
     {
         // Nothing special to do
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.AbstractResourceManager#doPrepare(org.mule.transaction.xa.AbstractTransactionContext)
-     */
     protected int doPrepare(AbstractTransactionContext context)
     {
         return XAResource.XA_OK;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.AbstractResourceManager#doCommit(org.mule.transaction.xa.AbstractTransactionContext)
-     */
     protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException
     {
         QueueTransactionContext ctx = (QueueTransactionContext) context;
@@ -253,11 +228,6 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         return obj;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.AbstractResourceManager#doRollback(org.mule.transaction.xa.AbstractTransactionContext)
-     */
     protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException
     {
         QueueTransactionContext ctx = (QueueTransactionContext) context;
@@ -378,17 +348,11 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     }
 
-    /**
-     * @return Returns the persistenceStrategy.
-     */
     public QueuePersistenceStrategy getPersistenceStrategy()
     {
         return persistenceStrategy;
     }
 
-    /**
-     * @param persistenceStrategy The persistenceStrategy to set.
-     */
     public void setPersistenceStrategy(QueuePersistenceStrategy persistenceStrategy)
     {
         if (operationMode != OPERATION_MODE_STOPPED)
@@ -411,4 +375,5 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         }
         this.memoryPersistenceStrategy = memoryPersistenceStrategy;
     }
+
 }

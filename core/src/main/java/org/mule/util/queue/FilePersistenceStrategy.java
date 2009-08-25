@@ -24,6 +24,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,33 +65,40 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         serializer.setMuleContext(muleContext);
     }
 
-    protected String getId(Object obj)
-    {
-        return UUID.getUUID();
-    }
-
     public Object store(String queue, Object obj) throws IOException
     {
-        String id = getId(obj);
-        File file = FileUtils.newFile(store, queue + File.separator + id + EXTENSION);
-        if(!file.getParentFile().exists() && !file.getParentFile().mkdirs())
+        String id = UUID.getUUID();
+        
+        String filename = queue + File.separator + id + EXTENSION;
+        File file = FileUtils.newFile(store, filename);
+        if (!file.getParentFile().exists() && !file.getParentFile().mkdirs())
         {
             throw new IOException("Failed to create directory: " + file.getAbsolutePath());
         }
+        
+        OutputStream out = new FileOutputStream(file);
         try
         {
-            serializer.write(new FileOutputStream(file), obj, muleContext.getConfiguration().getDefaultEncoding());
+            serializer.write(out, obj, muleContext.getConfiguration().getDefaultEncoding());
         }
         catch (MuleException e)
         {
-            throw new IOException(e.getDetailedMessage());
+            IOException iox = new IOException();
+            iox.initCause(e);
+            throw iox;
         }
+        finally
+        {
+            out.close();
+        }
+        
         return id;
     }
 
     public void remove(String queue, Object id) throws IOException
     {
-        File file = FileUtils.newFile(store, queue + File.separator + id + EXTENSION);
+        String fileName = queue + File.separator + id + EXTENSION;
+        File file = FileUtils.newFile(store, fileName);
         if (file.exists())
         {
             if (!file.delete())
@@ -99,21 +108,27 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         }
         else
         {
-            throw new FileNotFoundException(file.toString());
+            throw new FileNotFoundException(file.getAbsolutePath());
         }
     }
 
     public Object load(String queue, Object id) throws IOException
     {
-        File file = FileUtils.newFile(store, queue + File.separator + id + EXTENSION);
+        String fileName = queue + File.separator + id + EXTENSION;
+        File file = FileUtils.newFile(store, fileName);
+
+        InputStream in = new FileInputStream(file);
         try
         {
-            Object o = serializer.read(new FileInputStream(file));
-            return o;
+            return serializer.read(in);
         }
         catch (MuleException e)
         {
             throw new IOException(e.getDetailedMessage());
+        }
+        finally
+        {
+            in.close();
         }
     }
 
@@ -125,10 +140,16 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
             logger.warn("No store has be set on the File Persistence Strategy. Not restoring at this time");
             return msgs;
         }
+        
         try
         {
             restoreFiles(store, msgs);
-            logger.debug("Restore retrieved " + msgs.size() + " objects");
+            
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Restore retrieved " + msgs.size() + " objects");
+            }
+            
             return msgs;
         }
         catch (ClassNotFoundException e)
