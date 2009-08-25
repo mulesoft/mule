@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
@@ -71,7 +72,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateMuleContextListMuleContextBuilder() throws InitialisationException, ConfigurationException
     {
-        List configBuilders = new ArrayList();
+        List<ConfigurationBuilder> configBuilders = new ArrayList<ConfigurationBuilder>();
         configBuilders.add(new TestConfigurationBuilder());
         configBuilders.add(new TestConfigurationBuilder2());
 
