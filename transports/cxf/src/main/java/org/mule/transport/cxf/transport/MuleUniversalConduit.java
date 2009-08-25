@@ -429,7 +429,7 @@ public class MuleUniversalConduit extends AbstractConduit
         }
 
         MuleMessage msg = null;
-        if (muleEndpoint.isSynchronous())
+        if (muleEndpoint == null || muleEndpoint.isSynchronous())
         {
             msg = protocolEndpoint.send(event);
         }

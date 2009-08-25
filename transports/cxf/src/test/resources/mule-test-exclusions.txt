@@ -24,8 +24,3 @@ org.mule.transport.cxf.WSProxyTestCase
 # MULE-3694
 org.mule.transport.cxf.CxfConnectorVMFunctionalTestCase
 
-# MULE-4474
-org.mule.transport.cxf.Http10TestCase
-
-# MULE-4475
-org.mule.transport.cxf.wsa.WSATest

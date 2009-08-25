@@ -66,6 +66,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
+                    <forkMode>always</forkMode>
                 </configuration>
             </plugin>
         </plugins>
