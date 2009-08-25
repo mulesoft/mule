@@ -46,11 +46,6 @@ public interface EndpointURI extends Serializable, Initialisable
      */
     String getEndpointName();
 
-    /** 
-     * @deprecated This property is used by endpoint-identifiers, global-endpoints use ImmutableEndpoint.getName()
-     */
-    void setEndpointName(String name);
-
     Properties getParams();
 
     /**

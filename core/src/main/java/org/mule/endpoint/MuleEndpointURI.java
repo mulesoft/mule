@@ -404,11 +404,6 @@ public class MuleEndpointURI implements EndpointURI
         return filterAddress;
     }
 
-    public void setEndpointName(String name)
-    {
-        endpointName = name;
-    }
-
     public String getUser()
     {
         if (StringUtils.isNotBlank(userInfo))

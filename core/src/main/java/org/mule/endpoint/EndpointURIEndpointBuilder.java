@@ -57,18 +57,12 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         this.uriBuilder = URIBuilder;
     }
 
-    /**
-     * @deprecated
-     */
     public EndpointURIEndpointBuilder(String address, MuleContext muleContext)
     {
         this(new URIBuilder(address, muleContext), muleContext);
     }
 
-    /**
-     * @deprecated
-     */
-    public EndpointURIEndpointBuilder(EndpointURI endpointURI, MuleContext muleContext)
+    protected EndpointURIEndpointBuilder(EndpointURI endpointURI, MuleContext muleContext)
     {
         this(new URIBuilder(endpointURI), muleContext);
     }
