@@ -36,16 +36,21 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         MessageHeaderExpressionEvaluator eval = new MessageHeaderExpressionEvaluator();
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
+        // Value required + found
         Object result = eval.evaluate("foo", message);
         assertNotNull(result);
         assertEquals("moo", result);
 
-        result = eval.evaluate("fool*", message);
-        assertNull(result);
-
+        // Value not required + found
         result = eval.evaluate("foo*", message);
         assertNotNull(result);
         assertEquals("moo", result);
+
+        // Value not required + not found
+        result = eval.evaluate("fool*", message);
+        assertNull(result);
+
+        // Value required + not found (throws exception)
         try
         {
             result = eval.evaluate("fool", message);
@@ -65,6 +70,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
+        // Value required + found
         Object result = eval.evaluate("foo, baz", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
@@ -73,9 +79,16 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((Map)result).values().contains("maz"));
         assertFalse(((Map)result).values().contains("mar"));
 
+        // Value not required + found
+        result = eval.evaluate("foo*, baz", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+
+        // Value not required + not found
         result = eval.evaluate("fool*", message);
         assertNull(result);
 
+        // Value required + not found (throws exception)
         try
         {
             result = eval.evaluate("fool", message);
@@ -104,6 +117,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         MessageHeadersListExpressionEvaluator eval = new MessageHeadersListExpressionEvaluator();
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
+        // Value required + found
         Object result = eval.evaluate("foo, baz", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
@@ -112,9 +126,16 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((List)result).contains("maz"));
         assertFalse(((List)result).contains("mar"));
 
+        // Value not required + found
+        result = eval.evaluate("foo*, baz", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+
+        // Value not required + not found
         result = eval.evaluate("fool*", message);
         assertNull(result);
 
+        // Value required + not found (throws exception)
         try
         {
             result = eval.evaluate("fool", message);
@@ -140,13 +161,21 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
+        // Value required + found
         Object result = muleContext.getExpressionManager().evaluate("#[header:foo]", message);
         assertNotNull(result);
         assertEquals("moo", result);
 
+        // Value not required + found
+        result = muleContext.getExpressionManager().evaluate("#[header:foo*]", message);
+        assertNotNull(result);
+        assertEquals("moo", result);
+
+        // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[header:fool*]", message);
         assertNull(result);
 
+        // Value required + not found (throws exception)
         try
         {
             result = muleContext.getExpressionManager().evaluate("#[header:fool]", message);
@@ -164,6 +193,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
+        // Value required + found
         Object result = muleContext.getExpressionManager().evaluate("#[headers:foo, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
@@ -172,9 +202,16 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((Map)result).values().contains("maz"));
         assertFalse(((Map)result).values().contains("mar"));
 
+        // Value not required + found
+        result = muleContext.getExpressionManager().evaluate("#[headers:foo*, baz]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+
+        // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[headers:fool*]", message);
         assertNull(result);
 
+        // Value required + not found (throws exception)
         try
         {
             result = muleContext.getExpressionManager().evaluate("#[headers:fool]", message);
@@ -192,6 +229,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
 
+        // Value required + found
         Object result = muleContext.getExpressionManager().evaluate("#[headers-list:foo, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
@@ -200,9 +238,16 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((List)result).contains("maz"));
         assertFalse(((List)result).contains("mar"));
 
+        // Value not required + found
+        result = muleContext.getExpressionManager().evaluate("#[headers-list:foo*, baz]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+
+        // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[headers-list:fool*]", message);
         assertNull(result);
 
+        // Value required + not found (throws exception)
         try
         {
             result = muleContext.getExpressionManager().evaluate("#[headers-list:fool]", message);
