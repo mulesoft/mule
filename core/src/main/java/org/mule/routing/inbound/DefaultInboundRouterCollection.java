@@ -55,9 +55,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
     public MuleMessage route(MuleEvent event) throws MessagingException
     {
         // If the endpoint has a logical name, use it, otherwise use the URI.
-        String inboundEndpoint = 
-            // Endpoint identifier (deprecated)
-            event.getEndpoint().getEndpointURI().getEndpointName();
+        String inboundEndpoint = event.getEndpoint().getName();            
 
         if (StringUtils.isBlank(inboundEndpoint))
         {
