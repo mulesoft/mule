@@ -181,17 +181,17 @@ public class JaxenFilter implements Filter, MuleContextAware
         // Payload is a DOM Document
         if (dom4jDoc != null)
         {
-            xpathResult = getDom4jXPath().valueOf(dom4jDoc);
+            xpathResult = getDom4jXPath().stringValueOf(dom4jDoc);
         }
         // Payload is a W3C Document
         else if (obj instanceof DOMSource)
         {
-            xpathResult = getDOMXPath().valueOf(obj);
+            xpathResult = getDOMXPath().stringValueOf(obj);
         }
         // Payload is a W3C Document
         else if (obj instanceof org.w3c.dom.Document)
         {
-            xpathResult = getDOMXPath().valueOf(obj);
+            xpathResult = getDOMXPath().stringValueOf(obj);
         }
         // Payload is a Java object
         else
@@ -200,7 +200,7 @@ public class JaxenFilter implements Filter, MuleContextAware
             {
                 logger.debug("Passing object of type " + obj.getClass().getName() + " to JaxenContext");
             }
-            xpathResult = getJavaBeanXPath().valueOf(obj);
+            xpathResult = getJavaBeanXPath().stringValueOf(obj);
         }
 
         if (logger.isDebugEnabled())

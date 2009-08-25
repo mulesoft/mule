@@ -198,8 +198,8 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             {
                 logger.debug("SQL QUERY: " + readStmt + ", params = " + ArrayUtils.toString(readParams));
             }
-            Object results = connector.getQueryRunner().query(con, this.readStmt, readParams,
-                    connector.getResultSetHandler());
+            Object results = connector.getQueryRunner().query(con, this.readStmt, 
+                connector.getResultSetHandler(), readParams);
 
             List resultList = (List) results;
             if (resultList != null && resultList.size() > 1 && isReceiveMessagesInTransaction() && !receiveMessagesInXaTransaction)

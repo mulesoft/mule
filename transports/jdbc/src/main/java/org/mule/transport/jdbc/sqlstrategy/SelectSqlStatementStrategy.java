@@ -84,7 +84,8 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
                 }
 
                 //Perform actual query
-                result = connector.getQueryRunner().query(con, readStmt, params, connector.getResultSetHandler());
+                result = connector.getQueryRunner().query(con, readStmt, 
+                    connector.getResultSetHandler(), params);
                 
                 if (result != null)
                 {

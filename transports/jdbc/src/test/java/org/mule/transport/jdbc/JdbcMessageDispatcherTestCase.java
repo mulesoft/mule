@@ -32,9 +32,7 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
         connector.setDataSource(new TestDataSource());
         
         connector.setMuleContext(muleContext);
-        //muleContext.applyLifecycle(connector);
         muleContext.getRegistry().registerConnector(connector);
-        
         
         InboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "jdbc://select * from test");
@@ -43,11 +41,9 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
 
     public static final class TestQueryRunner extends QueryRunner
     {
-
-        public Object query(Connection connection,
-                            String string,
-                            Object[] objects,
-                            ResultSetHandler resultSetHandler) throws SQLException
+        @Override
+        public Object query(Connection connection, String string, ResultSetHandler resultSetHandler,
+                            Object[] objects) throws SQLException
         {
             assertTrue("Custom result set handler has been ignored.",
                 resultSetHandler instanceof TestResultSetHandler);
@@ -57,7 +53,6 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
 
     public static final class TestResultSetHandler implements ResultSetHandler
     {
-
         public Object handle(ResultSet resultSet) throws SQLException
         {
             return new Object();

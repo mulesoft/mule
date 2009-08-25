@@ -16,8 +16,8 @@ import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -142,10 +142,10 @@ public class TextFileObjectStore extends InMemoryObjectStore
             try
             {
                 output = new FileOutputStream(fileStore, false);
-                props.save(output, StringUtils.EMPTY);
+                props.store(output, StringUtils.EMPTY);
                 IOUtils.closeQuietly(output);
             }
-            catch (FileNotFoundException e)
+            catch (IOException e)
             {
                 logger.error(e.getMessage(), e);
             }
