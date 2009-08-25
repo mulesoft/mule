@@ -42,6 +42,6 @@ public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransacti
         ds.setDriverName(EMBEDDED_DRIVER_NAME);
         ds.setUrl(EMBEDDED_CONNECTION_STRING);
         ds.setTransactionManager(txManager);
-        return new DataSourceWrapper(ds, txManager);
+        return new DataSourceWrapper(ds);
     }
 }

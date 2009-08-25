@@ -17,6 +17,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.AbstractMessageDispatcher;
 
 import java.net.URLDecoder;
@@ -55,15 +56,15 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
                 transport = castConnector().getSessionDetails(endpoint).newTransport();
                 EndpointURI uri = endpoint.getEndpointURI();
-                String user = (uri.getUser()!=null ? URLDecoder.decode(uri.getUser()) : null);
-                String pass = (uri.getPassword()!=null ? URLDecoder.decode(uri.getPassword()) : null);
+                String encoding = endpoint.getEncoding();
+                String user = (uri.getUser()!=null ? URLDecoder.decode(uri.getUser(), encoding) : null);
+                String pass = (uri.getPassword()!=null ? URLDecoder.decode(uri.getPassword(), encoding) : null);
                 transport.connect(uri.getHost(), uri.getPort(),  user, pass);
             }
             catch (Exception e)
             {
                 throw new EndpointException(
-                    org.mule.config.i18n.MessageFactory.createStaticMessage("Unable to connect to mail transport."),
-                    e);
+                    MessageFactory.createStaticMessage("Unable to connect to mail transport."), e);
             }
         }
     }

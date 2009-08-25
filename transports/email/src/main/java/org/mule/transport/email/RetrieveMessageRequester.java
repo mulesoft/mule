@@ -58,8 +58,9 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
             Store store = castConnector().getSessionDetails(endpoint).newStore();
 
             EndpointURI uri = endpoint.getEndpointURI();
-            String user = (uri.getUser() != null ? URLDecoder.decode(uri.getUser()) : null);
-            String pass = (uri.getPassword() != null ? URLDecoder.decode(uri.getPassword()) : null);
+            String encoding = endpoint.getEncoding();
+            String user = (uri.getUser() != null ? URLDecoder.decode(uri.getUser(), encoding) : null);
+            String pass = (uri.getPassword() != null ? URLDecoder.decode(uri.getPassword(), encoding) : null);
             store.connect(uri.getHost(), uri.getPort(), user, pass);
 
             folder = store.getFolder(castConnector().getMailboxFolder());

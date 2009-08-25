@@ -16,7 +16,6 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
-import javax.transaction.TransactionManager;
 
 /**
  * Using for unification XADataSource and DataSource
@@ -29,15 +28,6 @@ public class DataSourceWrapper implements DataSource
     public DataSourceWrapper()
     {
         super();
-    }
-
-    /**
-     * @deprecated this method is only kept for API compatability with 
-     * JdbcTransactionalXaFunctionalTestCase. Remove if that test is refactored.
-     */
-    public DataSourceWrapper(XADataSource xaDataSource, TransactionManager tm)
-    {
-        this(xaDataSource);
     }
     
     public DataSourceWrapper(XADataSource xaDataSource)
