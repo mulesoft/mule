@@ -2,3 +2,5 @@
 # Test cases listed in this file are not run.
 #
 
+# MULE-
+org.mule.transport.email.issues.ExceptionHandlingMule2167TestCase
