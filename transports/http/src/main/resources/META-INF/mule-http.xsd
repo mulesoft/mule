@@ -345,7 +345,7 @@
                  substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                This filter can be used to restrict the request by applying wildcard expressions to the URL.
+                (As of 2.2.2) The request-wildcard-filter element can be used to restrict the request by applying wildcard expressions to the URL.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

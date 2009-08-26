@@ -354,7 +354,7 @@
                 <xsd:attribute name="durableName" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Allows the name for the durable topic subscription to be specified.
+                            (As of 2.2.2) Allows the name for the durable topic subscription to be specified.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
