@@ -32,52 +32,29 @@ public abstract class AbstractTransaction implements Transaction
     protected AbstractTransaction(MuleContext muleContext)
     {
         this.muleContext = muleContext;
-    }/*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#isRollbackOnly()
-     */
+    }
+
     public boolean isRollbackOnly() throws TransactionException
     {
         return getStatus() == STATUS_MARKED_ROLLBACK;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#isBegun()
-     */
     public boolean isBegun() throws TransactionException
     {
         int status = getStatus();
         return status != STATUS_NO_TRANSACTION && status != STATUS_UNKNOWN;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#isRolledBack()
-     */
     public boolean isRolledBack() throws TransactionException
     {
         return getStatus() == STATUS_ROLLEDBACK;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#isCommitted()
-     */
     public boolean isCommitted() throws TransactionException
     {
         return getStatus() == STATUS_COMMITTED;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#begin()
-     */
     public void begin() throws TransactionException
     {
         logger.debug("Beginning transaction");
@@ -86,11 +63,6 @@ public abstract class AbstractTransaction implements Transaction
         fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_BEGAN));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#commit()
-     */
     public void commit() throws TransactionException
     {
         try
@@ -111,11 +83,6 @@ public abstract class AbstractTransaction implements Transaction
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#rollback()
-     */
     public void rollback() throws TransactionException
     {
         try

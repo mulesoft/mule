@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.routing;
 
 import org.mule.api.MessagingException;
@@ -18,16 +19,6 @@ import org.mule.config.i18n.Message;
  */
 public class CorrelationTimeoutException  extends MessagingException
 {
-//    public CorrelationTimeoutException(Message message, Object payload)
-//    {
-//        super(message, payload);
-//    }
-//
-//    public CorrelationTimeoutException(Message message, Object payload, Throwable cause)
-//    {
-//        super(message, payload, cause);
-//    }
-
     public CorrelationTimeoutException(Message message, MuleMessage muleMessage)
     {
         super(message, muleMessage);
