@@ -113,7 +113,7 @@ public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
         runHttp11MethodAndAssert(request);
         
         // the connection should be still open, send another request and terminate the connection
-        request = new GetMethod(URL_WITHOUT_EP_OVERRIDE);
+        request = new GetMethod(url);
         request.setRequestHeader(HttpConstants.HEADER_CONNECTION, "close");
         runHttp11MethodAndAssert(request);
         
