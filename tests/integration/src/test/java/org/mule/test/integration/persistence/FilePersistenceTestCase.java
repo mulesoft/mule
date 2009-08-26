@@ -34,7 +34,9 @@ public class FilePersistenceTestCase extends FunctionalTestCase
         assertFalse(store.exists());
 
         MuleClient client = new MuleClient();
-        client.send("vm://test.queue", "test", null);
+        client.dispatch("vm://test.queue", "test", null);
+        // Give the vm dispatcher chance to persist message.  Cannot use send because send does not use queue.
+        Thread.sleep(500);
         File[] files = store.listFiles();
         assertNotNull(files);
         assertEquals(1, files.length);
