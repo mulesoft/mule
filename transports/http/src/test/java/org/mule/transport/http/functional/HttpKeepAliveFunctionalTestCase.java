@@ -27,7 +27,7 @@ import org.apache.commons.httpclient.params.HttpClientParams;
 public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
 {
     private static final String URL_WITHOUT_EP_OVERRIDE = "http://localhost:60213/http-in";
-    private static final String URL_WITH_EP_OVERRIDE = "http://localhost:60214/http-in";
+    private static final String URL_WITH_EP_OVERRIDE = "http://localhost:60216/http-in";
     
     private HttpClient http10Client;
     private HttpClient http11Client;
