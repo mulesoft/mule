@@ -27,7 +27,6 @@ public class FilePersistenceTestCase extends FunctionalTestCase
 
     public void testFilesStored() throws Exception
     {
-
         // Note that the FunctionalTestCase will remove the working directory after
         // each execution
         String path = muleContext.getConfiguration().getWorkingDirectory() + "/queuestore/test.queue";
@@ -46,6 +45,5 @@ public class FilePersistenceTestCase extends FunctionalTestCase
         files = store.listFiles();
         assertNotNull(files);
         assertEquals(0, files.length);
-
     }
 }

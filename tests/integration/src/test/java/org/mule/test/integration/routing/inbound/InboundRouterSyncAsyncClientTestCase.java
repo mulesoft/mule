@@ -40,6 +40,8 @@ public class InboundRouterSyncAsyncClientTestCase extends FunctionalTestCase
         client.dispatch("vm://singleSyncAsyncEntry", messsage);
 
         MuleMessage result = client.request("vm://asyncResponse", 5000);
+        assertNotNull(result);
         assertEquals("testAsync's Response sent to asyncResponse", result.getPayload());
     }
+    
 }

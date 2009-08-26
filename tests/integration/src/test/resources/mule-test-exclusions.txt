@@ -74,5 +74,23 @@ org.mule.security.MultiuserSecurityTestCase
 #No Jira, temporary exclusion because it passes locally but not on the build server
 org.mule.test.transformers.XQueryFunctionalTestCase
 
-MULE-2916 - temporary exclusion
+# MULE-2916 - temporary exclusion
 org.mule.test.integration.service.ServiceInFlightMessagesTestCase
+
+# MULE-4480
+org.mule.test.integration.exceptions.ExceptionListenerTestCase
+
+# MULE-4481
+org.mule.test.integration.persistence.FilePersistenceTestCase
+
+# MULE-4482
+org.mule.test.integration.exceptions.DefaultServiceExceptionStrategyTestCase
+
+# MULE-4483
+org.mule.test.integration.routing.outbound.ExpressionSplitterXPathWithFiltersTestCase
+
+# MULE-4484
+org.mule.test.integration.client.MuleClientRemotingHttpTestCase
+
+# MULE-4485
+org.mule.test.integration.routing.inbound.InboundRouterSyncAsyncClientTestCase
