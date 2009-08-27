@@ -250,26 +250,6 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:element name="legacy-filename-parser" type="legacyFilenameParserType"
-                 substitutionGroup="abstract-filenameParser">
-        <xsd:annotation>
-            <xsd:documentation>
-                The legacy-filename-parser element configures the default filename parser used by the File connector. It understands the following patterns:
-                * #\[DATE\] - The current date in the format dd-MM-yy_HH-mm-ss.SS
-                * #\[DATE:dd-MM-yy\] - The current date using the specified format
-                * #\[SYSTIME\] - The current system time milliseconds
-                * #\[UUID\] - A generated universally unique ID
-                * #\[ORIGINALNAME\] - The original file name if the file being written was read from another location
-                * #\[COUNT\] - An incremental counter.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="legacyFilenameParserType">
-        <xsd:complexContent>
-            <xsd:extension base="filenameParserType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="expression-filename-parser" type="expressionFilenameParserType"
                  substitutionGroup="abstract-filenameParser">
         <xsd:annotation>
@@ -311,7 +291,7 @@
     <xsd:element name="abstract-filenameParser" abstract="true" type="filenameParserType">
         <xsd:annotation>
             <xsd:documentation>
-                The abstract-filenameParser element is a placeholder for filename parser elements. The filename parser is set on the connector used when writing files to a directory. The parser will convert the outputPattern attribute to a string using the parser and the current message. The default implmentation used is legacy-filename-parser, but you can specify expression-filename-parser or custom-filename-parser. 
+                The abstract-filenameParser element is a placeholder for filename parser elements. The filename parser is set on the connector used when writing files to a directory. The parser will convert the outputPattern attribute to a string using the parser and the current message. The default implmentation used is expression-filename-parser, but you can also specify a custom-filename-parser. 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

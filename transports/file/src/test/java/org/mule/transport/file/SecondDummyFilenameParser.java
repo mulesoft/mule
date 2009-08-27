@@ -11,9 +11,8 @@
 package org.mule.transport.file;
 
 import org.mule.api.transport.MessageAdapter;
-import org.mule.transport.file.FilenameParser;
 
-public class SecondDummyFilenameParser implements FilenameParser
+public class SecondDummyFilenameParser extends DummyFilenameParser
 {
 
     public String getFilename(MessageAdapter adapter, String pattern)

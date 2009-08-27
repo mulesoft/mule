@@ -17,6 +17,5 @@
     </file:connector>
 
     <file:connector name="fileConnector3"/>
-
 </mule>
         

@@ -15,7 +15,7 @@
 
     <file:connector name="fileConnector" fileAge="500" autoDelete="false"  
         moveToDirectory="./.mule/done" streaming="true" pollingFrequency="100" 
-        workDirectory="./.mule/work" workFileNamePattern="#[UUID].#[SYSTIME].#[ORIGINALNAME]">
+        workDirectory="./.mule/work" workFileNamePattern="#[function:uuid].#[function:systime].#[header:originalFilename]">
     </file:connector>
 
     <file:endpoint path="./.mule/in" name="get" connector-ref="fileConnector"/>

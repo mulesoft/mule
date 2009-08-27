@@ -26,7 +26,6 @@
     <custom-transformer class="org.mule.transport.file.transformers.FileToByteArray" name="FileToByteArray"/>
 
     <model name="ESTest">
-
         <service name="FolderTO">
             <inbound>
                 <file:inbound-endpoint ref="get"
@@ -39,5 +38,4 @@
             <threading-profile doThreading="false"/>
         </service>
     </model>
-
 </mule>

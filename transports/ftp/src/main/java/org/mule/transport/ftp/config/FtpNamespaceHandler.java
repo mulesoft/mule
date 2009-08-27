@@ -14,12 +14,10 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.file.ExpressionFilenameParser;
 import org.mule.transport.file.FilenameParser;
-import org.mule.transport.file.SimpleFilenameParser;
 import org.mule.transport.ftp.FtpConnector;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
- *
  */
 public class FtpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -29,7 +27,6 @@ public class FtpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerConnectorDefinitionParser(FtpConnector.class);
         
         registerBeanDefinitionParser("custom-filename-parser", new ChildDefinitionParser("filenameParser", null, FilenameParser.class));
-        registerBeanDefinitionParser("legacy-filename-parser", new ChildDefinitionParser("filenameParser", SimpleFilenameParser.class));
         registerBeanDefinitionParser("expression-filename-parser", new ChildDefinitionParser("filenameParser", ExpressionFilenameParser.class));
     }
 }

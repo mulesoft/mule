@@ -16,7 +16,6 @@ import org.mule.endpoint.URIBuilder;
 import org.mule.transport.file.ExpressionFilenameParser;
 import org.mule.transport.file.FileConnector;
 import org.mule.transport.file.FilenameParser;
-import org.mule.transport.file.SimpleFilenameParser;
 import org.mule.transport.file.filters.FilenameRegexFilter;
 import org.mule.transport.file.filters.FilenameWildcardFilter;
 import org.mule.transport.file.transformers.FileToByteArray;
@@ -35,7 +34,6 @@ public class FileNamespaceHandler extends AbstractMuleNamespaceHandler
         registerConnectorDefinitionParser(FileConnector.class);
 
         registerBeanDefinitionParser("custom-filename-parser", new ChildDefinitionParser("filenameParser", null, FilenameParser.class));
-        registerBeanDefinitionParser("legacy-filename-parser", new ChildDefinitionParser("filenameParser", SimpleFilenameParser.class));
         registerBeanDefinitionParser("expression-filename-parser", new ChildDefinitionParser("filenameParser", ExpressionFilenameParser.class));
 
         registerBeanDefinitionParser("file-to-byte-array-transformer", new TransformerDefinitionParser(FileToByteArray.class));

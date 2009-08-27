@@ -30,11 +30,20 @@ public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase
         createPollDirectoryAndInputFiles();
         super.doSetUp();
     }
+    
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        // discard the test directory structure
+        assertTrue(FileUtils.deleteTree(pollDirectory.getParentFile()));
+        
+        super.doTearDown();
+    }
 
     private void createPollDirectoryAndInputFiles() throws IOException
     {
-        pollDirectory = createDirectory("target/testdir");
-        createDirectory("target/testdir-moveto");
+        pollDirectory = createDirectory("target/FilterOnGlobalFileEndpointTestCase/testdir");
+        createDirectory("target/FilterOnGlobalFileEndpointTestCase/testdir-moveto");
 
         createFileInPollDirectory(TEXT_FILE);
         createFileInPollDirectory(XML_FILE);
@@ -79,8 +88,8 @@ public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase
         
         MuleClient client = new MuleClient();
         client.request("globalEP", 1000);
+        
         assertTrue(txtFile.exists());
         assertFalse(xmlFile.exists());
     }
-    
 }

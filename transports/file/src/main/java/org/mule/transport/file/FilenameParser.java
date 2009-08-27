@@ -10,13 +10,14 @@
 
 package org.mule.transport.file;
 
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.transport.MessageAdapter;
 
 /**
  * <code>FilenameParser</code> is a simple expression parser interface for
  * processing filenames
  */
-public interface FilenameParser
+public interface FilenameParser extends MuleContextAware
 {
     public String getFilename(MessageAdapter adapter, String pattern);
 }

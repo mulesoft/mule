@@ -10,8 +10,8 @@
 
 package org.mule.transport.file;
 
+import org.mule.api.MuleContext;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.transport.file.FilenameParser;
 
 public class DummyFilenameParser implements FilenameParser
 {
@@ -19,6 +19,11 @@ public class DummyFilenameParser implements FilenameParser
     public String getFilename(MessageAdapter adapter, String pattern)
     {
         return null;
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        // ignore muleContext here
     }
 
 }

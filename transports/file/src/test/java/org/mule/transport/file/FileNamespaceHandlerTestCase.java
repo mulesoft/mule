@@ -50,7 +50,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(".mule/readFromDirectory", c.getReadFromDirectory());
         assertEquals(".mule/writeToDirectory", c.getWriteToDirectory());
         assertEquals(".mule/workDirectory", c.getWorkDirectory());
-        assertEquals("#[UUID]", c.getWorkFileNamePattern());
+        assertEquals("#[function:uuid]", c.getWorkFileNamePattern());
         assertEquals(false, c.isAutoDelete());
         assertEquals(true, c.isOutputAppend());
         assertEquals(true, c.isSerialiseObjects());
@@ -62,18 +62,6 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
 
         FilenameParser parser = c.getFilenameParser();
         assertTrue(parser.getClass().getName(), c.getFilenameParser() instanceof DummyFilenameParser);
-
-        assertTrue(c.isConnected());
-        assertTrue(c.isStarted());
-    }
-
-    public void testSecondConnector() throws Exception
-    {
-        FileConnector c = (FileConnector)muleContext.getRegistry().lookupConnector("secondConnector");
-        assertNotNull(c);
-
-        FilenameParser parser = c.getFilenameParser();
-        assertTrue(parser.getClass().getName(), c.getFilenameParser() instanceof SimpleFilenameParser);
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());

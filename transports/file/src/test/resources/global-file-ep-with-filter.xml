@@ -6,9 +6,11 @@
        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesource.org/schema/mule/file http://www.mulesource.org/schema/mule/file/3.0/mule-file.xsd">
 
-    <file:connector name="fileConnector" moveToDirectory="target/testdir-moveto" streaming="false"/>
+    <file:connector name="fileConnector" 
+        moveToDirectory="target/FilterOnGlobalFileEndpointTestCase/testdir-moveto" 
+        streaming="false"/>
 
-    <file:endpoint name="globalEP"  path="target/testdir" connector-ref="fileConnector">
+    <file:endpoint name="globalEP"  path="target/FilterOnGlobalFileEndpointTestCase/testdir" connector-ref="fileConnector">
         <file:filename-wildcard-filter pattern="*.xml"/>
     </file:endpoint>
 </mule>

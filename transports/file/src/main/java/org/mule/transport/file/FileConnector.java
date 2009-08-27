@@ -10,6 +10,7 @@
 
 package org.mule.transport.file;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -49,7 +50,7 @@ public class FileConnector extends AbstractConnector
     private static Log logger = LogFactory.getLog(FileConnector.class);
 
     public static final String FILE = "file";
-    private static final String DEFAULT_WORK_FILENAME_PATTERN = "#[UUID].#[SYSTIME].#[ORIGINALNAME]";
+    private static final String DEFAULT_WORK_FILENAME_PATTERN = "#[function:uuid].#[function:systime].#[header:originalFilename]";
 
     // These are properties that can be overridden on the Receiver by the endpoint declaration
     // inbound only
@@ -70,7 +71,6 @@ public class FileConnector extends AbstractConnector
     public static final String PROPERTY_FILE_TIMESTAMP = "timestamp";
 
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
-
 
     /**
      * Time in milliseconds to poll. On each poll the poll() method is called
@@ -110,7 +110,7 @@ public class FileConnector extends AbstractConnector
     public FileConnector()
     {
         super();
-        filenameParser = new SimpleFilenameParser();
+        filenameParser = new ExpressionFilenameParser();
     }
 
     @Override
@@ -118,7 +118,7 @@ public class FileConnector extends AbstractConnector
     {
         if (isOutputAppend() && value != 1)
         {
-            logger.warn("MULE-1773: cannot configure maxDispatchersActive when using outputAppend.  New value not set");
+            logger.warn("MULE-1773: cannot configure maxDispatchersActive when using outputAppend. New value not set");
         }
         else
         {
@@ -241,6 +241,10 @@ public class FileConnector extends AbstractConnector
     public void setFilenameParser(FilenameParser filenameParser)
     {
         this.filenameParser = filenameParser;
+        if (filenameParser != null)
+        {
+            filenameParser.setMuleContext(muleContext);
+        }
     }
 
     protected void doDispose()
@@ -568,6 +572,17 @@ public class FileConnector extends AbstractConnector
         else
         {
             return super.getMessageAdapter(message);
+        }
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        super.setMuleContext(context);
+        
+        if (filenameParser != null)
+        {
+            filenameParser.setMuleContext(context);
         }
     }
 

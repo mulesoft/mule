@@ -21,12 +21,8 @@
             readFromDirectory=".mule/readFromDirectory"
             writeToDirectory=".mule/writeToDirectory"
             workDirectory=".mule/workDirectory"
-            workFileNamePattern="#[UUID]">
+            workFileNamePattern="#[function:uuid]">
         <file:custom-filename-parser class="org.mule.transport.file.DummyFilenameParser"/>
-    </file:connector>
-
-    <file:connector name="secondConnector">
-        <file:legacy-filename-parser/>
     </file:connector>
 
     <file:connector name="thirdConnector">
@@ -41,11 +37,10 @@
         <file:file-to-string-transformer ignoreBadInput="true" name="test2" returnClass="java.lang.Object"/>
     </endpoint>
     
-
     <model>
         <service name="Test" initialState="stopped">
             <inbound>
-                <file:inbound-endpoint path="./target" connector-ref="secondConnector">
+                <file:inbound-endpoint path="./target" connector-ref="thirdConnector">
                     <file:filename-regex-filter pattern="(^SemDirector_Report-\d)(.*)(tab$)" caseSensitive="false"/>
                 </file:inbound-endpoint>
             </inbound>

@@ -12,7 +12,6 @@ package org.mule.transport.file;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.transport.file.FileConnector;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,10 +34,8 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         FileConnector connector =
                 (FileConnector) muleContext.getRegistry().lookupConnector("sendConnector");
         connector.setWriteToDirectory(target.getParent());
-        logger.debug("Directory is " + connector.getWriteToDirectory());
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put(TARGET_FILE, target.getName());
-        logger.debug("File is " + props.get(TARGET_FILE));
 
         MuleClient client = new MuleClient();
         client.dispatch("send", TEST_MESSAGE, props);

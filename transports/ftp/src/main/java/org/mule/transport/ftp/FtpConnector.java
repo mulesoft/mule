@@ -10,6 +10,7 @@
 
 package org.mule.transport.ftp;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
@@ -26,8 +27,8 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.model.streaming.CallbackOutputStream;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
+import org.mule.transport.file.ExpressionFilenameParser;
 import org.mule.transport.file.FilenameParser;
-import org.mule.transport.file.SimpleFilenameParser;
 import org.mule.util.ClassUtils;
 
 import java.io.IOException;
@@ -72,7 +73,7 @@ public class FtpConnector extends AbstractConnector
 
     private String outputPattern;
 
-    private FilenameParser filenameParser = new SimpleFilenameParser();
+    private FilenameParser filenameParser = new ExpressionFilenameParser();
 
     private boolean passive = true;
 
@@ -321,6 +322,10 @@ public class FtpConnector extends AbstractConnector
     public void setFilenameParser(FilenameParser filenameParser)
     {
         this.filenameParser = filenameParser;
+        if (filenameParser != null)
+        {
+            filenameParser.setMuleContext(muleContext);
+        }
     }
 
     /**
@@ -618,5 +623,16 @@ public class FtpConnector extends AbstractConnector
     public void setStreaming(boolean streaming)
     {
         this.streaming = streaming;
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        super.setMuleContext(context);
+        
+        if (filenameParser != null)
+        {
+            filenameParser.setMuleContext(context);
+        }
     }
 }
