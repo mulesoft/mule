@@ -30,21 +30,20 @@ import java.text.MessageFormat;
  * #[xpath:/message/header/@id]
  * </code>
  * <p/>
- * This parser superseeds the {@link org.mule.transport.file.SimpleFilenameParser} which has been 
- * kept in Mule 2 for compatibility. The following demonstrates how to achieve the same results 
- * when using the <code>ExpressionFilenameParser</code> over the 
- * {@link org.mule.transport.file.SimpleFilenameParser}.
+ * This parser superseeds the (now removed) <code>org.mule.transport.file.SimpleFilenameParser</code>
+ * which has been kept in Mule 2 for compatibility. The following demonstrates how to achieve the 
+ * same results when using the <code>ExpressionFilenameParser</code> over the 
+ * <code>SimpleFilenameParser</code>
  * <ul>
  * <li>#[DATE] : #[function:datestamp]</li>
  * <li>#[DATE:yy-MM-dd] : #[function:datestamp(yy-MM-dd)]</li>
  * <li>#[SYSTIME] : #[function:systime]</li>
  * <li>#[UUID] : #[function:uuid]</li>
  * <li>#[ORIGINALNAME] : #[header:originalFilename]</li>
- * <li>#[COUNT] : #[function:counter] - note that this is a global counter. If you want a local counter per file connector then you should use the {@link org.mule.transport.file.SimpleFilenameParser}.</li>
+ * <li>#[COUNT] : #[function:counter] - note that this is a global counter.</li>
  * <li>#[&lt;Message Property Name&gt;] : #[header:&lt;Message Property Name&gt;]</li>
  * </ul>
  */
-
 public class ExpressionFilenameParser implements FilenameParser, MuleContextAware
 {
     public static final String DEFAULT_DATE_FORMAT = "dd-MM-yy_HH-mm-ss.SSS";
