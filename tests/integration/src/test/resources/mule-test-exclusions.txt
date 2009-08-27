@@ -94,3 +94,6 @@ org.mule.test.integration.client.MuleClientRemotingHttpTestCase
 
 # MULE-4485
 org.mule.test.integration.routing.inbound.InboundRouterSyncAsyncClientTestCase
+
+# MULE-4487
+org.mule.test.integration.exceptions.ExceptionsWithRouterMule2715TestCase
