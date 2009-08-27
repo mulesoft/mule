@@ -8,7 +8,7 @@
        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesource.org/schema/mule/file http://www.mulesource.org/schema/mule/file/3.0/mule-file.xsd">
 
-    <file:connector name="fileConnector" outputAppend="true" outputPattern="test-${COUNT}.out">
+    <file:connector name="fileConnector" outputAppend="true" outputPattern="test-#[function:count].out">
         <default-connector-exception-strategy>
             <outbound-endpoint address="file://./.mule/errors"/>
         </default-connector-exception-strategy>

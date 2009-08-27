@@ -40,7 +40,7 @@ import java.text.MessageFormat;
  * <li>#[SYSTIME] : #[function:systime]</li>
  * <li>#[UUID] : #[function:uuid]</li>
  * <li>#[ORIGINALNAME] : #[header:originalFilename]</li>
- * <li>#[COUNT] : #[function:counter] - note that this is a global counter.</li>
+ * <li>#[COUNT] : #[function:count] - note that this is a global counter.</li>
  * <li>#[&lt;Message Property Name&gt;] : #[header:&lt;Message Property Name&gt;]</li>
  * </ul>
  */
