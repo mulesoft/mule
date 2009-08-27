@@ -2,12 +2,10 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:stdio="http://www.mulesource.org/schema/mule/stdio"
-
       xsi:schemaLocation="
-       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesource.org/schema/mule/stdio http://www.mulesource.org/schema/mule/stdio/3.0/mule-stdio.xsd">
+        http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+        http://www.mulesource.org/schema/mule/stdio http://www.mulesource.org/schema/mule/stdio/3.0/mule-stdio.xsd">
 
     <!-- This endpoint is intentionally malformed. -->
     <stdio:endpoint name="invalidEndpoint" address="stream://System.in"/>
-
 </mule>

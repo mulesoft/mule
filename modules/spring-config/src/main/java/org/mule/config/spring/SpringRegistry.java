@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -160,12 +160,11 @@ public class SpringRegistry extends AbstractRegistry
             //}
             return map.values();
         }
-        catch (BeanCreationException bcex)
+        catch (FatalBeanException fbex)
         {
-            // BCE is a result of a broken config, propagate it (see MULE-3297 for more details)
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage(String.format("Failed to lookup beans of type %s from the Spring registry", type)),
-                    bcex);
+            // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
+            String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
+            throw new MuleRuntimeException(MessageFactory.createStaticMessage(message), fbex);
         }
         catch (Exception e)
         {

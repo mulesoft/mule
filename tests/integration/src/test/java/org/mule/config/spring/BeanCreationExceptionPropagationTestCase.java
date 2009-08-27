@@ -9,14 +9,13 @@
  */
 package org.mule.config.spring;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.api.MuleRuntimeException;
+import org.mule.tck.FunctionalTestCase;
 
-import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.FatalBeanException;
 
 public class BeanCreationExceptionPropagationTestCase extends FunctionalTestCase
 {
-
     protected String getConfigResources()
     {
         return "org/mule/config/spring/bean-creation-exception-propagation-config.xml";
@@ -41,7 +40,7 @@ public class BeanCreationExceptionPropagationTestCase extends FunctionalTestCase
         {
             Throwable t = e.getCause();
             assertNotNull(t);
-            assertTrue(t instanceof BeanCreationException);
+            assertTrue(t instanceof FatalBeanException);
         }
     }
 }
