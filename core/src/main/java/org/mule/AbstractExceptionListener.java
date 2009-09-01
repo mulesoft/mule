@@ -16,6 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointURI;
@@ -26,16 +27,21 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
+import org.mule.api.transport.DispatchException;
 import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.message.ExceptionMessage;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.transaction.TransactionTemplate;
 import org.mule.transport.NullPayload;
 import org.mule.util.CollectionUtils;
 
@@ -43,9 +49,8 @@ import java.beans.ExceptionListener;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,7 +62,8 @@ import org.apache.commons.logging.LogFactory;
  * this exception listener and provides an implementation for dispatching exception
  * events from this Listener.
  */
-public abstract class AbstractExceptionListener implements ExceptionListener, Initialisable, Disposable, MuleContextAware
+public abstract class AbstractExceptionListener
+    implements ExceptionListener, Initialisable, Disposable, MuleContextAware
 {
     /**
      * logger used by this class
@@ -97,8 +103,8 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                 ImmutableEndpoint endpoint = (ImmutableEndpoint) it.next();
                 if (!(endpoint instanceof OutboundEndpoint))
                 {
-                    throw new InvalidEndpointTypeException(CoreMessages.exceptionListenerMustUseOutboundEndpoint(this,
-                        endpoint));
+                    throw new InvalidEndpointTypeException(
+                        CoreMessages.exceptionListenerMustUseOutboundEndpoint(this, endpoint));
                 }
             }
             this.endpoints.addAll(endpoints);
@@ -185,10 +191,10 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     /**
      * The initialise method is call every time the Exception stategy is assigned to
-     * a service or connector. This implementation ensures that initialise is
-     * called only once. The actual initialisation code is contained in the
+     * a service or connector. This implementation ensures that initialise is called
+     * only once. The actual initialisation code is contained in the
      * <code>doInitialise()</code> method.
-     *
+     * 
      * @throws InitialisationException
      */
     public final synchronized void initialise() throws InitialisationException
@@ -218,22 +224,22 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         {
             return;
         }
-        //Work with the root exception, not anything thaat wraps it
+        // Work with the root exception, not anything thaat wraps it
         t = ExceptionHelper.getRootException(t);
 
         if (rollbackTxFilter == null && commitTxFilter == null)
         {
-            //By default, rollback the transaction
+            // By default, rollback the transaction
             rollbackTransaction();
         }
         else if (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName()))
         {
-            //the rollback filter take preceedence over th ecommit filter
+            // the rollback filter take preceedence over th ecommit filter
             rollbackTransaction();
         }
         else if (commitTxFilter != null && !commitTxFilter.accept(t.getClass().getName()))
         {
-            //we only have to rollback if the commitTxFilter does NOT match
+            // we only have to rollback if the commitTxFilter does NOT match
             rollbackTransaction();
         }
     }
@@ -260,13 +266,13 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * dispatch. The message dispatched from this method will be an
      * <code>ExceptionMessage</code> which contains the exception thrown the
      * MuleMessage and any context information.
-     *
-     * @param message        the MuleMessage being processed when the exception occurred
+     * 
+     * @param message the MuleMessage being processed when the exception occurred
      * @param failedEndpoint optional; the endpoint being dispatched or received on
-     *                       when the error occurred. This is NOT the endpoint that the message
-     *                       will be disptched on and is only supplied to this method for
-     *                       logging purposes
-     * @param t              the exception thrown. This will be sent with the ExceptionMessage
+     *            when the error occurred. This is NOT the endpoint that the message
+     *            will be disptched on and is only supplied to this method for
+     *            logging purposes
+     * @param t the exception thrown. This will be sent with the ExceptionMessage
      * @see ExceptionMessage
      */
     protected void routeException(MuleMessage message, ImmutableEndpoint failedEndpoint, Throwable t)
@@ -295,7 +301,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                 Object payload;
                 if (message.getPayload() instanceof Serializable)
                 {
-                    payload = message.getPayload(); 
+                    payload = message.getPayload();
                 }
                 else
                 {
@@ -313,18 +319,18 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                     exceptionMessage = new DefaultMuleMessage(msg, ctx.getMessage(), muleContext);
                 }
 
-                for (int i = 0; i < endpoints.size(); i++)
+                Service service = ctx.getService();
+                if (service != null)
                 {
-                    OutboundEndpoint endpoint = (OutboundEndpoint) endpoints.get(i);
-                    MuleEvent exceptionEvent = new DefaultMuleEvent(exceptionMessage, endpoint, new DefaultMuleSession(
-                        exceptionMessage, new MuleSessionHandler(), muleContext), true);
-                    exceptionEvent = RequestContext.setEvent(exceptionEvent);
-                    endpoint.send(exceptionEvent);
-
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("routed Exception message via " + endpoint);
-                    }
+                    OutboundRouter router = createOutboundRouter();
+                    router.route(exceptionMessage, new DefaultMuleSession(exceptionMessage,
+                        new MuleSessionHandler(), ctx.getService(), muleContext));
+                }
+                else
+                {
+                    // As the service is not available an outbound router cannot be
+                    // used to route the exception message.
+                    customRouteExceptionMessage(exceptionMessage);
                 }
             }
             catch (Exception e)
@@ -338,6 +344,81 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
             handleTransaction(t);
             closeStream(message);
         }
+    }
+
+    private void customRouteExceptionMessage(MuleMessage exceptionMessage)
+        throws MessagingException, MuleException, DispatchException
+    {
+        // This is required because we don't always have the service available which
+        // is required to use an outbound route. This approach doesn't
+        // support everything but rather is an intermediate improvement.
+        for (int i = 0; i < endpoints.size(); i++)
+        {
+            OutboundEndpoint endpoint = (OutboundEndpoint) endpoints.get(i);
+            if (((DefaultMuleMessage) exceptionMessage).isConsumable())
+            {
+                throw new MessagingException(
+                    CoreMessages.cannotCopyStreamPayload(exceptionMessage.getPayload().getClass().getName()),
+                    exceptionMessage);
+            }
+
+            MuleMessage clonedMessage = new DefaultMuleMessage(exceptionMessage.getPayload(),
+                exceptionMessage, muleContext);
+            MuleEvent exceptionEvent = new DefaultMuleEvent(clonedMessage, endpoint, new DefaultMuleSession(
+                clonedMessage, new MuleSessionHandler(), muleContext), true);
+            exceptionEvent = RequestContext.setEvent(exceptionEvent);
+
+            if (endpoint.isSynchronous())
+            {
+                endpoint.send(exceptionEvent);
+            }
+            else
+            {
+                endpoint.dispatch(exceptionEvent);
+            }
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("routed Exception message via " + endpoint);
+            }
+        }
+    }
+
+    protected OutboundRouter createOutboundRouter()
+    {
+        // Use an instance of OutboundPassThroughRouter but override creation of
+        // createTransactionTemplate to use a custom ExceptionListener so that
+        // exception handling will not loop forever.
+        // We cannot use PassthroughRouter because multiple endpoints are supported
+        // on exception strategies.
+        MulticastingRouter router = new MulticastingRouter()
+        {
+            @Override
+            protected TransactionTemplate createTransactionTemplate(MuleSession session,
+                                                                    ImmutableEndpoint endpoint)
+            {
+                return new TransactionTemplate(endpoint.getTransactionConfig(), new ExceptionListener()
+                {
+                    public void exceptionThrown(Exception e)
+                    {
+                        // Log only, do not handle exception.
+                        logException(e);
+                    }
+                }, muleContext);
+            }
+
+            @Override
+            protected void setMessageProperties(MuleSession session,
+                                                MuleMessage message,
+                                                OutboundEndpoint endpoint)
+            {
+                // No reply-to or correlation for exception endpoints, at least for
+                // now anyway.
+            }
+        };
+        router.setEndpoints(getEndpoints());
+        router.setMuleContext(muleContext);
+        return router;
     }
 
     protected void closeStream(MuleMessage message)
@@ -359,7 +440,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * multiple endpoints registered on them. This methods allows custom
      * implementations to control which endpoint is used based on the exception
      * thrown. This implementation simply returns the first endpoint in the list.
-     *
+     * 
      * @param t the exception thrown
      * @return The endpoint used to dispatch an exception message on or null if there
      *         are no endpoints registered
@@ -378,7 +459,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     /**
      * Used to log the error passed into this Exception Listener
-     *
+     * 
      * @param t the exception thrown
      */
     protected void logException(Throwable t)
@@ -398,22 +479,21 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * Logs a fatal error message to the logging system. This should be used mostly
      * if an error occurs in the exception listener itself. This implementation logs
      * the the message itself to the logs if it is not null
-     *
+     * 
      * @param message The MuleMessage currently being processed
-     * @param t       the fatal exception to log
+     * @param t the fatal exception to log
      */
     protected void logFatal(MuleMessage message, Throwable t)
     {
         logger.fatal(
-                "Failed to dispatch message to error queue after it failed to process.  This may cause message loss."
-                        + (message == null ? "" : "Logging Message here: \n" + message.toString()), t);
+            "Failed to dispatch message to error queue after it failed to process.  This may cause message loss."
+                            + (message == null ? "" : "Logging Message here: \n" + message.toString()), t);
     }
 
     public boolean isInitialised()
     {
         return initialised.get();
     }
-
 
     public void dispose()
     {
@@ -424,7 +504,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * Fires a server notification to all registered
      * {@link org.mule.api.context.notification.ExceptionNotificationListener}
      * eventManager.
-     *
+     * 
      * @param notification the notification to fire.
      */
     protected void fireNotification(ExceptionNotification notification)
@@ -435,7 +515,8 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         }
         else if (logger.isWarnEnabled())
         {
-            logger.debug("MuleContext is not yet available for firing notifications, ignoring event: " + notification);
+            logger.debug("MuleContext is not yet available for firing notifications, ignoring event: "
+                         + notification);
         }
     }
 
@@ -471,12 +552,12 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     /**
      * A messaging exception is thrown when an excpetion occurs during normal message
-     * processing. A <code>MessagingException</code> holds a reference to the
-     * current message that is passed into this method
-     *
+     * processing. A <code>MessagingException</code> holds a reference to the current
+     * message that is passed into this method
+     * 
      * @param message the current message being processed
-     * @param e       the top level exception thrown. This may be a Messaging exception or
-     *                some wrapper exception
+     * @param e the top level exception thrown. This may be a Messaging exception or
+     *            some wrapper exception
      * @see MessagingException
      */
     public abstract void handleMessagingException(MuleMessage message, Throwable e);
@@ -486,36 +567,35 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * processing A <code>RoutingException</code> holds a reference to the current
      * message and te endpoint being routing to or from when the error occurred. Both
      * are passed into this method
-     *
-     * @param message  the current message being processed
+     * 
+     * @param message the current message being processed
      * @param endpoint the endpoint being dispatched to or received from when the
-     *                 error occurred
-     * @param e        the top level exception thrown. This may be a Messaging exception or
-     *                 some wrapper exception
+     *            error occurred
+     * @param e the top level exception thrown. This may be a Messaging exception or
+     *            some wrapper exception
      * @see RoutingException
      */
     public abstract void handleRoutingException(MuleMessage message, ImmutableEndpoint endpoint, Throwable e);
 
     /**
-     * DefaultLifecyclePhase exceptions are thrown when an error occurs during an object's
-     * lifecycle call such as start, stop or initialise. The exception contains a
-     * reference to the object that failed which can be used for more informative
-     * logging.
-     *
+     * DefaultLifecyclePhase exceptions are thrown when an error occurs during an
+     * object's lifecycle call such as start, stop or initialise. The exception
+     * contains a reference to the object that failed which can be used for more
+     * informative logging.
+     * 
      * @param component the object that failed during a lifecycle call
-     * @param e       the top level exception thrown. This may or may not be the
-     *                <code>LifecycleException</code> but a lifecycle exception will be
-     *                present in the exception stack.
+     * @param e the top level exception thrown. This may or may not be the
+     *            <code>LifecycleException</code> but a lifecycle exception will be
+     *            present in the exception stack.
      * @see LifecycleException
      */
     public abstract void handleLifecycleException(Object component, Throwable e);
 
     /**
      * A handler for all other exceptions
-     *
+     * 
      * @param e the top level exception thrown
      */
     public abstract void handleStandardException(Throwable e);
-    
-    
+
 }

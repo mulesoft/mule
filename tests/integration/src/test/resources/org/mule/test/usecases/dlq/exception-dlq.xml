@@ -37,7 +37,9 @@
             -->
             <default-service-exception-strategy>
                 <commit-transaction exception-pattern="*"/>
-                <jms:outbound-endpoint queue="DLQ"/>
+                <jms:outbound-endpoint queue="DLQ">
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
+                </jms:outbound-endpoint>
             </default-service-exception-strategy>
         </service>
     </model>
