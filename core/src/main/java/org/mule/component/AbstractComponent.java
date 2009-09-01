@@ -193,9 +193,21 @@ public abstract class AbstractComponent implements Component, Interceptor, MuleC
 
     protected abstract Object doInvoke(MuleEvent event) throws Exception;
 
+    @Override
     public String toString()
     {
-        return this.getClass().getName() + " component for: " + service.toString();
+        StringBuilder buf = new StringBuilder(this.getClass().getName());
+        
+        if (service != null)
+        {
+            buf.append(" component for: ").append(service.toString());
+        }
+        else
+        {
+            buf.append(" no component");
+        }
+        
+        return buf.toString();
     }
 
     public void release()
