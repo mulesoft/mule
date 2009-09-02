@@ -10,7 +10,6 @@
 
 package org.mule.context;
 
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
