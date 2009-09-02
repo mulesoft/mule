@@ -77,15 +77,6 @@ org.mule.test.transformers.XQueryFunctionalTestCase
 # MULE-2916 - temporary exclusion
 org.mule.test.integration.service.ServiceInFlightMessagesTestCase
 
-# MULE-4480
-org.mule.test.integration.exceptions.ExceptionListenerTestCase
-
-# MULE-4481
-org.mule.test.integration.persistence.FilePersistenceTestCase
-
-# MULE-4482
-org.mule.test.integration.exceptions.DefaultServiceExceptionStrategyTestCase
-
 # MULE-4483
 org.mule.test.integration.routing.outbound.ExpressionSplitterXPathWithFiltersTestCase
 
@@ -94,6 +85,3 @@ org.mule.test.integration.client.MuleClientRemotingHttpTestCase
 
 # MULE-4485
 org.mule.test.integration.routing.inbound.InboundRouterSyncAsyncClientTestCase
-
-# MULE-4487
-org.mule.test.integration.exceptions.ExceptionsWithRouterMule2715TestCase
