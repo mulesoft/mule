@@ -106,22 +106,28 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
-    protected void applyProcessors(Map objects)
+    protected Map applyProcessors(Map<String, Object> objects)
     {
         if (objects == null)
         {
-            return;
+            return null;
         }
-        for (Iterator iterator = objects.values().iterator(); iterator.hasNext();)
+        Map<String, Object> results = new HashMap<String, Object>();
+        for (Map.Entry<String, Object> entry : objects.entrySet())
         {
-            Object o = iterator.next();
-            Collection processors = lookupObjects(ObjectProcessor.class);
-            for (Iterator iterator2 = processors.iterator(); iterator2.hasNext();)
+            //We do this in the loop in case the map contains ObjectProcessors
+            Collection<ObjectProcessor> processors = lookupObjects(ObjectProcessor.class);
+            for (ObjectProcessor processor : processors)
             {
-                ObjectProcessor op = (ObjectProcessor) iterator2.next();
-                op.process(o);
+                Object result = processor.process(entry.getValue());
+                //If result is null do not add the object
+                if(result != null)
+                {
+                    results.put(entry.getKey(), result);
+                }
             }
         }
+        return results;
     }
 
 
@@ -200,6 +206,11 @@ public class TransientRegistry extends AbstractRegistry
             {
                 logger.debug("applying processors");
                 object = applyProcessors(object);
+                //Don't add the object if the processor returns null
+                if(object==null)
+                {
+                    return;
+                }
             }
         }
 
