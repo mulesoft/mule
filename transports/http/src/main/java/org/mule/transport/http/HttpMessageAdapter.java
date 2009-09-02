@@ -198,6 +198,10 @@ public class HttpMessageAdapter extends AbstractMessageAdapter implements Messag
             
             return bytes;
         }
+        else if (message instanceof byte[])
+        {
+            return (byte[]) message;
+        }
         else if (message instanceof String)
         {
             // message is a String when the HTTP method was GET

@@ -53,29 +53,28 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
         return "http-receiver-mule4456-config.xml";
     }
 
-//    SEE MULE-4456
-//    public void testAsyncPost() throws Exception
-//    {
-//        FunctionalTestComponent component = (FunctionalTestComponent) getComponent("AsyncService");
-//        component.setEventCallback(new EventCallback()
-//        {
-//            public void eventReceived(MuleEventContext context, Object component) throws Exception
-//            {
-//                Thread.sleep(200);
-//                context.getMessageAsString();
-//            }
-//        });
-//
-//        PostMethod request = new PostMethod("http://localhost:8000");
-//        RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", muleContext.getConfiguration()
-//            .getDefaultEncoding());
-//        request.setRequestEntity(entity);
-//
-//        httpClient.executeMethod(request);
-//        MuleMessage message = muleClient.request("vm://out", 1000);
-//        assertNotNull(message);
-//        assertEquals(MESSAGE, message.getPayloadAsString());
-//    }
+    public void testAsyncPost() throws Exception
+    {
+        FunctionalTestComponent component = (FunctionalTestComponent) getComponent("AsyncService");
+        component.setEventCallback(new EventCallback()
+        {
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                Thread.sleep(200);
+                context.getMessageAsString();
+            }
+        });
+
+        PostMethod request = new PostMethod("http://localhost:8000");
+        RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", muleContext.getConfiguration()
+            .getDefaultEncoding());
+        request.setRequestEntity(entity);
+
+        httpClient.executeMethod(request);
+        MuleMessage message = muleClient.request("vm://out", 1000);
+        assertNotNull(message);
+        assertEquals(MESSAGE, message.getPayloadAsString());
+    }
 
     public void testAsyncPostWithPersistentSedaQueue() throws Exception
     {
