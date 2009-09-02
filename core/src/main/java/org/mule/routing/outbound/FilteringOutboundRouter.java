@@ -214,7 +214,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
     
     public boolean isRequiresNewMessage()
     {
-        return transformers.size() > 1;
+        return !transformers.isEmpty();
     }
 
 }
