@@ -11,7 +11,7 @@
 package org.mule.agent;
 
 import org.mule.AbstractAgent;
-import org.mule.api.MuleContext;
+import org.mule.MuleServer;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.lifecycle.InitialisationException;
@@ -203,7 +203,7 @@ public class ConfigScannerAgent extends AbstractAgent
         try
         {
             Class cfgBuilderClass = ClassUtils.loadClass(
-                "org.mule.config.spring.SpringXmlConfigurationBuilder", MuleContext.class);
+                "org.mule.config.spring.SpringXmlConfigurationBuilder", MuleServer.class);
             ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
                 cfgBuilderClass, configFile);
 
