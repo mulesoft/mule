@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:http="http://www.mulesource.org/schema/mule/http"
+    xmlns:vm="http://www.mulesource.org/schema/mule/vm"
+    xmlns:test="http://www.mulesource.org/schema/mule/test"
+    xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+    http://www.mulesource.org/schema/mule/http http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd
+    http://www.mulesource.org/schema/mule/test http://www.mulesource.org/schema/mule/test/3.0/mule-test.xsd
+    http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd">
+    
+    <endpoint name="search.inbound.endpoint"  address="http://localhost:8888/searchin" synchronous="true"/>
+    <endpoint name="search.outbound.endpoint" address="http://localhost:8899/searchout" synchronous="true"/>
+    
+    <model name="TestAsync">
+        
+        <service name="SearchWebServiceBridge">
+            <inbound>
+                <inbound-endpoint  ref="search.inbound.endpoint" synchronous="true"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="request-channel" synchronous="false"/>
+                </pass-through-router>
+            </outbound>
+            <async-reply timeout="0">
+                <vm:inbound-endpoint path="back-channel"/>
+                <single-async-reply-router/>
+            </async-reply>
+        </service>
+        
+        <service name="RequestFlow">
+            <inbound>
+                <vm:inbound-endpoint path="request-channel" synchronous="false"/>
+            </inbound>
+            <test:component throwException="true"/>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="response-channel"/>
+                </pass-through-router>
+            </outbound>
+            <default-service-exception-strategy>
+                <vm:outbound-endpoint path="exception-channel"/>
+            </default-service-exception-strategy>
+        </service>
+        
+        <service name="ResponseFlow">
+            <inbound>
+                <vm:inbound-endpoint path="response-channel" synchronous="false"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="back-channel" synchronous="false"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="ExceptionFlow">
+            <inbound>
+                <vm:inbound-endpoint path="exception-channel"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="back-channel" synchronous="false"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

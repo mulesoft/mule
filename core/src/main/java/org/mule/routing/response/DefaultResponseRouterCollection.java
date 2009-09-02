@@ -10,8 +10,11 @@
 
 package org.mule.routing.response;
 
+import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InvalidEndpointTypeException;
@@ -98,6 +101,12 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
                     getStatistics().incrementNoRoutedMessage();
                 }
             }
+
+            // Copy event because the async-reply message was received by a different
+            // receiver thread (or the senders dispatcher thread in case of vm
+            // with queueEvents="false") and the current thread may need to mutate
+            // the even. See MULE-4370
+            return OptimizedRequestContext.unsafeRewriteEvent(result);
         }
 
         return result;
