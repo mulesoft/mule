@@ -157,6 +157,12 @@ public class ClasspathScanner
         String urlBase = url.getFile();
         //We can't URLDecoder.decode(path) since some encoded chars are allowed on file uris
         urlBase = urlBase.replaceAll("%20", " ");
+        File dir = new File(urlBase);
+        if(!dir.isDirectory())
+        {
+            logger.warn("Cannot process File URL: " + url + ". Path is not a directory");
+            return set;
+        }
 
         Collection<File> files = FileUtils.listFiles(new File(urlBase), new String[]{"class"}, true);
         for (File file : files)
