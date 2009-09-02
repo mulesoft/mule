@@ -30,7 +30,7 @@ public class MuleMessageAttachmentSerializationTestCase extends AbstractMuleTest
     public void testAttachmentPersistence() throws Exception
     {
         ObjectToByteArray transformer = new ObjectToByteArray();
-        transformer.setAcceptUMOMessage(true);
+        transformer.setAcceptMuleMessage(true);
 
         MuleEvent event = RequestContext.setEvent(getTestEvent("Mmm... attachments!"));
         MuleMessage msg = event.getMessage();
