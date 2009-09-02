@@ -172,6 +172,10 @@ public class TransientRegistry extends AbstractRegistry
         for (ObjectProcessor processor : processors)
         {
             theObject = processor.process(theObject);
+            if(theObject==null)
+            {
+                return null;
+            }
         }
         return theObject;
     }
