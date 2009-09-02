@@ -16,7 +16,7 @@
         <!-- Tools properties -->
         <eclipsePluginVersion>2.5</eclipsePluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
-        <jdk5Name>jdk5</jdk5Name>
+        <jdk5Name>J2SE-1.5</jdk5Name>
         <jdk.version>1.5</jdk.version>
     </properties>
 
