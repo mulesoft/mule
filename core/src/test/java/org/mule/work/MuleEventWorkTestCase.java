@@ -92,7 +92,6 @@ public class MuleEventWorkTestCase extends AbstractMuleTestCase
         public TestMuleEventWork(MuleEvent event)
         {
             super(event);
-            originalEvent = event;
         }
 
         @Override

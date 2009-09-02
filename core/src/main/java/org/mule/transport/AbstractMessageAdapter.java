@@ -607,11 +607,6 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
                             + ownerThread.get() + "/" + Thread.currentThread());
                 }
             }
-            else
-            {
-                // access by another thread
-                mutable.set(false);
-            }
         }
     }
 
