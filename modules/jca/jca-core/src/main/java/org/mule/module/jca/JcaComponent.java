@@ -10,7 +10,6 @@
 
 package org.mule.module.jca;
 
-import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
@@ -24,11 +23,11 @@ import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.module.jca.i18n.JcaMessages;
+import org.mule.work.AbstractMuleEventWork;
 
 import javax.resource.spi.UnavailableException;
 import javax.resource.spi.endpoint.MessageEndpoint;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkManager;
@@ -99,22 +98,15 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
         // no-op no object-factory
     }
 
-    public class MuleJcaWorker implements Work
+    public class MuleJcaWorker extends AbstractMuleEventWork
     {
-
-        private MuleEvent event;
 
         MuleJcaWorker(MuleEvent event)
         {
-            this.event = event;
+            super(event);
         }
 
-        public void release()
-        {
-            // TODO Auto-generated method stub
-        }
-
-        public void run()
+        public void doRun()
         {
 
             if (logger.isTraceEnabled())
@@ -124,7 +116,6 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
             try
             {
                 // Invoke method
-                event = OptimizedRequestContext.criticalSetEvent(event);
                 entryPointResolverSet.invoke(getManagedInstance(), RequestContext.getEventContext());
             }
             catch (Exception e)

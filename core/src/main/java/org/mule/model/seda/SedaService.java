@@ -39,6 +39,7 @@ import org.mule.service.AbstractService;
 import org.mule.transport.NullPayload;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
+import org.mule.work.AbstractMuleEventWork;
 
 import java.text.MessageFormat;
 
@@ -560,20 +561,17 @@ public class SedaService extends AbstractService implements Work, WorkListener
         // routers
     }
 
-    private class ComponentStageWorker implements Work
+    private class ComponentStageWorker extends AbstractMuleEventWork
     {
-        private MuleEvent event;
-
         public ComponentStageWorker(MuleEvent event)
         {
-            this.event = event;
+            super(event);
         }
 
-        public void run()
+        protected void doRun()
         {
             try
             {
-                event = OptimizedRequestContext.criticalSetEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();
                 ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(),
                     (InboundEndpoint) event.getEndpoint());
@@ -596,11 +594,6 @@ public class SedaService extends AbstractService implements Work, WorkListener
                         event.getMessage(), e));
                 }
             }
-        }
-
-        public void release()
-        {
-            // no-op
         }
     }
 }
