@@ -10,7 +10,7 @@
 
 package org.mule.module.boot;
 
-import org.mule.module.boot.util.JarUtils;
+import org.mule.util.JarUtils;
 
 import java.io.BufferedReader;
 import java.io.File;

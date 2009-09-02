@@ -8,10 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.boot.util;
+package org.mule.util;
 
 import org.mule.module.boot.MuleBootstrapUtils;
-import org.mule.util.FileUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

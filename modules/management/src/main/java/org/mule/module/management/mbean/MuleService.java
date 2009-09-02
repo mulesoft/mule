@@ -10,10 +10,10 @@
 
 package org.mule.module.management.mbean;
 
+import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.config.MuleManifest;
-import org.mule.module.boot.MuleServer;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
