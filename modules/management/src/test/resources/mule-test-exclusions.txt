@@ -1,6 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-
-# MULE-4075
-org.mule.management.JmxStatisticsAsyncTestCase

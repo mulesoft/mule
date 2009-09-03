@@ -23,6 +23,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.service.AbstractService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -75,12 +76,12 @@ public class DefaultReplyToHandler implements ReplyToHandler
         // dispatch the event
         try
         {
+            ((AbstractService) event.getService()).getStatistics().incSentReplyToEvent();
             endpoint.dispatch(replyToEvent);
             if (logger.isInfoEnabled())
             {
                 logger.info("reply to sent: " + endpoint);
             }
-            event.getService().getStatistics().incSentReplyToEvent();
         }
         catch (Exception e)
         {

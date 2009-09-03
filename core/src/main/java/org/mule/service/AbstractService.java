@@ -54,6 +54,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -454,18 +455,17 @@ public abstract class AbstractService implements Service
             return;
         }
 
-        // Dispatching event to the service
-        if (stats.isEnabled())
-        {
-            stats.incReceivedEventASync();
-        }
-
         if (logger.isDebugEnabled())
         {
             logger.debug("Service: " + name + " has received asynchronous event on: "
                     + event.getEndpoint().getEndpointURI());
         }
 
+        // Dispatching event to the service
+        if (stats.isEnabled())
+        {
+            stats.incReceivedEventASync();
+        }
         doDispatch(event);
     }
 
@@ -487,14 +487,14 @@ public abstract class AbstractService implements Service
             throw new ServiceException(event.getMessage(), this, e);
         }
 
-        if (stats.isEnabled())
-        {
-            stats.incReceivedEventSync();
-        }
         if (logger.isDebugEnabled())
         {
             logger.debug("Service: " + name + " has received synchronous event on: "
                     + event.getEndpoint().getEndpointURI());
+        }
+        if (stats.isEnabled())
+        {
+            stats.incReceivedEventSync();
         }
         event = OptimizedRequestContext.unsafeSetEvent(event);
         return doSend(event);
@@ -864,11 +864,11 @@ public abstract class AbstractService implements Service
             if (getOutboundRouter().hasEndpoints())
             {
                 // Here we can use the same message instance because there is no inbound response.
-                getOutboundRouter().route(result, event.getSession());
                 if (stats.isEnabled())
                 {
                     stats.incSentEventASync();
                 }
+                getOutboundRouter().route(result, event.getSession());
             }
         }
     }
@@ -889,6 +889,10 @@ public abstract class AbstractService implements Service
                 // Here we need to use a copy of the message instance because there
                 // is an inbound response so that transformers executed as part of
                 // the outbound phase do not affect the inbound response. MULE-3307
+                if (stats.isEnabled())
+                {
+                    stats.incSentEventSync();
+                }
                 MuleMessage outboundReturnMessage = getOutboundRouter().route(new DefaultMuleMessage(result.getPayload(), result, muleContext), event.getSession());
                 if (outboundReturnMessage != null)
                 {
@@ -899,11 +903,6 @@ public abstract class AbstractService implements Service
                     // If there was no component, then we really want to return the response from
                     // the outbound router as the actual payload - even if it's null.
                     return new DefaultMuleMessage(NullPayload.getInstance(), result, muleContext);
-                }
-                
-                if (stats.isEnabled())
-                {
-                    stats.incSentEventSync();
                 }
             }
             else

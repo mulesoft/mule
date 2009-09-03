@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
+import org.mule.service.AbstractService;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
@@ -123,6 +124,8 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 replyToMessage.setJMSCorrelationID(correlationIDString);
             }
 
+            ((AbstractService) event.getService()).getStatistics().incSentReplyToEvent();
+
             if (ttlString == null && priorityString == null && persistentDeliveryString == null)
             {
                 connector.getJmsSupport().send(replyToProducer, replyToMessage, topic);
@@ -149,7 +152,6 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             }
 
             logger.info("Reply Message sent to: " + replyToDestination +" with correlationID:" + correlationIDString);
-            event.getService().getStatistics().incSentReplyToEvent();
         }
         catch (Exception e)
         {
@@ -188,7 +190,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         if (jmsCorrelationId == null)
         {
             jmsCorrelationId = eventMsg.getProperty("JMSMessageID");
-}
+		}
         if (jmsCorrelationId != null)
         {
             replyToMessage.setJMSCorrelationID(jmsCorrelationId.toString());

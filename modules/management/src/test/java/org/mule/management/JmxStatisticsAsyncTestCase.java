@@ -10,13 +10,13 @@
 
 package org.mule.management;
 
+import org.mule.api.MuleMessage;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -27,9 +27,12 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        MuleClient muleClient = new MuleClient(FunctionalTestCase.muleContext);
+                
+        MuleClient muleClient = new MuleClient();
         muleClient.dispatch("vm://in", "Hello world", null);
-        muleClient.request("vm://out", 5000);
+        MuleMessage response = muleClient.request("vm://out", RECEIVE_TIMEOUT * 2);
+        assertNotNull(response);
+        assertEquals("data", response.getPayloadAsString());
     }
 
     @Override
@@ -79,5 +82,4 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
     {
         return (ServiceStatistics) muleContext.getStatistics().getComponentStatistics().iterator().next();
     }
-
 }

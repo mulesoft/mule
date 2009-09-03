@@ -46,13 +46,13 @@ public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
 
     protected void logFatal(MuleMessage message, Throwable t)
     {
-        super.logFatal(message, t);
-
         ServiceStatistics statistics = getServiceStatistics();
         if (statistics != null)
         {
             statistics.incFatalError();
         }
+
+        super.logFatal(message, t);
     }
 
     protected void routeException(MuleMessage message, ImmutableEndpoint failedEndpoint, Throwable t)

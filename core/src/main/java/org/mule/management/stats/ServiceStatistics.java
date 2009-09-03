@@ -15,25 +15,27 @@ import org.mule.management.stats.printers.SimplePrinter;
 
 import java.io.PrintWriter;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
+
 public class ServiceStatistics implements Statistics
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -2086999226732861674L;
+    private static final long serialVersionUID = -2086999226732861675L;
 
     private String name;
-    private long receivedEventSync = 0;
-    private long receivedEventASync = 0;
+    private final AtomicLong receivedEventSync = new AtomicLong(0);
+    private final AtomicLong receivedEventASync = new AtomicLong(0);
+    private final AtomicLong sentEventSync = new AtomicLong(0);
+    private final AtomicLong sentReplyToEvent = new AtomicLong(0);
+    private final AtomicLong sentEventASync = new AtomicLong(0);
+    private final AtomicLong executionError = new AtomicLong(0);
+    private final AtomicLong fatalError = new AtomicLong(0);
+
+    // these can't sensibly converted to AtomicLong as they are processed together
+    // in incQueuedEvent
     private long queuedEvent = 0;
     private long maxQueuedEvent = 0;
     private long averageQueueSize = 0;
     private long totalQueuedEvent = 0;
-    private long sentEventSync = 0;
-    private long sentReplyToEvent = 0;
-    private long sentEventASync = 0;
-    private long executionError = 0;
-    private long fatalError = 0;
 
     private int threadPoolSize = 0;
     private long samplePeriod = 0;
@@ -48,11 +50,6 @@ public class ServiceStatistics implements Statistics
         this(name, 0);
     }
 
-    /**
-     * The constructor
-     *
-     * @param name
-     */
     public ServiceStatistics(String name, int threadPoolSize)
     {
         super();
@@ -91,39 +88,39 @@ public class ServiceStatistics implements Statistics
         }
     }
 
-    public synchronized void incReceivedEventSync()
+    public void incReceivedEventSync()
     {
-        receivedEventSync++;
+        receivedEventSync.addAndGet(1);
     }
 
-    public synchronized void incReceivedEventASync()
+    public void incReceivedEventASync()
     {
-        receivedEventASync++;
+        receivedEventASync.addAndGet(1);
     }
 
-    public synchronized void incExecutionError()
+    public void incExecutionError()
     {
-        executionError++;
+        executionError.addAndGet(1);
     }
 
-    public synchronized void incFatalError()
+    public void incFatalError()
     {
-        fatalError++;
+        fatalError.addAndGet(1);
     }
 
-    public synchronized void incSentEventSync()
+    public void incSentEventSync()
     {
-        sentEventSync++;
+        sentEventSync.addAndGet(1);
     }
 
-    public synchronized void incSentEventASync()
+    public void incSentEventASync()
     {
-        sentEventASync++;
+        sentEventASync.addAndGet(1);
     }
 
-    public synchronized void incSentReplyToEvent()
+    public void incSentReplyToEvent()
     {
-        sentReplyToEvent++;
+        sentReplyToEvent.addAndGet(1);
     }
 
     public synchronized void incQueuedEvent()
@@ -134,9 +131,7 @@ public class ServiceStatistics implements Statistics
         {
             maxQueuedEvent = queuedEvent;
         }
-        // if(queuedEvent > 1) {
-        averageQueueSize = Math.round(getAsyncEventsReceived() / totalQueuedEvent);
-        // }
+        averageQueueSize = Math.round(receivedEventASync.get() / totalQueuedEvent);
     }
 
     public synchronized void decQueuedEvent()
@@ -149,12 +144,12 @@ public class ServiceStatistics implements Statistics
         return componentStat.getAverageExecutionTime();
     }
 
-    public long getAverageQueueSize()
+    public synchronized long getAverageQueueSize()
     {
         return averageQueueSize;
     }
 
-    public long getMaxQueueSize()
+    public synchronized long getMaxQueueSize()
     {
         return maxQueuedEvent;
     }
@@ -169,7 +164,7 @@ public class ServiceStatistics implements Statistics
 
     public long getFatalErrors()
     {
-        return fatalError;
+        return fatalError.get();
     }
 
     /**
@@ -188,34 +183,34 @@ public class ServiceStatistics implements Statistics
         return componentStat.getTotalExecutionTime();
     }
 
-    public long getQueuedEvents()
+    public synchronized long getQueuedEvents()
     {
         return queuedEvent;
     }
 
     public long getAsyncEventsReceived()
     {
-        return receivedEventASync;
+        return receivedEventASync.get();
     }
 
     public long getSyncEventsReceived()
     {
-        return receivedEventSync;
+        return receivedEventSync.get();
     }
 
     public long getReplyToEventsSent()
     {
-        return sentReplyToEvent;
+        return sentReplyToEvent.get();
     }
 
     public long getSyncEventsSent()
     {
-        return sentEventSync;
+        return sentEventSync.get();
     }
 
     public long getAsyncEventsSent()
     {
-        return sentEventASync;
+        return sentEventASync.get();
     }
 
     public long getTotalEventsSent()
@@ -235,7 +230,7 @@ public class ServiceStatistics implements Statistics
 
     public long getExecutionErrors()
     {
-        return executionError;
+        return executionError.get();
     }
 
     public synchronized String getName()
@@ -248,9 +243,6 @@ public class ServiceStatistics implements Statistics
         this.name = name;
     }
 
-    /**
-     * log in info level the main statistics
-     */
     public void logSummary()
     {
         logSummary(new SimplePrinter(System.out));
@@ -263,19 +255,19 @@ public class ServiceStatistics implements Statistics
 
     public synchronized void clear()
     {
-        receivedEventSync = 0;
-        receivedEventASync = 0;
+        receivedEventSync.set(0);
+        receivedEventASync.set(0);
         queuedEvent = 0;
         maxQueuedEvent = 0;
         totalQueuedEvent = 0;
         averageQueueSize = 0;
 
-        sentEventSync = 0;
-        sentEventASync = 0;
-        sentReplyToEvent = 0;
+        sentEventSync.set(0);
+        sentEventASync.set(0);
+        sentReplyToEvent.set(0);
 
-        executionError = 0;
-        fatalError = 0;
+        executionError.set(0);
+        fatalError.set(0);
 
         if (getInboundRouterStat() != null)
         {
@@ -287,7 +279,6 @@ public class ServiceStatistics implements Statistics
         }
 
         samplePeriod = System.currentTimeMillis();
-
     }
 
     public RouterStatistics getInboundRouterStat()
