@@ -148,6 +148,11 @@ public class TransactionTemplate
                 // the context delimited by XA's ALWAYS_BEGIN
                 return null;
             }
+            else if (exceptionListener != null)
+            {
+                // if there's an exception listener, it has been handled already, don't loop
+                return null;
+            }
             else
             {
                 throw e;
