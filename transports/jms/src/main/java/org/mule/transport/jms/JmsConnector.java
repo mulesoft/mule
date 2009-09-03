@@ -67,6 +67,18 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     public static final String JMS = "jms";
 
+    /**
+     * Indicates that Mule should throw an exception on any redelivery attempt.
+     */
+    public static final int REDELIVERY_FAIL_ON_FIRST = 0;
+
+    /**
+     * Indicates that Mule should consume the message. You MUST KNOW what you are doing, as the
+     * transaction will be committed and message might be lost if further exceptions not properly
+     * handled by your services.
+     */
+    public static final int REDELIVERY_SWALLOW_MESSAGE = -1;
+
     private AtomicInteger receiverReportedExceptionCount = new AtomicInteger();
     
     ////////////////////////////////////////////////////////////////////////
@@ -85,7 +97,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     private boolean honorQosHeaders;
 
-    private int maxRedelivery = 0;
+    private int maxRedelivery = REDELIVERY_FAIL_ON_FIRST;
 
     private boolean cacheJmsSessions = false;
 
@@ -457,7 +469,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         
         if (receiverReportedExceptionCount.incrementAndGet() >= expectedReceiverCount)
         {
-            receiverReportedExceptionCount.set(0);
+            receiverReportedExceptionCount.set(REDELIVERY_FAIL_ON_FIRST);
         
             handleException(new ConnectException(jmsException, this));
         }

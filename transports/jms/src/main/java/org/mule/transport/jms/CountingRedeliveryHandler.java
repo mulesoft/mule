@@ -66,7 +66,9 @@ public class CountingRedeliveryHandler implements RedeliveryHandler
      */
     public void handleRedelivery(Message message) throws JMSException, MuleException
     {
-        if (connector.getMaxRedelivery() <= 0)
+        final int connectorRedelivery = connector.getMaxRedelivery();
+        if (connectorRedelivery == JmsConnector.REDELIVERY_SWALLOW_MESSAGE ||
+            connectorRedelivery < 0 ) // just in case, for manual setting)
         {
             return;
         }
@@ -96,18 +98,34 @@ public class CountingRedeliveryHandler implements RedeliveryHandler
             }
             messages.put(id, 1);
         }
-        else if (redeliveryCount > connector.getMaxRedelivery())
+        else if (redeliveryCount == 1)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Message with id: " + id + " has been redelivered for the first time");
+            }
+
+            if (connectorRedelivery == JmsConnector.REDELIVERY_FAIL_ON_FIRST)
+            {
+                JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
+                throw new MessageRedeliveredException(
+                        JmsMessages.tooManyRedeliveries(id, String.valueOf(redeliveryCount),
+                                                        connectorRedelivery, connector.getName()), new DefaultMuleMessage(adapter, connector.getMuleContext()));
+            }
+
+        }
+        else if (redeliveryCount > connectorRedelivery)
         {
             if (logger.isDebugEnabled())
             {
                 logger.debug(MessageFormat.format(
                         "Message with id: {0} has been redelivered {1} times, which exceeds the maxRedelivery setting " +
-                        "of {2} on the connector {3}", id, redeliveryCount, connector.getMaxRedelivery(), connector.getName()));
+                        "of {2} on the connector {3}", id, redeliveryCount, connectorRedelivery, connector.getName()));
             }
             JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
 
             throw new MessageRedeliveredException(
-                    JmsMessages.tooManyRedeliveries(id, "" + redeliveryCount, connector.getMaxRedelivery(),
+                    JmsMessages.tooManyRedeliveries(id, "" + redeliveryCount, connectorRedelivery,
                             connector.getName()), new DefaultMuleMessage(adapter, connector.getMuleContext()));
 
         }
