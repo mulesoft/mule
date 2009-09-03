@@ -40,7 +40,7 @@ public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
         final AtomicBoolean callbackMade = new AtomicBoolean(false);
         EventCallback callback = new EventCallback()
         {
-            public void eventReceived(final MuleEventContext context, final Object component) throws Exception
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
                 MuleMessage msg = context.getMessage();
                 assertTrue(callbackMade.compareAndSet(false, true));

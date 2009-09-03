@@ -12,18 +12,20 @@ package org.mule.transport.http;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.params.HttpConnectionParams;
+import org.apache.commons.httpclient.protocol.ReflectionSocketFactory;
 import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
 
 public class MuleSecureProtocolSocketFactory implements SecureProtocolSocketFactory
 {
-    
     private SSLSocketFactory socketFactory;
 
     public MuleSecureProtocolSocketFactory(SSLSocketFactory factory)
@@ -31,6 +33,7 @@ public class MuleSecureProtocolSocketFactory implements SecureProtocolSocketFact
         super();
         socketFactory = factory;
     }
+
 
     public Socket createSocket(Socket socket, String host, int port, boolean autoClose)
         throws IOException, UnknownHostException
@@ -59,11 +62,22 @@ public class MuleSecureProtocolSocketFactory implements SecureProtocolSocketFact
         } 
         else 
         {
-            throw new UnsupportedOperationException(
-                "Cannot create MuleSecureProtocolSocketFactory using HttpConnectionParams with timeout");
+            return createSocketWithTimeout(host, port, localAddress, localPort, timeout);
         }
     }
 
+    /**
+     * This is a direct version of code in {@link ReflectionSocketFactory}.
+     */
+    private Socket createSocketWithTimeout(String host, int port, InetAddress localAddress,
+        int localPort, int timeout) throws IOException
+    {
+        Socket socket = socketFactory.createSocket();
+        SocketAddress local = new InetSocketAddress(localAddress, localPort);
+        SocketAddress remote = new InetSocketAddress(host, port);
+        
+        socket.bind(local);
+        socket.connect(remote, timeout);
+        return socket;
+    }
 }
-
-
