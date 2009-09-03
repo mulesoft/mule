@@ -84,7 +84,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     /**
      * Default test watchdog timeout in seconds.
      */
-    public static final int DEFAULT_MULE_TEST_TIMEOUT_SECS = 6000;
+    public static final int DEFAULT_MULE_TEST_TIMEOUT_SECS = 60;
 
     protected static MuleContext muleContext;
 
