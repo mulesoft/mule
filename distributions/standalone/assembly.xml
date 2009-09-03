@@ -343,6 +343,7 @@
         <include>org.mule:mule-core</include>
         <!-- Transports -->
         <include>org.mule.transports:mule-transport-axis</include>
+        <include>org.mule.transports:mule-transport-ajax</include>
         <include>org.mule.transports:mule-transport-bpm</include>
         <include>org.mule.transports:mule-transport-cxf</include>
         <include>org.mule.transports:mule-transport-ejb</include>
@@ -369,8 +370,10 @@
         <include>org.mule.modules:mule-module-acegi</include>
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
+        <include>org.mule.modules:mule-module-guice</include>
         <include>org.mule.modules:mule-module-jaas</include>
         <include>org.mule.modules:mule-module-jbossts</include>
+        <include>org.mule.modules:mule-module-json</include>
         <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-pgp</include>
@@ -392,11 +395,11 @@
       _exclude_ all libs which should _not_ go into this directory (usually 
       because they are already in a different directory). -->
       <excludes>
-
         <!-- lib/mule -->
         <exclude>org.mule:mule-core</exclude>
         <exclude>org.mule.transports:mule-transports-all</exclude>
         <exclude>org.mule.transports:mule-transport-axis</exclude>
+        <exclude>org.mule.transports:mule-transport-ajax</exclude>
         <exclude>org.mule.transports:mule-transport-bpm</exclude>
         <exclude>org.mule.transports:mule-transport-cxf</exclude>
         <exclude>org.mule.transports:mule-transport-ejb</exclude>
@@ -425,9 +428,11 @@
         <exclude>org.mule.modules:mule-module-boot</exclude>
         <exclude>org.mule.modules:mule-module-builders</exclude>
         <exclude>org.mule.modules:mule-module-client</exclude>
+        <exclude>org.mule.modules:mule-module-guice</exclude>
         <exclude>org.mule.modules:mule-module-jaas</exclude>
         <exclude>org.mule.modules:mule-module-jbossts</exclude>
         <exclude>org.mule.modules:mule-module-jca</exclude>
+        <exclude>org.mule.modules:mule-module-json</exclude>
         <exclude>org.mule.modules:mule-module-management</exclude>
         <exclude>org.mule.modules:mule-module-ognl</exclude>
         <exclude>org.mule.modules:mule-module-pgp</exclude>
@@ -449,12 +454,12 @@
         <exclude>org.mule.examples:mule-example-scripting</exclude>
         <exclude>org.mule.examples:mule-example-stockquote</exclude>
         <exclude>org.mule.examples:mule-example-bookstore</exclude>
-        
+
         <!-- lib/user -->
         <exclude>junit:junit</exclude>
         <exclude>xmlunit:xmlunit</exclude>
         <exclude>org.mule.tests:mule-tests-functional</exclude>
-        
+
         <!-- lib/boot -->
         <exclude>commons-cli:commons-cli</exclude>
         <exclude>tanukisoft:wrapper</exclude>
