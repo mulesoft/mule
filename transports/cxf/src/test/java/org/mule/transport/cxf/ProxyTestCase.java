@@ -16,6 +16,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.transport.cxf.testmodels.AsyncService;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.concurrent.Latch;
 
@@ -160,25 +161,43 @@ public class ProxyTestCase extends FunctionalTestCase
         System.out.println(resString);
         assertTrue(resString.indexOf("<transformed xmlns=\"http://foo\">") != -1);
     }
-    
-    public void testOneWay() throws Exception 
-    {
-        String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" + 
-            "<soap:Body>" +
-            "<send xmlns=\"http://testmodels.cxf.transport.mule.org\"><text>hello</text></send>" + 
-            "</soap:Body>" + 
-            "</soap:Envelope>";
 
+    public void testOneWaySend() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        MuleMessage result = client.send("http://localhost:63081/services/oneway",
+            prepareOneWayTestMessage(), prepareOneWayTestProperties());
+        assertEquals("", result.getPayloadAsString());
+
+        AsyncService component = (AsyncService) getComponent("asyncService");
+        assertTrue(component.getLatch().await(10000, TimeUnit.MILLISECONDS));
+    }
+
+    public void testOneWayDispatch() throws Exception
+    {
+        new MuleClient().dispatch("http://localhost:63081/services/oneway", prepareOneWayTestMessage(),
+            prepareOneWayTestProperties());
+
+        AsyncService component = (AsyncService) getComponent("asyncService");
+        assertTrue(component.getLatch().await(10000, TimeUnit.MILLISECONDS));
+    }
+
+    protected String prepareOneWayTestMessage()
+    {
+        return "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" + "<soap:Body>"
+               + "<send xmlns=\"http://testmodels.cxf.transport.mule.org\"><text>hello</text></send>"
+               + "</soap:Body>" + "</soap:Envelope>";
+    }
+
+    protected Map prepareOneWayTestProperties()
+    {
         Map<String, Object> httpHeaders = new HashMap<String, Object>();
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, httpHeaders);
         props.put("SOAPAction", "http://acme.com/oneway");
-              
-        MuleClient client = new MuleClient();
-        MuleMessage result = client.send("http://localhost:63081/services/routeBasedOnSoapAction", msg, props);
-        assertEquals("", result.getPayloadAsString());
-    }
+        return props;
+    }   
     
     protected String getConfigResources()
     {

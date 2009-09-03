@@ -234,7 +234,9 @@
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:63081/services/oneway"/>
             </inbound>
-             <component class="org.mule.transport.cxf.testmodels.AsyncService"/>
+            <component>
+                <singleton-object class="org.mule.transport.cxf.testmodels.AsyncService"/>
+            </component>
         </service>
     </model>
 

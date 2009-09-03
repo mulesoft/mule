@@ -15,13 +15,24 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+
 @WebService
-public class AsyncService {
-    
+public class AsyncService
+{
+
+    private CountDownLatch latch = new CountDownLatch(1);
+
     @WebMethod
     @Oneway
-    public void send(@WebParam(name="text") String s) {
+    public void send(@WebParam(name = "text") String s)
+    {
+        latch.countDown();
+    }
+
+    @WebMethod(exclude = true)
+    public CountDownLatch getLatch()
+    {
+        return latch;
     }
 }
-
-
