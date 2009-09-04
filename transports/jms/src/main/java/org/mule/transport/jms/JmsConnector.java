@@ -699,7 +699,15 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         if (producer != null)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Closing producer: " + producer);
+            }
             producer.close();
+        }
+        else if (logger.isDebugEnabled())
+        {
+            logger.debug("Producer is null, nothis to close");
         }
     }
 
@@ -731,7 +739,15 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         if (consumer != null)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Closing consumer: " + consumer);
+            }
             consumer.close();
+        }
+        else if (logger.isDebugEnabled())
+        {
+            logger.debug("Consumer is null, nothing to close");
         }
     }
 
