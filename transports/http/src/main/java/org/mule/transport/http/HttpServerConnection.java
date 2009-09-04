@@ -14,6 +14,7 @@ import org.mule.RequestContext;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.OutputHandler;
+import org.mule.util.SystemUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class HttpServerConnection
         }
 
         this.socket = socket;
-        this.socket.setTcpNoDelay(true);
+        setSocketTcpNoDelay();
         this.socket.setKeepAlive(connector.isKeepAlive());
         
         if (connector.getReceiveBufferSize() != Connector.INT_VALUE_NOT_SET
@@ -71,6 +72,31 @@ public class HttpServerConnection
         this.in = socket.getInputStream();
         this.out = new DataOutputStream(socket.getOutputStream());
         this.encoding = encoding;
+    }
+
+    private void setSocketTcpNoDelay() throws IOException
+    {
+        try
+        {
+            socket.setTcpNoDelay(true);
+        }
+        catch (SocketException se)
+        {
+            if (SystemUtils.IS_OS_SOLARIS)
+            {
+                // this is a known Solaris bug, see
+                // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6378870
+                
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Failed to set tcpNoDelay on socket", se);
+                }
+            }
+            else
+            {
+                throw se;
+            }
+        }
     }
 
     public synchronized void close()
