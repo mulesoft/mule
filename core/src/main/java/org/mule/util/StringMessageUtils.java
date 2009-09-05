@@ -251,7 +251,12 @@ public final class StringMessageUtils
 
                 for (Object name : names)
                 {
-                    buf.append("    ").append(name).append("=").append(m.getProperty(name.toString(), scope)).append(SystemUtils.LINE_SEPARATOR);
+                    Object value = m.getProperty(name.toString(), scope);
+                    if(name.equals("password") || name.toString().contains("secret") || name.equals("pass"))
+                    {
+                        value = "****";
+                    }
+                    buf.append("    ").append(name).append("=").append(value).append(SystemUtils.LINE_SEPARATOR);
                 }
             }
             catch (IllegalArgumentException e)
