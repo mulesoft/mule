@@ -16,42 +16,42 @@ import org.mule.tck.AbstractMuleTestCase;
 public class IsJsonFilterTestCase extends AbstractMuleTestCase 
 {
 
-	private IsJsonFilter filter;
+    private IsJsonFilter filter;
 
-	protected void doSetUp() throws Exception 
-	{
-		filter = new IsJsonFilter();
+    protected void doSetUp() throws Exception 
+    {
+        filter = new IsJsonFilter();
         filter.setValidateParsing(true);
-	}
-	
-	public void testFilterFalse() throws Exception
-	{
-		assertFalse(filter.accept(new DefaultMuleMessage("This is definitely not JSON.", muleContext)));
-	}
+    }
+    
+    public void testFilterFalse() throws Exception
+    {
+        assertFalse(filter.accept(new DefaultMuleMessage("This is definitely not JSON.", muleContext)));
+    }
 
-	public void testFilterFalse2() throws Exception
-	{
-		assertFalse(filter.accept(new DefaultMuleMessage("{name=\"This may be JSON\",bool:}", muleContext)));
-	}
-	
-	public void testFilterFalse3() throws Exception
-	{
-		assertFalse(filter.accept(new DefaultMuleMessage("[name=\"This may be JSON\",bool:]", muleContext)));
-	}
-	
-	public void testFilterTrue() throws Exception
-	{
-		assertTrue(filter.accept(new DefaultMuleMessage("{name=\"This is some nice JSON\",bool:true,int:1,\"id\":1,\"options\":[\"a\",\"f\"],\"doublev\":2.2}", muleContext)));
-	}
-	
-	public void testFilterTrue2() throws Exception
-	{
-		assertTrue(filter.accept(new DefaultMuleMessage("{name=\"This is some nice JSON\",bool:true,int:1,\"id\":1,\"options\":[\"a\",\"f\"],\"doublev\":2.2}", muleContext)));
-	}
-	
-	public void testFilterNull() throws Exception
-	{
-		assertFalse(filter.accept(new DefaultMuleMessage(null, muleContext)));
-	}
+    public void testFilterFalse2() throws Exception
+    {
+        assertFalse(filter.accept(new DefaultMuleMessage("{name=\"This may be JSON\",bool:}", muleContext)));
+    }
+    
+    public void testFilterFalse3() throws Exception
+    {
+        assertFalse(filter.accept(new DefaultMuleMessage("[name=\"This may be JSON\",bool:]", muleContext)));
+    }
+    
+    public void testFilterTrue() throws Exception
+    {
+        assertTrue(filter.accept(new DefaultMuleMessage("{name=\"This is some nice JSON\",bool:true,int:1,\"id\":1,\"options\":[\"a\",\"f\"],\"doublev\":2.2}", muleContext)));
+    }
+    
+    public void testFilterTrue2() throws Exception
+    {
+        assertTrue(filter.accept(new DefaultMuleMessage("{name=\"This is some nice JSON\",bool:true,int:1,\"id\":1,\"options\":[\"a\",\"f\"],\"doublev\":2.2}", muleContext)));
+    }
+    
+    public void testFilterNull() throws Exception
+    {
+        assertFalse(filter.accept(new DefaultMuleMessage(null, muleContext)));
+    }
 
 }
