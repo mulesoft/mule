@@ -203,6 +203,19 @@ public class JsonData implements DynaBean, Serializable
 
     public String toString()
     {
-        return morphDynaBean.toString();
+    	if(morphDynaBean != null)
+    	{
+    		return morphDynaBean.toString();
+    	}
+    	else if(entries != null && entries.size() > 0)
+    	{
+    		StringBuffer sb = new StringBuffer();
+    		for(int i = 0; i < entries.size(); i++)
+    		{
+    			sb.append(entries.get(i));
+    		}    		    		
+    		return sb.toString();
+    	}
+    	return ""; //avoid returning null
     }
 }

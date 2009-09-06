@@ -26,7 +26,8 @@ public class JsonDataTestCase extends AbstractMuleTestCase
 
         assertEquals("Mule Test", jsonData.get("[0]->user->name"));
         assertEquals("Mule Test9", jsonData.get("[9]->user->name"));
-
+        // test toString() since it was broken for arrays
+        assertNotNull(jsonData.toString());
         try
         {
             jsonData.get("[0]->user->XXX");
@@ -68,5 +69,7 @@ public class JsonDataTestCase extends AbstractMuleTestCase
         assertEquals("/**", jsonData.get("filters[0]->channels"));
         assertEquals("teh ", jsonData.get("filters[1]->init[1][0]"));        
         assertEquals("the ", jsonData.get("filters[1]->init[1][1]"));
+        // test toString() since it was broken for arrays
+        assertNotNull(jsonData.toString());
     }
 }
