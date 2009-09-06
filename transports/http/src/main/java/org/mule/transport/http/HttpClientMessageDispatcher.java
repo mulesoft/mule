@@ -17,12 +17,14 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.message.DefaultExceptionPayload;
+import org.mule.transformer.TransformerChain;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.http.transformers.ObjectToHttpClientMethodRequest;
 import org.mule.util.StringUtils;
@@ -31,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Cookie;
@@ -57,14 +60,25 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     public static final int REDIRECT_STATUS_CODE_RANGE_START = 300;
     protected final HttpConnector connector;
     private volatile HttpClient client = null;
-    //TODO should this really be hardcoded??
-    private final ObjectToHttpClientMethodRequest sendTransformer;
+    private final Transformer sendTransformer;
 
     public HttpClientMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (HttpConnector) endpoint.getConnector();
-        this.sendTransformer = new ObjectToHttpClientMethodRequest();
+        List<Transformer> ts = connector.getDefaultOutboundTransformers();
+        if (ts.size() == 1)
+        {
+            this.sendTransformer = ts.get(0);
+        }
+        else if (ts.size() == 0)
+        {
+            this.sendTransformer = new ObjectToHttpClientMethodRequest();
+        }
+        else
+        {
+            this.sendTransformer = new TransformerChain(ts);
+        }
     }
 
     @Override
@@ -99,17 +113,20 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         try
         {
             execute(event, httpMethod);
-            
+
             if (returnException(event, httpMethod))
             {
                 logger.error(httpMethod.getResponseBodyAsString());
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), new Exception(
-                    "Http call returned a status of: " + httpMethod.getStatusCode() + " "
-                                    + httpMethod.getStatusText()));
+                        "Http call returned a status of: " + httpMethod.getStatusCode() + " "
+                                + httpMethod.getStatusText()));
             }
-            else if(httpMethod.getStatusCode() >= REDIRECT_STATUS_CODE_RANGE_START)
+            else if (httpMethod.getStatusCode() >= REDIRECT_STATUS_CODE_RANGE_START)
             {
-                if(logger.isInfoEnabled()) logger.info("Received a redirect response code: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText());
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Received a redirect response code: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText());
+                }
             }
         }
         finally
@@ -183,8 +200,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 String key = (String) keyIter.next();
                 String cookieValue = (String) cookieMap.get(key);
 
-                String value = event.getMuleContext().getExpressionManager().parse(cookieValue, 
-                    event.getMessage());
+                String value = event.getMuleContext().getExpressionManager().parse(cookieValue,
+                        event.getMessage());
 
                 Cookie cookie = new Cookie(host, key, value, path, null, false);
                 client.getState().addCookie(cookie);
@@ -200,7 +217,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         MuleMessage msg = event.getMessage();
         setPropertyFromEndpoint(event, msg, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
-        
+
         HttpMethod httpMethod;
         Object body = event.transformMessage();
 
@@ -272,13 +289,13 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             httpMethod = execute(event, httpMethod);
 
             DefaultExceptionPayload ep = null;
-            
+
             if (returnException(event, httpMethod))
             {
                 ep = new DefaultExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
-                    new HttpResponseException(httpMethod.getStatusText(), httpMethod.getStatusCode())));
+                        new HttpResponseException(httpMethod.getStatusText(), httpMethod.getStatusCode())));
             }
-            else if(httpMethod.getStatusCode() >= REDIRECT_STATUS_CODE_RANGE_START)
+            else if (httpMethod.getStatusCode() >= REDIRECT_STATUS_CODE_RANGE_START)
             {
                 try
                 {
@@ -290,7 +307,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                     return getResponseFromMethod(httpMethod, ep);
                 }
             }
-            releaseConn = httpMethod.getResponseBodyAsStream()==null;
+            releaseConn = httpMethod.getResponseBodyAsStream() == null;
             return getResponseFromMethod(httpMethod, ep);
         }
         catch (Exception e)
@@ -313,20 +330,23 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     protected MuleMessage handleRedirect(HttpMethod method, MuleEvent event) throws HttpResponseException, MuleException, IOException
     {
-        if(!connector.isFollowRedirects())
+        if (!connector.isFollowRedirects())
         {
-            if(logger.isInfoEnabled()) logger.info("Received a redirect, but followRedirects=false. Response code: " + method.getStatusCode() + " " + method.getStatusText());            
+            if (logger.isInfoEnabled())
+            {
+                logger.info("Received a redirect, but followRedirects=false. Response code: " + method.getStatusCode() + " " + method.getStatusText());
+            }
             return getResponseFromMethod(method, null);
         }
         Header locationHeader = method.getRequestHeader(HttpConstants.HEADER_LOCATION);
-        if(locationHeader==null)
+        if (locationHeader == null)
         {
             throw new HttpResponseException(method.getStatusText(), method.getStatusCode());
         }
         OutboundEndpoint out = new EndpointURIEndpointBuilder(locationHeader.getValue(), connector.getMuleContext()).buildOutboundEndpoint();
-        if(event.isSynchronous())
+        if (event.isSynchronous())
         {
-           return connector.send(out, event);
+            return connector.send(out, event);
         }
         else
         {
@@ -340,38 +360,38 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         Object body = null;
 
         InputStream is = httpMethod.getResponseBodyAsStream();
-            if (is == null)
-            {
-                body = StringUtils.EMPTY;
-            }
-            else
-            {
-                is = new ReleasingInputStream(is, httpMethod);
-                body = is;
-            }
+        if (is == null)
+        {
+            body = StringUtils.EMPTY;
+        }
+        else
+        {
+            is = new ReleasingInputStream(is, httpMethod);
+            body = is;
+        }
 
-            Header[] headers = httpMethod.getResponseHeaders();
-            HttpMessageAdapter adapter = new HttpMessageAdapter(new Object[]{body, headers});
+        Header[] headers = httpMethod.getResponseHeaders();
+        HttpMessageAdapter adapter = new HttpMessageAdapter(new Object[]{body, headers});
 
-            String status = String.valueOf(httpMethod.getStatusCode());
+        String status = String.valueOf(httpMethod.getStatusCode());
 
-            adapter.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Http response is: " + status);
-            }
+        adapter.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Http response is: " + status);
+        }
 
-            MuleMessage m = new DefaultMuleMessage(adapter, connector.getMuleContext());
+        MuleMessage m = new DefaultMuleMessage(adapter, connector.getMuleContext());
 
-            m.setExceptionPayload(ep);
-            return m;
+        m.setExceptionPayload(ep);
+        return m;
     }
 
-	protected boolean returnException(MuleEvent event, HttpMethod httpMethod) 
-	{
-		return httpMethod.getStatusCode() >= ERROR_STATUS_CODE_RANGE_START 
-				&& !BooleanUtils.toBoolean((String)event.getMessage().getProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK));
-	}
+    protected boolean returnException(MuleEvent event, HttpMethod httpMethod)
+    {
+        return httpMethod.getStatusCode() >= ERROR_STATUS_CODE_RANGE_START
+                && !BooleanUtils.toBoolean((String) event.getMessage().getProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK));
+    }
 
     protected HostConfiguration getHostConfig(URI uri) throws Exception
     {
