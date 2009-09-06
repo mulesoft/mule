@@ -60,7 +60,7 @@ public class ClasspathScanner
 
     public ClasspathScanner(String... basepaths)
     {
-        this.classLoader = getClass().getClassLoader();
+        this.classLoader = Thread.currentThread().getContextClassLoader();
         this.basepaths = basepaths;
     }
 
