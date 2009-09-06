@@ -21,32 +21,37 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-/** 
- *  A referencable chain of transformers that can be used as a single transformer
- * */
+/**
+ * A referencable chain of transformers that can be used as a single transformer
+ */
 public class TransformerChain extends AbstractMessageAwareTransformer
 {
     private List<Transformer> transformers;
 
+    public TransformerChain(List<Transformer> transformers)
+    {
+        super();
+        if (transformers.size() < 1)
+        {
+            throw new IllegalArgumentException("You must set at least one transformer");
+        }
+        this.transformers = new LinkedList<Transformer>(transformers);
+    }
+
     public TransformerChain(Transformer... transformers)
     {
-        super();
-        if (transformers.length < 1)
-        {
-            throw new IllegalArgumentException("You must set at least one transformer");
-        }
-        this.transformers = new LinkedList<Transformer>(Arrays.asList(transformers));
+        this(Arrays.asList(transformers));
     }
-    
+
+    public TransformerChain(String name, List<Transformer> transformers)
+    {
+        this(transformers);
+        this.name = name;
+    }
+
     public TransformerChain(String name, Transformer... transformers)
     {
-        super();
-        this.name = name;
-        if (transformers.length < 1)
-        {
-            throw new IllegalArgumentException("You must set at least one transformer");
-        }
-        this.transformers = new LinkedList<Transformer>(Arrays.asList(transformers));
+        this(name, Arrays.asList(transformers));
     }
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
