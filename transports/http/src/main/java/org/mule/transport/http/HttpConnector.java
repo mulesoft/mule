@@ -372,7 +372,9 @@ public class HttpConnector extends TcpConnector
                 endpoint.getEncoding()))));
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
         }
-        else if (event!=null && event.getMessage().getProperty(HttpConstants.HEADER_AUTHORIZATION, PropertyScope.OUTBOUND)!=null)
+        //TODO MULE-4501 this sohlud be removed and handled only in the ObjectToHttpRequest transformer
+        else if (event!=null && event.getMessage().getProperty(HttpConstants.HEADER_AUTHORIZATION, PropertyScope.OUTBOUND)!=null &&
+                httpMethod.getRequestHeader(HttpConstants.HEADER_AUTHORIZATION)==null)
         {
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION,
                     event.getMessage().getProperty(HttpConstants.HEADER_AUTHORIZATION, PropertyScope.OUTBOUND).toString());
