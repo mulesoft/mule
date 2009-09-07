@@ -221,12 +221,10 @@ public class DefaultMuleContext implements MuleContext
 
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
 
+            initSplashScreens();
             if (logger.isInfoEnabled())
             {
-                SplashScreen splashScreen = SplashScreen.getInstance(ServerStartupSplashScreen.class);
-                splashScreen.setHeader(this);
-                splashScreen.setFooter(this);
-                logger.info(splashScreen.toString());
+                logger.info(startupScreen.toString());
             }
         }
     }
@@ -286,9 +284,7 @@ public class DefaultMuleContext implements MuleContext
 
         if ((getStartDate() > 0) && logger.isInfoEnabled())
         {
-            SplashScreen splashScreen = SplashScreen.getInstance(ServerShutdownSplashScreen.class);
-            splashScreen.setHeader(this);
-            logger.info(splashScreen.toString());
+            logger.info(shutdownScreen.toString());
         }
 
         staticInsntace = null;
