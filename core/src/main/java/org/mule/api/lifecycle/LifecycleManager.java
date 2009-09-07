@@ -37,6 +37,13 @@ public interface LifecycleManager
      * Applies lifecycle phase to a collection of objects.
      */
     LifecyclePhase applyPhase(Registry registry, String phase) throws MuleException;
+
+    /**
+     * Applies lifecycle phase to an object independent of the current lifecycle phase. All phases between the current
+     * phase and the 'endPhase' will be executed.
+     * @param endPhase the final phase to execute on the object.  All phases inbetween current and end will be executed
+     */
+    void applyPhases(Object object, String endPhase) throws MuleException;
     
     String getCurrentPhase();
 

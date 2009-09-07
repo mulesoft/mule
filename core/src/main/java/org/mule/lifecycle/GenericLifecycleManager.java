@@ -97,6 +97,27 @@ public class GenericLifecycleManager implements LifecycleManager
         return li;
     }
 
+    public void applyPhases(Object object, String phase) throws MuleException
+    {
+        int current = index.get(currentPhase);
+        int end = index.get(phase);
+        if(end < current)
+        {
+            logger.warn("Phase: " + phase + " has alredy been fired for this object");
+            return;
+        }
+
+        //we want to start at the next one from current
+        current++;
+        LifecyclePhase li;
+        while(current <= end)
+        {
+            li = (LifecyclePhase)lifecycles.get(current);
+            li.applyLifecycle(object);
+            current++;
+        }
+    }
+
     public String getCurrentPhase()
     {
         return currentPhase;

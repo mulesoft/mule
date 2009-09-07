@@ -16,7 +16,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ObjectProcessor;
@@ -254,17 +253,17 @@ public class TransientRegistry extends AbstractRegistry
         {
             obj = registry.remove(key);
         }
-        if (obj instanceof Stoppable)
-        {
+
             try
             {
-                ((Stoppable) obj).stop();
+                context.getLifecycleManager().applyPhases(obj, Disposable.PHASE_NAME);
+
             }
             catch (MuleException e)
             {
                 throw new RegistrationException(e);
             }
-        }
+
     }
 
     public void unregisterObject(String key) throws RegistrationException
