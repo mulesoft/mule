@@ -36,7 +36,7 @@ import java.text.MessageFormat;
  * <code>SimpleFilenameParser</code>
  * <ul>
  * <li>#[DATE] : #[function:datestamp]</li>
- * <li>#[DATE:yy-MM-dd] : #[function:datestamp(yy-MM-dd)]</li>
+ * <li>#[DATE:yy-MM-dd] : #[function:datestamp-yy-MM-dd]</li>
  * <li>#[SYSTIME] : #[function:systime]</li>
  * <li>#[UUID] : #[function:uuid]</li>
  * <li>#[ORIGINALNAME] : #[header:originalFilename]</li>
