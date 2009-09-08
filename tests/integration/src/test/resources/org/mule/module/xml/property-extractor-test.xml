@@ -18,7 +18,7 @@
     
     <vm:connector name="queue"/>
 
-    <vm:endpoint name="in" address="vm://in" connector-ref="default"/>
+    <vm:endpoint name="in" path="in" connector-ref="default"/>
 
     <model name="property extractor test">
 
