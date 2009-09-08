@@ -226,7 +226,7 @@ public class ImmutableThreadingProfile implements ThreadingProfile
         }
 
         ThreadPoolExecutor pool =
-                new ThreadPoolExecutor(Math.max(tp.getMaxThreadsIdle(), tp.getMaxThreadsActive()),
+                new ThreadPoolExecutor(Math.min(tp.getMaxThreadsIdle(), tp.getMaxThreadsActive()),
                         tp.getMaxThreadsActive(), tp.getThreadTTL(),
                         TimeUnit.MILLISECONDS, buffer);
 
