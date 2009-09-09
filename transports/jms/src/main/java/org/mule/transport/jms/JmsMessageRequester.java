@@ -11,7 +11,13 @@
 package org.mule.transport.jms;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.context.notification.TransactionNotification;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.notification.TransactionNotificationListener;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transaction.Transaction;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
@@ -64,13 +70,40 @@ public class JmsMessageRequester extends AbstractMessageRequester
     {
         Session session = null;
         MessageConsumer consumer = null;
+        boolean cleanupListenerRegistered = false;
 
         try
         {
             final boolean topic = connector.getTopicResolver().isTopic(endpoint);
 
             JmsSupport support = connector.getJmsSupport();
-            session = connector.getSession(false, topic);
+            final TransactionConfig transactionConfig = endpoint.getTransactionConfig();
+            final Transaction tx = TransactionCoordination.getInstance().getTransaction();
+            boolean transacted = transactionConfig != null && transactionConfig.isTransacted();
+
+            session = connector.getSession(transacted, topic);
+
+            if (transacted && !tx.isXA())
+            {
+                // register a session close listener
+                final Session finalSession = session;
+                getConnector().getMuleContext().registerListener(new TransactionNotificationListener() {
+                    public void onNotification(ServerNotification notification)
+                    {
+                        TransactionNotification txNotification = (TransactionNotification) notification;
+
+                        final int txAction = txNotification.getAction();
+                        final String txId = txNotification.getTransactionStringId();
+                        if ((txAction == TransactionNotification.TRANSACTION_COMMITTED || txAction == TransactionNotification.TRANSACTION_ROLLEDBACK) &&
+                            txId.equals(tx.getId())) {
+                            connector.closeQuietly(finalSession);
+                        }
+                    }
+                }, tx.getId());
+
+                cleanupListenerRegistered = true;
+            }
+
             Destination dest = support.createDestination(session, endpoint);
 
             // Extract jms selector
@@ -150,8 +183,11 @@ public class JmsMessageRequester extends AbstractMessageRequester
         }
         finally
         {
-            connector.closeQuietly(consumer);
-            connector.closeQuietly(session);
+            if (!cleanupListenerRegistered)
+            {
+                connector.closeQuietly(consumer);
+                connector.closeQuietly(session);
+            }
         }
     }
 
