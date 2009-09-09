@@ -24,7 +24,7 @@ public class QuartzReceiveAndDispatchJobTestCase extends FunctionalTestCase
 
     public void testMuleClientReceiveAndDispatchJob() throws Exception
     {
-        FunctionalTestComponent component = (FunctionalTestComponent)getComponent("scheduledService");
+        FunctionalTestComponent component = getFunctionalTestComponent("scheduledService");
         assertNotNull(component);
         CountdownCallback count = new CountdownCallback(3);
         component.setEventCallback(count);
@@ -35,6 +35,7 @@ public class QuartzReceiveAndDispatchJobTestCase extends FunctionalTestCase
         client.dispatch("vm://event.queue", "quartz test", null);
 
         client.dispatch("vm://quartz.scheduler", "test", null);
-        assertTrue(count.await(5000));
+        Thread.sleep(5000);
+        assertEquals(0, count.getCount());
     }
 }
