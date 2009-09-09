@@ -87,7 +87,7 @@ public class DefaultMuleContext implements MuleContext
 
     private ExpressionManager expressionManager;
 
-    private static MuleContext staticInsntace;
+    private static MuleContext staticInstance;
 
     private SplashScreen startupScreen;
     private SplashScreen shutdownScreen;
@@ -109,12 +109,12 @@ public class DefaultMuleContext implements MuleContext
         this.expressionManager = new DefaultExpressionManager();
 
         //TODO URGENT remove - currently used by the MuleClient only
-        staticInsntace = this;
+        staticInstance = this;
     }
 
     public static MuleContext getContext()
     {
-        return staticInsntace;
+        return staticInstance;
     }
 
     protected RegistryBroker createRegistryBroker()
@@ -192,6 +192,8 @@ public class DefaultMuleContext implements MuleContext
             lifecycleManager.firePhase(this, Initialisable.PHASE_NAME);
 
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
+
+            initSplashScreens();
         }
         catch (Exception e)
         {
@@ -221,7 +223,6 @@ public class DefaultMuleContext implements MuleContext
 
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
 
-            initSplashScreens();
             if (logger.isInfoEnabled())
             {
                 logger.info(startupScreen.toString());
@@ -287,7 +288,7 @@ public class DefaultMuleContext implements MuleContext
             logger.info(shutdownScreen.toString());
         }
 
-        staticInsntace = null;
+        staticInstance = null;
         // SplashScreen holds static variables which need to be cleared in case we restart the server.
         SplashScreen.dispose();
     }
