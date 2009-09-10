@@ -172,7 +172,10 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
                         doConnect();
                         connected.set(true);
 
-                        logger.info("Connected: " + getWorkDescription());
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Connected: " + getWorkDescription());
+                        }
                         // TODO Make this work somehow inside the RetryTemplate
                         //connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
                         //    ConnectionNotification.CONNECTION_CONNECTED));
@@ -222,7 +225,10 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         this.doDisconnect();
         connected.set(false);
 
-        logger.info("Disconnected: " + this);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Disconnected: " + this);
+        }
         connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
             ConnectionNotification.CONNECTION_DISCONNECTED));
     }
