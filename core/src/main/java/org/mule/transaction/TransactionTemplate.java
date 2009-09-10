@@ -115,6 +115,7 @@ public class TransactionTemplate
         }
         catch (Exception e)
         {
+            tx = TransactionCoordination.getInstance().getTransaction();
             if (exceptionListener != null)
             {
                 logger.info("Exception Caught in Transaction template.  Handing off to exception handler: "
