@@ -11,14 +11,13 @@
 package org.mule.transport.jms;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.context.notification.TransactionNotification;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.TransactionNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transaction.Transaction;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionConfig;
+import org.mule.context.notification.TransactionNotification;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
 import org.mule.util.StringUtils;
@@ -87,11 +86,10 @@ public class JmsMessageRequester extends AbstractMessageRequester
             {
                 // register a session close listener
                 final Session finalSession = session;
-                getConnector().getMuleContext().registerListener(new TransactionNotificationListener() {
-                    public void onNotification(ServerNotification notification)
+                getConnector().getMuleContext().registerListener(new TransactionNotificationListener<TransactionNotification>()
+                {
+                    public void onNotification(TransactionNotification txNotification)
                     {
-                        TransactionNotification txNotification = (TransactionNotification) notification;
-
                         final int txAction = txNotification.getAction();
                         final String txId = txNotification.getTransactionStringId();
                         if ((txAction == TransactionNotification.TRANSACTION_COMMITTED || txAction == TransactionNotification.TRANSACTION_ROLLEDBACK) &&

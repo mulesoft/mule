@@ -13,7 +13,6 @@ package org.mule.test.integration.routing;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.context.notification.RoutingNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -34,11 +33,11 @@ public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
     {
         latch = new CountDownLatch(1);
 
-        muleContext.registerListener(new RoutingNotificationListener() 
+        muleContext.registerListener(new RoutingNotificationListener<RoutingNotification>() 
         {
-            public void onNotification(ServerNotification notification)
+            public void onNotification(RoutingNotification notification)
             {
-                if(notification.getAction() == RoutingNotification.MISSED_ASYNC_REPLY)
+                if (notification.getAction() == RoutingNotification.MISSED_ASYNC_REPLY)
                 {
                     latch.countDown();
                     assertEquals("test Received Late!", ((MuleMessage)((RoutingNotification)notification).getSource()).getPayload());

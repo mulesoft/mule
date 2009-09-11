@@ -15,12 +15,12 @@ import org.mule.api.context.notification.ServerNotification;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AbstractNotificationLogger
+public abstract class AbstractNotificationLogger<T extends ServerNotification>
 {
 
     private LinkedList notifications = new LinkedList();
 
-    public synchronized void onNotification(ServerNotification notification)
+    public synchronized void onNotification(T notification)
     {
         notifications.addLast(notification);
     }

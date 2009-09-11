@@ -10,13 +10,15 @@
 
 package org.mule.api.context.notification;
 
+import org.mule.context.notification.ModelNotification;
+
 
 /**
  * <code>ModelNotificationListener</code> is an observer interface that objects can
  * implement and then register themselves with the Mule manager to be notified when a
  * Model event occurs.
  */
-public interface ModelNotificationListener extends ServerNotificationListener
+public interface ModelNotificationListener<T extends ModelNotification> extends ServerNotificationListener<ModelNotification>
 {
     // no methods
 }

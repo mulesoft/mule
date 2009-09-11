@@ -10,12 +10,13 @@
 
 package org.mule.api.context.notification;
 
+import org.mule.context.notification.EndpointMessageNotification;
 
 /**
  * <code>EndpointMessageNotificationListener</code> is an observer interface that objects
  * can use to receive notifications about messages being sent and received from endpoints
  */
-public interface EndpointMessageNotificationListener extends MessageNotificationListener
+public interface EndpointMessageNotificationListener<T extends EndpointMessageNotification> extends ServerNotificationListener<EndpointMessageNotification>
 {
     // no methods
 }

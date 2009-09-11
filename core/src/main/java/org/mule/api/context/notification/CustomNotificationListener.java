@@ -18,7 +18,7 @@ package org.mule.api.context.notification;
  * by components and other objects such as routers, transformers, agents, etc to
  * communicate a change of state to each other.
  */
-public interface CustomNotificationListener extends ServerNotificationListener
+public interface CustomNotificationListener<T extends ServerNotification> extends ServerNotificationListener<ServerNotification>
 {
     // no methods
 }

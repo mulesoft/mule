@@ -10,13 +10,15 @@
 
 package org.mule.api.context.notification;
 
+import org.mule.context.notification.ServiceNotification;
+
 
 /**
  * <code>ServiceNotificationListener</code> is an observer interface that objects
  * can implement and then register themselves with the Mule manager to be notified
  * when a Service event occurs.
  */
-public interface ServiceNotificationListener extends ServerNotificationListener
+public interface ServiceNotificationListener<T extends ServiceNotification> extends ServerNotificationListener<ServiceNotification>
 {
     // no methods
 }

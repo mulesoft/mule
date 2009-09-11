@@ -14,6 +14,6 @@ import org.mule.api.context.notification.ServerNotificationListener;
 /**
  * Listen for {@link org.mule.example.notifications.HeartbeatNotification} events.
  */
-public interface HeartbeatNotificationListener extends ServerNotificationListener
+public interface HeartbeatNotificationListener<T extends HeartbeatNotification> extends ServerNotificationListener<HeartbeatNotification>
 {
 }

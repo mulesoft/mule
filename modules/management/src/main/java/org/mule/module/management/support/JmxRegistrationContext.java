@@ -11,7 +11,6 @@ package org.mule.module.management.support;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 
@@ -41,7 +40,7 @@ public class JmxRegistrationContext
      * by a single thread. We only need to share this info between random agents
      * during startup.
      */
-    private static final ThreadLocal contexts = new ThreadLocal();
+    private static final ThreadLocal<JmxRegistrationContext> contexts = new ThreadLocal<JmxRegistrationContext>();
 
     private String resolvedDomain;
 
@@ -52,9 +51,9 @@ public class JmxRegistrationContext
         {
             // register the cleanup hook, otherwise server stop/start cycles may produce
             // Mule JMX domains with ever increasing suffix.
-            context.registerListener(new MuleContextNotificationListener()
+            context.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
             {
-                public void onNotification(ServerNotification notification)
+                public void onNotification(MuleContextNotification notification)
                 {
                     MuleContextNotification mn = (MuleContextNotification) notification;
                     if (MuleContextNotification.CONTEXT_DISPOSED == mn.getAction())
@@ -78,7 +77,7 @@ public class JmxRegistrationContext
      */
     public static JmxRegistrationContext getCurrent(MuleContext context)
     {
-        JmxRegistrationContext ctx = (JmxRegistrationContext) contexts.get();
+        JmxRegistrationContext ctx = contexts.get();
         if (ctx == null)
         {
             ctx = new JmxRegistrationContext(context);

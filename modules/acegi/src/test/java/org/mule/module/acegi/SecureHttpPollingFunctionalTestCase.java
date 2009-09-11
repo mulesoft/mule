@@ -11,7 +11,7 @@ package org.mule.module.acegi;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.SecurityNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
+import org.mule.context.notification.SecurityNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
@@ -25,9 +25,9 @@ public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
     public void testPollingHttpConnectorSentCredentials() throws Exception
     {
         final Latch latch = new Latch();
-        muleContext.registerListener(new SecurityNotificationListener()
+        muleContext.registerListener(new SecurityNotificationListener<SecurityNotification>()
         {
-            public void onNotification(ServerNotification notification)
+            public void onNotification(SecurityNotification notification)
             {
                 latch.countDown();
             }

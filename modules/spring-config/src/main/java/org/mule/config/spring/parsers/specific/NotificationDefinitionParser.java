@@ -16,7 +16,6 @@ import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
-import org.mule.api.context.notification.MessageNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.RegistryNotificationListener;
@@ -92,7 +91,6 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         INTERFACE_MAP.put("CONNECTION", ConnectionNotificationListener.class.getName());
         INTERFACE_MAP.put("REGISTRY", RegistryNotificationListener.class.getName());
         INTERFACE_MAP.put("CUSTOM", CustomNotificationListener.class.getName());
-        INTERFACE_MAP.put("MESSAGE", MessageNotificationListener.class.getName());
         INTERFACE_MAP.put("ENDPOINT-MESSAGE", EndpointMessageNotificationListener.class.getName());
         INTERFACE_MAP.put("COMPONENT-MESSAGE", ComponentMessageNotificationListener.class.getName());
         INTERFACE_MAP.put("EXCEPTION", ExceptionNotificationListener.class.getName());

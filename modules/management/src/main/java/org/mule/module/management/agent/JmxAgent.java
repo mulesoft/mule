@@ -13,7 +13,6 @@ import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
@@ -599,10 +598,10 @@ public class JmxAgent extends AbstractAgent
         }
     }
 
-    protected class MuleContextStartedListener implements MuleContextNotificationListener
+    protected class MuleContextStartedListener implements MuleContextNotificationListener<MuleContextNotification>
     {
 
-        public void onNotification(ServerNotification notification)
+        public void onNotification(MuleContextNotification notification)
         {
             if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
             {
@@ -625,10 +624,10 @@ public class JmxAgent extends AbstractAgent
         }
     }
 
-    protected class MuleContextStoppedListener implements MuleContextNotificationListener
+    protected class MuleContextStoppedListener implements MuleContextNotificationListener<MuleContextNotification>
     {
 
-        public void onNotification(ServerNotification notification)
+        public void onNotification(MuleContextNotification notification)
         {
             if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED)
             {

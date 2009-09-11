@@ -547,8 +547,6 @@
             <xsd:enumeration value="EXCEPTION"/>
             <xsd:enumeration value="TRANSACTION"/>
             <xsd:enumeration value="ROUTING"/>
-            <!-- DEPRECATED -->
-            <xsd:enumeration value="MESSAGE"/>
         </xsd:restriction>
     </xsd:simpleType>
     <!--==============================================================-->

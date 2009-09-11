@@ -26,6 +26,14 @@ import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.context.notification.NotificationException;
+import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.ModelNotification;
+import org.mule.context.notification.ServiceNotification;
+import org.mule.context.notification.SecurityNotification;
+import org.mule.context.notification.ManagementNotification;
+import org.mule.context.notification.ConnectionNotification;
+import org.mule.context.notification.EndpointMessageNotification;
+import org.mule.context.notification.ComponentMessageNotification;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -209,9 +217,9 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         doInitialise();
         if (!ignoreManagerNotifications)
         {
-            ServerNotificationListener l = new MuleContextNotificationListener()
+            ServerNotificationListener l = new MuleContextNotificationListener<MuleContextNotification>()
             {
-                public void onNotification(ServerNotification notification)
+                public void onNotification(MuleContextNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -228,9 +236,9 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         }
         if (!ignoreModelNotifications)
         {
-            ServerNotificationListener l = new ModelNotificationListener()
+            ServerNotificationListener l = new ModelNotificationListener<ModelNotification>()
             {
-                public void onNotification(ServerNotification notification)
+                public void onNotification(ModelNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -247,9 +255,9 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         }
         if (!ignoreComponentNotifications)
         {
-            ServerNotificationListener l = new ServiceNotificationListener()
+            ServerNotificationListener l = new ServiceNotificationListener<ServiceNotification>()
             {
-                public void onNotification(ServerNotification notification)
+                public void onNotification(ServiceNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -266,9 +274,9 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         }
         if (!ignoreSecurityNotifications)
         {
-            ServerNotificationListener l = new SecurityNotificationListener()
+            ServerNotificationListener l = new SecurityNotificationListener<SecurityNotification>()
             {
-                public void onNotification(ServerNotification notification)
+                public void onNotification(SecurityNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -286,9 +294,9 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 
         if (!ignoreManagementNotifications)
         {
-            ServerNotificationListener l = new ManagementNotificationListener()
+            ServerNotificationListener l = new ManagementNotificationListener<ManagementNotification>()
             {
-                public void onNotification(ServerNotification notification)
+                public void onNotification(ManagementNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -326,9 +334,9 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 
         if (!ignoreConnectionNotifications)
         {
-            ServerNotificationListener l = new ConnectionNotificationListener()
+            ServerNotificationListener l = new ConnectionNotificationListener<ConnectionNotification>()
             {
-                public void onNotification(ServerNotification notification)
+                public void onNotification(ConnectionNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -346,9 +354,9 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 
         if (!ignoreMessageNotifications && !ignoreEndpointMessageNotifications)
         {
-            ServerNotificationListener l = new EndpointMessageNotificationListener()
+            ServerNotificationListener l = new EndpointMessageNotificationListener<EndpointMessageNotification>()
             {
-                public void onNotification(ServerNotification notification)
+                public void onNotification(EndpointMessageNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -366,9 +374,9 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         
         if (!ignoreMessageNotifications && !ignoreComponentMessageNotifications)
         {
-            ServerNotificationListener l = new ComponentMessageNotificationListener()
+            ServerNotificationListener l = new ComponentMessageNotificationListener<ComponentMessageNotification>()
             {
-                public void onNotification(ServerNotification notification)
+                public void onNotification(ComponentMessageNotification notification)
                 {
                     logEvent(notification);
                 }

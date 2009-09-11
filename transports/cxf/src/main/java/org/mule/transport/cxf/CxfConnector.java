@@ -12,7 +12,6 @@ package org.mule.transport.cxf;
 
 import org.mule.api.MuleException;
 import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -53,7 +52,7 @@ import org.springframework.context.ApplicationContext;
 /**
  * Connects Mule to a CXF bus instance.
  */
-public class CxfConnector extends AbstractConnector implements MuleContextNotificationListener
+public class CxfConnector extends AbstractConnector implements MuleContextNotificationListener<MuleContextNotification>
 {
 
     public static final String CXF = "cxf";
@@ -372,7 +371,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         }
     }
 
-    public void onNotification(ServerNotification event)
+    public void onNotification(MuleContextNotification event)
     {
         // We need to register the CXF service service once the model
         // starts because

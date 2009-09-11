@@ -15,7 +15,7 @@ package org.mule.api.context.notification;
  * can implement and register themselves with the Mule Server to receive
  * notifications when the server, model and components stop, start, initialise, etc.
  */
-public interface ServerNotificationListener
+public interface ServerNotificationListener<T extends ServerNotification>
 {
-    void onNotification(ServerNotification notification);
+    void onNotification(T notification);
 }

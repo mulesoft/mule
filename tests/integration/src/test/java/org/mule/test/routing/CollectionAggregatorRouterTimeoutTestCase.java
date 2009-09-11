@@ -11,7 +11,6 @@
 package org.mule.test.routing;
 
 import org.mule.api.context.notification.RoutingNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -34,11 +33,10 @@ public class CollectionAggregatorRouterTimeoutTestCase extends FunctionalTestCas
     {
         // correlation timeouts should not fire in this scenario, check it
         final AtomicInteger correlationTimeoutCount = new AtomicInteger(0);
-        muleContext.registerListener(new RoutingNotificationListener()
+        muleContext.registerListener(new RoutingNotificationListener<RoutingNotification>()
         {
-            public void onNotification(ServerNotification n)
+            public void onNotification(RoutingNotification notification)
             {
-                RoutingNotification notification = (RoutingNotification) n;
                 if (notification.getAction() == RoutingNotification.CORRELATION_TIMEOUT)
                 {
                     correlationTimeoutCount.incrementAndGet();

@@ -13,12 +13,12 @@ package org.mule.context.notification;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 
-public abstract class AbstractListener implements ServerNotificationListener
+public abstract class AbstractListener<T extends ServerNotification> implements ServerNotificationListener<T>
 {
 
-    private ServerNotification notification = null;
+    private T notification = null;
 
-    public void onNotification(ServerNotification notification)
+    public void onNotification(T notification)
     {
         this.notification = notification;
     }

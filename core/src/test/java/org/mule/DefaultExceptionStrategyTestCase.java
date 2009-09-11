@@ -36,9 +36,9 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicInteger notificationCount = new AtomicInteger(0);
 
-        muleContext.registerListener(new ExceptionNotificationListener()
+        muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
         {
-            public void onNotification(ServerNotification notification)
+            public void onNotification(ExceptionNotification notification)
             {
                 if (notification.getAction() == ExceptionNotification.EXCEPTION_ACTION)
                 {

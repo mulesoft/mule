@@ -11,7 +11,6 @@
 package org.mule.transaction;
 
 import org.mule.api.MuleContext;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -31,9 +30,9 @@ public class TransactionNotificationsTestCase extends AbstractMuleTestCase
         // a global TransactionCoordination instance, which binds it to the current thread.
         Transaction transaction = new DummyTransaction(muleContext);
 
-        muleContext.registerListener(new TransactionNotificationListener()
+        muleContext.registerListener(new TransactionNotificationListener<TransactionNotification>()
         {
-            public void onNotification(ServerNotification notification)
+            public void onNotification(TransactionNotification notification)
             {
                 if (notification.getAction() == TransactionNotification.TRANSACTION_BEGAN)
                 {

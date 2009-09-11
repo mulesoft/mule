@@ -10,13 +10,15 @@
 
 package org.mule.api.context.notification;
 
+import org.mule.context.notification.ConnectionNotification;
+
 
 /**
  * <code>ConnectionNotificationListener</code> is an observer interface that
  * objects can implement and then register themselves with the Mule manager to be
  * notified when a Connection event occurs.
  */
-public interface ConnectionNotificationListener extends ServerNotificationListener
+public interface ConnectionNotificationListener<T extends ConnectionNotification> extends ServerNotificationListener<ConnectionNotification>
 {
     // no methods
 }

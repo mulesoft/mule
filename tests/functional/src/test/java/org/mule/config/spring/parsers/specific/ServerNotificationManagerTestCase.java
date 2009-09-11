@@ -128,7 +128,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
 
     }
 
-    protected static class TestSecurityListener implements SecurityNotificationListener
+    protected static class TestSecurityListener implements SecurityNotificationListener<SecurityNotification>
     {
 
         private boolean called = false;
@@ -138,7 +138,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
             return called;
         }
 
-        public void onNotification(ServerNotification notification)
+        public void onNotification(SecurityNotification notification)
         {
             called = true;
         }

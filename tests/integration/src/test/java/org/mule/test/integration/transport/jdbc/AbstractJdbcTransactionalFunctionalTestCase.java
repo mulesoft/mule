@@ -35,7 +35,7 @@ import org.mule.transaction.MuleTransactionConfig;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class AbstractJdbcTransactionalFunctionalTestCase extends AbstractJdbcFunctionalTestCase  implements TransactionNotificationListener
+public abstract class AbstractJdbcTransactionalFunctionalTestCase extends AbstractJdbcFunctionalTestCase  implements TransactionNotificationListener<TransactionNotification>
 {
 
     private Transaction currentTx;
@@ -145,7 +145,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         return service;
     }
 
-    public void onNotification(ServerNotification notification)
+    public void onNotification(TransactionNotification notification)
     {
         if (notification.getAction() == TransactionNotification.TRANSACTION_ROLLEDBACK)
         {

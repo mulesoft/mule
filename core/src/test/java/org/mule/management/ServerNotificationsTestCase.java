@@ -10,15 +10,15 @@
 
 package org.mule.management;
 
-import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
-import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.context.notification.ServiceNotification;
+import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.context.notification.CustomNotification;
-import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.ModelNotification;
+import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.ServiceNotification;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -93,9 +93,9 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     public void testStandardNotificationsWithSubscription() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
-        muleContext.registerListener(new ServiceNotificationListener()
+        muleContext.registerListener(new ServiceNotificationListener<ServiceNotification>()
         {
-            public void onNotification(ServerNotification notification)
+            public void onNotification(ServiceNotification notification)
             {
                 if (notification.getAction() == ServiceNotification.SERVICE_STARTED)
                 {
@@ -119,9 +119,9 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     {
         final CountDownLatch latch = new CountDownLatch(2);
 
-        muleContext.registerListener(new ServiceNotificationListener()
+        muleContext.registerListener(new ServiceNotificationListener<ServiceNotification>()
         {
-            public void onNotification(ServerNotification notification)
+            public void onNotification(ServiceNotification notification)
             {
                 if (notification.getAction() == ServiceNotification.SERVICE_STARTED)
                 {

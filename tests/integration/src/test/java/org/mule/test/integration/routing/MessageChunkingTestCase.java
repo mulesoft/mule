@@ -22,7 +22,6 @@ import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.commons.lang.SerializationUtils;
 
 public class MessageChunkingTestCase extends FunctionalTestCase
@@ -87,9 +86,9 @@ public class MessageChunkingTestCase extends FunctionalTestCase
 
         // Listen to Message Notifications on the Chunking receiver so we can
         // determine how many message parts have been received
-        muleContext.registerListener(new EndpointMessageNotificationListener()
+        muleContext.registerListener(new EndpointMessageNotificationListener<EndpointMessageNotification>()
         {
-            public void onNotification(ServerNotification notification)
+            public void onNotification(EndpointMessageNotification notification)
             {
                 if (notification.getAction() == EndpointMessageNotification.MESSAGE_RECEIVED)
                 {
@@ -129,9 +128,9 @@ public class MessageChunkingTestCase extends FunctionalTestCase
 
         // Listen to Message Notifications on the Chunking receiver so we can
         // determine how many message parts have been received
-        muleContext.registerListener(new EndpointMessageNotificationListener()
+        muleContext.registerListener(new EndpointMessageNotificationListener<EndpointMessageNotification>()
         {
-            public void onNotification(ServerNotification notification)
+            public void onNotification(EndpointMessageNotification notification)
             {
                 if (notification.getAction() == EndpointMessageNotification.MESSAGE_RECEIVED)
                 {

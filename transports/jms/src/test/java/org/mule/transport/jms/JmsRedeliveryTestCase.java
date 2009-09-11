@@ -12,7 +12,6 @@ package org.mule.transport.jms;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.context.notification.ExceptionNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -47,12 +46,11 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
 
         // whether a MessageRedeliverdException has been fired
         final Latch mrexFired = new Latch();
-        muleContext.registerListener(new ExceptionNotificationListener()
+        muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
         {
-            public void onNotification(ServerNotification notification)
+            public void onNotification(ExceptionNotification notification)
             {
-                ExceptionNotification n = (ExceptionNotification) notification;
-                if (n.getException() instanceof MessageRedeliveredException)
+                if (notification.getException() instanceof MessageRedeliveredException)
                 {
                     mrexFired.countDown();
                 }

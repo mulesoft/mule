@@ -11,10 +11,6 @@ package org.mule.transport.servlet.events;
 
 import org.mule.api.context.notification.ServerNotificationListener;
 
-/**
- * TODO
- */
-
-public interface ServletContextNotificationListener extends ServerNotificationListener
+public interface ServletContextNotificationListener<T extends ServletContextNotification> extends ServerNotificationListener<ServletContextNotification>
 {
 }

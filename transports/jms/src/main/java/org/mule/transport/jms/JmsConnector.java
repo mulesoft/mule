@@ -62,7 +62,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
  * and queues, durable subscribers, acknowledgement modes and local transactions.
  */
 
-public class JmsConnector extends AbstractConnector implements ConnectionNotificationListener, ExceptionListener
+public class JmsConnector extends AbstractConnector implements ConnectionNotificationListener<ConnectionNotification>, ExceptionListener
 {
 
     public static final String JMS = "jms";
@@ -648,7 +648,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         return new JmsReplyToHandler(this, getDefaultResponseTransformers());
     }
 
-    public void onNotification(ServerNotification notification)
+    public void onNotification(ConnectionNotification notification)
     {
         if (notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED
                 || notification.getAction() == ConnectionNotification.CONNECTION_FAILED)

@@ -11,7 +11,6 @@
 package org.mule.test.integration.routing;
 
 import org.mule.api.context.notification.RoutingNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -31,9 +30,9 @@ public class InboundAggregationWithTimeoutTestCase extends FunctionalTestCase
     {
         final CountDownLatch latch = new CountDownLatch(1);
 
-        muleContext.registerListener(new RoutingNotificationListener()
+        muleContext.registerListener(new RoutingNotificationListener<RoutingNotification>()
         {
-            public void onNotification(ServerNotification notification)
+            public void onNotification(RoutingNotification notification)
             {
                 if (notification.getAction() == RoutingNotification.CORRELATION_TIMEOUT)
                 {

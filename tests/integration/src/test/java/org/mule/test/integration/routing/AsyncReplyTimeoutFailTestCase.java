@@ -12,7 +12,6 @@ package org.mule.test.integration.routing;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.RoutingNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
@@ -34,10 +33,10 @@ public class AsyncReplyTimeoutFailTestCase extends FunctionalTestCase
     {
         latch = new CountDownLatch(1);
 
-        muleContext.registerListener(new RoutingNotificationListener() {
-            public void onNotification(ServerNotification notification)
+        muleContext.registerListener(new RoutingNotificationListener<RoutingNotification>() {
+            public void onNotification(RoutingNotification notification)
             {
-                if(notification.getAction() == RoutingNotification.ASYNC_REPLY_TIMEOUT)
+                if (notification.getAction() == RoutingNotification.ASYNC_REPLY_TIMEOUT)
                 {
                     latch.countDown();
                 }

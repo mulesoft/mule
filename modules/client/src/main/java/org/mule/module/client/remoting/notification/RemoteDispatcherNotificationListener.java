@@ -17,7 +17,7 @@ import org.mule.api.context.notification.ServerNotificationListener;
  * objects can use to receive notifications about the state of the Mule instance and
  * its resources
  */
-public interface RemoteDispatcherNotificationListener extends ServerNotificationListener
+public interface RemoteDispatcherNotificationListener<T extends RemoteDispatcherNotification> extends ServerNotificationListener<RemoteDispatcherNotification>
 {
     // no methods
 }
