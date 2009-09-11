@@ -72,12 +72,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
      */
     public static final int REDELIVERY_FAIL_ON_FIRST = 0;
 
-    /**
-     * Indicates that Mule should consume the message. You MUST KNOW what you are doing, as the
-     * transaction will be committed and message might be lost if further exceptions not properly
-     * handled by your services.
-     */
-    public static final int REDELIVERY_SWALLOW_MESSAGE = -1;
+    public static final int REDELIVERY_IGNORE = -1;
 
     private AtomicInteger receiverReportedExceptionCount = new AtomicInteger();
     
@@ -469,7 +464,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         
         if (receiverReportedExceptionCount.incrementAndGet() >= expectedReceiverCount)
         {
-            receiverReportedExceptionCount.set(REDELIVERY_FAIL_ON_FIRST);
+            receiverReportedExceptionCount.set(0);
         
             handleException(new ConnectException(jmsException, this));
         }
@@ -591,15 +586,16 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
 
+        session = jmsSupport.createSession(connection, topic, transacted, acknowledgementMode, noLocal);
+
         if (logger.isDebugEnabled())
         {
             logger.debug(MessageFormat.format(
-                    "Retrieving new jms session from connection: " +
-                            "topic={0}, transacted={1}, ack mode={2}, nolocal={3}",
-                            topic, transacted, acknowledgementMode, noLocal));
+                    "Retrieved new jms session from connection: " +
+                            "topic={0}, transacted={1}, ack mode={2}, nolocal={3}: {4}",
+                            topic, transacted, acknowledgementMode, noLocal, session));
         }
 
-        session = jmsSupport.createSession(connection, topic, transacted, acknowledgementMode, noLocal);
         if (tx != null)
         {
             logger.debug("Binding session " + session + " to current transaction " + tx);

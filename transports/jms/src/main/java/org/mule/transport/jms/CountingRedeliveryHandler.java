@@ -67,9 +67,12 @@ public class CountingRedeliveryHandler implements RedeliveryHandler
     public void handleRedelivery(Message message) throws JMSException, MuleException
     {
         final int connectorRedelivery = connector.getMaxRedelivery();
-        if (connectorRedelivery == JmsConnector.REDELIVERY_SWALLOW_MESSAGE ||
-            connectorRedelivery < 0 ) // just in case, for manual setting)
+        if (connectorRedelivery == JmsConnector.REDELIVERY_IGNORE || connectorRedelivery < 0 ) // just in case, for manual setting)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("We were asked to ignore the redelivery count, nothing to do here.");
+            }
             return;
         }
 
