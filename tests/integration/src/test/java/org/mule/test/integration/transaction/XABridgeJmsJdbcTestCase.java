@@ -59,6 +59,7 @@ public class XABridgeJmsJdbcTestCase extends AbstractDerbyTestCase
             {
                 break;
             }
+            System.out.println("Time elapsed: " + (System.currentTimeMillis() - t0));
             assertTrue(System.currentTimeMillis() - t0 < 40000);
             Thread.sleep(500);
         }
