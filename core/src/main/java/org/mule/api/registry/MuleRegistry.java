@@ -137,6 +137,20 @@ public interface MuleRegistry extends Registry
 
     void unregisterAgent(String agentName) throws MuleException;
 
+    /**
+     * Will execute any processors on an object and fire any lifecycle methods according to the current lifecycle without actually
+     * registering the object in the registry.  This is useful for prototype objects that are created per request and would
+     * clutter the registry with single use objects.  Not that this will only be applied to Mule registies.  Thrid party registries
+     * such as Guice support wiring, but you need to get a reference to the container/context to call the method.  This is so that
+     * wiring mechanisms dont trip over each other.
+     *
+     * @param object the object to process
+     * @return the same object with any processors and lifecycle methods called
+     * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change or process object processors for the object.
+     */
+    Object processObject(Object object) throws MuleException;
+    
+
     // /////////////////////////////////////////////////////////////////////////
     // Creation methods
     // /////////////////////////////////////////////////////////////////////////

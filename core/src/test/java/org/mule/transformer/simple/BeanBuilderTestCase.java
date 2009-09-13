@@ -27,7 +27,9 @@ public class BeanBuilderTestCase extends AbstractTransformerTestCase
     {
         BeanBuilderTransformer trans = new BeanBuilderTransformer();
         trans.setMuleContext(muleContext);
-        trans.setBeanFactory(new PrototypeObjectFactory(Orange.class));
+        PrototypeObjectFactory factory = new PrototypeObjectFactory(Orange.class);
+        muleContext.getRegistry().processObject(factory);
+        trans.setBeanFactory(factory);
         trans.addArgument(new ExpressionArgument("brand", new ExpressionConfig("", "payload", null), false));
         trans.addArgument(new ExpressionArgument("segments", new ExpressionConfig("segments", "header", null), false));
         trans.addArgument(new ExpressionArgument("radius", new ExpressionConfig("radius", "header", null), false));

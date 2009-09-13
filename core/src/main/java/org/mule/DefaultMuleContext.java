@@ -29,7 +29,6 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
-import org.mule.api.registry.RegistryBroker;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.config.DefaultMuleConfiguration;
@@ -60,7 +59,7 @@ public class DefaultMuleContext implements MuleContext
     private static transient Log logger = LogFactory.getLog(DefaultMuleContext.class);
 
     /** Internal registry facade which delegates to other registries. */
-    private RegistryBroker registryBroker;
+    private DefaultRegistryBroker registryBroker;
 
     /** Simplified Mule configuration interface */
     private MuleRegistry muleRegistryHelper;
@@ -117,12 +116,12 @@ public class DefaultMuleContext implements MuleContext
         return staticInstance;
     }
 
-    protected RegistryBroker createRegistryBroker()
+    protected DefaultRegistryBroker createRegistryBroker()
     {
         return new DefaultRegistryBroker(this);
     }
     
-    protected MuleRegistry createRegistryHelper(Registry registry)
+    protected MuleRegistry createRegistryHelper(DefaultRegistryBroker registry)
     {
         return new MuleRegistryHelper(registry);
     }

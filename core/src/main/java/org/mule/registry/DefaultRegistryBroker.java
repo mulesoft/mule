@@ -20,6 +20,8 @@ import java.util.TreeMap;
 
 public class DefaultRegistryBroker extends AbstractRegistryBroker
 {
+    private TransientRegistry transientRegistry;
+
     private Map<Long, Registry> registries = new TreeMap<Long, Registry>(new Comparator<Long>(){
         public int compare(Long o1, Long o2)
         {
@@ -37,7 +39,13 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
 
     public DefaultRegistryBroker(MuleContext context)
     {
-        addRegistry(-1, new TransientRegistry(context));
+        transientRegistry = new TransientRegistry(context);
+        addRegistry(-1, transientRegistry);
+    }
+
+    TransientRegistry getTransientRegistry()
+    {
+        return transientRegistry;
     }
 
     public void addRegistry(long id, Registry registry)
@@ -50,7 +58,7 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
         registries.remove(new Long(id));
     }
 
-    protected Collection/*<Registry>*/ getRegistries()
+    protected Collection<Registry> getRegistries()
     {
         return registries.values();
     }

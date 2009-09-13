@@ -160,6 +160,22 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
+    /**
+     * Will execute any processors on an object and fire any lifecycle methods according to the current lifecycle without actually
+     * registering the object in the registry.  This is useful for prototype objects that are created per request and would
+     * clutter the registry with single use objects.
+     *
+     * @param object the object to process
+     * @return the same object with any processors and lifecycle methods called
+     * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change or process object processors for the object.
+     */
+    Object processObject(Object object) throws MuleException
+    {
+        applyProcessors(object);
+        context.getLifecycleManager().applyCompletedPhases(object);
+        return object;
+    }
+
     protected Object applyProcessors(Object object)
     {
         Object theObject = object;

@@ -10,11 +10,13 @@
 
 package org.mule.component;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.component.LifecycleAdapterFactory;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
@@ -85,6 +87,16 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         finally
         {
             returnComponentLifecycleAdaptor(componentLifecycleAdapter);
+        }
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        super.setMuleContext(context);
+        if(objectFactory instanceof MuleContextAware)
+        {
+            ((MuleContextAware)objectFactory).setMuleContext(context);
         }
     }
 

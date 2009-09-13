@@ -11,7 +11,6 @@
 package org.mule.object;
 
 import org.mule.api.object.ObjectFactory;
-import org.mule.object.SingletonObjectFactory;
 
 public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCase
 {
@@ -27,6 +26,7 @@ public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCas
     {
         SingletonObjectFactory factory = (SingletonObjectFactory) getObjectFactory();
         factory.setObjectClass(Object.class);
+        factory.setMuleContext(muleContext);
         factory.initialise();
         assertEquals(Object.class, factory.getObjectClass());
     }
@@ -36,6 +36,7 @@ public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCas
     {
         SingletonObjectFactory factory = (SingletonObjectFactory) getObjectFactory();
         factory.setObjectClass(Object.class);
+        factory.setMuleContext(muleContext);
         factory.initialise();
         assertSame(factory.getInstance(), factory.getInstance());
     }

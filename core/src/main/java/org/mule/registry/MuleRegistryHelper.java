@@ -56,8 +56,8 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard
  * Registry interface.
- * 
- * TODO MULE-2228 "Java-based configuration mechanism for Mule 2.0" will extend/build 
+ * <p/>
+ * TODO MULE-2228 "Java-based configuration mechanism for Mule 2.0" will extend/build
  * upon this interface.
  */
 public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposable
@@ -67,17 +67,19 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
 
     protected Map transformerListCache = new ConcurrentHashMap(8);
     protected Map exactTransformerCache = new ConcurrentHashMap(8);
-    
-    /** A reference to Mule's internal registry */
-    private Registry registry;
-    
+
+    /**
+     * A reference to Mule's internal registry
+     */
+    private DefaultRegistryBroker registry;
+
     protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
-    
-    public MuleRegistryHelper(Registry registry)
+
+    public MuleRegistryHelper(DefaultRegistryBroker registry)
     {
         this.registry = registry;
     }
-    
+
     public void initialise() throws InitialisationException
     {
         // no-op
@@ -103,7 +105,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
      * existing endpoint instances that have been registered. This lookup method
      * should be avoided and the intelligent, role specific endpoint lookup methods
      * should be used instead.<br/><br/>
-     * 
+     *
      * @param name the idendtifer/name used to register endpoint in registry
      */
     public ImmutableEndpoint lookupEndpoint(String name)
@@ -149,7 +151,9 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return (Transformer) registry.lookupObject(name);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public Transformer lookupTransformer(Class inputType, Class outputType) throws TransformerException
     {
         Transformer result = (Transformer) exactTransformerCache.get(inputType.getName() + outputType.getName());
@@ -244,7 +248,9 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public List lookupTransformers(Class input, Class output)
     {
         List results = (List) transformerListCache.get(input.getName() + output.getName());
@@ -355,7 +361,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         {
             exactTransformerCache.clear();
             transformerListCache.clear();
-        }        
+        }
         registry.registerObject(getName(transformer), transformer, Transformer.class);
     }
 
@@ -434,7 +440,9 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     // logger.info("Agents Successfully Initialised");
     // }
 
-    /** Looks up the service descriptor from a singleton cache and creates a new one if not found. */
+    /**
+     * Looks up the service descriptor from a singleton cache and creates a new one if not found.
+     */
     public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
     {
         String key = new AbstractServiceDescriptor.Key(name, overrides).getKey();
@@ -460,7 +468,9 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return sd;
     }
 
-    /** @deprecated ServiceDescriptors will be created upon bundle startup for OSGi. */
+    /**
+     * @deprecated ServiceDescriptors will be created upon bundle startup for OSGi.
+     */
     protected ServiceDescriptor createServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
     {
         Properties props = SpiUtils.findServiceDescriptor(type, name);
@@ -506,7 +516,6 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         registry.unregisterObject(serviceName, Service.class);
     }
 
-
     public void unregisterAgent(String agentName) throws MuleException
     {
         registry.unregisterObject(agentName, Agent.class);
@@ -538,36 +547,16 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         registry.unregisterObject(transformerName, Transformer.class);
     }
 
-//    public Transformer lookupTransformer(String name)
-//    {
-//        Transformer transformer = super.lookupTransformer(name);
-//        if (transformer != null)
-//        {
-//            try
-//            {
-//                if (transformer.getEndpoint() != null)
-//                {
-//                    throw new IllegalStateException("Endpoint cannot be set");
-//                }
-////                Map props = BeanUtils.describe(transformer);
-////                props.remove("endpoint");
-////                props.remove("strategy");
-////                transformer = (Transformer)ClassUtils.instanciateClass(transformer.getClass(), ClassUtils.NO_ARGS);
-//                //TODO: friggin' cloning
-//                transformer = (Transformer) BeanUtils.cloneBean(transformer);
-//            }
-//            catch (Exception e)
-//            {
-//                e.printStackTrace();
-//            }
-//        }
-//        return transformer;
-//    }
+    public Object processObject(Object object) throws MuleException
+    {
+        registry.getTransientRegistry().processObject(object);
+        return object;
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     // Delegate to internal registry
     ////////////////////////////////////////////////////////////////////////////
-    
+
     public Object lookupObject(Class type) throws RegistrationException
     {
         return registry.lookupObject(type);
@@ -607,7 +596,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     {
         registry.unregisterObject(key);
     }
-    
+
     protected String getName(Object obj)
     {
         String name = null;
@@ -625,7 +614,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     ////////////////////////////////////////////////////////////////////////////
     // Registry Metadata
     ////////////////////////////////////////////////////////////////////////////
-    
+
     public String getRegistryId()
     {
         return this.toString();

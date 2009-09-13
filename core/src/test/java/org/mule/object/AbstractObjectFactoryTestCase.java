@@ -12,7 +12,6 @@ package org.mule.object;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
-import org.mule.object.AbstractObjectFactory;
 import org.mule.tck.AbstractMuleTestCase;
 
 public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
@@ -47,15 +46,8 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
     {
         AbstractObjectFactory factory = (AbstractObjectFactory) getObjectFactory();
         factory.setObjectClass(Object.class);
-
-        try
-        {
-            factory.initialise();
-        }
-        catch (InitialisationException iex)
-        {
-            fail(iex.getDetailedMessage());
-        }
+        //Will init the object        
+        muleContext.getRegistry().processObject(factory);
 
         assertNotNull(factory.getInstance());
     }
@@ -64,16 +56,8 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
     {
         AbstractObjectFactory factory = (AbstractObjectFactory) getObjectFactory();
         factory.setObjectClassName(Object.class.getName());
-
-        try
-        {
-            factory.initialise();
-        }
-        catch (InitialisationException iex)
-        {
-            fail(iex.getDetailedMessage());
-        }
-
+        //Will init the object
+        muleContext.getRegistry().processObject(factory);
         assertNotNull(factory.getInstance());
     }
 
@@ -81,8 +65,8 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
     {
         AbstractObjectFactory factory = (AbstractObjectFactory) getObjectFactory();
         factory.setObjectClass(Object.class);
-
-        factory.initialise();
+        //Will init the object
+        muleContext.getRegistry().processObject(factory);
         factory.dispose();
 
         assertNull(factory.getObjectClass());

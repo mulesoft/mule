@@ -365,9 +365,9 @@ public final class MuleTestUtils
         service.setName(name);
         service.setMuleContext(context);
         ObjectFactory of = new SingletonObjectFactory(clazz, props);
-        of.initialise();
         final DefaultJavaComponent component = new DefaultJavaComponent(of);
         component.setMuleContext(context);
+        of.initialise();        
         service.setComponent(component);
         service.setModel(model);
         if (initialize)

@@ -10,6 +10,8 @@
 
 package org.mule.object;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
@@ -29,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Creates object instances based on the class and sets any properties.
  */
-public abstract class AbstractObjectFactory implements ObjectFactory
+public abstract class AbstractObjectFactory implements ObjectFactory, MuleContextAware
 {
     public static final String ATTRIBUTE_OBJECT_CLASS_NAME = "objectClassName";
     public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";
@@ -38,6 +40,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory
     protected SoftReference<Class<?>> objectClass = null;
     protected Map properties = null;
     protected List initialisationCallbacks = new ArrayList();
+    protected MuleContext muleContext;
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -67,6 +70,11 @@ public abstract class AbstractObjectFactory implements ObjectFactory
     {
         this.objectClass = new SoftReference<Class<?>>(objectClass);
         this.properties = properties;
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
     public void initialise() throws InitialisationException
@@ -114,6 +122,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory
         {
             BeanUtils.populateWithoutFail(object, properties, true);
         }
+        muleContext.getRegistry().processObject(object);
 
         fireInitialisationCallbacks(object);
         
