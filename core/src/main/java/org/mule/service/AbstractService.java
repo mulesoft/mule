@@ -268,7 +268,7 @@ public abstract class AbstractService implements Service
         // or throw an exception?
         if (!initialised.get())
         {
-            throw new IllegalStateException("Cannot start an unitialised service.");
+            throw new IllegalStateException("Cannot start an uninitialised service.");
         }
         if (isStarted())
         {
