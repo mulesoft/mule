@@ -29,9 +29,9 @@ public class CheckRequiredAttributes implements PreProcessor
 {
 
     // maps from attribute name to attribute set index (integer)
-    private Map knownAttributes = new HashMap();
+    private Map<String, Integer> knownAttributes = new HashMap<String, Integer>();
     // maps from attribute set index to number of attributes in that set
-    private Map numberOfAttributes = new HashMap();
+    private Map<Integer, Integer> numberOfAttributes = new HashMap<Integer, Integer>();
     // description of acceptable attributes
     private String summary;
 
@@ -69,7 +69,7 @@ public class CheckRequiredAttributes implements PreProcessor
     public void preProcess(PropertyConfiguration config, Element element)
     {
         // map from attribute set index to count
-        Map foundAttributesCount = new HashMap();
+        Map<Integer, Integer> foundAttributesCount = new HashMap<Integer, Integer>();
 
         NamedNodeMap attributes = element.getAttributes();
         for (int i = 0; i < attributes.getLength(); i++)
@@ -77,24 +77,24 @@ public class CheckRequiredAttributes implements PreProcessor
             String alias = SpringXMLUtils.attributeName((Attr) attributes.item(i));
             if (knownAttributes.containsKey(alias))
             {
-                Integer index = (Integer) knownAttributes.get(alias);
+                Integer index = knownAttributes.get(alias);
                 if (!foundAttributesCount.containsKey(index))
                 {
                     foundAttributesCount.put(index, new Integer(0));
                 }
                 foundAttributesCount.put(index,
-                        new Integer(1 + ((Integer) foundAttributesCount.get(index)).intValue()));
+                        new Integer(1 + foundAttributesCount.get(index).intValue()));
 
             }
         }
 
         // if there are no attributes to check for, we are ok
         boolean ok = knownAttributes.size() == 0;
-        Iterator indices = foundAttributesCount.keySet().iterator();
+        Iterator<Integer> indices = foundAttributesCount.keySet().iterator();
         while (indices.hasNext() && !ok)
         {
-            Object index = indices.next();
-            Object count = foundAttributesCount.get(index);
+            Integer index = indices.next();
+            Integer count = foundAttributesCount.get(index);
             ok = numberOfAttributes.get(index).equals(count);
         }
         if (!ok)
