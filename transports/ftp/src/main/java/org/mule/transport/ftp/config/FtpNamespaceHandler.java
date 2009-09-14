@@ -17,7 +17,7 @@ import org.mule.transport.file.FilenameParser;
 import org.mule.transport.ftp.FtpConnector;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
+ * Reigsters a Bean Definition Parser for handling <code><ftp:connector></code> elements.
  */
 public class FtpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
