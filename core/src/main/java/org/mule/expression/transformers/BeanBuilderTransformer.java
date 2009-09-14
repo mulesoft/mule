@@ -10,6 +10,7 @@
 package org.mule.expression.transformers;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -75,6 +76,11 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
             setBeanFactory(new PrototypeObjectFactory(getBeanClass()));
         }
         setReturnClass(getBeanFactory().getObjectClass());
+        //We need to set the MuleContext if we create the factory here 
+        if(getBeanFactory() instanceof MuleContextAware)
+        {
+            ((MuleContextAware)getBeanFactory()).setMuleContext(muleContext);
+        }
     }
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
