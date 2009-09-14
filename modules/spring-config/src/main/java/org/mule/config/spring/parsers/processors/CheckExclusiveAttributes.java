@@ -31,7 +31,7 @@ public class CheckExclusiveAttributes implements PreProcessor
 {
 
     public static final int NONE = -1;
-    private Map knownAttributes = new HashMap();
+    private Map<String, Integer> knownAttributes = new HashMap<String, Integer>();
 
     public CheckExclusiveAttributes(String[][] attributeSets)
     {
@@ -47,7 +47,7 @@ public class CheckExclusiveAttributes implements PreProcessor
 
     public void preProcess(PropertyConfiguration config, Element element)
     {
-        List foundAttributes = new LinkedList();
+        List<String> foundAttributes = new LinkedList<String>();
         int foundSetIndex = NONE;
 
         NamedNodeMap attributes = element.getAttributes();
@@ -59,7 +59,7 @@ public class CheckExclusiveAttributes implements PreProcessor
 //            String name = null == config ? alias : config.translateName(alias);
             if (knownAttributes.containsKey(alias))
             {
-                int index = ((Integer) knownAttributes.get(alias)).intValue();
+                int index = knownAttributes.get(alias).intValue();
                 if (foundSetIndex != NONE && foundSetIndex != index)
                 {
                     StringBuffer message = new StringBuffer("The attribute '");
@@ -69,7 +69,7 @@ public class CheckExclusiveAttributes implements PreProcessor
                     {
                         message.append("s");
                     }
-                    Iterator found = foundAttributes.iterator();
+                    Iterator<String> found = foundAttributes.iterator();
                     while (found.hasNext())
                     {
                         message.append(" '");
