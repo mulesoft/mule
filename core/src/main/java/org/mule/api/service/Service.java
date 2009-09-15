@@ -60,6 +60,8 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
      */
     boolean isStarted();
 
+    boolean isStopped();
+
     /**
      * Pauses event processing for a single Mule Service. Unlike stop(), a paused
      * service will still consume messages from the underlying transport, but those
