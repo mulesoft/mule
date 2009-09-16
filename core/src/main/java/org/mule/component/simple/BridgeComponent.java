@@ -11,7 +11,6 @@
 package org.mule.component.simple;
 
 import org.mule.api.MuleEventContext;
-import org.mule.api.config.ConfigurationException;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.service.Service;
@@ -43,7 +42,7 @@ public class BridgeComponent implements ServiceAware, Callable
                             + context.getService().getName());
     }
 
-    public void setService(Service service) throws ConfigurationException
+    public void setService(Service service)
     {
         // Add a ForwardingConsumer, which punts message to oubound router, unless already present
         boolean registered = false;

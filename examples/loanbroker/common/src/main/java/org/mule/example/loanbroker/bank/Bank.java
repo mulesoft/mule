@@ -10,11 +10,9 @@
 
 package org.mule.example.loanbroker.bank;
 
-import org.mule.api.config.ConfigurationException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceAware;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.example.loanbroker.LocaleMessage;
 import org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
@@ -66,14 +64,14 @@ public class Bank implements ServiceAware, Serializable, BankService
 
     // TODO This method doesn't help us with the Static Recipient list because the list of banks is created 
     // programatically in DefaultLenderService (they should be looked up from the config/registry).
-    public void setService(Service service) throws ConfigurationException 
+    public void setService(Service service)
     {
         this.bankName = service.getName(); 
 
         List endpoints = service.getInboundRouter().getEndpoints();
         if ((endpoints == null) || (endpoints.size() != 1))
         {
-            throw new ConfigurationException(MessageFactory.createStaticMessage("Bank is expected to have exactly 1 incoming endpoint."));
+            throw new IllegalArgumentException("Bank is expected to have exactly 1 incoming endpoint.");
         }
         // TODO This gives us the endpoint the bank is listening on, but the endpoint for sending to the bank 
         // is different in the ESB config ("Bank1In" vs. "Bank1")

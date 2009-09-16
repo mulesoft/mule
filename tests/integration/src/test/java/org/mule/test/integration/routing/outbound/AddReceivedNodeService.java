@@ -9,9 +9,8 @@
  */
 package org.mule.test.integration.routing.outbound;
 
-import org.mule.api.service.ServiceAware;
 import org.mule.api.service.Service;
-import org.mule.api.config.ConfigurationException;
+import org.mule.api.service.ServiceAware;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -23,7 +22,7 @@ public class AddReceivedNodeService implements ServiceAware
 {
     private Service service;
 
-    public void setService(Service service) throws ConfigurationException
+    public void setService(Service service)
     {
         this.service = service;
     }

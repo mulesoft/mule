@@ -10,8 +10,6 @@
 
 package org.mule.api.service;
 
-import org.mule.api.config.ConfigurationException;
-
 /**
  * <code>ServiceAware</code> is an injector interface that will supply a
  * Service to the object. This interface should be implemented by services
@@ -26,6 +24,6 @@ import org.mule.api.config.ConfigurationException;
 public interface ServiceAware
 {
 
-    void setService(Service service) throws ConfigurationException;
+    void setService(Service service);
 
 }
