@@ -34,7 +34,7 @@ public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
         registerPreProcessor(new ProvideDefaultNameFromElement());
     }
 
-    protected Class getBeanClass(Element element)
+    protected Class<?> getBeanClass(Element element)
     {
         return JmxAgent.class;
     }
@@ -42,13 +42,17 @@ public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
     protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
         NodeList childNodes = element.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
+        for (int i = 0; i < childNodes.getLength(); i++)
+        {
             Node node = childNodes.item(i);
-            if (CONNECTOR_SERVER.equals(node.getLocalName())) {
+            if (CONNECTOR_SERVER.equals(node.getLocalName())) 
+            {
                 assembler.extendBean("connectorServerUrl", ((Element) node).getAttribute("url"), false);
                 String rebind = ((Element) node).getAttribute("rebind");
-                if (!StringUtils.isEmpty(rebind)) {
-                    Map csProps = new HashMap();
+                
+                if (!StringUtils.isEmpty(rebind)) 
+                {
+                    Map<String, String> csProps = new HashMap<String, String>();
                     csProps.put("jmx.remote.jndi.rebind", rebind);
                     assembler.extendBean("connectorServerProperties", csProps, false);
                 }
