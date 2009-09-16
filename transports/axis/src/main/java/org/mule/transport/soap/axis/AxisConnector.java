@@ -452,7 +452,6 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
             SingletonObjectFactory of = new SingletonObjectFactory(AxisServiceComponent.class, props);
             final DefaultJavaComponent component = new DefaultJavaComponent(of);
             component.setMuleContext(muleContext);
-            of.initialise();
             service.setComponent(component);
         }
         return service;
