@@ -10,13 +10,11 @@
 
 package org.mule.component;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.component.LifecycleAdapterFactory;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
@@ -90,16 +88,6 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         }
     }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        super.setMuleContext(context);
-        if(objectFactory instanceof MuleContextAware)
-        {
-            ((MuleContextAware)objectFactory).setMuleContext(context);
-        }
-    }
-
     public Class getObjectType()
     {
         return objectFactory.getObjectClass();
@@ -148,11 +136,18 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         {
             throw new InitialisationException(CoreMessages.objectIsNull("object factory"), this);
         }
-        // If this component was configured with spring the objectFactory instance
-        // has already been initialised, yet if this component was no configured with
-        // spring then the objectFactory is still uninitialised so we need to
-        // initialise it here.
-        objectFactory.initialise();
+
+        //Will apply any processors on the object factory and ensure its lifecycle is phase is called. Often the objectFactory
+        //is created by the calling code not the registry, so this is required
+        //TODO see is we can perform object factory creation via the registry
+        try
+        {
+            muleContext.getRegistry().processObject(objectFactory);
+        }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     @Override
