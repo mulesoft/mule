@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
 import org.mule.api.registry.MuleRegistry;
@@ -79,10 +78,18 @@ public class TransientRegistry extends AbstractRegistry
             for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
             {
                 obj = iterator.next();
-                if (obj instanceof Initialisable)
+                try
                 {
-                    ((Initialisable) obj).initialise();
-                }        
+                    applyLifecycle(obj);
+                }
+                catch (InitialisationException e)
+                {
+                    throw e;
+                } 
+                catch (MuleException e)
+                {
+                    throw new InitialisationException(e, this);
+                }
             }
         }
     }
@@ -97,9 +104,13 @@ public class TransientRegistry extends AbstractRegistry
             for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
             {
                 obj = iterator.next();
-                if (obj instanceof Disposable)
+                try
                 {
-                    ((Disposable) obj).dispose();
+                    applyLifecycle(obj);
+                }
+                catch (MuleException e)
+                {
+                    logger.warn("Object '" + obj + "'disposed with error: " + e.getDetailedMessage());
                 }
             }
         }
