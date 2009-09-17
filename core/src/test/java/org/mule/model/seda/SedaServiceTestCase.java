@@ -36,9 +36,8 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
-import junit.framework.AssertionFailedError;
-
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import junit.framework.AssertionFailedError;
 
 public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractServiceTestCase
 {
@@ -75,6 +74,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
         QueueManager queueManager = muleContext.getQueueManager();
 
         Mock mockTransactionalQueueManager = new Mock(QueueManager.class);
+        mockTransactionalQueueManager.expect("toString");
         mockTransactionalQueueManager.expect("toString");
         mockTransactionalQueueManager.expect("setQueueConfiguration", new FullConstraintMatcher(
             C.eq(queueName), C.eq(new QueueConfiguration(capacity, persistent))));
