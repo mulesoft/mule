@@ -547,10 +547,30 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         registry.unregisterObject(transformerName, Transformer.class);
     }
 
-    public Object processObject(Object object) throws MuleException
+    /**
+     * Will execute any processors on an object and fire any lifecycle methods according to the current lifecycle without actually
+     * registering the object in the registry.  This is useful for prototype objects that are created per request and would
+     * clutter the registry with single use objects.
+     *
+     * @param object the object to process
+     * @return the same object with any processors and lifecycle methods called
+     * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change or process object processors for the object.
+     */
+    public Object applyProcessorsAndLifecycle(Object object) throws MuleException
     {
-        registry.getTransientRegistry().processObject(object);
+        object = applyProcessors(object);
+        object = applyLifecycle(object);
         return object;
+    }
+
+    public Object applyProcessors(Object object) throws MuleException
+    {
+        return registry.getTransientRegistry().applyProcessors(object);
+    }
+
+    public Object applyLifecycle(Object object) throws MuleException
+    {
+        return registry.getTransientRegistry().applyLifecycle(object);
     }
 
     ////////////////////////////////////////////////////////////////////////////

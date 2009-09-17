@@ -47,7 +47,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
         AbstractObjectFactory factory = (AbstractObjectFactory) getObjectFactory();
         factory.setObjectClass(Object.class);
         //Will init the object        
-        muleContext.getRegistry().processObject(factory);
+        muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
 
         assertNotNull(factory.getInstance());
     }
@@ -57,7 +57,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
         AbstractObjectFactory factory = (AbstractObjectFactory) getObjectFactory();
         factory.setObjectClassName(Object.class.getName());
         //Will init the object
-        muleContext.getRegistry().processObject(factory);
+        muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
         assertNotNull(factory.getInstance());
     }
 
@@ -66,7 +66,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
         AbstractObjectFactory factory = (AbstractObjectFactory) getObjectFactory();
         factory.setObjectClass(Object.class);
         //Will init the object
-        muleContext.getRegistry().processObject(factory);
+        muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
         factory.dispose();
 
         assertNull(factory.getObjectClass());

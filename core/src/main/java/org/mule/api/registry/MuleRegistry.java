@@ -148,8 +148,30 @@ public interface MuleRegistry extends Registry
      * @return the same object with any processors and lifecycle methods called
      * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change or process object processors for the object.
      */
-    Object processObject(Object object) throws MuleException;
-    
+    Object applyProcessorsAndLifecycle(Object object) throws MuleException;
+
+    /**
+     * Will execute any processors on an object without actually registering the object in the registry.  This is useful for prototype objects that are created per request and would
+     * clutter the registry with single use objects.  Not that this will only be applied to Mule registies.  Thrid party registries
+     * such as Guice support wiring, but you need to get a reference to the container/context to call the method.  This is so that
+     * wiring mechanisms dont trip over each other.
+     *
+     * @param object the object to process
+     * @return the same object with any processors called
+     * @throws org.mule.api.MuleException if the registry fails to process object processors for the object.
+     */
+    Object applyProcessors(Object object) throws MuleException;
+
+    /**
+     * Will execute any lifecycle phases on an object without actually registering the object in the registry.  This is useful for prototype objects that are created per request and would
+     * clutter the registry with single use objects. The lifecycle applied is the lifecycle of the MuleContext. If multiple phases have
+     * been completed i.e. init and start, each phase will be executed on the object in order.
+     *
+     * @param object the object to apply the current lifecycle state to
+     * @return the same object with any lifecycle methods called
+     * @throws org.mule.api.MuleException if the registry fails to execute a lifecycle method.
+     */
+    Object applyLifecycle(Object object) throws MuleException;
 
     // /////////////////////////////////////////////////////////////////////////
     // Creation methods

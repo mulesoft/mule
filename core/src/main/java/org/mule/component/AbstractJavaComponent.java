@@ -20,12 +20,14 @@ import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.routing.BindingCollection;
+import org.mule.api.service.ServiceAware;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.routing.binding.DefaultBindingCollection;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Abstract implementation of JavaComponent adds JavaComponent specific's:
@@ -44,6 +46,11 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
     protected ObjectFactory objectFactory;
 
     protected LifecycleAdapterFactory lifecycleAdapterFactory;
+
+    //Determines whether an object should be wired once created.  For
+    //prototypes this value is always true, for singletons it is only true
+    //the first time the object is created from the objectFactory
+    private AtomicBoolean wireObject = new AtomicBoolean(true);
 
     public AbstractJavaComponent()
     {
@@ -100,25 +107,48 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
      * @throws MuleException
      * @throws Exception
      */
-    protected LifecycleAdapter createLifeCycleAdaptor() throws MuleException, Exception
+    protected LifecycleAdapter createLifeCycleAdaptor() throws Exception
     {
         LifecycleAdapter lifecycleAdapter;
+        //Todo this could be moved to the LCAFactory potentially
+        Object object = objectFactory.getInstance();
+        //We wire the object here since it is not stored in the registry
+        if(wireObject.get())
+        {
+            //Only wire it once if it is a singleton
+            if(objectFactory.isSingleton())
+            {
+                wireObject.set(false);
+            }
+            //The registry cannot inject the Service for this object since there is no way to tie the two together
+            if(object instanceof ServiceAware)
+            {
+                ((ServiceAware)object).setService(getService());
+            }
+            
+            if(!objectFactory.isExternallyManagedLifecycle())
+            {
+                //Apply processors, object lifecycle is handled by this adapter
+                muleContext.getRegistry().applyProcessors(object);
+            }
+        }
+
         if (lifecycleAdapterFactory != null)
         {
             // Custom lifecycleAdapterFactory set on component
-            lifecycleAdapter = lifecycleAdapterFactory.create(objectFactory.getInstance(), this, entryPointResolverSet, muleContext);
+            lifecycleAdapter = lifecycleAdapterFactory.create(object, this, entryPointResolverSet, muleContext);
         }
         else if (objectFactory.isExternallyManagedLifecycle())
         {
             // If no lifecycleAdapterFactory is configured explicitly and object factory returns externally managed instance then 
             // use NullLifecycleAdapter so that lifecycle is not propagated
-            lifecycleAdapter = new NullLifecycleAdapter(objectFactory.getInstance(), this,
+            lifecycleAdapter = new NullLifecycleAdapter(object, this,
                 entryPointResolverSet, muleContext);
         }
         else
         {
             // Inherit lifecycleAdapterFactory from model
-            lifecycleAdapter = service.getModel().getLifecycleAdapterFactory().create(objectFactory.getInstance(),
+            lifecycleAdapter = service.getModel().getLifecycleAdapterFactory().create(object,
                 this, entryPointResolverSet, muleContext);
         }
         lifecycleAdapter.initialise();
@@ -137,17 +167,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
             throw new InitialisationException(CoreMessages.objectIsNull("object factory"), this);
         }
 
-        //Will apply any processors on the object factory and ensure its lifecycle is phase is called. Often the objectFactory
-        //is created by the calling code not the registry, so this is required
-        //TODO see is we can perform object factory creation via the registry
-        try
-        {
-            muleContext.getRegistry().processObject(objectFactory);
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
+        objectFactory.initialise();
     }
 
     @Override

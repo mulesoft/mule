@@ -20,7 +20,6 @@ import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -29,7 +28,6 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.routing.InterfaceBinding;
-import org.mule.api.service.ServiceAware;
 import org.mule.api.service.ServiceException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
@@ -115,15 +113,6 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         isStoppable = Stoppable.class.isInstance(componentObject);
         isDisposable = Disposable.class.isInstance(componentObject);
 
-        if (componentObject instanceof ServiceAware)
-        {
-            ((ServiceAware) componentObject).setService(component.getService());
-        }
-
-        if (componentObject instanceof MuleContextAware)
-        {
-            ((MuleContextAware) componentObject).setMuleContext(muleContext);
-        }
         configureBinding();
     }
 

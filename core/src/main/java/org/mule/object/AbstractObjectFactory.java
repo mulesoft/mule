@@ -122,7 +122,6 @@ public abstract class AbstractObjectFactory implements ObjectFactory, MuleContex
         {
             BeanUtils.populateWithoutFail(object, properties, true);
         }
-        muleContext.getRegistry().processObject(object);
 
         fireInitialisationCallbacks(object);
         
