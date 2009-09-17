@@ -1894,5 +1894,25 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>nexus</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>mule-ee-releases</id>
+                    <name>Mule Release Repository</name>
+                    <url>http://dev.ee.mulesource.com/repository/content/repositories/releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>mule-ee-snapshots</id>
+                    <name>Mule Snapshot Repository</name>
+                    <url>http://dev.ee.mulesource.com/repository/content/repositories/snapshots/</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
     </profiles>
 </project>
