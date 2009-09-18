@@ -229,8 +229,11 @@ public class TransientRegistry extends AbstractRegistry
         {
             throw new RegistrationException("Attempt to register object with no key");
         }
-        
-        logger.debug("registering object");
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(String.format("registering key/object %s/%s", key, object));
+        }
         if (!MuleRegistry.LIFECYCLE_BYPASS_FLAG.equals(metadata))
         {
             if (context.isInitialised() || context.isInitialising())
@@ -238,7 +241,7 @@ public class TransientRegistry extends AbstractRegistry
                 logger.debug("applying processors");
                 object = applyProcessors(object);
                 //Don't add the object if the processor returns null
-                if(object==null)
+                if (object==null)
                 {
                     return;
                 }
