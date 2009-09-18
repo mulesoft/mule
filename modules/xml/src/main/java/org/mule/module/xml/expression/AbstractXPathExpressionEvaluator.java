@@ -13,6 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Disposable;
@@ -20,6 +21,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.NamespaceManager;
 
@@ -47,9 +49,48 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+
     }
 
-    public void initialise() throws InitialisationException {
+    public void initialise() throws InitialisationException
+    {
+        try
+        {
+            /*
+                Workaround for standalone mode, when registry bootstrap order may be non-deterministic and lead
+                to failures on startup.
+
+                initialise() can't do any lookups as it will have spring create and init beans for things like
+                global endpoints, interfering with current lifecycle and leading to failure.
+                TODO AP/RM this will be solved by the @Inject annotation or phase, as discussed
+             */
+            this.muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>(){
+
+                public void onNotification(MuleContextNotification notification)
+                {
+                    // CONTEXT_INITIALIZED fires too soon, before registry is inited, thus using this one
+                    if (MuleContextNotification.CONTEXT_STARTING == notification.getAction())
+                    {
+                        try
+                        {
+                            namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
+                        }
+                        catch (RegistrationException e)
+                        {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            });
+        }
+        catch (Throwable t)
+        {
+            throw new InitialisationException(t, this);
+        }
+    }
+
+    public void inject() throws Exception
+    {
         try
         {
             namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
