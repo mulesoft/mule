@@ -16,6 +16,8 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.i18n.XmlMessages;
@@ -35,7 +37,7 @@ import org.jaxen.XPath;
  * Provides a base class for XPath property extractors. The XPath engine used is jaxen (http://jaxen.org) which supports
  * XPath queries on other object models such as JavaBeans as well as Xml
  */
-public abstract class AbstractXPathExpressionEvaluator implements ExpressionEvaluator, Disposable, MuleContextAware
+public abstract class AbstractXPathExpressionEvaluator implements ExpressionEvaluator, Initialisable, Disposable, MuleContextAware
 {
     private Map<String, XPath> cache = new WeakHashMap<String, XPath>(8);
 
@@ -45,6 +47,9 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+    }
+
+    public void initialise() throws InitialisationException {
         try
         {
             namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
