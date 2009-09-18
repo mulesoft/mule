@@ -115,8 +115,8 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     protected void process(Properties props) throws Exception
     {
-        registerTransformers(props, context.getRegistry());
         registerUnnamedObjects(props, context.getRegistry());
+        registerTransformers(props, context.getRegistry());
         //this must be called last as it clears the properties map
         registerObjects(props, context.getRegistry());
 
