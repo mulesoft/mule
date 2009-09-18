@@ -70,6 +70,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         namespaces.put("nstwo", "http://two.org");
         nsAwareFilter.setNamespaces(namespaces);
         nsAwareFilter.setMuleContext(muleContext);
+        muleContext.start();
     }
 
     public void testBogusExpression() throws Exception
