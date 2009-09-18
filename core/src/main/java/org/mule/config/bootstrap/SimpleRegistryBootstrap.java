@@ -179,12 +179,14 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         int i = 1;
         String transString = props.getProperty(TRANSFORMER_PREFIX + i);
         String name = null;
-        String returnClassString = null;
+        String returnClassString;
         boolean optional = false;
 
         while (transString != null)
         {
+            // reset
             Class returnClass = null;
+            returnClassString = null;
             int x = transString.indexOf(",");
             if (x > -1)
             {
