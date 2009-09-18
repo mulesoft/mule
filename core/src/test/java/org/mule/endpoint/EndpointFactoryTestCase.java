@@ -156,8 +156,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     public void testCreateEndpointFromNamedConcreteEndpoint() throws MuleException
     {
         Registry r = muleContext.getRegistry();
-        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder("test://address", muleContext));
-        String uri = "&myNamedConcreateEndpoint";
+        r.registerObject("&myNamedConcreteEndpoint", new EndpointURIEndpointBuilder("test://address", muleContext));
+        String uri = "&myNamedConcreteEndpoint";
         EndpointFactory endpointFactory = new DefaultEndpointFactory();
         endpointFactory.setMuleContext(muleContext);
         ImmutableEndpoint ep = endpointFactory.getInboundEndpoint(uri);
