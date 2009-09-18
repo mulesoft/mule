@@ -36,14 +36,14 @@ public class UrlEndpointURIBuilder extends AbstractEndpointURIBuilder
                 address += ":" + uri.getPort();
             }
         }
-        if (StringUtils.isNotBlank(uri.getPath()))
+        if (StringUtils.isNotBlank(uri.getRawPath()))
         {
-            address += uri.getPath();
+            address += uri.getRawPath();
         }
 
-        if (StringUtils.isNotBlank(uri.getQuery()))
+        if (StringUtils.isNotBlank(uri.getRawQuery()))
         {
-            address += "?" + uri.getQuery();
+            address += "?" + uri.getRawQuery();
         }
     }
 }
