@@ -99,7 +99,9 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             try
             {
                 URL url = (URL) e.nextElement();
-                if(logger.isInfoEnabled()) logger.info("Reading bootstrap file: " + url.toString());
+                if (logger.isInfoEnabled()) {
+                    logger.info("Reading bootstrap file: " + url.toString());
+                }
                 Properties p = new Properties();
                 p.load(url.openStream());
                 process(p);
