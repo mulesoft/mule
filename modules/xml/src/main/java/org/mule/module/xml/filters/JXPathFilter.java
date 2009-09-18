@@ -111,7 +111,7 @@ public class JXPathFilter implements Filter, MuleContextAware, Initialisable
             }
             catch (Exception e)
             {
-                logger.warn("JxPath filter rejected message because it could not convert from byte[] to String" + e.getMessage(), e);
+                logger.warn("JxPath filter rejected message because it could not convert from byte[] to String: " + e.getMessage(), e);
                 return false;
             }
         }
