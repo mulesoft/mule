@@ -9,6 +9,8 @@
  */
 package org.mule.config.bootstrap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -29,11 +31,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This object will load objects defined in a file called <code>registry-bootstrap.properties</code> into the local registry.
@@ -94,6 +95,10 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     public void initialise() throws InitialisationException
     {
         Enumeration e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
+        List<Properties> bootstraps = new LinkedList<Properties>();
+
+
+        // load ALL of the bootstrap files first
         while (e.hasMoreElements())
         {
             try
@@ -104,12 +109,59 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 }
                 Properties p = new Properties();
                 p.load(url.openStream());
-                process(p);
+                bootstraps.add(p);
             }
             catch (Exception e1)
             {
                 throw new InitialisationException(e1, this);
             }
+        }
+
+        // ... and only then merge and process them
+
+        int objectCounter = 1;
+        int transformerCounter = 1;
+        Properties accumulatedProps = new Properties();
+
+        for (Properties bootstrap : bootstraps)
+        {
+            for (Map.Entry entry : bootstrap.entrySet())
+            {
+                final String key = (String) entry.getKey();
+                if (key.startsWith(OBJECT_PREFIX))
+                {
+                    String newKey = OBJECT_PREFIX + objectCounter++;
+                    accumulatedProps.put(newKey, entry.getValue());
+                }
+                else if (key.startsWith("transformer"))
+                {
+                    String newKey = TRANSFORMER_PREFIX + transformerCounter++;
+                    accumulatedProps.put(newKey, entry.getValue());
+                }
+                else
+                {
+                    // we allow arbitrary keys in the registry-bootstrap.properties but since we're
+                    // aggregating multiple files here we must make sure that the keys are unique
+                    if (accumulatedProps.getProperty(key) != null)
+                    {
+                        throw new IllegalStateException(
+                                "more than one registry-bootstrap.properties file contains a key " + key);
+                    }
+                    else
+                    {
+                        accumulatedProps.put(key, entry.getValue());
+                    }
+                }
+            }
+        }
+
+        try
+        {
+            process(accumulatedProps);
+        }
+        catch (Exception e1)
+        {
+            throw new InitialisationException(e1, this);
         }
     }
 
