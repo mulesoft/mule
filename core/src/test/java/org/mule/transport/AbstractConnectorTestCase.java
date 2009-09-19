@@ -61,8 +61,6 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         {
             fail("Connector has been disposed prematurely - lifecycle problem? Instance: " + connector);
         }
-
-        connector.dispose();
     }
 
     /** Look up the connector from the Registry */
