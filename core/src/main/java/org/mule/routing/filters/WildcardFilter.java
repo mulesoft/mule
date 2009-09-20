@@ -10,12 +10,11 @@
 
 package org.mule.routing.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.ObjectFilter;
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
@@ -63,9 +62,14 @@ public class WildcardFilter implements Filter, ObjectFilter
 
     public boolean accept(Object object)
     {
-        if (object == null)
+        if (object == null || pattern ==null)
         {
             return false;
+        }
+
+        if(this.pattern.equals(object))
+        {
+            return true;
         }
 
         String[] currentPatterns = this.patterns;

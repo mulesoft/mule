@@ -53,6 +53,16 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
 
     }
 
+    public void testWildcardFilterExactMatch()
+    {
+        WildcardFilter filter = new WildcardFilter();
+        filter.setPattern("fox");
+        assertTrue(filter.accept("fox"));
+
+        filter.setPattern("");
+        assertTrue(filter.accept(""));
+    }
+
     public void testWildcardFilterPrePost()
     {
         WildcardFilter filter = new WildcardFilter();
