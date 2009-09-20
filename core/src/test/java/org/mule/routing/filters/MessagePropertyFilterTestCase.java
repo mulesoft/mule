@@ -16,7 +16,6 @@ import org.mule.tck.AbstractMuleTestCase;
 
 public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
 {
-
     public void testMessagePropertyFilter() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
@@ -57,6 +56,19 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         message.setProperty("foo", "bar");
         assertTrue(!filter.accept(message));
         filter.setCaseSensitive(false);
+        assertTrue(filter.accept(message));
+    }
+
+
+    public void testMessagePropertyFilterWithWildcard() throws Exception
+    {
+        MessagePropertyFilter filter = new MessagePropertyFilter("foo=B*");
+        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        message.setProperty("foo", "bar");
+        assertTrue(!filter.accept(message));
+        filter.setCaseSensitive(false);
+        assertTrue(filter.accept(message));
+        filter.setPattern("foo=*a*");
         assertTrue(filter.accept(message));
     }
 

@@ -10,11 +10,10 @@
 
 package org.mule.routing.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,6 +27,10 @@ import org.apache.commons.logging.LogFactory;
  * more than one property you can use the logic filters for And, Or and Not
  * expressions. By default the comparison is case sensitive; you can set the
  * <i>caseSensitive</i> property to override this.
+ *
+ * Since 3.0.0 its possible to set the property value as a wildcard expression i.e.
+ *
+ * <pre>fooHeader = *foo*</pre>
  */
 public class MessagePropertyFilter implements Filter
 {
@@ -40,6 +43,8 @@ public class MessagePropertyFilter implements Filter
 
     private String propertyName;
     private String propertyValue;
+
+    private WildcardFilter wildcardFilter;
 
     public MessagePropertyFilter()
     {
@@ -87,21 +92,11 @@ public class MessagePropertyFilter implements Filter
             value1 = "null";
         }
 
-        if (value2 == null)
-        {
-            value2 = "null";
-        }
+      
 
         boolean result;
 
-        if (caseSensitive)
-        {
-            result = value1.equals(value2);
-        }
-        else
-        {
-            result = value1.equalsIgnoreCase(value2);
-        }
+        result = wildcardFilter.accept(value1);
 
         return (not ? !result : result);
     }
@@ -132,6 +127,8 @@ public class MessagePropertyFilter implements Filter
             }
             propertyValue = expression.substring(i + 1).trim();
         }
+        wildcardFilter = new WildcardFilter(propertyValue);
+        wildcardFilter.setCaseSensitive(isCaseSensitive());
     }
 
     public boolean isCaseSensitive()
@@ -142,6 +139,7 @@ public class MessagePropertyFilter implements Filter
     public void setCaseSensitive(boolean caseSensitive)
     {
         this.caseSensitive = caseSensitive;
+        if(wildcardFilter!=null) wildcardFilter.setCaseSensitive(caseSensitive);
     }
 
     public boolean equals(Object obj)
