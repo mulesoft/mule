@@ -96,7 +96,9 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("maz", baos.toString());
 
         result = eval.evaluate("fool*", message);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(0, ((Map)result).size());
 
         try
         {
@@ -146,7 +148,9 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals(3, ((List)result).size());
 
         result = eval.evaluate("fool*", message);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(0, ((List)result).size());
 
         try
         {
@@ -204,7 +208,9 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("maz", baos.toString());
 
         result = muleContext.getExpressionManager().evaluate("#[attachments:fool*]", message);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(0, ((Map)result).size());
 
         try
         {
@@ -239,7 +245,9 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("maz", baos.toString());
 
         result = muleContext.getExpressionManager().evaluate("#[attachments-list:fool*]", message);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(0, ((List)result).size());
 
         try
         {

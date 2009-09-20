@@ -18,6 +18,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.TemplateParser;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Iterator;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
@@ -99,8 +100,8 @@ public class DefaultExpressionManager implements ExpressionManager
      * method should be used since it will iterate through all expressions in a string.
      *
      * @param expression a single expression i.e. xpath://foo
-     * @param message
-     * @return the result of the evaluation
+     * @param message the current message to process.  The expression will evaluata on the message.
+     * @return the result of the evaluation. Expressions that return collection will return an empty collection, not null.
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
@@ -116,9 +117,11 @@ public class DefaultExpressionManager implements ExpressionManager
      * method should be used since it will iterate through all expressions in a string.
      *
      * @param expression a single expression i.e. xpath://foo
-     * @param message
-     *@param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
- *                   null. @return the result of the evaluation @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
+     * @param message the current message to process.  The expression will evaluata on the message.
+     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
+     *                   null.
+     * @return the result of the evaluation.  Expressions that return collection will return an empty collection, not null.
+     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
     public Object evaluate(String expression, MuleMessage message, boolean failIfNull) throws ExpressionRuntimeException
@@ -155,9 +158,11 @@ public class DefaultExpressionManager implements ExpressionManager
      *
      * @param expression a single expression i.e. xpath://foo
      * @param evaluator  the evaluator to use when executing the expression
-     * @param message
-     *@param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
- *                   null. @return the result of the evaluation @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
+     * @param message the current message to process.  The expression will evaluata on the message.
+     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
+     *                   null or if an exception should be thrown if an empty collection is returned.
+     * @return the result of the evaluation. Expressions that return collection will return an empty collection, not null.
+     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
     public Object evaluate(String expression, String evaluator, MuleMessage message, boolean failIfNull) throws ExpressionRuntimeException
@@ -168,7 +173,7 @@ public class DefaultExpressionManager implements ExpressionManager
             throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator).getMessage());
         }
         Object result = extractor.evaluate(expression, message);
-        if (result == null && failIfNull)
+        if (failIfNull && (result == null || (result instanceof Collection && ((Collection)result).size()==0)))
         {
             throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(evaluator, expression));
         }
@@ -185,8 +190,8 @@ public class DefaultExpressionManager implements ExpressionManager
      * a user needs to evaluate a single expression they can use {@link org.mule.api.expression.ExpressionManager#evaluate(String,org.mule.api.MuleMessage,boolean)}.
      *
      * @param expression a single expression i.e. xpath://foo
-     * @param message
-     * @return the result of the evaluation
+     * @param message the current message to process.  The expression will evaluata on the message.
+     * @return the result of the evaluation. Expressions that return collection will return an empty collection, not null.
      * @throws org.mule.api.expression.ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
@@ -200,9 +205,10 @@ public class DefaultExpressionManager implements ExpressionManager
      * a user needs to evaluate a single expression they can use {@link org.mule.api.expression.ExpressionManager#evaluate(String,org.mule.api.MuleMessage,boolean)}.
      *
      * @param expression a single expression i.e. xpath://foo
-     * @param message
-     *@param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
- *                   null. @return the result of the evaluation @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
+     * @param message the current message to process.  The expression will evaluata on the message.
+     * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns null.
+     * @return the result of the evaluation. Expressions that return collection will return an empty collection, not null.
+     * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
     public String parse(final String expression, final MuleMessage message, final boolean failIfNull) throws ExpressionRuntimeException

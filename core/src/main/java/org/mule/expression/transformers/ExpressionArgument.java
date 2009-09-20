@@ -16,6 +16,8 @@ import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.expression.ExpressionConfig;
 
+import java.util.Collection;
+
 /**
  * TODO
  */
@@ -105,6 +107,10 @@ public class ExpressionArgument implements MuleContextAware
             if (!getReturnClass().isInstance(result))
             {
                 throw new ExpressionRuntimeException(CoreMessages.transformUnexpectedType(result.getClass(), getReturnClass()));
+            }
+            if(result instanceof Collection && ((Collection)result).size()==0 && !isOptional())
+            {
+                throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(this.getEvaluator(), this.getExpression()));
             }
         }
         return result;

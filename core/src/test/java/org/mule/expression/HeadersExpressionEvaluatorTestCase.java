@@ -86,7 +86,9 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         // Value not required + not found
         result = eval.evaluate("fool*", message);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(0, ((Map)result).size());
 
         // Value required + not found (throws exception)
         try
@@ -133,7 +135,9 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         // Value not required + not found
         result = eval.evaluate("fool*", message);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(0, ((List)result).size());
 
         // Value required + not found (throws exception)
         try
@@ -209,7 +213,9 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[headers:fool*]", message);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(0, ((Map)result).size());
 
         // Value required + not found (throws exception)
         try
@@ -245,7 +251,9 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[headers-list:fool*]", message);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(0, ((List)result).size());
 
         // Value required + not found (throws exception)
         try

@@ -123,7 +123,9 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("maz", baos.toString());
 
         result = eval.evaluate("message.attachments(fool*)", createMessageWithAttachments());
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(0, ((Map)result).size());
 
         try
         {
@@ -159,7 +161,9 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("maz", baos.toString());
 
         result = eval.evaluate("message.attachments-list(fool*)", createMessageWithAttachments());
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(0, ((List)result).size());
 
         try
         {
@@ -249,7 +253,9 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("maz", baos.toString());
 
         result = muleContext.getExpressionManager().evaluate("#[mule:message.attachments-list(fool*)]", createMessageWithAttachments());
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(0, ((List)result).size());
 
         result = muleContext.getExpressionManager().evaluate("#[mule:message.attachments-list(foo, fool*)]", createMessageWithAttachments());
         assertTrue(((List)result).get(0) instanceof DataHandler);
@@ -369,7 +375,9 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertFalse(((Map)result).values().contains("mar"));
 
         result = eval.evaluate("message.headers(fool*)", message);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(0, ((Map)result).size());
 
         result = eval.evaluate("message.headers(foo, fool*)", message);
         assertTrue(result instanceof Map);
@@ -403,7 +411,9 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertFalse(((List)result).contains("mar"));
 
         result = eval.evaluate("message.headers(fool*)", message);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(0, ((Map)result).size());
 
         result = eval.evaluate("message.headers-list(foo, fool*)", message);
         assertTrue(result instanceof List);
@@ -490,7 +500,9 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertFalse(((Map)result).values().contains("mar"));
 
         result = muleContext.getExpressionManager().evaluate("#[mule:message.headers(fool*)]", message);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(0, ((Map)result).size());
 
         result = muleContext.getExpressionManager().evaluate("#[mule:message.headers(foo, fool*)]", message);
         assertTrue(result instanceof Map);
@@ -520,8 +532,10 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((List)result).contains("maz"));
         assertFalse(((List)result).contains("mar"));
 
-        result = muleContext.getExpressionManager().evaluate("#[mule:message.headers(fool*)]", message);
-        assertNull(result);
+        result = muleContext.getExpressionManager().evaluate("#[mule:message.headers-list(fool*)]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(0, ((List)result).size());
 
         result = muleContext.getExpressionManager().evaluate("#[mule:message.headers-list(foo, fool*)]", message);
         assertTrue(result instanceof List);

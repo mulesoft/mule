@@ -16,6 +16,7 @@ import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -77,7 +78,7 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
         }
         if (result.size() == 0)
         {
-            return null;
+            return Collections.emptyList();
         }
         else
         {

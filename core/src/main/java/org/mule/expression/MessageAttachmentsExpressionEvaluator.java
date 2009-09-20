@@ -15,6 +15,7 @@ import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -81,7 +82,7 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
         }
         if (result.size() == 0)
         {
-            return null;
+            return Collections.emptyMap();
         }
         else
         {
