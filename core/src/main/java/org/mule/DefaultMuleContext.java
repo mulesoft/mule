@@ -107,6 +107,9 @@ public class DefaultMuleContext implements MuleContext
         //there is no point having this object configurable
         this.expressionManager = new DefaultExpressionManager();
 
+        registryBroker = createRegistryBroker();
+        muleRegistryHelper = createRegistryHelper(registryBroker);
+
         //TODO URGENT remove - currently used by the MuleClient only
         staticInstance = this;
     }
@@ -176,8 +179,7 @@ public class DefaultMuleContext implements MuleContext
 
         try
         {
-            registryBroker = createRegistryBroker();
-            muleRegistryHelper = createRegistryHelper(registryBroker);
+
             
             // Initialize internal registries
             registryBroker.initialise();
