@@ -97,6 +97,13 @@ public class GenericLifecycleManager implements LifecycleManager
         return li;
     }
 
+
+    public void applyPhase(Object object, String phase) throws MuleException
+    {
+        LifecyclePhase li = lookupPhase(phase);
+        li.applyLifecycle(object);
+    }
+
     public void applyPhases(Object object, String phase) throws MuleException
     {
         int current = index.get(currentPhase);
