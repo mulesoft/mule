@@ -68,7 +68,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
     private boolean started = false;
     private boolean disposed = false;
 
-    private MuleContext muleContext;
+    protected MuleContext muleContext;
 
     public DefaultLifecycleAdapter(Object componentObject, JavaComponent component, MuleContext muleContext) throws MuleException
     {
