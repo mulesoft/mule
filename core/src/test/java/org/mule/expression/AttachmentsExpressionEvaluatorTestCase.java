@@ -58,7 +58,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         ((DataHandler)result).writeTo(baos);
         assertEquals("moo", baos.toString());
         
-        result = eval.evaluate("fool*", message);
+        result = eval.evaluate("fool?", message);
         assertNull(result);
 
         try
@@ -95,7 +95,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         dh.writeTo(baos);
         assertEquals("maz", baos.toString());
 
-        result = eval.evaluate("fool*", message);
+        result = eval.evaluate("fool?", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(0, ((Map)result).size());
@@ -147,7 +147,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(result instanceof List);
         assertEquals(3, ((List)result).size());
 
-        result = eval.evaluate("fool*", message);
+        result = eval.evaluate("fool?", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(0, ((List)result).size());
@@ -172,7 +172,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         ((DataHandler)result).writeTo(baos);
         assertEquals("moo", baos.toString());
 
-        result = muleContext.getExpressionManager().evaluate("#[attachment:fool*]", message);
+        result = muleContext.getExpressionManager().evaluate("#[attachment:fool?]", message);
         assertNull(result);
 
         try
@@ -207,7 +207,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         dh.writeTo(baos);
         assertEquals("maz", baos.toString());
 
-        result = muleContext.getExpressionManager().evaluate("#[attachments:fool*]", message);
+        result = muleContext.getExpressionManager().evaluate("#[attachments:fool?]", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(0, ((Map)result).size());
@@ -244,7 +244,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         dh.writeTo(baos);
         assertEquals("maz", baos.toString());
 
-        result = muleContext.getExpressionManager().evaluate("#[attachments-list:fool*]", message);
+        result = muleContext.getExpressionManager().evaluate("#[attachments-list:fool?]", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(0, ((List)result).size());

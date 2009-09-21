@@ -171,7 +171,7 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
 
     public void testExpressionFilter()
     {
-        ExpressionFilter filter = new ExpressionFilter("mule:message.header(foo*)");
+        ExpressionFilter filter = new ExpressionFilter("mule:message.header(foo?)");
         filter.setMuleContext(muleContext);
 
         filter.setNullReturnsTrue(false);
@@ -184,7 +184,7 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
 
     public void testExpressionFilterWithFullSyntax()
     {
-        ExpressionFilter filter = new ExpressionFilter("#[mule:message.header(foo*)]");
+        ExpressionFilter filter = new ExpressionFilter("#[mule:message.header(foo?)]");
         filter.setMuleContext(muleContext);
 
         filter.setNullReturnsTrue(false);

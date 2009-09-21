@@ -42,12 +42,12 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("moo", result);
 
         // Value not required + found
-        result = eval.evaluate("foo*", message);
+        result = eval.evaluate("foo?", message);
         assertNotNull(result);
         assertEquals("moo", result);
 
         // Value not required + not found
-        result = eval.evaluate("fool*", message);
+        result = eval.evaluate("fool?", message);
         assertNull(result);
 
         // Value required + not found (throws exception)
@@ -80,12 +80,12 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertFalse(((Map)result).values().contains("mar"));
 
         // Value not required + found
-        result = eval.evaluate("foo*, baz", message);
+        result = eval.evaluate("foo?, baz", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
 
         // Value not required + not found
-        result = eval.evaluate("fool*", message);
+        result = eval.evaluate("fool?", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(0, ((Map)result).size());
@@ -129,12 +129,12 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertFalse(((List)result).contains("mar"));
 
         // Value not required + found
-        result = eval.evaluate("foo*, baz", message);
+        result = eval.evaluate("foo?, baz", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
 
         // Value not required + not found
-        result = eval.evaluate("fool*", message);
+        result = eval.evaluate("fool?", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(0, ((List)result).size());
@@ -171,12 +171,12 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("moo", result);
 
         // Value not required + found
-        result = muleContext.getExpressionManager().evaluate("#[header:foo*]", message);
+        result = muleContext.getExpressionManager().evaluate("#[header:foo?]", message);
         assertNotNull(result);
         assertEquals("moo", result);
 
         // Value not required + not found
-        result = muleContext.getExpressionManager().evaluate("#[header:fool*]", message);
+        result = muleContext.getExpressionManager().evaluate("#[header:fool?]", message);
         assertNull(result);
 
         // Value required + not found (throws exception)
@@ -207,12 +207,12 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertFalse(((Map)result).values().contains("mar"));
 
         // Value not required + found
-        result = muleContext.getExpressionManager().evaluate("#[headers:foo*, baz]", message);
+        result = muleContext.getExpressionManager().evaluate("#[headers:foo?, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
 
         // Value not required + not found
-        result = muleContext.getExpressionManager().evaluate("#[headers:fool*]", message);
+        result = muleContext.getExpressionManager().evaluate("#[headers:fool?]", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(0, ((Map)result).size());
@@ -245,12 +245,12 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertFalse(((List)result).contains("mar"));
 
         // Value not required + found
-        result = muleContext.getExpressionManager().evaluate("#[headers-list:foo*, baz]", message);
+        result = muleContext.getExpressionManager().evaluate("#[headers-list:foo?, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
 
         // Value not required + not found
-        result = muleContext.getExpressionManager().evaluate("#[headers-list:fool*]", message);
+        result = muleContext.getExpressionManager().evaluate("#[headers-list:fool?]", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(0, ((List)result).size());

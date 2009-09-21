@@ -17,5 +17,5 @@ public interface ExpressionConstants
     public static final String DELIM = ",";
     public static final String ALL_ARGUMENT = "*";
     public static final String COUNT_ARGUMENT = "{count}";
-    public static final String OPTIONAL_ARGUMENT = "*"; //TODO this should be a '?' really...
+    public static final String OPTIONAL_ARGUMENT = "?"; //TODO this should be a '?' really...
 }

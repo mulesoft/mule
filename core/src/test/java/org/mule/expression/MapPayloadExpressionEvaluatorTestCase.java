@@ -42,7 +42,7 @@ public class MapPayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("moo", result);
 
         // direct match, optional
-        result = eval.evaluate("bar*", message);
+        result = eval.evaluate("bar?", message);
         assertEquals("mar", result);
 
         // direct match with * inline
@@ -50,7 +50,7 @@ public class MapPayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("maz", result);
 
         // no match, optional
-        result = eval.evaluate("fool*", message);
+        result = eval.evaluate("fool?", message);
         assertNull(result);
 
         try

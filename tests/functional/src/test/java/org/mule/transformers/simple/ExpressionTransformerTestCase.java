@@ -46,7 +46,7 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
 
         ExpressionArgument arg2 = transformer.getArguments().get(1);
         assertEquals("headers", arg2.getEvaluator());
-        assertEquals("foo,bar*", arg2.getExpression());
+        assertEquals("foo,bar?", arg2.getExpression());
         assertTrue(arg2.isOptional());
 
     }
