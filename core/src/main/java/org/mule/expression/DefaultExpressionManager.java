@@ -172,11 +172,11 @@ public class DefaultExpressionManager implements ExpressionManager
             throw new IllegalArgumentException(CoreMessages.expressionEvaluatorNotRegistered(evaluator).getMessage());
         }
         Object result = extractor.evaluate(expression, message);
-        //TODO part of MULE-4389
-//        if (failIfNull && (result == null || (result instanceof Collection && ((Collection)result).size()==0)))
-//        {
-//            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(evaluator, expression));
-//        }
+        //TODO Handle empty collections || (result instanceof Collection && ((Collection)result).size()==0)
+        if (failIfNull && (result == null))
+        {
+            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(evaluator, expression));
+        }
         if (logger.isDebugEnabled())
         {
              logger.debug(MessageFormat.format("Result of expression: {0}:{1} is: {2}", evaluator, expression, result));
