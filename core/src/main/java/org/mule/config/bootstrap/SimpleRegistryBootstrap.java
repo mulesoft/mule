@@ -142,12 +142,12 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 {
                     // we allow arbitrary keys in the registry-bootstrap.properties but since we're
                     // aggregating multiple files here we must make sure that the keys are unique
-                    if (accumulatedProps.getProperty(key) != null)
-                    {
-                        throw new IllegalStateException(
-                                "more than one registry-bootstrap.properties file contains a key " + key);
-                    }
-                    else
+//                    if (accumulatedProps.getProperty(key) != null)
+//                    {
+//                        throw new IllegalStateException(
+//                                "more than one registry-bootstrap.properties file contains a key " + key);
+//                    }
+//                    else
                     {
                         accumulatedProps.put(key, entry.getValue());
                     }
