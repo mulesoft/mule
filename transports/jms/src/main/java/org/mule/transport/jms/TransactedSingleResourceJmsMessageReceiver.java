@@ -126,7 +126,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
 
             // Create consumer
             consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName,
-                    topic);
+                    topic, endpoint);
         }
         catch (JMSException e)
         {

@@ -83,10 +83,10 @@ public class Jms11Support implements JmsSupport
         return session.createProducer(destination);
     }
 
-    public MessageConsumer createConsumer(Session session, Destination destination, boolean topic)
+    public MessageConsumer createConsumer(Session session, Destination destination, boolean topic, ImmutableEndpoint endpoint)
         throws JMSException
     {
-        return createConsumer(session, destination, null, false, null, topic);
+        return createConsumer(session, destination, null, false, null, topic, endpoint);
     }
 
     public MessageConsumer createConsumer(Session session,
@@ -94,7 +94,7 @@ public class Jms11Support implements JmsSupport
                                           String messageSelector,
                                           boolean noLocal,
                                           String durableName,
-                                          boolean topic) throws JMSException
+                                          boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         if (durableName == null)
         {
@@ -139,10 +139,10 @@ public class Jms11Support implements JmsSupport
         {
             address = endpoint.getEndpointURI().getAddress();
         }
-        return createDestination(session, address, connector.getTopicResolver().isTopic(endpoint));
+        return createDestination(session, address, connector.getTopicResolver().isTopic(endpoint), endpoint);
     }
 
-    public Destination createDestination(Session session, String name, boolean topic) throws JMSException
+    public Destination createDestination(Session session, String name, boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         if (connector.isJndiDestinations())
         {
@@ -248,17 +248,17 @@ public class Jms11Support implements JmsSupport
         }
     }
 
-    public void send(MessageProducer producer, Message message, boolean topic) throws JMSException
+    public void send(MessageProducer producer, Message message, boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         send(producer, message, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY,
-            Message.DEFAULT_TIME_TO_LIVE, topic);
+            Message.DEFAULT_TIME_TO_LIVE, topic, endpoint);
     }
 
-    public void send(MessageProducer producer, Message message, Destination dest, boolean topic)
+    public void send(MessageProducer producer, Message message, Destination dest, boolean topic, ImmutableEndpoint endpoint)
         throws JMSException
     {
         send(producer, message, dest, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY,
-            Message.DEFAULT_TIME_TO_LIVE, topic);
+            Message.DEFAULT_TIME_TO_LIVE, topic, endpoint);
     }
 
     public void send(MessageProducer producer,
@@ -266,7 +266,7 @@ public class Jms11Support implements JmsSupport
                      boolean persistent,
                      int priority,
                      long ttl,
-                     boolean topic) throws JMSException
+                     boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         producer.send(message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
             priority, ttl);
@@ -278,7 +278,7 @@ public class Jms11Support implements JmsSupport
                      boolean persistent,
                      int priority,
                      long ttl,
-                     boolean topic) throws JMSException
+                     boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         producer.send(dest, message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
             priority, ttl);

@@ -13,6 +13,7 @@ package org.mule.transport.jms;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
@@ -75,7 +76,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             //This is a work around for JmsTransformers where the current endpoint needs
             //to be set on the transformer so that a JMSMessage can be created correctly (the transformer needs a Session)
             Class srcType = returnMessage.getPayload().getClass();
-                for (Iterator iterator = getTransformers().iterator(); iterator.hasNext();)
+            for (Iterator iterator = getTransformers().iterator(); iterator.hasNext();)
             {
                 Transformer t = (Transformer) iterator.next();
                 if (t.isSourceTypeSupported(srcType))
@@ -124,11 +125,12 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 replyToMessage.setJMSCorrelationID(correlationIDString);
             }
 
-            ((AbstractService) event.getService()).getStatistics().incSentReplyToEvent();
+            event.getService().getStatistics().incSentReplyToEvent();
 
+            final ImmutableEndpoint endpoint = event.getEndpoint();
             if (ttlString == null && priorityString == null && persistentDeliveryString == null)
             {
-                connector.getJmsSupport().send(replyToProducer, replyToMessage, topic);
+                connector.getJmsSupport().send(replyToProducer, replyToMessage, topic, endpoint);
             }
             else
             {
@@ -144,11 +146,11 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                     priority = Integer.parseInt(priorityString);
                 }
                 boolean persistent = StringUtils.isNotBlank(persistentDeliveryString)
-                                ? Boolean.valueOf(persistentDeliveryString).booleanValue()
+                                ? Boolean.valueOf(persistentDeliveryString)
                                 : connector.isPersistentDelivery();
 
                 connector.getJmsSupport().send(replyToProducer, replyToMessage, persistent, priority, ttl,
-                    topic);
+                    topic, endpoint);
             }
 
             logger.info("Reply Message sent to: " + replyToDestination +" with correlationID:" + correlationIDString);

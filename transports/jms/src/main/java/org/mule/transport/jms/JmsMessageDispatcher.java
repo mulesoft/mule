@@ -222,7 +222,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                        "\n  JMSPriority=" + priority +
                        "\n  JMSReplyTo=" + msg.getJMSReplyTo());
             }
-            connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic);
+            connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic, endpoint);
 
             if (useReplyToDestination && replyTo != null)
             {
@@ -235,7 +235,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     ReplyToListener listener = new ReplyToListener(l);
                     consumer.setMessageListener(listener);
 
-                    connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic);
+                    connector.getJmsSupport().send(producer, msg, persistent, priority, ttl, topic, endpoint);
 
                     int timeout = event.getTimeout();
 
@@ -422,7 +422,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             }
         }
         return connector.getJmsSupport().createConsumer(session, replyTo, selector,
-                                                        connector.isNoLocal(), null, topic);
+                                                        connector.isNoLocal(), null, topic, endpoint);
     }
 
     protected Destination getReplyToDestination(Message message, Session session, MuleEvent event, boolean remoteSync, boolean topic) throws JMSException, EndpointException, InitialisationException
@@ -477,7 +477,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                         replyToTopic = JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(qtype);
                         reply = reply.substring(i + 1);
                     }
-                    replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
+                    replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic, endpoint);
                 }
             }
             // Are we going to wait for a return event ?

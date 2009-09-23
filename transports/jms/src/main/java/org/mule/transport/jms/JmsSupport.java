@@ -48,27 +48,27 @@ public interface JmsSupport
                                    String messageSelector,
                                    boolean noLocal,
                                    String durableName,
-                                   boolean topic) throws JMSException;
+                                   boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 
-    MessageConsumer createConsumer(Session session, Destination destination, boolean topic)
+    MessageConsumer createConsumer(Session session, Destination destination, boolean topic, ImmutableEndpoint endpoint)
         throws JMSException;
 
-    Destination createDestination(Session session, String name, boolean topic) throws JMSException;
+    Destination createDestination(Session session, String name, boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 
     Destination createDestination(Session session, ImmutableEndpoint endpoint) throws JMSException;
 
     Destination createTemporaryDestination(Session session, boolean topic) throws JMSException;
 
-    void send(MessageProducer producer, Message message, boolean topic) throws JMSException;
+    void send(MessageProducer producer, Message message, boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 
     void send(MessageProducer producer,
               Message message,
               boolean persistent,
               int priority,
               long ttl,
-              boolean topic) throws JMSException;
+              boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 
-    void send(MessageProducer producer, Message message, Destination dest, boolean topic) throws JMSException;
+    void send(MessageProducer producer, Message message, Destination dest, boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 
     void send(MessageProducer producer,
               Message message,
@@ -76,5 +76,5 @@ public interface JmsSupport
               boolean persistent,
               int priority,
               long ttl,
-              boolean topic) throws JMSException;
+              boolean topic, ImmutableEndpoint endpoint) throws JMSException;
 }

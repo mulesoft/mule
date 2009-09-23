@@ -297,7 +297,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
                 // Create consumer
                 consumer = jmsSupport.createConsumer(session, dest, selector, jmsConnector.isNoLocal(), durableName,
-                                                     topic);
+                                                     topic, endpoint);
             }
             catch (JMSException e)
             {

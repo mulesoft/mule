@@ -262,7 +262,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
 
             // Create consumer
             consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName,
-                    topic);
+                    topic, endpoint);
         }
         catch (JMSException e)
         {

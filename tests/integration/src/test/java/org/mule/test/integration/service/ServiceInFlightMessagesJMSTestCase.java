@@ -161,7 +161,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         JmsConnector jmsConnector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector");
         JmsSupport jmsSupport = jmsConnector.getJmsSupport();
         MessageConsumer consumer = jmsSupport.createConsumer(jmsConnector.getSession(endpoint),
-            jmsSupport.createDestination(jmsConnector.getSession(endpoint), endpoint), false);
+            jmsSupport.createDestination(jmsConnector.getSession(endpoint), endpoint), false, endpoint);
         return consumer;
     }
 

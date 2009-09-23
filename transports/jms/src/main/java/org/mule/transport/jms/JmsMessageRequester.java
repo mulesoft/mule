@@ -145,7 +145,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
 
             // Create consumer
             consumer = support.createConsumer(session, dest, selector, connector.isNoLocal(), durableName,
-                topic);
+                topic, endpoint);
 
             try
             {

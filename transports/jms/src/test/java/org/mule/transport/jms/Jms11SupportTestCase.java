@@ -11,8 +11,6 @@
 package org.mule.transport.jms;
 
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.jms.Jms11Support;
-import org.mule.transport.jms.JmsConnector;
 
 import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
@@ -43,7 +41,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
         Mock mockSession = new Mock(Session.class);
         mockSession.expect("createDurableSubscriber", matcher);
 
-        jmsSupport.createConsumer((Session)mockSession.proxy(), topic, null, noLocal, durableName, true);
+        jmsSupport.createConsumer((Session)mockSession.proxy(), topic, null, noLocal, durableName, true, getTestInboundEndpoint("test"));
 
         mockTopic.verify();
         mockSession.verify();
@@ -64,7 +62,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
         Mock mockSession = new Mock(Session.class);
         mockSession.expect("createConsumer", matcher);
 
-        jmsSupport.createConsumer((Session)mockSession.proxy(), topic, null, noLocal, null, true);
+        jmsSupport.createConsumer((Session)mockSession.proxy(), topic, null, noLocal, null, true, getTestInboundEndpoint("test"));
 
         mockTopic.verify();
         mockSession.verify();
@@ -84,7 +82,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
         Mock mockSession = new Mock(Session.class);
         mockSession.expect("createConsumer", matcher);
 
-        jmsSupport.createConsumer((Session)mockSession.proxy(), queue, null, noLocal, null, false);
+        jmsSupport.createConsumer((Session)mockSession.proxy(), queue, null, noLocal, null, false, getTestInboundEndpoint("test"));
 
         mockQueue.verify();
         mockSession.verify();
@@ -104,7 +102,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
 
         try
         {
-            jmsSupport.createConsumer((Session)mockSession.proxy(), queue, null, noLocal, durableName, false);
+            jmsSupport.createConsumer((Session)mockSession.proxy(), queue, null, noLocal, durableName, false, getTestInboundEndpoint("test"));
         }
         catch (JMSException jmsex)
         {
