@@ -133,7 +133,7 @@ sxc-runtime-0.7.3-osgi
 sxc-xpath-0.7.3-osgi
 wrapper-3.2.3
 wsdl4j-1.6.1-osgi
-wss4j-1.5.4-osgi
+wss4j-1.5.8-osgi
 wstx-asl-3.2.6-osgi
 xapool-1.4-osgi
 xml-resolver-1.2-osgi
