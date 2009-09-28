@@ -140,7 +140,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
     }
 
-    protected synchronized void scheduleConfigMonitor(FileWatcher watcher)
+    protected void scheduleConfigMonitor(FileWatcher watcher)
     {
         final int reloadIntervalMs = RELOAD_INTERVAL_MS;
         // time cancellation handled in the watcher's onChange() callback
