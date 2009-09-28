@@ -11,11 +11,14 @@
 package org.mule.config.spring.hotdeploy;
 
 import org.mule.api.MuleContext;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.ConfigResource;
 import org.mule.config.StartupContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.NotificationException;
 import org.mule.module.boot.MuleBootstrapUtils;
 
 import java.io.File;
@@ -103,73 +106,28 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
                 logger.info("Monitoring for hot-reload: " + monitoredResource);
             }
 
-            FileWatcher watcher = new FileWatcher(monitoredResource)
-            {
-                private volatile boolean cancelled;
-
-                protected synchronized void onChange(File file)
-                {
-                    if (!this.cancelled)
-                    {
-                        this.cancel();
-                        this.cancelled = true;
-                    }
-                    else
-                    {
-                        // duplicate timer event
-                        return;
-                    }
-
-                    if (logger.isInfoEnabled())
-                    {
-                        logger.info("================== Reloading " + file);
-                    }
-
-
-                    try
-                    {
-                        muleContext.dispose();
-                        Thread.currentThread().setContextClassLoader(null);
-                        // TODO this is really a job of a deployer and deployment descriptor info
-                        // TODO I don't think shared domains can be safely redeployment, this will probably be removed 
-                        ClassLoader parent = MuleBootstrapUtils.isStandalone()
-                                             ? new DefaultMuleSharedDomainClassLoader(CLASSLOADER_ROOT)
-                                             : CLASSLOADER_ROOT;
-                        ClassLoader cl = new MuleApplicationClassLoader(monitoredResource, parent);
-                        Thread.currentThread().setContextClassLoader(cl);
-
-                        //muleContext.initialise();
-                        //muleContext.start();
-                        DefaultMuleContextFactory f = new DefaultMuleContextFactory();
-                        MuleContext newContext = f.createMuleContext(ReloadableBuilder.this);
-                        doConfigure(newContext);
-                        newContext.start();
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new RuntimeException(ex);
-                    }
-                    //finally
-                    //{
-                    //    Thread.currentThread().setContextClassLoader(rootClassloader);
-                    //}
-
-                }
-            };
+            final FileWatcher watcher = new ConfigFileWatcher(muleContext);
 
             if (redeploymentEnabled)
             {
-                Timer timer = new Timer();
-                final int reloadIntervalMs = RELOAD_INTERVAL_MS;
-                timer.schedule(watcher, new Date(), reloadIntervalMs);
+                // register a config monitor only after context has started, as it may take some time
+                muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>() {
 
-                if (logger.isInfoEnabled())
-                {
-                    logger.info("Reload interval: " + reloadIntervalMs);
-                }
+                    public void onNotification(MuleContextNotification notification)
+                    {
+                        if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+                        {
+                            scheduleConfigMonitor(watcher);
+                        }
+                    }
+                });
             }
 
             super.configure(muleContext);
+        }
+        catch (NotificationException e)
+        {
+            throw new ConfigurationException(e);
         }
         catch (IOException e)
         {
@@ -180,6 +138,18 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
         //    Thread.currentThread().setContextClassLoader(rootClassloader);
         //}
 
+    }
+
+    protected synchronized void scheduleConfigMonitor(FileWatcher watcher)
+    {
+        final int reloadIntervalMs = RELOAD_INTERVAL_MS;
+        // time cancellation handled in the watcher's onChange() callback
+        new Timer().schedule(watcher, new Date(System.currentTimeMillis() + reloadIntervalMs), reloadIntervalMs);
+
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Reload interval: " + reloadIntervalMs);
+        }
     }
 
     protected void doConfigure(final MuleContext muleContext) throws Exception
@@ -200,4 +170,62 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
     }
 
+    protected class ConfigFileWatcher extends FileWatcher
+    {
+
+        private volatile boolean cancelled;
+        private final MuleContext muleContext;
+
+        public ConfigFileWatcher(MuleContext muleContext)
+        {
+            super(ReloadableBuilder.this.monitoredResource);
+            this.muleContext = muleContext;
+        }
+
+        protected synchronized void onChange(File file)
+        {
+            if (!this.cancelled)
+            {
+                this.cancel();
+                this.cancelled = true;
+            }
+            else
+            {
+                // duplicate timer event
+                return;
+            }
+
+            if (logger.isInfoEnabled())
+            {
+                logger.info("================== Reloading " + file);
+            }
+
+
+            try
+            {
+                muleContext.dispose();
+                Thread.currentThread().setContextClassLoader(null);
+                // TODO this is really a job of a deployer and deployment descriptor info
+                // TODO I don't think shared domains can be safely redeployed, this will probably be removed
+                ClassLoader parent = MuleBootstrapUtils.isStandalone()
+                                     ? new DefaultMuleSharedDomainClassLoader(CLASSLOADER_ROOT)
+                                     : CLASSLOADER_ROOT;
+                ClassLoader cl = new MuleApplicationClassLoader(monitoredResource, parent);
+                Thread.currentThread().setContextClassLoader(cl);
+
+                DefaultMuleContextFactory f = new DefaultMuleContextFactory();
+                MuleContext newContext = f.createMuleContext(ReloadableBuilder.this);
+                newContext.start();
+            }
+            catch (Exception ex)
+            {
+                throw new RuntimeException(ex);
+            }
+            //finally
+            //{
+            //    Thread.currentThread().setContextClassLoader(rootClassloader);
+            //}
+
+        }
+    }
 }
