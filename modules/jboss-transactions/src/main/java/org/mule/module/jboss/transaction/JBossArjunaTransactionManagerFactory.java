@@ -44,8 +44,6 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
     {
         //arjPropertyManager.propertyManager.setProperty("com.arjuna.ats.arjuna.objectstore.objectStoreType", "ShadowNoFileLockStore");
         //arjPropertyManager.propertyManager.setProperty(Environment.OBJECTSTORE_TYPE, ArjunaNames.Implementation_ObjectStore_JDBCStore().stringForm());
-
-
     }
 
     public synchronized TransactionManager create(MuleConfiguration config) throws Exception
@@ -75,9 +73,9 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
             }
 
 
-            for (Map.Entry entry : properties.entrySet())
+            for (Map.Entry<String, String> entry : properties.entrySet())
             {
-                arjPropertyManager.propertyManager.setProperty((String) entry.getKey(), (String) entry.getValue());
+                arjPropertyManager.propertyManager.setProperty(entry.getKey(), entry.getValue());
             }
             tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
@@ -85,12 +83,12 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
         return tm;
     }
 
-    public Map getProperties()
+    public Map<String, String> getProperties()
     {
         return properties;
     }
 
-    public void setProperties(Map properties)
+    public void setProperties(Map<String, String> properties)
     {
         this.properties = properties;
     }

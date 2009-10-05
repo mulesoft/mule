@@ -26,11 +26,13 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "jetty-https-functional-test.xml";
     }
 
+    @Override
     public void testSend() throws Exception
     {
         final TestSedaService testSedaService = (TestSedaService) muleContext.getRegistry().lookupService("testComponent");
@@ -42,8 +44,8 @@ public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
         {
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
-                MuleMessage msg = context.getMessage();
                 assertTrue(callbackMade.compareAndSet(false, true));
+//                MuleMessage msg = context.getMessage();
 //                assertNotNull(msg.getProperty(HttpsConnector.LOCAL_CERTIFICATES));
             }
         };
@@ -51,13 +53,11 @@ public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
         testComponent.setEventCallback(callback);
 
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         assertNotNull(result);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         assertTrue("Callback never fired", callbackMade.get());
-
     }
-
 }

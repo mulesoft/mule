@@ -69,7 +69,7 @@ public class MuleSecureProtocolSocketFactory implements SecureProtocolSocketFact
     /**
      * This is a direct version of code in {@link ReflectionSocketFactory}.
      */
-    private Socket createSocketWithTimeout(String host, int port, InetAddress localAddress,
+    protected Socket createSocketWithTimeout(String host, int port, InetAddress localAddress,
         int localPort, int timeout) throws IOException
     {
         Socket socket = socketFactory.createSocket();
