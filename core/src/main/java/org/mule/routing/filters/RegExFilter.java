@@ -26,10 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>RegExFilter</code> is used to match a String argument against a regular
- * pattern.
+ * <code>RegExFilter</code> is used to match a String argument against a regular expression.
  */
-
 public class RegExFilter implements Filter, ObjectFilter
 {
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -102,25 +100,8 @@ public class RegExFilter implements Filter, ObjectFilter
     {
         this.pattern = (pattern != null ? Pattern.compile(pattern) : null);
     }
-
-    /**
-     * @deprecated Use {@link #getPattern()} This method name was changed to be
-     *             consistent with other filters
-     */
-    public String getExpression()
-    {
-        return getPattern();
-    }
-
-    /**
-     * @deprecated Use {@link #setPattern(String)} This method name was changed to be
-     *             consistent with other filters
-     */
-    public void setExpression(String expression)
-    {
-        setPattern(expression);
-    }
     
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
@@ -130,6 +111,7 @@ public class RegExFilter implements Filter, ObjectFilter
         return equal(pattern, other.pattern);
     }
 
+    @Override
     public int hashCode()
     {
         return hash(new Object[]{this.getClass(), pattern});
