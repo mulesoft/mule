@@ -10,13 +10,14 @@
        http://www.mulesource.org/schema/mule/http http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd
        http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd">
 
+    <byte-array-to-string-transformer name="ByteArrayToString"/>
 
-        <http:endpoint name="serverEndpoint" host="localhost" port="60203" synchronous="true" transformer-refs="ByteArrayToString"/>
-        <vm:endpoint name="restServiceEndpoint" path="restservice" />
-        <vm:endpoint name="restServiceEndpoint2" path="restservice2" />
-        <vm:endpoint name="restServiceEndpoint3" path="restservice3" />
+    <http:endpoint name="serverEndpoint" host="localhost" port="60203" synchronous="true" 
+        transformer-refs="ByteArrayToString"/>
 
-        <byte-array-to-string-transformer name="ByteArrayToString"/>
+    <vm:endpoint name="restServiceEndpoint" path="restservice" />
+    <vm:endpoint name="restServiceEndpoint2" path="restservice2" />
+    <vm:endpoint name="restServiceEndpoint3" path="restservice3" />
 
     <model name="Sample">
         <service name="HTTPPostSample">
@@ -57,11 +58,9 @@
 
         <service name="EchoService">
             <inbound>
-                <inbound-endpoint ref="serverEndpoint"/>    
+                <inbound-endpoint ref="serverEndpoint"/>
             </inbound>
             <echo-component/>
         </service>
-        
     </model>
-    
 </mule>

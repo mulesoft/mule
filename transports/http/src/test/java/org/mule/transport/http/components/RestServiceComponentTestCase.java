@@ -24,7 +24,6 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
     public static final String SERVICE_URL = MessageFormat.format("{0}header:serviceUrl{1}",
                                                                   ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
                                                                   ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
-    //public static final String SERVICE_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote";
 
     protected String getConfigResources()
     {
@@ -33,7 +32,6 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
 
     public void testResetServiceNamespaceHandler() throws Exception
     {
-
         Component component = muleContext.getRegistry().lookupService(SERVICE_NAME).getComponent();
         assertTrue(component instanceof RestServiceWrapper);
         RestServiceWrapper restServiceWrapper = (RestServiceWrapper) component;

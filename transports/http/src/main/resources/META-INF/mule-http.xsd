@@ -180,6 +180,7 @@
                     </xsd:annotation>
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="DELETE"/>
                             <xsd:enumeration value="GET"/>
                             <xsd:enumeration value="POST"/>
                         </xsd:restriction>
