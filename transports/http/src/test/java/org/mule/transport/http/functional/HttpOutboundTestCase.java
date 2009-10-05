@@ -11,7 +11,6 @@
 package org.mule.transport.http.functional;
 
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConstants;
 
 import java.io.BufferedReader;
@@ -20,19 +19,15 @@ import java.util.StringTokenizer;
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public class HttpOutboundTestCase extends FunctionalTestCase
+public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 {
     private static final int LISTEN_PORT = 60215;
-    private CountDownLatch httpServerLatch = new CountDownLatch(1);
     private CountDownLatch testLatch = new CountDownLatch(1);
     private String httpMethod = null;
     
-    @Override
-    protected void doSetUp() throws Exception
+    protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
     {
-        super.doSetUp();
-        
-        new Thread(new SimpleHttpServer(LISTEN_PORT, httpServerLatch, testLatch)).start();
+        return new SimpleHttpServer(LISTEN_PORT, serverStartLatch, testLatch);
     }
 
     protected String getConfigResources()
@@ -77,9 +72,6 @@ public class HttpOutboundTestCase extends FunctionalTestCase
 
     private void sendHttpRequest(String endpoint, String expectedHttpMethod) throws Exception
     {
-        // wait for the simple server thread started in doSetUp to come up
-        assertTrue(httpServerLatch.await(LOCK_TIMEOUT, TimeUnit.MILLISECONDS));
-        
         MuleClient client = new MuleClient();
         client.dispatch(endpoint, TEST_MESSAGE, null);
         
@@ -103,5 +95,3 @@ public class HttpOutboundTestCase extends FunctionalTestCase
         }
     }
 }
-
-
