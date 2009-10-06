@@ -99,7 +99,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 12);
     }
 
-    public static Message messageIsOfType(Class type)
+    public static Message messageIsOfType(Class<?> type)
     {
         return factory.createMessage(BUNDLE_PATH, 18, ClassUtils.getSimpleName(type));
     }
@@ -219,20 +219,20 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 52);
     }
 
-    public static Message transformUnexpectedType(Class class1, Class returnClass)
+    public static Message transformUnexpectedType(Class<?> class1, Class<?> returnClass)
     {
-        return factory.createMessage(BUNDLE_PATH, 53, ClassUtils.getSimpleName(class1), ClassUtils.getSimpleName(returnClass));
+        return factory.createMessage(BUNDLE_PATH, 53, ClassUtils.getSimpleName(class1), 
+            ClassUtils.getSimpleName(returnClass));
     }
 
     public static Message transformOnObjectUnsupportedTypeOfEndpoint(String name,
-                                                                     Class class1,
-                                                                     ImmutableEndpoint endpoint)
+        Class<?> class1, ImmutableEndpoint endpoint)
     {
         return factory.createMessage(BUNDLE_PATH, 54, name, StringMessageUtils.toString(class1),
                 (endpoint != null ? endpoint.getEndpointURI() : null));
     }
 
-    public static Message transformFailedFrom(Class clazz)
+    public static Message transformFailedFrom(Class<?> clazz)
     {
         return factory.createMessage(BUNDLE_PATH, 55, clazz);
     }
@@ -262,7 +262,8 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 60, StringMessageUtils.toString(object), StringMessageUtils.toString(types));
     }
 
-    public static Message cannotSetPropertyOnObjectWithParamType(String property, Class class1, Class class2)
+    public static Message cannotSetPropertyOnObjectWithParamType(String property, Class<?> class1, 
+        Class<?> class2)
     {
         return factory.createMessage(BUNDLE_PATH, 61, property, StringMessageUtils.toString(class1),
                 StringMessageUtils.toString(class2));
@@ -478,7 +479,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 108);
     }
 
-    public static Message methodWithParamsNotFoundOnObject(String method, Object class1, Class class2)
+    public static Message methodWithParamsNotFoundOnObject(String method, Object class1, Class<?> class2)
     {
         return factory.createMessage(BUNDLE_PATH, 109, method, StringMessageUtils.toString(class1),
                 StringMessageUtils.toString(class2));
@@ -494,7 +495,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 112);
     }
 
-    public static Message schemeNotCompatibleWithConnector(String scheme, Class expectedClass)
+    public static Message schemeNotCompatibleWithConnector(String scheme, Class<?> expectedClass)
     {
         return factory.createMessage(BUNDLE_PATH, 115, scheme, expectedClass);
     }
@@ -619,13 +620,13 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 156, scheme);
     }
 
-    public static Message propertyIsNotSupportedType(String property, Class expected, Class actual)
+    public static Message propertyIsNotSupportedType(String property, Class<?> expected, Class<?> actual)
     {
         return factory.createMessage(BUNDLE_PATH, 157, property, StringMessageUtils.toString(expected),
                 StringMessageUtils.toString(actual));
     }
 
-    public static Message propertyIsNotSupportedType(String property, Class[] expected, Class actual)
+    public static Message propertyIsNotSupportedType(String property, Class<?>[] expected, Class<?> actual)
     {
         return factory.createMessage(BUNDLE_PATH, 157, property, StringMessageUtils.toString(expected),
                 StringMessageUtils.toString(actual));
@@ -651,7 +652,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 163);
     }
 
-    public static Message reconnectStrategyFailed(Class strategy, String description)
+    public static Message reconnectStrategyFailed(Class<?> strategy, String description)
     {
         return factory.createMessage(BUNDLE_PATH, 164, StringMessageUtils.toString(strategy), description);
     }
@@ -716,13 +717,13 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 183, string);
     }
 
-    public static Message objectNotOfCorrectType(Class actualClass, Class[] expectedClass)
+    public static Message objectNotOfCorrectType(Class<?> actualClass, Class<?>[] expectedClass)
     {
         return factory.createMessage(BUNDLE_PATH, 185, StringMessageUtils.toString(actualClass),
                 StringMessageUtils.toString(expectedClass));
     }
 
-    public static Message objectNotOfCorrectType(Class actualClass, Class expectedClass)
+    public static Message objectNotOfCorrectType(Class<?> actualClass, Class<?> expectedClass)
     {
         return factory.createMessage(BUNDLE_PATH, 185, StringMessageUtils.toString(actualClass),
                 StringMessageUtils.toString(expectedClass));
@@ -829,7 +830,7 @@ public class CoreMessages extends MessageFactory
                 StringMessageUtils.toString(returnType));
     }
 
-    public static Message failedToSetProxyOnService(Object proxy, Class routerClass)
+    public static Message failedToSetProxyOnService(Object proxy, Class<?> routerClass)
     {
         return factory.createMessage(BUNDLE_PATH, 217, proxy, routerClass);
     }
@@ -844,7 +845,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 219, name);
     }
 
-    public static Message noMatchingMethodsOnObjectReturning(Object object, Class returnType)
+    public static Message noMatchingMethodsOnObjectReturning(Object object, Class<?> returnType)
     {
         return factory.createMessage(BUNDLE_PATH, 220, StringMessageUtils.toString(object),
                 StringMessageUtils.toString(returnType));
@@ -935,7 +936,7 @@ public class CoreMessages extends MessageFactory
                 notset));
     }
 
-    public static Message noTransformerFoundForMessage(Class input, Class output)
+    public static Message noTransformerFoundForMessage(Class<?> input, Class<?> output)
     {
         return factory.createMessage(BUNDLE_PATH, 237, input.getName(), output.getName());
     }
@@ -959,11 +960,10 @@ public class CoreMessages extends MessageFactory
     }
 
     public static Message noMatchingMethodsOnObjectReturningUsingResolver(Object object,
-                                                                          Class returnType,
-                                                                          EntryPointResolver resolver)
+        Class<?> returnType, EntryPointResolver resolver)
     {
-        return factory.createMessage(BUNDLE_PATH, 241, StringMessageUtils.toString(object), returnType.getClass().getName(),
-                resolver);
+        return factory.createMessage(BUNDLE_PATH, 241, StringMessageUtils.toString(object), 
+            returnType.getClass().getName(), resolver);
     }
 
     public static Message tooManyAcceptableMethodsOnObjectUsingResolverForTypes(Object object,
@@ -982,7 +982,7 @@ public class CoreMessages extends MessageFactory
                 StringMessageUtils.toString(object), resolver);
     }
 
-    public static Message objectDoesNotImplementInterface(Object object, Class interfaceClass)
+    public static Message objectDoesNotImplementInterface(Object object, Class<?> interfaceClass)
     {
         return factory.createMessage(BUNDLE_PATH, 244, StringMessageUtils.toString(object), interfaceClass);
     }
@@ -1045,10 +1045,8 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 255, transformer);
     }
 
-    public static Message transformHasMultipleMatches(Class input,
-                                                      Class output,
-                                                      Transformer transformer1,
-                                                      Transformer transformer2)
+    public static Message transformHasMultipleMatches(Class<?> input, Class<?> output,
+        Transformer transformer1, Transformer transformer2)
     {
         return factory.createMessage(BUNDLE_PATH, 256, new Object[]{input, output,
                 transformer1.getName() + "(" + transformer1.getClass() + ")",
@@ -1100,22 +1098,10 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 266, groupId);
     }
 
-    public static Message transformerInvalidReturnType(Class clazz, String transformerName)
+    public static Message transformerInvalidReturnType(Class<?> clazz, String transformerName)
     {
         return factory.createMessage(BUNDLE_PATH, 267, clazz, transformerName);
     }
-
-    /**
-     * 
-     * @deprecated Use more specific {@link #commitTxButNoResource} or
-     * {@link #rollbackTxButNoResource}
-     */
-    @Deprecated
-    public static Message noBindingResource()
-    {
-        return factory.createMessage(BUNDLE_PATH, 268);
-    }
-
 
     public static Message transactionFactoryIsMandatory(String action)
     {
