@@ -12,9 +12,6 @@ package org.mule.test.integration.components;
 
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.MuleContext;
-import org.mule.config.builders.AbstractConfigurationBuilder;
 
 /**
  * @author David Dossot (david@dossot.net)
@@ -29,18 +26,6 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
         return "org/mule/test/integration/components/component-lifecycle-config.xml";
     }
 
-    @Override
-    protected ConfigurationBuilder getBuilder() throws Exception
-    {
-
-        return new AbstractConfigurationBuilder(){
-            protected void doConfigure(MuleContext muleContext) throws Exception
-            {
-                //from(vm("service.in").queueEvents()).to("SpringBeanLifecycleTrackerComponent");
-            }
-        };
-    }
-
     /**
      * ASSERT:
      * - Mule stop/start lifecycle methods invoked
@@ -48,13 +33,11 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
      * - Spring lifecycle methods invoked
      * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * NOTE: muleContext is injected twice, once by registry and once by lifecycleAdaptor
-     * @throws Exception
      */
     public void testSpringBeanServiceLifecycle() throws Exception
     {
-        testComponentLifecycle(
-            "SpringBeanService",
-            "[setProperty, setMuleContext, springInitialize, setService, setMuleContext, start, stop, springDestroy]");
+        testComponentLifecycle("SpringBeanService",
+            "[setProperty, setMuleContext, springInitialize, setService, start, stop, springDestroy]");
     }
 
     /**
@@ -64,20 +47,17 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
      * - Spring lifecycle methods NOT invoked
      * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * NOTE: muleContext is injected twice, once by registry and once by lifecycleAdaptor
-     * @throws Exception
      */
     public void testSpringBeanService2Lifecycle() throws Exception
     {
-        testComponentLifecycle(
-            "SpringBeanService2",
-            "[setProperty, setMuleContext, setService, setMuleContext, start, stop]");
+        testComponentLifecycle("SpringBeanService2",
+            "[setProperty, setMuleContext, setService, start, stop]");
     }
 
     /**
      * ASSERT:
      * - Mule lifecycle methods invoked
      * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
-     * @throws Exception
      */
     public void testSingletonServiceLifecycle() throws Exception
     {
@@ -89,7 +69,6 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
      * ASSERT:
      * - Mule lifecycle methods invoked
      * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
-     * @throws Exception
      */
     public void testMulePrototypeServiceLifecycle() throws Exception
     {
@@ -101,29 +80,28 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
      * ASSERT:
      * - Mule lifecycle methods invoked
      * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
-     * @throws Exception
      */
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
-        testComponentLifecycle("MulePooledPrototypeService", "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]");
+        testComponentLifecycle("MulePooledPrototypeService", 
+            "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]");
     }
 
     /**
      * ASSERT:
      * - Mule lifecycle methods invoked each time singleton is used to create new object in pool
-     * - Service and muleContext injected each time singleton is used to create new object in pool (Component implements ServiceAware/MuleContextAware)
-     * @throws Exception
+     * NOTE: injecting service/muleContext only once since this is a pooled singleton
      */
     public void testMulePooledSingletonServiceLifecycle() throws Exception
     {
-        testComponentLifecycle("MulePooledSingletonService", "[setProperty, setService, setMuleContext, initialise, setService, setMuleContext, initialise, setService, setMuleContext, initialise, start, start, start, stop, stop, stop, dispose, dispose, dispose]");
+        testComponentLifecycle("MulePooledSingletonService", 
+            "[setProperty, setService, setMuleContext, initialise, initialise, initialise, start, start, start, stop, stop, stop, dispose, dispose, dispose]");
     }
 
     private void testComponentLifecycle(final String serviceName, final String expectedLifeCycle)
         throws Exception
     {
-
-        final AbstractLifecycleTracker tracker = exerciseComponent(serviceName);
+        AbstractLifecycleTracker tracker = exerciseComponent(serviceName);
 
         muleContext.dispose();
 
