@@ -12,11 +12,13 @@
 # ensure that the object gets a unique name you can use -
 #
 # <code>
-# object.1=org.foo.MyObject
-# object.2=org.bar.MyObject
+# [module name].object.1=org.foo.MyObject
+# [module name].object.2=org.bar.MyObject
 # </code>
 #
-# or
+# Where module name is the short name of the module. It is very important that this prefix is set for object and 
+# transformer entries.
+# You can also name objects with the object key -
 #
 # <code>
 # myFoo=org.foo.MyObject
@@ -28,9 +30,9 @@
 # the transformer as parameters i.e.
 #
 # <code>
-# transformer.1=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
-# transformer.2=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String, name=JMSMessageToString
-# transformer.3=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
+# [module name].transformer.1=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
+# [module name].transformer.2=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String, name=JMSMessageToString
+# [module name].transformer.3=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
 # </code>
 #
 # Note that the key used for transformers must be 'transformer.x' where 'x' is a sequential number.  The transformer name will be

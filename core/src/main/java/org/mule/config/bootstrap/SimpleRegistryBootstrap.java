@@ -9,8 +9,6 @@
  */
 package org.mule.config.bootstrap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -35,6 +33,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This object will load objects defined in a file called <code>registry-bootstrap.properties</code> into the local registry.
@@ -78,8 +79,8 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     public static final String REGISTRY_PROPERTIES = "registry-bootstrap.properties";
 
-    public String TRANSFORMER_PREFIX = "transformer.";
-    public String OBJECT_PREFIX = "object.";
+    public String TRANSFORMER_KEY = ".transformer.";
+    public String OBJECT_KEY = ".object.";
 
     protected final transient Log logger = LogFactory.getLog(getClass());
 
@@ -121,22 +122,24 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
         int objectCounter = 1;
         int transformerCounter = 1;
-        Properties accumulatedProps = new Properties();
+        Properties transformers = new Properties();
+        Properties namedObjects = new Properties();
+        Properties unnamedObjects = new Properties();
 
         for (Properties bootstrap : bootstraps)
         {
             for (Map.Entry entry : bootstrap.entrySet())
             {
                 final String key = (String) entry.getKey();
-                if (key.startsWith(OBJECT_PREFIX))
+                if (key.contains(OBJECT_KEY))
                 {
-                    String newKey = OBJECT_PREFIX + objectCounter++;
-                    accumulatedProps.put(newKey, entry.getValue());
+                    String newKey = key.substring(0, key.lastIndexOf(".")) + objectCounter++;
+                    unnamedObjects.put(newKey, entry.getValue());
                 }
-                else if (key.startsWith("transformer"))
+                else if (key.contains(TRANSFORMER_KEY))
                 {
-                    String newKey = TRANSFORMER_PREFIX + transformerCounter++;
-                    accumulatedProps.put(newKey, entry.getValue());
+                    String newKey = key.substring(0, key.lastIndexOf(".")) + transformerCounter++;
+                    transformers.put(newKey, entry.getValue());
                 }
                 else
                 {
@@ -149,7 +152,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 //                    }
 //                    else
                     {
-                        accumulatedProps.put(key, entry.getValue());
+                        namedObjects.put(key, entry.getValue());
                     }
                 }
             }
@@ -157,7 +160,9 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
         try
         {
-            process(accumulatedProps);
+            registerUnnamedObjects(unnamedObjects, context.getRegistry());
+            registerTransformers(transformers, context.getRegistry());
+            registerObjects(namedObjects, context.getRegistry());
         }
         catch (Exception e1)
         {
@@ -165,25 +170,16 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    protected void process(Properties props) throws Exception
-    {
-        registerUnnamedObjects(props, context.getRegistry());
-        registerTransformers(props, context.getRegistry());
-        //this must be called last as it clears the properties map
-        registerObjects(props, context.getRegistry());
-
-    }
-
     private void registerTransformers(Properties props, MuleRegistry registry) throws Exception
     {
-        int i = 1;
-        String transString = props.getProperty(TRANSFORMER_PREFIX + i);
+        String transString;
         String name = null;
         String returnClassString;
         boolean optional = false;
 
-        while (transString != null)
+        for (Map.Entry<Object, Object> entry : props.entrySet())
         {
+            transString = (String)entry.getValue();
             // reset
             Class returnClass = null;
             returnClassString = null;
@@ -278,10 +274,8 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 }
             }
 
-            props.remove(TRANSFORMER_PREFIX + i++);
             name = null;
             returnClass = null;
-            transString = props.getProperty(TRANSFORMER_PREFIX + i);
         }
     }
 
@@ -360,10 +354,10 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     private void registerUnnamedObjects(Properties props, Registry registry) throws Exception
     {
-        int i = 1;
-        String objectString = props.getProperty(OBJECT_PREFIX + i);
-        while (objectString != null)
+        String objectString;
+        for (Map.Entry<Object, Object> entry : props.entrySet())
         {
+            objectString = (String)entry.getValue();
             boolean optional = false;
             try
             {
@@ -383,7 +377,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 {
                     meta = StreamCloser.class;
                 }
-                registry.registerObject(OBJECT_PREFIX + i + "#" + o.hashCode(), o, meta);
+                registry.registerObject(entry.getKey().toString() + "#" + o.hashCode(), o, meta);
             }
             catch (InvocationTargetException itex)
             {
@@ -428,9 +422,6 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                     throw cnfe;
                 }
             }
-
-            props.remove(OBJECT_PREFIX + i++);
-            objectString = props.getProperty(OBJECT_PREFIX + i);
         }
     }
 }
