@@ -20,11 +20,13 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
 
     private EmbeddedJettyServer httpServer;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/security/servlet-http-filter-test.xml";
     }
     
+    @Override
     protected String getUrl()
     {
         return "http://localhost:" + HTTP_PORT + "/test/index.html";
@@ -36,7 +38,6 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
         super.doSetUp();
         
         httpServer = new EmbeddedJettyServer(HTTP_PORT, "/", "/*", new MuleReceiverServlet(), muleContext);
-
         httpServer.start();
     }
 
