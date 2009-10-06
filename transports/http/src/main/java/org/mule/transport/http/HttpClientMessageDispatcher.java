@@ -252,8 +252,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         HttpMethod httpMethod;
         if (body instanceof String)
         {
-            ObjectToHttpClientMethodRequest trans = new ObjectToHttpClientMethodRequest();
-            httpMethod = (HttpMethod) trans.transform(body.toString());
+            httpMethod = (HttpMethod) sendTransformer.transform(body.toString());
         }
         else if (body instanceof byte[])
         {
