@@ -23,16 +23,20 @@ public class HttpHeadersTestCase extends FunctionalTestCase
         return "http-headers-config.xml";
     }
 
-    public void testJettyHeaders() throws Exception
-    {
-        MuleClient client = new MuleClient();
+    public void testJettyHeaders() throws Exception 
+    { 
+        MuleClient client = new MuleClient(); 
         MuleMessage result = client.send("clientEndpoint", null, null);
-        assertNotNull(result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_TYPE));
-        assertEquals("application/x-download",
-            result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_TYPE));
-        assertNotNull(result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_DISPOSITION));
-        assertEquals("attachment; filename=foo.zip",
-            result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_DISPOSITION));
+        
+        String contentTypeProperty = 
+            result.getAdapter().getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+        assertNotNull(contentTypeProperty); 
+        assertEquals("application/x-download", contentTypeProperty); 
+        
+        String contentDispositionProperty = 
+            result.getAdapter().getStringProperty(HttpConstants.HEADER_CONTENT_DISPOSITION, null);
+        assertNotNull(contentDispositionProperty);
+        assertEquals("attachment; filename=foo.zip", contentDispositionProperty);
     }
 
     public void testClientHeaders() throws Exception
@@ -41,17 +45,19 @@ public class HttpHeadersTestCase extends FunctionalTestCase
         client.dispatch("clientEndpoint2", null, null); 
 
         MuleMessage result = client.request("vm://out", 5000);
-        assertNotNull(result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_TYPE));
-        assertEquals("application/xml",
-            result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_TYPE));
-        assertNotNull(result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_DISPOSITION));
-        assertEquals("attachment; filename=foo.zip",
-            result.getAdapter().getProperty(HttpConstants.HEADER_CONTENT_DISPOSITION));
+        
+        String contentTypeProperty = 
+            result.getAdapter().getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+        assertNotNull(contentTypeProperty);
+        assertEquals("application/xml", contentTypeProperty);
+        
+        String contentDispositionProperty =
+            result.getAdapter().getStringProperty(HttpConstants.HEADER_CONTENT_DISPOSITION, null);
+        assertNotNull(contentDispositionProperty);
+        assertEquals("attachment; filename=foo.zip", contentDispositionProperty);
 
         assertNotNull(result.getAdapter().getProperty("X-Test"));
         assertEquals("foo", result.getAdapter().getProperty("X-Test"));
     }
     
 }
-
-
