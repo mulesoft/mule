@@ -103,7 +103,6 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         addMethodByName(method, context);
 
         return invokeMethod(component, method, payload);
-
     }
 
     /**
@@ -141,12 +140,13 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         }
     }
 
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();
         sb.append("MethodHeaderPropertyEntryPointResolver");
         sb.append("{methodHeader=").append(methodProperty);
-        sb.append("transformFirst=").append(isTransformFirst());
+        sb.append(", transformFirst=").append(isTransformFirst());
         sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());
         sb.append('}');
         return sb.toString();
