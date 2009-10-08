@@ -10,7 +10,6 @@
 
 package org.mule.transport.jdbc;
 
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -38,11 +37,11 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (JdbcConnector) endpoint.getConnector();
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
-    
 
     protected void doDispatch(MuleEvent event) throws Exception
     {
@@ -52,31 +51,31 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         }
         
         doSend(event);
-        
     }
 
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
-        //Use a strategy pattern to choose a particular strategy to handle the SQL request
-   
+        // Use a strategy pattern to choose a particular strategy to handle the SQL request
         ImmutableEndpoint endpoint = event.getEndpoint();
         JdbcConnector connector = (JdbcConnector) endpoint.getConnector();
         String statement = connector.getStatement(endpoint);
-
-        SqlStatementStrategy strategy = connector.getSqlStatementStrategyFactory().create(statement, event.getMessage().getPayload());
+        Object payload = event.transformMessage();
+        
+        SqlStatementStrategy strategy = 
+            connector.getSqlStatementStrategyFactory().create(statement, payload);
         return strategy.executeStatement(connector, endpoint, event, event.getTimeout());
     }
 
-
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
 
-   
 }
