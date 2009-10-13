@@ -30,6 +30,10 @@ public class ProxyTestCase extends FunctionalTestCase
     String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
         + "<soap:Body><test xmlns=\"http://foo\"> foo </test>" + "</soap:Body>" + "</soap:Envelope>";
 
+    String msgWithComment = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><!-- This is a comment -->"
+                            + "<soap:Body><!-- This is a comment --><test xmlns=\"http://foo\"> foo </test>"
+                            + "</soap:Body>" + "</soap:Envelope>";
+    
     public void testServerWithEcho() throws Exception
     {
         MuleClient client = new MuleClient();
@@ -182,6 +186,18 @@ public class ProxyTestCase extends FunctionalTestCase
         assertTrue(component.getLatch().await(10000, TimeUnit.MILLISECONDS));
     }
 
+    /**
+     * MULE-4549 ReversibleXMLStreamReader chokes on comments with ClassCastException
+     * @throws Exception
+     */
+    public void testProxyWithCommentInRequest() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        MuleMessage result = client.send("http://localhost:63081/services/envelope-proxy", msgWithComment, null);
+        String resString = result.getPayloadAsString();
+        assertTrue(resString.indexOf("<test xmlns=\"http://foo\"> foo </test>") != -1);
+    }
+    
     protected String prepareOneWayTestMessage()
     {
         return "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" + "<soap:Body>"

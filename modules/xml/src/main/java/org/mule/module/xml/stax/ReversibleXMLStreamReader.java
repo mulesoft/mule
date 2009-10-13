@@ -557,7 +557,14 @@ public class ReversibleXMLStreamReader extends DelegateXMLStreamReader
     {
         if (replay)
         {
-            return ((CharactersEvent) current).getData();
+            if (current instanceof CommentEvent)
+            {
+                return ((CommentEvent) current).getText();
+            }
+            else
+            {
+                return ((CharactersEvent) current).getData();
+            }
         }
         else
         {
