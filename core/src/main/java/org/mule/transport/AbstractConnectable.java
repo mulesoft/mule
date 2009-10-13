@@ -152,11 +152,18 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
 
     public final synchronized void connect() throws Exception
     {
+        // This method may be called to ensure transport is connected, if it is
+        // already connected then just return.
+        if (connected.get())
+        {
+            return;
+        }
+
         if (disposed.get())
         {
             throw new IllegalStateException("Requester/dispatcher has been disposed; cannot connect to resource");
         }
-
+        
         if (logger.isDebugEnabled())
         {
             logger.debug("Connecting: " + this);
