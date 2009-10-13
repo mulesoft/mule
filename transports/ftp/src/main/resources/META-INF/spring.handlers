@@ -1,1 +1,1 @@
-http\://www.mulesource.org/schema/mule/ftp=org.mule.transport.ftp.config.FtpNamespaceHandler
+http\://www.mulesoft.org/schema/mule/ftp=org.mule.transport.ftp.config.FtpNamespaceHandler

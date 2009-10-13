@@ -1,2 +1,2 @@
-http\://www.mulesource.org/schema/mule/client=org.mule.module.client.config.ClientNamespaceHandler
+http\://www.mulesoft.org/schema/mule/client=org.mule.module.client.config.ClientNamespaceHandler
 

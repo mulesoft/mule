@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--// START SNIPPET: full-config -->
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
-      xmlns:mxml="http://www.mulesource.org/schema/mule/xml"
-      xmlns:vm="http://www.mulesource.org/schema/mule/vm"
-      xmlns:stdio="http://www.mulesource.org/schema/mule/stdio"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="
-      http://www.mulesource.org/schema/mule/stdio http://www.mulesource.org/schema/mule/stdio/3.0/mule-stdio.xsd
-      http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
-      http://www.mulesource.org/schema/mule/xml http://www.mulesource.org/schema/mule/xml/3.0/mule-xml.xsd
-       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd">
+      http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/3.0/mule-stdio.xsd
+      http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+      http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.0/mule-xml.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
 <!--// START SNIPPET: transformer-config -->
     <mxml:xquery-transformer name="xquery">

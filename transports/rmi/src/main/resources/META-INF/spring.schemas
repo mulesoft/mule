@@ -1,2 +1,2 @@
-http\://www.mulesource.org/schema/mule/jnp/3.0/mule-jnp.xsd=META-INF/mule-jnp.xsd
-http\://www.mulesource.org/schema/mule/rmi/3.0/mule-rmi.xsd=META-INF/mule-rmi.xsd
+http\://www.mulesoft.org/schema/mule/jnp/3.0/mule-jnp.xsd=META-INF/mule-jnp.xsd
+http\://www.mulesoft.org/schema/mule/rmi/3.0/mule-rmi.xsd=META-INF/mule-rmi.xsd

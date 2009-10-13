@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:tcp="http://www.mulesource.org/schema/mule/tcp"
-       xmlns:test="http://www.mulesource.org/schema/mule/test"
+       xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
        xsi:schemaLocation="
-               http://www.mulesource.org/schema/mule/test http://www.mulesource.org/schema/mule/test/3.0/mule-test.xsd
-               http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-               http://www.mulesource.org/schema/mule/tcp http://www.mulesource.org/schema/mule/tcp/3.0/mule-tcp.xsd">
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/3.0/mule-tcp.xsd">
 
     <tcp:connector name="tcpConnector">
         <tcp:length-protocol payloadOnly="false"/>

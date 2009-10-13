@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:rmi="http://www.mulesource.org/schema/mule/rmi"
+       xmlns:rmi="http://www.mulesoft.org/schema/mule/rmi"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesource.org/schema/mule/rmi http://www.mulesource.org/schema/mule/rmi/3.0/mule-rmi.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/rmi http://www.mulesoft.org/schema/mule/rmi/3.0/mule-rmi.xsd">
 
     <spring:bean name="securityManager"
           class="org.mule.transport.rmi.DummySecurityManager"/>

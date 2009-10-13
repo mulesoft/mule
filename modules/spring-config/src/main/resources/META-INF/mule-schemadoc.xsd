@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/schemadoc"
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/schemadoc"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://www.mulesource.org/schema/mule/schemadoc"
+            targetNamespace="http://www.mulesoft.org/schema/mule/schemadoc"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 

@@ -112,7 +112,7 @@ class Package {
     if (endpoints.size() > 0) {
       endpointContextSpecific++
     }
-    if (endpoints.findAll{e -> e.name.namespaceURI != "http://www.mulesource.org/schema/mule/core"}) {
+    if (endpoints.findAll{e -> e.name.namespaceURI != "http://www.mulesoft.org/schema/mule/core"}) {
       endpointTransportSpecific++
     }
   }

@@ -1,7 +1,7 @@
-http\://www.mulesource.org/schema/mule/email=org.mule.transport.email.config.EmailNamespaceHandler
-http\://www.mulesource.org/schema/mule/imap=org.mule.transport.email.config.ImapNamespaceHandler
-http\://www.mulesource.org/schema/mule/imaps=org.mule.transport.email.config.ImapsNamespaceHandler
-http\://www.mulesource.org/schema/mule/pop3=org.mule.transport.email.config.Pop3NamespaceHandler
-http\://www.mulesource.org/schema/mule/pop3s=org.mule.transport.email.config.Pop3sNamespaceHandler
-http\://www.mulesource.org/schema/mule/smtp=org.mule.transport.email.config.SmtpNamespaceHandler
-http\://www.mulesource.org/schema/mule/smtps=org.mule.transport.email.config.SmtpsNamespaceHandler
+http\://www.mulesoft.org/schema/mule/email=org.mule.transport.email.config.EmailNamespaceHandler
+http\://www.mulesoft.org/schema/mule/imap=org.mule.transport.email.config.ImapNamespaceHandler
+http\://www.mulesoft.org/schema/mule/imaps=org.mule.transport.email.config.ImapsNamespaceHandler
+http\://www.mulesoft.org/schema/mule/pop3=org.mule.transport.email.config.Pop3NamespaceHandler
+http\://www.mulesoft.org/schema/mule/pop3s=org.mule.transport.email.config.Pop3sNamespaceHandler
+http\://www.mulesoft.org/schema/mule/smtp=org.mule.transport.email.config.SmtpNamespaceHandler
+http\://www.mulesoft.org/schema/mule/smtps=org.mule.transport.email.config.SmtpsNamespaceHandler

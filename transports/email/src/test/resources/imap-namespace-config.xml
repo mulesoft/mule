@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:imap="http://www.mulesource.org/schema/mule/imap"
-       xmlns:imaps="http://www.mulesource.org/schema/mule/imaps"
+       xmlns:imap="http://www.mulesoft.org/schema/mule/imap"
+       xmlns:imaps="http://www.mulesoft.org/schema/mule/imaps"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesource.org/schema/mule/imap http://www.mulesource.org/schema/mule/imap/3.0/mule-imap.xsd
-       http://www.mulesource.org/schema/mule/imaps http://www.mulesource.org/schema/mule/imaps/3.0/mule-imaps.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/3.0/mule-imap.xsd
+       http://www.mulesoft.org/schema/mule/imaps http://www.mulesoft.org/schema/mule/imaps/3.0/mule-imaps.xsd">
 
     <imap:connector name="imapConnector" backupEnabled="true" backupFolder="newBackup" checkFrequency="1234"
                     mailboxFolder="newMailbox" deleteReadMessages="false"/>

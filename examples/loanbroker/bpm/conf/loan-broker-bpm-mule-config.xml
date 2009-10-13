@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:bpm="http://www.mulesource.org/schema/mule/bpm"
-    xmlns:vm="http://www.mulesource.org/schema/mule/vm"
-    xmlns:jms="http://www.mulesource.org/schema/mule/jms"
+    xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesource.org/schema/mule/bpm http://www.mulesource.org/schema/mule/bpm/3.0/mule-bpm.xsd
-       http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd
-       http://www.mulesource.org/schema/mule/jms http://www.mulesource.org/schema/mule/jms/3.0/mule-jms.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/3.0/mule-bpm.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd">
 
     <bpm:connector name="jBpmConnector" bpms-ref="jbpm" />
 

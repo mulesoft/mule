@@ -1,1 +1,1 @@
-http\://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}=org.mule.transport.${ModuleNameLower}.config.${ModuleName}NamespaceHandler
+http\://www.mulesoft.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}=org.mule.transport.${ModuleNameLower}.config.${ModuleName}NamespaceHandler

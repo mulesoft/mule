@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:servlet="http://www.mulesource.org/schema/mule/servlet"
-       xmlns:axis="http://www.mulesource.org/schema/mule/axis"
-       xmlns:test="http://www.mulesource.org/schema/mule/test"
+       xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet"
+       xmlns:axis="http://www.mulesoft.org/schema/mule/axis"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
-       http://www.mulesource.org/schema/mule/test http://www.mulesource.org/schema/mule/test/3.0/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesource.org/schema/mule/servlet http://www.mulesource.org/schema/mule/servlet/3.0/mule-servlet.xsd
-       http://www.mulesource.org/schema/mule/axis http://www.mulesource.org/schema/mule/axis/3.0/mule-axis.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/3.0/mule-servlet.xsd
+       http://www.mulesoft.org/schema/mule/axis http://www.mulesoft.org/schema/mule/axis/3.0/mule-axis.xsd">
 
     <servlet:connector name="servlet" servletUrl="http://localhost:62088/services"/>
 

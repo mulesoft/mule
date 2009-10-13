@@ -28,8 +28,8 @@ public class SpringXMLUtils extends XMLUtils
 
     private static final Log logger = LogFactory.getLog(SpringXMLUtils.class);
 
-    public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesource.org/schema/mule/core";
-    public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesource.org/schema/mule/";
+    public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesoft.org/schema/mule/core";
+    public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesoft.org/schema/mule/";
 
     public static boolean isMuleNamespace(Element element)
     {

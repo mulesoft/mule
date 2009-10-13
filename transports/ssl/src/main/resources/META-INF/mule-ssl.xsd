@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/ssl"
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/ssl"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:mule="http://www.mulesource.org/schema/mule/core"
-            xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc"
-            xmlns:tcp="http://www.mulesource.org/schema/mule/tcp"
-            targetNamespace="http://www.mulesource.org/schema/mule/ssl"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
+            xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+            targetNamespace="http://www.mulesoft.org/schema/mule/ssl"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core"
-                schemaLocation="http://www.mulesource.org/schema/mule/core/3.0/mule.xsd" />
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/tcp"
-                schemaLocation="http://www.mulesource.org/schema/mule/tcp/3.0/mule-tcp.xsd"/>
-    <xsd:import namespace = "http://www.mulesource.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesource.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd" />
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/tcp"
+                schemaLocation="http://www.mulesoft.org/schema/mule/tcp/3.0/mule-tcp.xsd"/>
+    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>

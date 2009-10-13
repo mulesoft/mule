@@ -1,2 +1,2 @@
-http\://www.mulesource.org/schema/mule/xmpp/3.0/mule-xmpp.xsd=META-INF/mule-xmpp.xsd
-http\://www.mulesource.org/schema/mule/xmpps/3.0/mule-xmpps.xsd=META-INF/mule-xmpps.xsd
+http\://www.mulesoft.org/schema/mule/xmpp/3.0/mule-xmpp.xsd=META-INF/mule-xmpp.xsd
+http\://www.mulesoft.org/schema/mule/xmpps/3.0/mule-xmpps.xsd=META-INF/mule-xmpps.xsd

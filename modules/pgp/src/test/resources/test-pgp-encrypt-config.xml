@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:file="http://www.mulesource.org/schema/mule/file"
-       xmlns:pgp="http://www.mulesource.org/schema/mule/pgp"
+       xmlns:file="http://www.mulesoft.org/schema/mule/file"
+       xmlns:pgp="http://www.mulesoft.org/schema/mule/pgp"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesource.org/schema/mule/file http://www.mulesource.org/schema/mule/file/3.0/mule-file.xsd
-       http://www.mulesource.org/schema/mule/pgp http://www.mulesource.org/schema/mule/pgp/3.0/mule-pgp.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.0/mule-file.xsd
+       http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/3.0/mule-pgp.xsd">
 
     <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl" init-method="initialise">
         <spring:property name="publicKeyRingFileName" value="serverPublic.gpg"/>

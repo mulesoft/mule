@@ -1,1 +1,1 @@
-http\://www.mulesource.org/schema/mule/multicast=org.mule.transport.multicast.config.MulticastNamespaceHandler
+http\://www.mulesoft.org/schema/mule/multicast=org.mule.transport.multicast.config.MulticastNamespaceHandler

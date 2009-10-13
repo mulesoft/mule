@@ -15,17 +15,17 @@ import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.xml.XMLConstants;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.xml.sax.SAXException;
 import org.apache.commons.collections.map.HashedMap;
+import org.xml.sax.SAXException;
 
 public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestCase
 {
@@ -36,7 +36,7 @@ public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestC
     // we define these locally so that tests use the latest version rather than grabbing xsi:location
     protected void doSetUp() throws Exception
     {
-        addSchema("http://www.mulesource.org/schema/mule/core", "META-INF/mule.xsd");
+        addSchema("http://www.mulesoft.org/schema/mule/core", "META-INF/mule.xsd");
     }
 
     protected void addSchema(String name, String location)

@@ -1,2 +1,2 @@
-http\://www.mulesource.org/schema/mule/ssl/3.0/mule-ssl.xsd=META-INF/mule-ssl.xsd
-http\://www.mulesource.org/schema/mule/tls/3.0/mule-tls.xsd=META-INF/mule-tls.xsd
+http\://www.mulesoft.org/schema/mule/ssl/3.0/mule-ssl.xsd=META-INF/mule-ssl.xsd
+http\://www.mulesoft.org/schema/mule/tls/3.0/mule-tls.xsd=META-INF/mule-tls.xsd

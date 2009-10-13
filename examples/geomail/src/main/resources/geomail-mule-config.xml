@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesource.org/schema/mule/vm"
-      xmlns:imaps="http://www.mulesource.org/schema/mule/imaps"
-      xmlns:http="http://www.mulesource.org/schema/mule/http"
-      xmlns:mulexml="http://www.mulesource.org/schema/mule/xml"
-      xmlns:ajax="http://www.mulesource.org/schema/mule/ajax"
-      xmlns:json="http://www.mulesource.org/schema/mule/json"
-      xmlns:quartz="http://www.mulesource.org/schema/mule/quartz"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:imaps="http://www.mulesoft.org/schema/mule/imaps"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
+      xmlns:json="http://www.mulesoft.org/schema/mule/json"
+      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
       xsi:schemaLocation="
-       http://www.mulesource.org/schema/mule/quartz http://www.mulesource.org/schema/mule/quartz/3.0/mule-quartz.xsd
-       http://www.mulesource.org/schema/mule/json http://www.mulesource.org/schema/mule/json/3.0/mule-json.xsd
-       http://www.mulesource.org/schema/mule/imaps http://www.mulesource.org/schema/mule/imaps/3.0/mule-imaps.xsd
-       http://www.mulesource.org/schema/mule/ajax http://www.mulesource.org/schema/mule/ajax/3.0/mule-ajax.xsd
+       http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd
+       http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.0/mule-json.xsd
+       http://www.mulesoft.org/schema/mule/imaps http://www.mulesoft.org/schema/mule/imaps/3.0/mule-imaps.xsd
+       http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesource.org/schema/mule/http http://www.mulesource.org/schema/mule/http/3.0/mule-http.xsd
-       http://www.mulesource.org/schema/mule/xml http://www.mulesource.org/schema/mule/xml/3.0/mule-xml.xsd
-       http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.0/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.0/mule-xml.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
     <spring:beans>
         <spring:import resource="classpath:components.xml"/>

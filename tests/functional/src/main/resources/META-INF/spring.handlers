@@ -1,1 +1,1 @@
-http\://www.mulesource.org/schema/mule/test=org.mule.tck.config.TestNamespaceHandler
+http\://www.mulesoft.org/schema/mule/test=org.mule.tck.config.TestNamespaceHandler

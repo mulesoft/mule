@@ -2,7 +2,7 @@
         version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        xmlns:schemadoc="http://www.mulesource.org/schema/mule/schemadoc"
+        xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
         >
 
     <!-- the base path mapping for snippet URLS.  These are configured in the Confluence Snippet macro -->

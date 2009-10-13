@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:ajax="http://www.mulesource.org/schema/mule/ajax"
+      xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
       xsi:schemaLocation="
-       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesource.org/schema/mule/ajax http://www.mulesource.org/schema/mule/ajax/3.0/mule-ajax.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd">
 
     <ajax:connector name="connector1" directDeliver="true" interval="1000" jsonCommented="true" logLevel="1"
                       maxInterval="10000" multiFrameInterval="3000" refsThreshold="4000" timeout="50000"/>

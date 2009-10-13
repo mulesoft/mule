@@ -1,1 +1,1 @@
-http\://www.mulesource.org/schema/mule/cxf=org.mule.transport.cxf.config.CxfNamespaceHandler
+http\://www.mulesoft.org/schema/mule/cxf=org.mule.transport.cxf.config.CxfNamespaceHandler

@@ -1,1 +1,1 @@
-http\://www.mulesource.org/schema/mule/tcp=org.mule.transport.tcp.config.TcpNamespaceHandler
+http\://www.mulesoft.org/schema/mule/tcp=org.mule.transport.tcp.config.TcpNamespaceHandler

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:servlet="http://www.mulesource.org/schema/mule/servlet"
-      xmlns:cxf="http://www.mulesource.org/schema/mule/cxf"
+      xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xsi:schemaLocation="
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-      http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-      http://www.mulesource.org/schema/mule/cxf http://www.mulesource.org/schema/mule/cxf/3.0/mule-cxf.xsd
-      http://www.mulesource.org/schema/mule/servlet http://www.mulesource.org/schema/mule/servlet/3.0/mule-servlet.xsd">
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+      http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
+      http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/3.0/mule-servlet.xsd">
 
     <servlet:connector name="servlet" servletUrl="http://localhost:63088/services"/>
 

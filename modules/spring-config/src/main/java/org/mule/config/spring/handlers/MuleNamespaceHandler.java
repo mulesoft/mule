@@ -34,6 +34,7 @@ import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.config.spring.parsers.specific.AgentDefinitionParser;
 import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
@@ -59,7 +60,6 @@ import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerRefDefinitionParser;
-import org.mule.config.spring.parsers.specific.AgentDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.EndpointRefParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
@@ -144,23 +144,23 @@ import org.mule.transformer.compression.GZipUncompressTransformer;
 import org.mule.transformer.encryption.DecryptionTransformer;
 import org.mule.transformer.encryption.EncryptionTransformer;
 import org.mule.transformer.simple.AutoTransformer;
+import org.mule.transformer.simple.BeanToMap;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.simple.HexStringToByteArray;
+import org.mule.transformer.simple.MapToBean;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
-import org.mule.transformer.simple.MapToBean;
-import org.mule.transformer.simple.BeanToMap;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
- * <code>http://www.mulesource.org/schema/mule/core/${version}</code> Namespace.
+ * <code>http://www.mulesoft.org/schema/mule/core/${version}</code> Namespace.
  */
 public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 {

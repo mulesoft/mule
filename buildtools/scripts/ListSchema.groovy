@@ -15,11 +15,11 @@
 
   Example schema and their locations:
     transports/file/src/main/resources/META-INF/mule-file.xsd
-     -> http://www.mulesource.org/schema/mule/file/3.0/mule-file.xsd
+     -> http://www.mulesoft.org/schema/mule/file/3.0/mule-file.xsd
     modules/acegi/src/main/resources/META-INF/mule-acegi.xsd
-     -> http://www.mulesource.org/schema/mule/acegi/3.0/mule-acegi.xsd
+     -> http://www.mulesoft.org/schema/mule/acegi/3.0/mule-acegi.xsd
     core/src/main/resources/META-INF/mule.xsd
-     -> http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
+     -> http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
 
   $Id$
 */
@@ -45,7 +45,7 @@ def schemaDestinationPaths = [:]
 def root = "../.."
 
 // destination base
-def base = "http://www.mulesource.org/schema/mule/"
+def base = "http://www.mulesoft.org/schema/mule/"
 
 // the structure of xsd locations
 def corexsd = /.*(\/|\\)spring-config(\/|\\).*(\/|\\)mule\.xsd/

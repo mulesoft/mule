@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/client"
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/client"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:mule="http://www.mulesource.org/schema/mule/core"
-            targetNamespace="http://www.mulesource.org/schema/mule/client"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            targetNamespace="http://www.mulesoft.org/schema/mule/client"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core"
-                schemaLocation="http://www.mulesource.org/schema/mule/core/3.0/mule.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd"/>
 
     <xsd:element name="remote-dispatcher-agent" type="remoteDispatcherAgentType" substitutionGroup="mule:abstract-agent"/>
 

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:smtp="http://www.mulesource.org/schema/mule/smtp"
-       xmlns:smtps="http://www.mulesource.org/schema/mule/smtps"
+       xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+       xmlns:smtps="http://www.mulesoft.org/schema/mule/smtps"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesource.org/schema/mule/smtp http://www.mulesource.org/schema/mule/smtp/3.0/mule-smtp.xsd
-       http://www.mulesource.org/schema/mule/smtps http://www.mulesource.org/schema/mule/smtps/3.0/mule-smtps.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/3.0/mule-smtp.xsd
+       http://www.mulesoft.org/schema/mule/smtps http://www.mulesoft.org/schema/mule/smtps/3.0/mule-smtps.xsd">
 
     <smtp:connector name="smtpConnector"
                    bccAddresses="abc@example.com"

@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core/${MuleMajorMinorVersion}"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:test="http://www.mulesource.org/schema/mule/test/${MuleMajorMinorVersion}"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test/${MuleMajorMinorVersion}"
 #foreach($item in $transportArray)
-    xmlns:${item}="http://www.mulesource.org/schema/mule/${item}/${MuleMajorMinorVersion}"
+    xmlns:${item}="http://www.mulesoft.org/schema/mule/${item}/${MuleMajorMinorVersion}"
 #end
 #foreach($item in $moduleArray)
     #if($item == "xml")
-    xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/${MuleMajorMinorVersion}"
+    xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml/${MuleMajorMinorVersion}"
     #else
-    xmlns:${item}="http://www.mulesource.org/schema/mule/${item}/${MuleMajorMinorVersion}"
+    xmlns:${item}="http://www.mulesoft.org/schema/mule/${item}/${MuleMajorMinorVersion}"
     #end
 #end
     xsi:schemaLocation="
-       http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion} http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}/mule.xsd
-       http://www.mulesource.org/schema/mule/test/${MuleMajorMinorVersion} http://www.mulesource.org/schema/mule/test/${MuleMajorMinorVersion}/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core/${MuleMajorMinorVersion} http://www.mulesoft.org/schema/mule/core/${MuleMajorMinorVersion}/mule.xsd
+       http://www.mulesoft.org/schema/mule/test/${MuleMajorMinorVersion} http://www.mulesoft.org/schema/mule/test/${MuleMajorMinorVersion}/mule-test.xsd
 #foreach($item in $transportArray)
-       http://www.mulesource.org/schema/mule/${item}/${MuleMajorMinorVersion} http://www.mulesource.org/schema/mule/${item}/${MuleMajorMinorVersion}/mule-${item}.xsd
+       http://www.mulesoft.org/schema/mule/${item}/${MuleMajorMinorVersion} http://www.mulesoft.org/schema/mule/${item}/${MuleMajorMinorVersion}/mule-${item}.xsd
 #end
 #foreach($item in $moduleArray)
-       http://www.mulesource.org/schema/mule/${item}/${MuleMajorMinorVersion} http://www.mulesource.org/schema/mule/${item}/${MuleMajorMinorVersion}/mule-${item}.xsd
+       http://www.mulesoft.org/schema/mule/${item}/${MuleMajorMinorVersion} http://www.mulesoft.org/schema/mule/${item}/${MuleMajorMinorVersion}/mule-${item}.xsd
 #end
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 

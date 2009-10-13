@@ -1,13 +1,13 @@
-<mule xmlns="http://www.mulesource.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:cxf="http://www.mulesource.org/schema/mule/cxf"
-    xmlns:quartz="http://www.mulesource.org/schema/mule/quartz"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/core http://www.mulesource.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesource.org/schema/mule/quartz http://www.mulesource.org/schema/mule/quartz/3.0/mule-quartz.xsd
-       http://www.mulesource.org/schema/mule/cxf http://www.mulesource.org/schema/mule/cxf/3.0/mule-cxf.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
 
     <quartz:endpoint name="quartz.in" jobName="eventTimer" repeatInterval="1000" repeatCount="0" startDelay="1000">
         <quartz:event-generator-job/>

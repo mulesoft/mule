@@ -35,10 +35,10 @@ if (options.h)
 
 root = options.r
 
-base = "http://www.mulesource.org/schema/mule/"
+base = "http://www.mulesoft.org/schema/mule/"
 if (options.e)
 {
-    base = "http://www.mulesource.org/schema/mule/ee/"
+    base = "http://www.mulesoft.org/schema/mule/ee/"
 }
 
 schemaVersion = "3.0"
