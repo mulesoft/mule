@@ -114,7 +114,7 @@ def checkSchema = {
     for (element in parser.value) {
       if (element.name.localPart == "import") {
         namespace = element.attributes["namespace"]
-        if (namespace.contains("mulesource") && ! namespace.contains("core") && ! element.attributes.keySet().contains("schemaLocation")) {
+        if (namespace.contains("mulesoft") && ! namespace.contains("core") && ! element.attributes.keySet().contains("schemaLocation")) {
           println "# WARNING: missing schema location"
           println "# in " + file
           println "# for " + namespace
@@ -144,7 +144,7 @@ def scanAndCheckConfigs = {
                     while (tokens.hasMoreTokens()) {
                         id = tokens.nextToken()
                         uri = tokens.nextToken()
-                        match = (id =~ /.*mulesource\.org.*mule\/([^\/]+)\/.*/)
+                        match = (id =~ /.*mulesoft\.org.*mule\/([^\/]+)\/.*/)
                         if (match.matches()) {
                             name = match[0][1]
                             // we should really scan for test schema too, 
