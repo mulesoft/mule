@@ -82,7 +82,7 @@ public class HttpServerConnection
         }
         catch (SocketException se)
         {
-            if (SystemUtils.IS_OS_SOLARIS)
+            if (SystemUtils.IS_OS_SOLARIS || SystemUtils.IS_OS_SUN_OS)
             {
                 // this is a known Solaris bug, see
                 // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6378870
