@@ -16,6 +16,12 @@
        </quartz:scheduled-dispatch-job>
     </quartz:endpoint>
 
+    <quartz:endpoint name="expressionSchedulerEndpoint" jobName="myExpressionService" repeatInterval="1000">
+       <quartz:scheduled-dispatch-job>
+           <quartz:job-endpoint address="vm://#[header:ENDPOINT_NAME]"/>
+       </quartz:scheduled-dispatch-job>
+    </quartz:endpoint>
+
     <model name="quartz-dispatcher">
         <service name="quartzSchedulingService">
             <inbound>
@@ -29,9 +35,28 @@
             </outbound>
         </service>
 
+         <service name="quartzExpressionSchedulingService">
+            <inbound>
+                <inbound-endpoint address="vm://quartz.expression.scheduler"/>
+                <forwarding-router/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="expressionSchedulerEndpoint"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
         <service name="scheduledService">
             <inbound>
                 <inbound-endpoint address="vm://quartz.in"/>
+            </inbound>
+            <test:component/>
+        </service>
+
+        <service name="expressionScheduledService">
+            <inbound>
+                <inbound-endpoint address="vm://quartz.expression.in"/>
             </inbound>
             <test:component/>
         </service>

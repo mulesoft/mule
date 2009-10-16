@@ -44,7 +44,7 @@ public class ScheduledDispatchJob implements Job
             payload = NullPayload.getInstance();
         }
 
-        ScheduledDispatchJobConfig config = (ScheduledDispatchJobConfig)jobDataMap.get(QuartzConnector.PROPERTY_JOB_CONFIG);
+        ScheduledDispatchJobConfig config = (ScheduledDispatchJobConfig) jobDataMap.get(QuartzConnector.PROPERTY_JOB_CONFIG);
         if (config == null)
         {
             throw new JobExecutionException(
@@ -54,8 +54,16 @@ public class ScheduledDispatchJob implements Job
         try
         {
             MuleClient client = new MuleClient();
+
+            String endpointRef = config.getEndpointRef();
+            if (jobDataMap.containsKey("endpointRef")) 
+            {
+                endpointRef = (String) jobDataMap.get("endpointRef");
+            }
+
             logger.debug("Dispatching payload on: " + config.getEndpointRef());
-            client.dispatch(config.getEndpointRef(), payload, jobDataMap);
+
+            client.dispatch(endpointRef, payload, jobDataMap);
         }
         catch (MuleException e)
         {
