@@ -68,7 +68,6 @@
             <artifactId>retrotranslator-runtime</artifactId>
         </dependency>
 
-        
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -100,6 +99,5 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-
-         </dependencies>
+    </dependencies>
 </project>

@@ -931,7 +931,6 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>1.5.6-osgi</version>
-            
             <exclusions>
                 <!--  Exclude openejb-loader as it is not needed and there are currently version inconsistancies in openejb-core pom-->
                 <exclusion>
