@@ -60,6 +60,10 @@ org.mule.test.integration.client.MuleClientWSDLExternalTestCase
 # EE-979
 org.mule.security.MultiuserSecurityTestCase
 
+# MULE-4512
+org.mule.test.integration.messaging.meps.SynchronousResponseExceptionTestCase
+
+
 ##########################################################################
 # The following tests will fail if run off-line
 ##########################################################################

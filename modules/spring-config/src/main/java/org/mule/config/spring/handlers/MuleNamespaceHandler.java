@@ -329,6 +329,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("filtering-router", new RouterDefinitionParser(FilteringOutboundRouter.class));        registerBeanDefinitionParser("chaining-router", new RouterDefinitionParser(ChainingRouter.class));
         registerBeanDefinitionParser("endpoint-selector-router", new RouterDefinitionParser(EndpointSelector.class));
         registerBeanDefinitionParser("exception-based-router", new RouterDefinitionParser(ExceptionBasedRouter.class));
+        registerBeanDefinitionParser("recipient-list-exception-based-router", new RouterDefinitionParser(ExceptionBasedRouter.class));
         registerBeanDefinitionParser("list-message-splitter-router", new RouterDefinitionParser(ListMessageSplitter.class));
         registerBeanDefinitionParser("expression-splitter-router", new RouterDefinitionParser(ExpressionMessageSplitter.class));
         registerBeanDefinitionParser("message-chunking-router", new RouterDefinitionParser(MessageChunkingRouter.class));

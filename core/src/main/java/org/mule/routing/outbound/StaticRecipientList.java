@@ -24,6 +24,8 @@ import java.util.List;
  * configured statically on the router itself.
  */
 
+// TODO I think the ExpressionRecipientList router does everything this router does and more.
+// Perhaps we should rename it to simply "RecipientList Router" and remove this one?
 public class StaticRecipientList extends AbstractRecipientList
 {
     public static final String RECIPIENTS_PROPERTY = "recipients";

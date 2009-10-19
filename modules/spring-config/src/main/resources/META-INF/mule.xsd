@@ -3484,7 +3484,16 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                Sends a message over an endpoint by selecting the first endpoint that can connect to the transport.
+                Sends a message over an endpoint by selecting the first endpoint that can connect to the transport.  Endpoints are listed statically in the router configuration.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="recipient-list-exception-based-router" type="expressionRecipientListRouterType"
+                 substitutionGroup="abstract-outbound-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                Sends a message over an endpoint by selecting the first endpoint that can connect to the transport.  Endpoints/recipients are extracted from the message using an expression.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3664,7 +3673,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="expression-recipient-list-router" type="expressionRecipientListRouterType"
+    <xsd:element name="expression-recipient-list-router" type="expressionOrStaticRecipientListRouterType"
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
@@ -3678,13 +3687,6 @@
             <xsd:extension base="abstractOutboundRouterType">
                 <xsd:sequence>
                     <xsd:group ref="defaultFilteredOutboundRouterElements"/>
-                    <xsd:element name="recipients" type="listOrSetType" minOccurs="0" maxOccurs="1">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                A static list of endpoint names or URIs that will be used as recipients of the current message. If the expression on this router returns a list of endpoint names, the endpoints here will be checked as well as any global endpoints.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="defaultFilteredOutboundRouterAttributes"/>
                 <xsd:attributeGroup ref="expressionAttributes"/>
@@ -3693,6 +3695,22 @@
                         <xsd:documentation>This flag controls whether the message will be sent to the recipients synchronously. Unlike other routers th recipient list router doesn't have pre-configured endpoints so the synchronicity of the endpoint cannot be honoured.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="expressionOrStaticRecipientListRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="expressionRecipientListRouterType">
+                <xsd:sequence>
+                    <xsd:element name="recipients" type="listOrSetType" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A static list of endpoint names or URIs that will be used as recipients of the current message. If the expression on this router returns a list of endpoint names, the endpoints here will be checked as well as any global endpoints.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

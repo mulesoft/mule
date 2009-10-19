@@ -10,18 +10,24 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.expression.RequiredValueException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionTemplate;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>ExceptionBasedRouter</code> Will send the current event to the first
@@ -30,18 +36,36 @@ import org.mule.transaction.TransactionTemplate;
  * endpoint and force the sync mode for all endpoints except the last one.
  */
 
-public class ExceptionBasedRouter extends FilteringOutboundRouter
+public class ExceptionBasedRouter extends ExpressionRecipientList
 {
-
+    @Override
     public MuleMessage route(MuleMessage message, MuleSession session)
         throws RoutingException
     {
-        if (endpoints == null || endpoints.size() == 0)
+        List recipients = null;
+        try
+        {
+            recipients = getRecipients(message);
+        }
+        catch (RequiredValueException e)
+        {
+            // ignore because the recipient list is optional for this router
+        }
+
+        if (recipients == null)
+        {
+            int endpointsCount = endpoints.size();
+            recipients = new ArrayList(endpointsCount);
+            for (int i = 0; i < endpointsCount; i++)
+            {
+                recipients.add(getEndpoint(i, message));
+            }
+        }        
+        
+        if (recipients == null || recipients.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
-
-        final int endpointsCount = endpoints.size();
 
         if (enableCorrelation != ENABLE_CORRELATION_NEVER)
         {
@@ -53,20 +77,20 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
             else
             {
                 // the correlationId will be set by the AbstractOutboundRouter
-                message.setCorrelationGroupSize(endpointsCount);
+                message.setCorrelationGroupSize(recipients.size());
             }
         }
 
         MuleMessage result = null;
-        // need that ref for an error message
         OutboundEndpoint endpoint = null;
+        MuleMessage request = null;
         boolean success = false;
 
-        for (int i = 0; i < endpointsCount; i++)
+        for (Iterator iterator = recipients.iterator(); iterator.hasNext();)
         {
-            // apply endpoint URI templates if any
-            endpoint = getEndpoint(i, message);
-            boolean lastEndpoint = (i == endpointsCount - 1);
+            request = new DefaultMuleMessage(message.getPayload(), message, muleContext);
+            endpoint = getRecipientEndpoint(request, iterator.next());
+            boolean lastEndpoint = !iterator.hasNext();
 
             if (!lastEndpoint)
             {
@@ -78,7 +102,11 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
             {
                 try
                 {
-                    result = send(session, message, endpoint);
+                    result = send(session, request, endpoint);
+                    if (result != null)
+                    {
+                        result.applyTransformers(endpoint.getResponseTransformers());
+                    }
                     if (!exceptionPayloadAvailable(result))
                     {
                         if (logger.isDebugEnabled())
@@ -103,7 +131,7 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
             {
                 try
                 {
-                    dispatch(session, message, endpoint);
+                    dispatch(session, request, endpoint);
                     success = true;
                     break;
                 }
@@ -117,23 +145,11 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
 
         if (!success)
         {
-            throw new CouldNotRouteOutboundMessageException(message, endpoint);
+            throw new CouldNotRouteOutboundMessageException(request, endpoint);
         }
 
         return result;
     }
-
-//    public void addEndpoint(Endpoint endpoint)
-//    {
-//        if (!endpoint.isRemoteSync())
-//        {
-//            logger.debug("Endpoint: "
-//                         + endpoint.getEndpointURI()
-//                         + " registered on ExceptionBasedRouter needs to be RemoteSync enabled. Setting this property now.");
-//            endpoint.setRemoteSync(true);
-//        }
-//        super.addEndpoint(endpoint);
-//    }
 
     /**
      * @param message message to check
@@ -158,6 +174,7 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
         }
     }
     
+    @Override
     protected TransactionTemplate createTransactionTemplate(MuleSession session, ImmutableEndpoint endpoint)
     {
         return new TransactionTemplate(endpoint.getTransactionConfig(), null, muleContext);
