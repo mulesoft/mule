@@ -249,16 +249,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         System.out.print("\n===== Parameterized test using: " + config.getName() + " =====");
     }
 
-    @Override
-    protected void suitePreSetUp() throws Exception
-    {
-        super.suitePreSetUp();
-
-        purge(getInboundEndpoint());
-        purge(getOutboundEndpoint());
-        // TODO Add other queues if necessary
-    }
-
     /**
      * Adds the following properties to the registry so that the Xml configuration files can reference them.
      * <p/>
