@@ -24,6 +24,7 @@ import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCollection;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.NullPayload;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.NumberUtils;
@@ -43,6 +44,7 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang.BooleanUtils;
 
 /**
@@ -57,13 +59,20 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     private JmsConnector connector;
     private Session cachedSession;
     private boolean disableTemporaryDestinations = false;
+    private boolean returnOriginalMessageAsReply = false;
 
     public JmsMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (JmsConnector) endpoint.getConnector();
         disableTemporaryDestinations = connector.isDisableTemporaryReplyToDestinations() ||
-                ("true".equals(endpoint.getProperty(JmsConstants.DISABLE_TEMP_DESTINATIONS_PROPERTY)));
+            ("true".equals(endpoint.getProperty(JmsConstants.DISABLE_TEMP_DESTINATIONS_PROPERTY)));
+        returnOriginalMessageAsReply = connector.isReturnOriginalMessageAsReply() ||
+            ("true".equals(endpoint.getProperty(JmsConstants.RETURN_ORIGINAL_MESSAGE_PROPERTY)));
+        if (returnOriginalMessageAsReply && !disableTemporaryDestinations)
+        {
+            logger.warn("The returnOriginalMessageAsReply property will be ignored because disableTemporaryReplyToDestinations=false.  You need to disable temporary ReplyTo destinations in order for this propery to take effect.");
+        }
     }
 
     protected void doDispatch(MuleEvent event) throws Exception
@@ -285,7 +294,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
 
-            return null;
+            return new DefaultMuleMessage(returnOriginalMessageAsReply ? msg : NullPayload.getInstance(), connector.getMuleContext());
         }
         finally
         {

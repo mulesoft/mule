@@ -154,6 +154,13 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /** determines whether a temporary JMSReplyTo destination will be used when using synchronous outbound JMS endpoints */
     private boolean disableTemporaryReplyToDestinations = false;
 
+    /** 
+     * If disableTemporaryReplyToDestinations = "true", this flag causes the original JMS Message to be returned as a 
+     * synchronous response with any properties set on it by the JMS Provider (e.g., JMSMessageID).
+     * @see EE-1688/MULE-3059
+     */
+    private boolean returnOriginalMessageAsReply = false;
+
     /**
      * In-container embedded mode disables some features for strict Java EE compliance.
      */
@@ -1210,6 +1217,16 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     public void setDisableTemporaryReplyToDestinations(boolean disableTemporaryReplyToDestinations)
     {
         this.disableTemporaryReplyToDestinations = disableTemporaryReplyToDestinations;
+    }
+
+    public boolean isReturnOriginalMessageAsReply()
+    {
+        return returnOriginalMessageAsReply;
+    }
+
+    public void setReturnOriginalMessageAsReply(boolean returnOriginalMessageAsReply)
+    {
+        this.returnOriginalMessageAsReply = returnOriginalMessageAsReply;
     }
 
    /**
