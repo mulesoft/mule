@@ -71,9 +71,10 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         
         String filename = queue + File.separator + id + EXTENSION;
         File file = FileUtils.newFile(store, filename);
-        if (!file.getParentFile().exists() && !file.getParentFile().mkdirs())
+        
+        if (!file.getParentFile().exists())
         {
-            throw new IOException("Failed to create directory: " + file.getAbsolutePath());
+            createStoreDirectory(file.getParentFile());
         }
         
         OutputStream out = new FileOutputStream(file);
@@ -93,6 +94,14 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         }
         
         return id;
+    }
+    
+    protected synchronized void createStoreDirectory(File direcetory) throws IOException
+    {
+        if (!direcetory.mkdirs())
+        {
+            throw new IOException("Failed to create directory: " + direcetory.getAbsolutePath());
+        }
     }
 
     public void remove(String queue, Object id) throws IOException
