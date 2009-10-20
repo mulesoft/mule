@@ -98,7 +98,9 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
     
     protected synchronized void createStoreDirectory(File direcetory) throws IOException
     {
-        if (!direcetory.mkdirs())
+        // To support concurrency we need to check if directory exists again inside
+        // synchronized method
+        if (!direcetory.exists() && !direcetory.mkdirs())
         {
             throw new IOException("Failed to create directory: " + direcetory.getAbsolutePath());
         }
@@ -196,9 +198,9 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
     {
         String path = muleContext.getConfiguration().getWorkingDirectory() + File.separator + DEFAULT_QUEUE_STORE;
         store = FileUtils.newFile(path).getCanonicalFile();
-        if(!store.exists() && !store.mkdirs())
+        if (!store.exists())
         {
-            throw new IOException("Failed to create directory: " + store.getAbsolutePath());
+            createStoreDirectory(store);
         }
     }
 
