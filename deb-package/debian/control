@@ -8,7 +8,7 @@ Homepage: http://mule.mulesoft.org
 
 Package: mule
 Architecture: i386
-Depends: ${shlibs:Depends}
+Depends: libc6 (>= 2.1.3)
 Description: Lightweight Enterprise Service Bus (ESB) and Integration Platform
  Mule ESB is a lightweight integration platform and service container that 
  allows you to quickly and easily connect your applications together. Mule ESB 

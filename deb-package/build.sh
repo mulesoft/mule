@@ -13,6 +13,9 @@ mkdir target
 # Extract the tarball and give it a proper name
 tar xfz ${MULE_TARBALL} --directory target
 mv target/mule-* target/mule-${MULE_VERSION}
+# Overwrite a few Mule files from the standard distribution
+cp mule/mule target/mule-${MULE_VERSION}/bin/
+cp mule/wrapper.conf target/mule-${MULE_VERSION}/conf/
 # Add the Debian control files
 cp -r debian target/mule-${MULE_VERSION}/
 
