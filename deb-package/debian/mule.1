@@ -1,0 +1,75 @@
+.TH MULE 1 "October 20, 2009"
+.SH NAME
+mule \- Lightweight Enterprise Service Bus (ESB) and Integration Platform
+.SH SYNOPSIS
+.B mule
+.RI mule [-config <your-config.xml>]
+.br
+.SH DESCRIPTION
++-------------+
+| BASIC USAGE |
++-------------+
+
+mule [-config <your-config.xml>]
+
+    (runs in the foreground, stop with Ctrl-C)
+
+mule start|stop|restart [-config <your-config.xml>]
+
+    (runs in the background as a daemon)
+
++---------------------+
+| CONFIGURATION FILES |
++---------------------+
+
+If the "-config" parameter is not specified, a default file name of 
+"mule-config.xml" will be assumed.
+
+You may optionally specify more than one file as a comma-separated list (this 
+can be useful for splitting up your Mule configuration to make it more 
+manageable).
+
+Your configuration file(s) need to be on the classpath prior to startup.  A 
+convenient way to achieve this is by placing them in the "conf" or "lib/user" 
+directory.
+
+Alternatively, you can specify an explicit path to their location on the file 
+system as follows:
+
+mule -config file:/path/to/my-config.xml
+
++---------------------+
+| CLASSES & LIBRARIES |
++---------------------+
+
+Any user classes or libraries used by your configuration should be placed in
+"lib/user" before starting up the server.
+
+Please note that hot deployment is not yet supported, so you will need to 
+restart the server for configuration changes and/or new classes/libraries to 
+take effect.
+
++-----------------------+
+| CONFIGURATION BUILDER |
++-----------------------+
+By default, the "org.mule.config.spring.SpringXmlConfigurationBuilder" class 
+will be used to interpret your configuration file(s).  If you wish to use a 
+different configuration builder, you can specify it using the "-builder" option.  
+For example, to use the Scripting configuration builder you could specify:
+
+mule -config my-scripted-config.xml \
+     -builder org.mule.config.builders.ScriptConfigurationBuilder
+
++------------------+
+| ADVANCED OPTIONS |
++------------------+
+
+Mule uses the Java Service Wrapper (http://wrapper.tanukisoftware.org) to 
+control the JVM from your native OS.  The wrapper provides many advanced options 
+and features.  For more information, see 
+http://wrapper.tanukisoftware.org/doc/english/launch.html
+and http://wrapper.tanukisoftware.org/doc/english/properties.html
+
+.br
+.PP
+This manual page was written by MuleSoft, Inc. <dev@mule.codehaus.org>

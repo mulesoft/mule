@@ -1,0 +1,21 @@
+Source: mule
+Section: devel
+Priority: optional
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.0
+Maintainer: MuleSoft, Inc. <dev@mule.codehaus.org>
+Homepage: http://mule.mulesoft.org
+
+Package: mule
+Architecture: i386
+Depends: ${shlibs:Depends}
+Description: Lightweight Enterprise Service Bus (ESB) and Integration Platform
+ Mule ESB is a lightweight integration platform and service container that 
+ allows you to quickly and easily connect your applications together. Mule ESB 
+ provides a robust, secure and scalable platform to build enterprise 
+ applications offering an array of transports such as JMS, HTTP, Email, FTP, 
+ JDBC and many more. It also offers rich set of features for web services, 
+ message routing, mediation, transformation and transaction management. 
+ Designed around the ESB (enterprise service bus) concept, Mule ESB is the most 
+ widely used open source integration platform.
+

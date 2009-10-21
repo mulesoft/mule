@@ -1,0 +1,68 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+PACKAGE=mule
+DESTDIR=$(CURDIR)/debian/$(PACKAGE)
+
+clean: 
+	dh_testdir
+	dh_testroot
+
+	rm -f $(DESTDIR)/usr/bin/mule
+	rm -rf $(DESTDIR)/etc/$(PACKAGE)
+	rm -rf $(DESTDIR)/usr/share/$(PACKAGE)
+	rm -f $(DESTDIR)/usr/lib/$(PACKAGE)/libwrapper-linux-x86-32.so
+	rm -f $(DESTDIR)/usr/sbin/$(PACKAGE)/wrapper-linux-x86-32
+
+	dh_clean 
+
+build:
+
+install: 
+	dh_testdir
+	dh_testroot
+	dh_clean -k 
+	dh_installdirs
+
+	cp bin/mule $(DESTDIR)/usr/bin/
+	cp -r conf/* $(DESTDIR)/etc/$(PACKAGE)/
+	cp -r lib/mule $(DESTDIR)/usr/share/$(PACKAGE)/lib/
+	cp -r lib/endorsed $(DESTDIR)/usr/share/$(PACKAGE)/lib/
+	cp -r lib/opt $(DESTDIR)/usr/share/$(PACKAGE)/lib/
+	cp lib/boot/*.jar $(DESTDIR)/usr/share/$(PACKAGE)/lib/boot/
+	cp lib/boot/libwrapper-linux-x86-32.so $(DESTDIR)/usr/lib/$(PACKAGE)/
+	cp lib/boot/exec/wrapper-linux-x86-32 $(DESTDIR)/usr/sbin/$(PACKAGE)/
+
+binary-arch:
+
+binary-indep:
+
+binary: install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs 
+	dh_installdocs
+	dh_installexamples examples/* --exclude=*.bat
+#	dh_install
+#	dh_installmenu
+#	dh_installdebconf	
+#	dh_installlogrotate
+#	dh_installpam
+#	dh_installinit
+#	dh_installcron
+#	dh_installinfo
+	dh_installman debian/mule.1 
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+#	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+.PHONY: clean build install binary
