@@ -26,7 +26,6 @@ import org.mule.transport.NullPayload;
  * <code>ChainingRouter</code> is used to pass a Mule event through multiple
  * endpoints using the result of the first as the input for the second.
  */
-
 public class ChainingRouter extends FilteringOutboundRouter
 {
 
@@ -38,16 +37,10 @@ public class ChainingRouter extends FilteringOutboundRouter
         {
             throw new InitialisationException(CoreMessages.objectIsNull("endpoints"), this);
         }
-
-//        for (int i = 0; i < endpoints.size() - 1; i++)
-//        {   endpoints.get(i);
-//
-//        }
-
     }
 
-    public MuleMessage route(MuleMessage message, MuleSession session)
-        throws RoutingException
+    @Override
+    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         MuleMessage resultToReturn = null;
         if (endpoints == null || endpoints.size() == 0)
