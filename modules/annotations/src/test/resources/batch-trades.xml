@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Batch>
+    <Trade>
+        <Type>CASH</Type>
+        <Amount>40000</Amount>
+        <Currency>EUR</Currency>
+        <Date>28102008</Date>
+    </Trade>
+
+    <Trade>
+        <Type>CASH</Type>
+        <Amount>40001</Amount>
+        <Currency>USD</Currency>
+        <Date>28102008</Date>
+    </Trade>
+
+    <Trade>
+        <Type>CASH</Type>
+        <Amount>2000</Amount>
+        <Currency>GBP</Currency>
+        <Date>28102008</Date>
+    </Trade>
+</Batch>

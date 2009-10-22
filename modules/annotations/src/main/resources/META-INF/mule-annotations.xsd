@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/annotations"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:spring="http://www.springframework.org/schema/beans"
+            targetNamespace="http://www.mulesoft.org/schema/mule/annotations"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd"/>
+
+    <xsd:element name="service" type="annotatedServiceType" substitutionGroup="mule:abstract-service"/>
+    
+    <xsd:complexType name="annotatedServiceType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractServiceType">
+                <xsd:sequence>
+                    <xsd:element name="component" type="mule:singletonObjectFactoryType" minOccurs="1" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>Factory to create the user's POJO service</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+</xsd:schema>
