@@ -254,5 +254,33 @@ public class AnnotationUtils
         }
     }
 
+    
+    public static Set<AnnotationMetaData> getFieldAnnotationsForHeirarchy(Class bottom, Class<? extends Annotation> annotation)
+    {
+        Set<AnnotationMetaData> annos = new HashSet<AnnotationMetaData>();
+        getFieldAnnotationsForSuperClasses(bottom, annos, annotation);
+        getFieldAnnotationsForInterfaces(bottom, annos, annotation);
+        return annos;
+    }
+
+    public static void getFieldAnnotationsForInterfaces(Class clazz, Set<AnnotationMetaData> annos, Class<? extends Annotation> annotation)
+    {
+        for (int i = 0; i < clazz.getInterfaces().length; i++)
+        {
+            Class aClass = clazz.getInterfaces()[i];
+            annos.addAll(getFieldAnnotations(aClass, annotation));
+            getFieldAnnotationsForInterfaces(aClass, annos, annotation);
+        }
+    }
+
+    protected static void getFieldAnnotationsForSuperClasses(Class bottom, Set<AnnotationMetaData> annos, Class<? extends Annotation> annotation)
+    {
+        annos.addAll(getFieldAnnotations(bottom, annotation));
+
+        if (bottom.getSuperclass() != null && !bottom.getSuperclass().equals(Object.class))
+        {
+            getFieldAnnotationsForSuperClasses(bottom.getSuperclass(), annos, annotation);
+        }
+    }
 
 }
