@@ -47,12 +47,12 @@ public class DefaultJmxSupportAgent extends AbstractAgent
      */
     private Map credentials = new HashMap();
 
-
     /**
      * Should be a 1 line description of the agent
      *
      * @return agent description
      */
+    @Override
     public String getDescription()
     {
         return "Default Jmx Support Agent";
