@@ -9,7 +9,7 @@
     <description>Demonstrates using Spring as the external container to provide the objects managed by Mule and how to publish events to multiple outbound endpoints. The example consists of two components; ExecptionManager and BusinessErrorManager.</description>
 
     <properties>
-        <muleVersion>3.0.0-M2-SNAPSHOT</muleVersion>
+        <muleVersion>3.0.0-M2-20091026</muleVersion>
         <activemqVersion>4.1.2</activemqVersion>
         <javaMailVersion>1.4</javaMailVersion>
     </properties>
