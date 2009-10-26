@@ -13,13 +13,12 @@ package org.mule.module.xml.filters;
 import org.mule.DefaultMuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 
-import com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl;
-
 import java.io.InputStream;
 import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.xpath.jaxp.XPathFactoryImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -93,7 +92,6 @@ public class XPathFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept(document));
         filter.setExpectedValue("another");
         assertTrue(filter.accept(document));
-
     }
 
     /**
