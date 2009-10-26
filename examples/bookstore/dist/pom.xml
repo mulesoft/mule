@@ -12,7 +12,7 @@
     <description>Bookstore Example App</description>
 
     <properties>
-        <muleVersion>3.0.0-M2-20091026</muleVersion>
+        <muleVersion>3.0.0-M2-SNAPSHOT</muleVersion>
         <cxfVersion>2.1.2</cxfVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
         <jettyVersion>6.1.11</jettyVersion>
