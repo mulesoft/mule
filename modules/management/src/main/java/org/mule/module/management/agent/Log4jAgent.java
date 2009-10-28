@@ -43,12 +43,10 @@ public class Log4jAgent extends AbstractAgent
     private JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
     private JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
 
-
     public Log4jAgent()
     {
         super("jmx-log4j");
     }
-    
 
     public void initialise() throws InitialisationException
     {
@@ -62,7 +60,7 @@ public class Log4jAgent extends AbstractAgent
         }
         catch (Exception e)
         {
-            throw new InitialisationException(CoreMessages.failedToStart("JMX Agent"), e, this);
+            throw new InitialisationException(CoreMessages.failedToStart("Log4j Agent"), e, this);
         }
     }
 
@@ -95,11 +93,6 @@ public class Log4jAgent extends AbstractAgent
         // nothing to do
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.lifecycle.Disposable#dispose()
-     */
     public void dispose()
     {
         try
@@ -112,21 +105,11 @@ public class Log4jAgent extends AbstractAgent
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.context.Agent#registered()
-     */
     public void registered()
     {
         // nothing to do
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.context.Agent#unregistered()
-     */
     public void unregistered()
     {
         // nothing to do
