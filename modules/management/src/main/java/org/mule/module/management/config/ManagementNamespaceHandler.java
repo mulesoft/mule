@@ -13,6 +13,7 @@ import org.mule.agent.EndpointNotificationLoggerAgent;
 import org.mule.agent.Log4jNotificationLoggerAgent;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.specific.AgentDefinitionParser;
@@ -39,7 +40,11 @@ public class ManagementNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("jmx-log4j", new AgentDefinitionParser(Log4jAgent.class));
         registerBeanDefinitionParser("jmx-mx4j-adaptor", new AgentDefinitionParser(Mx4jAgent.class));
         registerBeanDefinitionParser("jmx-notifications", new AgentDefinitionParser(JmxServerNotificationAgent.class));
-        registerMuleBeanDefinitionParser("jmx-default-config", new AgentDefinitionParser(DefaultJmxSupportAgent.class)).addAlias("registerMx4jAdapter", "loadMx4jAgent");
+
+        MuleDefinitionParserConfiguration defaultJmxParser = registerMuleBeanDefinitionParser("jmx-default-config", new AgentDefinitionParser(DefaultJmxSupportAgent.class));
+        defaultJmxParser.addAlias("registerMx4jAdapter", "loadMx4jAgent");
+        defaultJmxParser.addAlias("registerLog4j", "loadLog4jAgent");
+        
         registerBeanDefinitionParser("level-mapping", new ChildMapEntryDefinitionParser("levelMappings", "severity", "eventId"));
 
         // these two are identical?
@@ -52,8 +57,8 @@ public class ManagementNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("outbound-endpoint", new GenericEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
 
-
-        //This gets processed by the jmx-server parser
+        // This gets processed by the jmx-server parser
         registerIgnoredElement("connector-server");
     }
+    
 }

@@ -13,6 +13,7 @@ package org.mule.management.support;
 import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.tck.AbstractMuleTestCase;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
 
     public void testSuccessfulAuthentication()
     {
-        Map credentials = getValidCredentials();
+        Map<String, Object> credentials = getValidCredentials();
 
         authenticator.setCredentials(credentials);
 
@@ -42,30 +43,30 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
         assertNotNull(subject);
         assertTrue(subject.isReadOnly());
 
-        final Set publicCredentials = subject.getPublicCredentials();
+        Set<Object> publicCredentials = subject.getPublicCredentials();
         assertNotNull(publicCredentials);
         assertEquals(0, publicCredentials.size());
 
-        final Set privateCredentials = subject.getPrivateCredentials();
+        Set<Object> privateCredentials = subject.getPrivateCredentials();
         assertNotNull(privateCredentials);
         assertEquals(0, privateCredentials.size());
 
-        final Set principals = subject.getPrincipals();
+        Set<Principal> principals = subject.getPrincipals();
         assertNotNull(principals);
         assertEquals(1, principals.size());
 
-        final Object ref = principals.iterator().next();
+        Object ref = principals.iterator().next();
         assertTrue(ref instanceof JMXPrincipal);
 
-        final JMXPrincipal jmxPrincipal = (JMXPrincipal) ref;
-        final String name = jmxPrincipal.getName();
+        JMXPrincipal jmxPrincipal = (JMXPrincipal) ref;
+        String name = jmxPrincipal.getName();
         assertNotNull(name);
         assertEquals(VALID_AUTH_TOKEN[0], name);
     }
 
     public void testNullOrEmptyCredentialsConfigured()
     {
-        final Map credentials = Collections.EMPTY_MAP;
+        Map<String, Object> credentials = Collections.emptyMap();
 
         // shouldn't fail
         authenticator.setCredentials(credentials);
@@ -180,9 +181,9 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
         }
     }
 
-    protected Map getValidCredentials ()
+    protected Map<String, Object> getValidCredentials ()
     {
-        final Map credentials = new HashMap(1);
+        Map<String, Object> credentials = new HashMap<String, Object>(1);
         credentials.put(VALID_AUTH_TOKEN[0], VALID_AUTH_TOKEN[1]);
 
         return credentials;

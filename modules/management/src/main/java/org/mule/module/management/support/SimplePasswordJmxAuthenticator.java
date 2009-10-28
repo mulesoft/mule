@@ -14,6 +14,7 @@ import org.mule.module.management.agent.JmxAgent;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,11 +42,8 @@ public class SimplePasswordJmxAuthenticator implements JMXAuthenticator
     /**
      * An in-memory credentials storage.
      */
-    private Map credentials = new HashMap();
+    private Map<String, Object> credentials = new HashMap<String, Object>();
 
-    /**
-     * {@inheritDoc}
-     */
     public Subject authenticate (Object authToken)
     {
         if (authToken == null)
@@ -72,18 +70,12 @@ public class SimplePasswordJmxAuthenticator implements JMXAuthenticator
             throw new SecurityException("Invalid password");
         }
 
-        Set principals = new HashSet();
+        Set<Principal> principals = new HashSet<Principal>();
         principals.add(new JMXPrincipal(username));
         return new Subject(true, principals, Collections.EMPTY_SET, Collections.EMPTY_SET);
     }
 
-
-    /**
-     * Setter for property 'credentials'.
-     *
-     * @param newCredentials Value to set for property 'credentials'.
-     */
-    public void setCredentials (final Map newCredentials)
+    public void setCredentials (Map<String, Object> newCredentials)
     {
         this.credentials.clear();
         if (newCredentials == null || newCredentials.isEmpty())
