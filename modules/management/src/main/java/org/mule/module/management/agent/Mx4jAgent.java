@@ -51,15 +51,13 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management,
  * statistics and configuration viewing of a Mule instance.
- * <p/>
- * TODO MULE-1353
  */
 public class Mx4jAgent extends AbstractAgent
 {
     public static final String HTTP_ADAPTER_OBJECT_NAME = "name=Mx4jHttpAdapter";
 
-    protected static final String DEFAULT_PATH_IN_JAR = StringUtils.replaceChars(ClassUtils.getPackageName(Mx4jAgent.class), '.', '/') +
-                                                        "/http/xsl";
+    protected static final String DEFAULT_PATH_IN_JAR = 
+        StringUtils.replaceChars(ClassUtils.getPackageName(Mx4jAgent.class), '.', '/') + "/http/xsl";
 
     private static final org.apache.commons.logging.Log logger = LogFactory.getLog(Mx4jAgent.class);
 
@@ -105,7 +103,6 @@ public class Mx4jAgent extends AbstractAgent
 
     protected HttpAdaptor createAdaptor() throws Exception
     {
-
         Log.redirectTo(new CommonsLogger());
         URI uri = new URI(StringUtils.stripToEmpty(jmxAdaptorUrl));
         adaptor = new HttpAdaptor(uri.getPort(), uri.getHost());
@@ -258,7 +255,6 @@ public class Mx4jAgent extends AbstractAgent
         }
     }
 
-    /* @see org.mule.api.lifecycle.Disposable#dispose() */
     public void dispose()
     {
         try
@@ -283,13 +279,11 @@ public class Mx4jAgent extends AbstractAgent
         }
     }
 
-    /* @see org.mule.api.context.Agent#registered() */
     public void registered()
     {
         // nothing to do
     }
 
-    /* @see org.mule.api.context.Agent#unregistered() */
     public void unregistered()
     {
         // nothing to do
@@ -298,20 +292,17 @@ public class Mx4jAgent extends AbstractAgent
     // /////////////////////////////////////////////////////////////////////////
     // Getters and setters
     // /////////////////////////////////////////////////////////////////////////
-
-    /* @see org.mule.api.context.Agent#getDescription() */
+    @Override
     public String getDescription()
     {
         return "MX4J Http adaptor: " + jmxAdaptorUrl;
     }
 
-    /** @return Returns the jmxAdaptorUrl. */
     public String getJmxAdaptorUrl()
     {
         return jmxAdaptorUrl;
     }
 
-    /** @param jmxAdaptorUrl The jmxAdaptorUrl to set. */
     public void setJmxAdaptorUrl(String jmxAdaptorUrl)
     {
         this.jmxAdaptorUrl = jmxAdaptorUrl;
@@ -386,7 +377,6 @@ public class Mx4jAgent extends AbstractAgent
     {
         this.cacheXsl = cacheXsl;
     }
-
 
     public String getHost()
     {
