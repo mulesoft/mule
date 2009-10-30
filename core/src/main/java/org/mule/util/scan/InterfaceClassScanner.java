@@ -95,7 +95,10 @@ public class InterfaceClassScanner extends EmptyVisitor implements ClassScanner
         {
             InterfaceClassScanner scanner = new InterfaceClassScanner(interfaceClass, classLoader);
             URL classURL = getClassURL(name);
-            
+            if(classURL==null)
+            {
+                throw new RuntimeException("Failed to read class URL for name: " + name);
+            }
             InputStream classStream = classURL.openStream();
             ClassReader r = new ClosableClassReader(classStream);
             
