@@ -30,9 +30,9 @@ import org.apache.commons.httpclient.methods.GetMethod;
 public class HttpClientMessageRequester extends AbstractMessageRequester
 {
 
-    private final HttpConnector connector;
-    private volatile HttpClient client = null;
-    private final Transformer receiveTransformer;
+    protected final HttpConnector connector;
+    protected volatile HttpClient client = null;
+    protected final Transformer receiveTransformer;
 
     public HttpClientMessageRequester(InboundEndpoint endpoint)
     {
