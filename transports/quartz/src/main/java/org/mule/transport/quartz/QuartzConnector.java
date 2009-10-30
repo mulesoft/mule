@@ -65,6 +65,7 @@ public class QuartzConnector extends AbstractConnector
         }
 
         //Set the thread count, we can't seem to plug in our work manager unfortunately
+        factoryProperties.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
         factoryProperties.setProperty("org.quartz.threadPool.threadCount", String.valueOf(getReceiverThreadingProfile().getMaxThreadsActive()));
 
         try
