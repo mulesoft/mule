@@ -77,14 +77,12 @@ public class FtpConnectionFactory implements PoolableObjectFactory
 
     public void activateObject(Object obj) throws Exception
     {
-        FTPClient client = (FTPClient) obj;
-        client.setReaderThread(true);
+        // nothing to do
     }
 
     public void passivateObject(Object obj) throws Exception
     {
-        FTPClient client = (FTPClient) obj;
-        client.setReaderThread(false);
+        // nothing to do
     }
 }
 

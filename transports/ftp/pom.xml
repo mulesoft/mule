@@ -47,9 +47,9 @@
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
-            <version>${commonsNetVersion}-osgi</version>
+            <version>${commonsNetVersion}</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>oro</groupId>
             <artifactId>oro</artifactId>
             <version>${oroVersion}-osgi</version>
