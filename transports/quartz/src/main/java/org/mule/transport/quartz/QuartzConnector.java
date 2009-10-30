@@ -59,21 +59,23 @@ public class QuartzConnector extends AbstractConnector
 
     protected void doInitialise() throws InitialisationException
     {
+        if(factoryProperties==null)
+        {
+            factoryProperties = new Properties();
+        }
+
+        //Set the thread count, we can't seem to plug in our work manager unfortunately
+        factoryProperties.setProperty("org.quartz.threadPool.threadCount", String.valueOf(getReceiverThreadingProfile().getMaxThreadsActive()));
+
         try
         {
             if (quartzScheduler == null)
             {
-                if (factoryProperties != null)
-                {
-                    SchedulerFactory factory = new StdSchedulerFactory(factoryProperties);
-                    quartzScheduler = factory.getScheduler();
-                }
-                else
-                {
-                    quartzScheduler = StdSchedulerFactory.getDefaultScheduler();
-                }
+                SchedulerFactory factory = new StdSchedulerFactory(factoryProperties);
+                quartzScheduler = factory.getScheduler();
             }
             quartzScheduler.getContext().put(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);            
+        
         }
         catch (Exception e)
         {
