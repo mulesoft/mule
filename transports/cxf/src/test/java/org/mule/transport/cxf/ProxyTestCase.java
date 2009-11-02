@@ -54,6 +54,28 @@ public class ProxyTestCase extends FunctionalTestCase
         System.out.println(resString);
         assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
     }
+    
+    
+    public void testProxyStreamClsoing() throws Exception
+    {
+        String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                     + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
+
+        MuleClient client = new MuleClient();
+        for (int i = 0; i < 20; i++) {
+        	MuleMessage result = client.send("http://localhost:63081/services/envelope-proxy", msg, null);
+
+            String resString = result.getPayloadAsString();
+            assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
+        }
+        
+        for (int i = 0; i < 20; i++) {
+        	MuleMessage result = client.send("http://localhost:63081/services/proxy", msg, null);
+
+            String resString = result.getPayloadAsString();
+            assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
+        }
+    }
 
     public void testServerClientProxyWithWsdl() throws Exception
     {

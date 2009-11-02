@@ -30,6 +30,7 @@ public class ReversibleStaxInInterceptor extends AbstractPhaseInterceptor<Messag
     public ReversibleStaxInInterceptor()
     {
         super(Phase.POST_STREAM);
+        getAfter().add(StreamClosingInterceptor.class.getName());
         getAfter().add(StaxInInterceptor.class.getName());
     }
 
