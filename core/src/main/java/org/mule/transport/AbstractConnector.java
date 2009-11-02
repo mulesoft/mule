@@ -95,6 +95,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -229,7 +230,7 @@ public abstract class AbstractConnector
     /**
      * A generic scheduling service for tasks that need to be performed periodically.
      */
-    private final AtomicReference/*<ScheduledExecutorService>*/ scheduler = new AtomicReference();
+    private ScheduledExecutorService scheduler;
 
     /**
      * Holds the service configuration for this connector
@@ -392,11 +393,8 @@ public abstract class AbstractConnector
         }
 
         // the scheduler is recreated after stop()
-        ScheduledExecutorService currentScheduler = (ScheduledExecutorService) scheduler.get();
-        if (currentScheduler == null || currentScheduler.isShutdown())
-        {
-            scheduler.set(this.getScheduler());
-        }
+        scheduler = createScheduler();
+
         initWorkManagers();
 
         this.doStart();
@@ -522,7 +520,7 @@ public abstract class AbstractConnector
         }
 
         // make sure the scheduler is gone
-        scheduler.set(null);
+        scheduler = null;
 
         // we do not need to stop the work managers because they do no harm (will just be idle)
         // and will be reused on restart without problems.
@@ -536,22 +534,21 @@ public abstract class AbstractConnector
 
     protected void shutdownScheduler()
     {
-        ScheduledExecutorService schedulerExecutor = ((ScheduledExecutorService) scheduler.get());
-        if (schedulerExecutor != null)
+        if (scheduler != null)
         {
             // Disable new tasks from being submitted
-            schedulerExecutor.shutdown();
+            scheduler.shutdown();
             try
             {
                 // Wait a while for existing tasks to terminate
-                if (!schedulerExecutor.awaitTermination(muleContext.getConfiguration().getShutdownTimeout(),
+                if (!scheduler.awaitTermination(muleContext.getConfiguration().getShutdownTimeout(),
                     TimeUnit.MILLISECONDS))
                 {
                     // Cancel currently executing tasks and return list of pending
                     // tasks
-                    List outstanding = schedulerExecutor.shutdownNow();
+                    List outstanding = scheduler.shutdownNow();
                     // Wait a while for tasks to respond to being cancelled
-                    if (!schedulerExecutor.awaitTermination(SCHEDULER_FORCED_SHUTDOWN_TIMEOUT,
+                    if (!scheduler.awaitTermination(SCHEDULER_FORCED_SHUTDOWN_TIMEOUT,
                         TimeUnit.MILLISECONDS))
                     {
                         logger.warn(MessageFormat.format(
@@ -573,13 +570,13 @@ public abstract class AbstractConnector
             catch (InterruptedException ie)
             {
                 // (Re-)Cancel if current thread also interrupted
-                schedulerExecutor.shutdownNow();
+                scheduler.shutdownNow();
                 // Preserve interrupt status
                 Thread.currentThread().interrupt();
             }
             finally
             {
-                schedulerExecutor = null;
+                scheduler = null;
             }
         }
     }
@@ -1888,23 +1885,17 @@ public abstract class AbstractConnector
      */
     public ScheduledExecutorService getScheduler()
     {
-        if (scheduler.get() == null)
-        {
-            ThreadFactory threadFactory = new NamedThreadFactory(this.getName() + ".scheduler");
-            ScheduledThreadPoolExecutor newExecutor = new ScheduledThreadPoolExecutor(4, threadFactory);
-            newExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
-            newExecutor.setKeepAliveTime(this.getReceiverThreadingProfile().getThreadTTL(),
-                TimeUnit.MILLISECONDS);
-            newExecutor.allowCoreThreadTimeOut(true);
+        return scheduler;
+    }
 
-            if (!scheduler.compareAndSet(null, newExecutor))
-            {
-                // someone else was faster, ditch our copy.
-                newExecutor.shutdown();
-            }
-        }
-
-        return (ScheduledExecutorService) scheduler.get();
+    protected ScheduledExecutorService createScheduler()
+    {
+        ThreadFactory threadFactory = new NamedThreadFactory(this.getName() + ".scheduler");
+        ScheduledThreadPoolExecutor newExecutor = new ScheduledThreadPoolExecutor(4, threadFactory);
+        newExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        newExecutor.setKeepAliveTime(this.getReceiverThreadingProfile().getThreadTTL(), TimeUnit.MILLISECONDS);
+        newExecutor.allowCoreThreadTimeOut(true);
+        return newExecutor;
     }
 
     /**

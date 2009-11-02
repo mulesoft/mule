@@ -368,27 +368,21 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     public void testSchedulerLifecycle() throws MuleException, WorkException
     {
-        // Scheduler lifecycle is hard to test because scheduler is created in
-        // getScheduler() method and the field is private. (MULE-4555)
-
-        assertFalse(connector.getScheduler().isShutdown());
-        assertFalse(connector.getScheduler().isTerminated());
+        assertNull(connector.getScheduler());
 
         connector.start();
         assertFalse(connector.getScheduler().isShutdown());
         assertFalse(connector.getScheduler().isTerminated());
 
         connector.stop();
-        assertFalse(connector.getScheduler().isShutdown());
-        assertFalse(connector.getScheduler().isTerminated());
+        assertNull(connector.getScheduler());
 
         connector.start();
         assertFalse(connector.getScheduler().isShutdown());
         assertFalse(connector.getScheduler().isTerminated());
 
         connector.dispose();
-        assertFalse(connector.getScheduler().isShutdown());
-        assertFalse(connector.getScheduler().isTerminated());
+        assertNull(connector.getScheduler());
     }
 
     protected Work createSomeWork()
