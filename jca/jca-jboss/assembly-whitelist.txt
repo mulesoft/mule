@@ -100,7 +100,6 @@ mule-transport-vm
 mule-transport-xmpp
 neethi-2.0.4
 ognl-2.7.3-osgi
-opensaml-1.1b-osgi
 oro-2.0.8-osgi
 quartz-all-1.6.0-osgi
 retrotranslator-runtime-1.2.1
