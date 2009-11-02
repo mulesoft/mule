@@ -285,7 +285,6 @@ public class DefaultMuleEventContext implements MuleEventContext
         };
 
         FutureMessageResult result = new FutureMessageResult(callable, event.getMuleContext());
-        // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
     }
@@ -320,7 +319,6 @@ public class DefaultMuleEventContext implements MuleEventContext
         };
 
         FutureMessageResult result = new FutureMessageResult(callable, event.getMuleContext());
-        // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
     }
@@ -357,7 +355,6 @@ public class DefaultMuleEventContext implements MuleEventContext
         };
 
         FutureMessageResult result = new FutureMessageResult(callable, event.getMuleContext());
-        // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
     }
@@ -396,7 +393,6 @@ public class DefaultMuleEventContext implements MuleEventContext
         };
 
         FutureMessageResult result = new FutureMessageResult(callable, event.getMuleContext());
-        // TODO MULE-732: use injected ExecutorService
         result.execute();
         return result;
     }
@@ -650,6 +646,7 @@ public class DefaultMuleEventContext implements MuleEventContext
         return event.getSession();
     }
 
+    @Override
     public String toString()
     {
         return event.toString();
