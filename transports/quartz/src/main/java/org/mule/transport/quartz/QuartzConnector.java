@@ -39,6 +39,7 @@ public class QuartzConnector extends AbstractConnector
     public static final String PROPERTY_PAYLOAD = "payload";
 
     public static final String PROPERTY_JOB_CONFIG = "jobConfig";
+    public static final String PROPERTY_JOB_DATA = "jobData";
 
     public static final String PROPERTY_JOB_REF = "jobRef";
     public static final String PROPERTY_JOB_OBJECT = "jobObject";

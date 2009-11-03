@@ -41,7 +41,12 @@ public class EndpointPollingJobConfig extends AbstractJobConfig
         this.timeout = timeout;
     }
 
-    public Class getJobClass()
+    protected Class getStatefulJobClass()
+    {
+        return StatefulEndpointPollingJob.class;
+    }
+
+    protected Class getStatelessJobClass()
     {
         return EndpointPollingJob.class;
     }

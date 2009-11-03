@@ -18,6 +18,8 @@ import org.mule.transport.quartz.QuartzConnector;
  */
 public abstract class AbstractJobConfig implements JobConfig, MuleContextAware
 {
+    private boolean stateful = false;
+
     private String groupName = QuartzConnector.DEFAULT_GROUP_NAME;
 
     private String jobGroupName = QuartzConnector.DEFAULT_GROUP_NAME;
@@ -53,4 +55,24 @@ public abstract class AbstractJobConfig implements JobConfig, MuleContextAware
     {
         this.jobGroupName = jobGroupName;
     }
+
+    public boolean isStateful()
+    {
+        return stateful;
+    }
+
+    public void setStateful(boolean stateful)
+    {
+        this.stateful = stateful;
+    }
+
+    public final Class getJobClass()
+    {
+
+        return (isStateful() ? getStatefulJobClass() : getStatelessJobClass());
+    }
+
+    protected abstract Class getStatefulJobClass();
+    
+    protected abstract Class getStatelessJobClass();
 }

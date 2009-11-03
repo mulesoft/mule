@@ -12,7 +12,9 @@ package org.mule.transport.quartz.jobs;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.NullPayload;
@@ -99,7 +101,10 @@ public class EventGeneratorJob implements Job
                     payload = NullPayload.getInstance();
                 }
             }
-            receiver.routeMessage(new DefaultMuleMessage(receiver.getConnector().getMessageAdapter(payload), muleContext));
+            MuleMessage msg = new DefaultMuleMessage(receiver.getConnector().getMessageAdapter(payload), muleContext);
+            //If the job is stateful users cna store state in this map and have it available for the next job trigger
+            msg.setProperty(QuartzConnector.PROPERTY_JOB_DATA, jobExecutionContext.getJobDetail().getJobDataMap(), PropertyScope.INVOCATION);
+            receiver.routeMessage(msg);
         }
         catch (Exception e)
         {

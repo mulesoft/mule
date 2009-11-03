@@ -30,9 +30,13 @@ public class CustomJobConfig extends AbstractJobConfig
         this.job = job;
     }
 
-    public Class getJobClass()
+    protected Class getStatefulJobClass()
+    {
+        return StatefulCustomJob.class;
+    }
+
+    protected Class getStatelessJobClass()
     {
         return CustomJob.class;
     }
-
 }

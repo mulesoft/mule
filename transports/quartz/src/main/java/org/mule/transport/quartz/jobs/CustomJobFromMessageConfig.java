@@ -109,7 +109,12 @@ public class CustomJobFromMessageConfig extends AbstractJobConfig
         this.expression = expression;
     }
 
-    public Class getJobClass()
+    protected Class getStatefulJobClass()
+    {
+        return StatefulCustomJob.class;
+    }
+
+    protected Class getStatelessJobClass()
     {
         return CustomJob.class;
     }

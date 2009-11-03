@@ -9,8 +9,8 @@
  */
 package org.mule.transport.quartz.jobs;
 
-import org.mule.transport.quartz.config.AbstractJobConfig;
 import org.mule.transport.NullPayload;
+import org.mule.transport.quartz.config.AbstractJobConfig;
 
 
 /**
@@ -30,9 +30,13 @@ public class EventGeneratorJobConfig extends AbstractJobConfig
         this.payload = payload;
     }
 
-    public Class getJobClass()
+    protected Class getStatefulJobClass()
+    {
+        return StatefulEventGeneratorJob.class;
+    }
+
+    protected Class getStatelessJobClass()
     {
         return EventGeneratorJob.class;
     }
-
 }

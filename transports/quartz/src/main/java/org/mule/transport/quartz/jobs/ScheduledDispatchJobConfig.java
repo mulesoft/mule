@@ -30,7 +30,12 @@ public class ScheduledDispatchJobConfig extends AbstractJobConfig
         this.endpointRef = endpointRef;
     }
 
-    public Class getJobClass()
+    protected Class getStatefulJobClass()
+    {
+        return StatefulScheduledDispatchJob.class;
+    }
+
+    protected Class getStatelessJobClass()
     {
         return ScheduledDispatchJob.class;
     }

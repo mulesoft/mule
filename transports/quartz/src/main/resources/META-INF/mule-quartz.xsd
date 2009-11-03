@@ -122,6 +122,15 @@
                     <xsd:element ref="abstract-job" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attribute name="stateful" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Determines if the job is persistent. If so, the job detail state will be persisted for each
+                        request.  More importantly, each job triggered will execute sequentially. If the Job takes longer
+                        than the next trigger the next job will wait for the current job to execute.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
             </xsd:extension>
 
         </xsd:complexContent>
