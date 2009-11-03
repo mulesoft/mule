@@ -214,4 +214,9 @@ public class JndiObjectFactory implements ObjectFactory
     {
         return false;
     }
+
+    public boolean isAutoWireObject()
+    {
+        return true;
+    }
 }

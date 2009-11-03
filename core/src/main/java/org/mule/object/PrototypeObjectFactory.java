@@ -44,4 +44,9 @@ public class PrototypeObjectFactory extends AbstractObjectFactory
         super(objectClass, properties);
     }
 
+    public boolean isAutoWireObject()
+    {
+        return true;
+    }
+
 }

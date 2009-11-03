@@ -113,4 +113,10 @@ public class SpringBeanLookup extends AbstractObjectFactory implements Applicati
     {
         return true;
     }
+
+    public boolean isAutoWireObject()
+    {
+        //Spring does the wiring
+        return false;
+    }
 }

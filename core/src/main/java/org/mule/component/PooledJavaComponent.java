@@ -148,6 +148,11 @@ public class PooledJavaComponent extends AbstractJavaComponent
         {
             return objectFactory.isExternallyManagedLifecycle();
         }
+
+        public boolean isAutoWireObject()
+        {
+            return objectFactory.isAutoWireObject();
+        }
     }
 
 }

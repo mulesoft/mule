@@ -119,4 +119,8 @@ public class SingletonObjectFactory extends AbstractObjectFactory
         return true;
     }
 
+    public boolean isAutoWireObject()
+    {
+        return true;
+    }
 }

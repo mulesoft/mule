@@ -80,4 +80,9 @@ public class DummyInitialContextFactory implements ObjectFactory
     {
         return false;
     }
+
+    public boolean isAutoWireObject()
+    {
+        return false;
+    }
 }

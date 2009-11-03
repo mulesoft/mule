@@ -126,9 +126,9 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
                 ((ServiceAware)object).setService(getService());
             }
             
-            if(!objectFactory.isExternallyManagedLifecycle())
+            if(objectFactory.isAutoWireObject())
             {
-                //Apply processors, object lifecycle is handled by this adapter
+                //Apply processors, these will inject dependencies
                 muleContext.getRegistry().applyProcessors(object);
             }
         }

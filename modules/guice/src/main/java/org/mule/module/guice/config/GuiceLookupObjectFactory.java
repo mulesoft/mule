@@ -91,4 +91,10 @@ public class GuiceLookupObjectFactory extends AbstractObjectFactory implements M
         //Guice doesn't provide lifecycle hooks
         return false;
     }
+
+    public boolean isAutoWireObject()
+    {
+        //Guice does the wiring
+        return false;
+    }
 }

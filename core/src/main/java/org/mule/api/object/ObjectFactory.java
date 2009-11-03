@@ -47,6 +47,14 @@ public interface ObjectFactory extends Initialisable, Disposable
      * instance.
      */
     boolean isExternallyManagedLifecycle();
+
+    /**
+     * Return true if the created object should get its dependencies wired from the registry automatically.  Typically
+     * Mule object factories would return true for this value, objects managed by DI container such as Spring should
+     * set this to false.
+     * @return
+     */
+    boolean isAutoWireObject();
     
     /**
      * Register a custom initialiser

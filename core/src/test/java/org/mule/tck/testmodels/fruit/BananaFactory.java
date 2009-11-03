@@ -53,4 +53,9 @@ public class BananaFactory implements ObjectFactory
     {
         return false;
     }
+
+    public boolean isAutoWireObject()
+    {
+        return false;
+    }
 }
