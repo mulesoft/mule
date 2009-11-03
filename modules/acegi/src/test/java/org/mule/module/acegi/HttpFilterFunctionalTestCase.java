@@ -38,7 +38,11 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(get);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertEquals("/index.html", get.getResponseBodyAsString());
+            assertEquals(
+                "Registered authentication is set to org.mule.module.acegi.filters.http.HttpBasicAuthenticationFilter "
+                                + "but there was no security context on the session. Authentication denied on endpoint "
+                                + "http://localhost:4567. Message payload is of type: String",
+                get.getResponseBodyAsString());
         }
         finally
         {
