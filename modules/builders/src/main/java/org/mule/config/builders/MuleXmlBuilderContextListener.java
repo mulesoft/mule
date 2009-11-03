@@ -54,7 +54,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
      */
     public static final String INIT_PARAMETER_MULE_CONFIG = "org.mule.config";
 
-    private MuleContext muleContext;
+    protected MuleContext muleContext;
 
     protected transient final Log logger = LogFactory.getLog(MuleXmlBuilderContextListener.class);
 

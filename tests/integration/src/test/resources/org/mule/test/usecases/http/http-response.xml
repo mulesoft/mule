@@ -33,5 +33,25 @@
             </inbound>
             <echo-component/>
         </service>
+        
+        <service name="HttpWithChunking">
+            <inbound>
+                <inbound-endpoint address="http://localhost:8988" synchronous="true">
+                    <response-transformers>
+                        <message-properties-transformer>
+                            <add-message-property key="Transfer-Encoding" value="chunked"/>
+                        </message-properties-transformer>
+                    </response-transformers>
+                </inbound-endpoint>
+            </inbound>
+            <echo-component/>
+        </service>
+        
+        <service name="HttpWithNoChunking">
+            <inbound>
+                <inbound-endpoint address="http://localhost:8987" synchronous="true"/>
+            </inbound>
+            <echo-component/>
+        </service>
     </model>
 </mule>

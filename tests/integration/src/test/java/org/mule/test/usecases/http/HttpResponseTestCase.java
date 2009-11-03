@@ -16,6 +16,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 
 public class HttpResponseTestCase extends FunctionalTestCase
 {
@@ -52,4 +53,29 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertFalse(reply.getPayload() instanceof NullPayload);
         assertEquals("test", reply.getPayloadAsString());
     }
+    
+    /**
+     * See MULE-4522
+     * @throws Exception
+     */
+    public void testChunkingContentLength() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        MuleMessage reply = client.send("http://localhost:8988", new DefaultMuleMessage("test"));
+        assertNotNull(reply.getPayload());
+        assertFalse(reply.getPayload() instanceof NullPayload);
+        assertEquals("chunked", reply.getStringProperty(HttpConstants.HEADER_TRANSFER_ENCODING, null));
+        assertNull(reply.getStringProperty(HttpConstants.HEADER_CONTENT_LENGTH, null));
+    }
+
+    public void testNoChunkingContentLength() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        MuleMessage reply = client.send("http://localhost:8987", new DefaultMuleMessage("test"));
+        assertNotNull(reply.getPayload());
+        assertFalse(reply.getPayload() instanceof NullPayload);
+        assertNotSame("chunked", reply.getStringProperty(HttpConstants.HEADER_TRANSFER_ENCODING, null));
+        assertNotNull(reply.getStringProperty(HttpConstants.HEADER_CONTENT_LENGTH, null));
+    }
+    
 }

@@ -314,7 +314,10 @@ public class HttpResponse
         {
             setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE));
         }
-        setHeader(new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(raw.length)));
+        if (!containsHeader(HttpConstants.HEADER_TRANSFER_ENCODING))
+        {
+            setHeader(new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(raw.length)));
+        }        
         
         this.outputHandler = new OutputHandler() {
 
