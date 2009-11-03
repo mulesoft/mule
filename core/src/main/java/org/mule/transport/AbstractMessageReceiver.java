@@ -337,6 +337,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
                             SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
                     handleException(e);
                     resultMessage = RequestContext.getEvent().getMessage();
+                    resultMessage.setPayload(e.getLocalizedMessage());
                 }
             }
             else

@@ -60,7 +60,11 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(get);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertEquals("/services/Echo", get.getResponseBodyAsString());
+            assertEquals(
+                "Registered authentication is set to org.mule.module.acegi.filters.http.HttpBasicAuthenticationFilter "
+                                + "but there was no security context on the session. Authentication denied on "
+                                + "endpoint http://localhost:60443/services/Echo. Message payload is of type: "
+                                + "String", get.getResponseBodyAsString());
         }
         finally
         {
@@ -83,8 +87,11 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(post);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            // TODO MULE-4561 Why do we return request and not an error?
-            assertEquals(soapRequest, post.getResponseBodyAsString());
+            assertEquals(
+                "Registered authentication is set to org.mule.module.acegi.filters.http.HttpBasicAuthenticationFilter "
+                                + "but there was no security context on the session. Authentication denied on "
+                                + "endpoint http://localhost:60443/services/Echo. Message payload is of type: "
+                                + "ContentLengthInputStream",   post.getResponseBodyAsString());
         }
         finally
         {
@@ -207,7 +214,6 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(post);
             assertEquals(result, status);
-            // TODO MULE-4561 Why do we return request and not an error?
             assertNotNull(post.getResponseBodyAsString());
         }
         finally

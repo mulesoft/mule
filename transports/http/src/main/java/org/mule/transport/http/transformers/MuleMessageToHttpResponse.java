@@ -72,11 +72,6 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
     public Object transform(MuleMessage msg, String outputEncoding) throws TransformerException
     {
         Object src = msg.getPayload();
-        // Send back the exception payload if one has been set
-        if (msg.getExceptionPayload() != null)
-        {
-            // src = context.getMessage().getExceptionPayload();
-        }
 
         // Note this transformer excepts Null as we must always return a result
         // from the Http
