@@ -15,9 +15,9 @@ package org.mule.api.registry;
  */
 public interface RegistryBroker extends Registry
 {
-    void addRegistry(long id, Registry registry);
+    void addRegistry(Registry registry);
 
-    void removeRegistry(long id);
+    void removeRegistry(Registry registry);
 }
 
 

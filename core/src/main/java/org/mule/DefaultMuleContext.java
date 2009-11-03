@@ -615,18 +615,6 @@ public class DefaultMuleContext implements MuleContext
         return (ThreadingProfile) getRegistry().lookupObject(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE);
     }
 
-    // TODO This should ideally only be available via an Admin interface
-    public void addRegistry(long id, Registry registry)
-    {
-        registryBroker.addRegistry(id, registry);
-    }
-
-    // TODO This should ideally only be available via an Admin interface
-    public void removeRegistry(long id)
-    {
-        registryBroker.removeRegistry(id);
-    }
-
     /**
      * Returns the long date when the server was started
      *
@@ -646,5 +634,15 @@ public class DefaultMuleContext implements MuleContext
     public ExpressionManager getExpressionManager()
     {
         return expressionManager;
+    }
+
+    public void addRegistry(Registry registry)
+    {
+        registryBroker.addRegistry(registry);
+    }
+
+    public void removeRegistry(Registry registry)
+    {
+        registryBroker.removeRegistry(registry);
     }
 }

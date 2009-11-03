@@ -191,11 +191,11 @@ public interface MuleContext extends Lifecycle
     ThreadingProfile getDefaultThreadingProfile();
 
     // TODO This should ideally only be available via an Admin interface
-    void addRegistry(long id, Registry registry);
+    void addRegistry(Registry registry);
 
     // TODO This should ideally only be available via an Admin interface
-    void removeRegistry(long id);
-
+    void removeRegistry(Registry registry);
+    
     /**
      * Returns the date when the server was started.
      * @return the date when the server was started.

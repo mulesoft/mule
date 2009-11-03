@@ -13,34 +13,19 @@ package org.mule.registry;
 import org.mule.api.MuleContext;
 import org.mule.api.registry.Registry;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 
 public class DefaultRegistryBroker extends AbstractRegistryBroker
 {
     private TransientRegistry transientRegistry;
-
-    private Map<Long, Registry> registries = new TreeMap<Long, Registry>(new Comparator<Long>(){
-        public int compare(Long o1, Long o2)
-        {
-            if(o1.longValue() < o2.longValue())
-            {
-                return -1;
-            }
-            else if(o1.longValue() > o2.longValue())
-            {
-                return 1;
-            }
-            return 0;
-        }
-    });
+    private List<Registry> registries = new ArrayList<Registry>();
 
     public DefaultRegistryBroker(MuleContext context)
     {
         transientRegistry = new TransientRegistry(context);
-        addRegistry(-1, transientRegistry);
+        registries.add(0, new TransientRegistry(context));
     }
 
     TransientRegistry getTransientRegistry()
@@ -48,18 +33,18 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker
         return transientRegistry;
     }
 
-    public void addRegistry(long id, Registry registry)
+    public void addRegistry(Registry registry)
     {
-        registries.put(new Long(id), registry);
+        registries.add(registry);
     }
 
-    public void removeRegistry(long id)
+    public void removeRegistry(Registry registry)
     {
-        registries.remove(new Long(id));
+        registries.remove(registry);
     }
 
     protected Collection<Registry> getRegistries()
     {
-        return registries.values();
+        return registries;
     }
 }
